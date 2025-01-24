@@ -220,7 +220,7 @@
                     
                     var emailDropdownList='';
                     data.all_emails.forEach(function(item){
-                        emailDropdownList+='<option value="'+item+'">'+item+'</option>';
+                        emailDropdownList+='<option value="'+item.id+'">'+item.email+'</option>';
                         
                     });
                     $("#reminder_email").html(emailDropdownList);

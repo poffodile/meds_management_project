@@ -565,10 +565,9 @@
         } else if (document.getElementById('nav-profile').classList.contains('active')) {
             formTypeInput.value = 'timer_form';
         }
-        var url ='{{$saveButtonUrl}}';
         $.ajax({
                 type: "POST",
-                url: url,
+                url: "{{url('/purchase_order_new_task_save')}}",
                 data: new FormData($("#{{$formId}}")[0]),
                 async: false,
                 contentType: false,

@@ -20,7 +20,7 @@ use App\Models\Job_title;
 use App\Models\Job_recurring;
 use App\Models\Customer_type;
 use App\Models\Product_category;
-use App\Models\Constructor_region;
+// use App\Models\Constructor_region;
 use App\Models\Quote_product_detail;
 use App\Models\Workflow_notification;
 use App\Models\Construction_tax_rate;
@@ -35,9 +35,10 @@ use App\Models\Construction_job_appointment_type;
 use App\Models\Construction_product_supplier_list;
 use App\Models\construction_appointment_rejection_category;
 use App\Models\Region;
-use App\Models\LogHistory;
+// use App\Models\LogHistory;
 use App\Models\Tag;
-use DB,Auth,Session,Validator;
+use DB,Session,Validator;
+use Illuminate\Support\Facades\Auth;
 
 class JobController extends Controller
 {
@@ -619,7 +620,7 @@ class JobController extends Controller
         $data['home_id']=$home_id;
         $data['users']=User::all();
         // echo "<pre>";print_r($data['users']);die;
-        return view('frontEnd.salesAndFinance.jobs.job_appointment_type',$data);
+        return view('frontEnd.salesAndFinance.jobs.job_appointment_type', $data);
     }
     public function job_type_appointment_save(Request $request){
         // echo "<pre>";print_r($request->all());die;
@@ -1534,5 +1535,15 @@ class JobController extends Controller
             ';
         // return $data;
         echo $data;
+    }
+
+    public function getActiveJobAppointment(){
+        $data = Construction_job_appointment_type::where('home_id', Auth::user()->home_id)->select('id', 'name')->where('status', 1)->where('deleted_at', null)->get();    
+        
+        return response()->json([
+            'success' => (bool) $data,
+            'data' => $data ? $data : 'No Data'
+        ]);
+
     }
 }

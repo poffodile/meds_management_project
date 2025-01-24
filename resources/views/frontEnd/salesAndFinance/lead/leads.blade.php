@@ -107,20 +107,20 @@
                     </div>
                     <!-- Ram 15/10/2024 here code for bulk delete -->
                     <div class="markendDelete">
-                            <div class="row">
-                                <div class="col-md-7">
-                                    <div class="jobsection">
-                                        <a href="javascript:void(0)" id="deleteSelectedRows" class="profileDrop">Delete</a>
-                                        <!-- <a href="#" class="profileDrop">Mark As completed</a> -->
-                                    </div>
+                        <div class="row">
+                            <div class="col-md-7">
+                                <div class="jobsection">
+                                    <a href="javascript:void(0)" id="deleteSelectedRows" class="profileDrop">Delete</a>
+                                    <!-- <a href="#" class="profileDrop">Mark As completed</a> -->
                                 </div>
-                                <div class="col-md-5">
-                                    <div class="pageTitleBtn p-0">
-                                        <!-- <a href="#" class="profileDrop"> <i class="material-symbols-outlined"> settings </i></a> -->
-                                    </div>
+                            </div>
+                            <div class="col-md-5">
+                                <div class="pageTitleBtn p-0">
+                                    <!-- <a href="#" class="profileDrop"> <i class="material-symbols-outlined"> settings </i></a> -->
                                 </div>
                             </div>
                         </div>
+                    </div>
                     <!-- end here -->
                     <table id="exampleOne" class="display tablechange" cellspacing="0" width="100%">
                         <thead>
@@ -150,9 +150,9 @@
                             @php
                             $authorizationText = '';
                             if ($customer->status_id == 7) {
-                            if ($customer->authorization_status == 1) {
+                            if ($customer->authorization_status === 1) {
                             $authorizationText = 'Waiting for Authorization';
-                            } elseif ($customer->authorization_status == 2) {
+                            } elseif ($customer->authorization_status === 2) {
                             $authorizationText = 'Authorized';
                             } else {
                             $authorizationText = 'none';
@@ -170,7 +170,7 @@
                                 <td>{{ $customer->telephone }}</td>
                                 <td>{{ $customer->mobile }}</td>
                                 <td>{{ App\User::getLeadAssignUserName($customer->assign_to) }}</td>
-                                <td>{{ $customer->status }}</td>
+                                <td>{{ $customer->status_id == 7 ? $authorizationText : $customer->status }}</td>
                                 <td>{{ $customer->website }}</td>
                                 <td>{{ $customer->address }}</td>
                                 <td>{{ $customer->city }}</td>
@@ -189,7 +189,7 @@
                                                 <a href="#" class="dropdown-item set_value_on_CRM_model" data-user-id="{{ $customer->id }}" data-ref="{{ $customer->lead_ref }}" data-contact-name="{{ $customer->contact_name }}" data-email="{{ $customer->email }}" data-name="{{ $customer->name }}" data-status="{{ $customer->status }}" data-telephone="{{ $customer->telephone }}" class="dropdown-item">CRM History</a>
                                                 <a href="#" class="dropdown-item open-modal" data-lead_ref="{{ $customer->lead_ref }}" data-bs-toggle="modal" data-bs-target="#rejectModal">Reject</a>
                                                 <a href="{{ url('/leads/authorization').'/'.$customer->id }}" class="dropdown-item">Send for Authorization</a>
-                                                <a href="#" class="dropdown-item">Send to Quote</a>
+                                                <a href="javaScript:void(0)" onclick="openSentQuoteModal('{{ $customer->lead_ref }}')" class="dropdown-item">Send to Quote</a>
                                                 <a href="#" class="dropdown-item">Send to Job</a>
                                                 <a href="#" class="dropdown-item">Convert to Customer Only</a>
                                             </div>
@@ -1623,6 +1623,48 @@
 </div>
 <!-- CRM Types Modal Complaint End -->
 <!-- CRM Add compliants Modal End -->
+
+
+
+<div class="modal fade" id="sentToQuoteModal" tabindex="1" aria-labelledby="exampleModalLabel2" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel2"> Notify Leads </h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="lead_reject_type_form_edit">
+                    @csrf
+                    <div class="mb-3">
+                        <label for="recipient-name" class="col-form-label"> <h5>Would you like to notify anyone that this lead <span id="sentQuote"></span> has been converted?</h5></label>
+                    </div>
+                    <div class="mb-3">
+                        <label for="recipient-name" class="col-form-label">Notify </label>
+                        <input type="radio" class="form-control editInput" name="title" id="recipient-name">
+                        <input type="radio" class="form-control editInput" name="title" id="recipient-name">
+                    </div>
+                    <div class="mb-3">
+                        <label for="recipient-name" class="col-form-label">Notify Who ?</label>
+                        <input type="text" class="form-control editInput" name="title" id="recipient-name">
+                    </div>
+                    <div class="mb-3">
+                        <label for="message-text" class="col-form-label">Status:</label>
+                        <input type="radio" class="form-control editInput" name="Notification" id="recipient-name">
+                        <input type="radio" class="form-control editInput" name="sms" id="recipient-name">
+                        <input type="radio" class="form-control editInput" name="Email" id="recipient-name">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="profileDrop" data-bs-dismiss="modal">Close</button>
+                <button type="button" id="lead_reject" class="profileDrop">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 
 <!-- Moment js CDN -->
 <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
@@ -3143,50 +3185,64 @@
         });
 </script>
 <!-- Email CK Editor End -->
- <!-- Ram 15/10/2024 code for bulk delete -->
+<!-- Ram 15/10/2024 code for bulk delete -->
 <script>
-   $("#deleteSelectedRows").on('click', function() {
-    let ids = [];
-    
-    $('.delete_checkbox:checked').each(function() {
-        ids.push($(this).val());
-    });
-    if(ids.length == 0){
-        alert("Please check the checkbox for delete");
-    }else{
-        if(confirm("Are you sure to delete?")){
-            // console.log(ids);
-            var token='<?php echo csrf_token();?>'
-            var model='Lead';
-            $.ajax({
-                type: "POST",
-                url: "{{url('/bulk_delete')}}",
-                data: {ids:ids,model:model,_token:token},
-                success: function(data) {
-                    console.log(data);
-                    if(data){
-                        location.reload();
-                    }else{
-                        alert("Something went wrong");
+    $("#deleteSelectedRows").on('click', function() {
+        let ids = [];
+
+        $('.delete_checkbox:checked').each(function() {
+            ids.push($(this).val());
+        });
+        if (ids.length == 0) {
+            alert("Please check the checkbox for delete");
+        } else {
+            if (confirm("Are you sure to delete?")) {
+                // console.log(ids);
+                var token = '<?php echo csrf_token(); ?>'
+                var model = 'Lead';
+                $.ajax({
+                    type: "POST",
+                    url: "{{url('/bulk_delete')}}",
+                    data: {
+                        ids: ids,
+                        model: model,
+                        _token: token
+                    },
+                    success: function(data) {
+                        console.log(data);
+                        if (data) {
+                            // location.reload();
+                        } else {
+                            alert("Something went wrong");
+                        }
+                        // return false;
+                    },
+                    error: function(xhr, status, error) {
+                        var errorMessage = xhr.status + ': ' + xhr.statusText;
+                        alert('Error - ' + errorMessage + "\nMessage: " + xhr.responseJSON.message);
                     }
-                    // return false;
-                },
-                error: function(xhr, status, error) {
-                   var errorMessage = xhr.status + ': ' + xhr.statusText;
-                    alert('Error - ' + errorMessage + "\nMessage: " + xhr.responseJSON.message);
-                }
-            });
+                });
+            }
         }
+
+    });
+
+    function openSentQuoteModal(lead_ref){
+        document.getElementById('sentQuote').textContent = lead_ref;
+        $('#sentToQuoteModal').modal('show');
     }
-    
-});
-$('.delete_checkbox').on('click', function() {
-    if ($('.delete_checkbox:checked').length === $('.delete_checkbox').length) {
-        $('#selectAll').prop('checked', true);
-    } else {
-        $('#selectAll').prop('checked', false);
-    }
-});
- </script>
- <!-- end here -->
+
+    // $('#openSentQuoteModal').on('click', function(){
+    //     document.getElementById('sentQuote').value = ;
+    //     $('#sentToQuoteModal').modal('show');
+    // });
+    $('.delete_checkbox').on('click', function() {
+        if ($('.delete_checkbox:checked').length === $('.delete_checkbox').length) {
+            $('#selectAll').prop('checked', true);
+        } else {
+            $('#selectAll').prop('checked', false);
+        }
+    });
+</script>
+<!-- end here -->
 @include('frontEnd.salesAndFinance.jobs.layout.footer')

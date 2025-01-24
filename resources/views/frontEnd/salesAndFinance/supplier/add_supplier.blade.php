@@ -547,10 +547,10 @@
                 var paginationControls = $("#attachments-pagination-controls");
                 paginationControls.empty();
                 if (pagination.prev_page_url) {
-                    paginationControls.append('<button class="profileDrop" onclick="getAllSupplierAttachmentList(\'' + pagination.prev_page_url + '\')">Previous</button>');
+                    paginationControls.append('<button type="button" class="profileDrop" onclick="getAllSupplierAttachmentList(\'' + pagination.prev_page_url + '\')">Previous</button>');
                 }
                 if (pagination.next_page_url) {
-                    paginationControls.append('<button class="profileDrop" onclick="getAllSupplierAttachmentList( \'' + pagination.next_page_url + '\')">Next</button>');
+                    paginationControls.append('<button type="button" class="profileDrop" onclick="getAllSupplierAttachmentList( \'' + pagination.next_page_url + '\')">Next</button>');
                 }
             
             },
@@ -679,10 +679,10 @@
                 var paginationControlsContact = $("#pagination-controls-supplier-contact");
                 paginationControlsContact.empty();
                 if (paginationContact.prev_page_url) {
-                    paginationControlsContact.append('<button class="profileDrop" onclick="populateDataInTable(2,' + id + ', \'' + paginationContact.prev_page_url + '\')">Previous</button>');
+                    paginationControlsContact.append('<button type="button" class="profileDrop" onclick="populateDataInTable(2,' + id + ', \'' + paginationContact.prev_page_url + '\')">Previous</button>');
                 }
                 if (paginationContact.next_page_url) {
-                    paginationControlsContact.append('<button class="profileDrop" onclick="populateDataInTable(2,' + id + ', \'' + paginationContact.next_page_url + '\')">Next</button>');
+                    paginationControlsContact.append('<button type="button" class="profileDrop" onclick="populateDataInTable(2,' + id + ', \'' + paginationContact.next_page_url + '\')">Next</button>');
                 }
             },
             error: function(xhr, status, error) {
@@ -734,10 +734,10 @@
                 var paginationControlsPurchaseOrder = $("#pagination-controls-supplier-purchaseOrder");
                 paginationControlsPurchaseOrder.empty();
                 if (paginationPurchaseOrder.prev_page_url) {
-                    paginationControlsPurchaseOrder.append('<button class="profileDrop" onclick="getpurchaseorder(' + supplier_id + ', \'' + paginationContact.prev_page_url + '\')">Previous</button>');
+                    paginationControlsPurchaseOrder.append('<button type="button" class="profileDrop" onclick="getpurchaseorder(' + supplier_id + ', \'' + paginationContact.prev_page_url + '\')">Previous</button>');
                 }
                 if (paginationPurchaseOrder.next_page_url) {
-                    paginationControlsPurchaseOrder.append('<button class="profileDrop" onclick="getpurchaseorder(' + supplier_id + ', \'' + paginationContact.next_page_url + '\')">Next</button>');
+                    paginationControlsPurchaseOrder.append('<button type="button" class="profileDrop" onclick="getpurchaseorder(' + supplier_id + ', \'' + paginationContact.next_page_url + '\')">Next</button>');
                 }
             },
             error: function(xhr, status, error) {

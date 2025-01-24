@@ -1,5 +1,17 @@
 @include('frontEnd.salesAndFinance.jobs.layout.header')
 
+
+
+<style>
+    .maimTable.draftTable .dataTables_wrapper .dataTables_length, .maimTable.draftTable .dataTables_info, .maimTable.draftTable .paging_simple_numbers {
+    display: none;
+}
+tfoot.draftFoot tr th {
+    font-size: 12px;
+}
+</style>
+
+
 <section class="main_section_page px-3">
     <div class="container-fluid">
         <div class="row">
@@ -19,7 +31,7 @@
 
         <di class="row">
             <div class="col-lg-12">
-                <div class="maimTable">
+                <div class="maimTable draftTable">
                     <div class="printExpt">
                         <div class="prntExpbtn">
                             <a href="#!">Print</a>
@@ -232,102 +244,97 @@
                                 </tr>
                             </thead>
 
-                            <tbody>
-                                @php
-                                $subTotal = 0;
-                                $vat = 0;
-                                $total = 0;
-                                $deposit = 0;
-                                $outstanding = 0;
-                                $profit = 0;
-                                @endphp
-                                @if(!empty($quotes))
-                                @foreach($quotes as $value)
-                                @php
-                                $subTotal += $value->sub_total ?? 0;
-                                $vat += $value->vat_amount ?? 0;
-                                $total += $value->total ?? 0;
-                                $deposit += $value->deposit ?? 0;
-                                $outstanding += $value->outstanding ?? 0;
-                                $profit += $value->profit ?? 0;
-                                @endphp
-                                <tr>
-                                    <td></td>
-                                    <td>{{ $loop->iteration }}</td>
-                                    <td>{{ $value->quote_ref ?? '-'}}</td>
-                                    <td>{{ $value->quota_date }}</td>
-                                    <td>{{ $value->customer->name ?? '-' }}</td>
-                                    <td>{{ $value->customer_address }}</td>
-                                    <td>1</td>
-                                    <td>{{ $value->sub_total > 0 ? '£' . $value->sub_total : '-' }}</td>
-                                    <td>{{ $value->vat_amount > 0 ? '£' . $value->vat_amount : '-' }}</td>
-                                    <td>{{ $value->total > 0 ? '£' . $value->total : '-' }}</td>
-                                    <td>{{ $value->deposit > 0 ? '£' . $value->deposit : '-'}}</td>
-                                    <td>{{ $value->outstanding > 0 ? '£' . $value->outstanding : '-' }}</td>
-                                    <td>{{ $value->profit > 0 ? '£' . $value->profit : '-' }}</td>
-                                    @php
-                                    if ($lastSegment == "accepted"){
-                                    @endphp
-                                    <td>{{ $value->status }}</td>
-                                    @php
-                                    }
-                                    @endphp
-                                    <td>
-                                        <div class="d-flex justify-content-end actionDropdown">
-                                            <div class="nav-item dropdown">
-                                                <a href="#" class="nav-link dropdown-toggle profileDrop" data-bs-toggle="dropdown">
-                                                    Action
-                                                </a>
-                                                <div class="dropdown-menu fade-up m-0">
-                                                    <a href="#" class="dropdown-item">Send SMS</a>
-                                                    <a href="{{ url('/quote/edit').'/'.$value->id }}" class="dropdown-item">Edit</a>
-                                                    <a href="" class="dropdown-item">Preview</a>
-                                                    <a href="" class="dropdown-item">Print</a>
-                                                    <a href="" class="dropdown-item">Email</a>
-                                                    <a href="" class="dropdown-item">Convert To Recurring Quote </a>
-                                                    <a href="" class="dropdown-item">Convert To New Job</a>
-                                                    <a href="" class="dropdown-item">Convert To Recurring Job</a>
-                                                    <a href="" class="dropdown-item">Convert To Invoice</a>
-
-                                                    <hr class="dropdown-divider">
-                                                    <a href="javaScript:void(0);" onclick="statusChange('{{ $value->id }}', 'Processed')" class="dropdown-item">Change To Processed</a>
-                                                    <a href="javaScript:void(0)" onclick="openCallBackModal()" id="changeToCallBack" data-id="{{ $value->id }}" data-quote_ref="{{ $value->quote_ref }}" class="dropdown-item">Change To Call Back</a>
-                                                    <a href="javaScript:void(0);" onclick="statusChange('{{ $value->id }}', 'Accepted')" data-id="{{ $value->id }}" class="dropdown-item">Change To Accepted</a>
-                                                    <a href="javaScript:void(0);" class="dropdown-item" onclick="openRejectModal('{{ $value->quote_ref }}', '{{ $value->id}}');">Change To Rejected</a>
-                                                    <hr class="dropdown-divider">
-
-                                                    <a href="#" class="dropdown-item set_value_on_CRM_model" class="dropdown-item">CRM History</a>
-                                                    <a href="#" class="dropdown-item">Start Timer</a>
-                                                </div>
+                        <tbody>
+                            @php
+                            $subTotal = 0;
+                            $vat = 0;
+                            $total = 0;
+                            $deposit = 0;
+                            $outstanding = 0;
+                            $profit = 0;
+                            @endphp
+                            @if(!empty($quotes))
+                            @foreach($quotes as $value)
+                            @php
+                            $subTotal += $value->sub_total ?? 0;
+                            $vat += $value->vat_amount ?? 0;
+                            $total += $value->total ?? 0;
+                            $deposit += $value->deposit ?? 0;
+                            $outstanding += $value->outstanding ?? 0;
+                            $profit += $value->profit ?? 0;
+                            @endphp
+                            <tr>
+                                <td></td>
+                                <td>{{ $loop->iteration }}</td>
+                                <td>{{ $value->quote_ref ?? '-'}}</td>
+                                <td>{{ $value->quota_date }}</td>
+                                <td>{{ $value->customer->name ?? '' }}</td>
+                                <td>{{ $value->customer_address }}</td>
+                                <td>1</td>
+                                <td>£{{ $value->sub_total ?? '0.00' }}</td>
+                                <td>£{{ $value->vat_amount ?? '0.00'}}</td>
+                                <td>£{{ $value->total ?? '0.00'}}</td>
+                                <td>£{{ $value->deposit ??  '0.00'}}</td>
+                                <td>£{{ $value->outstanding ?? '0.00' }}</td>
+                                <td>£{{ $value->profit ?? '0.00' }}</td>
+                                <td>
+                                    <div class="d-inline-flex align-items-center ">
+                                        <div class="nav-item dropdown">
+                                            <a href="#" class="nav-link dropdown-toggle profileDrop" data-bs-toggle="dropdown">Action</a>
+                                            <div class="dropdown-menu fade-up m-0">
+                                                <a href="#" class="dropdown-item">Send SMS</a>
+                                                <a href="{{ url('/quote/edit').'/'.$value->id }}" class="dropdown-item">Edit</a>
+                                                <hr class="dropdown-divider">
+                                                <a href="" class="dropdown-item">Preview</a>
+                                                <hr class="dropdown-divider">
+                                                <a href="" class="dropdown-item">Print</a>
+                                                <a href="" class="dropdown-item">Email</a>
+                                                <hr class="dropdown-divider">
+                                                <a href="" class="dropdown-item">Convert To Recurring Quote </a>
+                                                <hr class="dropdown-divider">
+                                                <a href="" class="dropdown-item">Convert To New Job</a>
+                                                <hr class="dropdown-divider">
+                                                <a href="" class="dropdown-item">Convert To Recurring Job</a>
+                                                <hr class="dropdown-divider">
+                                                <a href="" class="dropdown-item">Convert To Invoice</a>
+                                                <hr class="dropdown-divider">
+                                                <a href="" class="dropdown-item">Change To Processed</a>
+                                                <a href="" class="dropdown-item">Change To Call Back</a>
+                                                <a href="" class="dropdown-item">Change To Accepted</a>
+                                                <a href="" class="dropdown-item">Change To Rejected</a>
+                                                <hr class="dropdown-divider">
+                                                <a href="#" class="dropdown-item set_value_on_CRM_model" class="dropdown-item">CRM History</a>
+                                                <hr class="dropdown-divider">
+                                                <a href="#" class="dropdown-item">Start Timer</a>
                                             </div>
                                         </div>
-                                    </td>
-                                </tr>
-                                @endforeach
-                                @else
-                                <tr>
-                                    <td></td>
-                                    <td colspan="12">
-                                        <label class="red_sorryText"> Sorry, there are no items available.. </label>
-                                    </td>
-                                </tr>
-                                @endif
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <th></th>
-                                    <th colspan="6">Page Sub Total</th>
-                                    <th>{{ number_format($subTotal, 2) > 0 ? '£' . number_format($subTotal, 2) : '-' }}</th>
-                                    <th>{{ number_format($vat, 2) > 0 ? '£' . number_format($vat, 2) : '-'  }}</th>
-                                    <th>{{ number_format($total, 2) > 0 ? '£' . number_format($total, 2) : '-'  }}</th>
-                                    <th>{{ number_format($deposit, 2) > 0 ? '£' . number_format($deposit, 2) : '-'  }}</th>
-                                    <th>{{ number_format($outstanding, 2) > 0 ? '£' . number_format($outstanding, 2) : '-'  }}</th>
-                                    <th>{{ number_format($profit, 2) > 0 ? '£' . number_format($profit, 2) : '-' }}</th>
-                                    <th></th>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            @endforeach
+                            @else
+                            <tr>
+                                <td></td>
+                                <td colspan="12">
+                                    <label class="red_sorryText"> Sorry, there are no items available.. </label>
+                                </td>
+                            </tr>
+                            @endif
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td></td>
+                                <td colspan="6">Page Sub Total</td>
+                                <td>&#163;{{ number_format($subTotal, 2) }}</td>
+                                <td>&#163;{{ number_format($vat, 2) }}</td>
+                                <td>&#163;{{ number_format($total, 2) }}</td>
+                                <td>&#163;{{ number_format($deposit, 2) }}</td>
+                                <td>&#163;{{ number_format($outstanding, 2) }}</td>
+                                <td>&#163;{{ number_format($profit, 2) }}</td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
                 </div> <!-- End off main Table -->
             </div>
         </di>
@@ -389,7 +396,7 @@
             url: '{{ route("quote.ajax.statusChange") }}',
             method: 'PATCH',
             headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('cont ent')
             },
             data: {
                 quote_id: id,

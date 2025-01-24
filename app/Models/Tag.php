@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Log;
+
 
 class Tag extends Model
 {
@@ -19,5 +19,9 @@ class Tag extends Model
     public static function saveTag($data){
         return self::updateOrCreate(['id' => $data['id'] ?? null],$data);
     }
+
+    public static function getActivetags($home_id){
+        return self::where('status', 1)->whereNull('deleted_at')->where('home_id', $home_id)->orderBy('created_at', 'desc')->get();
+    } 
 
 }

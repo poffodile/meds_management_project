@@ -36,6 +36,9 @@ ul#purchase_qoute_refList {
     height: 156px;
     overflow: auto;
 }
+.unclicked{
+    pointer-events: none;
+}
 
 </style>
         <section class="main_section_page px-3">
@@ -43,7 +46,7 @@ ul#purchase_qoute_refList {
                 <div class="row">
                     <div class="col-md-4 col-lg-4 col-xl-4 ">
                         <div class="pageTitle">
-                            @if(isset($key) && $key !='')
+                            @if((isset($key) && $key !='') && (isset($duplicate) && $duplicate ==''))
                             <h3 class="header_text">{{$purchase_orders->purchase_order_ref}}</h3>
                             @else
                             <h3 class="header_text">New Purchase Order</h3>
@@ -71,7 +74,7 @@ ul#purchase_qoute_refList {
                                     <div class="formDtail">
                                         <h4 class="contTitle">Supplier Details</h4>
                                        @csrf
-                                        <input type="hidden" id="id" name="id" value="<?php if(isset($purchase_orders) && $purchase_orders !=''){echo $purchase_orders->id; }?>">
+                                        <input type="hidden" id="id" name="id" value="<?php if((isset($purchase_orders) && $purchase_orders !='') && (isset($duplicate) && $duplicate =='')){echo $purchase_orders->id; }?>">
                                             <div class="mb-3 row">
                                                 <label for="inputCustomer"
                                                     class="col-sm-3 col-form-label">Supplier<span class="radStar">*</span></label>
@@ -219,7 +222,7 @@ ul#purchase_qoute_refList {
                                             <div class="mb-3 row">
                                                 <label for="inputCustomer" class="col-sm-3 col-form-label">Site</label>
                                                 <div class="col-sm-7">
-                                                <select class="form-control editInput selectOptions get_site_result" id="purchase_site_id" name="site_id" <?php if(!isset($purchase_orders) && $purchase_orders ==''){echo 'disabled'; }?>>
+                                                <select class="form-control editInput selectOptions get_site_result" onchange="siteDetail()" id="purchase_site_id" name="site_id" <?php if(!isset($purchase_orders) && $purchase_orders ==''){echo 'disabled'; }?>>
                                                     <option selected disabled value="">None</option>
                                                     <option <?php if(isset($purchase_orders) && $purchase_orders->site_id == 0){echo 'selected';}?> value="0">Same as customer</option>
                                                     @foreach($site as $siteVal)
@@ -388,10 +391,10 @@ ul#purchase_qoute_refList {
                                             <div class="mb-2 row">
                                                     <label class="col-sm-3 col-form-label">Payment Terms</label>
                                                     <div class="col-sm-6">
-                                                        <select class="form-control editInput selectOptions" id="purchase_payment_terms" name="payment_terms">
-                                                            <option value="21">Default (21)
+                                                        <select class="form-control editInput selectOptions" id="purchase_payment_terms" name="payment_terms" onchange="updateDueDate()">
+                                                            
                                                             </option>
-                                                            <?php for($i=1;$i<21;$i++){?>
+                                                            <?php for($i=0;$i<=90;$i++){?>
                                                             <option value="{{$i}}" <?php if(isset($purchase_orders) && $purchase_orders->payment_terms == $i){echo 'selected';}?>>{{$i}}</option>
                                                             <?php }?>
                                                         </select>
@@ -401,7 +404,7 @@ ul#purchase_qoute_refList {
                                                             days</label>
                                                     </div>
 
-                                                </div>
+                                            </div>
                                             <div class="mb-3 row">
                                                 <label for="inputTelephone" class="col-sm-6 col-form-label">Payment Due Date</label>
                                                 <div class="col-sm-4">
@@ -444,6 +447,55 @@ ul#purchase_qoute_refList {
                                                         <i class="fa-solid fa-square-plus" onclick="get_modal(6)"></i></a>
                                                 </div>
                                             </div>
+                                            <div class="mb-3 row">
+                                                <label for="" class="col-sm-4 col-form-label">
+                                                    <a href="javascript:void(0)" onclick="openReminderModal(<?php if(isset($purchase_orders) && $purchase_orders !=''){echo $purchase_orders->id;}?>)" class="profileDrop"> <i class="fa fa-clock"></i> Set
+                                                        Riminder </a>
+                                                </label>
+
+                                            </div>
+                                            <div class="setRiminderTable" style="display:none">
+                                                <div class="productDetailTable">
+                                                    <table class="table" id="">
+                                                        <thead class="table-light">
+                                                            <tr>
+                                                                <th>Title </th>
+                                                                <th>Date </th>
+                                                                <th>Time</th>
+                                                                <th>Status </th>
+                                                                <th>Action</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="reminder_data">
+                                                            @foreach($reminder_data as $reminderVal)
+                                                            <tr>
+                                                                <td>{{$reminderVal->title}}</td>
+                                                                <td>{{$reminderVal->reminder_date}}</td>
+                                                                <td>{{$reminderVal->reminder_time}}</td>
+                                                                @if($reminderVal->status == 1)
+                                                                <td><span class="iconColrGreen">Sent</span></td>
+                                                                <td>
+                                                                    
+                                                                    <a href="javascript:void(0)" data-id="{{$reminderVal->id}}" data-title="{{$reminderVal->title}}" data-user_id="{{$reminderVal->user_id}}" data-reminder_date="{{$reminderVal->reminder_date}}" data-reminder_time="{{$reminderVal->reminder_time}}" data-notification="{{$reminderVal->notification}}" data-sms="{{$reminderVal->sms}}" data-email="{{$reminderVal->email}}" data-notes="{{$reminderVal->notes}}" data-icon="eye" class="fecth_data"><i class="material-symbols-outlined">
+                                                                        visibility
+                                                                    </i></a>
+                                                                    <a href="#!" class="iconColrGreen"><i class="material-symbols-outlined">
+                                                                        check_circle
+                                                                    </i></a>
+                                                                </td>
+                                                                @else
+                                                                <td><span class="iconColrRad">Pending</span></td>
+                                                                <td>
+                                                                    <a href="javascript:void(0)" class="iconColrGreen fecth_data" data-id="{{$reminderVal->id}}" data-title="{{$reminderVal->title}}" data-user_id="{{$reminderVal->user_id}}" data-reminder_date="{{$reminderVal->reminder_date}}" data-reminder_time="{{$reminderVal->reminder_time}}" data-notification="{{$reminderVal->notification}}" data-sms="{{$reminderVal->sms}}" data-email="{{$reminderVal->email}}" data-notes="{{$reminderVal->notes}}" data-icon="edit"><i class="material-symbols-outlined">edit</i></a>
+                                                                    <a href="javascript:void(0)" class="iconColrRad"><i class="material-symbols-outlined">close</i></a>
+                                                                </td>
+                                                                @endif
+                                                            </tr>
+                                                            @endforeach
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
 
                                         <!-- </form> -->
                                     </div>
@@ -472,7 +524,7 @@ ul#purchase_qoute_refList {
                                 </div>
                                 <div class="col-sm-3">
                                     <div class="pageTitleBtn p-0">
-                                        <a href="#" class="profileDrop">Add Title</a>
+                                        <!-- <a href="#" class="profileDrop">Add Title</a> -->
                                         <!-- <a href="#" class="profileDrop">Show Variations</a>
                                         <a href="#" class="profileDrop bg-secondary">Export</a> -->
 
@@ -589,18 +641,18 @@ ul#purchase_qoute_refList {
                                     <div class="col-sm-12 mb-3 mt-2">
                                         <div class="jobsection">
                                             <a href="javascript:void(0)" class="profileDrop" onclick="get_modal(10)">New Attachment</a>
-                                            @if(isset($key) && $key != '')
+                                            @if((isset($key) && $key !='') && (isset($duplicate) && $duplicate ==''))
                                             <a href="javascript:void(0)" id="deleteSelectedRows" class="profileDrop">Delete Attachment(s)</a>
                                             @endif
                                         </div>
                                     </div>
-                                    @if(isset($key) && $key != '')
+                                    @if((isset($key) && $key !='') && (isset($duplicate) && $duplicate ==''))
                                     <div class="col-sm-12">
                                         <div class="productDetailTable">
                                             <table class="table">
                                                 <thead class="table-light">
                                                     <tr>
-                                                        <th class="text-center" style=" width:60px;"><input type="checkbox" id="selectAll"> <label for="selectAll"></label></th>
+                                                        <th style=" width:30px;"><input type="checkbox" id="selectAll"> <label for="selectAll"></label></th>
                                                       
                                                         <th>Type</th>
                                                         <th>Title</th>
@@ -627,7 +679,7 @@ ul#purchase_qoute_refList {
                                 <div class="row">
                                     <div class="col-sm-12 mb-3 mt-2">
                                         <div class="jobsection">
-                                            <a href="javascript:void(0)" class="profileDrop @if(!isset($key) || $key == '') disabled-tab @endif" @if(!isset($key) || $key == '') disabled @else  onclick="get_modal(11)" @endif>New Task</a>
+                                            <a href="javascript:void(0)" class="profileDrop @if(!isset($key) || $key == '' || isset($duplicate) && $duplicate) disabled-tab @endif" @if(!isset($key) || $key == '' || isset($duplicate) && $duplicate) disabled @else  onclick="get_modal(11)" @endif>New Task</a>
 
                                         </div>
                                     </div>
@@ -770,12 +822,11 @@ ul#purchase_qoute_refList {
     taskNotesText="taskNotesText"
     modalLabelTitle="modal_label_title"
     saveButtonId="saveNewTask"
-    saveButtonUrl="{{url('/purchase_order_new_task_save')}}"
 />
 
 <x-vat-tax-rate 
     modalId="VatTaxRateModal"
-    modalTitle="Departmental Code - Add"
+    modalTitle="Add Tax Rate"
     formId="vattaxrateform"
     id="vattaxrate_id"
     name="vat_tax_name"
@@ -784,7 +835,23 @@ ul#purchase_qoute_refList {
     expDate="vat_tax_expdate"
     status="vat_tax_satatus"
     saveButtonId="saveVatTaxRate"
-    saveButtonUrl="{{ url('/save_tax_rate') }}"
+/>
+
+<x-add-reminder
+    reminderModalId="ReminderModal"
+    modalTitle="PO Reminder"
+    reminderformId="reminderform"
+    reminderId="reminder_id"
+    reminderDate="reminder_date"
+    reminderTime="reminder_time"
+    reminderUser="reminder_user"
+    hiddenForeignId="reminder_po_id"
+    reminderNotification="reminder_notification"
+    reminderEmail="reminder_email"
+    reminderSms="reminder_sms"
+    reminderTitle="reminder_title"
+    reminderNotes="reminder_notes"
+    saveButtonId="saveReminder"
 />
 
 <!-- End here -->
@@ -841,7 +908,7 @@ CKEDITOR.replace('purchase_internal_notes', editor_config );
                 _token: token
             },
             success: function(response) {
-                console.log(response);
+                // console.log(response);
                 const data=response.data;
                 $('#purchase_contact_id').removeAttr('disabled');
                 var contactSelect=document.getElementById("purchase_contact_id");
@@ -858,7 +925,7 @@ CKEDITOR.replace('purchase_internal_notes', editor_config );
                     url: '{{ route("ajax.getCountriesList") }}',
                     method: 'GET',
                     success: function(response1) {
-                        console.log(response1.Data);
+                        // console.log(response1.Data);
                         const selectElement=$("#purchase_telephone_code")[0];
                         const selectElement1=$("#purchase_mobile_code")[0];
                         selectElement.innerHTML = '';
@@ -920,6 +987,16 @@ CKEDITOR.replace('purchase_internal_notes', editor_config );
             }
         });
     }
+    var purchase_user_name='';
+    var purchase_company_name='';
+    var purchase_user_address='';
+    var purchase_user_city='';
+    var purchase_user_county='';
+    var purchase_user_post_code='';
+    var purchase_user_telephone_code;
+    var user_telephone='';
+    var purchase_user_mobile_code;
+    var purchase_user_mobile='';
     function get_customer_details() {
         var customer_id = $("#purchase_customer_id").val();
         var token = '<?php echo csrf_token(); ?>'
@@ -932,11 +1009,11 @@ CKEDITOR.replace('purchase_internal_notes', editor_config );
             },
             success: function(data) {
                 console.log(data);
+                // return false;
                 $('#purchase_project_id').removeAttr('disabled');
                 $('#purchase_site_id').removeAttr('disabled');
                 if (data.customers && data.customers.length > 0) {
                 var customerData = data.customers[0];
-                // Populate project options
                 var project = '<option value="0" selected disabled>None</option>';
                 if (customerData.customer_project && Array.isArray(customerData.customer_project)) {
                     for (let i = 0; i < customerData.customer_project.length; i++) {
@@ -945,7 +1022,6 @@ CKEDITOR.replace('purchase_internal_notes', editor_config );
                 }
                 document.getElementById('purchase_project_id').innerHTML = project;
 
-                // Populate site options
                 var site = '<option value="0">Same as customer</option>';
                 if (customerData.sites && Array.isArray(customerData.sites)) {
                     for (let i = 0; i < customerData.sites.length; i++) {
@@ -955,7 +1031,27 @@ CKEDITOR.replace('purchase_internal_notes', editor_config );
                 document.getElementById('purchase_site_id').innerHTML = site;
                 $("#project_customer_name").text(customerData.name);
                 $("#site_customer_name").text(customerData.name);
-                // Enable the relevant fields
+                purchase_user_name=customerData.name;
+                purchase_company_name=customerData.contact_name;
+                purchase_user_address=customerData.address;
+                purchase_user_city=customerData.city;
+                purchase_user_county=customerData.country;
+                purchase_user_post_code=customerData.postal_code;
+                purchase_user_telephone_code=customerData.telephone_country_code ?? 230;
+                user_telephone=customerData.telephone;
+                purchase_user_mobile_code=customerData.mobile_country_code ?? 230;
+                purchase_user_mobile=customerData.mobile;
+                $("#purchase_user_name").val(purchase_user_name);
+                $("#purchase_company_name").val(purchase_company_name);
+                $("#purchase_user_address").val(purchase_user_address);
+                $("#purchase_user_city").val(purchase_user_city);
+                $("#purchase_user_county").val(purchase_user_county);
+                $("#purchase_user_post_code").val(purchase_user_post_code);
+                $("#purchase_user_telephone_code").val(purchase_user_telephone_code);
+                $("#user_telephone").val(user_telephone);
+                $("#purchase_user_mobile_code").val(purchase_user_mobile_code);
+                $("#purchase_user_mobile").val(purchase_user_mobile);
+
                 $('#purchase_project_id').removeAttr('disabled');
                 $('#purchase_site_id').removeAttr('disabled');
             }
@@ -965,13 +1061,54 @@ CKEDITOR.replace('purchase_internal_notes', editor_config );
             }
         });
     }
+    function siteDetail(){
+        var id=$("#purchase_site_id").val();
+        $.ajax({
+            url: '{{ route("customer.ajax.getCustomerSiteDetails") }}',
+            method: 'POST',
+            data: {
+                id: id
+            },
+            success: function(response) {
+                // console.log(response.data);
+                // return false;
+                if(id == 0){
+                    $("#purchase_user_name").val(purchase_user_name);
+                    $("#purchase_company_name").val(purchase_company_name);
+                    $("#purchase_user_address").val(purchase_user_address);
+                    $("#purchase_user_city").val(purchase_user_city);
+                    $("#purchase_user_county").val(purchase_user_county);
+                    $("#purchase_user_post_code").val(purchase_user_post_code);
+                    $("#purchase_user_telephone_code").val(purchase_user_telephone_code);
+                    $("#user_telephone").val(user_telephone);
+                    $("#purchase_user_mobile_code").val(purchase_user_mobile_code);
+                    $("#purchase_user_mobile").val(purchase_user_mobile);
+                }else{
+                    $("#purchase_user_name").val(response.data[0].contact_name);
+                    $("#purchase_company_name").val(response.data[0].company_name);
+                    $("#purchase_user_address").val(response.data[0].address);
+                    $("#purchase_user_city").val(response.data[0].city);
+                    $("#purchase_user_county").val(response.data[0].country);
+                    $("#purchase_user_post_code").val(response.data[0].post_code);
+                    $("#purchase_user_telephone_code").val(response.data[0].telephone_country_code ?? 230);
+                    $("#user_telephone").val(response.data[0].telephone);
+                    $("#purchase_user_mobile_code").val(response.data[0].mobile_country_code ?? 230);
+                    $("#purchase_user_mobile").val(response.data[0].mobile);
+                }
+                
+            },
+            error: function(xhr, status, error) {
+                console.error(error);
+            }
+        });
+    }
 </script>
 
 <script>
     function get_modal(modal){  
         // alert(modal)
-        var purchase_ref='<?php if(isset($purchase_orders) && $purchase_orders !=''){echo $purchase_orders->purchase_order_ref;}?>'
-        var po_id='<?php if(isset($purchase_orders) && $purchase_orders !=''){echo $purchase_orders->id;}?>'
+        var purchase_ref='<?php if((isset($purchase_orders) && $purchase_orders !='') && (isset($duplicate) && $duplicate =='')){echo $purchase_orders->purchase_order_ref;}?>'
+        var po_id='<?php if((isset($purchase_orders) && $purchase_orders !='') && (isset($duplicate) && $duplicate =='')){echo $purchase_orders->id;}?>'
         var supplier_select_check=$("#purchase_supplier_id").val();
         var modal_array=[1,7];
         var customer_id=$("#purchase_customer_id").val();
@@ -1134,9 +1271,10 @@ CKEDITOR.replace('purchase_internal_notes', editor_config );
                         $('#message_save').addClass('success-message').text(response.message).show();
                         setTimeout(function() {
                             $('#message_save').removeClass('success-message').text('').hide();
-                            var id = parseInt(response.data.id, 10) || 0;
-                            var encodedId = btoa(unescape(encodeURIComponent(id)));
-                            location.href = '<?php echo url('purchase_order_edit'); ?>?key=' + encodedId;
+                            // var id = parseInt(response.data.id, 10) || 0;
+                            // var encodedId = btoa(unescape(encodeURIComponent(id)));
+                            // location.href = '<?php echo url('purchase_order_edit'); ?>?key=' + encodedId;
+                            location.href='<?php echo url('draft_purchase_order');?>'
                         }, 3000);
                     }else if(response.success === false){
                         $('#message_save').addClass('error-message').text(response.message).show();
@@ -1152,45 +1290,7 @@ CKEDITOR.replace('purchase_internal_notes', editor_config );
             });
         }
     }
-    $("#savePurchaseAttachment").on('click', function(){
-        $.ajax({
-            type: "POST",
-            url: "{{url('/purchase_order_attachment_save')}}",
-            data: new FormData($("#purchase_Attachmentform")[0]),
-            async: false,
-            contentType: false,
-            cache: false,
-            processData: false,
-            success: function(response) {
-                console.log(response);
-                if(response.vali_error){
-                        alert(response.vali_error);
-                        $(window).scrollTop(0);
-                        return false;
-                }else if(response.success === true){
-                    $(window).scrollTop(0);
-                    $('#attachment_messagse').addClass('success-message').text(response.message).show();
-                    setTimeout(function() {
-                        $('#attachment_messagse').removeClass('success-message').text('').hide();
-                        location.reload();
-                    }, 3000);
-                }else if(response.success === false){
-                    $('#attachment_messagse').addClass('error-message').text(response.message).show();
-                    setTimeout(function() {
-                        $('#attachment_messagse').text('').fadeOut();
-                    }, 3000);
-                }
-            },
-            error: function(xhr, status, error) {
-                var errorMessage = xhr.status + ': ' + xhr.statusText;
-                // alert('Error - ' + errorMessage + "\nMessage: " + error);
-                $('#attachment_messagse').addClass('error-message').text(error).show();
-                    setTimeout(function() {
-                        $('#attachment_messagse').text('').fadeOut();
-                    }, 3000);
-            }
-        });
-    });
+    
     $("#saveTag").on('click', function(){
         var title = $("#tag_title").val().trim(); 
         var status = $.trim($('#tag_status option:selected').val());
@@ -1370,6 +1470,10 @@ CKEDITOR.replace('purchase_internal_notes', editor_config );
                         inputQty.type = 'text';
                         inputQty.className = 'qty input50';
                         inputQty.addEventListener('input', function() {
+                            this.value = this.value.replace(/[^0-9.]/g, '');
+                            if ((this.value.match(/\./g) || []).length > 1) {
+                                this.value = this.value.slice(0, -1);
+                            }
                             updateAmount(row);
                         });
                         inputQty.name = 'qty[]';
@@ -1381,7 +1485,14 @@ CKEDITOR.replace('purchase_internal_notes', editor_config );
                         const inputPrice = document.createElement('input');
                         inputPrice.type = 'text';
                         inputPrice.className = 'product_price input50';
-                        inputPrice.addEventListener('input', function() {
+                        // inputPrice.addEventListener('input', function() {
+                        //     updateAmount(row);
+                        // });
+                        inputPrice.addEventListener('input', function () {
+                            this.value = this.value.replace(/[^0-9.]/g, '');
+                            if ((this.value.match(/\./g) || []).length > 1) {
+                                this.value = this.value.slice(0, -1);
+                            }
                             updateAmount(row);
                         });
                         inputPrice.name = 'price[]'; 
@@ -1404,7 +1515,6 @@ CKEDITOR.replace('purchase_internal_notes', editor_config );
                         const optVat = document.createElement('option');
                         optVat.value = optionVat.id;
                         if(optionVat.id == data.product_detail.tax_rate){
-                            alert()
                             tax_rate=optionVat.tax_rate;
                             optVat.setAttribute("selected", "selected");
                         }
@@ -1514,7 +1624,7 @@ CKEDITOR.replace('purchase_internal_notes', editor_config );
     });
 
     function updateAmount(row) {
-        console.log(row)
+        // console.log(row)
         // const priceInput = row.querySelector('.price');
         const priceInput = row.querySelector('.product_price');
         const qtyInput = row.querySelector('.qty');
@@ -1558,7 +1668,7 @@ CKEDITOR.replace('purchase_internal_notes', editor_config );
             url: "{{url('/vat_tax_details')}}",
             data: {vat_id:vat_id,_token:token},
             success: function(response) {
-                console.log(response);
+                // console.log(response);
                 if(response){
                     const vat_value=Number(response.data);
                     const vat_ratePercentage = row.querySelector('.vat_ratePercentage').value=vat_value;
@@ -1652,13 +1762,24 @@ $('#search-product').on('keyup', function() {
  </script>
  <script>
     $(document).ready(function(){
-        var purchaseOrderId='<?php if(isset($purchase_orders)){echo $purchase_orders->id;}?>'
+        var purchaseOrderId='<?php if((isset($purchase_orders) && $purchase_orders !='') && (isset($duplicate) && $duplicate =='')){echo $purchase_orders->id;}?>'
+       
         if(purchaseOrderId){
             getAttachment(purchaseOrderId,'{{ url("getAllAttachmens") }}');
             getProductDetail(purchaseOrderId,'{{ url("getPurchaesOrderProductDetail") }}')
             getAllNewTaskList(purchaseOrderId,'{{ url("getAllNewTaskList") }}');
+        }else{
+            var purchaseOrderId='<?php if(isset($purchase_orders) && $purchase_orders !=''){echo $purchase_orders->id;}?>'
+            getProductDetail(purchaseOrderId,'{{ url("getPurchaesOrderProductDetail") }}')
+        }
+        var reminderCount='<?php echo count($reminder_data);?>'
+        if(reminderCount>0){
+            $(".setRiminderTable").show();
         }
     });
+    function getAllAttachment(data){
+        getAttachment(data.po_id,pageUrl = '{{ url("getAllAttachmens") }}')
+    }
     function getAttachment(id,pageUrl = '{{ url("getAllAttachmens") }}'){
         var token='<?php echo csrf_token();?>'
         $.ajax({
@@ -1666,10 +1787,11 @@ $('#search-product').on('keyup', function() {
             method: 'POST',
             data: {id: id,_token:token},
             success: function(response) {
-                // console.log(response.data.data);
+                // console.log(response);
                 var paginationAttachment = response.pagination;
                 var data = response.data.data;
-                const attachments = response.data.data[0].po_attachments || [];
+                // const attachments = response.data.data[0].po_attachments || [];
+                const attachments = data;
                 // console.log(attachments);
                 const tbody = $('#attachments_result');
                 tbody.empty();
@@ -1701,10 +1823,10 @@ $('#search-product').on('keyup', function() {
                 var paginationControlsAttachment = $("#pagination-controls-Attachments");
                 paginationControlsAttachment.empty();
                 if (paginationAttachment.prev_page_url) {
-                    paginationControlsAttachment.append('<button class="profileDrop" onclick="getAttachment(' + id + ', \'' + paginationAttachment.prev_page_url + '\')">Previous</button>');
+                    paginationControlsAttachment.append('<button type="button" class="profileDrop" onclick="getAttachment(' + id + ', \'' + paginationAttachment.prev_page_url + '\')">Previous</button>');
                 }
                 if (paginationAttachment.next_page_url) {
-                    paginationControlsAttachment.append('<button class="profileDrop" onclick="getAttachment(' + id + ', \'' + paginationAttachment.next_page_url + '\')">Next</button>');
+                    paginationControlsAttachment.append('<button type="button" class="profileDrop" onclick="getAttachment(' + id + ', \'' + paginationAttachment.next_page_url + '\')">Next</button>');
                 }
             },
             error: function(xhr, status, error) {
@@ -1722,7 +1844,6 @@ $('#search-product').on('keyup', function() {
             success: function(response) {
                 // console.log(response);
                 var data=response.data[0];
-                // console.log(data);
                 const tableBody = document.querySelector(`#result tbody`);
                 var purchase_order_products=data.product_details.purchase_order_products;
                 // console.log(purchase_order_products);return false;
@@ -1786,13 +1907,15 @@ $('#search-product').on('keyup', function() {
                         hiddenInput.name = 'product_id[]';
                         hiddenInput.value = data.purchase_order_products_detail.id;
                         row.appendChild(hiddenInput);
-                        // purchase order product hidden id
+                        // purchase order product hidden id if not duplicate is null
+                        <?php if((isset($purchase_orders) && $purchase_orders !='') && (isset($duplicate) && $duplicate =='')){?>
                         const hiddenID = document.createElement('input');
                         hiddenID.type = 'hidden';
                         hiddenID.className = 'purchase_product_id';
                         hiddenID.name = 'purchase_product_id[]';
                         hiddenID.value = product.id;
                         row.appendChild(hiddenID);
+                        <?php }?>
                     // end
 
                         const descriptionCell = document.createElement('td');
@@ -1833,6 +1956,10 @@ $('#search-product').on('keyup', function() {
                         inputQty.type = 'text';
                         inputQty.className = 'qty input50';
                         inputQty.addEventListener('input', function() {
+                            this.value = this.value.replace(/[^0-9.]/g, '');
+                            if ((this.value.match(/\./g) || []).length > 1) {
+                                this.value = this.value.slice(0, -1);
+                            }
                             updateAmount(row);
                         });
                         inputQty.name = 'qty[]';
@@ -1845,6 +1972,10 @@ $('#search-product').on('keyup', function() {
                         inputPrice.type = 'text';
                         inputPrice.className = 'product_price input50';
                         inputPrice.addEventListener('input', function() {
+                            this.value = this.value.replace(/[^0-9.]/g, '');
+                            if ((this.value.match(/\./g) || []).length > 1) {
+                                this.value = this.value.slice(0, -1);
+                            }
                             updateAmount(row);
                         });
                         inputPrice.name = 'price[]'; 
@@ -1872,6 +2003,12 @@ $('#search-product').on('keyup', function() {
                         optVat.textContent = optionVat.name;
                         selectDropdownVat.appendChild(optVat);
                         });
+                        const inputVatRate = document.createElement('input');
+                        inputVatRate.type = 'hidden';
+                        inputVatRate.className = 'vat_ratePercentage';
+                        inputVatRate.name = 'vat_ratePercentage[]'; 
+                        inputVatRate.value = tax_rate;
+                        dropdownVat.appendChild(inputVatRate);
                         dropdownVat.appendChild(selectDropdownVat);
                         row.appendChild(dropdownVat);
 
@@ -1879,6 +2016,7 @@ $('#search-product').on('keyup', function() {
                         const inputVat = document.createElement('input');
                         inputVat.type = 'text';
                         inputVat.className = 'vat';
+                        inputVat.setAttribute('disabled','disabled');
                         inputVat.addEventListener('input', function() {
                             updateAmount(row);
                         });
@@ -1917,10 +2055,10 @@ $('#search-product').on('keyup', function() {
                 // var paginationControlsProductDetail = $("#pagination-controls-Produc-details");
                 // paginationControlsProductDetail.empty();
                 // if (paginationProductDetails.prev_page_url) {
-                //     paginationControlsProductDetail.append('<button class="profileDrop" onclick="getProductDetail(' + id + ', \'' + paginationContact.prev_page_url + '\')">Previous</button>');
+                //     paginationControlsProductDetail.append('<button type="button" class="profileDrop" onclick="getProductDetail(' + id + ', \'' + paginationContact.prev_page_url + '\')">Previous</button>');
                 // }
                 // if (paginationProductDetails.next_page_url) {
-                //     paginationControlsProductDetail.append('<button class="profileDrop" onclick="getProductDetail(' + id + ', \'' + paginationContact.next_page_url + '\')">Next</button>');
+                //     paginationControlsProductDetail.append('<button type="button" class="profileDrop" onclick="getProductDetail(' + id + ', \'' + paginationContact.next_page_url + '\')">Next</button>');
                 // }
             },
             error: function(xhr, status, error) {
@@ -1966,10 +2104,10 @@ $('#search-product').on('keyup', function() {
                 var paginationControlsNewTask = $("#pagination-controls-New-task");
                 paginationControlsNewTask.empty();
                 if (paginationNewTask.prev_page_url) {
-                    paginationControlsNewTask.append('<button class="profileDrop" onclick="getAttachment(' + id + ', \'' + paginationNewTask.prev_page_url + '\')">Previous</button>');
+                    paginationControlsNewTask.append('<button type="button" class="profileDrop" onclick="getAllNewTaskList(' + id + ', \'' + paginationNewTask.prev_page_url + '\')">Previous</button>');
                 }
                 if (paginationNewTask.next_page_url) {
-                    paginationControlsNewTask.append('<button class="profileDrop" onclick="getAttachment(' + id + ', \'' + paginationNewTask.next_page_url + '\')">Next</button>');
+                    paginationControlsNewTask.append('<button type="button" class="profileDrop" onclick="getAllNewTaskList(' + id + ', \'' + paginationNewTask.next_page_url + '\')">Next</button>');
                 }
             },
             error: function(xhr, status, error) {
@@ -2087,7 +2225,7 @@ $(document).on('click','.attachment_delete', function() {
  </script>
  <script>
     function getAllNewTask(data){
-        console.log(data);
+        // console.log(data);
         getAllNewTaskList(data.po_id,pageUrl = '{{ url("getAllNewTaskList") }}');
     }
     function bgColorChange(button){
@@ -2103,7 +2241,7 @@ $(document).on('click','.attachment_delete', function() {
         }
     }
     function getAllAccountCodeList(data){
-        console.log(data.data);
+        // console.log(data.data);
         var accList=data.data;
         $('.accountCode_id').append('<option value="'+accList.id+'">'+accList.name+'</option>')
     }
@@ -2129,7 +2267,7 @@ $(document).on('click','.attachment_delete', function() {
                         search_purchase_qoute_ref: search_purchase_qoute_ref,purchase_customer_id:purchase_customer_id,_token: '{{ csrf_token() }}'
                     },
                     success: function(response) {
-                        console.log(response);
+                        // console.log(response);
                         // return false;
                         purchase_qoute_refdivList.innerHTML = "";
                         const div = document.createElement('div');
@@ -2161,8 +2299,8 @@ $(document).on('click','.attachment_delete', function() {
                                 if (event.target.tagName.toLowerCase() === 'li') {
                                     const selectedPurchaseQuotRefId = event.target.id;
                                     const selectedPurchaseQuoteName = event.target.name;
-                                    console.log('Selected Customer ID:', selectedPurchaseQuotRefId);
-                                    console.log('Selected Customer Name:', selectedPurchaseQuoteName);
+                                    // console.log('Selected Customer ID:', selectedPurchaseQuotRefId);
+                                    // console.log('Selected Customer Name:', selectedPurchaseQuoteName);
                                     $("#purchase_qoute_ref").val(selectedPurchaseQuoteName);
                                     $("#selectedPurchaseQuotRefId").val(selectedPurchaseQuotRefId);
                                 }
@@ -2207,7 +2345,7 @@ $(document).on('click','.attachment_delete', function() {
                         search_purchase_job_ref: search_purchase_job_ref,purchase_customer_id:purchase_customer_id,_token: '{{ csrf_token() }}'
                     },
                     success: function(response) {
-                        console.log(response);
+                        // console.log(response);
                         // return false;
                         purchase_job_refdivList.innerHTML = "";
                         const div = document.createElement('div');
@@ -2239,8 +2377,8 @@ $(document).on('click','.attachment_delete', function() {
                                 if (event.target.tagName.toLowerCase() === 'li') {
                                     const selectedPurchaseJobRefId = event.target.id;
                                     const selectedPurchaseJobName = event.target.name;
-                                    console.log('Selected Customer ID:', selectedPurchaseJobRefId);
-                                    console.log('Selected Customer Name:', selectedPurchaseJobName);
+                                    // console.log('Selected Customer ID:', selectedPurchaseJobRefId);
+                                    // console.log('Selected Customer Name:', selectedPurchaseJobName);
                                     $("#purchase_job_ref").val(selectedPurchaseJobName);
                                     $("#selectedPurchaseJobRefId").val(selectedPurchaseJobRefId);
                                 }
@@ -2268,6 +2406,101 @@ $(document).on('click','.attachment_delete', function() {
                 $('#results').empty();
             }
         });
+    function openReminderModal(po_id){
+        // if(id != ''){
+        //     alert("Please save Purchase Order first!");
+        //     // return false;
+        // }else{
+            
+        // }
+        $("#clickyesno").removeClass('unclicked');
+        $("#reminder_po_id").val(po_id);
+        $("#ReminderModal").modal('show');
+    }
+    function getAllReminder(data){
+        $(".setRiminderTable").show();
+        $("#reminder_data").append(`<tr>
+            <td>`+data.title+`</td>    
+            <td>`+data.reminder_date+`</td>    
+            <td>`+data.reminder_time+`</td>    
+            <td><span class="iconColrRad">Pending</span></td>    
+            <td>
+                <a href="javascript:void(0)" class="iconColrGreen fecth_data" data-id="`+data.id+`" data-title="`+data.title+`" data-user_id="`+data.user_id+`" data-reminder_date="`+data.reminder_date+`" data-reminder_time="`+data.reminder_time+`" data-notification="`+data.notification+`" data-sms="`+data.sms+`" data-email="`+data.email+`" data-notes="`+data.notes+`" data-icon="edit"><i class="material-symbols-outlined">edit</i></a>
+                <a href="javascript:void(0)" class="iconColrRad"><i class="material-symbols-outlined">close</i></a>
+            </td>    
+        </tr>`);
+    }
+    
  </script>
+<script>
+    function updateDueDate() {
+    const selectElement = document.getElementById('purchase_payment_terms');
+    const days = parseInt(selectElement.value);
+    const currentDate = new Date();
+    currentDate.setDate(currentDate.getDate() + days);
+    const formattedDate = currentDate.toISOString().split('T')[0];
+    document.getElementById('purchase_payment_due_date').value = formattedDate;
+}
+</script>
+
+<script>
+    $(document).on('click','.fecth_data', function(){
+        $("#ReminderModal").modal('show');
+        var id = $(this).data('id');
+        var title = $(this).data('title');
+        var user_id = $(this).data('user_id'); 
+        var reminder_date = $(this).data('reminder_date');
+        var reminder_time = $(this).data('reminder_time');
+        var notification = $(this).data('notification');
+        var sms = $(this).data('sms');
+        var email = $(this).data('email');
+        var notes = $(this).data('notes');
+        var icon = $(this).data('icon');
+        if(icon === 'eye'){
+            $("#reminder_date").attr('disabled','disabled');
+            $("#clickyesno").addClass('unclicked');
+            $("#reminder_notification").attr('disabled','disabled');
+            $("#reminder_sms").attr('disabled','disabled');
+            $("#reminder_email").attr('disabled','disabled');
+            $("#reminder_title").attr('disabled','disabled');
+            $("#reminder_notes").attr('disabled','disabled');
+        }else{
+            $("#reminder_date").removeAttr('disabled','disabled');
+            $("#clickyesno").removeClass('unclicked');
+            $("#reminder_notification").removeAttr('disabled','disabled');
+            $("#reminder_sms").removeAttr('disabled','disabled');
+            $("#reminder_email").removeAttr('disabled','disabled');
+            $("#reminder_title").removeAttr('disabled','disabled');
+            $("#reminder_notes").removeAttr('disabled','disabled');
+        }
+
+        
+        $("#reminder_id").val(id);
+        $("#reminder_date").val(reminder_date);
+        $("#reminder_time").val(reminder_time);
+        $("#reminder_title").val(title);
+        $("#reminder_notes").val(notes);
+
+        $("#reminder_notification").prop('checked', notification == 1);
+        $("#reminder_sms").prop('checked', sms == 1);
+        $("#reminder_email").prop('checked', email == 1);
+
+        if (user_id) {
+            $('.multiselect-dropdown').hide();
+            var userArray = user_id.split(',');
+            $("#reminder_user option").each(function () {
+                $(this).prop('selected', userArray.includes($(this).val()));
+            });
+        } else {
+            $("#reminder_user option").prop('selected', false);
+        }
+        userArray.forEach(function (userId) {
+            $(`#reminder_user option[value="${userId}"]`).prop('selected', true);
+            $(`#reminder_user + .multiselect-container input[type="checkbox"][value="${userId}"]`).prop('checked', true);
+        });
+        MultiselectDropdown();
+
+    });
+</script>
 
 @include('frontEnd.salesAndFinance.jobs.layout.footer')

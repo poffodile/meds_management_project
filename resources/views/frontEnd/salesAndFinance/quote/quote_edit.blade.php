@@ -651,15 +651,14 @@
                                                                 <th>Notes</th>
                                                                 <th>Appointment Type </th>
                                                                 <th>Status </th>
+                                                                <th></th>
                                                             </tr>
                                                         </thead>
                                                         <tbody class="add_insrtAppoinment">
 
                                                         </tbody>
 
-                                                        <tfoot>
-                                                            <a href="#!" class="profileDrop ms-3"> Save Appointment(s)</a>
-                                                        </tfoot>
+
                                                     </table>
                                                 </div>
                                             </div>
@@ -2358,6 +2357,7 @@
                                             <option value="2">Test</option>
                                         </select>
                                     </div>
+
                                 </div>
                             </div>
                         </div>
@@ -2939,7 +2939,7 @@
         $.ajax({
             url: '{{ route("customer.ajax.getCustomerList") }}',
             success: function(response) {
-                console.log(response.message);
+                console.log(response.data);
                 var get_customer_type = document.getElementById('getCustomerList');
                 // get_customer_type.innerHTML = '';
 
@@ -3205,7 +3205,7 @@
                             <td><a href="${attachment.timestamp_name}" target="_blank"> <i class="fas fa-eye"></i></a> | <i class="fa fa-times"></i> | <a href="#!" onclick="downloadAttachmentFile('${attachment.timestamp_name}');"> <i class="fas fa-download"></i></a> | <a href="javascript:void(0)" onclick="deleteAttachmentFile('${attachment.id}');"> <i class="fas fa-trash-alt"></i></a> </td>
                         </tr>
                     `;
-                        console.log(row);
+                        // console.log(row);
                         tableBody.append(row);
                     });
                 }
@@ -3733,6 +3733,7 @@
     }
 
     $(document).ready(function() {
+
         // Enable/disable "Delete Selected" button based on checkbox selection
         $(document).on("change", ".selectRow, #selectAll", function() {
             const anySelected = $(".selectRow:checked").length > 0;
@@ -3812,4 +3813,205 @@
         }
 
     });
+    // ****************************************************************
+
+
+    //**************insrtTitle
+    function insrtAppoinment() {
+        const node = document.createElement("tr");
+        node.classList.add("add_insrtAppoinment");
+        node.innerHTML = `<td>
+                    <div class="d-flex">
+                        <p class="leftNum">1</p>
+                        <select class="form-control editInput selectOptions setUserData" id="">
+                            <option>Select user</option>
+                        </select>
+                        <a href="#!" class="callIcon"><i class="fa-solid fa-square-phone"></i></a>
+                    </div>
+                    <div class="alertBy">
+                        <label><strong>Alert By :</strong></label>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1">
+                            <label class="form-check-label" for="inlineCheckbox1">SMS</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="inlineCheckbox2" value="option2">
+                            <label class="form-check-label" for="inlineCheckbox2">Email</label>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="addDateAndTime">
+                        <div class="startDate">
+                            <input type="date" name="date" class=" editInput">
+                            <input type="time" name="time" class=" editInput">
+                        </div>
+                    </div>
+                    <div class="pt-3">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="floatingAppointment" value="option2">
+                            <label class="form-check-label" for="floatingAppointment">Floating Appointment</label>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="addDateAndTime">
+                        <div class="endDate">
+                            <input type="date" name="date" class=" editInput">
+                            <input type="time" name="time" class=" editInput">
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="addTextarea">
+                        <textarea cols="40" rows="5" placeholder="Type Notes...">Type Notes... </textarea>
+                    </div>
+                </td>
+                <td class="col-2">
+                    <div class="appoinment_type">
+                        <select class="form-control editInput selectOptions setAppointmentType">
+                        </select>
+                    </div>
+                    <div class="Priority">
+                        <label>Priority :</label>
+                        <select class="form-control editInput selectOptions" id="inputJobType">
+                            <option value="1">Low</option>
+                            <option value="2" selected>Medium</option>
+                            <option value="3">High</option>
+                        </select>
+                    </div>
+                </td>
+                <td>
+                    <div class="statuswating">
+                        <label class="form-check-label" for="floatingAppointment">Awaiting </label>
+                        <a href="#!" class="closeappend"><i class="fa-solid fa-circle-xmark"></i></a>
+                    </div>
+                    <div class="tabheadingTitle">
+                        <a href="#" class="profileDrop me-3"> Notify</a>
+                    </div>
+                </td>  
+            `;
+
+        appointmentType();
+        getUsersData();
+
+        const tableBody = document.querySelector(".add_insrtAppoinment");
+        if (tableBody) {
+            tableBody.appendChild(node);
+
+            // Add event listener to the close button
+            const closeButton = node.querySelector('.closeappend');
+            closeButton.addEventListener('click', function() {
+                node.remove(); // Remove the row when close button is clicked
+            });
+        } else {
+            console.error("Table body with ID 'add_insrtAppoinment' not found.");
+        }
+        salesAppointment(tableBody);
+    }
+
+    function salesAppointment(table) {
+
+        let existingTfoot = table.querySelector('tfoot');
+        if (existingTfoot) {
+            // Remove the existing footer
+            existingTfoot.remove();
+        }
+
+        const tfoot = document.createElement('tfoot');
+
+        const footerRow = document.createElement('tr');
+        const footerCell = document.createElement('td');
+
+        // Set the cell to span all columns (adjust colspan to your table structure)
+        footerCell.colSpan = 8; // Change 8 to the number of columns in your table
+        footerCell.innerHTML = `<a href="#!" class="profileDrop ms-3">Save Appointment(s)</a>`;
+
+        // Append the cell to the row
+        footerRow.appendChild(footerCell);
+
+        // Append the row to the footer
+        tfoot.appendChild(footerRow);
+
+        // Append the footer to the table
+        table.appendChild(tfoot);
+
+    }
+
+    function getUsersData() {
+        $.ajax({
+            url: '{{ route("quote.ajax.getUsersData") }}',
+            method: 'GET',
+            success: function(response) {
+                console.log("response.userData", response.data);
+
+                const data = response.data;
+                const users = document.querySelectorAll('.setUserData');
+                console.log("Users:", users);
+
+                if (users.length === 0) {
+                    console.error("No elements found with class 'setUserData'");
+                    return;
+                }
+
+                users.forEach(user => {
+
+                    // Clear existing options if needed
+                    user.innerHTML = ''; // Optional, uncomment if required
+                    const defaultOption = document.createElement('option');
+                    defaultOption.value = ''; // Use an empty value for the "Please Select" option
+                    defaultOption.textContent = 'Please Select';
+                    defaultOption.disabled = true; // Make it unselectable (optional)
+                    defaultOption.selected = true; // Pre-select it by default
+                    user.appendChild(defaultOption);
+
+                    data.forEach(item => {
+                        const option = document.createElement('option');
+                        option.value = item.id;
+                        option.textContent = item.name;
+                        user.appendChild(option);
+                    });
+                });
+            },
+            error: function(xhr, status, error) {
+                console.error("AJAX Error:", error);
+            }
+        });
+    }
+
+    function appointmentType() {
+        $.ajax({
+            url: '{{ route("job.ajax.jobAppointment") }}',
+            method: 'GET',
+            success: function(response) {
+                console.log("response.jobAppointment", response.data);
+
+                const data = response.data;
+                const appointments = document.querySelectorAll('.setAppointmentType');
+                console.log("Appointments:", appointments);
+
+                if (appointments.length === 0) {
+                    console.error("No elements found with class 'setAppointmentType'");
+                    return;
+                }
+
+                appointments.forEach(appointment => {
+                    // Clear existing options if needed
+                    appointment.innerHTML = ''; // Optional, uncomment if required
+
+                    data.forEach(item => {
+                        console.log("Item:", item);
+
+                        const option = document.createElement('option');
+                        option.value = item.id;
+                        option.textContent = item.name;
+                        appointment.appendChild(option);
+                    });
+                });
+            },
+            error: function(xhr, status, error) {
+                console.error("AJAX Error:", error);
+            }
+        });
+    }
 </script>

@@ -17,7 +17,7 @@ class LeadStatus extends Model
     }
 
     public static function getLeadStatus(){
-        return LeadStatus::where('deleted_at', null)->where('status', 1)->get();
+        return LeadStatus::where('deleted_at', null)->where('status', 1)->orderBy('created_at', 'desc')->get();
     }
 
     public static function deleteLeadStatus($id){

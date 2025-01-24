@@ -88,7 +88,8 @@ class Customer extends Model
         ->join('lead_statuses', 'lead_statuses.id', 'leads.status')
         ->select('customers.*', 'leads.*', 'lead_statuses.title as status', 'lead_statuses.id as status_id')
         ->orderBy('leads.created_at', 'desc')
-        ->where('leads.home_id', $home_id);
+        ->where('leads.home_id', $home_id)
+        ->whereNull('leads.deleted_at');
    
         if ($lastSegment ===  "leads") {
             return $query->whereNotIn('assign_to', [0])->whereNotIn('leads.status', ['6','7'])->get();

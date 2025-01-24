@@ -53,7 +53,7 @@ $access_rights = explode(',', $rights);
                 <div class="row gx-0 d-none d-lg-flex">
                     <div class="col-lg-3 px-3 text-start">
                         <div class="h-100 d-inline-flex align-items-center py-1 ms-3">
-                            <a href="{{url('jobs_index')}}" class="brand_logo"><img src="{{ url('public/images/ewm_logo.png')}}" alt="ewm_logo"></a>
+                            <a href="{{url('sales-finance/dashboard')}}" class="brand_logo"><img src="{{ url('public/images/ewm_logo.png')}}" alt="ewm_logo"></a>
                         </div>
                     </div>
                     <div class="col-lg-9 px-3 text-end toprigihticon">
@@ -102,8 +102,8 @@ $access_rights = explode(',', $rights);
                                     <a href="{{ url('/leads/leads') }}" class="dropdown-item"><span><i class="fa fa-list"></i> All Lead </span></a>
                                     <a href="{{ url('/lead/myLeads') }}" class="dropdown-item"><span><i class="fa fa-list"></i> My Leads </span></a>
                                     <a href="{{ url('/leads/unassigned') }}" class="dropdown-item"><span><i class="fa fa-list"></i> Unassigned Lead </span></a>
-                                    <a href="{{ url('/leads/actioned') }}" class="dropdown-item"><span><i class="fa fa-list"></i> Actioned Lead </span></a>
-                                    <a href="{{ url('/leads/rejected') }}" class="dropdown-item"><span><i class="fa fa-list"></i> Rejected Lead </span></a>
+                                    <a href="{{ url('/lead/actioned') }}" class="dropdown-item"><span><i class="fa fa-list"></i> Actioned Lead </span></a>
+                                    <a href="{{ url('/lead/rejected') }}" class="dropdown-item"><span><i class="fa fa-list"></i> Rejected Lead </span></a>
                                     <a href="{{ url('/lead/authorization') }}" class="dropdown-item"><span><i class="fa fa-list"></i> Authorization </span></a>
                                     <a href="{{ url('/leads/converted') }}" class="dropdown-item"><span><i class="fa fa-list"></i> Converted Lead </span></a>
                                     <a href="{{ url('leads/search') }}" class="dropdown-item"><span><i class="fa fa-search"></i> Search Lead </span></a>
@@ -262,7 +262,14 @@ $access_rights = explode(',', $rights);
                                             <li><a class="dropdown-item" href="#"><span><i class="fa fa-file"></i>Invoices Received</span></a></li>
                                             <li><a class="dropdown-item" href="#"><span><i class="fa fa-file"></i>Purchase Orders Statements</span></a></li>
                                             <li><a class="dropdown-item" href="#"><span><i class="fa fa-rotate-right"></i>Recurring Purchase Orders</span></a></li>
-                                            <li><a class="dropdown-item" href="#"><span><i class="fa fa-list"></i>Credit Notes</span></a></li>
+                                            <li class="dropend"><a class="dropdown-item" href="credit_notes.html" data-bs-toggle="dropdown" aria-expanded="false"><span><i class="fa fa-list"></i>Credit Notes</span> <i class="fa-solid fa-angle-right"></i></a>
+                                                <ul class="dropdown-menu dropdown-menu1 fade-up m-0">
+                                                    <li><a class="dropdown-item" href="new_credit_note.html"><span><i class="fa fa-plus"></i> New Credit Note</span></a></li>
+                                                    <li><a class="dropdown-item" href="{{url('credit_notes?list_mode=Approved')}}"><span><i class="fa fa-check"></i>Approved Credit Notes</span></a></li>
+                                                    <li><a class="dropdown-item" href="{{url('credit_notes?list_mode=Paid')}}"><span><i class="fa fa-thumbs-up"></i>Paid Credit Notes </span></a></li>
+                                                    <li><a class="dropdown-item" href="{{url('credit_notes?list_mode=Cancelled')}}"><span><i class="fa fa-times"></i>Cancelled Credit Notes</span></a></li>
+                                                </ul>
+                                            </li>
                                         </ul>
                                     </li>
                                 </ul>

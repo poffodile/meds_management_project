@@ -1406,10 +1406,10 @@
                 var paginationControlsContact = $("#pagination-controls-contact");
                 paginationControlsContact.empty();
                 if (paginationContact.prev_page_url) {
-                    paginationControlsContact.append('<button class="profileDrop" onclick="GetAllContact(1,' + id + ', \'' + paginationContact.prev_page_url + '\')">Previous</button>');
+                    paginationControlsContact.append('<button type="button" class="profileDrop" onclick="GetAllContact(1,' + id + ', \'' + paginationContact.prev_page_url + '\')">Previous</button>');
                 }
                 if (paginationContact.next_page_url) {
-                    paginationControlsContact.append('<button class="profileDrop" onclick="GetAllContact(1,' + id + ', \'' + paginationContact.next_page_url + '\')">Next</button>');
+                    paginationControlsContact.append('<button type="button" class="profileDrop" onclick="GetAllContact(1,' + id + ', \'' + paginationContact.next_page_url + '\')">Next</button>');
                 }
             },
             error: function(xhr, status, error) {
@@ -1585,10 +1585,10 @@
                 var paginationControlsSite = $("#pagination-controls-site");
                 paginationControlsSite.empty();
                 if (paginationSite.prev_page_url) {
-                    paginationControlsSite.append('<button class="profileDrop" onclick="getAllSite(' + customer_id + ', \'' + paginationSite.prev_page_url + '\')">Previous</button>');
+                    paginationControlsSite.append('<button type="button" class="profileDrop" onclick="getAllSite(' + customer_id + ', \'' + paginationSite.prev_page_url + '\')">Previous</button>');
                 }
                 if (paginationSite.next_page_url) {
-                    paginationControlsSite.append('<button class="profileDrop" onclick="getAllSite(' + customer_id + ', \'' + paginationSite.next_page_url + '\')">Next</button>');
+                    paginationControlsSite.append('<button type="button" class="profileDrop" onclick="getAllSite(' + customer_id + ', \'' + paginationSite.next_page_url + '\')">Next</button>');
                 }
             },
             error: function(xhr, status, error) {
@@ -1695,10 +1695,10 @@
                 var paginationControlsLogin = $("#pagination-controls-login");
                 paginationControlsLogin.empty();
                 if (paginationLogin.prev_page_url) {
-                    paginationControlsLogin.append('<button class="profileDrop" onclick="getAllLogin(' + customer_id + ', \'' + paginationLogin.prev_page_url + '\')">Previous</button>');
+                    paginationControlsLogin.append('<button type="button" class="profileDrop" onclick="getAllLogin(' + customer_id + ', \'' + paginationLogin.prev_page_url + '\')">Previous</button>');
                 }
                 if (paginationLogin.next_page_url) {
-                    paginationControlsLogin.append('<button class="profileDrop" onclick="getAllLogin(' + customer_id + ', \'' + paginationLogin.next_page_url + '\')">Next</button>');
+                    paginationControlsLogin.append('<button type="button" class="profileDrop" onclick="getAllLogin(' + customer_id + ', \'' + paginationLogin.next_page_url + '\')">Next</button>');
                 }
             },
             error: function(xhr, status, error) {

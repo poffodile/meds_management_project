@@ -3641,10 +3641,10 @@ job_input.addEventListener('input', function() {
                 var paginationControlsClll = $("#pagination-controls-call");
                 paginationControlsClll.empty();
                 if (paginationCall.prev_page_url) {
-                    paginationControlsClll.append('<button class="profileDrop" onclick="get_all_crm_customer_call(' + id + ', \'' + paginationCall.prev_page_url + '\')">Previous</button>');
+                    paginationControlsClll.append('<button type="button" class="profileDrop" onclick="get_all_crm_customer_call(' + id + ', \'' + paginationCall.prev_page_url + '\')">Previous</button>');
                 }
                 if (paginationCall.next_page_url) {
-                    paginationControlsClll.append('<button class="profileDrop" onclick="get_all_crm_customer_call(' + id + ', \'' + paginationCall.next_page_url + '\')">Next</button>');
+                    paginationControlsClll.append('<button type="button" class="profileDrop" onclick="get_all_crm_customer_call(' + id + ', \'' + paginationCall.next_page_url + '\')">Next</button>');
                 }
             },
             error: function(xhr, status, error) {
@@ -3700,10 +3700,10 @@ job_input.addEventListener('input', function() {
                 var paginationControlsEmail = $("#pagination-controls-email");
                 paginationControlsEmail.empty();
                 if (paginationEmail.prev_page_url) {
-                    paginationControlsEmail.append('<button class="profileDrop" onclick="get_all_crm_customer_email(' + id + ', \'' + paginationEmail.prev_page_url + '\')">Previous</button>');
+                    paginationControlsEmail.append('<button type="button" class="profileDrop" onclick="get_all_crm_customer_email(' + id + ', \'' + paginationEmail.prev_page_url + '\')">Previous</button>');
                 }
                 if (paginationEmail.next_page_url) {
-                    paginationControlsEmail.append('<button class="profileDrop" onclick="get_all_crm_customer_email(' + id + ', \'' + paginationEmail.next_page_url + '\')">Next</button>');
+                    paginationControlsEmail.append('<button type="button" class="profileDrop" onclick="get_all_crm_customer_email(' + id + ', \'' + paginationEmail.next_page_url + '\')">Next</button>');
                 }
             },
             error: function(xhr, status, error) {
@@ -3753,10 +3753,10 @@ job_input.addEventListener('input', function() {
                 var paginationControlsTask = $("#pagination-controls-task");
                 paginationControlsTask.empty();
                 if (paginationTask.prev_page_url) {
-                    paginationControlsTask.append('<button class="profileDrop" onclick="get_all_crm_customer_task(' + id + ', \'' + paginationTask.prev_page_url + '\')">Previous</button>');
+                    paginationControlsTask.append('<button type="button" class="profileDrop" onclick="get_all_crm_customer_task(' + id + ', \'' + paginationTask.prev_page_url + '\')">Previous</button>');
                 }
                 if (paginationTask.next_page_url) {
-                    paginationControlsTask.append('<button class="profileDrop" onclick="get_all_crm_customer_task(' + id + ', \'' + paginationTask.next_page_url + '\')">Next</button>');
+                    paginationControlsTask.append('<button type="button" class="profileDrop" onclick="get_all_crm_customer_task(' + id + ', \'' + paginationTask.next_page_url + '\')">Next</button>');
                 }
             },
             error: function(xhr, status, error) {
@@ -3817,10 +3817,10 @@ job_input.addEventListener('input', function() {
                 var paginationControlsNotes = $("#pagination-controls-note");
                 paginationControlsNotes.empty();
                 if (paginationNotes.prev_page_url) {
-                    paginationControlsNotes.append('<button class="profileDrop" onclick="get_all_crm_customer_note(' + id + ', \'' + paginationNotes.prev_page_url + '\')">Previous</button>');
+                    paginationControlsNotes.append('<button type="button" class="profileDrop" onclick="get_all_crm_customer_note(' + id + ', \'' + paginationNotes.prev_page_url + '\')">Previous</button>');
                 }
                 if (paginationNotes.next_page_url) {
-                    paginationControlsNotes.append('<button class="profileDrop" onclick="get_all_crm_customer_note(' + id + ', \'' + paginationNotes.next_page_url + '\')">Next</button>');
+                    paginationControlsNotes.append('<button type="button" class="profileDrop" onclick="get_all_crm_customer_note(' + id + ', \'' + paginationNotes.next_page_url + '\')">Next</button>');
                 }
             },
             error: function(xhr, status, error) {
@@ -3884,10 +3884,10 @@ job_input.addEventListener('input', function() {
                 var paginationControls = $("#pagination-controls");
                 paginationControls.empty();
                 if (pagination.prev_page_url) {
-                    paginationControls.append('<button class="profileDrop" onclick="get_all_crm_customer_complaint(' + id + ', \'' + pagination.prev_page_url + '\')">Previous</button>');
+                    paginationControls.append('<button type="button" class="profileDrop" onclick="get_all_crm_customer_complaint(' + id + ', \'' + pagination.prev_page_url + '\')">Previous</button>');
                 }
                 if (pagination.next_page_url) {
-                    paginationControls.append('<button class="profileDrop" onclick="get_all_crm_customer_complaint(' + id + ', \'' + pagination.next_page_url + '\')">Next</button>');
+                    paginationControls.append('<button type="button" class="profileDrop" onclick="get_all_crm_customer_complaint(' + id + ', \'' + pagination.next_page_url + '\')">Next</button>');
                 }
             },
             error: function(xhr, status, error) {
@@ -3947,10 +3947,10 @@ job_input.addEventListener('input', function() {
                 var paginationControlsContact = $("#pagination-controls-contact");
                 paginationControlsContact.empty();
                 if (paginationContact.prev_page_url) {
-                    paginationControlsContact.append('<button class="profileDrop" onclick="get_all_crm_customer_contacts(' + id + ', \'' + paginationContact.prev_page_url + '\')">Previous</button>');
+                    paginationControlsContact.append('<button type="button" class="profileDrop" onclick="get_all_crm_customer_contacts(' + id + ', \'' + paginationContact.prev_page_url + '\')">Previous</button>');
                 }
                 if (paginationContact.next_page_url) {
-                    paginationControlsContact.append('<button class="profileDrop" onclick="get_all_crm_customer_contacts(' + id + ', \'' + paginationContact.next_page_url + '\')">Next</button>');
+                    paginationControlsContact.append('<button type="button" class="profileDrop" onclick="get_all_crm_customer_contacts(' + id + ', \'' + paginationContact.next_page_url + '\')">Next</button>');
                 }
             },
             error: function(xhr, status, error) {

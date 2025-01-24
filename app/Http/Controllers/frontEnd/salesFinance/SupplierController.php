@@ -150,29 +150,32 @@ class SupplierController extends Controller
         return response()->json(['success'=>true,'data'=>$data]);
     }
     public function search_email_list(Request $request){
+        // echo "<pre>";print_r($request->all());die;
         $email=$request->email;
-        // $supplier_check=Supplier::where('email','LIKE', "%$email%")->where(['status'=>1,'deleted_at'=>null])->take(10)->get();
-        // $customer_check=Customer::where('email','LIKE', "%$email%")->where(['is_converted'=>1,'status'=>1,'deleted_at'=>null])->take(10)->get();
-        // $all_emails=array();
-        // foreach($supplier_check as $suppval){
-        //     $all_emails[]=[
-        //         'id'=>$suppval->id,
-        //         'email'=>$suppval->email,
-        //         'userType'=>2
-        //     ];
-        // }
-        // foreach($customer_check as $cusval){
-        //     $all_emails[]=[
-        //         'id'=>$cusval->id,
-        //         'email'=>$cusval->email,
-        //         'userType'=>1
-        //     ];
-        // }
+        $supplier_check=Supplier::where('email','LIKE', "%$email%")->where(['status'=>1,'deleted_at'=>null])->take(10)->get();
+        $customer_check=Customer::where('email','LIKE', "%$email%")->where(['is_converted'=>1,'status'=>1,'deleted_at'=>null])->take(10)->get();
+        $all_emails=array();
+        foreach($supplier_check as $suppval){
+            $all_emails[]=[
+                'id'=>$suppval->id,
+                'email'=>$suppval->email,
+                'name'=>$suppval->name,
+                'userType'=>2
+            ];
+        }
+        foreach($customer_check as $cusval){
+            $all_emails[]=[
+                'id'=>$cusval->id,
+                'email'=>$cusval->email,
+                'name'=>$cusval->name,
+                'userType'=>1
+            ];
+        }
         // Uncomment above code when need to save usertype and primary id in table
-        $supplier_emails = Supplier::where('email', 'LIKE', "%$email%")->where(['status'=>1,'deleted_at'=>null])->take(10)->pluck('email');
-        $customer_emails = Customer::where('email', 'LIKE', "%$email%")->where(['is_converted'=>1,'status'=>1,'deleted_at'=>null])->take(10)->pluck('email');
+        // $supplier_emails = Supplier::where('email', 'LIKE', "%$email%")->where(['status'=>1,'deleted_at'=>null])->take(10)->pluck('email');
+        // $customer_emails = Customer::where('email', 'LIKE', "%$email%")->where(['is_converted'=>1,'status'=>1,'deleted_at'=>null])->take(10)->pluck('email');
         // $all_emails = $supplier_emails->merge($customer_emails)->unique()->toArray();
-        $all_emails = $supplier_emails->merge($customer_emails);
+        // $all_emails = $supplier_emails->merge($customer_emails);
 
         return response()->json(['all_emails' => $all_emails]);
     }

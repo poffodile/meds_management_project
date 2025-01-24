@@ -38,15 +38,15 @@ class InvoiceController extends Controller
     public function tax_rate(Request $request){
         $mode=$request->mode;
         $home_id = Auth::user()->home_id;
-        $data['tax_rate']=Construction_tax_rate::getAllTax_rate($home_id,$mode);
-        $data['home_id']=$home_id;
+        $data['tax_rate'] = Construction_tax_rate::getAllTax_rate($home_id,$mode);
+        $data['home_id'] = $home_id;
         return view('frontEnd.salesAndFinance.jobs.tax_rate',$data);
     }
 
     public function save_tax_rate(Request $request){
         // echo "<pre>";print_r($request->all());die;
         $validator = Validator::make($request->all(), [
-            'name' => 'required',
+            'name' => 'required|unique:construction_tax_rates,name|string',
             'tax_rate' => 'required',
         ]);
         if ($validator->fails()) {

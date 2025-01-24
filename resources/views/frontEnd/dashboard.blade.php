@@ -102,7 +102,7 @@
                 </a> <?php } ?>
                  <!-- Ram 14/06/2024 here code for job -->
              
-                <a href="{{ url('/jobs_index') }}">
+                <a href="{{ url('/sales-finance/dashboard') }}">
                      <div class="col-md-6">
                         <div class="profile-nav alt">
                             <section class="panel text-center">

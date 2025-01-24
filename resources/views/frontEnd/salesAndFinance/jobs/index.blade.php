@@ -267,9 +267,9 @@
                 </div>
                 <div class="col-lg-4">
 
-                    <div class="proBox">
-                        <div class="card">
-                            <div class="stikerBx">
+                    <!-- <div class="proBox">
+                        <div class="card"> -->
+                            <!-- <div class="stikerBx">
                                 <div class="shape">
                                     <div class="tile">
                                         <div class="boxCont">
@@ -499,9 +499,11 @@
                                 <div class="clickHere">
                                     <a href="#!"> Click here to find out more </a>
                                 </div>
-                            </div> <!---End stikerBx-->
-                        </div>
-                    </div><!--End proBox-->
+                            </div>  -->
+                            <!---End stikerBx-->
+                        <!-- </div>
+                    </div> -->
+                    <!--End proBox-->
                     <div class="proBox">
                         <div class="row">
                             <div class="col-lg-6">

@@ -35,14 +35,27 @@ class GeneralSectionController extends Controller
     }
 
     public function save_payment_type(Request $request){
+        // echo "<pre>";print_r($request->all());die;
         $validator = Validator::make($request->all(), [
             'title' => 'required',
         ]);
         if ($validator->fails()) {
             return response()->json(['vali_error' => $validator->errors()->first()]);
         }
-        $data=Payment_type::savePayment_type($request->all());
-        return response()->json(['data' => $data]);
+        $requestData=$request->all();
+        $requestData['home_id']=Auth::user()->home_id;
+        // echo "<pre>";print_r($requestData);die;
+        try {
+            $data=Payment_type::savePayment_type($requestData);
+            if($request->id == ''){
+                return response()->json(['success'=>true,'message'=>'Payment type Added Successfully.','data' => $data]);
+            }else{
+                return response()->json(['success'=>true,'message'=>'Payment type Updated Successfully.','data' => $data]);
+            }
+        }catch (\Exception $e) {
+            Log::error('Error: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     public function regions(){

@@ -9,7 +9,20 @@ class QuoteCustomerDeposit extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['quote_id', 'customer_id', 'deposit_percantage', 'amount', 'reference', 'description', 'payment_type', 'deposit_date'];
+
+    protected $fillable = [
+        'quote_id', 
+        'customer_id',
+        'deposit_percantage',
+        'amount',
+        'reference', 
+        'description', 
+        'payment_type', 
+        'deposit_date'
+    ];
+
+
 
 
 }
+    

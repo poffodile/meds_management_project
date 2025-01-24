@@ -435,7 +435,7 @@ class DynamicFormController extends Controller
                         <div class="input-group popovr">
 
                             <!-- <input type="hidden" name="su_bmp_id[]" value="' . $value->id . '" disabled="disabled" class="edit_bmp_id_' . $value->id . '"> -->
-                            <input type="text" class="form-control" name="" disabled value="' . $title . ' ' . $start_brct . $date . ' ' .  $end_brct . '" maxlength="255"/> 
+                            <input type="text" class="form-control" name="" disabled value="' . $title . ' ' . $start_brct . $date . ' ' .  $end_brct . '" maxlength="255"/ style="cursor:auto;"> 
                             
                             <span class="input-group-addon cus-inpt-grp-addon clr-blue settings">
                                 <i class="fa fa-cog"></i>

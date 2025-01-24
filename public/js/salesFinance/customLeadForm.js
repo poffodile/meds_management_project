@@ -254,14 +254,15 @@ document.getElementById('saveAddTask').addEventListener('click', function (event
     } else {
         var formData = $('#addTask').serialize();
         console.log(formData);
+        console.log("addLeadTaskUrl", addLeadTaskUrl);
         $.ajax({
             url: addLeadTaskUrl,
             method: 'POST',
             data: formData,
             success: function (response) {
-                alert(response.message);
-                $('#notesModel').modal('hide');
-                location.reload();
+                console.log(response);
+                $('#tasksModel').modal('hide');
+                getLeadTask(response.data);
             },
             error: function (xhr, status, error) {
                 console.error(error);
@@ -269,3 +270,23 @@ document.getElementById('saveAddTask').addEventListener('click', function (event
         });
     }
 });
+
+function getLeadTask(lead_ref){
+    $.ajax({
+        url: getLeadTaskDataURL,
+        method: 'POST',
+        data: {lead_ref:lead_ref},
+        success: function (response) {
+            console.log(response.data);
+            const table = document.getElementById('taskTableData'); // Replace with your table's ID
+            const tableBody = table.querySelector('tbody'); // Select the tbody within the table
+            setleadTaskTableData(response.data, tableBody, table)
+        },
+        error: function (xhr, status, error) {
+            console.error(error);
+        }
+    });
+}
+
+
+

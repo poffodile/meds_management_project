@@ -36,6 +36,7 @@ class LeadTask extends Model
         ->where('lead_tasks.deleted_at', null)
         ->where('lead_tasks.is_completed', $type)
         ->get();
+        
     } 
 
     public static function getLeadTasks($type){

@@ -38,7 +38,7 @@ h6 {
 }
 
 .btn-sm-square i {
-  color: #0877bd;
+  color: #1f88b5;
 }
 
 .toprigihticon {
@@ -53,8 +53,8 @@ h6 {
 
 
 .menubaar {
-  border-top: 2px solid #0877bd;
-  border-bottom: 2px solid #0877bd;
+  border-top: 2px solid #1f88b5;
+  border-bottom: 2px solid #1f88b5;
 }
 
 .menubaar .navbar .dropdown-toggle::after {
@@ -77,7 +77,7 @@ h6 {
   display: block;
   text-align: center;
   font-size: 30px;
-  color: #0877bd;
+  color: #1f88b5;
 }
 
 .menubaar .navbar-light .navbar-nav .nav-link.active span {
@@ -91,11 +91,11 @@ h6 {
 .menubaar .navbar-light .navbar-nav .nav-link:hover,
 .menubaar .navbar-light .navbar-nav .nav-link.active {
   color: white;
-  background-color: #0877bd;
+  background-color: #1f88b5;
 }
 
 /* .nav-item.dropdown.profileDrop a.nav-link{
-  background: #0877bd;
+  background: #1f88b5;
   padding: 4px 7px;
   border-radius: 4px;
   color: #fff;
@@ -127,13 +127,13 @@ h6 {
 .menubaar .dropdown-item:active {
   color: #000;
   text-decoration: none;
-  background-color: #0877bd;
+  background-color: #1f88b5;
 }
 
 .menubaar .dropdown-item:focus,
 .menubaar .dropdown-item:hover {
   color: #ffffff;
-  background-color: #0877bd;
+  background-color: #1f88b5;
 }
 
 
@@ -188,7 +188,7 @@ h6 {
 
 /* **************End off Header************* */
 .profileDrop {
-  background: #0877bd;
+  background: #1f88b5;
   padding: 6px 10px;
   border-radius: 3px;
   color: #fff;
@@ -199,11 +199,11 @@ h6 {
 }
 
 .profileDrop:hover {
-  background-color: #494949;
+  background-color: #32323A;
   color: #fff;
 }
 button.profileDrop{
-  background: #0877bd;
+  background: #1f88b5;
   padding: 6px 10px;
   border-radius: 3px;
   color: #fff;
@@ -803,7 +803,7 @@ span.supCirle.productIcon i {
 }
 
 .supCirle.productIcon {
-  background-color: #0877bd;
+  background-color: #1f88b5;
   color: #fff;
 }
 
@@ -835,7 +835,7 @@ footer.mainFooter {
 
 .contTitle {
   font-size: 16px;
-  color: #0877bd;
+  color: #1f88b5;
   font-weight: 600;
   line-height: 20px;
   margin-bottom: 0;
@@ -845,7 +845,7 @@ section.main_section_page {
   padding-bottom: 40px;
 }
 .newJobForm {
-  border: 2px solid #0877bd;
+  border: 2px solid #1f88b5;
   padding: 12px;
   border-radius: 4px;
   position: relative;
@@ -875,7 +875,7 @@ form.customerForm {
   font-size: 22px;
   padding-top: 5px;
   display: inline-block;
-  color: #0877bd;
+  color: #1f88b5;
 }
 
 .selectOptions option {
@@ -957,7 +957,7 @@ form.customerForm {
 
 .add_Customer .modal-header {
   padding: 8px 16px;
-  background: #0877bd;
+  background: #1f88b5;
 }
 .add_Customer .modal-header h5 {
   font-size: 18px;
@@ -1065,7 +1065,7 @@ form.customerForm {
 .popupTitle{
   padding: 12px;
   color: #fff;
-  background-color: #0877bd;
+  background-color: #1f88b5;
 }
 .contantbodypopup{
   padding: 12px;
@@ -1228,7 +1228,7 @@ a.profileDrop.dashboardSearchBtn{
 }
 h4.card-title {
   font-size: 16px;
-  color: #0877bd;
+  color: #1f88b5;
 }
 .card_text span{
   font-size: 14px;
@@ -1238,7 +1238,7 @@ h4.card-title {
 }
 .numberCount a{
   text-decoration: none;
-  color: #0877bd;
+  color: #1f88b5;
   font-weight: 900;
   display: flex;
 }
@@ -1277,7 +1277,7 @@ div#lineChart-license-text {
 /* Table Add Data */
 
 .leftNum{
-  background: #0877bd;
+  background: #1f88b5;
   padding: 4px;
   color: #fff;
   text-align: center;
@@ -1290,7 +1290,7 @@ div#lineChart-license-text {
 }
 .callIcon{
   font-size: 30px;
-  color: #0877bd;
+  color: #1f88b5;
   margin-left: 6px;
 }
 .addTextarea textarea{
@@ -1317,7 +1317,7 @@ div#lineChart-license-text {
 
  .statuswating a i {
   font-size: 22px;
-  color: #0877bd;
+  color: #1f88b5;
   line-height: 31px;
   margin-left: 8px;
 }
@@ -1371,7 +1371,7 @@ canvas#canv1 {
 }
 
 .uploadImg {
-  border: 2px dashed #0877bd;
+  border: 2px dashed #1f88b5;
   border-radius: 5px;
   text-align: center;
   background-color: #fff;
@@ -1382,7 +1382,7 @@ canvas#canv1 {
 
 .uploadImg i {
   font-size: 50px;
-  color: #0877bd;
+  color: #1f88b5;
 }
 .uploadImg input {
   position: absolute;
@@ -1540,7 +1540,7 @@ form .page .field select {
   font-weight: 500;
 }
 form .page .field button {
-  background: #0877bd;
+  background: #1f88b5;
     padding: 0px 20px;
     border-radius: 2px;
     color: #fff;
@@ -1800,7 +1800,7 @@ span.oNOfswich {
   height: 20px;
   -webkit-appearance: none;
   appearance: none;
-  background: #0877bd;
+  background: #1f88b5;
   outline: none;
   border-radius: 2rem;
   cursor: pointer;
@@ -1908,7 +1908,7 @@ span.oNOfswich {
   -moz-box-shadow: none !important;
   -webkit-box-shadow: none !important;
   box-shadow: none !important;
-  border: 1px solid #0877bd;
+  border: 1px solid #1f88b5;
   outline-width: 0
 }
 
@@ -1918,7 +1918,7 @@ span.oNOfswich {
   border: 0 none;
   margin: 10px 0px 10px 5px;
   float: right;
-  background: #0877bd;
+  background: #1f88b5;
   padding: 6px 10px;
   border-radius: 3px;
   color: #fff;
@@ -1940,7 +1940,7 @@ span.oNOfswich {
   cursor: pointer;
   margin: 10px 5px 10px 0px;
   float: right;
-  background: #0877bd;
+  background: #1f88b5;
   padding: 6px 10px;
   border-radius: 3px;
   color: #fff;
@@ -1963,14 +1963,14 @@ span.oNOfswich {
 
 /* .fs-title {
   font-size: 25px;
-  color: #0877bd;
+  color: #1f88b5;
   margin-bottom: 15px;
   font-weight: normal;
   text-align: left
 } */
 
 .purple-text {
-  color: #0877bd;
+  color: #1f88b5;
   font-weight: normal
 }
 
@@ -1994,7 +1994,7 @@ span.oNOfswich {
 }
 
 #progressbar .active {
-  color: #0877bd
+  color: #1f88b5
 }
 
 #progressbar li {
@@ -2048,7 +2048,7 @@ span.oNOfswich {
 
 #progressbar li.active:before,
 #progressbar li.active:after {
-  background: #0877bd
+  background: #1f88b5
 }
 
 .progress {
@@ -2056,7 +2056,7 @@ span.oNOfswich {
 }
 
 .progress-bar {
-  background-color: #0877bd
+  background-color: #1f88b5
 }
 
 .fit-image {
@@ -2080,13 +2080,13 @@ span.oNOfswich {
   font-size: 17px;
   font-weight: 600;
   line-height: 24px;
-  color: #0877bd;
+  color: #1f88b5;
 }
 .addproductCentertext a{
   color: #000;
 }
 .productCount{
-  background-color: #0877bd;
+  background-color: #1f88b5;
   color: #fff;
   display: inline-block;
   border-radius: 2px;
@@ -2095,7 +2095,7 @@ span.oNOfswich {
 }
 
 .nav-tabs button:nth-child(1) .productCount{
-  background: #0877bd;
+  background: #1f88b5;
 }
 .nav-tabs button:nth-child(2) .productCount{
   background: #00bb3b;
@@ -2185,7 +2185,7 @@ div#exampleOne_wrapper::-webkit-scrollbar-track {
 }
 /* Handle */
 div#exampleOne_wrapper::-webkit-scrollbar-thumb {
-  background: #0877bd; 
+  background: #1f88b5; 
   border-radius: 10px;
 }
 
@@ -2261,5 +2261,31 @@ ul#productList {
 }
 .actionDropdown .nav-item.dropdown .dropdown-menu .dropdown-item:focus, .actionDropdown .nav-item.dropdown .dropdown-menu .dropdown-item:hover {
     color: #ffffff;
-    background-color: #0877bd;
+    background-color: #1f88b5;
 }
+/* Remainder time */
+.iconColrGreen {
+  color: #02990f;
+  font-weight: 500;
+}
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}
+.iconColrRad {
+  color: #ff0000;
+  font-weight: 500;
+}
+
+/* end */

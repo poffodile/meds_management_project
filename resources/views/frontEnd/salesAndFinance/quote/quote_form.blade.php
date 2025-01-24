@@ -3645,8 +3645,6 @@
         $('#add_site_delivery_address_modal').modal('show');
     });
 
-
-
     $('#openABCProductModal').on('click', function() {
         $('#productModalBAC').modal('show');
     });
@@ -3655,20 +3653,9 @@
         $('#quoteTagModal').modal('show');
     });
 
-
-
     $('#new_Attachment_open_model').on('click', function() {
         $('#new_Attachment_model').modal('show');
     });
-
-
-
-
-
-
-
-
-
 
     function additemsCatagoryModal(th) {
         //alert();

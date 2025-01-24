@@ -9,7 +9,7 @@
             <a href="{{ url('/lead/rejected') }}" class="profileDrop">Rejected<span>({{ $rejectLead }})</span></a>
             <a href="{{ url('/lead/authorization') }}" class="profileDrop">Authorization<span>({{ $authorizedLead }})</span></a>
             <a href="{{ url('/leads/converted') }}" class="profileDrop">Converted <span>({{ $convertedLead }})</span></a>
-            <a href="{{ url('/lead/searchLead') }}" class="profileDrop">Search Leads</a>
+            <a href="{{ url('/leads/search') }}" class="profileDrop">Search Leads</a>
             <a href="{{ url('/leads/tasks') }}" class="profileDrop">Task</a>
         </div>
     </div>

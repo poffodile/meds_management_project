@@ -19,6 +19,7 @@
     <script src="{{ url('public/js/salesFinance/customCRM.js')}}"></script>
     <script src="https://www.dukelearntoprogram.com/course1/common/js/image/SimpleImage.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
+    
     <script>
         function getCustomerList(id) {
         $.ajax({

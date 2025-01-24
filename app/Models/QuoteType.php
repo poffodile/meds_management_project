@@ -15,8 +15,7 @@ class QuoteType extends Model
         return QuoteType::where('deleted_at', null)->where('home_id', $home_id)->get();
     }
 
-    public static function getActiveQuoteType(){
-        return QuoteType::where('deleted_at', null)->where('status', 1)->get();
+    public static function getActiveQuoteType($home_id){
+        return QuoteType::where('deleted_at', null)->where('status', 1)->where('home_id', $home_id)->get();
     }
-
 }

@@ -16,7 +16,7 @@ class QuoteSource extends Model
     }
 
     public static function getAllQuoteSourcesHome($home_id){
-        return self::where('deleted_at', null)->where('status', 1)->where('home_id', $home_id)->get();
+        return self::where('deleted_at', null)->where('status', 1)->where('deleted_at', null)->where('home_id', $home_id)->get();
     }
 
 }

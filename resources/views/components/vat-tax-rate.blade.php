@@ -1,3 +1,10 @@
+<style>
+    .tag_box {
+    background: #f5f5f5;
+    display: grid;
+    border: 1px solid #dee2e6;
+}
+</style>
 <div class="modal fade" id="{{ $modalId }}" tabindex="-1" aria-labelledby="customerModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content add_Customer">
@@ -14,15 +21,20 @@
                                 @csrf
                                 <input type="hidden" name="id" id="{{ $id }}">
                                 <div class="mb-2 row">
-                                    <label for="inputName" class="col-sm-3 col-form-label">Name<span class="radStar ">*</span></label>
+                                    <label for="inputName" class="col-sm-3 col-form-label">Tax Rate Name<span class="radStar ">*</span></label>
                                     <div class="col-sm-9">
                                         <input type="text" class="form-control editInput VatTaxcheckError" id="{{ $name }}" name="name" value="">
                                     </div>
                                 </div>
                                 <div class="mb-2 row">
                                     <label for="inputName" class="col-sm-3 col-form-label">Tax Rate<span class="radStar ">*</span></label>
-                                    <div class="col-sm-9">
+                                    <div class="col-sm-7">
                                         <input type="text" class="form-control editInput VatTaxcheckError" id="{{ $taxRate }}" name="tax_rate" value="" onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.charCode === 46">
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="tag_box text-center">
+                                            <span style="padding:3px">%</span>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="mb-2 row">
@@ -70,10 +82,9 @@
                 return false;
             }
         })
-        var url ='{{$saveButtonUrl}}';
         $.ajax({
                 type: "POST",
-                url: url,
+                url: "{{ url('/save_tax_rate') }}",
                 data: new FormData($("#{{$formId}}")[0]),
                 async: false,
                 contentType: false,

@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use App\User;
 use App\Lead;
 use Illuminate\Support\Facades\Auth;
-use App\Customer;
+use App\Models\Customer;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -36,30 +36,30 @@ class LeadController extends Controller
 {
     public function index(Request $request)
     {
-        $page = "leads";
+        $data['page'] = "leads";
         $path = $request->path();
         $segments = explode('/', $path);
-        $lastSegment = end($segments);
-        $users = User::getHomeUsers(Auth::user()->home_id);
-        $leadTask = LeadTaskType::getLeadTaskType();
-        $customers = Customer::getCustomerWithLeads($lastSegment, Auth::user()->home_id);
-        $leadRejectTypes = LeadRejectType::getLeadRejectType();
-        $weeks = Week::getWeeklist();
-        $allLead = Lead::getAllLeadCount(Auth::user()->home_id);
-        $myLeads = Lead::getLeadByUser(Auth::user()->id, Auth::user()->home_id);
-        $unAssignLead = Lead::getUnassignedCount(Auth::user()->home_id);
-        $actionedLead =   Lead::getActionedLead(Auth::user()->home_id);
-        $rejectLead = Lead::getRejectedCount(Auth::user()->home_id);
-        $authorizedLead     = Lead::getAuthorizationCount(Auth::user()->home_id);
-        $convertedLead = Customer::getConvertedCustomersCount(Auth::user()->home_id);
-        return view('frontEnd.salesAndFinance.lead.leads', compact('customers', 'page', 'lastSegment', 'users', 'leadTask', 'leadRejectTypes', 'weeks', 'allLead', 'myLeads', 'unAssignLead', 'actionedLead', 'rejectLead', 'authorizedLead', 'convertedLead'));
+        $data['lastSegment'] = end($segments);
+        $data['users'] = User::getHomeUsers(Auth::user()->home_id);
+        $data['leadTask'] = LeadTaskType::getLeadTaskType();
+        $data['customers'] = Customer::getCustomerWithLeads(end($segments), Auth::user()->home_id);
+        $data['leadRejectTypes'] = LeadRejectType::getLeadRejectType();
+        $data['weeks'] = Week::getWeeklist();
+        $data['allLead'] = Lead::getAllLeadCount(Auth::user()->home_id);
+        $data['myLeads'] = Lead::getLeadByUser(Auth::user()->id, Auth::user()->home_id);
+        $data['unAssignLead'] = Lead::getUnassignedCount(Auth::user()->home_id);
+        $data['actionedLead'] =   Lead::getActionedLead(Auth::user()->home_id);
+        $data['rejectLead'] = Lead::getRejectedCount(Auth::user()->home_id);
+        $data['authorizedLead']     = Lead::getAuthorizationCount(Auth::user()->home_id);
+        $data['convertedLead'] = Customer::getConvertedCustomersCount(Auth::user()->home_id);
+        return view('frontEnd.salesAndFinance.lead.leads', $data);
     }
     public function create()
     {
         $page = "leads";
         $users = User::getHomeUsers(Auth::user()->home_id);
         $status = LeadStatus::getLeadStatus();
-        $sources = LeadSource::getLeadSources();
+        $sources = LeadSource::getLeadSources(Auth::user()->home_id);
         return view('frontEnd.salesAndFinance.lead.lead_form', compact('page', 'users', 'status', 'sources'));
     }
     public function store(Request $request)
@@ -131,7 +131,6 @@ class LeadController extends Controller
 
         $page = 'leads';
         $lead = Customer::getCustomerLeads($id);
-        // dd($lead);
         $users = User::getHomeUsers(Auth::user()->home_id);
         $status = LeadStatus::getLeadStatus();
         $sources = LeadSource::getLeadSources();
@@ -141,6 +140,7 @@ class LeadController extends Controller
         $lead_notes_data = LeadNote::getLeadNoteFromleadNoteType($id);
         $lead_task_open =  LeadTask::getLeadTaskTypeUser($lead->lead_ref, 0);
         $lead_task_close =  LeadTask::getLeadTaskTypeUser($lead->lead_ref, 1);
+        // dd($lead_task_open);
         $lead_attachment = LeadAttachment::getLeadAttachments($id);
         return view('frontEnd.salesAndFinance.lead.lead_form', compact('lead', 'users', 'page', 'sources', 'status', 'notes_type', 'lead_notes_data', 'leadTask', 'lead_task_open', 'lead_task_close', 'attachment_type', 'lead_attachment'));
     }
@@ -270,12 +270,12 @@ class LeadController extends Controller
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
-        LeadTask::updateOrCreate(['id' => $request->lead_task_id], $request->all());
+        $lead = LeadTask::updateOrCreate(['id' => $request->lead_task_id], $request->all());
 
         if (isset($request->lead_task_id)) {
-            return response()->json(['success' => true, 'message' => 'Record updated successfully!']);
+            return response()->json(['success' => true, 'message' => 'Record updated successfully!', 'data' => $lead->lead_ref]);
         } else {
-            return response()->json(['success' => false, 'message' => 'Task added successfully!']);
+            return response()->json(['success' => false, 'message' => 'Task added successfully!', 'data' => $lead->lead_ref]);
         }
     }
     public function lead_task_delete($taskId, $leadId)
@@ -1018,14 +1018,27 @@ class LeadController extends Controller
 
     public function searchLead(){
        
-        $page = "leads";
-        $allLead = Lead::getAllLeadCount(Auth::user()->home_id);
-        $myLeads = Lead::getLeadByUser(Auth::user()->id, Auth::user()->home_id);
-        $unAssignLead = Lead::getUnassignedCount(Auth::user()->home_id);
-        $actionedLead =   Lead::getActionedLead(Auth::user()->home_id);
-        $rejectLead = Lead::getRejectedCount(Auth::user()->home_id);
-        $authorizedLead     = Lead::getAuthorizationCount(Auth::user()->home_id);
-        $convertedLead = Customer::getConvertedCustomersCount(Auth::user()->home_id);
-        return view('frontEnd.salesAndFinance.lead.search_leads', compact('page', 'allLead', 'myLeads', 'unAssignLead', 'actionedLead', 'rejectLead', 'authorizedLead', 'convertedLead'));
+        $data['page'] = "leads";
+        $data['allLead'] = Lead::getAllLeadCount(Auth::user()->home_id);
+        $data['myLeads'] = Lead::getLeadByUser(Auth::user()->id, Auth::user()->home_id);
+        $data['unAssignLead'] = Lead::getUnassignedCount(Auth::user()->home_id);
+        $data['actionedLead'] =   Lead::getActionedLead(Auth::user()->home_id);
+        $data['rejectLead'] = Lead::getRejectedCount(Auth::user()->home_id);
+        $data['authorizedLead'] = Lead::getAuthorizationCount(Auth::user()->home_id);
+        $data['convertedLead'] = Customer::getConvertedCustomersCount(Auth::user()->home_id);
+        $data['statuses'] = LeadStatus::getLeadStatus();
+        $data['users'] = User::getHomeUsers(Auth::user()->home_id);
+        $data['sources'] = LeadSource::getLeadSources(Auth::user()->home_id);
+        return view('frontEnd.salesAndFinance.lead.search_leads', $data);
+    }
+
+    public function getLeadTaskOnLeadId(Request $request){
+        // dd($request);
+        $data =  LeadTask::getLeadTaskTypeUser($request->lead_ref, 0);
+        if ($data) {
+            return response()->json(['success' => true, 'data' => $data]);
+        } else {
+            return response()->json(['success' => false, 'data' => 'No Data']);
+        }
     }
 }

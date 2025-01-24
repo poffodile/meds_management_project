@@ -21,7 +21,6 @@ class VatTaxRate extends Component
     public $expDate;
     public $status;
     public $saveButtonId;
-    public $saveButtonUrl;
     public function __construct(
         string $modalId = 'defaultModalId',
         string $modalTitle = 'Add Attachment',
@@ -32,8 +31,7 @@ class VatTaxRate extends Component
         string $taxCode = 'defaultTaxCode',
         string $expDate = 'defaultExpDate',
         string $status = 'defaultStatus',
-        string $saveButtonId = 'defaultSaveButtonId',
-        string $saveButtonUrl = 'defaultSaveButtonUrl',)
+        string $saveButtonId = 'defaultSaveButtonId',)
     {
         $this->modalId = $modalId;
         $this->modalTitle = $modalTitle;
@@ -45,7 +43,6 @@ class VatTaxRate extends Component
         $this->expDate = $expDate;
         $this->status = $status;
         $this->saveButtonId = $saveButtonId;
-        $this->saveButtonUrl = $saveButtonUrl;
     }
 
     /**
