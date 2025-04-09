@@ -116,7 +116,7 @@
                   
                         <div class="schedule-table" ng-app="myApp" ng-controller="myCtrl">
                             @if($shift_types->isEmpty())
-                            <p class="m-l-15" style="color:red">Note: Your rota shifts are not set. Please contact admin for setting.</p>
+                            <p class="m-l-15" style="color:#e10078;">Note: Your rota shifts are not set. Please contact admin for setting.</p>
                             @endif
                             <div class="table-responsive" id="calendar" style="margin:0px 15px;">
                                 <table class="table table-bordered">

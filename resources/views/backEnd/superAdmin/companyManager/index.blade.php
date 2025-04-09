@@ -131,12 +131,17 @@ color:#FF0000;
                                             <td>{{ ucfirst($value->phone_no) }}</td>
                                             <td class="action-icn">
                                                 @if($del_status == '0')
-                                                    <a href="{{ url('admin/company-manager/edit/'.$value->id) }}" class="edit"><span style= "color: #000"><i data-toggle="tooltip" title="Edit" class="fa fa-edit fa-lg"></i></span></a>&nbsp&nbsp&nbsp
-                                                    <a href="{{ url('admin/company-manager/send-set-pass-link/'.$value->id) }}"  id="{{ $value->id }}" class="mail send-set-pass-link-btn"><span style= "color: #000"><i data-toggle="tooltip" title="Send Credential Mail" class="fa fa-envelope-o fa-lg"></i></span></a>&nbsp&nbsp&nbsp
-                                                    <a href="{{ url('admin/company-manager/delete/'.$value->id) }}" class="delete"><span style= "color: #000"><i data-toggle="tooltip" title="Delete" class="fa fa-trash-o fa-lg"></i></span></a>
+                                                
+                                                    <a href="{{ url('admin/company-manager/edit/'.$value->id) }}" class="edit"><span><i data-toggle="tooltip" title="Edit" class="fa fa-edit fa-lg"></i></span></a>
+
+                                                    <a href="{{ url('admin/company-manager/send-set-pass-link/'.$value->id) }}"  id="{{ $value->id }}" class="mail send-set-pass-link-btn"><span><i data-toggle="tooltip" title="Send Credential Mail" class="fa fa-envelope-o fa-lg"></i></span></a>
+
+                                                    <a href="{{ url('admin/company-manager/delete/'.$value->id) }}" class="delete"><span><i data-toggle="tooltip" title="Delete" class="fa fa-trash-o fa-lg"></i></span></a>
+
                                                 @else
-                                                    <a href="{{ url('admin/users/edit/'.$value->id.'?del_status='.$del_status) }}" class="edit"><span style= "color: #000"><i data-toggle="tooltip" title="View" class="fa fa-eye fa-lg"></i></span></a>
+                                                    <a href="{{ url('admin/users/edit/'.$value->id.'?del_status='.$del_status) }}" class="edit"><span><i data-toggle="tooltip" title="View" class="fa fa-eye fa-lg"></i></span></a>
                                                 @endif
+
                                                 </td>
 
 

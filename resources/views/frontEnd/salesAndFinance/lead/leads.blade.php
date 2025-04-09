@@ -4,9 +4,9 @@
 <meta name="csrf-token" content="{{ csrf_token() }}">
 
 <style>
-    .CRMFullModel .modal-dialog.modal-xl {
+    /* .CRMFullModel .modal-dialog.modal-xl {
         --bs-modal-width: 1600px;
-    }
+    } */
 
     .overdue {
         display: flex;
@@ -49,7 +49,7 @@
     }
 
     #showDivContLeads {
-        height: 176px;
+        height: 200px;
         transition: .7s;
         overflow: hidden;
     }
@@ -99,7 +99,7 @@
                     <div class="printExpt">
                         <div class="prntExpbtn">
                             <a href="#!">Print</a>
-                            <a href="#!">Export</a>
+                            <a href="#!" id="exportCsv">Export</a>
                         </div>
                         <div class="searchFilter">
                             <a href="#!">Show Search Filter</a>
@@ -122,164 +122,166 @@
                         </div>
                     </div>
                     <!-- end here -->
-                    <table id="exampleOne" class="display tablechange" cellspacing="0" width="100%">
-                        <thead>
-                            <tr>
-                                <!-- Ram bulk delete -->
-                                <th class="text-center" style=" width:30px;"><input type="checkbox" id="selectAll"> <label for="selectAll"> All Select</label></th>
-                                <th>#</th>
-                                <th>Lead Ref.</th>
-                                <th>Full Name</th>
-                                <th>Company Name</th>
-                                <th>Email Address</th>
-                                <th>Telephone</th>
-                                <th>Mobile</th>
-                                <th>Assigned User</th>
-                                <th>Status</th>
-                                <th>Website</th>
-                                <th>Address</th>
-                                <th>City </th>
-                                <th>County </th>
-                                <th>Postcode</th>
-                                <th></th>
-                            </tr>
-                        </thead>
+                    <div class="table-responsive" style="min-height: 350px;">
+                        <table id="exampleOne" class="display tablechange" cellspacing="0" width="100%">
+                            <thead>
+                                <tr>
+                                    <!-- Ram bulk delete -->
+                                    <th class="text-center" style=" width:30px;"><input type="checkbox" id="selectAll"> <label for="selectAll"> All Select</label></th>
+                                    <th>#</th>
+                                    <th>Lead Ref.</th>
+                                    <th>Full Name</th>
+                                    <th>Company Name</th>
+                                    <th>Email Address</th>
+                                    <th>Telephone</th>
+                                    <th>Mobile</th>
+                                    <th>Assigned User</th>
+                                    <th>Status</th>
+                                    <th>Website</th>
+                                    <th>Address</th>
+                                    <th>City </th>
+                                    <th>County </th>
+                                    <th>Postcode</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
 
-                        <tbody>
-                            @foreach ($customers as $customer)
-                            @php
-                            $authorizationText = '';
-                            if ($customer->status_id == 7) {
-                            if ($customer->authorization_status === 1) {
-                            $authorizationText = 'Waiting for Authorization';
-                            } elseif ($customer->authorization_status === 2) {
-                            $authorizationText = 'Authorized';
-                            } else {
-                            $authorizationText = 'none';
-                            }
-                            }
-                            @endphp
-                            <tr>
-                                <!-- Ram bulk delete -->
-                                <td><input type="checkbox" id="" class="delete_checkbox" value="{{$customer->id}}"></td>
-                                <td>{{ $loop->iteration }}</td>
-                                <td>{{ $customer->lead_ref }}</td>
-                                <td>{{ $customer->contact_name }}</td>
-                                <td>{{ $customer->name }}</td>
-                                <td>{{ $customer->email }}</td>
-                                <td>{{ $customer->telephone }}</td>
-                                <td>{{ $customer->mobile }}</td>
-                                <td>{{ App\User::getLeadAssignUserName($customer->assign_to) }}</td>
-                                <td>{{ $customer->status_id == 7 ? $authorizationText : $customer->status }}</td>
-                                <td>{{ $customer->website }}</td>
-                                <td>{{ $customer->address }}</td>
-                                <td>{{ $customer->city }}</td>
-                                <td>{{ $customer->country }}</td>
-                                <td>{{ $customer->postal_code }}</td>
-                                <td>
-                                    <div class="d-inline-flex align-items-center ">
-                                        <div class="nav-item dropdown">
-                                            <a href="#" class="nav-link dropdown-toggle profileDrop" data-bs-toggle="dropdown">
-                                                Action
-                                            </a>
-                                            <div class="dropdown-menu fade-up m-0">
-                                                <a href="{{ url('/leads/edit').'/'.$customer->id }}" class="dropdown-item">Edit Details</a>
-                                                <a href="#" class="dropdown-item">Send SMS</a>
-                                                <hr class="dropdown-divider">
-                                                <a href="#" class="dropdown-item set_value_on_CRM_model" data-user-id="{{ $customer->id }}" data-ref="{{ $customer->lead_ref }}" data-contact-name="{{ $customer->contact_name }}" data-email="{{ $customer->email }}" data-name="{{ $customer->name }}" data-status="{{ $customer->status }}" data-telephone="{{ $customer->telephone }}" class="dropdown-item">CRM History</a>
-                                                <a href="#" class="dropdown-item open-modal" data-lead_ref="{{ $customer->lead_ref }}" data-bs-toggle="modal" data-bs-target="#rejectModal">Reject</a>
-                                                <a href="{{ url('/leads/authorization').'/'.$customer->id }}" class="dropdown-item">Send for Authorization</a>
-                                                <a href="javaScript:void(0)" onclick="openSentQuoteModal('{{ $customer->lead_ref }}')" class="dropdown-item">Send to Quote</a>
-                                                <a href="#" class="dropdown-item">Send to Job</a>
-                                                <a href="#" class="dropdown-item">Convert to Customer Only</a>
+                            <tbody>
+                                @foreach ($customers as $customer)
+                                @php
+                                $authorizationText = '';
+                                if ($customer->status_id == 7) {
+                                if ($customer->authorization_status === 1) {
+                                $authorizationText = 'Waiting for Authorization';
+                                } elseif ($customer->authorization_status === 2) {
+                                $authorizationText = 'Authorized';
+                                } else {
+                                $authorizationText = 'none';
+                                }
+                                }
+                                @endphp
+                                <tr>
+                                    <!-- Ram bulk delete -->
+                                    <td><input type="checkbox" id="" class="delete_checkbox" value="{{$customer->id}}"></td>
+                                    <td>{{ $loop->iteration }}</td>
+                                    <td>{{ $customer->lead_ref }}</td>
+                                    <td>{{ $customer->contact_name }}</td>
+                                    <td>{{ $customer->name }}</td>
+                                    <td>{{ $customer->email }}</td>
+                                    <td>{{ $customer->telephone }}</td>
+                                    <td>{{ $customer->mobile }}</td>
+                                    <td>{{ App\User::getLeadAssignUserName($customer->assign_to) }}</td>
+                                    <td>{{ $customer->status_id == 7 ? $authorizationText : $customer->status }}</td>
+                                    <td>{{ $customer->website }}</td>
+                                    <td>{{ $customer->address }}</td>
+                                    <td>{{ $customer->city }}</td>
+                                    <td>{{ $customer->country }}</td>
+                                    <td>{{ $customer->postal_code }}</td>
+                                    <td>
+                                        <div class="d-inline-flex align-items-center ">
+                                            <div class="nav-item dropdown">
+                                                <a href="#" class="nav-link dropdown-toggle profileDrop" data-bs-toggle="dropdown">
+                                                    Action
+                                                </a>
+                                                <div class="dropdown-menu fade-up m-0">
+                                                    <a href="{{ url('/leads/edit').'/'.$customer->id }}" class="dropdown-item">Edit Details</a>
+                                                    <a href="#" class="dropdown-item">Send SMS</a>
+                                                    <hr class="dropdown-divider">
+                                                    <a href="#" class="dropdown-item set_value_on_CRM_model" data-user-id="{{ $customer->id }}" data-ref="{{ $customer->lead_ref }}" data-contact-name="{{ $customer->contact_name }}" data-email="{{ $customer->email }}" data-name="{{ $customer->name }}" data-status="{{ $customer->status }}" data-telephone="{{ $customer->telephone }}" class="dropdown-item">CRM History</a>
+                                                    <a href="#" class="dropdown-item open-modal" data-lead_ref="{{ $customer->lead_ref }}" data-bs-toggle="modal" data-bs-target="#rejectModal">Reject</a>
+                                                    <a href="{{ url('/leads/authorization').'/'.$customer->id }}" class="dropdown-item">Send for Authorization</a>
+                                                    <a href="javaScript:void(0)" onclick="openSentQuoteModal('{{ $customer->lead_ref }}', '{{ $customer->id}}', '{{ $customer->customer_id }}' ,'quote')" class="dropdown-item">Send to Quote</a>
+                                                    <a href="#" class="dropdown-item">Send to Job</a>
+                                                    <a href="#" class="dropdown-item" onclick="openSentQuoteModal('{{ $customer->lead_ref }}', '{{ $customer->id}}', '{{ $customer->customer_id }}' ,'customer')">Convert to Customer Only</a>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
 
-                                    <!-- **************** Reject Modal Start ****************-->
-                                    <div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h1 class="modal-title fs-5" id="exampleModalLabel">Reject Confirmation</h1>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <form id="lead_reject_reason_form">
-                                                        @csrf
-                                                        <div class="mb-3">
-                                                            <label for="recipient-name" class="col-form-label">Lead Ref:</label>
-                                                            <input type="text" name="lead_ref" class="form-control editInput" id="lead_ref" placeholder="Auto Generate" value="">
-                                                            <!-- <input type="text" class="form-control" id="recipient-name"> -->
-                                                        </div>
-                                                        <div class="mb-3">
-                                                            <label for="recipient-name" class="col-form-label">Reject Type:</label>
-                                                            <div class="row">
-                                                                <div class="col-10">
-                                                                    <select name="reject_type_id" class="form-control editInput" id="">
-                                                                        @foreach($leadRejectTypes as $value)
-                                                                        <option value="{{ $value->id }}">{{ $value->title}}</option>
-                                                                        @endforeach
-                                                                    </select>
-                                                                </div>
-                                                                <div class="col-2 d-flex align-items-center">
-                                                                    <a href="#!" data-bs-toggle="modal" data-bs-target="#rejectModal2">
-                                                                        <i class="fa-solid fa-square-plus"></i>
-                                                                    </a>
+                                        <!-- **************** Reject Modal Start ****************-->
+                                        <div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h1 class="modal-title fs-5" id="exampleModalLabel">Reject Confirmation</h1>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <form id="lead_reject_reason_form">
+                                                            @csrf
+                                                            <div class="mb-3">
+                                                                <label for="recipient-name" class="col-form-label">Lead Ref:</label>
+                                                                <input type="text" name="lead_ref" class="form-control editInput" id="lead_ref" placeholder="Auto Generate" value="">
+                                                                <!-- <input type="text" class="form-control" id="recipient-name"> -->
+                                                            </div>
+                                                            <div class="mb-3">
+                                                                <label for="recipient-name" class="col-form-label">Reject Type:</label>
+                                                                <div class="row">
+                                                                    <div class="col-10">
+                                                                        <select name="reject_type_id" class="form-control editInput" id="">
+                                                                            @foreach($leadRejectTypes as $value)
+                                                                            <option value="{{ $value->id }}">{{ $value->title}}</option>
+                                                                            @endforeach
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="col-2 d-flex align-items-center">
+                                                                        <a href="#!"  data-bs-toggle="modal" data-bs-target="#rejectModal2">
+                                                                            <i class="fa-solid fa-square-plus fs-4"></i>
+                                                                        </a>
+                                                                    </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
-                                                        <div class="mb-3">
-                                                            <label for="message-text" class="col-form-label">Reject Reason:</label>
-                                                            <textarea name="reject_reason" class="form-control editInput" id=""></textarea>
-                                                        </div>
-                                                    </form>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="profileDrop" data-bs-dismiss="modal">Close</button>
-                                                    <button type="button" class="profileDrop" id="lead_reject_reason">Confirm Reject</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="modal fade" id="rejectModal2" tabindex="1" aria-labelledby="exampleModalLabel2" aria-hidden="true">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h1 class="modal-title fs-5" id="exampleModalLabel2"> Add Lead Reject Type </h1>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <form id="lead_reject_type_form_edit">
-                                                        @csrf
-                                                        <div class="mb-3">
-                                                            <label for="recipient-name" class="col-form-label">Lead Reject Type :</label>
-                                                            <input type="text" class="form-control editInput" name="title" id="recipient-name">
-                                                        </div>
-                                                        <div class="mb-3">
-                                                            <label for="message-text" class="col-form-label">Status:</label>
-                                                            <select name="status" class="form-control editInput" id="">
-                                                                <option value="1">Active</option>
-                                                                <option value="0">InActive</option>
-                                                            </select>
-                                                        </div>
-                                                    </form>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="profileDrop" data-bs-dismiss="modal">Close</button>
-                                                    <button type="button" id="lead_reject" class="profileDrop">Save</button>
+                                                            <div class="mb-3">
+                                                                <label for="message-text" class="col-form-label">Reject Reason:</label>
+                                                                <textarea name="reject_reason" class="form-control editInput" id=""></textarea>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="profileDrop" data-bs-dismiss="modal">Close</button>
+                                                        <button type="button" class="profileDrop" id="lead_reject_reason">Confirm Reject</button>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <!--  **************** Reject Model End *****************  -->
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
 
+                                        <div class="modal fade" id="rejectModal2" tabindex="1" aria-labelledby="exampleModalLabel2" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h1 class="modal-title fs-5" id="exampleModalLabel2"> Add Lead Reject Type </h1>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <form id="lead_reject_type_form_edit">
+                                                            @csrf
+                                                            <div class="mb-3">
+                                                                <label for="recipient-name" class="col-form-label">Lead Reject Type :</label>
+                                                                <input type="text" class="form-control editInput" name="title" id="recipient-name">
+                                                            </div>
+                                                            <div class="mb-3">
+                                                                <label for="message-text" class="col-form-label">Status:</label>
+                                                                <select name="status" class="form-control editInput" id="">
+                                                                    <option value="1">Active</option>
+                                                                    <option value="0">InActive</option>
+                                                                </select>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="profileDrop" data-bs-dismiss="modal">Close</button>
+                                                        <button type="button" id="lead_reject" class="profileDrop">Save</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!--  **************** Reject Model End *****************  -->
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+
+                    </div>
                 </div> <!-- End off main Table -->
             </div>
             </di>
@@ -304,21 +306,21 @@
                                 <div class="">
                                     <h4 class="contTitle text-center">Contact Details</h4>
                                 </div>
-                                <div class="row pt-3">
-                                    <label class="col-md-4"><strong>Full Name:</strong></label>
-                                    <div class="col-md-8">
+                                <div class="row pt-2">
+                                    <label class="col-md-4 col-form-label">Full Name:</label>
+                                    <div class="col-md-8 small_content">
                                         <span id="calls_contact_name"></span>
                                     </div>
                                 </div>
-                                <div class="row pt-3">
-                                    <label class="col-md-4"><strong>Email Address:</strong></label>
-                                    <div class="col-md-8">
+                                <div class="row pt-2">
+                                    <label class="col-md-4 col-form-label">Email Address:</label>
+                                    <div class="col-md-8 small_content">
                                         <span id="calls_email"></span>
                                     </div>
                                 </div>
-                                <div class="row pt-3">
-                                    <label class="col-md-4"><strong>Telephone:</strong></label>
-                                    <div class="col-md-8">
+                                <div class="row pt-2">
+                                    <label class="col-md-4 col-form-label">Telephone:</label>
+                                    <div class="col-md-8 small_content">
                                         <span id="calls_telephone"></span>
                                     </div>
                                 </div>
@@ -327,17 +329,16 @@
                                 <div class="">
                                     <h4 class="contTitle text-center">Lead Details</h4>
                                 </div>
-                                <div class="row pt-3">
-                                    <label class="col-md-4"><strong>Lead Ref.:</strong></label>
-                                    <div class="col-md-8">
+                                <div class="row pt-2">
+                                    <label class="col-md-4 col-form-label">Lead Ref.:</label>
+                                    <div class="col-md-8 small_content">
                                         <span id="calls_lead_refs"></span>
                                         <input type="hidden" id="lead_id_CRM" name="">
-
                                     </div>
                                 </div>
-                                <div class="row pt-3">
-                                    <label class="col-md-4"><strong>Lead Status:</strong></label>
-                                    <div class="col-md-8">
+                                <div class="row pt-2">
+                                    <label class="col-md-4 col-form-label">Lead Status:</label>
+                                    <div class="col-md-8 small_content">
                                         <span id="calls_status"></span>
                                     </div>
                                 </div>
@@ -1188,7 +1189,7 @@
                     </div>
                     <div class="notification_div">
                         <div class="mb-2 row">
-                            <label for="user_notifiy" class="col-sm-3 col-form-label">Notify Who?<span class="radStar ">*</span> </label>
+                            <label for="user_notifiy" class="col-sm-3 col-form-label">Notify Who? <span class="radStar ">*</span> </label>
                             <div class="col-sm-9">
                                 <select name="notify_user" class="form-control editInput" id="user_notifiy">
                                     <option value=""></option>
@@ -1199,7 +1200,7 @@
                             </div>
                         </div>
                         <div class="mb-2 row">
-                            <label class="col-sm-3 col-form-label">Send As<span class="radStar ">*</span> </label>
+                            <label class="col-sm-3 col-form-label">Send As <span class="radStar ">*</span> </label>
                             <div class="col-sm-9">
                                 <label for="calls_notify_who1" class="editInput"><input type="checkbox" name="notification" id="calls_notify_who1" value="1"> Notification (User Only) </label>
                                 <label for="calls_notify_who2" class="editInput"><input type="checkbox" name="sms" id="calls_notify_who2" value="1"> SMS </label>
@@ -1326,7 +1327,7 @@
                     </div>
                     <div id="notification_email_div">
                         <div class="mb-2 row">
-                            <label for="user_notifiy" class="col-sm-3 col-form-label">Notify Who?<span class="radStar ">*</span> </label>
+                            <label for="user_notifiy" class="col-sm-3 col-form-label">Notify Who? <span class="radStar ">*</span> </label>
                             <div class="col-sm-9">
                                 <select name="notify_user" class="form-control editInput" id="user_notifiy">
                                     <option value=""></option>
@@ -1337,7 +1338,7 @@
                             </div>
                         </div>
                         <div class="mb-2 row">
-                            <label class="col-sm-3 col-form-label">Send As<span class="radStar ">*</span> </label>
+                            <label class="col-sm-3 col-form-label">Send As <span class="radStar ">*</span> </label>
                             <div class="col-sm-9">
                                 <label for="calls_notify_who1" class="editInput">
                                     <input type="checkbox" name="notification" id="calls_notify_who1" value="1"> Notification (User Only)
@@ -1421,7 +1422,7 @@
                     </div>
                     <div id="notification_notes_div">
                         <div class="mb-2 row">
-                            <label for="user_notifiy" class="col-sm-3 col-form-label">Notify Who?<span class="radStar ">*</span> </label>
+                            <label for="user_notifiy" class="col-sm-3 col-form-label">Notify Who? <span class="radStar ">*</span> </label>
                             <div class="col-sm-9">
                                 <select name="user_id" class="form-control editInput" id="user_notifiy">
                                     <option value=""></option>
@@ -1432,7 +1433,7 @@
                             </div>
                         </div>
                         <div class="mb-2 row">
-                            <label class="col-sm-3 col-form-label">Send As<span class="radStar ">*</span> </label>
+                            <label class="col-sm-3 col-form-label">Send As <span class="radStar ">*</span> </label>
                             <div class="col-sm-9">
                                 <label for="calls_notify_who1" class="editInput">
                                     <input type="checkbox" name="notification" id="calls_notify_who1" value="1"> Notification (User Only)
@@ -1554,7 +1555,7 @@
                     </div>
                     <div id="notification_complaint_div">
                         <div class="mb-2 row">
-                            <label for="user_notifiy" class="col-sm-3 col-form-label">Notify Who?<span class="radStar ">*</span> </label>
+                            <label for="user_notifiy" class="col-sm-3 col-form-label">Notify Who? <span class="radStar ">*</span> </label>
                             <div class="col-sm-9">
                                 <select name="user_id" class="form-control editInput" id="user_notifiy">
                                     <option value=""></option>
@@ -1565,7 +1566,7 @@
                             </div>
                         </div>
                         <div class="mb-2 row">
-                            <label class="col-sm-3 col-form-label">Send As<span class="radStar ">*</span> </label>
+                            <label class="col-sm-3 col-form-label">Send As <span class="radStar ">*</span> </label>
                             <div class="col-sm-9">
                                 <label for="calls_complaint_who1" class="editInput">
                                     <input type="checkbox" name="notification" id="calls_complaint_who1" value="1"> Notification (User Only)
@@ -1628,37 +1629,68 @@
 
 <div class="modal fade" id="sentToQuoteModal" tabindex="1" aria-labelledby="exampleModalLabel2" aria-hidden="true">
     <div class="modal-dialog modal-lg">
-        <div class="modal-content">
+        <div class="modal-content add_Customer">
             <div class="modal-header">
-                <h1 class="modal-title fs-5" id="exampleModalLabel2"> Notify Leads </h1>
+                <h5 class="modal-title fs-5" id="exampleModalLabel2"> Notify Leads </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form id="lead_reject_type_form_edit">
+                <form id="notify_lead_quote_form">
                     @csrf
                     <div class="mb-3">
-                        <label for="recipient-name" class="col-form-label"> <h5>Would you like to notify anyone that this lead <span id="sentQuote"></span> has been converted?</h5></label>
+                        <label for="recipient-name" class="col-form-label">
+                            <h6><strong>Would you like to notify anyone that this lead <span id="sentQuote"></span> has been converted?</strong></h6>
+                        </label>
                     </div>
-                    <div class="mb-3">
-                        <label for="recipient-name" class="col-form-label">Notify </label>
-                        <input type="radio" class="form-control editInput" name="title" id="recipient-name">
-                        <input type="radio" class="form-control editInput" name="title" id="recipient-name">
+                    <div class="mb-3 row">
+                        <input type="hidden" name="lead_id" id="notify_lead_id">
+                        <input type="hidden" name="type" id="notification_type">
+                        <input type="hidden" name="customer_id" id="converted_customer">
+                        <label class="col-sm-2 col-form-label"> <strong>Notify</strong></label>
+                        <div class="col-sm-10">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="notify" id="inlineRadio1" onclick="toggleDiv(true)" value="1">
+                                <label class="form-check-label checkboxtext" for="inlineRadio1">Yes</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="notify" id="inlineRadio2" onclick="toggleDiv(false)" value="0" checked="">
+                                <label class="form-check-label checkboxtext" for="inlineRadio2">No</label>
+                            </div>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="recipient-name" class="col-form-label">Notify Who ?</label>
-                        <input type="text" class="form-control editInput" name="title" id="recipient-name">
-                    </div>
-                    <div class="mb-3">
-                        <label for="message-text" class="col-form-label">Status:</label>
-                        <input type="radio" class="form-control editInput" name="Notification" id="recipient-name">
-                        <input type="radio" class="form-control editInput" name="sms" id="recipient-name">
-                        <input type="radio" class="form-control editInput" name="Email" id="recipient-name">
+                    <div id="toggleDiv">
+                        <div class="mb-3 row">
+                            <label class="col-sm-2 col-form-label"> <strong>Notify Who ?</strong></label>
+                            <div class="col-sm-10">
+                                <select class="form-control editInput" name="notifiy_user_id" id="notifiy_user">
+
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row">
+                            <label class="col-sm-2 col-form-label"> <strong>Send As <span class="radStar">*</span></strong></label>
+                            <div class="col-sm-10">
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" name="notifocation" id="checkalrt1" value="1">
+                                    <label class="form-check-label checkboxtext" for="checkalrt1">Notification</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" name="sms" id="checkalrt2" value="1">
+                                    <label class="form-check-label checkboxtext" for="checkalrt2">SMS</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" name="email" id="checkalrt3" value="1">
+                                    <label class="form-check-label checkboxtext" for="checkalrt3">Email</label>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </form>
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer customer_Form_Popup">
                 <button type="button" class="profileDrop" data-bs-dismiss="modal">Close</button>
-                <button type="button" id="lead_reject" class="profileDrop">Save</button>
+                <button type="button" id="save_lead_convert_quote" class="profileDrop">Save</button>
             </div>
         </div>
     </div>
@@ -3227,15 +3259,15 @@
 
     });
 
-    function openSentQuoteModal(lead_ref){
+    function openSentQuoteModal(lead_ref, lead_id, customer_id, type) {
         document.getElementById('sentQuote').textContent = lead_ref;
+        document.getElementById('notify_lead_id').value = lead_id;
+        document.getElementById('notification_type').value = type;
+        document.getElementById('converted_customer').value = customer_id;
         $('#sentToQuoteModal').modal('show');
     }
 
-    // $('#openSentQuoteModal').on('click', function(){
-    //     document.getElementById('sentQuote').value = ;
-    //     $('#sentToQuoteModal').modal('show');
-    // });
+
     $('.delete_checkbox').on('click', function() {
         if ($('.delete_checkbox:checked').length === $('.delete_checkbox').length) {
             $('#selectAll').prop('checked', true);
@@ -3243,6 +3275,48 @@
             $('#selectAll').prop('checked', false);
         }
     });
+
+    const getUserListNotify = "{{ route('lead.ajax.getUserList') }}";
+    const saveLeadConvertQuote = '{{ route("lead.ajax.saveLeadConvertQuote") }}';
+</script>
+<script type="module">
+    document.getElementById('exportCsv').addEventListener('click', function() {
+        const table = document.getElementById('exampleOne'); // Get the table
+        const selectedColumns = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]; // Specify which columns to export (e.g., 0 for Name, 2 for Phone)
+        let csvContent = '';
+
+        const now = new Date();
+        const formattedDateTime = now.toISOString().replace(/[-T:]/g, '_').split('.')[0];
+        const filename = `list_export_${formattedDateTime}.csv`;
+        // Extract headers (only selected columns)
+        const headers = Array.from(table.querySelectorAll('thead th'))
+            .filter((_, index) => selectedColumns.includes(index)) // Filter headers by selected columns
+            .map(th => th.textContent.trim())
+            .join(',');
+        csvContent += headers + '\n';
+
+        // Extract rows (only selected columns)
+        const rows = Array.from(table.querySelectorAll('tbody tr'));
+        rows.forEach(row => {
+            const cells = Array.from(row.querySelectorAll('td'))
+                .filter((_, index) => selectedColumns.includes(index)) // Filter cells by selected columns
+                .map(td => td.textContent.trim());
+            csvContent += cells.join(',') + '\n';
+        });
+
+        // Create and download CSV file
+        const blob = new Blob([csvContent], {
+            type: 'text/csv;charset=utf-8;'
+        });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = filename;
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    });
 </script>
 <!-- end here -->
 @include('frontEnd.salesAndFinance.jobs.layout.footer')
+<script type="text/javascript" src="{{ url('public/js/salesFinance/leads/customLeads.js') }}"></script>

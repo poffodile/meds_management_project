@@ -16,14 +16,14 @@
             <div class="col-sm-12">
                 <section class="panel">
                     <div class="panel-body">
-                        <div class="adv-table editable-table ">
+                        <div class="adv-table editable-table">
                             <div class="clearfix">
                                 <div class="btn-group">
                                     <a href="earning-scheme-label/add">
                                         <button id="editable-sample_new" class="btn btn-primary">
                                             Add Earning Scheme Label  <i class="fa fa-plus"></i>
                                         </button>
-                                    </a>    
+                                    </a>
                                 </div>
                                @include('backEnd.common.alert_messages')
                             </div>
@@ -58,11 +58,11 @@
                                 <table class="table table-striped table-hover table-bordered" id="editable-sample">
 
                                     <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Icon</th>
-                                        <th width="20%">Actions</th>
-                                    </tr>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Icon</th>
+                                            <th>Actions</th>
+                                        </tr>
                                     </thead>
 
                                     <tbody>
@@ -82,7 +82,8 @@
                                                 <a><i class="{{ $value->icon }} icn"></i></a>
                                             </td>
                                             <td class="action-icn">
-                                                <a href="{{ url('admin/earning-scheme-label/edit/'.$value->id) }}" class="edit"><span style = "color: #000"><i data-toggle="tooltip" title="Edit" class="fa fa-edit fa-lg"></i></span></a>
+                                                <a href="{{ url('admin/earning-scheme-label/edit/'.$value->id) }}" class="edit"><span><i data-toggle="tooltip" title="Edit" class="fa fa-edit fa-lg"></i></span></a>
+
                                                 <a href="{{ url('admin/earning-scheme-label/delete/'.$value->id) }}" class="delete"><i data-toggle="tooltip" title="Delete" class="fa fa-trash-o fa-lg"></i></a>
                                             </td>
 

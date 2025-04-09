@@ -115,28 +115,49 @@
                                         <td class="transform-none">{{ $value->email }}</td>
                                         <td class="action-icn">
                                             @if($del_status == '0')
-                                                <a href="{{ url('admin/service-users/edit/'.$value->id) }}" class="edit"><span style= "color: #000"><i data-toggle="tooltip" title="Edit" class="fa fa-edit fa-lg"></i></a>&nbsp
-                                                <a href="{{ url('admin/service-users/send-set-pass-link/'.$value->id) }}" class="mail send-set-pass-link-btn"><span style= "color: #000"><i data-toggle="tooltip" title="Send Credential Mail" class="fa fa-envelope-o fa-lg"></i></a>&nbsp
-                                                <a href="{{ url('admin/service-users/care-history/'.$value->id) }}"> <span style= "color: #000"><i data-toggle="tooltip" class="fa fa-user-md fa-lg" title="Care History" aria-hidden="true"></i></a>&nbsp
-                                                <a href="{{ url('admin/service-user/careteam/'.$value->id) }}" class="care_team"><span style= "color: #000"><i data-toggle="tooltip" title="Care Team" class="fa fa-users fa-lg"></i></a>&nbsp
-                                                <a href="{{ url('admin/service-user/moods/'.$value->id) }}" class=""><span style= "color: #000"><i data-toggle="tooltip" title="Emotional Health" class="fa fa-smile-o fa-lg"></i></a>&nbsp
-                                                <a href="{{ url('admin/service-user/external-service/'.$value->id) }}" class=""><span style= "color: #000"><i data-toggle="tooltip" title="External Service" class="fa fa-external-link-square fa-lg"></i></a>&nbsp
-                                                <a href="{{ url('admin/service-users/migrations/'.$value->id) }}" class="Home Migration"><span style= "color: #000"><i data-toggle="tooltip" title="Migration" class="fa fa-upload fa-lg"></i></a>&nbsp
-                                                <a href="{{ url('admin/service-users/contacts/'.$value->id) }}" class="contacts"><span style= "color: #000"><i data-toggle="tooltip" title="Contacts" class="fa fa-phone fa-lg"></i></a>&nbsp
-                                                <a href="{{ url('admin/service-user/dynamic-forms/'.$value->id) }}" class="contacts"><span style= "color: #000"><i data-toggle="tooltip" title="Dynamic Forms" class="fa fa-wpforms fa-lg"></i></a>&nbsp
-                                                <a href="{{ url('admin/service-user/file-managers/'.$value->id) }}" class="contacts"><span style= "color: #000"><i data-toggle="tooltip" title="File Manager" class="fa fa-file-pdf-o fa-lg"></i></a>&nbsp
-                                                <a href="{{ url('admin/service-user/my-money/history/'.$value->id) }}" class="contacts"><span style= "color: #000"><i data-toggle="tooltip" title="My Money History" class="fa fa-money fa-lg"></i></a>&nbsp
-                                                <a href="{{ url('admin/service-user/my-money/request/'.$value->id) }}" class="contacts"><span style= "color: #000"><i data-toggle="tooltip" title="My Money Request" class="fa fa-credit-card fa-lg"></i></a>&nbsp
-                                                <a href="{{ url('admin/service-user/logbooks/'.$value->id) }}"><span style= "color: #000"><i data-toggle="tooltip" title="Daily Log" class="fa fa-address-book-o fa-lg"></i></a>&nbsp
-                                                <a href="{{ url('admin/service-user/living-skills/'.$value->id) }}"><span style= "color: #000"><i data-toggle="tooltip" title="Independent Living Skills" class="fa fa-user-times fa-lg"></i></a>&nbsp
-                                                <a href="{{ url('admin/service-user/calendar/'.$value->id) }}"><span style= "color: #000"><i data-toggle="tooltip" title="Calendar" class="fa fa-calendar fa-lg"></i></a>&nbsp
-                                                <a href="{{ url('admin/service-user/rmps/'.$value->id) }}"><span style= "color: #000"><i data-toggle="tooltip" title="RMP" class="fa fa-meh-o fa-lg"></i></a>&nbsp
-                                                <a href="{{ url('admin/service-user/bmps/'.$value->id) }}"><span style= "color: #000"><i data-toggle="tooltip" title="BMP" class="fa fa-universal-access fa-lg"></i></a>&nbsp
-                                                <a href="{{ url('admin/service-user/risks/'.$value->id) }}"><span style= "color: #000"><i data-toggle="tooltip" title="Risk" class="fa fa-scissors fa-lg"></i></a>&nbsp
-                                                <a href="{{ url('admin/service-user/earning-schemes/'.$value->id) }}"><span style= "color: #000"><i data-toggle="tooltip" title="Earning Scheme" class="fa fa-star-half-o fa-lg"></i></a>&nbsp
-                                                <a href="{{ url('admin/service-users/delete/'.$value->id) }}" class="delete"><span style= "color: red"><i data-toggle="tooltip" title="Delete" class="fa fa-trash-o fa-lg"></i></a>&nbsp                                
+                                                <a href="{{ url('admin/service-users/edit/'.$value->id) }}" class="edit"><span style= "color: #000"><i data-toggle="tooltip" title="Edit" class="fa fa-edit fa-lg"></i></a>
+                                                
+                                                <a href="{{ url('admin/service-users/send-set-pass-link/'.$value->id) }}" class="mail send-set-pass-link-btn"><span style= "color: #000"><i data-toggle="tooltip" title="Send Credential Mail" class="fa fa-envelope-o fa-lg"></i></a>
+                                                
+                                                <a href="{{ url('admin/service-users/care-history/'.$value->id) }}"> <span style= "color: #000"><i data-toggle="tooltip" class="fa fa-user-md fa-lg" title="Care History" aria-hidden="true"></i></a>
+                                                
+                                                <a href="{{ url('admin/service-user/careteam/'.$value->id) }}" class="care_team"><span style= "color: #000"><i data-toggle="tooltip" title="Care Team" class="fa fa-users fa-lg"></i></a>
+                                                
+                                                <a href="{{ url('admin/service-user/moods/'.$value->id) }}" class=""><span style= "color: #000"><i data-toggle="tooltip" title="Emotional Health" class="fa fa-smile-o fa-lg"></i></a>
+                                                
+                                                <a href="{{ url('admin/service-user/external-service/'.$value->id) }}" class=""><span style= "color: #000"><i data-toggle="tooltip" title="External Service" class="fa fa-external-link-square fa-lg"></i></a>
+                                                
+                                                <a href="{{ url('admin/service-users/migrations/'.$value->id) }}" class="Home Migration"><span style= "color: #000"><i data-toggle="tooltip" title="Migration" class="fa fa-upload fa-lg"></i></a>
+                                                
+                                                <a href="{{ url('admin/service-users/contacts/'.$value->id) }}" class="contacts"><span style= "color: #000"><i data-toggle="tooltip" title="Contacts" class="fa fa-phone fa-lg"></i></a>
+                                                
+                                                <a href="{{ url('admin/service-user/dynamic-forms/'.$value->id) }}" class="contacts"><span style= "color: #000"><i data-toggle="tooltip" title="Dynamic Forms" class="fa fa-wpforms fa-lg"></i></a>
+                                                
+                                                <a href="{{ url('admin/service-user/file-managers/'.$value->id) }}" class="contacts"><span style= "color: #000"><i data-toggle="tooltip" title="File Manager" class="fa fa-file-pdf-o fa-lg"></i></a>
+                                                
+                                                <a href="{{ url('admin/service-user/my-money/history/'.$value->id) }}" class="contacts"><span style= "color: #000"><i data-toggle="tooltip" title="My Money History" class="fa fa-money fa-lg"></i></a>
+                                                
+                                                <a href="{{ url('admin/service-user/my-money/request/'.$value->id) }}" class="contacts"><span style= "color: #000"><i data-toggle="tooltip" title="My Money Request" class="fa fa-credit-card fa-lg"></i></a>
+                                                
+                                                <a href="{{ url('admin/service-user/logbooks/'.$value->id) }}"><span style= "color: #000"><i data-toggle="tooltip" title="Daily Log" class="fa fa-address-book-o fa-lg"></i></a>
+                                                
+                                                <a href="{{ url('admin/service-user/living-skills/'.$value->id) }}"><span style= "color: #000"><i data-toggle="tooltip" title="Independent Living Skills" class="fa fa-user-times fa-lg"></i></a>
+                                                
+                                                <a href="{{ url('admin/service-user/calendar/'.$value->id) }}"><span style= "color: #000"><i data-toggle="tooltip" title="Calendar" class="fa fa-calendar fa-lg"></i></a>
+                                                
+                                                <a href="{{ url('admin/service-user/rmps/'.$value->id) }}"><span style= "color: #000"><i data-toggle="tooltip" title="RMP" class="fa fa-meh-o fa-lg"></i></a>
+                                                
+                                                <a href="{{ url('admin/service-user/bmps/'.$value->id) }}"><span style= "color: #000"><i data-toggle="tooltip" title="BMP" class="fa fa-universal-access fa-lg"></i></a>
+                                                
+                                                <a href="{{ url('admin/service-user/risks/'.$value->id) }}"><span style= "color: #000"><i data-toggle="tooltip" title="Risk" class="fa fa-scissors fa-lg"></i></a>
+                                                
+                                                <a href="{{ url('admin/service-user/earning-schemes/'.$value->id) }}"><span style= "color: #000"><i data-toggle="tooltip" title="Earning Scheme" class="fa fa-star-half-o fa-lg"></i></a>
+                                                
+                                                <a href="{{ url('admin/service-users/delete/'.$value->id) }}" class="delete"><span style= "color: red"><i data-toggle="tooltip" title="Delete" class="fa fa-trash-o fa-lg"></i></a>
+                                                                                
                                             @else
-                                                <a href="{{ url('admin/service-users/edit/'.$value->id.'?del_status='.$del_status) }}" class="edit"><span style= "color: #000"><i data-toggle="tooltip" title="View" class="fa fa-eye fa-lg"></i></a>&nbsp
+                                                <a href="{{ url('admin/service-users/edit/'.$value->id.'?del_status='.$del_status) }}" class="edit"><span style= "color: #000"><i data-toggle="tooltip" title="View" class="fa fa-eye fa-lg"></i></a>
+                                                
                                             @endif
                                             </td>
 

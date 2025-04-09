@@ -899,7 +899,7 @@ display: none;
 }
 .delete {
   /* background-color: red; */
-  float: right;
+  /* float: right; */
   color:red;
   /*margin-right:24px;*/
 }

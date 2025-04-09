@@ -67,7 +67,7 @@
         $.ajax({
             url: '{{ route("quote.ajax.getRegions") }}',
             success: function(response) {
-                console.log(response.message);
+                console.log(response.data);
                 regions.innerHTML = '';
                 response.data.forEach(user => {
                     const option = document.createElement('option');

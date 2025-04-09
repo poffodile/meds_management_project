@@ -98,207 +98,208 @@
     background-color:#474747;
 }
 </style>
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-md-4 col-lg-4 col-xl-4 ">
-            <div class="pageTitle">
-                <h3>Suppliers</h3>
+<section class="main_section_page px-3">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-4 col-lg-4 col-xl-4 ">
+                <div class="pageTitle">
+                    <h3>Suppliers</h3>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="row">
+        <div class="row">
 
-        <div class="col-md-12 col-lg-12 col-xl-12 px-3">
-            <div class="jobsection">
-                <a href="{{url('/supplier_add')}}" class="profileDrop">New Supplier</a>
-                <a href="{{url('supplier?list_mode=ACTIVE')}}" class="profileDrop" <?php if($table_status == 1){echo 'id="active_inactive"';}?>>Active Supplier({{$CountActiveSupplier}})</a>
-                <a href="{{url('supplier?list_mode=INACTIVE')}}" class="profileDrop" <?php if($table_status == 0){echo 'id="active_inactive"';}?>>Inactive Supplier({{$CountInactiveSupplier}})</a>
-                <a href="#" class="profileDrop" id="impExpClickbtnPopup">Import</a>
-                <a href="#!">click here</a> to download import template
+            <div class="col-md-12 col-lg-12 col-xl-12 px-3">
+                <div class="jobsection">
+                    <a href="{{url('/supplier_add')}}" class="profileDrop">New Supplier</a>
+                    <a href="{{url('supplier?list_mode=ACTIVE')}}" class="profileDrop" <?php if($table_status == 1){echo 'id="active_inactive"';}?>>Active Supplier({{$CountActiveSupplier}})</a>
+                    <a href="{{url('supplier?list_mode=INACTIVE')}}" class="profileDrop" <?php if($table_status == 0){echo 'id="active_inactive"';}?>>Inactive Supplier({{$CountInactiveSupplier}})</a>
+                    <a href="#" class="profileDrop" id="impExpClickbtnPopup">Import</a>
+                    <a href="#!">click here</a> to download import template
+                </div>
             </div>
         </div>
-    </div>
 
 
 
-   
+    
 
 
 
-    <di class="row">
-    <div class="col-lg-12">
-        <div class="maimTable">
-            <div class="printExpt">
-                <div class="prntExpbtn">
-                    <a href="#!">Print</a>
-                    <a href="#!">Export</a>
-                </div>
-                <div class="searchFilter">
-                    <!-- <a href="javascript:void(0)" onclick="hideShowDiv()" class="hidebtn">Hide Search Filter</a> -->
-                </div>
-
-            </div>
-            <div class="searchJobForm" id="divTohide" style="display:none">
-                <form id="search_dataForm" class="p-4">
-                    <div class="row justify-content-center">
-                        <div class="col-md-3">
-                            <div class="row form-group mb-2">
-                                <label class="col-md-4 col-form-label text-end">Expense By:</label>
-                                <div class="col-md-8">
-                                    <select class="form-control editInput selectOptions" id="expenseBy">
-                                        <option selected disabled></option>
-                                        <option value="{{Auth::user()->id}}">{{Auth::user()->name}}</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="row form-group mb-2">
-                                <label class="col-md-4 col-form-label text-end">Expense Date:</label>
-                                <div class="col-md-4">
-                                    <input type="date" class="form-control editInput" id="start_date" >
-                                </div>
-                                <div class="col-md-4">
-                                    <input type="date" class="form-control editInput" id="end_date">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="row form-group mb-2">
-                                <label class="col-md-4 col-form-label text-end">Customer:</label>
-                                <div class="col-md-8">
-                                    <input type="text" class="form-control editInput" id="customer_name" placeholder="Type Customer Name">
-                                    <input type="hidden" id="selectedId" name="selectedId">
-                                    <div class="parent-container"></div>
-                                </div>
-                            </div>
-                            <div class="row form-group mb-2">
-                                <label class="col-md-4 col-form-label text-end">Keywords:</label>
-                                <div class="col-md-8">
-                                    <input type="text" class="form-control editInput" id="keywords" keywords="" placeholder="Keywords to seacrh">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="row form-group mb-2">
-                                <label class="col-md-4 col-form-label text-end">Billable:</label>
-                                <div class="col-md-8">
-                                    <select class="form-control editInput selectOptions" id="billable_search">
-                                        <option selected disabled>--Any--</option>
-                                        <option value="1">Yes</option>
-                                        <option value="0">No</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-12">
-                            <div class="pageTitleBtn justify-content-center">
-                                <a href="javascript:void(0)" onclick="searchBtn()" class="profileDrop px-3">Search </a>
-                                <a href="javascript:void(0)" onclick="clearBtn()" class="profileDrop px-3">Clear</a>
-                            </div>
-                        </div>
-
-                    </div>
-                </form>
-            </div>
-
-
-
-        </div> <!-- End off main Table -->
-    </div>
+        <di class="row">
         <div class="col-lg-12">
-            <div class="maimTable mt-2 table_responsive">
-             
-                
-                <div class="markendDelete">
-                    <div class="row">
-                        <div class="col-md-7">
-                            <div class="jobsection d-flex">
-                                <a href="javascript:void(0)" id="deleteSelectedRows" class="profileDrop">Delete</a>
-                                <!-- <div class="pageTitleBtn p-0">
-                                    <div class="nav-item dropdown">
-                                        <a href="#" class="nav-link dropdown-toggle profileDrop"
-                                            data-bs-toggle="dropdown" aria-expanded="false">
-                                            Bulk Action </a>
-                                        <div class="dropdown-menu fade-up m-0">
-                                            <a href="#" class="dropdown-item col-form-label">Set Accont
-                                                Codes</a>
-                                            <a href="#" class="dropdown-item col-form-label">Set Tax
-                                                Rats</a>
-                                            <a href="#" class="dropdown-item col-form-label">Fix duplicate
-                                                product codes</a>
-                                        </div>
-                                    </div>
-                                </div> -->
-                            </div>
-                        </div>
-                        <!-- <div class="col-md-5">
-                            <div class="pageTitleBtn p-0">
-                                <a href="#" class="profileDrop"> <i class="material-symbols-outlined">
-                                        settings </i></a>
-                            </div>
-                        </div> -->
+            <div class="maimTable">
+                <div class="printExpt">
+                    <div class="prntExpbtn">
+                        <a href="#!">Print</a>
+                        <a href="#!">Export</a>
                     </div>
-                </div>
-                <div class="alert alert-success text-center" style="display:none">
-                    <p>Status Change Successfully Done</p>
-                </div>
-                <table id="exampleOne" class="display tablechange" cellspacing="0" width="100%">
-                    <thead>
-                        <tr>
-                            <th class="text-center" style=" width:30px;"><input type="checkbox" id="selectAll"> <label for="selectAll"> All Select</label></th>
-                            <th>#</th>
-                            <th>Supplier Name</th>
-                            <th>Address</th>
-                            <th>Contact Name</th>
-                            <th>Email</th>
-                            <th>Telephone</th>
-                            <th>Status</th>
-                            <th></th>
+                    <div class="searchFilter">
+                        <!-- <a href="javascript:void(0)" onclick="hideShowDiv()" class="hidebtn">Hide Search Filter</a> -->
+                    </div>
 
-                        </tr>
-                    </thead>
-                    <tbody id="supplier_data">
-                        @foreach($supplier_list as $key=>$val)
-                        <tr>
-                            <td><input type="checkbox" id="" class="delete_checkbox" value="{{$val->id}}"></td>
-                            <td>{{++$key}}</td>
-                            <td>{{$val->name}}</td>
-                            <td>{{$val->address}}</td>
-                            <td>{{$val->contact_name}}</td>
-                            <td>{{$val->email}}</td>
-                            <td>{{$val->telephone}}</td>
-                            <td>
-                                @if($val->status == 1)
-                                    <span class="grencheck" onclick="status_change({{$val->id}},{{$val->status}})"><i class="fa-solid fa-circle-check"></i></span>
-                                @else
-                                    <span class="grayCheck" onclick="status_change({{$val->id}},{{$val->status}})"><i class="fa-solid fa-circle-check"></i></span>
-                                @endif
-                            </td>
-                            <td>
-                                <div class="d-inline-flex align-items-center ">
-                                    <div class="nav-item dropdown">
-                                        <a href="#" class="nav-link dropdown-toggle profileDrop" data-bs-toggle="dropdown">
-                                            Action
-                                        </a>
-                                        <div class="dropdown-menu fade-up m-0">
-                                            <a href="{{url('supplier_edit?key=')}}{{base64_encode($val->id)}}" class="dropdown-item">Edit Details</a>
-                                            <!-- <hr class="dropdown-divider">
-                                            <a href="javasrcript:void(0)" onclick="get_modal(1,null)" class="dropdown-item">Record Expense</a> -->
-                                            <hr class="dropdown-divider">
-                                            <a href="javascript:void(0)" onclick="get_modal(2,{{$val->id}})" class="dropdown-item">CRM / History</a>
-                                        </div>
+                </div>
+                <div class="searchJobForm" id="divTohide" style="display:none">
+                    <form id="search_dataForm" class="p-4">
+                        <div class="row justify-content-center">
+                            <div class="col-md-3">
+                                <div class="row form-group mb-2">
+                                    <label class="col-md-4 col-form-label text-end">Expense By:</label>
+                                    <div class="col-md-8">
+                                        <select class="form-control editInput selectOptions" id="expenseBy">
+                                            <option selected disabled></option>
+                                            <option value="{{Auth::user()->id}}">{{Auth::user()->name}}</option>
+                                        </select>
                                     </div>
                                 </div>
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+
+                                <div class="row form-group mb-2">
+                                    <label class="col-md-4 col-form-label text-end">Expense Date:</label>
+                                    <div class="col-md-4">
+                                        <input type="date" class="form-control editInput" id="start_date" >
+                                    </div>
+                                    <div class="col-md-4">
+                                        <input type="date" class="form-control editInput" id="end_date">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="row form-group mb-2">
+                                    <label class="col-md-4 col-form-label text-end">Customer:</label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control editInput" id="customer_name" placeholder="Type Customer Name">
+                                        <input type="hidden" id="selectedId" name="selectedId">
+                                        <div class="parent-container"></div>
+                                    </div>
+                                </div>
+                                <div class="row form-group mb-2">
+                                    <label class="col-md-4 col-form-label text-end">Keywords:</label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control editInput" id="keywords" keywords="" placeholder="Keywords to seacrh">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="row form-group mb-2">
+                                    <label class="col-md-4 col-form-label text-end">Billable:</label>
+                                    <div class="col-md-8">
+                                        <select class="form-control editInput selectOptions" id="billable_search">
+                                            <option selected disabled>--Any--</option>
+                                            <option value="1">Yes</option>
+                                            <option value="0">No</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="pageTitleBtn justify-content-center">
+                                    <a href="javascript:void(0)" onclick="searchBtn()" class="profileDrop px-3">Search </a>
+                                    <a href="javascript:void(0)" onclick="clearBtn()" class="profileDrop px-3">Clear</a>
+                                </div>
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+
+
+
             </div> <!-- End off main Table -->
         </div>
-    </di>
-</div>
+            <div class="col-lg-12">
+                <div class="maimTable mt-2 table_responsive">
+                
+                    
+                    <div class="markendDelete">
+                        <div class="row">
+                            <div class="col-md-7">
+                                <div class="jobsection d-flex">
+                                    <a href="javascript:void(0)" id="deleteSelectedRows" class="profileDrop">Delete</a>
+                                    <!-- <div class="pageTitleBtn p-0">
+                                        <div class="nav-item dropdown">
+                                            <a href="#" class="nav-link dropdown-toggle profileDrop"
+                                                data-bs-toggle="dropdown" aria-expanded="false">
+                                                Bulk Action </a>
+                                            <div class="dropdown-menu fade-up m-0">
+                                                <a href="#" class="dropdown-item col-form-label">Set Accont
+                                                    Codes</a>
+                                                <a href="#" class="dropdown-item col-form-label">Set Tax
+                                                    Rats</a>
+                                                <a href="#" class="dropdown-item col-form-label">Fix duplicate
+                                                    product codes</a>
+                                            </div>
+                                        </div>
+                                    </div> -->
+                                </div>
+                            </div>
+                            <!-- <div class="col-md-5">
+                                <div class="pageTitleBtn p-0">
+                                    <a href="#" class="profileDrop"> <i class="material-symbols-outlined">
+                                            settings </i></a>
+                                </div>
+                            </div> -->
+                        </div>
+                    </div>
+                    <div class="alert alert-success text-center" style="display:none">
+                        <p>Status Change Successfully Done</p>
+                    </div>
+                    <table id="exampleOne" class="display tablechange" cellspacing="0" width="100%">
+                        <thead>
+                            <tr>
+                                <th class="text-center" style=" width:30px;"><input type="checkbox" id="selectAll"> <label for="selectAll"> All Select</label></th>
+                                <th>#</th>
+                                <th>Supplier Name</th>
+                                <th>Address</th>
+                                <th>Contact Name</th>
+                                <th>Email</th>
+                                <th>Telephone</th>
+                                <th>Status</th>
+                                <th></th>
+
+                            </tr>
+                        </thead>
+                        <tbody id="supplier_data">
+                            @foreach($supplier_list as $key=>$val)
+                            <tr>
+                                <td><input type="checkbox" id="" class="delete_checkbox" value="{{$val->id}}"></td>
+                                <td>{{++$key}}</td>
+                                <td>{{$val->name}}</td>
+                                <td>{{$val->address}}</td>
+                                <td>{{$val->contact_name}}</td>
+                                <td>{{$val->email}}</td>
+                                <td>{{$val->telephone}}</td>
+                                <td>
+                                    @if($val->status == 1)
+                                        <span class="grencheck" onclick="status_change({{$val->id}},{{$val->status}})"><i class="fa-solid fa-circle-check"></i></span>
+                                    @else
+                                        <span class="grayCheck" onclick="status_change({{$val->id}},{{$val->status}})"><i class="fa-solid fa-circle-check"></i></span>
+                                    @endif
+                                </td>
+                                <td>
+                                    <div class="d-inline-flex align-items-center ">
+                                        <div class="nav-item dropdown">
+                                            <a href="#" class="nav-link dropdown-toggle profileDrop" data-bs-toggle="dropdown">
+                                                Action
+                                            </a>
+                                            <div class="dropdown-menu fade-up m-0">
+                                                <a href="{{url('supplier_edit?key=')}}{{base64_encode($val->id)}}" class="dropdown-item">Edit Details</a>
+                                                <!-- <hr class="dropdown-divider">
+                                                <a href="javasrcript:void(0)" onclick="get_modal(1,null)" class="dropdown-item">Record Expense</a> -->
+                                                <hr class="dropdown-divider">
+                                                <a href="javascript:void(0)" onclick="get_modal(2,{{$val->id}})" class="dropdown-item">CRM / History</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div> <!-- End off main Table -->
+            </div>
+        </di>
+    </div>
 </section>
   <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script> -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.8/js/select2.min.js" defer></script>

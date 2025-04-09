@@ -2,7 +2,8 @@
 
 namespace App;
 use Illuminate\Database\Eloquent\Model;
-use DB,Auth;
+use DB;
+use Illuminate\Support\Facades\Auth;
 use App\User, App\ServiceUser, App\Admin;
 
 
@@ -76,4 +77,8 @@ class Home extends Model
     }
 
 
+    public static function getCompanyIdFromHome(){
+        $home_id = Auth::user()->home_id;
+        return self::where('id', $home_id)->value('admin_id');
+    }
 }

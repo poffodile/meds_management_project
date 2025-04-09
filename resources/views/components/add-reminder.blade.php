@@ -15,7 +15,7 @@
                     <input type="hidden" name="po_id" id="{{ $hiddenForeignId }}" value="">
                     
                     <div class="mb-3 row">
-                        <label for="title" class="col-sm-3 col-form-label">Reminder Date<span class="radStar ">*</span></label>
+                        <label for="title" class="col-sm-3 col-form-label">Reminder Date <span class="radStar ">*</span></label>
                         <div class="col-sm-4">
                             <input type="date" name="{{ $reminderDate }}" class="form-control editInput" id="{{ $reminderDate }}" value="">
                         </div>
@@ -46,7 +46,7 @@
                         </div>
                     </div>
                     <div class="mb-3 row">
-                        <label for="description" class="col-sm-3 col-form-label">Send As<span class="radStar ">*</span></label>
+                        <label for="description" class="col-sm-3 col-form-label">Send As <span class="radStar ">*</span></label>
                         <div class="col-sm-9">
                             <label for="purchase_notify_who1" class="editInput">
                                 <input type="checkbox" name="notification" id="{{ $reminderNotification }}" value="1"> Notification </label>
@@ -91,7 +91,7 @@
     function save_reminder(){
         $.ajax({
             type: "POST",
-            url: "{{url('/save_reminder')}}",
+            url: "{{ $reminderSaveUrl }}",
             data: new FormData($("#{{ $reminderformId }}")[0]),
             async: false,
             contentType: false,
@@ -110,7 +110,10 @@
                     setTimeout(function() {
                         $('#message_reminderModal').removeClass('success-message').text('').hide();
                         $("#{{ $reminderModalId }}").modal('hide');
-                        getAllReminder(response.data);
+                        var id=$("#{{ $reminderId }}").val();
+                        if(id == '' || id == null || id == 'undefined'){
+                            getAllReminder(response.data);
+                        }
                     }, 3000);
                 }else{
                     alert("Something went wrong! Please try later");

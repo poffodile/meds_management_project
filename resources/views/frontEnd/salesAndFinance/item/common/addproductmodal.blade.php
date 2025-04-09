@@ -61,7 +61,7 @@
                     <div class="alert alert-danger text-center productsuccessdanger producthidemessagedanger"></div>
                 <div class="row">
                     <div class="col-md-6 col-lg-6 col-xl-6">
-                        <div class="formDtail">
+                        <div class="formDtail mt-3">
                             
                             <div class="mb-2 row">
                                 <label for="inputName" class="col-sm-4 col-form-label">Customer</label>
@@ -93,7 +93,7 @@
 
                             <div class="mb-2 row">
                                 <label for="productname" class="col-sm-4 col-form-label">Product
-                                    Name*</label>
+                                    Name <span class="radStar ">*</span></label>
                                 <div class="col-sm-8">
                                     <input type="text" class="form-control editInput" name="product_name" id="productname"
                                         value="" required>
@@ -149,7 +149,7 @@
 
                             <div class="mb-2 row">
                                 <label for="inputMobile" class="col-sm-4 col-form-label">Price
-                                    *</label>
+                                <span class="radStar ">*</span></label>
                                 <div class="col-sm-8">
                                     <input type="text" class="form-control editInput" id="price" name="price" value="" required>
                                 </div>
@@ -179,7 +179,7 @@
                     </div>
 
                     <div class="col-md-6 col-lg-6 col-xl-6">
-                        <div class="formDtail">
+                        <div class="formDtail mt-3">
                             
                                 <div class="mb-2 row">
                                     <label for="bar_code" class="col-sm-4 col-form-label">Bar

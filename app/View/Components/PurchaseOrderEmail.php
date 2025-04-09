@@ -14,6 +14,7 @@ class PurchaseOrderEmail extends Component
     public $emailModalId;
     public $modalTitle;
     public $emailformId;
+    public $foreignId;
     public $emailId;
     public $toField;
     public $ccField;
@@ -21,10 +22,12 @@ class PurchaseOrderEmail extends Component
     public $selectBoxsubject;
     public $body;
     public $saveButtonId;
+    public $saveUrl;
     public function __construct(
     string $emailModalId = 'defaultModalId',
     string $modalTitle = 'defaultTitle',
     string $emailformId = 'defaultRejectFormId',
+    string $foreignId = 'defaultForeignId',
     string $emailId = 'defaultRejectId',
     string $toField = 'defaultRadioYes',
     string $ccField = 'defaultRadioNo',
@@ -32,11 +35,13 @@ class PurchaseOrderEmail extends Component
     string $selectBox = 'defaultRadioNo',
     string $body = 'defaultRadioNo',
     string $saveButtonId = 'defaultSaveButtonId',
+    string $saveUrl = 'defaultSaveUrl',
     )
     {
         $this->emailModalId = $emailModalId;
         $this->modalTitle = $modalTitle;
         $this->emailformId = $emailformId;
+        $this->foreignId = $foreignId;
         $this->emailId = $emailId;
         $this->toField = $toField;
         $this->ccField = $ccField;
@@ -44,6 +49,7 @@ class PurchaseOrderEmail extends Component
         $this->selectBox = $selectBox;
         $this->body = $body;
         $this->saveButtonId = $saveButtonId;
+        $this->saveUrl = $saveUrl;
     }
 
     /**

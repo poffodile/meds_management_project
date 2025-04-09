@@ -136,7 +136,7 @@
                                 @else
                                 <tr>
                                     <td></td>
-                                    <td colspan="12">
+                                    <td colspan="14">
                                         <label class="red_sorryText"> Sorry, there are no items available.. </label>
                                     </td>
                                 </tr>
@@ -145,7 +145,7 @@
                             <tfoot>
                                 <tr>
                                     <th></th>
-                                    <th colspan="6">Page Sub Total</th>
+                                    <th colspan="7">Page Sub Total</th>
                                     <th>&#163;{{ number_format($subTotal, 2) }}</th>
                                     <th>&#163;{{ number_format($vat, 2) }}</th>
                                     <th>&#163;{{ number_format($total, 2) }}</th>

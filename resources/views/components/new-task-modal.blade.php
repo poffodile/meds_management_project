@@ -14,7 +14,7 @@
                 <h5 class="modal-title" id="secondModalLabel">{{ $modalTitle }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div id="message_show" class="mt-3"></div>
+            <div id="message_show" class="mt-3 text-center"></div>
             <div class="modal-body">
                 <!-- tab -->
                 <nav>
@@ -111,13 +111,15 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-sm-3"></div>
-                                        <div class="col-sm-9 mt-3">
-                                            <div id="optionsDiv" style="display:none">
-                                                <label class="editInput"><input type="checkbox" value="1" id="" name="notification"> Notification</label>
-                                                <label class="editInput"><input type="checkbox" value="1" id="" name="email"> Email</label>
-                                                <label class="editInput"><input type="checkbox" value="1" id="" name="sms"> SMS</label>
-                                            </div>
+                                    </div>
+                                    <div id="optionsDiv" style="display:none" class="mb-3">
+                                        <div class="row">
+                                        <label for="staticEmail" class="col-sm-3 col-form-label">Send as <span class="radStar ">*</span> </label>
+                                        <div class="col-sm-9">
+                                            <label class="editInput"><input type="checkbox" value="1" id="" name="notification"> Notification</label>
+                                            <label class="editInput"><input type="checkbox" value="1" id="" name="email"> Email</label>
+                                            <label class="editInput"><input type="checkbox" value="1" id="" name="sms"> SMS</label> 
+                                        </div>
                                         </div>
                                     </div>
 
@@ -437,6 +439,7 @@
             </div>
             <div class="modal-footer customer_Form_Popup">
                     <a href="#" class="profileDrop crmNewBtn" id="{{ $saveButtonId }}"> Save</a>
+                    <a href="#" class="profileDrop crmNewBtn" id="completeBTN" style="display:none"> Complete</a>
                     <!-- <a href="#" class="profileDrop p-2 crmNewBtn" > Close</a> -->
                     <button type="button" class="profileDrop" data-bs-dismiss="modal">Cancel</button>
                 </div>
@@ -567,7 +570,7 @@
         }
         $.ajax({
                 type: "POST",
-                url: "{{url('/purchase_order_new_task_save')}}",
+                url: "{{ $saveNewTaskUrl }}",
                 data: new FormData($("#{{$formId}}")[0]),
                 async: false,
                 contentType: false,
@@ -611,4 +614,30 @@
                 }
             });
     });
+$(document).on('click', '#completeBTN', function(){
+    var id = $("#task_id").val();
+    var token='<?php echo csrf_token();?>'
+    $.ajax({
+        url: "{{ $completeNewTaskUrl }}",
+        method: 'POST',
+        data: {
+            id: id,
+            _token: token
+        },
+        success: function(response) {
+            console.log(response);
+            if(response.success === true){
+                location.reload();
+            }else{
+                alert("Something went wrong!");
+                return false;
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error(error);
+            // location.reload();
+        }
+    });
+    
+});
 </script>

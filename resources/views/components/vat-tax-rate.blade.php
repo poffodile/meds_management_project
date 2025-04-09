@@ -21,13 +21,13 @@
                                 @csrf
                                 <input type="hidden" name="id" id="{{ $id }}">
                                 <div class="mb-2 row">
-                                    <label for="inputName" class="col-sm-3 col-form-label">Tax Rate Name<span class="radStar ">*</span></label>
+                                    <label for="inputName" class="col-sm-3 col-form-label">Tax Rate Name <span class="radStar ">*</span></label>
                                     <div class="col-sm-9">
                                         <input type="text" class="form-control editInput VatTaxcheckError" id="{{ $name }}" name="name" value="">
                                     </div>
                                 </div>
                                 <div class="mb-2 row">
-                                    <label for="inputName" class="col-sm-3 col-form-label">Tax Rate<span class="radStar ">*</span></label>
+                                    <label for="inputName" class="col-sm-3 col-form-label">Tax Rate <span class="radStar ">*</span></label>
                                     <div class="col-sm-7">
                                         <input type="text" class="form-control editInput VatTaxcheckError" id="{{ $taxRate }}" name="tax_rate" value="" onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.charCode === 46">
                                     </div>

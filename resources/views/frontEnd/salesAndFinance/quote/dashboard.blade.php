@@ -153,9 +153,7 @@
                         </div>
                     </div>
                 </div>
-
             </div>
-
             <div class="row">
                 <div class="col-lg-3">
                     <div class="row">
@@ -233,18 +231,12 @@
                 <div class="col-lg-6">
                     <div class="card link_box mt-4">
                         <div class="card-body">
-
-
                             <div id="lineChart">
                                 <a href="https://www.zingchart.com/" rel="noopener" class="zc-ref">Powered by ZingChart</a>
                             </div>
-
-
-
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>

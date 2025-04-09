@@ -61,11 +61,12 @@
         /* left: 80%;
         top:15px;
         position: absolute; */
-        float:right;
+        float: right;
+        margin-bottom: 38px;
     }
 
     .comment-detail-info-area {
-        width:100%;
+        width: 100%;
     }
 
     .comment-number-bnt-info {
@@ -73,33 +74,37 @@
         right: 20px;
         bottom: 0px;
     }
-    
-    .logimg {
-    margin-top:-45px;    
-    }
 
-   
+
     .logimg img {
-    width:100px;
-    height:60px;
-    object-fit:cover;    
+        width: 100px;
+        height: 60px;
+        object-fit: cover;
     }
 
+    .Select_staff {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+
+    .Select_staff_inner {
+        margin: 10px 0;
+    }
+
+    @media (max-width:890px) {
+        .Select_staff_inner {
+            width: 100%;
+            margin: 10px 0;
+        }
+    }
 </style>
-<!-- 
-@php
-function write_to_console($data) {
 
-$console = 'console.log(' . json_encode($data) . ');';
-$console = sprintf('<script>%s</script>', $console);
-echo $console;
-}
-write_to_console($log_book_records);
-
-@endphp -->
 
 
 @php
+if (!function_exists('time_diff_string')) {
 function time_diff_string($from, $to, $full = false) {
 $from = new DateTime($from);
 $to = new DateTime($to);
@@ -128,6 +133,8 @@ unset($string[$k]);
 if (!$full) $string = array_slice($string, 0, 1);
 return $string ? implode(', ', $string) . ' ago' : 'just now';
 }
+}
+
 @endphp
 
 <!--Core CSS -->
@@ -153,15 +160,15 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                 </div>
             </div>
             <!-- page start-->
-            <div class="row" style="margin-bottom:30px;">
-                <div class="col-md-1 col-lg-1">
+            <div class="Select_staff">
+                <div class="Select_staff_inner">
                     <a class="back_opt col-3" onclick="history.back()">
                         <i class="fa fa-angle-left"></i>
                     </a>
                 </div>
                 <!-- sourabh -->
 
-                <div class="col-md-2 col-lg-2">
+                <div class="Select_staff_inner">
                     <select class="form-control" name="staff_member" id="staff_member">
                         <option value="">Select Staff Member</option>
                         @foreach($staff_members as $val)
@@ -169,7 +176,7 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-2 col-lg-2">
+                <div class="Select_staff_inner">
                     <select class="form-control" name="service_user" id="service_user" <?php if (isset($_GET['key'])) {
                                                                                             echo "disabled";
                                                                                         } ?>>
@@ -184,10 +191,10 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                     </select>
                 </div>
                 <!-- sourabh -->
-                <div class="col-md-3 col-lg-3" style="margin-left: -10px;">
-                    <div class="form-group datepicker-sttng date-sttng">
-                        <label class="col-md-2 col-sm-1 col-xs-12 p-t-7" style="display: none;"> Date: </label>
-                        <div class="col-md-10 col-sm-10 col-xs-12">
+                <div class="Select_staff_inner">
+                    <div class="datepicker-sttng date-sttng">
+                        <label style="display: none;"> Date: </label>
+                        <div>
                             <div data-date-viewmode="years" data-date-format="dd-mm-yyyy" data-date="" class="input-group date">
                                 <input id="date_range_input" style="cursor: pointer;" name="daterange" value="{{ date('d-m-Y') }} - {{ date('d-m-Y') }}" type="text" value="" readonly="" size="16" class="form-control log-book-datetime">
                                 <span class="input-group-btn add-on datetime-picker2">
@@ -197,10 +204,10 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3 col-lg-2" style="padding-bottom:10px; margin-left: -84px;">
-                    <div class="form-group datepicker-sttng date-sttng">
-                        <label class="col-md-3 col-sm-1 col-xs-12 p-t-7" style="display: none;"> Category: </label>
-                        <div class="col-md-7 col-sm-10 col-xs-12">
+                <div class="Select_staff_inner">
+                    <div class="datepicker-sttng date-sttng">
+                        <label style="display: none;"> Category: </label>
+                        <div>
                             <select class="form-control" style="min-width:200px;" id="select_category" name="category_timeline" required />
                             <!-- <option disabled value> -- select an option -- </option> -->
                             <option selected value="all">All</option>
@@ -212,13 +219,13 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                     </div>
                 </div>
                 <!-- sourabh -->
-                <div class="col-md-2 col-lg-2" style="padding-bottom:10px; margin-left: -10px;">
-                    <input type="text" class="form-control" id="keyword" onKeyPress="myFunctionkey()" onKeyUp="myFunctionkey()" name="keyword" placeholder="Keyword" style="margin: 0px 0px 0px 40px;">
+                <div class="Select_staff_inner">
+                    <input type="text" class="form-control" id="keyword" onKeyPress="myFunctionkey()" onKeyUp="myFunctionkey()" name="keyword" placeholder="Keyword">
                 </div>
                 <!-- sourabh -->
                 <!-- <div class="col-md-4 filter_buttons" style="text-align:right;padding-right:150px;display:inline-block;">
-                <a data-toggle="modal" href="#addLogModal" class="btn btn-primary  col-6" id='add_new_log'>Add New</a>            
-                <a onclick="pdf()" id="pdf" target="_blank" class="btn col-6" id='add_new_log' style="background-color:#d9534f;color:white;">PDF Export</a>            
+                <a data-toggle="modal" href="#addLogModal" class="btn btn-primary  col-6" id='add_new_log'>Add New</a>
+                <a onclick="pdf()" id="pdf" target="_blank" class="btn col-6" id='add_new_log' style="background-color:#d9534f;color:white;">PDF Export</a>
             </div> -->
             </div>
 
@@ -234,10 +241,21 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                         </article>
                         <div id="logs_articles">
 
-                            <?php //echo "<pre>";print_r($log_book_records);  
+                            <?php //echo "<pre>";print_r($log_book_records);
                             ?>
                             @foreach ($log_book_records as $key )
+
+                            <?php if ($key['logType'] == "1") {
+                                $logType = "Daily Log";
+                            } else if ($key['logType'] == "2") {
+                                $logType = "Weekly Log";
+                            } else if ($key['logType'] == "3") {
+                                $logType = "Monthly Log";
+                            }
+                            ?>
+
                             @if($loop->iteration % 2 == 0)
+
                             <article class="timeline-item">
                                 <div class="timeline-desk">
                                     <div class="panel">
@@ -247,44 +265,52 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                                             <span class="badge badge-pill red-bg" style="position:absolute;right:30px;">Late</span>
                                             @endif
 
-                                            <span style="background:{{$key['category_color'] or null}};" data-toggle="tooltip" data-placement="left" title="{{ $key['category_name'] }}" class="timeline-icon">
-                                                <i class="{{ $key['category_icon'] or null }}"></i>
+                                            <span style="background:{{$key['category_color'] ?? ''}};"
+                                                data-toggle="tooltip" data-placement="left"
+                                                title="{{ $key['category_name'] }}" class="timeline-icon">
+                                                <i class="{{ $key['category_icon'] ?? '' }}"></i>
                                             </span>
-                                            <span class="time_abbre" data-toggle="tooltip" data-placement="top" title="{{ $key['created_at'] }}">{{ time_diff_string(date("d-m-Y H:i", strtotime($key['created_at'])), 'now') }} <span style="color:black;font-weight:400;font-size:14px;">by {{$key['staff_name']}}</span></span>
-                                            @if($key['category_name'])
-                                            <h1 class="title_time_log"><span style="color:{{$key['category_color']}};">{{ $key['category_name'] }}</span> </h1>
+                                            <span class="time_abbre" data-toggle="tooltip" data-placement="top"
+                                                title="{{ $key['created_at'] }}">{{ time_diff_string(date("d-m-Y H:i", strtotime($key['created_at'])), 'now') }}
+                                                <span style="color:black;font-weight:400;font-size:14px;">by {{ $key['staff_name'] }}</span>
+                                            </span>
+                                            @if(isset($key['category_name']) && !empty($key['category_name']))
+                                            <h1 class="title_time_log">
+                                                <span style="color:{{$key['category_color'] ?? '' }};">
+                                                    {{ $key['category_name'] }}
+                                                </span>
+                                            </h1>
                                             @else
-                                            <h1 class="title_time_log"><span class="log_title">{{ $key['title']}}</span></h1>
+                                            <h1 class="title_time_log">
+                                                <span class="log_title">{{ $key['title'] ?? $logType }}</span>
+                                            </h1>
                                             @endif
-                                            <?php if ($key['image_name'] != '') { ?>
-                                                <div class="logimg"><a href="{{url('upload/events/'.$key['image_name'])}}"><img class="" src="{{url('upload/events/'.$key['image_name'])}}" style="width:100px" /></a></div>
-                                            <?php } ?>
-                                            <p>{{ $key['details']}}</p>
-                                            <h6 hidden>{{ $key['id'] }}</h6>
-                                            <!--img-->
-                                            <!-- <?php //if ($key['image_name'] != '') { ?>
-                                                <div class="logimg"><a href="{{url('upload/events/'.$key['image_name'])}}"><img class="" src="{{url('upload/events/'.$key['image_name'])}}" style="width:100px" /></a></div>
-                                            <?php //} ?> -->
 
-                                            <!--img-->
-                                            <!-- <div class="comment-number-bnt-info"> 
-                                            <a data-toggle="modal"  onclick="daily_log_comment({{$key['id']}}, {{$service_user_id}})" href="#commentsModal" id="commentModal1" class="btn daily_log_comments_btn" style="background-color:#1f88b5;color:white;float:right;font-size: 10px;padding: 4px;margin-bottom:15px;">
-                                            Comments  
-                                                <span id="_{{$key['id']}}" class="badge badge-primary badge-pill comment_badge">{{$key['comments']}}</span>                                        
-                                            </a>
-                                       </div> -->
+
+                                            @if (!empty($key['image_name']))
+                                            <div class="logimg">
+                                                <a href="{{url('upload/events/'.$key['image_name'])}}">
+                                                    <img src="{{url('upload/events/'.$key['image_name'])}}" />
+                                                </a>
+                                            </div>
+                                            @endif
+
+                                            <p class="comment-detail-info-area">{{ $key['details'] }}</p>
                                             <p class="daily_log_time">
                                                 {{ date("d-m-Y H:i", strtotime($key['date'])) }}
                                                 @if($key['is_late'])
                                                 @if($key['late_time_text'])
                                                 | {{ $key['late_date_text'] }} <span style="color:red;">{{ $key['late_time_text'] }}</span>
                                                 @else
-                                                | <span style="red">{{ date("d-m-Y H:i", strtotime($key['created_at'])) }}</span>
+                                                | <span style="color:red;">{{ date("d-m-Y H:i", strtotime($key['created_at'])) }}</span>
                                                 @endif
                                                 @endif
                                             </p>
                                             <div class="comment-number-bnt-info">
-                                                <a data-toggle="modal" onclick="daily_log_comment({{$key['id']}}, {{$service_user_id}})" href="#commentsModal" id="commentModal1" class="btn daily_log_comments_btn" style="background-color:#1f88b5;color:white;float:right;font-size: 10px;padding: 4px;margin-bottom:15px;">
+                                                <a data-toggle="modal"
+                                                    onclick="daily_log_comment({{$key['id']}}, {{$service_user_id}})"
+                                                    href="#commentsModal" class="btn daily_log_comments_btn"
+                                                    style="background-color:#1f88b5;color:white;float:right;font-size: 10px;padding: 4px;margin-bottom:15px;">
                                                     Comments
                                                     <span id="_{{$key['id']}}" class="badge badge-primary badge-pill comment_badge">{{$key['comments']}}</span>
                                                 </a>
@@ -302,37 +328,54 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                                             @if($key['is_late'] == '1')
                                             <span class="badge badge-pill red-bg" style="position:absolute;right:30px;">Late</span>
                                             @endif
-                                            <span style="background:{{$key['category_color'] or null}};" data-toggle="tooltip" data-placement="right" title="{{ $key['category_name'] }}" class="timeline-icon">
-                                                <i class="{{ $key['category_icon']}}"></i>
-                                                <!-- <i class="fa fa-check"></i> -->
-                                            </span>
-                                            <span class="time_abbre" data-toggle="tooltip" data-placement="top" title="{{ $key['created_at'] }}">{{ time_diff_string(date("d-m-Y H:i", strtotime($key['created_at'])), 'now') }} <span style="color:black;font-weight:400;font-size:14px;">by {{ $key['staff_name']}}</span></span>
-                                            @if($key['category_name'])
-                                            <h1 class="title_time_log"><span style="color:{{$key['category_color']}};">{{ $key['category_name'] }}</span> </h1>
-                                            @else
-                                            <h1 class="title_time_log"><span class="log_title">{{ $key['title']}}</span></h1>
-                                            @endif
-                                               <!--img-->
-                                               <?php if ($key['image_name'] != '') { ?>
-                                                <div class="logimg"><a href="{{url('upload/events/'.$key['image_name'])}}"><img class="" src="{{url('upload/events/'.$key['image_name'])}}" style="width:100px" /></a></div>
-                                            <?php } ?>
-                                            <!--img-->
-                                            <p class="comment-detail-info-area">{{ $key['details']}}</p>
-                                            <h6 hidden>{{ $key['id'] }}</h6>
-                                         
 
+                                            <span style="background:{{$key['category_color'] ?? ''}};"
+                                                data-toggle="tooltip" data-placement="right"
+                                                title="{{ $key['category_name'] }}" class="timeline-icon">
+                                                <i class="{{ $key['category_icon'] ?? '' }}"></i>
+                                            </span>
+                                            <span class="time_abbre" data-toggle="tooltip" data-placement="top"
+                                                title="{{ $key['created_at'] }}">{{ time_diff_string(date("d-m-Y H:i", strtotime($key['created_at'])), 'now') }}
+                                                <span style="color:black;font-weight:400;font-size:14px;">by {{ $key['staff_name'] }}</span>
+                                            </span>
+
+                                            @if(isset($key['category_name']) && !empty($key['category_name']))
+                                            <h1 class="title_time_log">
+                                                <span style="color:{{$key['category_color'] ?? '' }};">
+                                                    {{ $key['category_name'] }}
+                                                </span>
+                                            </h1>
+                                            @else
+                                            <h1 class="title_time_log">
+                                                <span class="log_title">{{ $key['title'] ?? $logType }}</span>
+                                            </h1>
+                                            @endif
+
+
+                                            @if (!empty($key['image_name']))
+                                            <div class="logimg">
+                                                <a href="{{url('upload/events/'.$key['image_name'])}}">
+                                                    <img src="{{url('upload/events/'.$key['image_name'])}}" style="width:100px" />
+                                                </a>
+                                            </div>
+                                            @endif
+
+                                            <p class="comment-detail-info-area">{{ $key['details'] }}</p>
                                             <p class="daily_log_time">
                                                 {{ date("d-m-Y H:i", strtotime($key['date'])) }}
                                                 @if($key['is_late'])
                                                 @if($key['late_time_text'])
                                                 | {{ $key['late_date_text'] }} <span style="color:red;">{{ $key['late_time_text'] }}</span>
                                                 @else
-                                                | <span style="red">{{ date("d-m-Y H:i", strtotime($key['created_at'])) }}</span>
+                                                | <span style="color:red;">{{ date("d-m-Y H:i", strtotime($key['created_at'])) }}</span>
                                                 @endif
                                                 @endif
                                             </p>
                                             <div class="comment-number-bnt-info">
-                                                <a data-toggle="modal" onclick="daily_log_comment({{$key['id']}}, {{$service_user_id}})" data-id="{{$key['id']}}" href="#commentsModal" id="commentModal2" class="btn daily_log_comments_btn" style="background-color:#1f88b5;color:white;float:right;font-size: 10px;padding: 4px;margin-bottom:15px;">
+                                                <a data-toggle="modal"
+                                                    onclick="daily_log_comment({{$key['id']}}, {{$service_user_id}})"
+                                                    href="#commentsModal" class="btn daily_log_comments_btn"
+                                                    style="background-color:#1f88b5;color:white;float:right;font-size: 10px;padding: 4px;margin-bottom:15px;">
                                                     Comments
                                                     <span id="_{{$key['id']}}" class="badge badge-primary badge-pill comment_badge">{{$key['comments']}}</span>
                                                 </a>
@@ -342,6 +385,8 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                                 </div>
                             </article>
                             @endif
+
+
                             @endforeach
                         </div>
 
@@ -371,7 +416,8 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
      */
 
     function escapeHtml(str) {
-        return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g,
+            "&#039;");
     }
 
     $(function() {
@@ -381,7 +427,8 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                 format: 'DD/MM/YYYY'
             }
         }, function(start, end, label) {
-            console.log("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+            console.log("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end
+                .format('YYYY-MM-DD'));
         });
     });
 </script>
@@ -405,7 +452,8 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
         var end = get_dates()[1];
         var category_id = parseInt(get_dates()[2]);
         var link = document.getElementById("pdf");
-        let url = `{{ url('/service/logbook/download?end=${end}&start=${start}&category_id=${category_id}&format=pdf&service_user_id='.$service_user_id) }}`;
+        let url =
+            `{{ url('/service/logbook/download?end=${end}&start=${start}&category_id=${category_id}&format=pdf&service_user_id='.$service_user_id) }}`;
         url = url.replaceAll('&amp;', '&')
         link.setAttribute("href", url);
         return false;
@@ -572,7 +620,14 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                     const container = document.querySelector('#logs_articles');
                     removeAllChildNodes(container);
                     let previous_date = '';
+                    console.log()
+                    // if (!service_user && !resp.log_book_records.date) {
+
+                    // } else {
+
+                    // }
                     for (var i = 0; i < resp.log_book_records.length; i++) {
+
                         if (i % 2 != 0) {
                             var log_atricles = document.getElementById("logs_articles");
                             var article_left = document.createElement("article");
@@ -593,12 +648,8 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                             pannel_body.append(arrow);
 
                             if (resp.log_book_records[i]['is_late'] == '1') {
-                                $(pannel_body).append($(`
-                                <span class="badge badge-pill red-bg" style="position:absolute;right:30px;">Late</span>
-                                        `));
+                                $(pannel_body).append($(` <span class="badge badge-pill red-bg" style="position:absolute;right:30px;">Late</span>`));
                             }
-
-
 
                             var timeline_icon = document.createElement("span");
                             timeline_icon.setAttribute("class", "timeline-icon");
@@ -626,24 +677,32 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
 
 
                             pannel_body.append(created_at);
-                            if (previous_date != moment.utc(resp.log_book_records[i]['date'], 'DD-MM-YYYY H:i').format('DD-MM-YYYY')) {
+                            if (previous_date != moment.utc(resp.log_book_records[i]['date'],
+                                    'DD-MM-YYYY H:i').format('DD-MM-YYYY')) {
                                 $(log_atricles).append($(`
                                                 <div class="header_section" style="display: table-row;text-align: center;padding: 20px 0;">
                                                     <span style="width: 120px;text-align: center;font-size: 13px;background: #1f88b5;float: right;color: white;border-radius: 4px;margin-right: -60px;margin-top:10px;margin-bottom:30px;">
                                                         ${moment.utc(resp.log_book_records[i]['date'], 'DD-MM-YYYY H:i').format('DD-MM-YYYY')}
                                                     </span>
                                                 </div>`));
-                                previous_date = moment.utc(resp.log_book_records[i]['date'], 'DD-MM-YYYY H:i').format('DD-MM-YYYY');
+                                previous_date = moment.utc(resp.log_book_records[i]['date'],
+                                    'DD-MM-YYYY H:i').format('DD-MM-YYYY');
                             }
 
                             if (resp.log_book_records[i]['category_name'])
-                                $(pannel_body).append($(`<h1 class="title_time_log"><span style="color: ${resp.log_book_records[i]['category_color']}">${resp.log_book_records[i]['category_name']}</span> | <span>${resp.log_book_records[i]['title']}</span></h1>`));
+                                $(pannel_body).append($(
+                                    `<h1 class="title_time_log"><span style="color: ${resp.log_book_records[i]['category_color']}">${resp.log_book_records[i]['category_name']}</span> | <span>${resp.log_book_records[i]['title']}</span></h1>`
+                                ));
                             else
-                                $(pannel_body).append($(`<h1 class="title_time_log"><span>${resp.log_book_records[i]['title']}</span></h1>`));
+                                $(pannel_body).append($(
+                                    `<h1 class="title_time_log"><span>${resp.log_book_records[i]['title']}</span></h1>`
+                                ));
 
                             var details = document.createElement("p");
                             // details.className = "comment-detail-info-area";
-                            var details_text = document.createTextNode(resp.log_book_records[i]['details']);
+                            var details_text = document.createTextNode(resp.log_book_records[i][
+                                'details'
+                            ]);
                             details.append(details_text)
 
                             pannel_body.append(details);
@@ -655,7 +714,8 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                                 if (resp.log_book_records[i]['late_time_text']) {
                                     var span_date_field = document.createElement("span");
                                     span_date_field.setAttribute("style", "color:red");
-                                    var span_date_field_text = document.createTextNode(resp.log_book_records[i]['late_time_text']);
+                                    var span_date_field_text = document.createTextNode(resp
+                                        .log_book_records[i]['late_time_text']);
                                     span_date_field.append(span_date_field_text);
                                     // date_field.append(' | '+resp.log_book_records[i]['late_date_text']+' ');
                                     date_field.append(' | ');
@@ -663,7 +723,9 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                                 } else {
                                     var span_date_field = document.createElement("span");
                                     span_date_field.setAttribute("style", "color:red");
-                                    var span_date_field_text = document.createTextNode(moment.utc(resp.log_book_records[i]['created_at']).format('DD-MM-YYYY HH:mm'));
+                                    var span_date_field_text = document.createTextNode(moment.utc(resp
+                                        .log_book_records[i]['created_at']).format(
+                                        'DD-MM-YYYY HH:mm'));
                                     span_date_field.append(span_date_field_text);
                                     date_field.append(' | ');
                                     date_field.append(span_date_field);
@@ -716,8 +778,10 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                             timeline_icon.setAttribute("class", "timeline-icon");
                             timeline_icon.setAttribute("data-toggle", "tooltip");
                             timeline_icon.setAttribute("data-placement", "right");
-                            timeline_icon.setAttribute("style", "background:" + resp.log_book_records[i]['category_color']);
-                            timeline_icon.setAttribute("title", `${resp.log_book_records[i]['category_name']}`);
+                            timeline_icon.setAttribute("style", "background:" + resp.log_book_records[i]
+                                ['category_color']);
+                            timeline_icon.setAttribute("title",
+                                `${resp.log_book_records[i]['category_name']}`);
 
                             var fa_check = document.createElement("i");
                             fa_check.setAttribute("class", resp.log_book_records[i]['category_icon']);
@@ -729,33 +793,46 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                             created_at.setAttribute("class", "time_abbre");
                             created_at.setAttribute("data-toggle", "tooltip");
                             created_at.setAttribute("data-placement", "top");
-                            created_at.setAttribute("title", moment.utc(resp.log_book_records[i]['created_at']).format('DD-MM-YYYY HH:mm'));
+                            created_at.setAttribute("title", moment.utc(resp.log_book_records[i][
+                                'created_at'
+                            ]).format('DD-MM-YYYY HH:mm'));
 
-                            var created_at_text = document.createTextNode(moment.utc(resp.log_book_records[i]['created_at']).fromNow());
+                            var created_at_text = document.createTextNode(moment.utc(resp
+                                .log_book_records[i]['created_at']).fromNow());
                             created_at.append(created_at_text);
-                            $(created_at).append($(`<span style="color:black;font-weight:400;font-size:14px;"> by ${resp.log_book_records[i]['staff_name']}</span>`));
+                            $(created_at).append($(
+                                `<span style="color:black;font-weight:400;font-size:14px;"> by ${resp.log_book_records[i]['staff_name']}</span>`
+                            ));
 
 
                             pannel_body.append(created_at);
 
-                            if (previous_date != moment.utc(resp.log_book_records[i]['date'], 'DD-MM-YYYY H:i').format('DD-MM-YYYY')) {
+                            if (previous_date != moment.utc(resp.log_book_records[i]['date'],
+                                    'DD-MM-YYYY H:i').format('DD-MM-YYYY')) {
                                 $(log_atricles).append($(`
                                     <div class="header_section" style="display: table-row;text-align: center;padding: 20px 0;">
                                         <span style="width: 120px;text-align: center;font-size: 13px;background: #1f88b5;float: right;color: white;border-radius: 4px;margin-right: -60px;margin-top:10px;margin-bottom:30px;">
                                             ${moment.utc(resp.log_book_records[i]['date'], 'DD-MM-YYYY H:i').format('DD-MM-YYYY')}
                                         </span>
                                     </div>`));
-                                previous_date = moment.utc(resp.log_book_records[i]['date'], 'DD-MM-YYYY H:i').format('DD-MM-YYYY');
+                                previous_date = moment.utc(resp.log_book_records[i]['date'],
+                                    'DD-MM-YYYY H:i').format('DD-MM-YYYY');
                             }
 
                             if (resp.log_book_records[i]['category_name'])
-                                $(pannel_body).append($(`<h1 class="title_time_log"><span style="color: ${resp.log_book_records[i]['category_color']}">${resp.log_book_records[i]['category_name']}</span> | <span>${resp.log_book_records[i]['title']}</span></h1>`));
+                                $(pannel_body).append($(
+                                    `<h1 class="title_time_log"><span style="color: ${resp.log_book_records[i]['category_color']}">${resp.log_book_records[i]['category_name']}</span> | <span>${resp.log_book_records[i]['title']}</span></h1>`
+                                ));
                             else
-                                $(pannel_body).append($(`<h1 class="title_time_log"><span>${resp.log_book_records[i]['title']}</span></h1>`));
+                                $(pannel_body).append($(
+                                    `<h1 class="title_time_log"><span>${resp.log_book_records[i]['title']}</span></h1>`
+                                ));
 
                             var details = document.createElement("p");
                             details.className = "comment-detail-info-area";
-                            var details_text = document.createTextNode(resp.log_book_records[i]['details']);
+                            var details_text = document.createTextNode(resp.log_book_records[i][
+                                'details'
+                            ]);
                             details.append(details_text)
 
                             pannel_body.append(details);
@@ -767,14 +844,17 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                                 if (resp.log_book_records[i]['late_time_text']) {
                                     var span_date_field = document.createElement("span");
                                     span_date_field.setAttribute("style", "color:red");
-                                    var span_date_field_text = document.createTextNode(resp.log_book_records[i]['late_time_text']);
+                                    var span_date_field_text = document.createTextNode(resp
+                                        .log_book_records[i]['late_time_text']);
                                     span_date_field.append(span_date_field_text);
                                     date_field.append(' | ');
                                     date_field.append(span_date_field);
                                 } else {
                                     var span_date_field = document.createElement("span");
                                     span_date_field.setAttribute("style", "color:red");
-                                    var span_date_field_text = document.createTextNode(moment.utc(resp.log_book_records[i]['created_at']).format('DD-MM-YYYY HH:mm'));
+                                    var span_date_field_text = document.createTextNode(moment.utc(resp
+                                        .log_book_records[i]['created_at']).format(
+                                        'DD-MM-YYYY HH:mm'));
                                     span_date_field.append(span_date_field_text);
                                     date_field.append(' | ');
                                     date_field.append(span_date_field);
@@ -783,15 +863,17 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                             date_field.prepend(date_text);
                             // image sourabh
                             if (resp.log_book_records[i]['image_name'] != '') {
-                                $(pannel_body).append($(`
-                                <div class="logimg"><a href="{{url('upload/events/')}}/${resp.log_book_records[i]['image_name']}"><img class="" src="{{url('upload/events/')}}/${resp.log_book_records[i]['image_name']}" style="width:100px" /></a></div>`));
+                                $(pannel_body).append($(
+                                    `
+                                <div class="logimg"><a href="{{url('upload/events/')}}/${resp.log_book_records[i]['image_name']}"><img class="" src="{{url('upload/events/')}}/${resp.log_book_records[i]['image_name']}" style="width:100px" /></a></div>`
+                                ));
                             }
                             // image
 
                             $(pannel_body).append($(` <div class="comment-number-bnt-info">
                             <a data-toggle="modal" onclick="daily_log_comment(${resp.log_book_records[i]['id']})" data-id="${resp.log_book_records[i]['date']}" href="#commentsModal" id="commentModal2" class="btn daily_log_comments_btn" style="background-color:#1f88b5;color:white;float:right;font-size: 10px;padding: 4px;margin-bottom:15px;">
                                         Comments
-                                        <span id="_${resp.log_book_records[i]['id']}" class="badge badge-primary badge-pill comment_badge">${resp.log_book_records[i]['comments']}</span>  
+                                        <span id="_${resp.log_book_records[i]['id']}" class="badge badge-primary badge-pill comment_badge">${resp.log_book_records[i]['comments']}</span>
                                         </a>
                                         `));
                             pannel_body.append(date_field);
@@ -804,7 +886,6 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
 
                             log_atricles.append(article_left);
                         }
-
                     }
 
                     /**
@@ -832,7 +913,8 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
         $(this).val(start_date + ' - ' + end_date);
 
         let today = new Date;
-        let todayFormat = ("0" + today.getDate()).slice(-2) + "-" + ("0" + (today.getMonth() + 1)).slice(-2) + "-" + today.getFullYear();
+        let todayFormat = ("0" + today.getDate()).slice(-2) + "-" + ("0" + (today.getMonth() + 1)).slice(-2) + "-" +
+            today.getFullYear();
 
         if (start_date == todayFormat && end_date == todayFormat) {
             $('#today').text('Today');
@@ -906,12 +988,16 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                                     `));
                             }
 
+
+
                             var timeline_icon = document.createElement("span");
                             timeline_icon.setAttribute("class", "timeline-icon");
                             timeline_icon.setAttribute("data-toggle", "tooltip");
                             timeline_icon.setAttribute("data-placement", "left");
-                            timeline_icon.setAttribute("style", "background:" + resp.log_book_records[i]['category_color']);
-                            timeline_icon.setAttribute("title", `${resp.log_book_records[i]['category_name']}`);
+                            timeline_icon.setAttribute("style", "background:" + resp.log_book_records[i]
+                                ['category_color']);
+                            timeline_icon.setAttribute("title",
+                                `${resp.log_book_records[i]['category_name']}`);
 
                             var fa_check = document.createElement("i");
                             fa_check.setAttribute("class", resp.log_book_records[i]['category_icon']);
@@ -924,32 +1010,45 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                             created_at.setAttribute("class", "time_abbre");
                             created_at.setAttribute("data-toggle", "tooltip");
                             created_at.setAttribute("data-placement", "top");
-                            created_at.setAttribute("title", moment.utc(resp.log_book_records[i]['created_at']).format('DD-MM-YYYY HH:mm'));
+                            created_at.setAttribute("title", moment.utc(resp.log_book_records[i][
+                                'created_at'
+                            ]).format('DD-MM-YYYY HH:mm'));
 
-                            var created_at_text = document.createTextNode(moment.utc(resp.log_book_records[i]['created_at']).fromNow());
+                            var created_at_text = document.createTextNode(moment.utc(resp
+                                .log_book_records[i]['created_at']).fromNow());
                             created_at.append(created_at_text);
-                            $(created_at).append($(`<span style="color:black;font-weight:400;font-size:14px;"> by ${resp.log_book_records[i]['staff_name']}</span>`));
+                            $(created_at).append($(
+                                `<span style="color:black;font-weight:400;font-size:14px;"> by ${resp.log_book_records[i]['staff_name']}</span>`
+                            ));
 
 
                             pannel_body.append(created_at);
 
-                            if (previous_date != moment.utc(resp.log_book_records[i]['date'], 'DD-MM-YYYY H:i').format('DD-MM-YYYY')) {
+                            if (previous_date != moment.utc(resp.log_book_records[i]['date'],
+                                    'DD-MM-YYYY H:i').format('DD-MM-YYYY')) {
                                 $(log_atricles).append($(`
                                             <div class="header_section" style="display: table-row;text-align: center;padding: 20px 0;">
                                                 <span style="width: 120px;text-align: center;font-size: 13px;background: #1f88b5;float: right;color: white;border-radius: 4px;margin-right: -60px;margin-top:10px;margin-bottom:30px;">
                                                     ${moment.utc(resp.log_book_records[i]['date'], 'DD-MM-YYYY H:i').format('DD-MM-YYYY')}
                                                 </span>
                                             </div>`));
-                                previous_date = moment.utc(resp.log_book_records[i]['date'], 'DD-MM-YYYY H:i').format('DD-MM-YYYY');
+                                previous_date = moment.utc(resp.log_book_records[i]['date'],
+                                    'DD-MM-YYYY H:i').format('DD-MM-YYYY');
                             }
 
                             if (resp.log_book_records[i]['category_name'])
-                                $(pannel_body).append($(`<h1 class="title_time_log"><span style="color: ${resp.log_book_records[i]['category_color']}">${resp.log_book_records[i]['category_name']}</span> | <span>${resp.log_book_records[i]['title']}</span></h1>`));
+                                $(pannel_body).append($(
+                                    `<h1 class="title_time_log"><span style="color: ${resp.log_book_records[i]['category_color']}">${resp.log_book_records[i]['category_name']}</span> | <span>${resp.log_book_records[i]['title']}</span></h1>`
+                                ));
                             else
-                                $(pannel_body).append($(`<h1 class="title_time_log"><span>${escapeHtml(resp.log_book_records[i]['title'])}</span></h1>`));
+                                $(pannel_body).append($(
+                                    `<h1 class="title_time_log"><span>${escapeHtml(resp.log_book_records[i]['title'])}</span></h1>`
+                                ));
 
                             var details = document.createElement("p");
-                            var details_text = document.createTextNode(resp.log_book_records[i]['details']);
+                            var details_text = document.createTextNode(resp.log_book_records[i][
+                                'details'
+                            ]);
                             details.append(details_text)
 
                             pannel_body.append(details);
@@ -961,7 +1060,8 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                                 if (resp.log_book_records[i]['late_time_text']) {
                                     var span_date_field = document.createElement("span");
                                     span_date_field.setAttribute("style", "color:red");
-                                    var span_date_field_text = document.createTextNode(resp.log_book_records[i]['late_time_text']);
+                                    var span_date_field_text = document.createTextNode(resp
+                                        .log_book_records[i]['late_time_text']);
                                     span_date_field.append(span_date_field_text);
                                     date_field.append(' | ');
                                     // date_field.append(' | '+resp.log_book_records[i]['late_date_text']+' ');
@@ -969,7 +1069,9 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                                 } else {
                                     var span_date_field = document.createElement("span");
                                     span_date_field.setAttribute("style", "color:red");
-                                    var span_date_field_text = document.createTextNode(moment.utc(resp.log_book_records[i]['created_at']).format('DD-MM-YYYY HH:mm'));
+                                    var span_date_field_text = document.createTextNode(moment.utc(resp
+                                        .log_book_records[i]['created_at']).format(
+                                        'DD-MM-YYYY HH:mm'));
                                     span_date_field.append(span_date_field_text);
                                     date_field.append(' | ');
                                     date_field.append(span_date_field);
@@ -987,7 +1089,7 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                             $(pannel_body).append($(` <div class="comment-number-bnt-info">
                         <a data-toggle="modal" onclick="daily_log_comment(${resp.log_book_records[i]['id']})" data-id="${resp.log_book_records[i]['date']}" href="#commentsModal" id="commentModal2" class="btn daily_log_comments_btn" style="background-color:#1f88b5;color:white;float:right;font-size: 10px;padding: 4px;margin-bottom:15px;">
                                     Comments
-                                    <span id="_${resp.log_book_records[i]['id']}" class="badge badge-primary badge-pill comment_badge">${resp.log_book_records[i]['comments']}</span>  
+                                    <span id="_${resp.log_book_records[i]['id']}" class="badge badge-primary badge-pill comment_badge">${resp.log_book_records[i]['comments']}</span>
                                     </a> </div>
                                     `));
                             pannel_body.append(date_field);
@@ -1030,8 +1132,10 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                             timeline_icon.setAttribute("class", "timeline-icon");
                             timeline_icon.setAttribute("data-toggle", "tooltip");
                             timeline_icon.setAttribute("data-placement", "right");
-                            timeline_icon.setAttribute("style", "background:" + resp.log_book_records[i]['category_color']);
-                            timeline_icon.setAttribute("title", `${resp.log_book_records[i]['category_name']}`);
+                            timeline_icon.setAttribute("style", "background:" + resp.log_book_records[i]
+                                ['category_color']);
+                            timeline_icon.setAttribute("title",
+                                `${resp.log_book_records[i]['category_name']}`);
 
                             var fa_check = document.createElement("i");
                             fa_check.setAttribute("class", resp.log_book_records[i]['category_icon']);
@@ -1044,33 +1148,46 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                             created_at.setAttribute("class", "time_abbre");
                             created_at.setAttribute("data-toggle", "tooltip");
                             created_at.setAttribute("data-placement", "top");
-                            created_at.setAttribute("title", moment.utc(resp.log_book_records[i]['created_at']).format('DD-MM-YYYY HH:mm'));
+                            created_at.setAttribute("title", moment.utc(resp.log_book_records[i][
+                                'created_at'
+                            ]).format('DD-MM-YYYY HH:mm'));
 
-                            var created_at_text = document.createTextNode(moment.utc(resp.log_book_records[i]['created_at']).fromNow());
+                            var created_at_text = document.createTextNode(moment.utc(resp
+                                .log_book_records[i]['created_at']).fromNow());
                             created_at.append(created_at_text);
-                            $(created_at).append($(`<span style="color:black;font-weight:400;font-size:14px;"> by ${resp.log_book_records[i]['staff_name']}</span>`));
+                            $(created_at).append($(
+                                `<span style="color:black;font-weight:400;font-size:14px;"> by ${resp.log_book_records[i]['staff_name']}</span>`
+                            ));
 
 
                             pannel_body.append(created_at);
 
-                            if (previous_date != moment.utc(resp.log_book_records[i]['date'], 'DD-MM-YYYY H:i').format('DD-MM-YYYY')) {
+                            if (previous_date != moment.utc(resp.log_book_records[i]['date'],
+                                    'DD-MM-YYYY H:i').format('DD-MM-YYYY')) {
                                 $(log_atricles).append($(`
                                             <div class="header_section" style="display: table-row;text-align: center;padding: 20px 0;">
                                                 <span style="width: 120px;text-align: center;font-size: 13px;background: #1f88b5;float: right;color: white;border-radius: 4px;margin-right: -60px;margin-top:10px;margin-bottom:30px;">
                                                     ${moment.utc(resp.log_book_records[i]['date'], 'DD-MM-YYYY H:i').format('DD-MM-YYYY')}
                                                 </span>
                                             </div>`));
-                                previous_date = moment.utc(resp.log_book_records[i]['date'], 'DD-MM-YYYY H:i').format('DD-MM-YYYY');
+                                previous_date = moment.utc(resp.log_book_records[i]['date'],
+                                    'DD-MM-YYYY H:i').format('DD-MM-YYYY');
                             }
 
                             if (resp.log_book_records[i]['category_name'])
-                                $(pannel_body).append($(`<h1 class="title_time_log"><span style="color: ${resp.log_book_records[i]['category_color']}">${resp.log_book_records[i]['category_name']}</span> | <span>${resp.log_book_records[i]['title']}</span></h1>`));
+                                $(pannel_body).append($(
+                                    `<h1 class="title_time_log"><span style="color: ${resp.log_book_records[i]['category_color']}">${resp.log_book_records[i]['category_name']}</span> | <span>${resp.log_book_records[i]['title']}</span></h1>`
+                                ));
                             else
-                                $(pannel_body).append($(`<h1 class="title_time_log"><span>${escapeHtml(resp.log_book_records[i]['title'])}</span></h1>`));
+                                $(pannel_body).append($(
+                                    `<h1 class="title_time_log"><span>${escapeHtml(resp.log_book_records[i]['title'])}</span></h1>`
+                                ));
 
                             var details = document.createElement("p");
                             details.className = "comment-detail-info-area";
-                            var details_text = document.createTextNode(resp.log_book_records[i]['details']);
+                            var details_text = document.createTextNode(resp.log_book_records[i][
+                                'details'
+                            ]);
                             details.append(details_text)
 
                             pannel_body.append(details);
@@ -1082,7 +1199,8 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                                 if (resp.log_book_records[i]['late_time_text']) {
                                     var span_date_field = document.createElement("span");
                                     span_date_field.setAttribute("style", "color:red");
-                                    var span_date_field_text = document.createTextNode(resp.log_book_records[i]['late_time_text']);
+                                    var span_date_field_text = document.createTextNode(resp
+                                        .log_book_records[i]['late_time_text']);
                                     span_date_field.append(span_date_field_text);
                                     // date_field.append(' | '+resp.log_book_records[i]['late_date_text']+' ');
                                     date_field.append(' | ');
@@ -1090,7 +1208,9 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                                 } else {
                                     var span_date_field = document.createElement("span");
                                     span_date_field.setAttribute("style", "color:red");
-                                    var span_date_field_text = document.createTextNode(moment.utc(resp.log_book_records[i]['created_at']).format('DD-MM-YYYY HH:mm'));
+                                    var span_date_field_text = document.createTextNode(moment.utc(resp
+                                        .log_book_records[i]['created_at']).format(
+                                        'DD-MM-YYYY HH:mm'));
                                     span_date_field.append(span_date_field_text);
                                     date_field.append(' | ');
                                     date_field.append(span_date_field);
@@ -1108,7 +1228,7 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                             $(pannel_body).append($(`<div class="comment-number-bnt-info">
                         <a data-toggle="modal" onclick="daily_log_comment(${resp.log_book_records[i]['id']})" data-id="${resp.log_book_records[i]['date']}" href="#commentsModal" id="commentModal2" class="btn daily_log_comments_btn" style="background-color:#1f88b5;color:white;float:right;font-size: 10px;padding: 4px;margin-bottom:15px;">
                                     Comments
-                                    <span id="_${resp.log_book_records[i]['id']}" class="badge badge-primary badge-pill comment_badge">${resp.log_book_records[i]['comments']}</span>  
+                                    <span id="_${resp.log_book_records[i]['id']}" class="badge badge-primary badge-pill comment_badge">${resp.log_book_records[i]['comments']}</span>
                                     </a></div>
                                     `));
                             pannel_body.append(date_field);
@@ -1178,7 +1298,6 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
             data: data,
             success: function(resp) {
                 console.log(resp)
-                console.log("get the data for the daily log");
                 if (isAuthenticated(resp) == false) {
                     return false;
                 }
@@ -1220,9 +1339,11 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                             var timeline_icon = document.createElement("span");
                             timeline_icon.setAttribute("class", "timeline-icon");
                             timeline_icon.setAttribute("data-toggle", "tooltip");
-                            timeline_icon.setAttribute("style", "background:" + resp.log_book_records[i]['category_color']);
+                            timeline_icon.setAttribute("style", "background:" + resp.log_book_records[i]
+                                ['category_color']);
                             timeline_icon.setAttribute("data-placement", "left");
-                            timeline_icon.setAttribute("title", `${resp.log_book_records[i]['category_name']}`);
+                            timeline_icon.setAttribute("title",
+                                `${resp.log_book_records[i]['category_name']}`);
 
                             var fa_check = document.createElement("i");
                             fa_check.setAttribute("class", resp.log_book_records[i]['category_icon']);
@@ -1235,31 +1356,44 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                             created_at.setAttribute("class", "time_abbre");
                             created_at.setAttribute("data-toggle", "tooltip");
                             created_at.setAttribute("data-placement", "top");
-                            created_at.setAttribute("title", moment.utc(resp.log_book_records[i]['created_at']).format('DD-MM-YYYY HH:mm'));
+                            created_at.setAttribute("title", moment.utc(resp.log_book_records[i][
+                                'created_at'
+                            ]).format('DD-MM-YYYY HH:mm'));
 
-                            var created_at_text = document.createTextNode(moment.utc(resp.log_book_records[i]['created_at']).fromNow());
+                            var created_at_text = document.createTextNode(moment.utc(resp
+                                .log_book_records[i]['created_at']).fromNow());
                             created_at.append(created_at_text);
-                            $(created_at).append($(`<span style="color:black;font-weight:400;font-size:14px;"> by ${resp.log_book_records[i]['staff_name']}</span>`));
+                            $(created_at).append($(
+                                `<span style="color:black;font-weight:400;font-size:14px;"> by ${resp.log_book_records[i]['staff_name']}</span>`
+                            ));
 
 
                             pannel_body.append(created_at);
-                            if (previous_date != moment.utc(resp.log_book_records[i]['date'], 'DD-MM-YYYY H:i').format('DD-MM-YYYY')) {
+                            if (previous_date != moment.utc(resp.log_book_records[i]['date'],
+                                    'DD-MM-YYYY H:i').format('DD-MM-YYYY')) {
                                 $(log_atricles).append($(`
                                                 <div class="header_section" style="display: table-row;text-align: center;padding: 20px 0;">
                                                     <span style="width: 120px;text-align: center;font-size: 13px;background: #1f88b5;float: right;color: white;border-radius: 4px;margin-right: -60px;margin-top:10px;margin-bottom:30px;">
                                                         ${moment.utc(resp.log_book_records[i]['date'], 'DD-MM-YYYY H:i').format('DD-MM-YYYY')}
                                                     </span>
                                                 </div>`));
-                                previous_date = moment.utc(resp.log_book_records[i]['date'], 'DD-MM-YYYY H:i').format('DD-MM-YYYY');
+                                previous_date = moment.utc(resp.log_book_records[i]['date'],
+                                    'DD-MM-YYYY H:i').format('DD-MM-YYYY');
                             }
 
                             if (resp.log_book_records[i]['category_name'])
-                                $(pannel_body).append($(`<h1 class="title_time_log"><span style="color: ${resp.log_book_records[i]['category_color']}">${resp.log_book_records[i]['category_name']}</span> | <span>${resp.log_book_records[i]['title']}</span></h1>`));
+                                $(pannel_body).append($(
+                                    `<h1 class="title_time_log"><span style="color: ${resp.log_book_records[i]['category_color']}">${resp.log_book_records[i]['category_name']}</span> | <span>${resp.log_book_records[i]['title']}</span></h1>`
+                                ));
                             else
-                                $(pannel_body).append($(`<h1 class="title_time_log"><span>${resp.log_book_records[i]['title']}</span></h1>`));
+                                $(pannel_body).append($(
+                                    `<h1 class="title_time_log"><span>${resp.log_book_records[i]['title']}</span></h1>`
+                                ));
 
                             var details = document.createElement("p");
-                            var details_text = document.createTextNode(resp.log_book_records[i]['details']);
+                            var details_text = document.createTextNode(resp.log_book_records[i][
+                                'details'
+                            ]);
                             details.append(details_text)
 
                             pannel_body.append(details);
@@ -1271,7 +1405,8 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                                 if (resp.log_book_records[i]['late_time_text']) {
                                     var span_date_field = document.createElement("span");
                                     span_date_field.setAttribute("style", "color:red");
-                                    var span_date_field_text = document.createTextNode(resp.log_book_records[i]['late_time_text']);
+                                    var span_date_field_text = document.createTextNode(resp
+                                        .log_book_records[i]['late_time_text']);
                                     span_date_field.append(span_date_field_text);
                                     // date_field.append(' | '+resp.log_book_records[i]['late_date_text']+' ');
                                     date_field.append(' | ');
@@ -1279,7 +1414,9 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                                 } else {
                                     var span_date_field = document.createElement("span");
                                     span_date_field.setAttribute("style", "color:red");
-                                    var span_date_field_text = document.createTextNode(moment.utc(resp.log_book_records[i]['created_at']).format('DD-MM-YYYY HH:mm'));
+                                    var span_date_field_text = document.createTextNode(moment.utc(resp
+                                        .log_book_records[i]['created_at']).format(
+                                        'DD-MM-YYYY HH:mm'));
                                     span_date_field.append(span_date_field_text);
                                     date_field.append(' | ');
                                     date_field.append(span_date_field);
@@ -1296,7 +1433,7 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                             $(pannel_body).append($(`
                             <div class="comment-number-bnt-info"> <a data-toggle="modal" onclick="daily_log_comment(${resp.log_book_records[i]['id']})" data-id="${resp.log_book_records[i]['date']}" href="#commentsModal" id="commentModal2" class="btn daily_log_comments_btn" style="background-color:#1f88b5;color:white;float:right;font-size: 10px;padding: 4px;margin-bottom:15px;">
                                         Comments
-                                        <span id="_${resp.log_book_records[i]['id']}" class="badge badge-primary badge-pill comment_badge">${resp.log_book_records[i]['comments']}</span>  
+                                        <span id="_${resp.log_book_records[i]['id']}" class="badge badge-primary badge-pill comment_badge">${resp.log_book_records[i]['comments']}</span>
                                         </a> </div>
                                         `));
 
@@ -1339,8 +1476,10 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                             timeline_icon.setAttribute("class", "timeline-icon");
                             timeline_icon.setAttribute("data-toggle", "tooltip");
                             timeline_icon.setAttribute("data-placement", "right");
-                            timeline_icon.setAttribute("style", "background:" + resp.log_book_records[i]['category_color']);
-                            timeline_icon.setAttribute("title", `${resp.log_book_records[i]['category_name']}`);
+                            timeline_icon.setAttribute("style", "background:" + resp.log_book_records[i]
+                                ['category_color']);
+                            timeline_icon.setAttribute("title",
+                                `${resp.log_book_records[i]['category_name']}`);
 
                             var fa_check = document.createElement("i");
                             fa_check.setAttribute("class", resp.log_book_records[i]['category_icon']);
@@ -1353,33 +1492,46 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                             created_at.setAttribute("class", "time_abbre");
                             created_at.setAttribute("data-toggle", "tooltip");
                             created_at.setAttribute("data-placement", "top");
-                            created_at.setAttribute("title", moment.utc(resp.log_book_records[i]['created_at']).format('DD-MM-YYYY HH:mm'));
+                            created_at.setAttribute("title", moment.utc(resp.log_book_records[i][
+                                'created_at'
+                            ]).format('DD-MM-YYYY HH:mm'));
 
-                            var created_at_text = document.createTextNode(moment.utc(resp.log_book_records[i]['created_at']).fromNow());
+                            var created_at_text = document.createTextNode(moment.utc(resp
+                                .log_book_records[i]['created_at']).fromNow());
                             created_at.append(created_at_text);
-                            $(created_at).append($(`<span style="color:black;font-weight:400;font-size:14px;"> by ${resp.log_book_records[i]['staff_name']}</span>`));
+                            $(created_at).append($(
+                                `<span style="color:black;font-weight:400;font-size:14px;"> by ${resp.log_book_records[i]['staff_name']}</span>`
+                            ));
 
 
                             pannel_body.append(created_at);
 
-                            if (previous_date != moment.utc(resp.log_book_records[i]['date'], 'DD-MM-YYYY H:i').format('DD-MM-YYYY')) {
+                            if (previous_date != moment.utc(resp.log_book_records[i]['date'],
+                                    'DD-MM-YYYY H:i').format('DD-MM-YYYY')) {
                                 $(log_atricles).append($(`
                                                 <div class="header_section" style="display: table-row;text-align: center;padding: 20px 0;">
                                                     <span style="width: 120px;text-align: center;font-size: 13px;background: #1f88b5;float: right;color: white;border-radius: 4px;margin-right: -60px;margin-top:10px;margin-bottom:30px;">
                                                         ${moment.utc(resp.log_book_records[i]['date'], 'DD-MM-YYYY H:i').format('DD-MM-YYYY')}
                                                     </span>
                                                 </div>`));
-                                previous_date = moment.utc(resp.log_book_records[i]['date'], 'DD-MM-YYYY H:i').format('DD-MM-YYYY');
+                                previous_date = moment.utc(resp.log_book_records[i]['date'],
+                                    'DD-MM-YYYY H:i').format('DD-MM-YYYY');
                             }
 
                             if (resp.log_book_records[i]['category_name'])
-                                $(pannel_body).append($(`<h1 class="title_time_log"><span style="color: ${resp.log_book_records[i]['category_color']}">${resp.log_book_records[i]['category_name']}</span> | <span>${resp.log_book_records[i]['title']}</span></h1>`));
+                                $(pannel_body).append($(
+                                    `<h1 class="title_time_log"><span style="color: ${resp.log_book_records[i]['category_color']}">${resp.log_book_records[i]['category_name']}</span> | <span>${resp.log_book_records[i]['title']}</span></h1>`
+                                ));
                             else
-                                $(pannel_body).append($(`<h1 class="title_time_log"><span>${resp.log_book_records[i]['title']}</span></h1>`));
+                                $(pannel_body).append($(
+                                    `<h1 class="title_time_log"><span>${resp.log_book_records[i]['title']}</span></h1>`
+                                ));
 
                             var details = document.createElement("p");
                             details.className = "comment-detail-info-area";
-                            var details_text = document.createTextNode(resp.log_book_records[i]['details']);
+                            var details_text = document.createTextNode(resp.log_book_records[i][
+                                'details'
+                            ]);
                             details.append(details_text)
 
                             pannel_body.append(details);
@@ -1391,14 +1543,17 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                                 if (resp.log_book_records[i]['late_time_text']) {
                                     var span_date_field = document.createElement("span");
                                     span_date_field.setAttribute("style", "color:red");
-                                    var span_date_field_text = document.createTextNode(resp.log_book_records[i]['late_time_text']);
+                                    var span_date_field_text = document.createTextNode(resp
+                                        .log_book_records[i]['late_time_text']);
                                     span_date_field.append(span_date_field_text);
                                     date_field.append(' | ');
                                     date_field.append(span_date_field);
                                 } else {
                                     var span_date_field = document.createElement("span");
                                     span_date_field.setAttribute("style", "color:red");
-                                    var span_date_field_text = document.createTextNode(moment.utc(resp.log_book_records[i]['created_at']).format('DD-MM-YYYY HH:mm'));
+                                    var span_date_field_text = document.createTextNode(moment.utc(resp
+                                        .log_book_records[i]['created_at']).format(
+                                        'DD-MM-YYYY HH:mm'));
                                     span_date_field.append(span_date_field_text);
                                     date_field.append(' | ');
                                     date_field.append(span_date_field);
@@ -1416,7 +1571,7 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                             $(pannel_body).append($(`
                             <div class="comment-number-bnt-info">  <a data-toggle="modal" onclick="daily_log_comment(${resp.log_book_records[i]['id']})" data-id="${resp.log_book_records[i]['date']}" href="#commentsModal" id="commentModal2" class="btn daily_log_comments_btn" style="background-color:#1f88b5;color:white;float:right;font-size: 10px;padding: 4px;margin-bottom:15px;">
                                         Comments
-                                        <span id="_${resp.log_book_records[i]['id']}" class="badge badge-primary badge-pill comment_badge">${resp.log_book_records[i]['comments']}</span>  
+                                        <span id="_${resp.log_book_records[i]['id']}" class="badge badge-primary badge-pill comment_badge">${resp.log_book_records[i]['comments']}</span>
                                         </a> </div>
                                         `));
                             pannel_body.append(date_field);
@@ -1521,9 +1676,11 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                             var timeline_icon = document.createElement("span");
                             timeline_icon.setAttribute("class", "timeline-icon");
                             timeline_icon.setAttribute("data-toggle", "tooltip");
-                            timeline_icon.setAttribute("style", "background:" + resp.log_book_records[i]['category_color']);
+                            timeline_icon.setAttribute("style", "background:" + resp.log_book_records[i]
+                                ['category_color']);
                             timeline_icon.setAttribute("data-placement", "left");
-                            timeline_icon.setAttribute("title", `${resp.log_book_records[i]['category_name']}`);
+                            timeline_icon.setAttribute("title",
+                                `${resp.log_book_records[i]['category_name']}`);
 
                             var fa_check = document.createElement("i");
                             fa_check.setAttribute("class", resp.log_book_records[i]['category_icon']);
@@ -1536,31 +1693,44 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                             created_at.setAttribute("class", "time_abbre");
                             created_at.setAttribute("data-toggle", "tooltip");
                             created_at.setAttribute("data-placement", "top");
-                            created_at.setAttribute("title", moment.utc(resp.log_book_records[i]['created_at']).format('DD-MM-YYYY HH:mm'));
+                            created_at.setAttribute("title", moment.utc(resp.log_book_records[i][
+                                'created_at'
+                            ]).format('DD-MM-YYYY HH:mm'));
 
-                            var created_at_text = document.createTextNode(moment.utc(resp.log_book_records[i]['created_at']).fromNow());
+                            var created_at_text = document.createTextNode(moment.utc(resp
+                                .log_book_records[i]['created_at']).fromNow());
                             created_at.append(created_at_text);
-                            $(created_at).append($(`<span style="color:black;font-weight:400;font-size:14px;"> by ${resp.log_book_records[i]['staff_name']}</span>`));
+                            $(created_at).append($(
+                                `<span style="color:black;font-weight:400;font-size:14px;"> by ${resp.log_book_records[i]['staff_name']}</span>`
+                            ));
 
 
                             pannel_body.append(created_at);
-                            if (previous_date != moment.utc(resp.log_book_records[i]['date'], 'DD-MM-YYYY H:i').format('DD-MM-YYYY')) {
+                            if (previous_date != moment.utc(resp.log_book_records[i]['date'],
+                                    'DD-MM-YYYY H:i').format('DD-MM-YYYY')) {
                                 $(log_atricles).append($(`
                                                 <div class="header_section" style="display: table-row;text-align: center;padding: 20px 0;">
                                                     <span style="width: 120px;text-align: center;font-size: 13px;background: #1f88b5;float: right;color: white;border-radius: 4px;margin-right: -60px;margin-top:10px;margin-bottom:30px;">
                                                         ${moment.utc(resp.log_book_records[i]['date'], 'DD-MM-YYYY H:i').format('DD-MM-YYYY')}
                                                     </span>
                                                 </div>`));
-                                previous_date = moment.utc(resp.log_book_records[i]['date'], 'DD-MM-YYYY H:i').format('DD-MM-YYYY');
+                                previous_date = moment.utc(resp.log_book_records[i]['date'],
+                                    'DD-MM-YYYY H:i').format('DD-MM-YYYY');
                             }
 
                             if (resp.log_book_records[i]['category_name'])
-                                $(pannel_body).append($(`<h1 class="title_time_log"><span style="color: ${resp.log_book_records[i]['category_color']}">${resp.log_book_records[i]['category_name']}</span> | <span>${resp.log_book_records[i]['title']}</span></h1>`));
+                                $(pannel_body).append($(
+                                    `<h1 class="title_time_log"><span style="color: ${resp.log_book_records[i]['category_color']}">${resp.log_book_records[i]['category_name']}</span> | <span>${resp.log_book_records[i]['title']}</span></h1>`
+                                ));
                             else
-                                $(pannel_body).append($(`<h1 class="title_time_log"><span>${resp.log_book_records[i]['title']}</span></h1>`));
+                                $(pannel_body).append($(
+                                    `<h1 class="title_time_log"><span>${resp.log_book_records[i]['title']}</span></h1>`
+                                ));
 
                             var details = document.createElement("p");
-                            var details_text = document.createTextNode(resp.log_book_records[i]['details']);
+                            var details_text = document.createTextNode(resp.log_book_records[i][
+                                'details'
+                            ]);
                             details.append(details_text)
 
                             pannel_body.append(details);
@@ -1572,7 +1742,8 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                                 if (resp.log_book_records[i]['late_time_text']) {
                                     var span_date_field = document.createElement("span");
                                     span_date_field.setAttribute("style", "color:red");
-                                    var span_date_field_text = document.createTextNode(resp.log_book_records[i]['late_time_text']);
+                                    var span_date_field_text = document.createTextNode(resp
+                                        .log_book_records[i]['late_time_text']);
                                     span_date_field.append(span_date_field_text);
                                     // date_field.append(' | '+resp.log_book_records[i]['late_date_text']+' ');
                                     date_field.append(' | ');
@@ -1580,7 +1751,9 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                                 } else {
                                     var span_date_field = document.createElement("span");
                                     span_date_field.setAttribute("style", "color:red");
-                                    var span_date_field_text = document.createTextNode(moment.utc(resp.log_book_records[i]['created_at']).format('DD-MM-YYYY HH:mm'));
+                                    var span_date_field_text = document.createTextNode(moment.utc(resp
+                                        .log_book_records[i]['created_at']).format(
+                                        'DD-MM-YYYY HH:mm'));
                                     span_date_field.append(span_date_field_text);
                                     date_field.append(' | ');
                                     date_field.append(span_date_field);
@@ -1597,7 +1770,7 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                             $(pannel_body).append($(`
                             <div class="comment-number-bnt-info">  <a data-toggle="modal" onclick="daily_log_comment(${resp.log_book_records[i]['id']})" data-id="${resp.log_book_records[i]['date']}" href="#commentsModal" id="commentModal2" class="btn daily_log_comments_btn" style="background-color:#1f88b5;color:white;float:right;font-size: 10px;padding: 4px;margin-bottom:15px;">
                                         Comments
-                                        <span id="_${resp.log_book_records[i]['id']}" class="badge badge-primary badge-pill comment_badge">${resp.log_book_records[i]['comments']}</span>  
+                                        <span id="_${resp.log_book_records[i]['id']}" class="badge badge-primary badge-pill comment_badge">${resp.log_book_records[i]['comments']}</span>
                                         </a></div>
                                         `));
 
@@ -1640,8 +1813,10 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                             timeline_icon.setAttribute("class", "timeline-icon");
                             timeline_icon.setAttribute("data-toggle", "tooltip");
                             timeline_icon.setAttribute("data-placement", "right");
-                            timeline_icon.setAttribute("style", "background:" + resp.log_book_records[i]['category_color']);
-                            timeline_icon.setAttribute("title", `${resp.log_book_records[i]['category_name']}`);
+                            timeline_icon.setAttribute("style", "background:" + resp.log_book_records[i]
+                                ['category_color']);
+                            timeline_icon.setAttribute("title",
+                                `${resp.log_book_records[i]['category_name']}`);
 
                             var fa_check = document.createElement("i");
                             fa_check.setAttribute("class", resp.log_book_records[i]['category_icon']);
@@ -1654,33 +1829,46 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                             created_at.setAttribute("class", "time_abbre");
                             created_at.setAttribute("data-toggle", "tooltip");
                             created_at.setAttribute("data-placement", "top");
-                            created_at.setAttribute("title", moment.utc(resp.log_book_records[i]['created_at']).format('DD-MM-YYYY HH:mm'));
+                            created_at.setAttribute("title", moment.utc(resp.log_book_records[i][
+                                'created_at'
+                            ]).format('DD-MM-YYYY HH:mm'));
 
-                            var created_at_text = document.createTextNode(moment.utc(resp.log_book_records[i]['created_at']).fromNow());
+                            var created_at_text = document.createTextNode(moment.utc(resp
+                                .log_book_records[i]['created_at']).fromNow());
                             created_at.append(created_at_text);
-                            $(created_at).append($(`<span style="color:black;font-weight:400;font-size:14px;"> by ${resp.log_book_records[i]['staff_name']}</span>`));
+                            $(created_at).append($(
+                                `<span style="color:black;font-weight:400;font-size:14px;"> by ${resp.log_book_records[i]['staff_name']}</span>`
+                            ));
 
 
                             pannel_body.append(created_at);
 
-                            if (previous_date != moment.utc(resp.log_book_records[i]['date'], 'DD-MM-YYYY H:i').format('DD-MM-YYYY')) {
+                            if (previous_date != moment.utc(resp.log_book_records[i]['date'],
+                                    'DD-MM-YYYY H:i').format('DD-MM-YYYY')) {
                                 $(log_atricles).append($(`
                                                 <div class="header_section" style="display: table-row;text-align: center;padding: 20px 0;">
                                                     <span style="width: 120px;text-align: center;font-size: 13px;background: #1f88b5;float: right;color: white;border-radius: 4px;margin-right: -60px;margin-top:10px;margin-bottom:30px;">
                                                         ${moment.utc(resp.log_book_records[i]['date'], 'DD-MM-YYYY H:i').format('DD-MM-YYYY')}
                                                     </span>
                                                 </div>`));
-                                previous_date = moment.utc(resp.log_book_records[i]['date'], 'DD-MM-YYYY H:i').format('DD-MM-YYYY');
+                                previous_date = moment.utc(resp.log_book_records[i]['date'],
+                                    'DD-MM-YYYY H:i').format('DD-MM-YYYY');
                             }
 
                             if (resp.log_book_records[i]['category_name'])
-                                $(pannel_body).append($(`<h1 class="title_time_log"><span style="color: ${resp.log_book_records[i]['category_color']}">${resp.log_book_records[i]['category_name']}</span> | <span>${resp.log_book_records[i]['title']}</span></h1>`));
+                                $(pannel_body).append($(
+                                    `<h1 class="title_time_log"><span style="color: ${resp.log_book_records[i]['category_color']}">${resp.log_book_records[i]['category_name']}</span> | <span>${resp.log_book_records[i]['title']}</span></h1>`
+                                ));
                             else
-                                $(pannel_body).append($(`<h1 class="title_time_log"><span>${resp.log_book_records[i]['title']}</span></h1>`));
+                                $(pannel_body).append($(
+                                    `<h1 class="title_time_log"><span>${resp.log_book_records[i]['title']}</span></h1>`
+                                ));
 
                             var details = document.createElement("p");
                             details.className = "comment-detail-info-area";
-                            var details_text = document.createTextNode(resp.log_book_records[i]['details']);
+                            var details_text = document.createTextNode(resp.log_book_records[i][
+                                'details'
+                            ]);
                             details.append(details_text)
 
                             pannel_body.append(details);
@@ -1692,14 +1880,17 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                                 if (resp.log_book_records[i]['late_time_text']) {
                                     var span_date_field = document.createElement("span");
                                     span_date_field.setAttribute("style", "color:red");
-                                    var span_date_field_text = document.createTextNode(resp.log_book_records[i]['late_time_text']);
+                                    var span_date_field_text = document.createTextNode(resp
+                                        .log_book_records[i]['late_time_text']);
                                     span_date_field.append(span_date_field_text);
                                     date_field.append(' | ');
                                     date_field.append(span_date_field);
                                 } else {
                                     var span_date_field = document.createElement("span");
                                     span_date_field.setAttribute("style", "color:red");
-                                    var span_date_field_text = document.createTextNode(moment.utc(resp.log_book_records[i]['created_at']).format('DD-MM-YYYY HH:mm'));
+                                    var span_date_field_text = document.createTextNode(moment.utc(resp
+                                        .log_book_records[i]['created_at']).format(
+                                        'DD-MM-YYYY HH:mm'));
                                     span_date_field.append(span_date_field_text);
                                     date_field.append(' | ');
                                     date_field.append(span_date_field);
@@ -1717,7 +1908,7 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                             $(pannel_body).append($(`
                             <div class="comment-number-bnt-info"> <a data-toggle="modal" onclick="daily_log_comment(${resp.log_book_records[i]['id']})" data-id="${resp.log_book_records[i]['date']}" href="#commentsModal" id="commentModal2" class="btn daily_log_comments_btn" style="background-color:#1f88b5;color:white;float:right;font-size: 10px;padding: 4px;margin-bottom:15px;">
                                         Comments
-                                        <span id="_${resp.log_book_records[i]['id']}" class="badge badge-primary badge-pill comment_badge">${resp.log_book_records[i]['comments']}</span>  
+                                        <span id="_${resp.log_book_records[i]['id']}" class="badge badge-primary badge-pill comment_badge">${resp.log_book_records[i]['comments']}</span>
                                         </a> </div>
                                         `));
                             pannel_body.append(date_field);
@@ -1776,8 +1967,8 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                 'end_date': end_date.format('YYYY-MM-DD'),
                 'filter': 1,
                 'keyword': keyword
-            };   
-            
+            };
+
         $.ajax({
             type: 'post',
             url: "{{ url('/service/daily-logs') }}",
@@ -1825,7 +2016,9 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                             var timeline_icon = document.createElement("span");
                             timeline_icon.setAttribute("class", "timeline-icon");
                             timeline_icon.setAttribute("data-toggle", "tooltip");
-                            timeline_icon.setAttribute("style", "background:" + resp.log_book_records[i]['category_color']);
+                            timeline_icon.setAttribute("style", "background:" + resp.log_book_records[i][
+                                'category_color'
+                            ]);
                             timeline_icon.setAttribute("data-placement", "left");
                             timeline_icon.setAttribute("title", `${resp.log_book_records[i]['category_name']}`);
 
@@ -1840,28 +2033,39 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                             created_at.setAttribute("class", "time_abbre");
                             created_at.setAttribute("data-toggle", "tooltip");
                             created_at.setAttribute("data-placement", "top");
-                            created_at.setAttribute("title", moment.utc(resp.log_book_records[i]['created_at']).format('DD-MM-YYYY HH:mm'));
+                            created_at.setAttribute("title", moment.utc(resp.log_book_records[i]['created_at'])
+                                .format('DD-MM-YYYY HH:mm'));
 
-                            var created_at_text = document.createTextNode(moment.utc(resp.log_book_records[i]['created_at']).fromNow());
+                            var created_at_text = document.createTextNode(moment.utc(resp.log_book_records[i][
+                                'created_at'
+                            ]).fromNow());
                             created_at.append(created_at_text);
-                            $(created_at).append($(`<span style="color:black;font-weight:400;font-size:14px;"> by ${resp.log_book_records[i]['staff_name']}</span>`));
+                            $(created_at).append($(
+                                `<span style="color:black;font-weight:400;font-size:14px;"> by ${resp.log_book_records[i]['staff_name']}</span>`
+                            ));
 
 
                             pannel_body.append(created_at);
-                            if (previous_date != moment.utc(resp.log_book_records[i]['date'], 'DD-MM-YYYY H:i').format('DD-MM-YYYY')) {
+                            if (previous_date != moment.utc(resp.log_book_records[i]['date'], 'DD-MM-YYYY H:i')
+                                .format('DD-MM-YYYY')) {
                                 $(log_atricles).append($(`
                                                 <div class="header_section" style="display: table-row;text-align: center;padding: 20px 0;">
                                                     <span style="width: 120px;text-align: center;font-size: 13px;background: #1f88b5;float: right;color: white;border-radius: 4px;margin-right: -60px;margin-top:10px;margin-bottom:30px;">
                                                         ${moment.utc(resp.log_book_records[i]['date'], 'DD-MM-YYYY H:i').format('DD-MM-YYYY')}
                                                     </span>
                                                 </div>`));
-                                previous_date = moment.utc(resp.log_book_records[i]['date'], 'DD-MM-YYYY H:i').format('DD-MM-YYYY');
+                                previous_date = moment.utc(resp.log_book_records[i]['date'], 'DD-MM-YYYY H:i')
+                                    .format('DD-MM-YYYY');
                             }
 
                             if (resp.log_book_records[i]['category_name'])
-                                $(pannel_body).append($(`<h1 class="title_time_log"><span style="color: ${resp.log_book_records[i]['category_color']}">${resp.log_book_records[i]['category_name']}</span> | <span>${resp.log_book_records[i]['title']}</span></h1>`));
+                                $(pannel_body).append($(
+                                    `<h1 class="title_time_log"><span style="color: ${resp.log_book_records[i]['category_color']}">${resp.log_book_records[i]['category_name']}</span> | <span>${resp.log_book_records[i]['title']}</span></h1>`
+                                ));
                             else
-                                $(pannel_body).append($(`<h1 class="title_time_log"><span>${resp.log_book_records[i]['title']}</span></h1>`));
+                                $(pannel_body).append($(
+                                    `<h1 class="title_time_log"><span>${resp.log_book_records[i]['title']}</span></h1>`
+                                ));
 
                             var details = document.createElement("p");
                             var details_text = document.createTextNode(resp.log_book_records[i]['details']);
@@ -1876,7 +2080,9 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                                 if (resp.log_book_records[i]['late_time_text']) {
                                     var span_date_field = document.createElement("span");
                                     span_date_field.setAttribute("style", "color:red");
-                                    var span_date_field_text = document.createTextNode(resp.log_book_records[i]['late_time_text']);
+                                    var span_date_field_text = document.createTextNode(resp.log_book_records[i][
+                                        'late_time_text'
+                                    ]);
                                     span_date_field.append(span_date_field_text);
                                     // date_field.append(' | '+resp.log_book_records[i]['late_date_text']+' ');
                                     date_field.append(' | ');
@@ -1884,7 +2090,8 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                                 } else {
                                     var span_date_field = document.createElement("span");
                                     span_date_field.setAttribute("style", "color:red");
-                                    var span_date_field_text = document.createTextNode(moment.utc(resp.log_book_records[i]['created_at']).format('DD-MM-YYYY HH:mm'));
+                                    var span_date_field_text = document.createTextNode(moment.utc(resp
+                                        .log_book_records[i]['created_at']).format('DD-MM-YYYY HH:mm'));
                                     span_date_field.append(span_date_field_text);
                                     date_field.append(' | ');
                                     date_field.append(span_date_field);
@@ -1901,7 +2108,7 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                             $(pannel_body).append($(`
                             <div class="comment-number-bnt-info">  <a data-toggle="modal" onclick="daily_log_comment(${resp.log_book_records[i]['id']})" data-id="${resp.log_book_records[i]['date']}" href="#commentsModal" id="commentModal2" class="btn daily_log_comments_btn" style="background-color:#1f88b5;color:white;float:right;font-size: 10px;padding: 4px;margin-bottom:15px;">
                                         Comments
-                                        <span id="_${resp.log_book_records[i]['id']}" class="badge badge-primary badge-pill comment_badge">${resp.log_book_records[i]['comments']}</span>  
+                                        <span id="_${resp.log_book_records[i]['id']}" class="badge badge-primary badge-pill comment_badge">${resp.log_book_records[i]['comments']}</span>
                                         </a> </div>
                                         `));
 
@@ -1944,7 +2151,9 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                             timeline_icon.setAttribute("class", "timeline-icon");
                             timeline_icon.setAttribute("data-toggle", "tooltip");
                             timeline_icon.setAttribute("data-placement", "right");
-                            timeline_icon.setAttribute("style", "background:" + resp.log_book_records[i]['category_color']);
+                            timeline_icon.setAttribute("style", "background:" + resp.log_book_records[i][
+                                'category_color'
+                            ]);
                             timeline_icon.setAttribute("title", `${resp.log_book_records[i]['category_name']}`);
 
                             var fa_check = document.createElement("i");
@@ -1958,29 +2167,40 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                             created_at.setAttribute("class", "time_abbre");
                             created_at.setAttribute("data-toggle", "tooltip");
                             created_at.setAttribute("data-placement", "top");
-                            created_at.setAttribute("title", moment.utc(resp.log_book_records[i]['created_at']).format('DD-MM-YYYY HH:mm'));
+                            created_at.setAttribute("title", moment.utc(resp.log_book_records[i]['created_at'])
+                                .format('DD-MM-YYYY HH:mm'));
 
-                            var created_at_text = document.createTextNode(moment.utc(resp.log_book_records[i]['created_at']).fromNow());
+                            var created_at_text = document.createTextNode(moment.utc(resp.log_book_records[i][
+                                'created_at'
+                            ]).fromNow());
                             created_at.append(created_at_text);
-                            $(created_at).append($(`<span style="color:black;font-weight:400;font-size:14px;"> by ${resp.log_book_records[i]['staff_name']}</span>`));
+                            $(created_at).append($(
+                                `<span style="color:black;font-weight:400;font-size:14px;"> by ${resp.log_book_records[i]['staff_name']}</span>`
+                            ));
 
 
                             pannel_body.append(created_at);
 
-                            if (previous_date != moment.utc(resp.log_book_records[i]['date'], 'DD-MM-YYYY H:i').format('DD-MM-YYYY')) {
+                            if (previous_date != moment.utc(resp.log_book_records[i]['date'], 'DD-MM-YYYY H:i')
+                                .format('DD-MM-YYYY')) {
                                 $(log_atricles).append($(`
                                                 <div class="header_section" style="display: table-row;text-align: center;padding: 20px 0;">
                                                     <span style="width: 120px;text-align: center;font-size: 13px;background: #1f88b5;float: right;color: white;border-radius: 4px;margin-right: -60px;margin-top:10px;margin-bottom:30px;">
                                                         ${moment.utc(resp.log_book_records[i]['date'], 'DD-MM-YYYY H:i').format('DD-MM-YYYY')}
                                                     </span>
                                                 </div>`));
-                                previous_date = moment.utc(resp.log_book_records[i]['date'], 'DD-MM-YYYY H:i').format('DD-MM-YYYY');
+                                previous_date = moment.utc(resp.log_book_records[i]['date'], 'DD-MM-YYYY H:i')
+                                    .format('DD-MM-YYYY');
                             }
 
                             if (resp.log_book_records[i]['category_name'])
-                                $(pannel_body).append($(`<h1 class="title_time_log"><span style="color: ${resp.log_book_records[i]['category_color']}">${resp.log_book_records[i]['category_name']}</span> | <span>${resp.log_book_records[i]['title']}</span></h1>`));
+                                $(pannel_body).append($(
+                                    `<h1 class="title_time_log"><span style="color: ${resp.log_book_records[i]['category_color']}">${resp.log_book_records[i]['category_name']}</span> | <span>${resp.log_book_records[i]['title']}</span></h1>`
+                                ));
                             else
-                                $(pannel_body).append($(`<h1 class="title_time_log"><span>${resp.log_book_records[i]['title']}</span></h1>`));
+                                $(pannel_body).append($(
+                                    `<h1 class="title_time_log"><span>${resp.log_book_records[i]['title']}</span></h1>`
+                                ));
 
                             var details = document.createElement("p");
                             details.className = "comment-detail-info-area";
@@ -1996,14 +2216,17 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                                 if (resp.log_book_records[i]['late_time_text']) {
                                     var span_date_field = document.createElement("span");
                                     span_date_field.setAttribute("style", "color:red");
-                                    var span_date_field_text = document.createTextNode(resp.log_book_records[i]['late_time_text']);
+                                    var span_date_field_text = document.createTextNode(resp.log_book_records[i][
+                                        'late_time_text'
+                                    ]);
                                     span_date_field.append(span_date_field_text);
                                     date_field.append(' | ');
                                     date_field.append(span_date_field);
                                 } else {
                                     var span_date_field = document.createElement("span");
                                     span_date_field.setAttribute("style", "color:red");
-                                    var span_date_field_text = document.createTextNode(moment.utc(resp.log_book_records[i]['created_at']).format('DD-MM-YYYY HH:mm'));
+                                    var span_date_field_text = document.createTextNode(moment.utc(resp
+                                        .log_book_records[i]['created_at']).format('DD-MM-YYYY HH:mm'));
                                     span_date_field.append(span_date_field_text);
                                     date_field.append(' | ');
                                     date_field.append(span_date_field);
@@ -2018,10 +2241,10 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                             }
                             // image
 
-                            $(pannel_body).append($(` <div class="comment-number-bnt-info"> 
+                            $(pannel_body).append($(` <div class="comment-number-bnt-info">
                             <a data-toggle="modal" onclick="daily_log_comment(${resp.log_book_records[i]['id']})" data-id="${resp.log_book_records[i]['date']}" href="#commentsModal" id="commentModal2" class="btn daily_log_comments_btn" style="background-color:#1f88b5;color:white;float:right;font-size: 10px;padding: 4px;margin-bottom:15px;">
                                         Comments
-                                        <span id="_${resp.log_book_records[i]['id']}" class="badge badge-primary badge-pill comment_badge">${resp.log_book_records[i]['comments']}</span>  
+                                        <span id="_${resp.log_book_records[i]['id']}" class="badge badge-primary badge-pill comment_badge">${resp.log_book_records[i]['comments']}</span>
                                         </a> </div>
                                         `));
                             pannel_body.append(date_field);

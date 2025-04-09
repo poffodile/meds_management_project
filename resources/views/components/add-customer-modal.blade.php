@@ -235,7 +235,7 @@
                                 </div>
 
                                 <div class="mb-2 row">
-                                    <label for="inputAddress" class="col-sm-3 col-form-label">Address<span class="radStar ">*</span></label>
+                                    <label for="inputAddress" class="col-sm-3 col-form-label">Address <span class="radStar ">*</span></label>
                                     <div class="col-sm-9">
                                         <textarea class="form-control textareaInput CustomercheckError" placeholder="Enter Customer Address" id="cuatomer_address" name="address" rows="3"></textarea>
                                     </div>

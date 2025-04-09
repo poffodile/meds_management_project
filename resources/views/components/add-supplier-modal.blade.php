@@ -110,7 +110,7 @@
                         <div class="col-md-6 col-lg-6 col-xl-6">
                             <div class="formDtail">
                                 <div class="mb-2 row">
-                                    <label for="supplier_address" class="col-sm-3 col-form-label">Address<span class="radStar ">*</span></label>
+                                    <label for="supplier_address" class="col-sm-3 col-form-label">Address <span class="radStar ">*</span></label>
                                     <div class="col-sm-9">
                                         <textarea class="form-control textareaInput suppliercheckError" maxlength="300" placeholder="Enter Supplier Address" id="supplier_address" name="address" rows="3"></textarea>
                                     </div>
@@ -178,11 +178,9 @@
                             </div>
                         </div>
                         <div class="col-md-12 col-lg-12 col-xl-12">
-                            <div class="mb-2 row">
-                                <label for="supplier_note" class="col-sm-2 col-form-label">Notes</label>
-                                <div class="col-sm-10">
-                                    <textarea class="form-control textareaInput" placeholder="Enter Supplier Notes" rows="3" id="supplier_note" name="notes"></textarea>
-                                </div>
+                            <div class="mb-2 notes_input">
+                                <label for="supplier_note" class="col-form-label">Notes</label>
+                                <textarea class="form-control textareaInput" placeholder="Enter Supplier Notes" rows="3" id="supplier_note" name="notes"></textarea>
                             </div>
                         </div>
                         

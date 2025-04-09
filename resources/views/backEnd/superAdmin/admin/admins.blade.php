@@ -199,14 +199,15 @@ if ($del_status == '0') { //regular users
                                                     <td style="width: 25%;">@if($value->qr_code_id == NULL) <button class="re-generateQR" onclick="generateQR(<?= $value->id ?>);"><span>Generate QR</span></button> <button><i class="fa fa-qrcode" aria-hidden="true"></i></button> @else <button class="re-generateQR" onclick="generateQR(<?= $value->id ?>);"><span>Re-Generate QR</span></button> <button class="re-generateQR" onclick="ViewQR(<?= $value->id ?>);"><span>View</span></button> @endif </td>
                                                     <td class="action-icn">
                                                         @if($del_status == '0')
-                                                        <a href="{{ url('admin/system-admin/homes/'.$value->id) }}"><i data-toggle="tooltip" title="Homes" class="fa fa-home"></i></a>&nbsp&nbsp&nbsp
-                                                        <a href="{{ url('admin/system-admin/edit/'.$value->id) }}" class="edit"><i data-toggle="tooltip" title="Edit" class="fa fa-edit"></i></a>&nbsp&nbsp&nbsp
-                                                        <a href="{{ url('admin/system-admin/send-set-pass-link/'.$value->id) }}" class="send-set-pass-link-btn-admin" id="{{ $value->id }}"><i class="fa fa-envelope-o" data-toggle="tooltip" title="Send Credential Mail"></i></a>&nbsp&nbsp&nbsp
-                                                        <a href="{{ url('admin/system-admin/delete/'.$value->id) }}" class="delete"><i data-toggle="tooltip" title="Delete" class="fa fa-trash-o"></i></a>
+                                                        <a href="{{ url('admin/system-admin/homes/'.$value->id) }}"><i data-toggle="tooltip" title="Homes" class="fa fa-home"></i></a>
+                                                        <a href="{{ url('admin/system-admin/edit/'.$value->id) }}" class="edit"><i data-toggle="tooltip" title="Edit" class="fa fa-edit"></i></a>
+                                                        <a href="{{ url('admin/system-admin/send-set-pass-link/'.$value->id) }}" class="send-set-pass-link-btn-admin" id="{{ $value->id }}"><i class="fa fa-envelope-o" data-toggle="tooltip" title="Send Credential Mail"></i></a>
+                                                        
                                                         @else
                                                             <a href="{{ url('admin/system-admin/edit/'.$value->id.'?del_status='.$del_status) }}" class="edit"><i data-toggle="tooltip" title="View" class="fa fa-eye"></i></a>
                                                         @endif
                                                         <a href="{{ url('admin/system-admin/package/detail/'.$value->id) }}"><i class="fa fa-file-powerpoint-o" data-toggle="tooltip" title="Current Package"></i></a>
+                                                        <a href="{{ url('admin/system-admin/delete/'.$value->id) }}" class="delete"><i data-toggle="tooltip" title="Delete" class="fa fa-trash-o"></i></a>
                                                     </td>
 
                                                     <!-- <td class="action-icn">

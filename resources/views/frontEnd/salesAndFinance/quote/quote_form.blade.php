@@ -21,7 +21,6 @@
     }
 </style>
 
-
 <section class="main_section_page px-3 pt-0">
     <div class="container-fluid">
         <div class="row">
@@ -58,7 +57,7 @@
                                         </div>
                                     </div>
                                     <div class="mb-3 row">
-                                        <label for="inputCustomer" class="col-sm-3 col-form-label">Customer<span class="radStar">*</span></label>
+                                        <label for="inputCustomer" class="col-sm-3 col-form-label">Customer <span class="radStar">*</span></label>
                                         <div class="col-sm-7">
                                             <select class="form-control editInput selectOptions" name="customer_id" id="getCustomerList">
                                                 <option value="">Select Customer</option>
@@ -73,7 +72,7 @@
                                     <div class="mb-3 row">
                                         <label for="inputName" class="col-sm-3 col-form-label">Status</label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control-plaintext editInput" id="inputName" value="Auto generate" readonly>
+                                            <input type="text" class="form-control-plaintext editInput" id="inputName" value="Draft" readonly>
                                         </div>
                                     </div>
                                 </div>
@@ -110,6 +109,11 @@
                                     <div class="mb-3 row">
                                         <label for="billingCustomerCity" class="col-sm-3 col-form-label">City </label>
                                         <div class="col-sm-9">
+                                            <!-- <div class="wrapper">
+                                                <label for="datepicker">
+                                                    <input type="text" id="datepicker" class="form-control editInput" autocomplete="off" placeholder="21/08/2025">
+                                                </label>
+                                            </div> -->
                                             <input type="text" class="form-control editInput textareaInput" id="billingCustomerCity" placeholder="City">
                                         </div>
                                     </div>
@@ -503,7 +507,7 @@
                                         <div class="col-sm-9">
                                             <select class="form-control editInput" name="status" id="">
                                                 <option value="Draft">Draft</option>
-                                                <option value="Processed2">Processed</option>
+                                                <option value="Processed">Processed</option>
                                                 <option value="Call back">Call back</option>
                                                 <option value="Accepted">Accepted</option>
                                                 <option value="Rejected">Rejected</option>
@@ -578,11 +582,11 @@
                                         <div class="tab-pane fade" id="nav-Tasks" role="tabpanel" aria-labelledby="nav-Tasks-tab" tabindex="0">
                                             <div class="tabheadingTitle">
                                                 <a href="#!" class="profileDrop me-3" onclick="insrtAppoinment()"> New Appointments</a>
-                                                <a href="#!" class="profileDrop ms-3"> Send To Planner</a>
+                                                <a href="#!" class="profileDrop"> Send To Planner</a>
                                             </div>
                                             <div class="col-sm-12">
                                                 <div class="productDetailTable mt-3">
-                                                    <table class="table" id="containerA">
+                                                    <table class="table mt-3" id="containerA">
                                                         <thead class="table-light">
                                                             <tr>
                                                                 <th>User</th>
@@ -593,12 +597,9 @@
                                                                 <th>Status </th>
                                                             </tr>
                                                         </thead>
-                                                        <tbody class="add_insrtAppoinment">
-
-                                                        </tbody>
-
+                                                        <tbody class="add_insrtAppoinment"></tbody>
                                                         <tfoot>
-                                                            <a href="#!" class="profileDrop ms-3"> Save Appointment(s)</a>
+                                                            <a href="#!" class="profileDrop"> Save Appointment(s)</a>
                                                         </tfoot>
                                                     </table>
                                                 </div>
@@ -701,7 +702,14 @@
                                             <thead class="table-light">
                                                 <tr>
                                                     <th>Code </th>
-                                                    <th>Product <i class="fa fa-info-circle"></i></th>
+                                                    <th>Product
+                                                        <a href="" class="wrapper">
+                                                            <i class="fa  fa-info-circle"></i>
+                                                            <div class="custom-tooltip">If Inventory or one of our
+                                                                Accounting integrations are active then the Product Name field will
+                                                                be locked</div>
+                                                        </a>
+                                                    </th>
                                                     <th>Description</th>
                                                     <th>
                                                         <div class="tableplusBTN">
@@ -712,14 +720,19 @@
                                                         </div>
                                                     </th>
                                                     <th>Qty </th>
-                                                    <th>Cost Price($) </th>
+                                                    <th>Cost Price(£) </th>
                                                     <th>Cost Calc</th>
-                                                    <th>Price($) </th>
+                                                    <th>Price(£) </th>
                                                     <th>Markup(%)</th>
                                                     <th>VAT(%) </th>
                                                     <th>Discount </th>
                                                     <th class="tableAmountRight">Amount </th>
-                                                    <th>Profit </th>
+                                                    <th>Profit
+                                                        <a href="" class="wrapper">
+                                                            <i class="fa  fa-info-circle"></i>
+                                                            <div class="custom-tooltip">Gross profit margin is a measure of profitability that shows the percentage of revenue that exceeds the cost of goods sold (COGS)</div>
+                                                        </a>
+                                                    </th>
                                                     <th></th>
                                                 </tr>
                                             </thead>
@@ -748,10 +761,10 @@
                                                                         <th>Product </th>
                                                                         <th>Description</th>
                                                                         <th>Qty</th>
-                                                                        <th>Cost Price($)</th>
-                                                                        <th>Price($)</th>
-                                                                        <th>Amount($) </th>
-                                                                        <th>Profit($)</th>
+                                                                        <th>Cost Price(£)</th>
+                                                                        <th>Price(£)</th>
+                                                                        <th>Amount(£) </th>
+                                                                        <th>Profit(£)</th>
                                                                     </tr>
                                                                 </thead>
                                                                 <tbody>
@@ -985,7 +998,7 @@
                                                                 </div>
                                                                 <div class="mb-2 row">
                                                                     <label for="inputCity" class="col-sm-3 col-form-label">Deposit Persontage
-                                                                        <span class="radStar">*</span></label>
+                                                                         <span class="radStar">*</span></label>
                                                                     <div class="col-sm-5">
                                                                         <input type="text" class="form-control editInput" id="inputCity" value="100">
                                                                     </div>
@@ -994,7 +1007,7 @@
                                                                     </div>
                                                                 </div>
                                                                 <div class="mb-2 row">
-                                                                    <label for="inputCity" class="col-sm-3 col-form-label">Deposit Amount (inc. VAT)<span class="radStar">*</span></label>
+                                                                    <label for="inputCity" class="col-sm-3 col-form-label">Deposit Amount (inc. VAT) <span class="radStar">*</span></label>
                                                                     <div class="col-sm-1 pe-0">
                                                                         <input class="form-control editInput text-center" value="$" disabled="">
                                                                     </div>
@@ -1003,13 +1016,13 @@
                                                                     </div>
                                                                 </div>
                                                                 <div class="mb-2 row">
-                                                                    <label for="inputCity" class="col-sm-3 col-form-label">Reference<span class="radStar">*</span></label>
+                                                                    <label for="inputCity" class="col-sm-3 col-form-label">Reference <span class="radStar">*</span></label>
                                                                     <div class="col-sm-9">
                                                                         <input type="text" class="form-control editInput" id="inputCity" placeholder="Reference">
                                                                     </div>
                                                                 </div>
                                                                 <div class="mb-2 row">
-                                                                    <label for="inputCity" class="col-sm-3 col-form-label">Description<span class="radStar">*</span></label>
+                                                                    <label for="inputCity" class="col-sm-3 col-form-label">Description <span class="radStar">*</span></label>
                                                                     <div class="col-sm-9">
                                                                         <textarea class="form-control textareaInput rounded-1" name="address" id="description" rows="3" placeholder="Description"></textarea>
                                                                     </div>
@@ -1028,31 +1041,31 @@
                                                         <div class="tab-pane fade" id="billingDetails" role="tabpanel" aria-labelledby="billingDetails-tab" tabindex="0">
                                                             <div class="newJobForm card">
                                                                 <div class="mb-2 row">
-                                                                    <label for="inputCity" class="col-sm-3 col-form-label">First Name<span class="radStar">*</span></label>
+                                                                    <label for="inputCity" class="col-sm-3 col-form-label">First Name <span class="radStar">*</span></label>
                                                                     <div class="col-sm-9">
                                                                         <input type="text" class="form-control editInput" id="inputCity" placeholder="Arjun">
                                                                     </div>
                                                                 </div>
                                                                 <div class="mb-2 row">
-                                                                    <label for="inputCity" class="col-sm-3 col-form-label">Last Name<span class="radStar">*</span></label>
+                                                                    <label for="inputCity" class="col-sm-3 col-form-label">Last Name <span class="radStar">*</span></label>
                                                                     <div class="col-sm-9">
                                                                         <input type="text" class="form-control editInput" id="inputCity" placeholder="Kumar">
                                                                     </div>
                                                                 </div>
                                                                 <div class="mb-2 row">
-                                                                    <label for="inputCity" class="col-sm-3 col-form-label">Email Address<span class="radStar">*</span></label>
+                                                                    <label for="inputCity" class="col-sm-3 col-form-label">Email Address <span class="radStar">*</span></label>
                                                                     <div class="col-sm-9">
                                                                         <input type="text" class="form-control editInput" id="inputCity" placeholder="info@gmail.com">
                                                                     </div>
                                                                 </div>
                                                                 <div class="mb-2 row">
-                                                                    <label for="inputCity" class="col-sm-3 col-form-label">Telephone<span class="radStar">*</span></label>
+                                                                    <label for="inputCity" class="col-sm-3 col-form-label">Telephone <span class="radStar">*</span></label>
                                                                     <div class="col-sm-9">
                                                                         <input type="text" class="form-control editInput" id="inputCity">
                                                                     </div>
                                                                 </div>
                                                                 <div class="mb-2 row">
-                                                                    <label for="inputCity" class="col-sm-3 col-form-label">Address Line1<span class="radStar">*</span></label>
+                                                                    <label for="inputCity" class="col-sm-3 col-form-label">Address Line1 <span class="radStar">*</span></label>
                                                                     <div class="col-sm-9">
                                                                         <input type="text" class="form-control editInput" id="inputCity" placeholder="USA">
                                                                     </div>
@@ -1064,7 +1077,7 @@
                                                                     </div>
                                                                 </div>
                                                                 <div class="mb-2 row">
-                                                                    <label for="inputCity" class="col-sm-3 col-form-label">City<span class="radStar">*</span></label>
+                                                                    <label for="inputCity" class="col-sm-3 col-form-label">City <span class="radStar">*</span></label>
                                                                     <div class="col-sm-9">
                                                                         <input type="text" class="form-control editInput" id="inputCity">
                                                                     </div>
@@ -1082,7 +1095,7 @@
                                                                     </div>
                                                                 </div>
                                                                 <div class="mb-2 row">
-                                                                    <label for="inputCity" class="col-sm-3 col-form-label">Postcode<span class="radStar">*</span></label>
+                                                                    <label for="inputCity" class="col-sm-3 col-form-label">Postcode <span class="radStar">*</span></label>
                                                                     <div class="col-sm-9">
                                                                         <input type="text" class="form-control editInput" id="inputCity">
                                                                     </div>
@@ -1100,7 +1113,7 @@
                                                             </div>
                                                             <div class="newJobForm card">
                                                                 <div class="mb-2 row">
-                                                                    <label for="inputCity" class="col-sm-3 col-form-label">Payment Type<span class="radStar">*</span></label>
+                                                                    <label for="inputCity" class="col-sm-3 col-form-label">Payment Type <span class="radStar">*</span></label>
                                                                     <div class="col-sm-9">
                                                                         <select class="form-control editInput selectOptions" id="inputCustomer">
                                                                             <option>Cash</option>
@@ -1184,7 +1197,7 @@
                                                             </div>
                                                         </div>
                                                         <div class="mb-2 row">
-                                                            <label for="inputCity" class="col-sm-3 col-form-label">Line Description<span class="radStar">*</span></label>
+                                                            <label for="inputCity" class="col-sm-3 col-form-label">Line Description <span class="radStar">*</span></label>
                                                             <div class="col-sm-9">
                                                                 <textarea class="form-control textareaInput rounded-1" name="address" id="description" rows="3" placeholder="Description"></textarea>
                                                             </div>
@@ -1193,7 +1206,7 @@
 
                                                         <div class="mb-2 row">
                                                             <label for="inputCity" class="col-sm-3 col-form-label">Deposit Persontage
-                                                                <span class="radStar">*</span></label>
+                                                                 <span class="radStar">*</span></label>
                                                             <div class="col-sm-5">
                                                                 <input type="text" class="form-control editInput" id="inputCity" value="100">
                                                             </div>
@@ -1211,7 +1224,7 @@
                                                             </div>
                                                         </div>
                                                         <div class="mb-2 row">
-                                                            <label for="inputCity" class="col-sm-3 col-form-label">VAT (%)<span class="radStar">*</span></label>
+                                                            <label for="inputCity" class="col-sm-3 col-form-label">VAT (%) <span class="radStar">*</span></label>
                                                             <div class="col-sm-9">
                                                                 <select class="form-control editInput selectOptions" id="inputCustomer">
                                                                     <option>-Please Select-</option>
@@ -2030,7 +2043,7 @@
                         <div class="col-md-6 col-lg-6 col-xl-6">
                             <div class="formDtail">
                                 <div class="mb-2 row">
-                                    <label for="inputAddress" class="col-sm-4 col-form-label">Address Details<span class="radStar ">*</span></label>
+                                    <label for="inputAddress" class="col-sm-4 col-form-label">Address Details <span class="radStar ">*</span></label>
                                     <div class="col-sm-8">
                                         <label for="inputAddress" class="col-form-label">Same as Default <input type="checkbox" value="1" id="same_as_default" name="same_as_default"></label>
                                     </div>
@@ -2324,6 +2337,7 @@
 @include('frontEnd.salesAndFinance.item.common.productcategoryaddmodal')
 <script type="text/javascript" src="{{ url('public/js/salesFinance/customeQuoteForm.js') }}"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/ckeditor/4.3.2/ckeditor.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 
 @include('frontEnd.salesAndFinance.jobs.layout.footer')
 <script>
@@ -2466,7 +2480,7 @@
                     id: getCustomerListValue.value
                 },
                 success: function(response) {
-                    console.log(response.message);
+                    console.log(response.data);
 
                     response.data.forEach(user => {
                         const option = document.createElement('option');
@@ -2480,7 +2494,7 @@
                 }
             });
 
-            getBillingDetailsData(getCustomerListValue.value);
+            getBillingDetailsData(getCustomerListValue.value, '1');
 
 
             const customerSiteDetails = document.getElementById('customerSiteDetails');
@@ -2531,7 +2545,7 @@
             var selected = document.getElementById('getCustomerList').value;
             console.log(selected);
             if ($(this).val() === selected) {
-                getBillingDetailsData($(this).val());
+                getBillingDetailsData($(this).val(), "2");
             } else {
                 setCustomerBillingData($(this).val());
             }
@@ -2701,15 +2715,20 @@
             });
         });
 
-          // Save Customer Data
-          $('#saveCustomerContactData').on('click', function() {
+        // Save Customer Data
+        $('#saveCustomerContactData').on('click', function() {
             var formData = $('#add_customer_contact_form').serialize();
+            var formDataArray = $('#add_customer_contact_form').serializeArray();
+
             $.ajax({
                 url: '{{ route("customer.ajax.SaveCustomerContactData") }}',
                 method: 'POST',
                 data: formData,
                 success: function(response) {
                     alert(response.message);
+                    setCustomerBillingData(response.lastid);
+                    // $('#add_customer_contact_modal')[0].reset();
+                    $('#add_customer_contact_modal').find('form')[0].reset();
                     $('#add_customer_contact_modal').modal('hide');
                 },
                 error: function(xhr, status, error) {
@@ -2718,7 +2737,7 @@
             });
         });
 
-        
+
         // Save Customer Data
         $('#SaveCustomerData').on('click', function() {
             var formData = $('#add_customer_form').serialize();
@@ -2769,7 +2788,7 @@
             },
             success: function(response) {
                 console.log("response.data", response.data);
-                quoteProductTable(response.data, 'quoteProducts' , 'add');
+                quoteProductTable(response.data, 'quoteProducts', 'add');
             },
             error: function(xhr, status, error) {
                 console.error(error);
@@ -2811,6 +2830,44 @@
         });
     }
 
+    // function getAccountCode() {
+    //     $.ajax({
+    //         url: '{{ route("Invoice.ajax.getActiveAccountCode") }}',
+    //         method: 'GET',
+    //         success: function(response) {
+    //             console.log("response.getActiveAccountCode", response.data);
+
+    //             // Ensure response.data contains the account codes
+    //             if (Array.isArray(response.data)) {
+    //                 // Iterate over all dropdowns with class `accountCodeList` and populate them
+    //                 document.querySelectorAll('#accountCodeList').forEach(dropdown => {
+    //                     dropdown.innerHTML = ''; // Clear existing options
+
+    //                     // Add initial option
+    //                     const optionInitial = document.createElement('option');
+    //                     optionInitial.textContent = "-No Department-";
+    //                     optionInitial.value = "";
+    //                     dropdown.appendChild(optionInitial);
+
+    //                     // Append new options
+    //                     response.data.forEach(code => {
+    //                         const option = document.createElement('option');
+    //                         option.value = code.id;
+    //                         option.textContent = code.departmental_code + "-" + code.name;
+    //                         dropdown.appendChild(option);
+    //                     });
+    //                 });
+    //             } else {
+    //                 console.error("Invalid response format");
+    //             }
+    //         },
+    //         error: function(xhr, status, error) {
+    //             console.error(error);
+    //         }
+    //     });
+    // }
+
+
     function taxRate() {
         $.ajax({
             url: '{{ route("invoice.ajax.getActiveTaxRate") }}',
@@ -2831,6 +2888,7 @@
                             const option = document.createElement('option');
                             option.value = code.id; // Use appropriate key from your response
                             option.textContent = code.name; // Use appropriate key from your response
+                            option.setAttribute('data-rate', code.tax_rate);
                             if (code.id === 2) {
                                 option.selected = true; // Select the option where id = 2
                             }
@@ -2849,25 +2907,72 @@
 
     function applyMarkup() {
         document.getElementById('markUpLinkRemove').innerHTML = '';
-        document.getElementById('markUpLinkRemove').innerHTML = 'Markup <input type="text" class="input50" name="mark" id="mark">%';
+        document.getElementById('markUpLinkRemove').innerHTML = '<span>Markup</span> <input type="text" class="input50 form-control editInput footMarkup" name="mark" id="footMarkup"><span>%</span>';
     }
 
-    function getTaxRateOnTaxId(taxID) {
-        $.ajax({
-            url: '{{ route("invoice.ajax.getTaxRateOnTaxId") }}',
-            method: 'Post',
-            data: {
-                id: 2
-            },
-            success: function(response) {
-                console.log("response.data", response.data);
-                document.querySelector('.selectedTaxID').value = response.data;
-            },
-            error: function(xhr, status, error) {
-                console.error(error);
-            }
+    // function getTaxRateOnTaxId(taxID) {
+    //     $.ajax({
+    //         url: '{{ route("invoice.ajax.getTaxRateOnTaxId") }}',
+    //         method: 'Post',
+    //         data: {
+    //             id: 2
+    //         },
+    //         success: function(response) {
+    //             console.log("response.data", response.data);
+    //             document.querySelector('.selectedTaxID').value = response.data;
+    //         },
+    //         error: function(xhr, status, error) {
+    //             console.error(error);
+    //         }
+    //     });
+    // }
+
+    $(document).on("change", ".vat", function() {
+        let selectedRate = $(this).find("option:selected").data("rate");
+        $(this).closest("tr").find(".selectedTaxID").val(selectedRate);
+        console.log(selectedRate); // Output the selected VAT rate
+
+        const table = document.querySelector(`#quoteProducts`);
+        calculateRowsValue(table); // Call function with selected rate
+
+    });
+
+    $(document).on("change", ".discount_type_value", function() {
+        const table = document.querySelector(`#quoteProducts`);
+        calculateRowsValue(table); // Call function with selected rate
+    });
+
+    $(document).on("change", ".discount, .priceMarkup ", function() {
+        const table = document.querySelector(`#quoteProducts`);
+        calculateRowsValue(table); // Call function with selected rate
+    });
+
+    $(document).on("input", "#discountInput", function() {
+        let discountValue = parseInt(this.value);
+        document.querySelectorAll(".discount").forEach(element => {
+            element.value = discountValue; // Set discount with %
         });
-    }
+
+        document.querySelectorAll(".discount_type_value").forEach(select => {
+            select.value = "%";
+        });
+
+        const table = document.querySelector(`#quoteProducts`);
+        calculateRowsValue(table);
+    });
+
+    $(document).on("input", "#footMarkup", function() {
+        console.log(this.value);
+        let markValue = parseInt(this.value);
+
+        document.querySelectorAll(".priceMarkup").forEach(element => {
+            element.value = markValue; 
+        });
+
+        const table = document.querySelector(`#quoteProducts`);
+        calculateRowsValue(table);
+    });
+
 
     function tableFootForProduct(tableName) {
         const table = document.querySelector(`#${tableName}`);
@@ -2875,61 +2980,67 @@
         if (!isFooterAppended) {
             const tableFoot = table.querySelector('.add_table_insrt33');
             tableFoot.innerHTML += `<tr>
-                                        <td colspan="10" class="borderNone"></td>
-                                        <td>Sub Total (exc. VAT) <input type="hidden" name="sub_total" id="InputFootAmount"></td>
+                                        <td colspan="9" class="borderNone"></td>
+                                        <td colspan="2">Sub Total (exc. VAT) <input type="hidden" name="sub_total" id="InputFootAmount"></td>
                                         <td class="tableAmountRight" id="footAmount">£00.00</td>
+                                        <td colspan="2" class="borderNone"></td>
                                     </tr>
                                     <tr>
-                                        <td colspan="10" class="borderNone"></td>
-                                        <td>
+                                        <td colspan="9" class="borderNone"></td>   
+                                        <td colspan="2">
                                             <div class="discountInput">
-                                                <span>Discount</span><input type="text" class="form-control editInput input50 discountInputField" id="discountInput" value="0" data-table="${tableName}">
+                                              <span>Discount</span><input type="text" class="form-control editInput input50 discountInputField" id="discountInput" value="0" data-table="${tableName}">
                                                 <span>%</span>
                                             </div>
                                         </td>
                                         <td class="tableAmountRight" id="footDiscount">£00.00</td>
+                                        <td colspan="2" class="borderNone"></td>
                                     </tr>
                                     <tr>
-                                        <td colspan="10" class="borderNone"></td>
-                                        <td>
-                                            <span id="markUpLinkRemove"><a href="javascript:void(0)" onclick="applyMarkup();"> Apply overall markup</a> </span>
+                                        <td colspan="9" class="borderNone"></td>
+                                        <td colspan="2">
+                                            <div class="discountInput" id="markUpLinkRemove">
+                                                <a href="javascript:void(0)" onclick="applyMarkup();"> Apply overall markup</a>
+                                            </div>
                                         </td>
                                         <td></td>
+                                        <td colspan="2" class="borderNone"></td>
                                     </tr>
                                     <tr>
-                                        <td colspan="10" class="borderNone"></td>
-                                        <td>VAT<input type="hidden" name="vat_amount" id="InputFootVatAmount"></td>
+                                        <td colspan="9" class="borderNone"></td>
+                                        <td colspan="2">VAT<input type="hidden" name="vat_amount" id="InputFootVatAmount"></td>
                                         <td class="tableAmountRight" id="footVatAmount">£00.00</td>
+                                        <td colspan="2" class="borderNone"></td>
                                     </tr>
                                     <tr>
-                                    <td colspan="10" class="borderNone"></td>
-                                        <td style="border-bottom: 1px solid #000;"><strong>Total(inc.VAT)<input type="hidden" name="total" id="inputFootTotalDiscountVat"></strong></td>
+                                        <td colspan="9" class="borderNone"></td>
+                                        <td colspan="2" style="border-bottom: 1px solid #000;"><strong>Total(inc.VAT)<input type="hidden" name="total" id="inputFootTotalDiscountVat"></strong></td>
                                         <td style="border-bottom: 1px solid #000;" class="tableAmountRight totleBold" id="footTotalDiscountVat">£00.00</td>
+                                        <td colspan="2" class="borderNone"></td>
                                     </tr>
                                     <tr>
-                                    <td colspan="10" class="borderNone"></td>
-                                        <td>Profit<input type="hidden" name="profit" id="inputFootProfit"></td>
+                                        <td colspan="9" class="borderNone"></td>
+                                        <td colspan="2">Profit<input type="hidden" name="profit" id="inputFootProfit"></td>
                                         <td class="tableAmountRight" id="footProfit">£00.00</td>
+                                        <td colspan="2" class="borderNone"></td>
                                     </tr>
                                     <tr>
-                                    <td colspan="10" class="borderNone"></td>
-                                        <td>Margin</td>
+                                        <td colspan="9" class="borderNone"></td>
+                                        <td colspan="2">Margin</td>
                                         <td class="tableAmountRight" id="footMargin">00.00%</td>
+                                        <td colspan="2" class="borderNone"></td>
                                     </tr>
                                     <tr>
-                                    <td colspan="10" class="borderNone"></td>
-                                        <td>Deposit</td>
+                                        <td colspan="9" class="borderNone"></td>
+                                        <td colspan="2">Deposit</td>
                                         <td class="tableAmountRight" id="footDeposit">£00.00</td>
+                                        <td colspan="2" class="borderNone"></td>
                                     </tr>
                                     <tr>
-                                    <td colspan="10" class="borderNone"></td>
-                                        <td>Refund</td>
-                                        <td class="tableAmountRight" id="footRefund">£00.00</td>
-                                    </tr>
-                                    <tr>
-                                    <td colspan="10" class="borderNone"></td>
-                                        <td style="border-bottom: 1px solid #000;"><strong>Outstanding (inc.VAT)<input type="hidden" name="outstanding" id="inputFootOutstandingAmount"></strong></td>
+                                        <td colspan="9" class="borderNone"></td>
+                                        <td colspan="2" style="border-bottom: 1px solid #000;"><strong>Outstanding (inc.VAT)<input type="hidden" name="outstanding" id="inputFootOutstandingAmount"></strong></td>
                                         <td style="border-bottom: 1px solid #000;" class="tableAmountRight totleBold" id="footOutstandingAmount">£00.00</td>
+                                        <td colspan="2" class="borderNone"></td>
                                     </tr>`;
             isFooterAppended = true;
 
@@ -2960,6 +3071,23 @@
         }
     }
 
+    function calculateDiscount(originalPrice, discountValue, discountType) {
+        let finalPrice;
+
+        if (discountType === "%") {
+            // Percentage discount
+            finalPrice = originalPrice * (discountValue / 100);
+            console.log("finalPrice", finalPrice);
+        } else if (discountType === "£") {
+            // Fixed amount discount
+            finalPrice = discountValue;
+            console.log("finalPrice", finalPrice);
+        }
+
+        return finalPrice > 0 ? finalPrice : 0; // Ensure price doesn't go negative
+    }
+
+
     function calculateRowsValue(table) {
         const rows = table.querySelectorAll('tbody tr');
 
@@ -2969,7 +3097,7 @@
         let totalMarkup = 0;
 
         let totalVAT = 0;
-        const vat = 20;
+        let vat = 20;
 
         let totalProfit = 0;
         let totalDiscount = 0;
@@ -2985,24 +3113,27 @@
 
         rows.forEach(row => {
 
-            getTaxRateOnTaxId();
-
             // Get input values from the row
             totalQuantity = parseInt(row.querySelector('.quantity').value) || 0;
             totalPrice = parseFloat(row.querySelector('.price').value) || 0;
             discount = parseInt(row.querySelector('.discount').value) || 0;
+            console.log("discount input", discount);
+            discount_type_value = row.querySelector('.discount_type_value').value;
+            console.log("discount_type_value", discount_type_value);
+            discountAmount = calculateDiscount(totalPrice, discount, discount_type_value);
             totalCostPrice = parseFloat(row.querySelector('.costPrice').value) || 0;
             totalMarkup = parseInt(row.querySelector('.priceMarkup').value) || 0;
+            vat = parseInt(row.querySelector('.selectedTaxID').value) || 0;
+
+            priceWithDiscount = totalPrice - discountAmount;
+
+            markupAmount = (priceWithDiscount * totalMarkup) / 100; // Percentage markup
+            console.log("markupAmount", markupAmount);
 
             // Calculate selling price (Cost Price + Markup - Discount)
-
-            markupAmount = (totalPrice * totalMarkup) / 100; // Percentage markup
-            console.log(markupAmount);
-            discountAmount = (totalPrice * discount) / 100; // Discount as a percentage
-            console.log(discountAmount);
-            totalDiscount += discountAmount;
-            sellingPrice = totalPrice + markupAmount - discountAmount;
+            sellingPrice = priceWithDiscount + markupAmount;
             console.log("sellingPrice", sellingPrice);
+            totalDiscount += discountAmount;
 
             // Calculate Amount (Quantity × Selling Price)
             amount = totalQuantity * sellingPrice;
@@ -3054,10 +3185,9 @@
         document.getElementById('inputFootTotalDiscountVat').value = (price + totalVAT).toFixed(2);
         document.getElementById('footProfit').textContent = doller + totalProfit.toFixed(2);
         document.getElementById('inputFootProfit').value = totalProfit.toFixed(2);
-        document.getElementById('footMargin').textContent = doller + totalMargin.toFixed(2) + "%";
+        document.getElementById('footMargin').textContent = totalMargin.toFixed(2) + "%";
         document.getElementById('footOutstandingAmount').textContent = doller + (price + totalVAT).toFixed(2);
         document.getElementById('inputFootOutstandingAmount').value = (price + totalVAT).toFixed(2);
-
 
     }
 
@@ -3072,6 +3202,7 @@
             const tableBody = document.querySelector(`#${tableId} tbody`);
             const node = document.createElement("tr");
             taxRate();
+            getAccountCode();
             node.classList.add("add_table_insrt");
             node.innerHTML = `<td>
                     <div class="CSPlus">
@@ -3095,7 +3226,7 @@
                 </td>
                 <td>
                     <div class="">
-                        <select class="form-control editInput selectOptions" onclick="getAccountCode();" name="products[${rowIndex}][account_code]" id="accoutCodeList">
+                        <select class="form-control editInput selectOptions accoutCodeList" name="products[${rowIndex}][account_code]" id="accoutCodeList">
                             <option>-No Department-</option> 
                         </select>
                     </div>
@@ -3120,12 +3251,12 @@
                 </td>
                 <td>
                     <div class="">
-                        <input type="text" class="form-control editInput input50 priceMarkup" name="products[${rowIndex}][markup]" value="${parseFloat(item.margin || 0).toFixed(2)}">
-                    </div>
+                        <input type="text" class="form-control editInput input50 priceMarkup" name="products[${rowIndex}][markup]" value="${parseFloat(item.markup || 0 ).toFixed(2)}">
+                    </div>  
                 </td>
                 <td>
                     <div class="">
-                        <input type="hidden" class="selectedTaxID">
+                        <input type="hidden" class="selectedTaxID" value="20">
                         <select class="form-control editInput selectOptions vat" name="products[${rowIndex}][VAT]" id="getTaxRate">
                             <option>Please Select</option>
                         </select>
@@ -3133,16 +3264,16 @@
                 </td>
                 <td>
                     <div class="d-flex">
-                        <input type="text" class="form-control editInput input50 me-2 discount" name="products[${rowIndex}][discount]" value="0">
-                        <select class="form-control editInput selectOptions input50" name="" id="">
-                            <option>Please Select</option>
-                            <option>%</option>
+                        <input type="text" class="form-control editInput input50 me-2 discount" name="products[${rowIndex}][discount]" value="${parseInt(item.discount || 0)}">
+                        <select class="form-control editInput selectOptions input50 discount_type_value" name="products[${rowIndex}][discount_type]">
+                            <option value="£">£</option>
+                            <option value="%">%</option>
                         </select>
                     </div>
                 </td>
                 <td>
                     <span class="amount">£00.00</span>
-                </td>
+                </td>   
                 <td>
                     <span class="profit">£00.00</span>
                     <div class="pt-1 footRowMargin">(00.00%)</div>
@@ -3202,7 +3333,7 @@
         $.ajax({
             url: '{{ route("quote.ajax.getQuoteTypes") }}',
             success: function(response) {
-                console.log(response.message);
+                console.log(response.data);
                 quoteType.innerHTML = '';
                 response.data.forEach(user => {
                     const option = document.createElement('option');
@@ -3222,7 +3353,7 @@
         $.ajax({
             url: '{{ route("customer.ajax.getCustomerList") }}',
             success: function(response) {
-                console.log(response.message);
+                console.log(response.data);
                 var get_customer_type = document.getElementById('getCustomerList');
                 // get_customer_type.innerHTML = '';
 
@@ -3346,7 +3477,10 @@
         });
     }
 
-    function getBillingDetailsData(id) {
+    function getBillingDetailsData(id, type) {
+
+        console.log("billingID", id);
+        console.log("type", type);
         $.ajax({
             url: '{{ route("customer.ajax.getCustomerDetails") }}',
             method: 'POST',
@@ -3359,36 +3493,50 @@
                 // billing details data set
                 // setFieldValues([], contactData.id);
 
-                setFieldValues(['billing_add_id', 'site_delivery_add_id', 'siteCustomerId', 'customer_id_site_delivery'], contactData.id);
-                setFieldValues(['billingDetailsName', 'customerSiteName', 'customerSiteDeliveryName'], contactData.contact_name);
-                setTextContent(['setCustomerName', 'setSiteAddress', 'customerSiteCompany', 'customerSiteDeliveryCompany', 'setSiteDeliveryAddress'], contactData.name);
-                setFieldValues(['billingDetailsAddress', 'customerSiteAddress', 'customerSiteDeliveryAdd'], contactData.address);
-                setFieldValues(['billingDetailsEmail', 'customerSiteDeliveryEmail'], contactData.email);
-                setFieldValues(['billingCustomerCity', 'customerSiteCity'], contactData.city);
-                setFieldValues(['billingCustomerCounty', 'customerSiteCounty'], contactData.country);
-                setFieldValues(['billingCustomerPostcode', 'customerSitePostCode', 'customerSiteDeliveryPostCode'], contactData.postal_code);
-                setFieldValues(['billingCustomerTelephone', 'customerSiteTelephone', 'customerSiteDeliveryTelephone'], contactData.telephone);
-                setFieldValues(['billingCustomerMobile', 'customerSiteMobile', 'customerSiteDeliveryMobile'], contactData.mobile);
+                setFieldValues(['billing_add_id'], contactData.id);
+                setFieldValues(['billingDetailsName'], contactData.contact_name);
+                setTextContent(['setCustomerName'], contactData.name);
+                setFieldValues(['billingDetailsAddress'], contactData.address);
+                setFieldValues(['billingDetailsEmail'], contactData.email);
+                setFieldValues(['billingCustomerCity'], contactData.city);
+                setFieldValues(['billingCustomerCounty'], contactData.country);
+                setFieldValues(['billingCustomerPostcode'], contactData.postal_code);
+                setFieldValues(['billingCustomerTelephone'], contactData.telephone);
+                setFieldValues(['customerSiteMobile'], contactData.mobile);
                 // customer_contact_id
 
                 selectPrevious(document.getElementById('billingCustomerTelephoneCode'), response.data[0].telephone_country_code);
                 selectPrevious(document.getElementById('billingCustomerMobileCode'), response.data[0].mobile_country_code);
                 selectPrevious(document.getElementById("billingCustomerCountry"), response.data[0].country_code);
 
-                // Customer Site Address Data Set
-                selectPrevious(document.getElementById('customerSiteDetailsCountry'), response.data[0].country_code);
-                selectPrevious(document.getElementById("customerSiteTelephoneCode"), response.data[0].telephone_country_code);
-                selectPrevious(document.getElementById("customerSiteMobileCode"), response.data[0].mobile_country_code);
+                if (contactData.default_billing === 1 && id === contactData.id) {
 
-                // Customer Site Delivery Address Data Set
-                selectPrevious(document.getElementById('customerSiteDeliveryCountry'), response.data[0].country_code);
-                selectPrevious(document.getElementById("customerSiteDeliveryTelephoneCode"), response.data[0].telephone_country_code);
-                selectPrevious(document.getElementById("customerSiteDeliveryMobileCode"), response.data[0].mobile_country_code);
+                    setTextContent(['customer_id_site_delivery', 'siteCustomerId', 'site_delivery_add_id'], contactData.id);
+                    setTextContent(['customerSiteDeliveryName', 'customerSiteName', 'site_delivery_add_id'], contactData.contact_name);
+                    setTextContent(['setSiteAddress', 'customerSiteCompany', 'customerSiteDeliveryCompany', 'setSiteDeliveryAddress'], contactData.name);
+                    setFieldValues(['customerSiteAddress', 'customerSiteDeliveryAdd'], contactData.address);
+                    document.getElementById('customerSiteDeliveryEmail').value = contactData.email;
+                    document.getElementById('customerSiteCity').value = contactData.city;
+                    document.getElementById('customerSiteCounty').value = contactData.country;
+                    setFieldValues(['customerSitePostCode', 'customerSiteDeliveryPostCode'], contactData.postal_code);
+                    setFieldValues(['customerSiteTelephone', 'customerSiteDeliveryTelephone'], contactData.telephone);
+                    setFieldValues(['customerSiteMobile', 'customerSiteDeliveryMobile'], contactData.mobile);
+
+                    // Customer Site Address Data Set
+                    selectPrevious(document.getElementById('customerSiteDetailsCountry'), response.data[0].country_code);
+                    selectPrevious(document.getElementById("customerSiteTelephoneCode"), response.data[0].telephone_country_code);
+                    selectPrevious(document.getElementById("customerSiteMobileCode"), response.data[0].mobile_country_code);
+
+                    // Customer Site Delivery Address Data Set
+                    selectPrevious(document.getElementById('customerSiteDeliveryCountry'), response.data[0].country_code);
+                    selectPrevious(document.getElementById("customerSiteDeliveryTelephoneCode"), response.data[0].telephone_country_code);
+                    selectPrevious(document.getElementById("customerSiteDeliveryMobileCode"), response.data[0].mobile_country_code);
+                }
             },
             error: function(xhr, status, error) {
                 console.error(error);
             }
-        });
+        }); 
     }
 
     function setSiteAddressDetails(id) {
@@ -3401,8 +3549,8 @@
             success: function(response) {
                 console.log(response.data);
 
-                let selectElement = document.getElementById('customerSiteDetails'); // or document.querySelector('[name="mySelectName"]');
-                let customerSiteDelivery = document.getElementById('customerSiteDelivery'); // or document.querySelector('[name="mySelectName"]');
+                let selectElement = document.getElementById('customerSiteDetails'); 
+                let customerSiteDelivery = document.getElementById('customerSiteDelivery'); 
 
                 let newOption = document.createElement('option');
                 newOption.value = response.data[0].id;
@@ -3499,38 +3647,56 @@
                 id: id
             },
             success: function(response) {
-                console.log(response.data);
+                console.log("getCustomerBillingAddressData", response.data);
 
                 let selectElement = document.getElementById('billingDetailContact'); // Get the select element
+                let newId = response.data[0].id; // Get the ID to be added
 
-                // Create and append a new option
-                let newOption = document.createElement('option');
-                newOption.value = response.data[0].id;
-                newOption.text = response.data[0].contact_name;
-                selectElement.appendChild(newOption);
+                // Check if the ID already exists in the select options
+                let exists = Array.from(selectElement.options).some(option => option.value == newId);
+
+                if (!exists) {
+                    // Create and append a new option
+                    let newOption = document.createElement('option');
+                    newOption.value = newId;
+                    newOption.text = response.data[0].contact_name;
+                    selectElement.appendChild(newOption);
+                    newOption.selected = true;
+                }
 
                 // Set the new option as selected
-                newOption.selected = true;
-                setFieldValues(['billing_add_id', 'siteCustomerId', 'site_delivery_add_id'], response.data[0].id);
+                setFieldValues(['billing_add_id', 'siteCustomerId'], response.data[0].id);
 
                 // billing details data set
-                document.getElementById('billingDetailsName').value = document.getElementById('customerSiteName').value = response.data[0].contact_name;
-                document.getElementById('customer_contact_id').value = document.getElementById('siteCustomerId').value = response.data[0].id;
-                document.getElementById('billingDetailsAddress').value = document.getElementById('customerSiteAddress').value = response.data[0].address;
+                document.getElementById('billingDetailsName').value = response.data[0].contact_name;
+                document.getElementById('customer_contact_id').value = response.data[0].id;
+                document.getElementById('billingDetailsAddress').value = response.data[0].address;
                 document.getElementById('billingDetailsEmail').value = response.data[0].email;
-                document.getElementById('billingCustomerCity').value = document.getElementById('customerSiteCity').value = response.data[0].city;
-                document.getElementById('billingCustomerCounty').value = document.getElementById('customerSiteCounty').value = response.data[0].county;
-                document.getElementById('billingCustomerPostcode').value = document.getElementById('customerSitePostCode').value = response.data[0].pincode;
-                document.getElementById('billingCustomerTelephone').value = document.getElementById('customerSiteTelephone').value = response.data[0].telephone;
-                document.getElementById('billingCustomerMobile').value = document.getElementById('customerSiteMobile').value = response.data[0].mobile;
+                document.getElementById('billingCustomerCity').value = response.data[0].city;
+                document.getElementById('billingCustomerCounty').value = response.data[0].county;
+                document.getElementById('billingCustomerPostcode').value = response.data[0].pincode;
+                document.getElementById('billingCustomerTelephone').value = response.data[0].telephone;
+                document.getElementById('billingCustomerMobile').value = response.data[0].mobile;
                 selectPrevious(document.getElementById('billingCustomerTelephoneCode'), response.data[0].telephone_country_code);
                 selectPrevious(document.getElementById('billingCustomerMobileCode'), response.data[0].mobile_country_code);
                 selectPrevious(document.getElementById("billingCustomerCountry"), response.data[0].country_code);
 
-                // Customer Site Address Data Set
-                selectPrevious(document.getElementById('customerSiteDetailsCountry'), response.data[0].country_code);
-                selectPrevious(document.getElementById("customerSiteTelephoneCode"), response.data[0].telephone_country_code);
-                selectPrevious(document.getElementById("customerSiteMobileCode"), response.data[0].mobile_country_code);
+
+                if ((response.default_billing) === 1) {
+                    document.getElementById('site_delivery_add_id').value = response.data[0].id;
+                    document.getElementById('customerSiteName').value = response.data[0].contact_name;
+                    document.getElementById('siteCustomerId').value = response.data[0].id;
+                    document.getElementById('customerSiteAddress').value = response.data[0].address;
+                    document.getElementById('customerSiteCity').value = response.data[0].city;
+                    document.getElementById('customerSiteCounty').value = response.data[0].county;
+                    document.getElementById('customerSitePostCode').value = response.data[0].pincode;
+                    document.getElementById('customerSiteTelephone').value = response.data[0].telephone;
+                    document.getElementById('customerSiteMobile').value = response.data[0].mobile;
+                    // Customer Site Address Data Set
+                    selectPrevious(document.getElementById('customerSiteDetailsCountry'), response.data[0].country_code);
+                    selectPrevious(document.getElementById("customerSiteTelephoneCode"), response.data[0].telephone_country_code);
+                    selectPrevious(document.getElementById("customerSiteMobileCode"), response.data[0].mobile_country_code);
+                }
             },
             error: function(xhr, status, error) {
                 console.error(error);
@@ -3727,7 +3893,7 @@
     });
     // **************************End Product Cetagory
 
- 
+
     //**************insrtTitle
     function insrtTitle() {
         const node = document.createElement("tr");
@@ -3912,9 +4078,9 @@
                                         </div>
                                     </th>
                                     <th>Qty </th>
-                                    <th>Cost Price($) </th>
+                                    <th>Cost Price(£) </th>
                                     <th>Cost Calc</th>
-                                    <th>Price($) </th>
+                                    <th>Price(£) </th>
                                     <th>Markup(%)</th>
                                     <th>VAT(%) </th>
                                     <th>Discount </th>
@@ -3925,120 +4091,120 @@
                             </thead>
                             <tbody class="add_sectionTitle">
                                  <tr>
-                            <td>
-                    <div class="CSPlus">
-                        <span class="plusandText">
-                            <a href="javascript:void(0)" class="formicon pt-0 me-2" onclick="insrtProduct()"> <i
-                                    class="fa-solid fa-square-plus"></i> </a>
-                            <input type="text"
-                                class="form-control editInput input80"
-                                value="CS-0001">
-                        </span>
-                    </div>
-                </td>
-                <td>
-                    <div class="">
-                        <input type="text" class="form-control editInput"
-                            value="CS-0001">
-                    </div>
-                </td>
-                <td>
-                    <div class="">
-                        <textarea class="form-control textareaInput" name="address"
-                            id="inputAddress" rows="2"
-                            placeholder="Address"></textarea>
-                    </div>
-                </td>
-                <td>
-                    <div class="">
-                        <select class="form-control editInput selectOptions"
-                            id="inputCustomer">
-                            <option>No account</option>
-                            <option>Default</option>
-                            <option>Default</option>
-                        </select>
-                    </div>
-                </td>
-                <td>
-                    <div class="">
-                        <input type="text" class="form-control editInput input50"
-                            value="1">
-                    </div>
-                </td>
-                <td>
-                    <div class="">
-                        <input type="text" class="form-control editInput input50"
-                            value="100.00">
-                    </div>
-                </td>
-                <td>
-                    <div class="calculatorIcon">
-                        <span class="plusandText">
-                            <a href="javascript:void(0)" class="formicon pt-0"
-                                data-bs-toggle="modal"
-                                data-bs-target="#calculatePop"> <span
-                                    class="material-symbols-outlined">
-                                    calculate
-                                </span> </a>
-                        </span>
-                    </div>
+                                    <td>
+                                        <div class="CSPlus">
+                                            <span class="plusandText">
+                                                <a href="javascript:void(0)" class="formicon pt-0 me-2" onclick="insrtProduct()"> <i
+                                                        class="fa-solid fa-square-plus"></i> </a>
+                                                <input type="text"
+                                                    class="form-control editInput input80"
+                                                    value="CS-0001">
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="">
+                                            <input type="text" class="form-control editInput"
+                                                value="CS-0001">
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="">
+                                            <textarea class="form-control textareaInput" name="address"
+                                                id="inputAddress" rows="2"
+                                                placeholder="Address"></textarea>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="">
+                                            <select class="form-control editInput selectOptions"
+                                                id="inputCustomer">
+                                                <option>No account</option>
+                                                <option>Default</option>
+                                                <option>Default</option>
+                                            </select>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="">
+                                            <input type="text" class="form-control editInput input50"
+                                                value="1">
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="">
+                                            <input type="text" class="form-control editInput input50"
+                                                value="100.00">
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="calculatorIcon">
+                                            <span class="plusandText">
+                                                <a href="javascript:void(0)" class="formicon pt-0"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#calculatePop"> <span
+                                                        class="material-symbols-outlined">
+                                                        calculate
+                                                    </span> </a>
+                                            </span>
+                                        </div>
 
-                </td>
-                <td>
-                    <div class="">
-                        <input type="text" class="form-control editInput input50"
-                            value="90.00">
-                    </div>
-                </td>
-                <td>
-                    <div class="">
-                        <input type="text" class="form-control editInput input50"
-                            value="0">
-                    </div>
-                </td>
-                <td>
-                    <div class="">
-                        <select class="form-control editInput selectOptions"
-                            id="inputCustomer">
-                            <option>Please Select</option>
-                            <option>Default</option>
-                            <option>Default</option>
-                        </select>
-                    </div>
-                </td>
-                <td>
-                    <div class="d-flex">
-                        <input type="text"
-                            class="form-control editInput input50 me-2" value="0">
-                        <select class="form-control editInput selectOptions input50"
-                            id="inputCustomer">
-                            <option>Please Select</option>
-                            <option>Default</option>
-                            <option>Default</option>
-                        </select>
-                    </div>
-                </td>
-                <td>
-                    <span>$90.00</span>
-                </td>
-                <td>
-                    <span>$-10.00</span>
-                    <div class="minusnmber pt-1">(-11.11%)</div>
-                </td>
-                <td>
-                    <div class="statuswating">
-                        <span class="oNOfswich">
-                            <input type="checkbox">
-                        </span>
-                        <a href="javascript:void(0)" class="closeappend"><i class="fa-solid fa-circle-xmark"></i></a>
-                    </div>
-                </td>    
-                        </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </td>                    
+                                    </td>
+                                    <td>
+                                        <div class="">
+                                            <input type="text" class="form-control editInput input50"
+                                                value="90.00">
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="">
+                                            <input type="text" class="form-control editInput input50"
+                                                value="0">
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="">
+                                            <select class="form-control editInput selectOptions"
+                                                id="inputCustomer">
+                                                <option>Please Select</option>
+                                                <option>Default</option>
+                                                <option>Default</option>
+                                            </select>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex">
+                                            <input type="text"
+                                                class="form-control editInput input50 me-2" value="0">
+                                            <select class="form-control editInput selectOptions input50"
+                                                id="inputCustomer">
+                                                <option>Please Select</option>
+                                                <option>Default</option>
+                                                <option>Default</option>
+                                            </select>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span>$90.00</span>
+                                    </td>
+                                    <td>
+                                        <span>$-10.00</span>
+                                        <div class="minusnmber pt-1">(-11.11%)</div>
+                                    </td>
+                                    <td>
+                                        <div class="statuswating">
+                                            <span class="oNOfswich">
+                                                <input type="checkbox">
+                                            </span>
+                                            <a href="javascript:void(0)" class="closeappend"><i class="fa-solid fa-circle-xmark"></i></a>
+                                        </div>
+                                    </td>    
+                                </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </td>                    
             `;
         // Get table body element 
         const tableBody = document.querySelector(".add_table_insrt");
@@ -4284,4 +4450,40 @@
         var image = new SimpleImage(fileinput);
         image.drawTo(imgcanvas);
     }
+
+
+
+    $(document).on("input", ".quantity", function() {
+        $(this).val($(this).val().replace(/\D/g, "")); // Remove non-numeric characters
+    });
+
+    $(document).on("input", ".costPrice, .price, .priceMarkup, .discount", function() {
+        let value = $(this).val();
+
+        // Allow only numbers and up to two decimal places
+        let validValue = value.replace(/[^0-9.]/g, ""); // Remove non-numeric characters except '.'
+
+        // Ensure only one decimal point is allowed
+        let decimalCount = (validValue.match(/\./g) || []).length;
+        if (decimalCount > 1) {
+            validValue = validValue.slice(0, -1);
+        }
+
+        // Ensure correct decimal formatting (only up to two decimal places)
+        if (validValue.includes(".")) {
+            let parts = validValue.split(".");
+            if (parts[1].length > 2) {
+                validValue = parts[0] + "." + parts[1].slice(0, 2);
+            }
+        }
+
+        // Update input value with the cleaned valid value
+        $(this).val(validValue);
+    });
+
+
+    $(document).on("input", ".costPrice", function() {
+        // Remove any alphabetic characters from the input field
+        $(this).val($(this).val().replace(/[a-zA-Z]/g, ''));
+    });
 </script>

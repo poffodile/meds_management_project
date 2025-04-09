@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tabs with Toggle Feature</title>
+  <style>
+    [data-tab-finance-content] {
+      display: none;
+    }
+
+    .active[data-tab-finance-content] {
+      display: block;
+    }
+
+    body {
+      padding: 0;
+      margin: 0;
+    }
+
+    .tabs_finance {
+      display: flex;
+      justify-content: space-around;
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+      border-bottom: 1px solid black;
+    }
+
+    .tab_finance {
+      cursor: pointer;
+      padding: 10px;
+    }
+
+    .tab_finance.active {
+      background-color: #CCC;
+    }
+
+    .tab_finance:hover {
+      background-color: #AAA;
+    }
+
+    .tab_finance-content {
+      margin-left: 20px;
+      margin-right: 20px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <ul class="tabs_finance">
+    <li data-tab-finance-target="#home" class="tab_finance">Home</li>
+    <li data-tab-finance-target="#pricing" class="tab_finance">Pricing</li>
+    <li data-tab-finance-target="#about" class="tab_finance">About</li>
+    <li data-tab-finance-target="#news" class="tab_finance">News</li>
+  </ul>
+
+  <div class="tab_finance-content">
+    <div id="home" data-tab-finance-content>
+      <h1>Home</h1>
+      <p>This is the home</p>
+    </div>
+    <div id="pricing" data-tab-finance-content>
+      <h1>Pricing</h1>
+      <p>Some information on pricing</p>
+    </div>
+    <div id="about" data-tab-finance-content>
+      <h1>About</h1>
+      <p>Let me tell you about me</p>
+    </div>
+    <div id="news" data-tab-finance-content>
+      <h1>News</h1>
+      <p>News is great.</p>
+    </div>
+  </div>
+
+  <script>
+    const tabs = document.querySelectorAll('[data-tab-finance-target]');
+    const tabContents = document.querySelectorAll('[data-tab-finance-content]');
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const target = document.querySelector(tab.dataset.tabFinanceTarget);
+
+        if (tab.classList.contains('active')) {
+          // If tab is already active, remove the active class to close it
+          tab.classList.remove('active');
+          target.classList.remove('active');
+        } else {
+          // Otherwise, deactivate all tabs and contents
+          tabContents.forEach(tabContent => tabContent.classList.remove('active'));
+          tabs.forEach(tab => tab.classList.remove('active'));
+
+          // Activate the clicked tab and its content
+          tab.classList.add('active');
+          target.classList.add('active');
+        }
+      });
+    });
+  </script>
+
+</body>
+
+</html>

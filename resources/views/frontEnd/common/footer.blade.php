@@ -133,4 +133,14 @@
     });
   });
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/choices.js/1.1.6/choices.min.js" integrity="sha512-7PQ3MLNFhvDn/IQy12+1+jKcc1A/Yx4KuL62Bn6+ztkiitRVW1T/7ikAh675pOs3I+8hyXuRknDpTteeptw4Bw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/choices.js/1.1.6/choices.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+<script>
+// Date Pikker INCLUDE JQUERY & JQUERY UI 1.12.1
+    $( function() {
+        $( "#datepicker" ).datepicker({
+            dateFormat: "dd-mm-yy"
+            ,	duration: "fast"
+        });
+    } );
+     </script>

@@ -204,7 +204,7 @@ thead#flowhead {
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="row form-group">
-                                            <label class="col-lg-3 control-label">Product Group<span class="radStar ">*</span></label>
+                                            <label class="col-lg-3 control-label">Product Group<span class="radStar "> *</span></label>
                                             <div class="col-lg-9">
                                                 <input type="text" name="name" id="name" class="form-control">
                                             </div>
@@ -375,7 +375,7 @@ thead#flowhead {
                     noDataRow.id='EmptyError'
                         const noDataCell = document.createElement('td');
                         noDataCell.setAttribute('colspan', 7);
-                        noDataCell.innerHTML = '<span class="text-center" style="color:red">Sorry, there are no items available</span>';
+                        noDataCell.innerHTML = '<span class="text-center" style="color: #e10078;">Sorry, there are no items available</span>';
                         noDataCell.style.textAlign = 'center';
                         noDataRow.appendChild(noDataCell);
                         tableBody.appendChild(noDataRow);

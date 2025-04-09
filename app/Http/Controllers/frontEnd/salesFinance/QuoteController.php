@@ -295,7 +295,7 @@ class QuoteController extends Controller
         try {
 
             $qutRef = $request->quote_ref ?? $this->quoteService->generateQuoteRef();
-            $quote = $this->quoteService->saveQuoteData($request->all(), $qutRef, Auth::user()->home_id);
+            $quote = $this->quoteService->saveQuoteData($request->all(), $qutRef, Auth::user()->home_id, Auth::user()->id);
 
             if ($request->has('products')) {
                 $item = $this->itemService->saveItems($request->input('products'), $quote->id);
@@ -333,7 +333,9 @@ class QuoteController extends Controller
         $data['attachment_type'] = AttachmentType::getActiveAttachmentType(Auth::user()->home_id);
         $data['users'] = User::getHomeUsers(Auth::user()->home_id);
         $data['loginCustomer'] = Auth::user()->id;
+        $data['paymentType'] = Payment_type::getActivePaymentType(Auth::user()->home_id);
         // dd($data['attachment_type']);
+        $data['type'] = 1;
         $data['taskType'] = Task_type::getAllAciveTask_type(Auth::user()->home_id);
         return view('frontEnd.salesAndFinance.quote.quote_edit', $data);
     }
@@ -476,11 +478,15 @@ class QuoteController extends Controller
         $data['countries'] = Country::getCountriesNameCode();
         $data['product_categories'] = Product_category::activeProductCategory(Auth::user()->home_id);
         $data['quoteData'] = $this->quoteService->getQuoteDataOnId($id);
+        // dd($data['quoteData']);
+        
         $data['attachment_type'] = AttachmentType::getActiveAttachmentType(Auth::user()->home_id);
         $data['paymentType'] = Payment_type::getActivePaymentType(Auth::user()->home_id);
-        // $data['type'] = 2;
-        // dd($data['quoteData']);
-        return view('frontEnd.salesAndFinance.quote.quote_edit_details', $data);
+        $data['type'] = 2;
+        $data['users'] = User::getHomeUsers(Auth::user()->home_id);
+        $data['loginCustomer'] = Auth::user()->id;
+        // dd($data);
+        return view('frontEnd.salesAndFinance.quote.quote_edit', $data);
     }
 
     public function getQuoteProductList(Request $request)

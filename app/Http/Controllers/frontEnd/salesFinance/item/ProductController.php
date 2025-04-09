@@ -12,7 +12,8 @@ use App\Models\Construction_tax_rate;
 use App\Models\Construction_account_code;
 use App\Models\ProductImage;
 use App\Models\ProductGroup;
-use App\Customer;
+// use App\Customer;
+use App\Models\Customer;
 use App\User;
 
 class ProductController extends Controller

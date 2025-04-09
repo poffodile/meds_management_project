@@ -143,12 +143,70 @@
     .set-width {
         width: 68%;
     }
+
+    .profileDrop {
+        background: #1f88b5;
+        padding: 6px 10px;
+        border-radius: 3px;
+        color: #fff;
+        font-size: 13px;
+        text-decoration: none;
+        transition: .6s;
+        display: flex;
+        line-height: 18px;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .profileDrop:hover {
+        background-color: #32323A;
+        color: #fff !important;
+    }
+
+    /* .top_tabs {
+        padding-bottom: 20px;
+        display: flex;
+        justify-content: end;
+        align-items: center;
+        gap: 10px;
+    } */
+
+    .notifiNumberRadColor {
+        width: 16px;
+        height: 16px;
+        background-color: #e10078;
+        color: #fff;
+        font-size: 10px;
+        border-radius: 50%;
+        text-align: center;
+        line-height: 16px;
+        margin: 2px;
+        border: 1px solid #fff;
+        font-weight: 500;
+        letter-spacing: -1px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 </style>
 
 <!--main content start-->
 <section id="main-content">
     <section class="wrapper">
         <!-- page start-->
+        <div class="row">
+            <!-- <div class="col-md-12">
+                <div class="top_tabs">
+                    <a href="#!" class="profileDrop"> <i class="fa fa-book"></i> My Diary</a>
+                    <a href="#!" class="profileDrop" data-bs-toggle="modal" data-bs-target="#CRMHeaderPopup"><i class="fa fa-database"></i> CRM</a>
+                    <a href="#!" class="profileDrop"><i class="fa fa-commenting"></i> Help Desk <span class="notifiNumberRadColor">2</span></a>
+                    <a href="#!" class="profileDrop"><i class="fa fa-comment"></i> Messages </a>
+                    <a href="#!" class="profileDrop"><i class="fa fa-bell"></i> Notifications <span class="notifiNumberRadColor">23</span> </a>
+                    <a href="#!" class="profileDrop"><i class="fa fa-handshake-o"></i> Partners </a>
+                </div>
+            </div> -->
+            @include('frontEnd.salesAndFinance.jobs.layout.secondheader')
+        </div>
         <div class="row">
             <div class="col-md-12">
                 <section class="panel">
@@ -379,7 +437,11 @@
     function facebook(url) {
         window.open(url, "myWindow", "status = 1, height = 462, width = 830,left = 100,top= 100, resizable = yes, scrolling=yes")
     }
-    async function initMap() { const { Map } = await google.maps.importLibrary("maps");}
+    async function initMap() {
+        const {
+            Map
+        } = await google.maps.importLibrary("maps");
+    }
 </script>
 
 
@@ -405,9 +467,13 @@
         function initialize() {
 
             var myLatlng = new google.maps.LatLng({
-                { $latitude = 37.7749; }, 
-                { $longitude = -122.4194; },
-             });
+                {
+                    $latitude = 37.7749;
+                },
+                {
+                    $longitude = -122.4194;
+                },
+            });
 
             var mapOptions = {
                 zoom: 15,

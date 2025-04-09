@@ -33,6 +33,8 @@ class NewTaskModal extends Component
     public $taskNotesText;
     public $modalLabelTitle;
     public $saveButtonId;
+    public $saveNewTaskUrl;
+    public $completeNewTaskUrl;
     public function __construct(
         string $modalId = 'defaultModalId',
         string $modalTitle = 'Add Attachment',
@@ -52,6 +54,8 @@ class NewTaskModal extends Component
         string $taskNotesText = 'defaultTaskNotesText',
         string $modalLabelTitle = 'defaultModalLabelTitle',
         string $saveButtonId = 'defaultSaveButtonId',
+        string $saveNewTaskUrl = 'defaultSaveNewTaskUrl',
+        string $completeNewTaskUrl = 'defaultCompleteNewTaskUrl',
         )
     {
         $this->modalId = $modalId;
@@ -72,6 +76,8 @@ class NewTaskModal extends Component
         $this->taskNotesText = $taskNotesText;
         $this->modalLabelTitle = $modalLabelTitle;
         $this->saveButtonId = $saveButtonId;
+        $this->saveNewTaskUrl = $saveNewTaskUrl;
+        $this->completeNewTaskUrl = $completeNewTaskUrl;
     }
 
     /**

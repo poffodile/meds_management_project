@@ -118,9 +118,12 @@
                                             <td class="transform-none" style="text-transform: none;">{{ $value->email }}</td>
                                             <td class="action-icn">
                                                 @if($del_status == '0')
-                                                    <a href="{{ url('admin/agents/edit/'.$value->id) }}" class="edit"><span style = "color: #000;"><i data-toggle="tooltip" title="Edit" class="fa fa-edit fa-lg"></i></span></a>&nbsp &nbsp &nbsp
-                                                    <a href="{{ url('admin/agents/send-set-pass-link/'.$value->id) }}"  id="{{ $value->id }}" class="mail send-set-pass-link-btn"><span style = "color: #000;"><i data-toggle="tooltip" title="Send Credential Mail" class="fa fa-envelope-o fa-lg"></i></span></a>&nbsp &nbsp &nbsp
-                                                    <a href="{{ url('admin/agents/access-rights/'.$value->id) }}" class="right"s><span style = "color: #000;"><i data-toggle="tooltip" title="User Rights" class="fa fa-legal fa-lg"></i></span></a>&nbsp &nbsp &nbsp
+                                                    <a href="{{ url('admin/agents/edit/'.$value->id) }}" class="edit"><span style = "color: #000;"><i data-toggle="tooltip" title="Edit" class="fa fa-edit fa-lg"></i></span></a>
+
+                                                    <a href="{{ url('admin/agents/send-set-pass-link/'.$value->id) }}"  id="{{ $value->id }}" class="mail send-set-pass-link-btn"><span style = "color: #000;"><i data-toggle="tooltip" title="Send Credential Mail" class="fa fa-envelope-o fa-lg"></i></span></a>
+                                    
+                                                    <a href="{{ url('admin/agents/access-rights/'.$value->id) }}" class="right"s><span style = "color: #000;"><i data-toggle="tooltip" title="User Rights" class="fa fa-legal fa-lg"></i></span></a>
+                                                    
                                                     <?php ?>
                                                     <a href="{{ url('admin/agents/delete/'.$value->id) }}" class="delete"><i data-toggle="tooltip" title="Delete" class="fa fa-trash-o fa-lg"></i></span></a>
                                                 @else

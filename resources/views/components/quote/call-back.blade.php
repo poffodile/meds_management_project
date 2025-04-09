@@ -18,7 +18,7 @@
                                 </div>
                             </div>
                             <div class="mb-3 row">
-                                <label class="col-sm-4 col-form-label">Call Back Date <span class="red_sorryText">*</span></label>
+                                <label class="col-sm-4 col-form-label">Call Back Date <span class="radStar">*</span></label>
                                 <div class="col-sm-5">
                                     <input type="date" name="call_back_date" class="form-control editInput" id="">
                                 </div>
@@ -27,13 +27,13 @@
                                 </div>
                             </div>
                             <div class="mb-3 row">
-                                <label class="col-sm-4 col-form-label">Contact Name <span class="red_sorryText">*</span></label>
+                                <label class="col-sm-4 col-form-label">Contact Name <span class="radStar">*</span></label>
                                 <div class="col-sm-8">
                                     <input type="text" name="contact_name" class="form-control editInput" id="">
                                 </div>
                             </div>
                             <div class="mb-3 row">
-                                <label class="col-sm-4 col-form-label">Contact Phone <span class="red_sorryText">*</span></label>
+                                <label class="col-sm-4 col-form-label">Contact Phone <span class="radStar">*</span></label>
                                 <div class="col-sm-8">
                                     <input type="text" name="contact_phone" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="form-control editInput" id="">
                                 </div>

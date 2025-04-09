@@ -366,7 +366,7 @@ thead#flowhead {
                 // console.log(response.data);
                 var html1='';
                 if (response.data.length === 0) {
-                    html1 = `<tr><td colspan="5" class="text-center" style="color:red">Sorry, there are no items available</td></tr>`;
+                    html1 = `<tr><td colspan="5" class="text-center" style="color: #e10078;">Sorry, there are no items available</td></tr>`;
                 }else{
                     response.data.forEach((item) => {
                         var formattedPrice1 = parseFloat(item.catalogue_price).toFixed(2); 

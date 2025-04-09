@@ -5,7 +5,7 @@
                 <h5 class="modal-title pupTitle">{{ $modalTitle }}</h5>
                 <button aria-hidden="true" data-bs-dismiss="modal" class="btn-close" type="button"></button>
             </div>
-            <div id="attachment_messagse" class="mt-3"></div>
+            <div id="attachment_messagse" class="mt-3 text-center"></div>
             <div class="modal-body">
                 <form role="form" id="{{ $purchaseformId }}">
                     <input type="hidden" id="attachment_id" name="id">
@@ -83,7 +83,7 @@
         }else{
             $.ajax({
                 type: "POST",
-                url: "{{url('/purchase_order_attachment_save')}}",
+                url: "{{ $saveButtonUrl }}",
                 data: new FormData($("#{{$purchaseformId}}")[0]),
                 async: false,
                 contentType: false,

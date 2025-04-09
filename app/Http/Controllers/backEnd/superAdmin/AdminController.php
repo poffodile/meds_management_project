@@ -140,7 +140,8 @@ class AdminController extends Controller
         if($request->isMethod('post'))
         {
             $address = $request->address;
-            $apiKey = 'AIzaSyAMCKKwljh4nvmKVhFHngldmyw7At9rndg'; // Google maps now requires an API key.
+            $apiKey = 'AIzaSyCPmAAbKW3OvAqDoEXdetwiP6X0TF7CJL4'; // Google maps now requires an API key. 
+            // $apiKey = 'AIzaSyAMCKKwljh4nvmKVhFHngldmyw7At9rndg'; // Google maps now requires an API key. 
             // Get JSON results from this request
             $geo = file_get_contents('https://maps.googleapis.com/maps/api/geocode/json?address='.urlencode($address).'&sensor=false&key='.$apiKey);
             $geo = json_decode($geo, true); // Convert the JSON to an array
@@ -157,7 +158,7 @@ class AdminController extends Controller
             $system_admin->email        = $request->email;
             $system_admin->company      = $request->company;
             $system_admin->address      = $request->address; 
-            $system_admin->post_code      = $request->post_code; 
+            $system_admin->post_code    = $request->post_code; 
             $system_admin->latitude     = $latitude; 
             $system_admin->longitude    = $longitude; 
             //$system_admin->password     = $request->password;
@@ -173,7 +174,6 @@ class AdminController extends Controller
                
                 if($ext == 'jpg' || $ext == 'jpeg' || $ext == 'png')
 
-                
                 {
                     $destination = base_path().adminbasePath; 
                   

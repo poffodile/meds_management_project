@@ -15,6 +15,7 @@ class ProductGroupController extends Controller
 {
     public function productGroupList()
     {
+        $data['page'] = "item";
         $data['productGroups'] = ProductGroup::getProductGroupData(Auth::user()->home_id);
         return view('frontEnd.salesAndFinance.item.product_group', $data);
     }

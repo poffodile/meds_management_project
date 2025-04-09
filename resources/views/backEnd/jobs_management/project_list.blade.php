@@ -157,7 +157,7 @@ thead#flowhead {
                                         {
                                             foreach($project as $key => $val) 
                                             {  
-                                                $cust=App\Customer::find($val->customer_name);?>
+                                                $cust=App\models\Customer::find($val->customer_name);?>
 
                                         <tr >
                                             <td class="user_name">{{ ++$key }}</td>

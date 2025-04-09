@@ -21,6 +21,7 @@ class QuoteProduct extends Model
         'markup',
         'VAT',
         'discount',
+        'discount_type',
     ];
 
     public function quote()

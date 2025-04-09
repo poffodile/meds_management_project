@@ -20,7 +20,7 @@
                     <div class="mb-2 row">
                         <label for="taxratename"
                             class="col-sm-3 col-form-label">Tax
-                            Rate Name*</label>
+                            Rate Name <span class="radStar ">*</span></label>
                         <div class="col-sm-9">
                             <input type="text"
                                 class="form-control editInput"
@@ -30,7 +30,7 @@
                     <div class="mb-2 row">
                         <label for="inputCity"
                             class="col-sm-3 col-form-label">Tax
-                            Rate*</label>
+                            Rate <span class="radStar ">*</span></label>
                         <div class="col-sm-9">
                             <input type="text"
                                 class="form-control editInput"

@@ -58,7 +58,7 @@
                                                     <h4 class="contTitle mb-3">Supplier Details</h4>
                                                     @csrf
                                                     <div class="mb-3 row">
-                                                        <label for="name" class="col-sm-4 col-form-label">Supplier Name<span class="radStar ">*</span></label>
+                                                        <label for="name" class="col-sm-4 col-form-label">Supplier Name <span class="radStar ">*</span></label>
                                                         <div class="col-sm-8">
                                                             <input type="text" class="form-control editInput checkError" id="name" name="name" placeholder="Supplier Name" value="<?php if(isset($supplier) && $supplier !=''){echo $supplier->name;}?>">
                                                         </div>
@@ -70,7 +70,7 @@
                                                         </div>
                                                     </div>
                                                     <div class="mb-3 row">
-                                                        <label for="contact_name" class="col-sm-4 col-form-label">Contact Name<span class="radStar ">*</span></label>
+                                                        <label for="contact_name" class="col-sm-4 col-form-label">Contact Name <span class="radStar ">*</span></label>
                                                         <div class="col-sm-8">
                                                             <input type="text" class="form-control editInput checkError" id="contact_name" name="contact_name" value="<?php if(isset($supplier) && $supplier !=''){echo $supplier->contact_name;}?>">
                                                         </div>
@@ -142,7 +142,7 @@
                                                 
                                                     <div class="mb-3 row">
                                                         <label for="address"
-                                                            class="col-sm-3 col-form-label">Address<span class="radStar ">*</span></label>
+                                                            class="col-sm-3 col-form-label">Address <span class="radStar ">*</span></label>
                                                         <div class="col-sm-9">
                                                             <textarea class="form-control textareaInput checkError" name="address" id="address" rows="8" placeholder="75 Cope Road Mall Park USA"><?php if(isset($supplier) && $supplier !=''){echo $supplier->address;}?></textarea>
                                                         </div>

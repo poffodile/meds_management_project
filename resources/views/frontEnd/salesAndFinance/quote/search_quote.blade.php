@@ -23,16 +23,16 @@
                     </div>
                     <div class="searchJobForm" id="divTohide">
                         <form action="" id="searchQuoteForm" class="p-4">
-                            <div class="row">
-                                <div class="col-md-3">
-                                    <!-- <div class="row form-group mb-2">
+                            <div class="row justify-content-center">
+                                <!-- <div class="col-md-3">
+                                    <div class="row form-group mb-2">
                                         <label class="col-md-4 col-form-label text-end">Quote Ref:</label>
                                         <div class="col-md-8">
                                             <input type="text" class="form-control editInput" id="quote_ref" name="quote_ref" placeholder="Quote Ref.">
                                         </div>
-                                    </div> -->
+                                    </div>
 
-                                    <!-- <div class="row form-group mb-2">
+                                    <div class="row form-group mb-2">
                                         <label class="col-md-4 col-form-label text-end">Quote Source:</label>
                                         <div class="col-md-8">
                                             <select class="form-control editInput selectOptions" name="source" id="quote_source">
@@ -41,8 +41,8 @@
                                                 @endforeach
                                             </select>
                                         </div>
-                                    </div> -->
-                                    <!-- <div class="row form-group mb-2">
+                                    </div>
+                                    <div class="row form-group mb-2">
                                         <label class="col-md-4 col-form-label text-end">Tag:</label>
                                         <div class="col-md-8">
                                             <select class="form-control editInput selectOptions" name="tags" id="tag">
@@ -51,8 +51,8 @@
                                                 @endforeach
                                             </select>
                                         </div>
-                                    </div> -->
-                                    <!-- <div class="row form-group mb-2">
+                                    </div>
+                                    <div class="row form-group mb-2">
                                         <label class="col-md-4 col-form-label text-end">Accepted Date:</label>
                                         <div class="col-md-4">
                                             <input type="date" class="form-control editInput" name="accepted_to" id="accepted_to">
@@ -60,8 +60,8 @@
                                         <div class="col-md-4">
                                             <input type="date" class="form-control editInput" name="accepted_from" id="accepted_from">
                                         </div>
-                                    </div> -->
-                                </div>
+                                    </div>
+                                </div> -->
 
                                 <!-- <div class="col-md-3">
                                     <div class="row form-group mb-2">
@@ -71,8 +71,8 @@
                                                 <option>--All--</option>
                                             </select>
                                         </div>
-                                    </div> -->
-                                    <!-- <div class="row form-group mb-2">
+                                    </div>
+                                    <div class="row form-group mb-2">
                                         <label class="col-md-4 col-form-label text-end">Created By:</label>
                                         <div class="col-md-8">
                                             <select class="form-control editInput selectOptions" name="user" id="user">
@@ -81,8 +81,8 @@
                                                 @endforeach
                                             </select>
                                         </div>
-                                    </div> -->
-                                    <!-- <div class="row form-group mb-2">
+                                    </div>
+                                    <div class="row form-group mb-2">
                                         <label class="col-md-4 col-form-label text-end">Region:</label>
                                         <div class="col-md-8">
                                             <select class="form-control editInput selectOptions" name="region" id="region">
@@ -91,8 +91,8 @@
                                                 @endforeach
                                             </select>
                                         </div>
-                                    </div> -->
-                                    <!-- <div class="row form-group mb-2">
+                                    </div>
+                                    <div class="row form-group mb-2">
                                         <label class="col-md-4 col-form-label text-end">Rejected Date:</label>
                                         <div class="col-md-4">
                                             <input type="date" class="form-control editInput" id="rejected_to" name="rejected_to">
@@ -100,10 +100,10 @@
                                         <div class="col-md-4">
                                             <input type="date" class="form-control editInput" id="rejected_from" name="rejected_from">
                                         </div>
-                                    </div> -->
-                                </div>
+                                    </div>
+                                </div> -->
 
-                                <div class="col-md-3">
+                                <div class="col-md-5">
                                     <!-- <div class="row form-group mb-2">
                                         <label class="col-md-4 col-form-label text-end">Project:</label>
                                         <div class="col-md-8">
@@ -116,7 +116,7 @@
                                     </div> -->
                                     <div class="row form-group mb-2">
                                         <label class="col-md-4 col-form-label text-end">Created Date</label>
-                                        <div class="col-md-4">
+                                        <div class="col-md-4 pe-0">
                                             <input type="date" class="form-control editInput" id="date_from" name="date_from">
                                         </div>
                                         <div class="col-md-4">
@@ -148,8 +148,8 @@
                                     </div> -->
                                 </div>
 
-                                <div class="col-md-3">
-                                    <!-- <div class="row form-group mb-2">
+                                <!-- <div class="col-md-3">
+                                    <div class="row form-group mb-2">
                                         <label class="col-md-4 col-form-label text-end">Quote Type:</label>
                                         <div class="col-md-8">
                                             <select class="form-control editInput selectOptions" id="quote_type" name="quote_type">
@@ -158,14 +158,14 @@
                                                 @endforeach
                                             </select>
                                         </div>
-                                    </div> -->
-                                    <!-- <div class="row form-group mb-2">
+                                    </div>
+                                    <div class="row form-group mb-2">
                                         <label class="col-md-4 col-form-label text-end">Keywords:</label>
                                         <div class="col-md-8">
                                             <input type="text" class="form-control editInput" id="address" name="address" placeholder="Address Site">
                                         </div>
-                                    </div> -->
-                                    <!-- <div class="row form-group mb-2">
+                                    </div>
+                                    <div class="row form-group mb-2">
                                         <label class="col-md-4 col-form-label text-end">Expiry Date:</label>
                                         <div class="col-md-4">
                                             <input type="date" class="form-control editInput" id="Expiry_to" name="Expiry_to">
@@ -173,8 +173,9 @@
                                         <div class="col-md-4">
                                             <input type="date" class="form-control editInput" id="Expiry_from" name="Expiry_from">
                                         </div>
-                                    </div> -->
-                                </div>
+                                    </div>
+                                </div> -->
+
                                 <div class="col-md-12">
                                     <div class="pageTitleBtn justify-content-center">
                                         <button type="submit" class="profileDrop px-3" id="">Search </button>
@@ -312,7 +313,7 @@
             // Handle the case where there is no data
             const errorRow = document.createElement('tr');
             const errorCell = document.createElement('td');
-            errorCell.colSpan = 8; // Adjust this based on the number of columns in your table
+            errorCell.colSpan = 13; // Adjust this based on the number of columns in your table
             errorCell.classList.add('red_sorryText');
             errorCell.textContent = 'Sorry, no records to show ';
             errorCell.style.textAlign = 'center'; // Optional: Center the text
@@ -383,19 +384,19 @@
 
             const actionCell = document.createElement('td');
             actionCell.innerHTML = `<a href="#!" class="nav-link dropdown-toggle profileDrop" data-bs-toggle="dropdown" aria-expanded="false">Action</a>
-                        <div class="dropdown-menu fade-up m-0" style="">
-                            <a href="#!" class="dropdown-item col-form-label" data-bs-toggle="modal" data-bs-target="#productModalBAC">Send SMS</a>
-                            <a href="${BASE_URL}/quote/edit/${item.id}" class="dropdown-item col-form-label" onclick="insrtTitle()">Edit</a>
-                            <a href="#!" class="dropdown-item col-form-label" data-bs-toggle="modal" data-bs-target="#attachmentsPopup">Preview </a>
-                            <a href="#!" class="dropdown-item col-form-label" onclick="insrtDescription()">Print </a>
-                            <a href="#!" class="dropdown-item col-form-label" onclick="insrtSection()">Email</a>
-                            <a href="#!" class="dropdown-item col-form-label" onclick="insrtSection()">Convert To Recurring Quote</a>
-                            <a href="#!" class="dropdown-item col-form-label" onclick="insrtSection()">Convert To New Job</a>
-                            <a href="#!" class="dropdown-item col-form-label" onclick="insrtSection()">Convert To Recurring Job</a>
-                            <a href="#!" class="dropdown-item col-form-label" onclick="insrtSection()">Convert To Invoice</a>
-                            <a href="#!" class="dropdown-item col-form-label" onclick="insrtSection()">Convert To Processed</a>
-                            <a href="#!" class="dropdown-item col-form-label" onclick="insrtSection()">Change To Call Back</a>
-                        </div>`;
+            <div class="dropdown-menu fade-up m-0" style="">
+                <a href="#!" class="dropdown-item col-form-label" data-bs-toggle="modal" data-bs-target="#productModalBAC">Send SMS</a>
+                <a href="${BASE_URL}/quote/edit/${item.id}" class="dropdown-item col-form-label" onclick="insrtTitle()">Edit</a>
+                <a href="#!" class="dropdown-item col-form-label" data-bs-toggle="modal" data-bs-target="#attachmentsPopup">Preview </a>
+                <a href="#!" class="dropdown-item col-form-label" onclick="insrtDescription()">Print </a>
+                <a href="#!" class="dropdown-item col-form-label" onclick="insrtSection()">Email</a>
+                <a href="#!" class="dropdown-item col-form-label" onclick="insrtSection()">Convert To Recurring Quote</a>
+                <a href="#!" class="dropdown-item col-form-label" onclick="insrtSection()">Convert To New Job</a>
+                <a href="#!" class="dropdown-item col-form-label" onclick="insrtSection()">Convert To Recurring Job</a>
+                <a href="#!" class="dropdown-item col-form-label" onclick="insrtSection()">Convert To Invoice</a>
+                <a href="#!" class="dropdown-item col-form-label" onclick="insrtSection()">Convert To Processed</a>
+                <a href="#!" class="dropdown-item col-form-label" onclick="insrtSection()">Change To Call Back</a>
+            </div>`;
             row.appendChild(actionCell);
             tableBody.appendChild(row);
             i++;

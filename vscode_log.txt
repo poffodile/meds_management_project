@@ -1,0 +1,32 @@
+
+[main 2025-02-10T12:12:07.996Z] PolicyConfiguration#initialize
+[main 2025-02-10T12:12:07.997Z] PolicyConfiguration#updatePolicyDefinitions [
+  'update.mode',
+  'update.channel',
+  'update.enableWindowsBackgroundUpdates',
+  'update.showReleaseNotes',
+  'http.useLocalProxyConfiguration',
+  'http.electronFetch',
+  'http.proxy',
+  'http.proxyStrictSSL',
+  'http.proxyKerberosServicePrincipal',
+  'http.noProxy',
+  'http.proxyAuthorization',
+  'http.proxySupport',
+  'http.systemCertificates',
+  'http.experimental.systemCertificatesV2',
+  'http.fetchAdditionalSupport',
+  'telemetry.telemetryLevel',
+  'telemetry.enableTelemetry'
+]
+[main 2025-02-10T12:12:08.000Z] NativePolicyService#_updatePolicyDefinitions - Found 1 policy definitions
+[main 2025-02-10T12:12:08.013Z] [File Watcher (node.js)] Request to start watching: c:\Users\admin\AppData\Roaming\Code\User (excludes: <none>, includes: <all>, filter: <none>, correlationId: <none>),c:\Users\admin\AppData\Roaming\Code\User\settings.json (excludes: <none>, includes: <all>, filter: <none>, correlationId: <none>)
+[main 2025-02-10T12:12:08.040Z] NativePolicyService#_onDidPolicyChange - Updated policy values: {}
+[main 2025-02-10T12:12:08.040Z] PolicyConfiguration#update [ 'update.mode' ]
+[main 2025-02-10T12:12:08.046Z] [File Watcher (node.js)] Started watching: 'c:\Users\admin\AppData\Roaming\Code\User'
+[main 2025-02-10T12:12:08.053Z] [File Watcher (node.js)] Started watching: 'c:\Users\admin\AppData\Roaming\Code\User\settings.json'
+[main 2025-02-10T12:12:08.085Z] Sending some foreground love to the running instance: 5084
+[main 2025-02-10T12:12:08.094Z] Sending env to running instance...
+[main 2025-02-10T12:12:08.237Z] Sent env to running instance. Terminating...
+[main 2025-02-10T12:12:08.238Z] Lifecycle#kill()
+[main 2025-02-10T12:12:08.239Z] Lifecycle#onWillShutdown.fire()

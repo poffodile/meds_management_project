@@ -98,9 +98,11 @@
                                             ?>
                                             <td>{{ $status }}</td>
                                             <td class="action-icn">
-                                                <a href="{{ url('admin/earning-scheme/edit/'.$value->id) }}" class="edit"><span style = "color: #000;"><i data-toggle="tooltip" title="Edit" class="fa fa-edit fa-lg"></i></span></a>
+                                                <a href="{{ url('admin/earning-scheme/edit/'.$value->id) }}" class="edit"><span><i data-toggle="tooltip" title="Edit" class="fa fa-edit fa-lg"></i></span></a>
+
                                                 <a href="{{ url('admin/earning-scheme/delete/'.$value->id) }}" class="delete"><i data-toggle="tooltip" title="Delete" class="fa fa-trash-o fa-lg"></i></a>
-                                                <a href="{{ url('admin/earning-scheme/incentive/'.$value->id) }}"><span style = "color: #000;"><i class="fa fa-italic fa-lg" title="Incentives" aria-hidden="true"></i></span></a>
+
+                                                <a href="{{ url('admin/earning-scheme/incentive/'.$value->id) }}"><span><i class="fa fa-italic fa-lg" title="Incentives" aria-hidden="true"></i></span></a>
                                             </td>
 
                                             <!-- <td class="action-icn">

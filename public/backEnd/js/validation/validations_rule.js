@@ -1201,7 +1201,7 @@ $('#add_service_user_form').formValidation({
                 notEmpty: 
                 {
                   message: 'This field is required'
-                },
+                }   ,
                 stringLength: 
                 {
                     min: 1,
@@ -1212,6 +1212,26 @@ $('#add_service_user_form').formValidation({
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'Section Name can only consist of characters'
+                }
+            }
+        },
+        "local_authority": 
+        {
+            validators: 
+            {
+                notEmpty: 
+                {
+                  message: 'This field is required'
+                },
+                stringLength: {
+                    min: 2,
+                    max: 30,
+                    message: 'This field must between 1 to 30 characters'
+                },
+                regexp: 
+                {
+                   regexp: /^[A-Za-z]+$/,
+                    message: 'Local Authority can only contain letters (A-Z or a-z)'
                 }
             }
         },

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\frontEnd\salesFinance;
 
+
+use Illuminate\Validation\Rule;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\User;
@@ -34,6 +36,10 @@ use App\Models\Week;
 
 class LeadController extends Controller
 {
+    public function leads(){
+        // echo 1;die;lead_dasboard
+        return view('frontEnd.salesAndFinance.common.lead_dasboard');
+    }
     public function index(Request $request)
     {
         $data['page'] = "leads";
@@ -43,6 +49,7 @@ class LeadController extends Controller
         $data['users'] = User::getHomeUsers(Auth::user()->home_id);
         $data['leadTask'] = LeadTaskType::getLeadTaskType();
         $data['customers'] = Customer::getCustomerWithLeads(end($segments), Auth::user()->home_id);
+        // dd($data['customers']);
         $data['leadRejectTypes'] = LeadRejectType::getLeadRejectType();
         $data['weeks'] = Week::getWeeklist();
         $data['allLead'] = Lead::getAllLeadCount(Auth::user()->home_id);
@@ -51,7 +58,7 @@ class LeadController extends Controller
         $data['actionedLead'] =   Lead::getActionedLead(Auth::user()->home_id);
         $data['rejectLead'] = Lead::getRejectedCount(Auth::user()->home_id);
         $data['authorizedLead']     = Lead::getAuthorizationCount(Auth::user()->home_id);
-        $data['convertedLead'] = Customer::getConvertedCustomersCount(Auth::user()->home_id);
+        $data['convertedLead'] = Lead::getConvertedCustomersCount(Auth::user()->home_id);
         return view('frontEnd.salesAndFinance.lead.leads', $data);
     }
     public function create()
@@ -65,6 +72,18 @@ class LeadController extends Controller
     public function store(Request $request)
     {
         // dd($request);
+        $validator = Validator::make($request->all(), [
+            'email' => [
+                'required',
+                'email',
+                'max:255',
+                Rule::unique('customers', 'email')->ignore($request->customer_id),
+            ],
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
         try {
 
             $website = $request->input('website');
@@ -96,16 +115,22 @@ class LeadController extends Controller
                     $lead_refid = $request->lead_ref;
                 }
 
+                if ($request->input('prefer_date')  !== null) {
+                    $prefer_date = Carbon::createFromFormat('d/m/Y', $request->input('prefer_date'))->format('Y-m-d');
+                } else {
+                    $prefer_date = $request->input('prefer_date');
+                }
 
                 // Create the lead using the customer ID
                 $lead = Lead::updateOrCreate(['id' => $request->lead_id], [
                     'home_id' => Auth::user()->home_id,
+                    'user_id' => Auth::user()->id,
                     'lead_ref' => $lead_refid,
                     'customer_id' => $customer_id,
                     'assign_to' => $request->input('assign_to'),
                     'source' => $request->input('source'),
                     'status' => $request->input('status'),
-                    'prefer_date' => $request->input('prefer_date'),
+                    'prefer_date' => $prefer_date,
                     'prefer_time' => $request->input('prefer_time'),
                 ]);
 
@@ -128,9 +153,9 @@ class LeadController extends Controller
 
     public function edit($id)
     {
-
         $page = 'leads';
         $lead = Customer::getCustomerLeads($id);
+        // dd($lead);
         $users = User::getHomeUsers(Auth::user()->home_id);
         $status = LeadStatus::getLeadStatus();
         $sources = LeadSource::getLeadSources();
@@ -142,6 +167,7 @@ class LeadController extends Controller
         $lead_task_close =  LeadTask::getLeadTaskTypeUser($lead->lead_ref, 1);
         // dd($lead_task_open);
         $lead_attachment = LeadAttachment::getLeadAttachments($id);
+        // dd($lead);
         return view('frontEnd.salesAndFinance.lead.lead_form', compact('lead', 'users', 'page', 'sources', 'status', 'notes_type', 'lead_notes_data', 'leadTask', 'lead_task_open', 'lead_task_close', 'attachment_type', 'lead_attachment'));
     }
 
@@ -180,7 +206,7 @@ class LeadController extends Controller
                 'is_completed' => $value->is_completed,
                 'created_at' => $value->created_at,
             ];
-                if ($value->is_recurring == 1) {
+            if ($value->is_recurring == 1) {
                 $recurrence = CRMLeadTaskReccurence::getRecurrenceDataFromTaskType($value->id);
                 //    print_r($recurrence); 
                 //    die;
@@ -270,7 +296,15 @@ class LeadController extends Controller
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
-        $lead = LeadTask::updateOrCreate(['id' => $request->lead_task_id], $request->all());
+
+        $create_date = Carbon::createFromFormat('d/m/Y', $request->create_date)->format('Y-m-d');
+        if (isset($request->notify_date)) {
+            $notify_date = Carbon::createFromFormat('d/m/Y', $request->notify_date)->format('Y-m-d');
+        } else {
+            $notify_date = $request->notify_date;
+        }
+
+        $lead = LeadTask::updateOrCreate(['id' => $request->lead_task_id], array_merge($request->all(), ['create_date' => $create_date, 'notify_date' => $notify_date]));
 
         if (isset($request->lead_task_id)) {
             return response()->json(['success' => true, 'message' => 'Record updated successfully!', 'data' => $lead->lead_ref]);
@@ -322,9 +356,16 @@ class LeadController extends Controller
 
     public function task_list()
     {
-        $page = "Leads";
-        $lead_tasks = LeadTask::getLeadTasks(0);
-        return view('frontEnd.salesAndFinance.lead.lead_task', compact('page', 'lead_tasks'));
+        $data['page'] = "Leads";
+        $data['lead_tasks'] = LeadTask::getLeadTasks(0);
+        $data['allLead'] = Lead::getAllLeadCount(Auth::user()->home_id);
+        $data['myLeads'] = Lead::getLeadByUser(Auth::user()->id, Auth::user()->home_id);
+        $data['unAssignLead'] = Lead::getUnassignedCount(Auth::user()->home_id);
+        $data['actionedLead'] =   Lead::getActionedLead(Auth::user()->home_id);
+        $data['rejectLead'] = Lead::getRejectedCount(Auth::user()->home_id);
+        $data['authorizedLead'] = Lead::getAuthorizationCount(Auth::user()->home_id);
+        $data['convertedLead'] = Lead::getConvertedCustomersCount(Auth::user()->home_id);
+        return view('frontEnd.salesAndFinance.lead.lead_task', $data);
     }
 
     public function lead_task_list_delete($id)
@@ -335,13 +376,14 @@ class LeadController extends Controller
             return redirect()->route('lead.task_list')->with('error', "Record not found");
         }
     }
-    public function task_mark_as_completed($task_id, $leadId)
+    public function task_mark_as_completed($task_id)
     {
-        if (LeadTask::taskMarkAsCompleted($task_id)) {
-            return redirect()->route('lead.edit', ['id' => $leadId])->with('success', 'Task mark as completed');
-        } else {
-            return redirect()->route('lead.edit', ['id' => $leadId])->with('fails', 'Error in task complete');
-        }
+        $data = LeadTask::taskMarkAsCompleted($task_id);
+
+        return response()->json([
+            'success' => (bool) $data,
+            'data' => $data ? $data : 'No data'
+        ]);
     }
 
     public function sentToAuthorization($leadId)
@@ -539,18 +581,17 @@ class LeadController extends Controller
 
     public function crm_section_type_delete($id)
     {
-        $url= str_replace(url('/'), '', url()->previous());
+        $url = str_replace(url('/'), '', url()->previous());
         $data = CRMSectionType::deleteCRMSectionType($id);
-        if($url == '/complaint_type' && $data){
+        if ($url == '/complaint_type' && $data) {
             return redirect('/complaint_type')->with('success', "Record deleted successfully");
-        }else{
+        } else {
             if ($data) {
                 return redirect()->route('lead.crm_section')->with('success', "Record deleted successfully");
             } else {
                 return redirect()->route('lead.crm_section')->with('error', "Record not found");
             }
         }
-        
     }
 
     public function get_CRM_section_types()
@@ -889,7 +930,6 @@ class LeadController extends Controller
                 'title_timer' => 'required',
                 'user_id_timer' => 'required'
             ]);
-
         }
 
         if ($validator->fails()) {
@@ -1016,8 +1056,9 @@ class LeadController extends Controller
         }
     }
 
-    public function searchLead(){
-       
+    public function searchLead()
+    {
+
         $data['page'] = "leads";
         $data['allLead'] = Lead::getAllLeadCount(Auth::user()->home_id);
         $data['myLeads'] = Lead::getLeadByUser(Auth::user()->id, Auth::user()->home_id);
@@ -1032,13 +1073,87 @@ class LeadController extends Controller
         return view('frontEnd.salesAndFinance.lead.search_leads', $data);
     }
 
-    public function getLeadTaskOnLeadId(Request $request){
+    public function getLeadTaskOnLeadId(Request $request)
+    {
         // dd($request);
-        $data =  LeadTask::getLeadTaskTypeUser($request->lead_ref, 0);
-        if ($data) {
-            return response()->json(['success' => true, 'data' => $data]);
+        $close =  LeadTask::getLeadTaskTypeUser($request->lead_ref, 1);
+        $open =  LeadTask::getLeadTaskTypeUser($request->lead_ref, 0);
+        if ($open) {
+            return response()->json(['success' => true, 'open' => $open, 'close' => $close]);
         } else {
             return response()->json(['success' => false, 'data' => 'No Data']);
         }
     }
+
+    // public function searchUser(Request $request){
+    //     $query = $request->get('query');
+
+    //     // Fetch data from database (replace `YourModel` with your actual model)
+    //     $results = Product::where('product_name', 'LIKE', "%{$query}%")->select('id', 'product_name')->get();
+
+    //     // Return the results as JSON or a rendered view
+    //     return response()->json($results); // For JSON response
+    // }
+
+
+    public function get30DaysLead()
+    {
+        $result = Lead::join('customers', 'customers.id', '=', 'leads.customer_id')
+            ->where('leads.created_at', '>=', Carbon::now()->subDays(30))->where('leads.home_id', Auth::user()->home_id)
+            // ->select('customers.name', 'customers.contact_name', 'customers.address')
+            ->get()
+            ->groupBy(function ($item) {
+                return $item->created_at->format('Y-m-d'); // Group by the date only
+            });
+
+        // dd($data);
+
+        $data = $result->map(function ($group, $date) {
+            return [
+                'date' => $date,
+                'count' => $group->count(),
+                'records' => $group, // Include the original records if needed
+            ];
+        });
+
+        return response()->json([
+            'success' => (bool) $data,
+            'data' => $data ? $data : 'No data'
+        ]);
+    }
+
+    public function saveLeadConvertQuote(Request $request)
+    {
+        if ($request->type == "quote") {
+            $data = Lead::saveLeadConvertQuote($request->all(), Auth::user()->home_id);
+
+            return response()->json([
+                'success' => (bool) $data,
+                'data' => $data ? "lead converted to quote successfully" : 'Failed to convert lead to quote'
+            ]);
+        } elseif ($request->type == "customer") {
+            $leadUpdated = Lead::where('id', $request->lead_id)->update(['converted_to' => "customer"]);
+            $customerUpdated = Customer::where('id', $request->customer_id)->update(["is_converted" => 1]);
+
+            if ($leadUpdated && $customerUpdated) {
+                return response()->json([
+                    'success' => true,
+                    'data' => "Lead converted to customer successfully."
+                ], 200);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'data' => "Failed to convert lead to customer."
+                ], 400);
+            }
+        }
+    }
 }
+
+// converted does not show the correct data
+// after converting page reload
+// ater convert the thata data remove
+
+
+
+

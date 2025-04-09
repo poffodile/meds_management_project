@@ -96,7 +96,7 @@
                                     @default {{-- No output if none of the cases match --}}
                                     @endswitch </div></td>
                                 <td> @if($value->status) <span class="grencheck"><i class="fa-solid fa-circle-check"></i></span> @else <span class="grayCheck"><i class="fa-solid fa-circle-check"></i></span> @endif </td>
-    <td>
+                                <td>
                                     <div class="d-inline-flex align-items-center ">
                                         <div class="nav-item dropdown">
                                             <a href="#" class="nav-link dropdown-toggle profileDrop show" data-bs-toggle="dropdown" aria-expanded="true">Action</a>

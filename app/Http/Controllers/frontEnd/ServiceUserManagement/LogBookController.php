@@ -71,8 +71,6 @@ class LogBookController extends ServiceUserManagementController
         if(!$su_log_book_records->isEmpty()){
             $pre_date = date('y-m-d',strtotime($su_log_book_records['0']->date));
         }
-
-        // dd($su_log_book_records);
                 
         foreach ($su_log_book_records as $key => $value) {
 
@@ -206,12 +204,11 @@ class LogBookController extends ServiceUserManagementController
             Log::error($ex);
         }
     }
-
+  
     public function add(Request $request) {       
 
         if($request->isMethod('post'))
-        {   
-            // dd($request);
+        {
             //sourabh geo location
             // $ip = '49.35.41.195'; //For static IP address get
             // $ip = request()->ip(); //Dynamic IP address get
@@ -278,14 +275,14 @@ class LogBookController extends ServiceUserManagementController
                             ->orderBy('date','desc')->take(1)->value('date');
 
             $latest_date    = date('Y-m-d H:i:s', strtotime($latest_date));
-            // $given_date    = date('Y-m-d H:i:s', strtotime($data['log_date']));
-            $given_date    = date('Y-m-d H:i:s');
+            $given_date    = date('Y-m-d H:i:s', strtotime($data['log_date']));
+            // $given_date    = date('Y-m-d H:i:s');
             $latest_date_without_time    = date('Y-m-d', strtotime($latest_date));
             $given_date_without_time    = date('Y-m-d', strtotime($given_date));
             $current_date_without_time    = date('Y-m-d');
 
 
-            // $latest_date_value = $latest_date->value('date');    
+            // $latest_date_value = $latest_date->value('date');
 
             $log_book_record          = new LogBook;
             // echo "<pre>"; print_r($log_book_record); die;
@@ -294,12 +291,12 @@ class LogBookController extends ServiceUserManagementController
             $category_name = CategoryFrontEnd::where('id',$data['category'])->value('name');
             
             // $log_book_record->title   = $data['log_title'];
-            $log_book_record->title   = null;
+             $log_book_record->title   = null;
             $log_book_record->category_id = $data['category'];
             $log_book_record->category_name   = $category_name;
             $log_book_record->category_icon   = $category_icon;
-            $log_book_record->date    = date('Y-m-d H:i:s');
-            // $log_book_record->date    = null;
+            $log_book_record->date    = date('Y-m-d H:i:s', strtotime($data['log_date']));
+            // $log_book_record->date    = date('Y-m-d H:i:s');
             // $log_book_record->details = $data['log_detail'];
             $log_book_record->details = null;
             $log_book_record->home_id = $login_home_id;
@@ -330,6 +327,8 @@ class LogBookController extends ServiceUserManagementController
                 $su_log_book_record->log_book_id        =   $log_book_record->id;
                 $su_log_book_record->user_id            =   Auth::user()->id;
                 //$su_log_book_record->category_id        =   $data['category_id'];
+                $su_log_book_record->logType = '1';
+
                 if($given_date < $latest_date)
                 {
                     $su_log_book_record->is_late = true;
@@ -341,7 +340,8 @@ class LogBookController extends ServiceUserManagementController
                     else {
                         $result['response'] = false;
                     }
-                } else{
+                }
+                else{
                     if($su_log_book_record->save()) {
                         $result['response'] = true;
                         echo "1";
@@ -360,7 +360,8 @@ class LogBookController extends ServiceUserManagementController
                 // }  else {
                 //     $result['response'] = false;  
                 // }
-            }  else {
+            }   
+            else {
                 
                 $result['response'] = false;
                 echo "2";
@@ -392,6 +393,9 @@ class LogBookController extends ServiceUserManagementController
             // return $result;
         }
     }
+    
+    
+   
 
     public function view($log_book_id = null) {
 

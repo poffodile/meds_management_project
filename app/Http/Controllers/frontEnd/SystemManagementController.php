@@ -42,6 +42,14 @@ class SystemManagementController extends Controller
             $user->admission_number = $data['admission_number'];
             $user->phone_no         = $data['phone_no'];
             $user->date_of_birth    = $date_of_birth;
+            $user->child_type       =  $data['child_type'];
+            $user->room_type        =  $data['room_type'];
+            $user->weekly_rate      =  $data['weekly_rate'];
+            $user->subs             =  $data['subs'];
+            $user->extra            =  $data['extra'];
+            $user->start_date       =  date('Y-m-d', strtotime($data['start_date']));
+            $user->local_authority  =  $data['local_authority'];
+            $user->end_date         =  date('Y-m-d', strtotime($data['end_date']));
             $user->section          = $data['section'];
             $user->short_description= $data['short_description'];
             $user->height           = $data['height'];

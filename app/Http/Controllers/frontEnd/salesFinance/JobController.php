@@ -74,20 +74,25 @@ class JobController extends Controller
         // echo $lastSegment;die;
         $home_id = Auth::user()->home_id;
         $job=Job::getAllJob($home_id)->where('user_id',Auth::user()->id)->get();
+        // echo "<pre>";print_r($job);die;
         $data['access_rights']=$this->access_rights();
         $data_arr=array();
         foreach($job as $val){
             $customer_name=Customer::where('id',$val->customer_id)->first();
             $job_type_detail=Job_type::where('id',$val->job_type)->first(); 
-            // $product_details=Product::where('id',$val->product_id)->first();  
-            $site=Constructor_customer_site::where('id',$val->site_id)->first();
+            // $product_details=Product::where('id',$val->product_id)->first(); 
+            if($val->site_id == 'default'){
+                $site=Customer::where('id',$val->customer_id)->first();
+            }else{
+                $site=Constructor_customer_site::where('id',$val->site_id)->first();
+            }
             $customers = Customer::with('sites','additional_contact','customer_project')->where('id', $val->customer_id)->first();
             $data_arr[]=[
                 'id'=>$val->id,
                 'job_ref'=>$val->job_ref,
                 'customer_name'=>$customer_name->name,
                 'job_type'=>$job_type_detail->name,
-                'site'=>$site->site_name,
+                'site'=>$site->site_name ?? $site->address,
                 'short_decinc'=>$val->short_decinc,
                 'complete_by'=>$val->complete_by
             ];
@@ -95,6 +100,7 @@ class JobController extends Controller
         // echo "<pre>";print_r($data_arr);die;
         $data['lastSegment']=$lastSegment;
         $data['job']=$data_arr;
+        $data['page']="jobs";
         // echo "<pre>";print_r($data['job']);die;
         return view('frontEnd.salesAndFinance.jobs.job',$data);
     }
@@ -105,6 +111,7 @@ class JobController extends Controller
         $data['appointment_type']=Construction_job_appointment_type::where('home_id',$home_id)->get();
         $data['home_id']=$home_id;
         $data['customers']=Customer::get_customer_list_Attribute($home_id,'ACTIVE');
+        $data['page']='setting';
 
         // echo "<pre>";print_r($data['workflow']);die;
         return view('frontEnd.salesAndFinance.jobs.job_type',$data);
@@ -113,6 +120,7 @@ class JobController extends Controller
         $home_id = Auth::user()->home_id;
         $data['job_title']=Job_title::whereNull('deleted_at')->get();
         $data['home_id']=$home_id;
+        $data['page']='setting';
         return view('frontEnd.salesAndFinance.jobs.job_titles',$data);
     }
     public function job_type_save(Request $request){
@@ -276,6 +284,7 @@ class JobController extends Controller
         // $data['customer_project']=$customer_details->customer_project;
         // echo "<pre>";print_r($customer_profession);die;
         // echo "<pre>";print_r($data['sales_tax']);die;
+        $data['page']="jobs";
         return view('frontEnd.salesAndFinance.jobs.add_job',$data);
     }
     public function job_add_edit_save(Request $request){
@@ -619,6 +628,7 @@ class JobController extends Controller
         // echo "<pre>";print_r($data['appointment_type']);die;
         $data['home_id']=$home_id;
         $data['users']=User::all();
+        $data['page']='setting';
         // echo "<pre>";print_r($data['users']);die;
         return view('frontEnd.salesAndFinance.jobs.job_appointment_type', $data);
     }
@@ -653,6 +663,7 @@ class JobController extends Controller
         $data['rejection']=construction_appointment_rejection_category::where(['deleted_at'=>null])->get();
         $home_id = Auth::user()->home_id;
         $data['home_id']=$home_id;
+        $data['page']='setting';
         // echo "<pre>";print_r($data['rejection']);die;
         return view('frontEnd.salesAndFinance.jobs.appointment_rejection_cat',$data);
         

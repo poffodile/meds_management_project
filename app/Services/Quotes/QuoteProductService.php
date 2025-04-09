@@ -25,6 +25,8 @@ class QuoteProductService
                     'markup' => $productData['markup'],
                     'VAT' => $productData['VAT'],
                     'discount' => $productData['discount'],
+                    'discount_type' => $productData['discount_type'],
+
                 ]);
             } elseif ($productData['type'] === "edit") {
                 QuoteProduct::where('quote_id', $quoteId)
@@ -40,6 +42,7 @@ class QuoteProductService
                     'markup' => $productData['markup'],
                     'VAT' => $productData['VAT'],
                     'discount' => $productData['discount'],
+                    'discount_type' => $productData['discount_type'],
                 ]);
             }
         }
@@ -67,6 +70,7 @@ class QuoteProductService
             $data['markup'] = $product['markup'];
             $data['VAT'] = $product['VAT'];
             $data['discount'] = $product['discount'];
+            $data['discount_type'] = $product['discount_type'];
             array_push($products, $data);
         }
 

@@ -6,7 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use DB;
 use App\Models\Project;
-use App\Customer;
+// use App\Customer;
+use App\Models\Customer;
 use App\Models\Constructor_additional_contact;
 class Job extends Model
 {

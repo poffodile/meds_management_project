@@ -80,7 +80,7 @@
                     <input type="hidden" name="id" id="id">
                     <input type="hidden" name="home_id" id="home_id" value="{{$home_id}}">
                     <div class="form-group row">
-                        <label class="col-lg-3 col-sm-3 ">Task Type<span class="radStar ">*</span></label>
+                        <label class="col-lg-3 col-sm-3 ">Task Type <span class="radStar ">*</span></label>
                         <div class="col-sm-9">
                              <input type="text" name="title" class="form-control" placeholder="Task Type" id="title">
                         </div>

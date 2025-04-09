@@ -8,7 +8,7 @@
             <div class="modal-body">
                 <form id="taskTypeForm">
                     <div class="mb-3 row">
-                        <label for="inputJobRef" class="col-sm-4 col-form-label">Task Type <span class="red_sorryText">*</span></label>
+                        <label for="inputJobRef" class="col-sm-4 col-form-label">Task Type <span class="radStar">*</span></label>
                         <div class="col-sm-8">
                             <input type="hidden" name="task_type_id" id="task_type_id">
                             <input type="text" name="title" class="form-control editInput" id="">

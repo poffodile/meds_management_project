@@ -28,19 +28,19 @@
                                     </div>
                                 </div>
                                 <div class="mb-2 row">
-                                    <label for="inputName" class="col-sm-3 col-form-label">Invoice Ref<span class="radStar ">*</span></label>
+                                    <label for="inputName" class="col-sm-3 col-form-label">Invoice Ref <span class="radStar ">*</span></label>
                                     <div class="col-sm-9">
                                         <input type="text" class="form-control editInput textareaInput" id="{{ $inputInvoiceRef }}" name="inv_ref" value="" placeholder="Invoice refrence,number">
                                     </div>
                                 </div>
                                 <div class="mb-2 row">
-                                    <label class="col-sm-3 col-form-label">Net Amount<span class="radStar ">*</span></label>
+                                    <label class="col-sm-3 col-form-label">Net Amount <span class="radStar ">*</span></label>
                                     <div class="col-sm-9">
                                         <input type="text" class="form-control editInput" id="{{ $invoiceNetAmount }}" name="net_amount" value="">
                                     </div>
                                 </div>
                                 <div class="mb-2 row">
-                                    <label for="inputProject" class="col-sm-3 col-form-label">VAT<span class="radStar ">*</span></label>
+                                    <label for="inputProject" class="col-sm-3 col-form-label">VAT <span class="radStar ">*</span></label>
                                     <div class="col-sm-9">
                                     <?php $rate=App\Models\Construction_tax_rate::getAllTax_rate(Auth::user()->home_id,'Active');?>
                                     <select class="form-control editInput selectOptions" id="{{ $invoiceVatId }}" name="vat_id">
@@ -59,13 +59,13 @@
                                     </div>
                                 </div>
                                 <div class="mb-2 row">
-                                    <label class="col-sm-3 col-form-label">Gross Amount<span class="radStar ">*</span></label>
+                                    <label class="col-sm-3 col-form-label">Gross Amount <span class="radStar ">*</span></label>
                                     <div class="col-sm-9">
                                         <input type="text" class="form-control editInput" id="{{ $invoiceGrossAmount }}" name="gross_amount" value="">
                                     </div>
                                 </div>
                                 <div class="mb-2 row">
-                                    <label class="col-sm-3 col-form-label">Invoice Date<span class="radStar ">*</span></label>
+                                    <label class="col-sm-3 col-form-label">Invoice Date <span class="radStar ">*</span></label>
                                     <div class="col-sm-9">
                                         <input type="date" class="form-control editInput" id="{{ $invoiceDate }}" name="invoice_date" value="">
                                     </div>

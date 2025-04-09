@@ -19,6 +19,7 @@ class GeneralSectionController extends Controller
         $home_id = Auth::user()->home_id;
         $data['attachmentType']=AttachmentType::getAllAttachmentType();
         $data['home_id']=$home_id;
+        $data['page']='setting';
         return view('frontEnd.salesAndFinance.general.attachment_type',$data);
     }
 
@@ -31,6 +32,7 @@ class GeneralSectionController extends Controller
         $home_id = Auth::user()->home_id;
         $data['payment_type']=Payment_type::getAllPayment_type();
         $data['home_id']=$home_id;
+        $data['page']='setting';
         return view('frontEnd.salesAndFinance.general.payment_type',$data);
     }
 
@@ -62,6 +64,7 @@ class GeneralSectionController extends Controller
         $home_id = Auth::user()->home_id;
         $data['region']=Region::getAllRegion($home_id);
         $data['home_id']=$home_id;
+        $data['page']='setting';
         return view('frontEnd.salesAndFinance.general.region',$data);
     }
 
@@ -69,6 +72,7 @@ class GeneralSectionController extends Controller
         $home_id = Auth::user()->home_id;
         $data['task_type']=Task_type::getAllTask_type($home_id);
         $data['home_id']=$home_id;
+        $data['page']='setting';
         return view('frontEnd.salesAndFinance.general.task_type',$data);
     }
 
@@ -114,6 +118,7 @@ class GeneralSectionController extends Controller
         $home_id = Auth::user()->home_id;
         $data['tags']=Tag::getAllTag($home_id);
         $data['home_id']=$home_id;
+        $data['page']='setting';
         return view('frontEnd.salesAndFinance.jobs.tag',$data);
     }
 

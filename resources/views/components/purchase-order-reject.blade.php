@@ -48,7 +48,7 @@
                                     </div>
                                 </div>
                                 <div class="mb-2 row notificationHideShow" style="display:none">
-                                    <label class="col-sm-3 col-form-label">Send As<span class="radStar ">*</span> </label>
+                                    <label class="col-sm-3 col-form-label">Send As <span class="radStar ">*</span> </label>
                                     <div class="col-sm-9">
                                         <label for="purchase_notify_who1" class="editInput">
                                             <input type="checkbox" name="notification" id="{{ $rejectNotification }}" value="1" checked=""> Notification (User Only)
@@ -62,7 +62,7 @@
                                     </div>
                                 </div>
                                 <div class="mb-2 row">
-                                    <label for="inputAddress" class="col-sm-3 col-form-label">Resion for Rejecting?<span class="radStar ">*</span></label>
+                                    <label for="inputAddress" class="col-sm-3 col-form-label">Resion for Rejecting? <span class="radStar ">*</span></label>
                                     <div class="col-sm-9">
                                         <textarea class="form-control textareaInput CustomercheckError" id="{{ $inputRejectMessage }}" name="message" rows="10" maxlength="500"></textarea>
                                     </div>

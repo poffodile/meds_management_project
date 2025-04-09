@@ -875,7 +875,7 @@
                                         aria-labelledby="nav-Tasks-tab" tabindex="0">
                                         <div class="tabheadingTitle">
                                             <a href="#!" class="profileDrop me-3" onclick="insrtAppoinment()"> New Appointments</a>
-                                            <a href="send_To_planner.html" class="profileDrop ms-3"> Send To Planner</a>
+                                            <a href="send_To_planner.html" class="profileDrop"> Send To Planner</a>
                                         </div>
                                         <div class="col-sm-12">
                                             <div class="productDetailTable mt-3">

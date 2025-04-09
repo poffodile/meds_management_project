@@ -170,11 +170,9 @@
                             </div>
                         </div>
                         <div class="col-md-12 col-lg-12 col-xl-12">
-                            <div class="mb-2 row">
+                            <div class="mb-2 notes_input">
                                 <label for="inputCountry" class="col-sm-3 col-form-label">Notes</label>
-                                <div class="col-sm-12">
-                                    <textarea name="notes" placeholder="Enter Site Notes" id="site_notes" class="form-control textareaInput" rows="10" cols="15"></textarea>
-                                </div>
+                                <textarea name="notes" placeholder="Enter Site Notes" id="site_notes" class="form-control textareaInput" rows="3" cols="15"></textarea>
                             </div>
                         </div>
                     </div> <!-- End row -->

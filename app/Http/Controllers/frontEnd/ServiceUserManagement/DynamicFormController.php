@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 use Auth, DB;
-use App\DynamicFormBuilder, App\DynamicForm, App\ServiceUser, App\DynamicFormLocation, App\Notification, App\ServiceUserLogBook, App\LogBook, App\EarningScheme, APP\ServiceUserRisk;
+use App\DynamicFormBuilder, App\DynamicForm, App\ServiceUser, App\DynamicFormLocation, App\Notification, App\ServiceUserLogBook, App\LogBook, App\EarningScheme, APP\ServiceUserRisk, App\CategoryFrontEnd;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\File;
 
@@ -44,7 +44,7 @@ class DynamicFormController extends Controller
                 if (in_array('5', $location_ids_arr)) {
                     EarningScheme::updateEarning($data['service_user_id']);
                 }
-                //update earning scheme in case of mfc form ends here 
+                //update earning scheme in case of mfc form ends here
                 //sourabh log insert
                 $logtype = DynamicFormBuilder::where('id', $data['dynamic_form_builder_id'])->value('logtype');
                 $logtype_arr = explode(',', $logtype);
@@ -244,13 +244,13 @@ class DynamicFormController extends Controller
                     //         $notification->service_user_id            = $data['service_user_id'];
                     //         $notification->event_id                   = $risk->id;
                     //         $notification->notification_event_type_id = '11';
-                    //         $notification->event_action               = 'ADD';      
+                    //         $notification->event_action               = 'ADD';
                     //         $notification->home_id                    = Auth::user()->home_id;
-                    //         $notification->user_id                    = Auth::user()->id;        
+                    //         $notification->user_id                    = Auth::user()->id;
                     //         $notification->save();
                     //         //saving notification end
 
-                    //     } 
+                    //     }
                     //     //
 
                     // }
@@ -313,8 +313,8 @@ class DynamicFormController extends Controller
             $form->time                = null;
             $form->image_path          =  $formImage;
             $form->pattern_data        = json_encode($data['data']);
-            // $form->alert_status     = $data['alert_status']; 
-            // $form->alert_date       = $data['alert_date']; 
+            // $form->alert_status     = $data['alert_status'];
+            // $form->alert_date       = $data['alert_date'];
 
             if ($form->save()) {
 
@@ -335,14 +335,14 @@ class DynamicFormController extends Controller
                 }
 
                 return 'true';
-                //return redirect()->back()->with('success','Form has been saved successfully');    
+                //return redirect()->back()->with('success','Form has been saved successfully');
             } else {
                 return 'false';
-                //return redirect()->back()->with('error',COMMON_ERROR);	
+                //return redirect()->back()->with('error',COMMON_ERROR);
             }
         } else {
             return 'false';
-            //return redirect()->back()->with('error',COMMON_ERROR);	
+            //return redirect()->back()->with('error',COMMON_ERROR);
         }
         //echo '<pre>'; print_r($data); die;
     }
@@ -435,15 +435,17 @@ class DynamicFormController extends Controller
                         <div class="input-group popovr">
 
                             <!-- <input type="hidden" name="su_bmp_id[]" value="' . $value->id . '" disabled="disabled" class="edit_bmp_id_' . $value->id . '"> -->
-                            <input type="text" class="form-control" name="" disabled value="' . $title . ' ' . $start_brct . $date . ' ' .  $end_brct . '" maxlength="255"/ style="cursor:auto;"> 
-                            
+                            <a href="#" class="dyn-form-view-data" id="' . $value->id . '"><span><input type="text" class="form-control" style="cursor:pointer" name="" readonly value="' . $title . ' ' . $start_brct . $date . ' ' .  $end_brct . '" maxlength="255"/></span></a>
+
                             <span class="input-group-addon cus-inpt-grp-addon clr-blue settings">
                                 <i class="fa fa-cog"></i>
                                 <div class="pop-notifbox">
                                     <ul class="pop-notification" type="none">
                                         <li> <a href="#" data-dismiss="modal" aria-hidden="true" class="dyn-form-view-data" id="' . $value->id . '"> <span> <i class="fa fa-eye"></i> </span> View/Edit</a> </li>
                                         <li> <a href="#" class="dyn_form_del_btn" id="' . $value->id . '"> <span class="color-red"> <i class="fa fa-exclamation-circle"></i> </span> Remove </a> </li>
-                                        <li> <a href="#" class="dyn_form_daily_log" dyn_form_id="' . $value->id . '"> <span class="color-green"> <i class="fa fa-plus-circle"></i> </span> Daily Log Book </a> </li>
+                                        <li> <a href="#" class="dyn_form_daily_log" dyn_form_id="' . $value->id . '" logtype="1"> <span class="color-green"> <i class="fa fa-plus-circle"></i> </span>Send to Daily Log Book (In development)</a> </li>
+                                        <li> <a href="#" class="dyn_form_daily_log" dyn_form_id="' . $value->id . '" logtype="2"> <span class="color-green"> <i class="fa fa-plus-circle"></i> </span> Send to Weekly Log Book (In development)</a> </li>
+                                        <li> <a href="#" class="dyn_form_daily_log" dyn_form_id="' . $value->id . '" logtype="3"> <span class="color-green"> <i class="fa fa-plus-circle"></i> </span> Send to Monthly Log Book (In development)</a> </li>
                                     </ul>
                                 </div>
                             </span>
@@ -459,7 +461,7 @@ class DynamicFormController extends Controller
             //                     <div class="input-group popovr">
 
             //                         <!-- <input type="hidden" name="su_bmp_id[]" value="' . $value->id . '" disabled="disabled" class="edit_bmp_id_' . $value->id . '"> -->
-            //                         <input type="text" class="form-control" name="" disabled value="' . $value->title . ' ' . $start_brct . $date . ' ' . $value->time . $end_brct . '" maxlength="255"/> 
+            //                         <input type="text" class="form-control" name="" disabled value="' . $value->title . ' ' . $start_brct . $date . ' ' . $value->time . $end_brct . '" maxlength="255"/>
 
             //                         <span class="input-group-addon cus-inpt-grp-addon clr-blue settings">
             //                             <i class="fa fa-cog"></i>
@@ -489,37 +491,51 @@ class DynamicFormController extends Controller
 
             $dyn_form = DynamicForm::where('id', $data['dyn_form_id'])->first();
 
-            $check_log_record = LogBook::where('dynamic_form_id', $data['dyn_form_id'])->get()->toArray();
+            $check_log_record = LogBook::where('dynamic_form_id', $data['dyn_form_id'])->where('logType',$data['logtype'])->get()->toArray();
             // echo "<pre>"; print_r($check_log_record); die;
             if (!empty($check_log_record)) {
                 foreach ($check_log_record as $key => $log_record) {
-                    $su_log_yp = ServiceUserLogBook::where('log_book_id', $log_record['id'])
-                        ->where('service_user_id', $data['s_user_id'])
-                        ->first();
+                    $su_log_yp = ServiceUserLogBook::where('log_book_id', $log_record['id'])->where('service_user_id', $data['s_user_id'])->first();
                     // echo "<pre>"; print_r($su_log_yp); die;
 
                     if (!empty($su_log_yp)) {
-                        echo "already";
+                        if($data['logtype']==1){
+                            echo "already_daily";
+                        }else if($data['logtype']==2){
+                            echo "already_weekly";
+                        }else if($data['logtype']==3){
+                            echo "already_monthly";
+                        }
+                        //echo "already";
                         die;
                         // $response = 'already';
                     }
                 }
             }
 
+            $s_category_id = $data['s_category_id'] ?? null;
+            $category_data = $s_category_id ? CategoryFrontEnd::where('id', $s_category_id)->first() : null;
+            
             $log_book                  = new LogBook;
-            $log_book->dynamic_form_id = $data['dyn_form_id'];
+            $log_book->dynamic_form_id = $data['dyn_form_id'] ?? null;
             $log_book->home_id         = Auth::user()->home_id;
             $log_book->user_id         = Auth::user()->id;
-            $log_book->title           = $dyn_form->title;
+            $log_book->title           = $dyn_form->title ?? null;
             $log_book->date            = date('Y-m-d H:i:s');
-            $log_book->details         = $dyn_form->details;
+            $log_book->details         = $dyn_form->details ?? null;
+            $log_book->category_id     = $s_category_id;
+            $log_book->category_name   = $category_data ? $category_data->name : null;
+            $log_book->category_icon   = $category_data ? $category_data->icon : null;
+            $log_book->logType         = $data['logtype'] ?? null;
             $log_book->save();
+            
 
             $su_log_record                  = new ServiceUserLogBook;
             $su_log_record->user_id         = Auth::user()->id;
             $su_log_record->log_book_id     = $log_book->id;
             $su_log_record->service_user_id = $data['s_user_id'];
             $su_log_record->user_id         = Auth::user()->id;
+            $su_log_record->logType         = $data['logtype'];
 
             if ($su_log_record->save()) {
                 // $response = 1;
@@ -541,8 +557,8 @@ class DynamicFormController extends Controller
         if(isset($data['dyn_id'])) {
 
             $dyn_form_ids = $data['dyn_id'];
-            if(!empty($dyn_form_ids)) { 
-                foreach($dyn_form_ids as $key => $record_id) { 
+            if(!empty($dyn_form_ids)) {
+                foreach($dyn_form_ids as $key => $record_id) {
                     $record = DynamicForm::find($record_id);
                     $su_home_id = ServiceUser::where('id',$record->service_user_id)->value('home_id');
                     if(Auth::user()->home_id == $su_home_id) {
@@ -566,7 +582,7 @@ class DynamicFormController extends Controller
         }
         $service_user_id = $record->service_user_id;
         $res = $this->index($service_user_id);
-        echo $res;  
+        echo $res;
     }*/
 
     public function patterndataformio(Request $request)
@@ -593,16 +609,16 @@ class DynamicFormController extends Controller
         // Check if an image is uploaded
         if ($request->hasFile('image')) {
             $image = $request->file('image');
-        
+
             // Generate a unique filename using timestamp
             $fileName = time() . '_' . $image->getClientOriginalName();
-        
+
             // Define the target path in the public folder
             $publicPath = public_path('images/formio/' . $fileName);
-        
+
             // Move the image to the public folder
             $image->move(public_path('images/formio'), $fileName);
-        
+
             // Return success response with the public file path
             return response()->json(['success' => true, 'file_path' => 'images/formio/' . $fileName]);
         }

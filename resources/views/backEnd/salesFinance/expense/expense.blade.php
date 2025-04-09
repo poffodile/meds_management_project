@@ -207,7 +207,7 @@
                     <div class="row">
                         <div class="col-md-6 col-lg-6 col-xl-6">
                                 <div class="form-group row">
-                                    <label for="inputName" class="col-sm-4 control-label">Expense Name<span class="radStar">*</span></label>
+                                    <label for="inputName" class="col-sm-4 control-label">Expense Name <span class="radStar">*</span></label>
                                     <div class="col-sm-8">
                                         <input type="text" class="form-control"
                                             id="title" name="title" value="" placeholder="Expense Name">
@@ -215,7 +215,7 @@
                                 </div>
                                 
                                 <div class="form-group row">
-                                    <label for="inputName" class="col-sm-4 control-label">Net Amount<span class="radStar">*</span></label>
+                                    <label for="inputName" class="col-sm-4 control-label">Net Amount <span class="radStar">*</span></label>
                                     <div class="col-sm-8">
                                         <input type="text" class="form-control"
                                             id="amount" name="amount" value="" placeholder="Net Amount">
@@ -223,7 +223,7 @@
                                 </div>
                                 <div class="form-group row">
                                     <label for="inputProject"
-                                        class="col-sm-4 control-label">Vat<span class="radStar">*</span></label>
+                                        class="col-sm-4 control-label">Vat <span class="radStar">*</span></label>
                                     <div class="col-sm-8">
                                         <select class="form-control"
                                             id="vat" name="vat">
@@ -242,14 +242,14 @@
                                     </div>
                                 </div>
                                 <div class="form-group row">
-                                    <label for="inputName" class="col-sm-4 control-label">Gross Amount<span class="radStar">*</span></label>
+                                    <label for="inputName" class="col-sm-4 control-label">Gross Amount <span class="radStar">*</span></label>
                                     <div class="col-sm-8">
                                         <input type="text" class="form-control "
                                             id="gross_amount" name="gross_amount" value="" disabled>
                                     </div>
                                 </div>
                                 <div class="form-group row">
-                                    <label for="inputName" class="col-sm-4 control-label">Expense Date<span class="radStar">*</span></label>
+                                    <label for="inputName" class="col-sm-4 control-label">Expense Date <span class="radStar">*</span></label>
                                     <div class="col-sm-8">
                                         <input type="date" class="form-control "
                                             id="expense_date" name="expense_date" value="">

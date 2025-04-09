@@ -23,6 +23,7 @@ class addAttachmentModal extends Component
     public $selectfileName;
     public $hiddenForeignId;
     public $saveButtonId;
+    public $saveButtonUrl;
     public function __construct(
         string $purchaseModalId = 'defaultModalId',
         string $purchaseformId = 'defaultFormId',
@@ -33,7 +34,8 @@ class addAttachmentModal extends Component
         string $selectfileName = 'defaultSelectfileName',
         string $inputDescription = 'defaultInputDescription',
         string $hiddenForeignId = 'defaulthiddenForeignId',
-        string $saveButtonId = 'defaultSaveButtonId',)
+        string $saveButtonId = 'defaultSaveButtonId',
+        string $saveButtonUrl = 'defaultSaveButtonUrl',)
     {
         $this->purchaseModalId = $purchaseModalId;
         $this->purchaseformId = $purchaseformId;
@@ -45,6 +47,7 @@ class addAttachmentModal extends Component
         $this->selectfileName = $selectfileName;
         $this->hiddenForeignId = $hiddenForeignId;
         $this->saveButtonId = $saveButtonId;
+        $this->saveButtonUrl = $saveButtonUrl;
     }
 
     /**

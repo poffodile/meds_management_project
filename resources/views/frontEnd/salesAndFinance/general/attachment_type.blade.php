@@ -126,7 +126,7 @@
                                                     <input type="hidden" name="id" id="id">
                                                     <div class="mb-2 row">
 
-                                                        <label for="inputName" class="col-sm-3 col-form-label">Attachment Type<span class="radStar ">*</span></label>
+                                                        <label for="inputName" class="col-sm-3 col-form-label">Attachment Type <span class="radStar ">*</span></label>
 
                                                         
 

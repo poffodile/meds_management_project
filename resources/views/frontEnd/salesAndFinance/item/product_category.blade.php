@@ -30,13 +30,12 @@
                         <div class="searchFilter">
                             {{-- <a href="#!">Show Search Filter</a> --}}
                         </div>
-
                     </div>
                     <div class="markendDelete">
                         <div class="row">
                             <div class="col-md-7">
                                 <div class="jobsection">
-                                    <input type="button" class="profileDrop" id="getCheckedValues" value="Delete">
+                                    <input type="button" class="btn profileDrop" id="getCheckedValues" value="Delete">
                                     <span class="alert text-danger text-center deletemsg"></span>
                                 </div>
                             </div>

@@ -17,10 +17,10 @@
                     <div class="alert alert-danger text-center catsuccessdanger cathidemessagedanger"></div>                                 
                 <div class="contantbodypopup p-0">                                                                                                
                     <div class="mb-2 row">
-                        <label for="category_name" class="col-sm-3 col-form-label">Product Category*</label>
+                        <label for="category_name" class="col-sm-3 col-form-label">Product Category <span class="radStar ">*</span></label>
                         <div class="col-sm-9">
                             <input type="text" class="form-control editInput" id="category_name" name="name" value="" required>
-                            <span class="text-danger" id="category_name_error"></span>
+                            <span class="text-danger" id="category_name_error"></span> 
                         </div>
                     </div>
                     <div class="mb-2 row">

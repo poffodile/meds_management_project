@@ -46,6 +46,7 @@ class ExpenseController extends Controller
         $data['rejectCount']=Expense::getAllExpense($home_id)->where(['reject'=>1,'login_user_id'=>Auth::user()->id])->count();
         $data['paidCount']=Expense::getAllExpense($home_id)->where(['paid'=>1,'reject'=>0,'login_user_id'=>Auth::user()->id])->count();
         $data['expenseCount']=Expense::getAllExpense($home_id)->where('login_user_id',Auth::user()->id)->count();
+        $data['page'] = "expenses";
         // echo "<pre>";print_r($data['paidWithAuthCount']);die;
         return view('frontEnd.salesAndFinance.expenses.expense',$data);
     }

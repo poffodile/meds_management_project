@@ -17,21 +17,14 @@
                     <div class="printExpt">
                         <div class="prntExpbtn">
                             <a href="#!">Print</a>
-                            <a href="#!">Export</a>
+                            <a href="#!" id="exportCsv">Export</a>
                         </div>
                         <div class="searchFilter">
                             <a href="#!">Show Search Filter</a>
                         </div>
-
                     </div>
                     <div class="markendDelete">
                         <div class="row">
-                            <div class="col-md-7">
-                                <div class="jobsection">
-                                    <a href="#" class="profileDrop">Delete</a>
-                                    <a href="#" class="profileDrop">Mark As completed</a>
-                                </div>
-                            </div>
                             <div class="col-md-5">
                                 <div class="pageTitleBtn p-0">
                                     <!-- <a href="#" class="profileDrop"> <i class="material-symbols-outlined"> settings </i></a> -->
@@ -84,5 +77,42 @@
         </di>
     </div>
 </section>
+<script type="module">
+    document.getElementById('exportCsv').addEventListener('click', function() {
+        const table = document.getElementById('exampleOne'); // Get the table
+        const selectedColumns = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]; // Specify which columns to export (e.g., 0 for Name, 2 for Phone)
+        let csvContent = '';
 
+        const now = new Date();
+        const formattedDateTime = now.toISOString().replace(/[-T:]/g, '_').split('.')[0];
+        const filename = `list_export_${formattedDateTime}.csv`;
+        // Extract headers (only selected columns)
+        const headers = Array.from(table.querySelectorAll('thead th'))
+            .filter((_, index) => selectedColumns.includes(index)) // Filter headers by selected columns
+            .map(th => th.textContent.trim())
+            .join(',');
+        csvContent += headers + '\n';
+
+        // Extract rows (only selected columns)
+        const rows = Array.from(table.querySelectorAll('tbody tr'));
+        rows.forEach(row => {
+            const cells = Array.from(row.querySelectorAll('td'))
+                .filter((_, index) => selectedColumns.includes(index)) // Filter cells by selected columns
+                .map(td => td.textContent.trim());
+            csvContent += cells.join(',') + '\n';
+        });
+
+        // Create and download CSV file
+        const blob = new Blob([csvContent], {
+            type: 'text/csv;charset=utf-8;'
+        });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = filename;
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    });
+</script>
 @include('frontEnd.salesAndFinance.jobs.layout.footer')

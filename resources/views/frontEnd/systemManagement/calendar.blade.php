@@ -30,6 +30,7 @@ if (isset($system_calendar)) {
         position: relative;
         top: -3px;
     }
+
     .slctAuto .select-style {
         margin: 0 40px;
     }
@@ -69,11 +70,12 @@ if (isset($system_calendar)) {
     }
 
     .label-mandatory {
-    background-color: #7f2222b0;
-}
-.panel {
-    padding: 20px;
-}
+        background-color: #7f2222b0;
+    }
+
+    .panel {
+        padding: 20px;
+    }
 </style>
 <?php //echo 'selected_user_id='.$selected_user_id; die; 
 ?>
@@ -506,25 +508,25 @@ if (isset($system_calendar)) {
 
                             <!-- Mandatory Leave Scroller -->
                             <div id="external-events">
-                            <div class="scroller_cal_evnt1 cal_evnt_scroller m-b-5">
-                                <?php
-                                $pre_exist = 'N';
-                                if (!empty($service_users)) {
-                                    // print_r($ml_record);
-                                    if (isset($ml_record)) {
-                                        foreach ($ml_record as  $value) {
-                                            if (empty($value['calendar_id'])) {
-                                                $pre_exist = 'Y';
-                                                $su_name = App\ServiceUser::where('id', $value['su_id'])->where('home_id', Auth::user()->home_id)->value('name');
-                                ?>
-                                                <div class='external-event label label-mandatory del_event_rec' event_id="{{ $value['mandatory_leaves_id'] }}" event_type="{{ $value['event_type'] }}" su_id="{{ $value['su_id'] }}" rec_type='mandatory_leave'>{{ $value['title'] }}
-                                                    <span class="fa fa-close pull-right del_mandatory_leave_rec dele"></span>
-                                                </div>
-                                <?php   }
-                                    }
-                                    }
-                                } ?>
-                            </div>
+                                <div class="scroller_cal_evnt1 cal_evnt_scroller m-b-5">
+                                    <?php
+                                    $pre_exist = 'N';
+                                    if (!empty($service_users)) {
+                                        // print_r($ml_record);
+                                        if (isset($ml_record)) {
+                                            foreach ($ml_record as  $value) {
+                                                if (empty($value['calendar_id'])) {
+                                                    $pre_exist = 'Y';
+                                                    $su_name = App\ServiceUser::where('id', $value['su_id'])->where('home_id', Auth::user()->home_id)->value('name');
+                                    ?>
+                                                    <div class='external-event label label-mandatory del_event_rec' event_id="{{ $value['mandatory_leaves_id'] }}" event_type="{{ $value['event_type'] }}" su_id="{{ $value['su_id'] }}" rec_type='mandatory_leave'>{{ $value['title'] }}
+                                                        <span class="fa fa-close pull-right del_mandatory_leave_rec dele"></span>
+                                                    </div>
+                                    <?php   }
+                                            }
+                                        }
+                                    } ?>
+                                </div>
                             </div>
                             <!-- external-events div close -->
 
@@ -538,10 +540,7 @@ if (isset($system_calendar)) {
                                 </div>
                             </div>
                             @endif
-
-
                             <input type="hidden" name="_token" value="{{ csrf_token() }}">
-
                         </div>
                     </aside>
                 </div>
@@ -1055,24 +1054,24 @@ if (isset($system_calendar)) {
 
             <?php
             if (!empty($service_users)) {
-                    if (isset($ml_record)) {
-                        foreach ($ml_record as  $value) {
-                            if (!empty($value['calendar_id'])) {
-                                $event_day  = date('d', strtotime($value['event_date']));
-                                $event_mon  = date('m', strtotime($value['event_date'])) - 1;
-                                $event_year = date('Y', strtotime($value['event_date']));
-                                $service_user = App\ServiceUser::where('id', $value['su_id'])->where('home_id', Auth::user()->home_id)->value('name');
-                                $event_id   = $value['mandatory_leaves_id'];
-                                $event_type = $value['event_type'];
-                                $calendar_id = $value['calendar_id'];
+                if (isset($ml_record)) {
+                    foreach ($ml_record as  $value) {
+                        if (!empty($value['calendar_id'])) {
+                            $event_day  = date('d', strtotime($value['event_date']));
+                            $event_mon  = date('m', strtotime($value['event_date'])) - 1;
+                            $event_year = date('Y', strtotime($value['event_date']));
+                            $service_user = App\ServiceUser::where('id', $value['su_id'])->where('home_id', Auth::user()->home_id)->value('name');
+                            $event_id   = $value['mandatory_leaves_id'];
+                            $event_type = $value['event_type'];
+                            $calendar_id = $value['calendar_id'];
             ?> {
-                                    title: '{{ $service_user.' - '.$value["title"] }}',
-                                    start: new Date('{{ $event_year }}', '{{ $event_mon }}', '{{ $event_day }}'),
-                                    color: '#7f2222b0',
-                                    event_id: '{{ $value["mandatory_leaves_id"] }}',
-                                    event_type: '{{ $event_type }}',
-                                    calendar_id: '{{ $calendar_id }}'
-                                },
+                                title: '{{ $service_user.' - '.$value["title"] }}',
+                                start: new Date('{{ $event_year }}', '{{ $event_mon }}', '{{ $event_day }}'),
+                                color: '#7f2222b0',
+                                event_id: '{{ $value["mandatory_leaves_id"] }}',
+                                event_type: '{{ $event_type }}',
+                                calendar_id: '{{ $calendar_id }}'
+                            },
             <?php                         }
                     }
                 }

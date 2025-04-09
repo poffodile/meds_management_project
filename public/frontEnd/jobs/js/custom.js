@@ -42,36 +42,36 @@
 //   });
 // });
 //*******************************DataTable */
-$(document).ready(function() {
+$(document).ready(function () {
   var table = $('#exampleOne').DataTable({
     // Ram 09/10/2024 comment here for manual checkbox 
-      // columnDefs: [{
-      //     orderable: false,
-      //     className: 'select-checkbox',
-      //     targets: 0
-      // }],
-      // select: {
-      //     style: 'multi',
-      //     selector: 'td:first-child'
-      // },
-      // end here
-      order: [[1, 'asc']],
-      language: {
-          paginate: {
-              previous: "Previous",
-              next: "Next"
-          },
-          info: "Showing _START_ to _END_ of _TOTAL_ entries",
-          infoEmpty: "No entries available",
-          emptyTable: '<span style="color: red; font-weight: bold;">Sorry, there are no items available</span>',
-          infoFiltered: "(filtered from _MAX_ total entries)",
-          lengthMenu: "Show _MENU_ entries",
-          search: "Search:",
-          zeroRecords: "No matching records found"
+    // columnDefs: [{
+    //     orderable: false,
+    //     className: 'select-checkbox',
+    //     targets: 0
+    // }],
+    // select: {
+    //     style: 'multi',
+    //     selector: 'td:first-child'
+    // },
+    // end here
+    order: [[1, 'asc']],
+    language: {
+      paginate: {
+        previous: "Previous",
+        next: "Next"
       },
-      paging: true,
+      info: "Showing _START_ to _END_ of _TOTAL_ entries",
+      infoEmpty: "No entries available",
+      emptyTable: '<span style="color: #e10078; font-weight: bold;">Sorry, there are no items available</span>',
+      infoFiltered: "(filtered from _MAX_ total entries)",
+      lengthMenu: "Show _MENU_ entries",
+      search: "Search:",
+      zeroRecords: "No matching records found"
+    },
+    paging: true,
   });
-// Ram change
+  // Ram change
   // Select All checkbox functionality
   // $('#selectAll').on('click', function() {
   //     if ($(this).prop('checked')) {
@@ -81,15 +81,15 @@ $(document).ready(function() {
   //     }
   // });
 
-$('#selectAll').on('click', function() {
-      // if ($(this).prop('checked')) {
-      //     table.rows().select();  
-      // } else {
-      //     table.rows().deselect();
-      // }
-      $('.delete_checkbox').prop('checked', $(this).prop('checked'));
+  $('#selectAll').on('click', function () {
+    // if ($(this).prop('checked')) {
+    //     table.rows().select();  
+    // } else {
+    //     table.rows().deselect();
+    // }
+    $('.delete_checkbox').prop('checked', $(this).prop('checked'));
   });
-// Ram comment this function
+  // Ram comment this function
   // Delete button functionality
   // $('#deleteSelectedRows').click(function() {
   //     var selectedRows = table.rows({ selected: true }).remove().draw();
@@ -101,7 +101,7 @@ $('#selectAll').on('click', function() {
 //*******************************End DataTable */
 // CRM JS
 
-document.getElementById('onclickbtnHideShow').addEventListener('click', function(){
+document.getElementById('onclickbtnHideShow').addEventListener('click', function () {
   var element = document.getElementById('showDivCont');
   element.classList.toggle('show');
 });
@@ -116,47 +116,53 @@ function hideShowDiv() {
   let hideBtn = document.querySelector(".hidebtn");
 
   if (div.style.display === 'none' || div.style.opacity === '0') {
-      div.style.display = 'block';
-      div.style.height = div.scrollHeight + 'px'; // Ensures the height is set for the transition
-      div.style.opacity = '1';
-      hideBtn.textContent = "Hide Search Filter";
+    div.style.display = 'block';
+    div.style.height = div.scrollHeight + 'px'; // Ensures the height is set for the transition
+    div.style.opacity = '1';
+    hideBtn.textContent = "Hide Search Filter";
   } else {
-      hideBtn.textContent = "Show Search Filter";
-      div.style.height = '0px';
-      div.style.opacity = '0';
-      // Use a timeout to set display to none after the transition
-      setTimeout(() => {
-          div.style.display = 'none';
-      }, 500); // 500ms matches the CSS transition duration
+    hideBtn.textContent = "Show Search Filter";
+    div.style.height = '0px';
+    div.style.opacity = '0';
+    // Use a timeout to set display to none after the transition
+    setTimeout(() => {
+      div.style.display = 'none';
+    }, 500); // 500ms matches the CSS transition duration
   }
 }
 // end search leads show search Filter js
 
-// *******************PaiChart
+// ******************* PaiChart *******************
 
 var myConfig = {
   "type": "pie",
- "title": {
-    "text": "All Potential Jobs - July 2024"
+  "title": {
+    "text": "All Potential Jobs - July 2024",
+    "fontSize": "17px"
   },
   "series": [{
-      "values": [59]
-    },
-    {
-      "values": [55]
-    },
-    {
-      "values": [30]
-    },
-    {
-      "values": [28]
-    },
-    {
-      "values": [15]
-    }
+    values: [59],
+    backgroundColor: "#FF5733"
+  },
+  {
+    values: [55],
+    backgroundColor: "#1f88b5"
+  },
+  {
+    values: [30],
+    backgroundColor: "#5c6bc0"
+  },
+  {
+    values: [28],
+    backgroundColor: "#e10078"
+  },
+  {
+    values: [15],
+    backgroundColor: '#42a5f5'
+  }
   ]
 };
- 
+
 zingchart.render({
   id: 'PieChart',
   data: myConfig,
@@ -179,6 +185,7 @@ let chartConfig = {
     text: 'Authorised Jobs For Period',
     align: 'left',
     marginLeft: '23%',
+    fontSize: '17px', // Adjust the font size as needed
   },
   legend: {
     adjustLayout: true,
@@ -274,7 +281,7 @@ let chartConfig = {
       type: 'line',
       text: 'Completed Tasks',
       values: [90, 80, 70, 60, 50, 40, 30, 20],
-      lineColor: '#66bb6a',
+      lineColor: '#e10078',
       marker: {
         visible: false,
       },
@@ -284,7 +291,7 @@ let chartConfig = {
       type: 'bar',
       text: 'Completed Tasks',
       values: [5, 10, 6, 3, 6, 2, 0, 9],
-      backgroundColor: '#0877bd',
+      backgroundColor: '#1f88b5',
       scales: 'scale-x, scale-y-2',
     },
   ],
@@ -302,101 +309,89 @@ zingchart.render({
 
 
 
-    // --------------------- /* Select option with search  */ ---------------------
-    let customInput = document.querySelector('.customInput')
-    selectedData = document.querySelector('.selectedData')
-    searchInput = document.querySelector('.searchInput input')
-    ul = document.querySelector('.options ul')
-    customInputContainer = document.querySelector('.customInputContainer')
-    
-    window.addEventListener('click', (e) => {
-        if (document.querySelector('.searchInput').contains(e.target)) {
-            document.querySelector('.searchInput').classList.add('focus')
-        } else {
-            document.querySelector('.searchInput').classList.remove('focus')
-        }
-    })
-    
-    var countries = [
-        "Custom Input",
-        "Afghanistan",
-        "Aland Islands",
-        
-        "Zimbabwe"
-    ];
-    
-    customInput.addEventListener('click', () => {
-        customInputContainer.classList.toggle('show')
-    })
-    
-    let countriesLength = countries.length
-    
-    for (let i = 0; i < countriesLength; i++) {
-        let country = countries[i]
-        const li = document.createElement("li");
-        const countryName = document.createTextNode(country);
-        li.appendChild(countryName);
-        ul.appendChild(li);
+// --------------------- /* Select option with search  */ ---------------------
+let customInput = document.querySelector('.customInput')
+selectedData = document.querySelector('.selectedData')
+searchInput = document.querySelector('.searchInput input')
+ul = document.querySelector('.options ul')
+customInputContainer = document.querySelector('.customInputContainer')
+
+window.addEventListener('click', (e) => {
+  if (document.querySelector('.searchInput').contains(e.target)) {
+    document.querySelector('.searchInput').classList.add('focus')
+  } else {
+    document.querySelector('.searchInput').classList.remove('focus')
+  }
+})
+
+var countries = [
+  "Custom Input",
+  "Afghanistan",
+  "Aland Islands",
+
+  "Zimbabwe"
+];
+
+customInput.addEventListener('click', () => {
+  customInputContainer.classList.toggle('show')
+})
+
+let countriesLength = countries.length
+
+for (let i = 0; i < countriesLength; i++) {
+  let country = countries[i]
+  const li = document.createElement("li");
+  const countryName = document.createTextNode(country);
+  li.appendChild(countryName);
+  ul.appendChild(li);
+}
+
+
+ul.querySelectorAll('li').forEach(li => {
+  li.addEventListener('click', (e) => {
+    let selectdItem = e.target.innerText
+    selectedData.innerText = selectdItem
+
+    for (const li of document.querySelectorAll("li.selected")) {
+      li.classList.remove("selected");
     }
-    
-    
-    ul.querySelectorAll('li').forEach(li => {
-        li.addEventListener('click', (e) => {
-            let selectdItem = e.target.innerText
-            selectedData.innerText = selectdItem
-            
-            for (const li of document.querySelectorAll("li.selected")) {
-                li.classList.remove("selected");
-            }
-            e.target.classList.add('selected')
-            customInputContainer.classList.toggle('show')
-        })
-    });
-    
-    function updateData(data) {
-        let selectedCountry = data.innerText
-        selectedData.innerText = selectedCountry
-    
-        for (const li of document.querySelectorAll("li.selected")) {
-            li.classList.remove("selected");
-        }
-        data.classList.add('selected')
-        customInputContainer.classList.toggle('show')
-        console.log(selectedCountry);
-    }
-    
-    searchInput.addEventListener('keyup', (e) => {
-        let searchedVal = searchInput.value.toLowerCase()
-        let searched_country = []
-    
-        searched_country = countries.filter(data => {
-            return data.toLocaleLowerCase().startsWith(searchedVal)
-        }).map(data => {
-            return `<li onClick="updateData(this)">${data}</li>`
-        }).join('')
-        ul.innerHTML = searched_country ? searched_country : "<p style='margin-top: 1rem;'>Opps can't find any result <p style='margin-top: .2rem; font-size: .9rem;'>Try searching something else.</p></p>"
-    })
+    e.target.classList.add('selected')
+    customInputContainer.classList.toggle('show')
+  })
+});
+
+function updateData(data) {
+  let selectedCountry = data.innerText
+  selectedData.innerText = selectedCountry
+
+  for (const li of document.querySelectorAll("li.selected")) {
+    li.classList.remove("selected");
+  }
+  data.classList.add('selected')
+  customInputContainer.classList.toggle('show')
+  console.log(selectedCountry);
+}
+
+searchInput.addEventListener('keyup', (e) => {
+  let searchedVal = searchInput.value.toLowerCase()
+  let searched_country = []
+
+  searched_country = countries.filter(data => {
+    return data.toLocaleLowerCase().startsWith(searchedVal)
+  }).map(data => {
+    return `<li onClick="updateData(this)">${data}</li>`
+  }).join('')
+  ul.innerHTML = searched_country ? searched_country : "<p style='margin-top: 1rem;'>Opps can't find any result <p style='margin-top: .2rem; font-size: .9rem;'>Try searching something else.</p></p>"
+})
 
 
-    // ************************************************************************************************
-
-
-
+// ************************************************************************************************
 
 $(window).scroll(function () {
-    if ($(this).scrollTop() > 250) {
-        $('.sticky-top').addClass('sticky-nav').css('top', '0px');
-    } else {
-        $('.sticky-top').removeClass('sticky-nav').css('top', '-100px');
-    }
-  });
-
-
-
-
-
-
-
-
-
+  if ($(this).scrollTop() > 250) {
+    $('.sticky-top').addClass('sticky-nav').css('top', '0px');
+  } else {
+    $('.sticky-top').removeClass('sticky-nav').css('top', '-100px');
+  }
+});
 

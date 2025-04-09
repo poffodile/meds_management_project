@@ -1072,9 +1072,7 @@ class Notification extends Model
                                     ->orderBy('su_calendar_event.id','desc')
                                     ->get()
                                     ->toArray();
-        // echo"<pre>";
-        // print_r($event_records);
-        //die();
+        // echo"<pre>";  print_r($event_records); die();
         $event_count = 0;
         foreach ($event_records as $key => $event_record) {
 
@@ -1092,6 +1090,8 @@ class Notification extends Model
             //     if($event_count <= 4){
             //         $records[] = $event_record;
             //         $event_count++;
+
+            
             //     } else {  
             //         break;
             //     }
@@ -1103,9 +1103,7 @@ class Notification extends Model
                 break;
             }
         }
-        // echo"<pre>";
-        // print_r($records);
-        // die;
+        // echo"<pre>";  print_r($records);  die;
         return $records;
         //$plan_records = Notification::aasort($records,"created_at");
         // echo '<pre>'; print_r($records); die;

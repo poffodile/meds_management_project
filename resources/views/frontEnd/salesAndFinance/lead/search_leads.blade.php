@@ -55,10 +55,8 @@
                                         <label class="col-md-4 col-form-label text-end">Assigned User:</label>
                                         <div class="col-md-8">
                                             <select class="form-control editInput selectOptions" id="inputJobType">
-                                                @foreach($users as $user)
-                                                    <option value="{{ $user->id}}">{{ $user->name }}</option>
-                                                @endforeach
-                                                
+                                                <input type="hidden" id="search_user" placeholder="Type user name">
+                                                <div class="user-list"></div>
                                             </select>
                                         </div>
                                     </div>
@@ -101,7 +99,7 @@
                                     <div class="row form-group mb-2">
                                         <label class="col-md-4 col-form-label text-end">Email Address:</label>
                                         <div class="col-md-8">
-                                            <input type="text" class="form-control editInput" id="inputName" placeholder="Email add">
+                                            <input type="text" class="form-control editInput" id="inputName" placeholder="Email address">
                                         </div>
                                     </div>
                                     <div class="row form-group mb-2">
@@ -117,7 +115,7 @@
                                         <div class="col-md-8">
                                             <select class="form-control editInput selectOptions" id="inputJobType">
                                                 @foreach($sources as $source)
-                                                    <option value="{{ $source->id }}">{{ $source->title }}</option>
+                                                <option value="{{ $source->id }}">{{ $source->title }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -236,4 +234,66 @@
     </div>
 </section>
 
+<script>
+    $('#search_user').on('keyup', function() {
+            let query = $(this).val();
+            const divList = document.querySelector('.user-list');
+
+            if (query === '') {
+                divList.innerHTML = '';
+            }
+
+            // Make an AJAX call only if query length > 2
+            if (query.length > 2) {
+                $.ajax({
+                    url: "{{ route('lead.ajax.searchUser') }}", 
+                    method: 'GET',
+                    data: {
+                        query: query
+                    },
+                    success: function(response) {
+                        console.log(response);
+                        // $('#results').html(response);
+                        divList.innerHTML = "";
+                        const div = document.createElement('div');
+                        div.className = 'container'; // Optional: Add a class to the div for styling
+
+                        // Step 2: Create a ul (unordered list)
+                        const ul = document.createElement('ul');
+                        ul.id = "productList";
+                        // Step 3: Loop through the data and create li (list item) for each entry
+                        response.forEach(item => {
+                            const li = document.createElement('li'); // Create a new li element
+                            li.textContent = item.product_name; // Set the text of the li item
+                            li.id = item.id;
+                            li.className = "editInput";
+                            ul.appendChild(li); // Append the li to the ul
+                        });
+
+                        // Step 4: Append the ul to the div
+                        div.appendChild(ul);
+
+                        // Step 5: Append the div to the parent container in the HTML
+                        divList.appendChild(div);
+
+                        ul.addEventListener('click', function(event) {
+                            divList.innerHTML = '';
+                            document.getElementById('search_user').value = '';
+                            // Check if the clicked element is an <li> (to avoid triggering on other child elements)
+                            if (event.target.tagName.toLowerCase() === 'li') {
+                                const selectedId = event.target.id; // Get the ID of the clicked <li>
+                                console.log('Selected Product ID:', selectedId); // Print the ID of the selected product
+                                getProductData(selectedId);
+                            }
+                        });
+                    },
+                    error: function(xhr) {
+                        console.error(xhr.responseText);
+                    }
+                });
+            } else {
+                $('#results').empty(); // Clear results if the input is empty
+            }
+        });
+</script>
 @include('frontEnd.salesAndFinance.jobs.layout.footer')

@@ -11,6 +11,7 @@ class Quote extends Model
 
     protected $fillable = [
         'home_id',
+        'user_id',
         'quote_ref',
         'customer_id',
         'billing_add_id',

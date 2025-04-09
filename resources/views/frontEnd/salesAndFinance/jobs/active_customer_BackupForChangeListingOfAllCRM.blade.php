@@ -130,9 +130,9 @@
     min-height:32px !important;
  }
 
- .CRMFullModel .modal-dialog.modal-xl {
+ /* .CRMFullModel .modal-dialog.modal-xl {
         --bs-modal-width: 1600px;
-    }
+    } */
 
     .overdue {
         display: flex;
@@ -175,7 +175,7 @@
     }
 
     #showDivContLeads {
-        height: 176px;
+        height: 200px;
         transition: .7s;
         overflow: hidden;
     }
@@ -319,7 +319,7 @@
                                             <label for="recipient-name" class="col-form-label">Reject Type:</label>
                                             <input type="text" class="form-control" id="recipient-name">
                                         </div>
-                                        <a href="#!" data-bs-toggle="modal" data-bs-target="#rejectModal2"><i class="fa-solid fa-square-plus"></i></a>
+                                        <a href="#!" data-bs-toggle="modal" data-bs-target="#rejectModal2"><i class="fa-solid fa-square-plus fs-4"></i></a>
                                         <div class="mb-3">
                                             <label for="message-text" class="col-form-label">Reject Reason:</label>
                                             <textarea class="form-control" id="message-text"></textarea>
@@ -387,14 +387,14 @@
                                                     <div class="row">
                                                         <div class="col-md-6 col-lg-6 col-xl-6">
                                                                 <div class="mb-2 row">
-                                                                    <label for="inputName" class="col-sm-3 col-form-label">Expense Name<span class="radStar">*</span></label>
+                                                                    <label for="inputName" class="col-sm-3 col-form-label">Expense Name <span class="radStar">*</span></label>
                                                                     <div class="col-sm-9">
                                                                         <input type="text" class="form-control editInput"
                                                                             id="title" name="title" value="" placeholder="Expense Name">
                                                                     </div>
                                                                 </div>
                                                                 <div class="mb-2 row">
-                                                                    <label for="inputName" class="col-sm-3 col-form-label">Net Amount<span class="radStar">*</span></label>
+                                                                    <label for="inputName" class="col-sm-3 col-form-label">Net Amount <span class="radStar">*</span></label>
                                                                     <div class="col-sm-9">
                                                                         <input type="text" class="form-control editInput"
                                                                             id="amount" name="amount" value="" placeholder="Net Amount">
@@ -402,7 +402,7 @@
                                                                 </div>
                                                                 <div class="mb-2 row">
                                                                     <label for="inputProject"
-                                                                        class="col-sm-3 col-form-label">Vat<span class="radStar">*</span></label>
+                                                                        class="col-sm-3 col-form-label">Vat <span class="radStar">*</span></label>
                                                                     <div class="col-sm-9">
                                                                         <select class="form-control editInput selectOptions"
                                                                             id="vat" name="vat">
@@ -421,14 +421,14 @@
                                                                     </div>
                                                                 </div>
                                                                 <div class="mb-2 row">
-                                                                    <label for="inputName" class="col-sm-3 col-form-label">Gross Amount<span class="radStar">*</span></label>
+                                                                    <label for="inputName" class="col-sm-3 col-form-label">Gross Amount <span class="radStar">*</span></label>
                                                                     <div class="col-sm-9">
                                                                         <input type="text" class="form-control editInput"
                                                                             id="gross_amount" name="gross_amount" value="" disabled>
                                                                     </div>
                                                                 </div>
                                                                 <div class="mb-2 row">
-                                                                    <label for="inputName" class="col-sm-3 col-form-label">Expense Date<span class="radStar">*</span></label>
+                                                                    <label for="inputName" class="col-sm-3 col-form-label">Expense Date <span class="radStar">*</span></label>
                                                                     <div class="col-sm-9">
                                                                         <input type="date" class="form-control editInput"
                                                                             id="expense_date" name="expense_date" value="">
@@ -1536,7 +1536,7 @@
                     </div>
                     <div class="notification_div">
                         <div class="mb-2 row">
-                            <label for="user_notifiy" class="col-sm-3 col-form-label">Notify Who?<span class="radStar ">*</span> </label>
+                            <label for="user_notifiy" class="col-sm-3 col-form-label">Notify Who? <span class="radStar ">*</span> </label>
                             <div class="col-sm-9">
                                 <select name="notify_user" class="form-control editInput" id="user_notifiy">
                                     <option value=""></option>
@@ -1547,7 +1547,7 @@
                             </div>
                         </div>
                         <div class="mb-2 row">
-                            <label class="col-sm-3 col-form-label">Send As<span class="radStar ">*</span> </label>
+                            <label class="col-sm-3 col-form-label">Send As <span class="radStar ">*</span> </label>
                             <div class="col-sm-9">
                                 <label for="calls_notify_who1" class="editInput"><input type="checkbox" name="notification" id="calls_notify_who1" value="1"> Notification (User Only) </label>
                                 <label for="calls_notify_who2" class="editInput"><input type="checkbox" name="sms" id="calls_notify_who2" value="1"> SMS </label>
@@ -1595,7 +1595,7 @@
                         </div>
                     </div>
                     <div class="mb-2 row">
-                        <label for="type_title" class="col-sm-3 col-form-label">Customer<span class="radStar ">*</span></label>
+                        <label for="type_title" class="col-sm-3 col-form-label">Customer <span class="radStar ">*</span></label>
                         <div class="col-sm-8">
                             <select class="form-control editInput" name="notes_customer_id" id="notes_customer_id">
                                 @foreach($customer as $value)
@@ -1648,7 +1648,7 @@
                     </div>
                     <div id="notification_notes_div">
                         <div class="mb-2 row">
-                            <label for="user_notifiy" class="col-sm-3 col-form-label">Notify Who?<span class="radStar ">*</span> </label>
+                            <label for="user_notifiy" class="col-sm-3 col-form-label">Notify Who? <span class="radStar ">*</span> </label>
                             <div class="col-sm-9">
                                 <select name="user_id" class="form-control editInput" id="user_notifiy">
                                     <option value=""></option>
@@ -1659,7 +1659,7 @@
                             </div>
                         </div>
                         <div class="mb-2 row">
-                            <label class="col-sm-3 col-form-label">Send As<span class="radStar ">*</span> </label>
+                            <label class="col-sm-3 col-form-label">Send As <span class="radStar ">*</span> </label>
                             <div class="col-sm-9">
                                 <label for="calls_notify_who1" class="editInput">
                                     <input type="checkbox" name="notification" id="calls_notify_who1" value="1" checked> Notification (User Only)
@@ -1712,7 +1712,7 @@
                         </div>
                     </div>
                     <div class="mb-2 row">
-                        <label for="type_title" class="col-sm-3 col-form-label">Customer<span class="radStar ">*</span></label>
+                        <label for="type_title" class="col-sm-3 col-form-label">Customer <span class="radStar ">*</span></label>
                         <div class="col-sm-8">
                             <select class="form-control editInput" name="complaint_customer_id" id="complaint_customer_id">
                                 @foreach($customer as $value)
@@ -1768,7 +1768,7 @@
                     </div>
                     <div id="notification_complaint_div">
                         <div class="mb-2 row">
-                            <label for="user_notifiy" class="col-sm-3 col-form-label">Notify Who?<span class="radStar ">*</span> </label>
+                            <label for="user_notifiy" class="col-sm-3 col-form-label">Notify Who? <span class="radStar ">*</span> </label>
                             <div class="col-sm-9">
                                 <select name="user_id" class="form-control editInput" id="user_notifiy">
                                     <option value=""></option>
@@ -1779,7 +1779,7 @@
                             </div>
                         </div>
                         <div class="mb-2 row">
-                            <label class="col-sm-3 col-form-label">Send As<span class="radStar ">*</span> </label>
+                            <label class="col-sm-3 col-form-label">Send As <span class="radStar ">*</span> </label>
                             <div class="col-sm-9">
                                 <label for="calls_complaint_who1" class="editInput">
                                     <input type="checkbox" name="notification" id="calls_complaint_who1" value="1" checked> Notification (User Only)
@@ -1983,7 +1983,7 @@
                     </div>
                     <div id="notification_email_div">
                         <div class="mb-2 row">
-                            <label for="user_notifiy" class="col-sm-3 col-form-label">Notify Who?<span class="radStar ">*</span> </label>
+                            <label for="user_notifiy" class="col-sm-3 col-form-label">Notify Who? <span class="radStar ">*</span> </label>
                             <div class="col-sm-9">
                                 <select name="notify_user" class="form-control editInput" id="user_notifiy">
                                     <option value=""></option>
@@ -1996,7 +1996,7 @@
                             </div>
                         </div>
                         <div class="mb-2 row">
-                            <label class="col-sm-3 col-form-label">Send As<span class="radStar ">*</span> </label>
+                            <label class="col-sm-3 col-form-label">Send As <span class="radStar ">*</span> </label>
                             <div class="col-sm-9">
                                 <label for="calls_notify_who1" class="editInput">
                                     <input type="checkbox" name="notification" id="calls_notify_who1" value="1" checked> Notification (User Only)
@@ -2049,7 +2049,7 @@
                                     <input type="hidden" name="id" id="id">
                                     <div class="mb-2 row">
 
-                                        <label for="inputName" class="col-sm-3 col-form-label">Task Type<span class="radStar ">*</span></label>
+                                        <label for="inputName" class="col-sm-3 col-form-label">Task Type <span class="radStar ">*</span></label>
 
 
                                         <div class="col-sm-9">
@@ -2323,7 +2323,7 @@
                                     <div class="formDtail">
                                         <form id="contact_form">
                                             <div class="mb-2 row">
-                                                <label for="inputProject" class="col-sm-3 col-form-label">Customer<span class="radStar">*</span></label>
+                                                <label for="inputProject" class="col-sm-3 col-form-label">Customer <span class="radStar">*</span></label>
                                                 <div class="col-sm-9">
                                                     <select class="form-control editInput selectOptions" id="contact_customer_id">
                                                         <option selected disabled>Select Customer</option>

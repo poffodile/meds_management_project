@@ -9,7 +9,7 @@
             <div class="modal-body">
                 <form id="accountCodeForm">
                     <div class="mb-3 row">
-                        <label for="inputJobRef" class="col-sm-4 col-form-label">Name <span class="red_sorryText">*</span></label>
+                        <label for="inputJobRef" class="col-sm-4 col-form-label">Name <span class="radStar">*</span></label>
                         <div class="col-sm-8">
                             <input type="hidden" name="account_code_id" id="account_code_id">
                             <input type="text" name="name" class="form-control editInput" id="">

@@ -46,7 +46,7 @@
                                         <input type="hidden" id="home_id" name="home_id" value="{{$home_id}}">
                                             <div class="mb-3 row">
                                                 <label for="inputCustomer"
-                                                    class="col-sm-3 col-form-label">Customer<span
+                                                    class="col-sm-3 col-form-label">Customer <span
                                                     class="radStar">*</span></label>
                                                 <div class="col-sm-7">
                                                 <select class="form-control editInput selectOptions" id="customer_id" name="customer_id" required onchange="get_customer_details()">
@@ -104,7 +104,7 @@
                                                 </div>
                                             </div>
                                             <div class="mb-3 row">
-                                                <label for="inputName" class="col-sm-3 col-form-label">Name<span
+                                                <label for="inputName" class="col-sm-3 col-form-label">Name <span
                                                 class="radStar">*</span></label>
                                                 <div class="col-sm-9">
                                                     <input type="text" class="form-control editInput" name="name" id="name" value="<?php if(isset($job_details) && $job_details !=''){echo $job_details->name;}?>">
@@ -143,7 +143,7 @@
                                             </div>
                                             <div class="mb-3 row">
                                                 <label for="inputAddress"
-                                                    class="col-sm-3 col-form-label">Address<span
+                                                    class="col-sm-3 col-form-label">Address <span
                                                     class="radStar">*</span></label>
                                                 <div class="col-sm-9">
                                                     <textarea class="form-control textareaInput" id="address" name="address" rows="3"
@@ -227,7 +227,7 @@
                                                 <label for="inputContact"
                                                     class="col-sm-3 col-form-label">Company</label>
                                                 <div class="col-sm-9">
-                                                    <input type="text" name="company" id="company" class="form-control" value="<?php if(isset($job_details) && $job_details != ''){echo ($job_details->company ?? "");}?>">
+                                                    <input type="text" name="company" id="company" class="form-control editInput" value="<?php if(isset($job_details) && $job_details != ''){echo ($job_details->company ?? "");}?>">
                                                 </div>
                                             </div>
                                             <div class="mb-3 row">
@@ -277,7 +277,7 @@
                                         </div>
                                             <div class="mb-3 row">
                                                 <label for="inputAddress"
-                                                    class="col-sm-3 col-form-label">Address<span class="radStar">*</span></label>
+                                                    class="col-sm-3 col-form-label">Address <span class="radStar">*</span></label>
                                                 <div class="col-sm-9">
                                                     <textarea class="form-control textareaInput" id="site_address" name="site_address" rows="3"
                                                         ><?php if(isset($job_details) && $job_details != ''){echo ($job_details->site_address ?? "");}?></textarea>
@@ -360,7 +360,7 @@
                                             </div>
                                             <div class="mb-3 row">
                                                 <label for="inputJobType" class="col-sm-3 col-form-label">Job
-                                                    Type<span class="radStar">*</span></label>
+                                                    Type <span class="radStar">*</span></label>
                                                 <div class="col-sm-7">
                                                 <select class="form-control editInput selectOptions" id="job_type" name="job_type" required>
                                                     <option selected disabled>Please Select</option>
@@ -421,7 +421,7 @@
                                             </div>
                                             <div class="mb-3 row">
                                                 <label for="inputTelephone" class="col-sm-3 col-form-label">Start
-                                                    Date<span class="radStar">*</span></label>
+                                                    Date <span class="radStar">*</span></label>
                                                 <div class="col-sm-4">
                                                     <input type="date" class="form-control editInput"
                                                     id="start_date" name="start_date" value="<?php if(isset($job_details) && $job_details != ''){echo $job_details->start_date;}?>">
@@ -429,7 +429,7 @@
                                             </div>
                                             <div class="mb-3 row">
                                                 <label for="inputMobile" class="col-sm-3 col-form-label">Complete
-                                                    By<span class="radStar">*</span></label>
+                                                    By <span class="radStar">*</span></label>
                                                 <div class="col-sm-4">
                                                     <input type="date" class="form-control editInput" id="complete_by" name="complete_by" value="<?php if(isset($job_details) && $job_details != ''){echo $job_details->complete_by;}?>">
                                                 </div>
@@ -462,7 +462,7 @@
                                         <!-- <form class="customerForm"> -->
                                             <div class="mb-3">
                                                 <label for="exampleInputEmail1" class="col-form-label">Short
-                                                    Description<span class="radStar">*</span> <span>(max 250 charecters)</span></label>
+                                                    Description <span class="radStar">*</span> <span>(max 250 charecters)</span></label>
                                                 <textarea class="form-control textareaInput" name="short_decinc"
                                                     id="short_decinc" rows="2" placeholder="Short Notes" onkeyup="get_char()"><?php if(isset($job_details) && $job_details != ''){echo $job_details->short_decinc;}?></textarea>
                                             </div>
@@ -1909,7 +1909,7 @@
                                             </div>
                                             <div class="mb-2 row">
                                                 <label for="inputEmail"
-                                                    class="col-sm-3 col-form-label">Price<span class="radStar ">*</span></label>
+                                                    class="col-sm-3 col-form-label">Price <span class="radStar ">*</span></label>
                                                 <div class="col-sm-9">
                                                     <input type="text" class="form-control editInput"
                                                         id="product_price" name="product_price">
@@ -2120,7 +2120,7 @@
                     <div class="modal-body">
                         <form id="product_category_form">
                             <div class="mb-3 row">
-                                <label for="inputJobRef" class="col-sm-3 col-form-label">Product Category<span class="radStar ">*</span></label>
+                                <label for="inputJobRef" class="col-sm-3 col-form-label">Product Category <span class="radStar ">*</span></label>
                                 <div class="col-sm-9">
                                     <input type="text" name="product_category_name" class="form-control editInput" id="product_category_name" value="">
                                 </div>
@@ -2169,13 +2169,13 @@
                     <div class="modal-body">
                         <form id="product_tax_form">
                             <div class="mb-3 row">
-                                <label for="inputJobRef" class="col-sm-3 col-form-label">Tax Rate Name<span class="radStar ">*</span></label>
+                                <label for="inputJobRef" class="col-sm-3 col-form-label">Tax Rate Name <span class="radStar ">*</span></label>
                                 <div class="col-sm-9">
                                     <input type="text" name="tax_rate_name" class="form-control editInput" id="tax_rate_name" value="">
                                 </div>
                             </div>
                             <div class="mb-2 row">
-                                <label for="inputProject" class="col-sm-3 col-form-label">Tax Rate<span class="radStar ">*</span></label>
+                                <label for="inputProject" class="col-sm-3 col-form-label">Tax Rate <span class="radStar ">*</span></label>
                                 <div class="col-sm-9">
                                     <input type="text" name="tax_rate" class="form-control editInput" id="tax_rate" value="">
                                 </div>
@@ -2584,7 +2584,7 @@
                                 <form id="form_data" class="customerForm">
                                     <div class="mb-2 row">
 
-                                        <label for="inputName" class="col-sm-3 col-form-label">Tag<span class="radStar ">*</span></label>
+                                        <label for="inputName" class="col-sm-3 col-form-label">Tag <span class="radStar ">*</span></label>
                                         <div class="col-sm-9">
                                             <input type="text" class="form-control editInput"
                                                 id="Tagname" name="Tagname" value="">

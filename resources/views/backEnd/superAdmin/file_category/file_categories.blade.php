@@ -55,9 +55,9 @@
                                 <table class="table table-striped table-hover table-bordered" id="editable-sample">
                                     <thead>
                                     <tr>
-                                        <th>Name</th>
+                                        <th class="col-lg-8">Name</th>
                                         <!-- <th>Email</th> -->
-                                        <th>Actions</th>
+                                        <th class="col-lg-4">Actions</th>
                                     </tr>
                                     </thead>
 
@@ -81,7 +81,7 @@
                                             
                                             <td>{{ $value->name }}</td>
                                             <!-- <td class="transform-none"></td> -->
-                                            <td class="action-icn" width="25%">
+                                            <td class="action-icn">
                                                 <a href="{{ url('super-admin/filemanager-category/edit/'.$value->id) }}" class="edit"><span style = "color: #000;"><i data-toggle="tooltip" title="Edit" class="fa fa-edit fa-lg"></i></span</a>
                                                 <a href="{{ url('super-admin/filemanager-category/delete/'.$value->id) }}" class="delete"><i data-toggle="tooltip" title="Delete" class="fa fa-trash-o fa-lg"></i></a>
                                             </td>

@@ -55,8 +55,8 @@
                                 <table class="table table-striped table-hover table-bordered" id="editable-sample">
                                     <thead>
                                     <tr>
-                                        <th>Name</th>
-                                        <th>Actions</th>
+                                        <th class="col-lg-8">Name</th>
+                                        <th class="col-lg-4">Actions</th>
                                     </tr>
                                     </thead>
 
@@ -81,7 +81,7 @@
                                         <tr class="">
                                             
                                             <td>{{ ucfirst($value->name) }}</td>
-                                            <td class="action-icn" width="25%">
+                                            <td class="action-icn">
                                                 <a href="{{ url('/super-admin/ethnicity/edit/'.$value->id) }}" class="edit"><span style= "color: #000"><i data-toggle="tooltip" title="Edit" class="fa fa-edit fa-lg"></i></span></a>
                                                 <a href="{{ url('super-admin/ethnicity/delete/'.$value->id) }}" class="delete"><i data-toggle="tooltip" title="Delete" class="fa fa-trash-o fa-lg"></i></a>
                                             </td>

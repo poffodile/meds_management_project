@@ -118,7 +118,7 @@ input.form-control {
                                         </div>
                                     </div>    
                                     <div class="form-group">
-                                        <label class="col-lg-3 control-label">Product Name<span class="radStar ">*</span></label>
+                                        <label class="col-lg-3 control-label">Product Name<span class="radStar "> *</span></label>
                                         <div class="col-lg-9">
                                             <input type="text" name="product_name" id="name" class="form-control" placeholder="Name" value="<?php if(isset($product)){echo $product->product_name;}else{}?>" maxlength="255">
                                             
@@ -163,7 +163,7 @@ input.form-control {
                                     </div>
 
                                     <div class="form-group">
-                                        <label class="col-lg-3 control-label">Price<span class="radStar">*</span></label>
+                                        <label class="col-lg-3 control-label">Price<span class="radStar"> *</span></label>
                                         <div class="col-lg-9 d-flex align-items-center">
                                             <span class="currency">$</span>
                                             <input type="text" name="price" id="price" class="form-control" value="<?php if(isset($product)){echo $product->price;}else{}?>">
@@ -354,7 +354,7 @@ input.form-control {
                                         @csrf
                                         
                                         <div class="row form-group">
-                                            <label class="col-lg-3 control-label">Product Category<span class="radStar ">*</span></label>
+                                            <label class="col-lg-3 control-label">Product Category<span class="radStar "> *</span></label>
                                             <div class="col-lg-9">
                                                 <input type="text" name="product_category_name" id="product_category_name" class="form-control">
                                             </div>
@@ -411,13 +411,13 @@ input.form-control {
                                         @csrf
                                         
                                         <div class="row form-group">
-                                            <label class="col-lg-3 control-label">Tax Rate Name<span class="radStar ">*</span></label>
+                                            <label class="col-lg-3 control-label">Tax Rate Name<span class="radStar "> *</span></label>
                                             <div class="col-lg-9">
                                                 <input type="text" name="tax_rate_name" id="tax_rate_name" class="form-control">
                                             </div>
                                         </div>
                                         <div class="row form-group">
-                                            <label class="col-lg-3 control-label">Tax Rate<span class="radStar ">*</span></label>
+                                            <label class="col-lg-3 control-label">Tax Rate<span class="radStar "> *</span></label>
                                             <div class="col-lg-9">
                                                 <input type="text" name="tax_rateModal" id="tax_rateModal" class="form-control">
                                             </div>

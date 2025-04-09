@@ -25,6 +25,7 @@ class addReminder extends Component
     public $reminderTitle;
     public $reminderNotes;
     public $saveButtonId;
+    public $reminderSaveUrl;
     public function __construct(
     string $reminderModalId = 'defaultModalId',
     string $reminderformId = 'defaultFormId',
@@ -39,7 +40,8 @@ class addReminder extends Component
     string $reminderSms = 'defaulSms',
     string $reminderTitle = 'defaulTitle',
     string $reminderNotes = 'defaulNotes',
-    string $saveButtonId = 'defaultSaveButtonId',)
+    string $saveButtonId = 'defaultSaveButtonId',
+    string $reminderSaveUrl = 'defaultReminderSaveUrl',)
     {
         $this->reminderModalId = $reminderModalId;
         $this->reminderformId = $reminderformId;
@@ -55,6 +57,7 @@ class addReminder extends Component
         $this->reminderTitle = $reminderTitle;
         $this->reminderNotes = $reminderNotes;
         $this->saveButtonId = $saveButtonId;
+        $this->reminderSaveUrl = $reminderSaveUrl;
     }
 
     /**

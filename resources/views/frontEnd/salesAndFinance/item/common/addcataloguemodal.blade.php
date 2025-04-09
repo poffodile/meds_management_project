@@ -72,7 +72,7 @@
                         <div class="row cataloguefrm m-1">                            
                             <div class="formDtail mt-2">
                                 <div class="mb-2 row">
-                                    <label for="inputName" class="col-sm-2 col-form-label">Catalogue Name<span class="radStar">*</span></label>
+                                    <label for="inputName" class="col-sm-2 col-form-label">Catalogue Name <span class="radStar">*</span></label>
                                     <div class="col-sm-10">                                        
                                         <input type="text" class="form-control editInput" name="product_name" id="productname" value="" required>
                                     </div>

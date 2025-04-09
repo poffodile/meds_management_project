@@ -99,7 +99,7 @@
                                     <div class="title">Customer Details</div>
 
                                     <div class="mb-2 row field">
-                                        <label for="inputProject" class="col-sm-3 col-form-label">Customer<span
+                                        <label for="inputProject" class="col-sm-3 col-form-label">Customer <span
                                                 class="radStar">*</span></label>
                                         <div class="col-sm-7">
                                             <select class="form-control editInput selectOptions" id="customer_id" name="customer_id" required onchange="get_customer_details()">
@@ -151,7 +151,7 @@
                                     </div>
 
                                     <div class="mb-2 row field">
-                                        <label for="inputName" class="col-sm-3 col-form-label">Name<span
+                                        <label for="inputName" class="col-sm-3 col-form-label">Name <span
                                                 class="radStar">*</span></label>
                                         <div class="col-sm-9">
                                             <input type="text" class="form-control editInput" required name="name" id="name">

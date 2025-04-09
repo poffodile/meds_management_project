@@ -34,7 +34,7 @@
                                             <h4 class="contTitle">Customer Details</h4>
                                                 <div class="mb-2 row">
                                                     <label for="inputName" class="col-sm-3 col-form-label">Customer
-                                                        Name<span
+                                                        Name <span
                                                         class="radStar">*</span></label>
                                                     <div class="col-sm-9">
                                                         <input type="text" class="form-control editInput" id="name" name="name"
@@ -59,7 +59,7 @@
                                                 </div>
                                                 <div class="mb-2 row">
                                                     <label for="inputName" class="col-sm-3 col-form-label">Conatact
-                                                        Name<span
+                                                        Name <span
                                                         class="radStar">*</span></label>
                                                     <div class="col-sm-9">
                                                         <input type="text" class="form-control editInput" id="contact_name"
@@ -189,7 +189,7 @@
                                                 </div>
                                                 <div class="mb-3 row">
                                                     <label for="inputAddress"
-                                                        class="col-sm-3 col-form-label">Address<span
+                                                        class="col-sm-3 col-form-label">Address <span
                                                         class="radStar">*</span></label>
                                                     <div class="col-sm-9">
                                                         <textarea class="form-control textareaInput" name="address"
@@ -749,7 +749,7 @@
                                     </div>
                                 </div>
                                 <div class="mb-3 row">
-                                    <label for="inputName" class="col-sm-3 col-form-label">Contact Name<span class="radStar">*</span></label>
+                                    <label for="inputName" class="col-sm-3 col-form-label">Contact Name <span class="radStar">*</span></label>
                                     <div class="col-sm-9">
                                         <input type="text" class="form-control editInput" name="concontact_name" id="concontact_name">
                                     </div>
@@ -798,7 +798,7 @@
                                     </div>
                                 </div>
                                 <div class="mb-3 row">
-                                    <label for="inputName" class="col-sm-3 col-form-label">Address<span class="radStar">*</span></label>
+                                    <label for="inputName" class="col-sm-3 col-form-label">Address <span class="radStar">*</span></label>
                                     <div class="col-sm-9">
                                         <textarea class="form-control textareaInput" name="contact_address" id="contact_address" rows="3" placeholder="Site Notes"></textarea>
                                     </div>
@@ -871,13 +871,13 @@
                                             </div>
                                         </div>
                                         <div class="mb-3 row">
-                                            <label for="inputName" class="col-sm-3 col-form-label">Site Name<span class="radStar">*</span></label>
+                                            <label for="inputName" class="col-sm-3 col-form-label">Site Name <span class="radStar">*</span></label>
                                             <div class="col-sm-9">
                                                 <input type="text" class="form-control editInput" name="site_name" id="site_name">
                                             </div>
                                         </div>
                                         <div class="mb-3 row">
-                                            <label for="inputName" class="col-sm-3 col-form-label">Contact Name<span class="radStar">*</span></label>
+                                            <label for="inputName" class="col-sm-3 col-form-label">Contact Name <span class="radStar">*</span></label>
                                             <div class="col-sm-9">
                                                 <input type="text" class="form-control editInput" name="site_contact_name" id="site_contact_name">
                                             </div>
@@ -939,7 +939,7 @@
                                         </div>
                                 
                                         <div class="mb-3 row">
-                                            <label for="inputName" class="col-sm-3 col-form-label">Address<span class="radStar">*</span></label>
+                                            <label for="inputName" class="col-sm-3 col-form-label">Address <span class="radStar">*</span></label>
                                             <div class="col-sm-9">
                                                 <textarea class="form-control textareaInput" name="site_address" id="site_address" rows="3" placeholder="Site Notes"></textarea>
                                             </div>
@@ -1021,20 +1021,20 @@
                             <form role="form" id="login_form">
                                 <input type="hidden" id="login_id" name="login_id">
                             <div class="mb-3 row">
-                                    <label for="inputName" class="col-sm-3 col-form-label">Email<span class="radStar">*</span></label>
+                                    <label for="inputName" class="col-sm-3 col-form-label">Email <span class="radStar">*</span></label>
                                     <div class="col-sm-9">
                                         <input type="text" class="form-control editInput" name="login_email" id="login_email">
                                     </div>
                                 </div>
                                 <div class="mb-3 row">
-                                    <label for="inputName" class="col-sm-3 col-form-label">Password Type<span class="radStar">*</span></label>
+                                    <label for="inputName" class="col-sm-3 col-form-label">Password Type <span class="radStar">*</span></label>
                                     <div class="col-sm-9">
                                         <input type="radio" class="form-check-input" name="password_type" id="password_type1"> Generate Now
                                         <input type="radio" class="form-check-input" name="password_type" id="password_type2" checked> Email Password
                                     </div>
                                 </div>
                                 <div class="mb-3 row">
-                                    <label for="inputName" class="col-sm-3 col-form-label">Name<span class="radStar">*</span></label>
+                                    <label for="inputName" class="col-sm-3 col-form-label">Name <span class="radStar">*</span></label>
                                     <div class="col-sm-9">
                                         <input type="text" class="form-control editInput" name="login_name" id="login_name">
                                     </div>

@@ -19,7 +19,11 @@ class Supplier extends Model
         );
     }
     public static function allGetSupplier($home_id,$user_id){
-        return self::where(['home_id'=>$home_id,'user_id'=>$user_id,'deleted_at'=>null]);
+        return self::where(['home_id'=>$home_id, 'user_id'=>$user_id,'deleted_at'=>null]);
+    }
+
+    public static function getActiveSuppliers( $home_id, $user_id){
+        return self::where('home_id', $home_id)->where('user_id', $user_id)->where('status', 1)->where('deleted_at', null)->get();
     }
 
     public function contacts(){
@@ -28,4 +32,6 @@ class Supplier extends Model
     public function purchaseOrders(){
         return $this->hasMany(PurchaseOrder::class, 'supplier_id');
     }
+    
+    
 }

@@ -498,7 +498,7 @@
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <label class="col-lg-3 control-label">Short Description <span style="color:red">*</span>(max 250 characters)</label>
+                                                <label class="col-lg-3 control-label">Short Description <span class="radStar"> *</span>(max 250 characters)</label>
                                                 <div class="col-lg-9">
                                                     <textarea name="description" class="form-control" placeholder="description" rows="3" cols="6" onkeyup="get_char()" id="short_dec"><?php if (isset($job_details)) {
                                                                                                                                                                                             echo $job_details->description;

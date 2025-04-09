@@ -11,7 +11,8 @@ use App\Models\Supplier;
 use App\Models\Job_title;
 use App\Models\SupplierAttachment;
 use App\Models\Constructor_additional_contact;
-use App\Customer;
+// use App\Customer;
+use App\Models\Customer;
 
 class SupplierController extends Controller
 {
@@ -26,6 +27,7 @@ class SupplierController extends Controller
         $data['country']=Country::all_country_list();
         $data['job_title']=Job_title::where(['home_id'=>$home_id,'status'=>1])->get();
         $data['supplier_email']=Supplier::allGetSupplier($home_id,Auth::user()->id)->whereNotNull('email')->take(10)->get();
+        $data['page']="customers";
         // echo "<pre>";print_r($data['job_title']);die;
         return view('frontEnd.salesAndFinance.supplier.add_supplier',$data);
     }
@@ -64,6 +66,7 @@ class SupplierController extends Controller
         $data['CountInactiveSupplier']=Supplier::allGetSupplier($home_id,$user_id)->where('status',0)->count();
         // echo "<pre>";print_r($data['supplier_list']);die;
         $data['table_status']=$table_status;
+        $data['page']="customers";
         return view('frontEnd.salesAndFinance.supplier.supplier',$data);
     }
     public function supplier_attachment_save(Request $request){

@@ -53,6 +53,8 @@ class ActionController extends Controller
                 $modelName = "App\\" . $request->model;
             } else if ($request->model == "Lead"){
                 $modelName = "App\\" . $request->model;
+            }else if($request->model == "Invoice"){
+                $modelName = "App\Models\Invoice\\" . $request->model;
             } else {
                 $modelName = "App\Models\\" . $request->model;
             }

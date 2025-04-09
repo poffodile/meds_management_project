@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Requests\NewTaskRequest;
-use Auth,Log;
+use Auth,Log,DB;
 use App\Models\Customer;
 use App\Models\Department;
 use App\Models\Project;
@@ -42,8 +42,12 @@ use App\Models\PurchaseOrderInvoiceReceives;
 use App\Models\PurchaseOrderReject;
 use App\Models\PurchaseReminder;
 use App\Models\PurchaseOrderEmail;
+use App\Models\CreditNoteAllocate;
+use App\Models\CreditNote;
+use App\Models\CreditNoteProduct;
 use App\User;
 use PDF;
+use Carbon\Carbon;
 
 class Purchase_orderController extends Controller
 {
@@ -51,6 +55,7 @@ class Purchase_orderController extends Controller
         $home_id = Auth::user()->home_id;
         $data['department']=Department::getAllDepartment($home_id);
         $data['home_id']=$home_id;
+        $data['page']='setting';
         return view('frontEnd.salesAndFinance.jobs.department',$data);
     }
 
@@ -91,10 +96,12 @@ class Purchase_orderController extends Controller
         $contact_name=array();
         $attachments=array();
         $reminder_data=array();
+        $additional_contact=array();
         if($key){
             $site=Constructor_customer_site::where('customer_id',$purchase_orders->customer_id)->get();
             $contact_name=Customer::find($purchase_orders->customer_id);
             $reminder_data=$this->reminder_check($key);
+            $additional_contact = Constructor_additional_contact::where(['home_id'=> $home_id,'userType'=>2,'customer_id'=>$key,'deleted_at'=>null])->get();
         }
         // echo "<pre>";print_r($reminder_data);die;
         $data['purchase_orders']=$purchase_orders;
@@ -102,7 +109,7 @@ class Purchase_orderController extends Controller
         $data['site']=$site;
         $data['projects']=Project::where(['status'=>1,'home_id'=>$home_id])->get();
         $data['customers']=Customer::get_customer_list_Attribute($home_id,'ACTIVE');
-        $data['additional_contact'] = Constructor_additional_contact::where(['home_id'=> $home_id,'userType'=>2,'customer_id'=>$key,'deleted_at'=>null])->get();
+        $data['additional_contact'] = $additional_contact;
         $data['country']=Country::all_country_list();
         $data['tag'] = Tag::getAllTag($home_id);
         $data['currency']=Currency::where(['status'=>1,'deleted_at'=>null])->get();
@@ -114,11 +121,14 @@ class Purchase_orderController extends Controller
         $data['contact_name']=$contact_name;
         $data['product_categories'] = Product_category::with('parent', 'children')->where('home_id',Auth::user()->home_id)->where('status',1)->where('deleted_at',NULL)->get();
         $data['reminder_data']=$reminder_data;
+        $data['paymentTypeList']=Payment_type::getActivePaymentType($home_id);
+        $data['page']='finance';
         // echo "<pre>";print_r($data['country']);die;
         return view('frontEnd.salesAndFinance.purchase_order.new_purchase_order',$data);
     }
     public function purchase_order_save(Request $request){
         // echo "<pre>";print_r($request->all());die;
+        //   
         $home_id=Auth::user()->home_id;
         $user_id=Auth::user()->id;
         
@@ -162,6 +172,9 @@ class Purchase_orderController extends Controller
             }
             $requestData['home_id'] = $home_id;
             $requestData['user_id'] = $user_id;
+            $requestData['delivery_status'] = 0;
+            $requestData['purchase_date'] = Carbon::createFromFormat('d/m/Y', $request->purchase_date)->format('Y-m-d');
+            $requestData['payment_due_date'] = Carbon::createFromFormat('d/m/Y', $request->payment_due_date)->format('Y-m-d');
             
             // echo "<pre>";print_r($requestData);die;
             $purchaseOrder=PurchaseOrder::savePurchaseOrder($requestData);
@@ -195,7 +208,7 @@ class Purchase_orderController extends Controller
     public function getPurchaesOrderProductDetail(Request $request){
         // echo "<pre>";print_r($request->all());die;
         $home_id=Auth::user()->home_id;
-        $purchase_order_products = PurchaseOrder::with(['purchaseOrderProducts'])
+        $purchase_order_products = PurchaseOrder::with(['purchaseOrderProducts','suppliers'])
         ->where(['id' => $request->id, 'deleted_at' => null])
         ->first();
         // return $purchase_order_products;
@@ -206,6 +219,7 @@ class Purchase_orderController extends Controller
         $tax = Product::tax_detail($home_id);
         $all_job = Job::getAllJob($home_id)->where('status', 1)->get();
         $accountCode = Construction_account_code::getActiveAccountCode($home_id);
+        $payment_type=Payment_type::getActivePaymentType($home_id);
         
         if ($purchase_order_products->purchaseOrderProducts->isEmpty()) {
             return response()->json(['success' => false, 'message' => 'No products found for this purchase order.']);
@@ -224,12 +238,14 @@ class Purchase_orderController extends Controller
                 'all_job' => $all_job,
                 'accountCode' => $accountCode,
                 'purchase_order_products_detail' => $purchase_order_products_detail,
+                'payment_type'=>$payment_type,
             ];
         }
-        
+        $paid_all_amount=$this->getAllPaymentPaid($request->id);
         return response()->json([
             'success' => true,
             'data' => $data_array,
+            'paid_amount'=>$paid_all_amount,
             'pagination' => [
                 'total' => $purchase_order_products_paginated->total(),
                 'current_page' => $purchase_order_products_paginated->currentPage(),
@@ -239,6 +255,18 @@ class Purchase_orderController extends Controller
                 'prev_page_url' => $purchase_order_products_paginated->previousPageUrl(),
             ]
         ]);
+    }
+    private function getAllPaymentPaid($po_id){
+        $purchase_order = DB::table('purchase_order_record_payments')->where(['po_id'=>$po_id,'deleted_at'=>null])->sum('record_amount_paid');
+        
+        // return $purchase_order;
+        $credit_allocate = DB::table('credit_note_allocates')->where(['po_id'=>$po_id,'deleted_at'=>null])->sum('amount_paid');
+        
+        // $mergedData = $purchase_order->merge($credit_allocate);
+        // $sortedData = $mergedData->sortBy('date');
+
+        // $sortedArray = $sortedData->values()->all();
+        return $purchase_order+$credit_allocate;
     }
     public function vat_tax_details(Request $request){
         // echo "<pre>";print_r($request->all());
@@ -251,8 +279,11 @@ class Purchase_orderController extends Controller
         try {
             $product_ids = $data['product_id'];
             $success = 0;
-
+            $outstandignAmount=0;
             for ($i = 0; $i < count($product_ids); $i++) {
+                $sub_total=$data['qty'][$i]*$data['price'][$i];
+                $vatPercentage=$sub_total*$data['vat_ratePercentage'][$i]/100;
+                $outstandignAmount=$outstandignAmount+$sub_total+$vatPercentage;
                 $productData = [
                     'id'=>$data['purchase_product_id'][$i] ?? null,
                     'user_id'=>Auth::user()->id,
@@ -265,8 +296,8 @@ class Purchase_orderController extends Controller
                     'price' => $data['price'][$i] ?? 0,
                     'vat_id' => $data['vat_id'][$i] ?? null,
                     'vat' => $data['vat_ratePercentage'][$i] ?? 0,
-                    'outstanding_amount'=>0
                 ];
+                PurchaseOrder::find($data['purchase_order_id'])->update(['outstanding_amount' => $outstandignAmount]);
                 // echo "<pre>";print_r($productData);die;
                 $PurchaseOrderProduct = PurchaseOrderProduct::savePurchaseOrderProduct($productData);
                 if ($PurchaseOrderProduct) {
@@ -477,22 +508,23 @@ class Purchase_orderController extends Controller
         $data['customer_data'] = Customer::get_customer_list_Attribute($home_id, 'ACTIVE');
         $data['users'] = User::where('home_id', $home_id)->select('id', 'name','email','phone_no')->where('is_deleted', 0)->get();
         $data['paymentTypeList']=Payment_type::getActivePaymentType($home_id);
-        // echo "<pre>";print_r($data['list']);die;
+        $data['page']='finance';
+        // echo "<pre>";print_r($data['status']);die;
         return view('frontEnd.salesAndFinance.purchase_order.purchase_order_list',$data);
     }
     private function check_segment_purchaseOrder($lastSegment=null){
         if($lastSegment === 'AwaitingApprivalPurchaseOrders'){
-            return ['status'=>2,'list_status'=>'Awaiting Approval Purchase Oreders'];
+            return ['status'=>2,'list_status'=>'Awaiting Approval','page_heading'=>'Awaiting Authorisation Purchase Orders'];
         }else if($lastSegment === 'Approved'){
-            return ['status'=>3,'list_status'=>'Approved'];
+            return ['status'=>3,'list_status'=>'Approved','page_heading'=>'Authorised Purchase Orders'];
         }else if($lastSegment === 'Rejected'){
-            return ['status'=>8,'list_status'=>'Rejected'];
+            return ['status'=>8,'list_status'=>'Rejected','page_heading'=>'Rejected Purchase Orders'];
         }else if($lastSegment === 'Actioned'){
-            return ['status'=>4,'list_status'=>'Actioned'];
+            return ['status'=>4,'list_status'=>'Actioned','page_heading'=>'Actioned Purchase Orders'];
         }else if($lastSegment === 'Paid'){
-            return ['status'=>5,'list_status'=>'Paid'];
+            return ['status'=>5,'list_status'=>'Paid','page_heading'=>'Paid Purchase Orders'];
         }else{
-            return ['status'=>1,'list_status'=>'Draft'];
+            return ['status'=>1,'list_status'=>'Draft','page_heading'=>'Draft Purchase Orders'];
         }
     }
     public function searchPurchaseOrders(Request $request){
@@ -522,7 +554,19 @@ class Purchase_orderController extends Controller
         $selectedcreatedById=$request->selectedcreatedById;
         $selectedProjectId=$request->selectedProjectId;
         $home_id=Auth::user()->home_id;
-        $query = PurchaseOrder::with('suppliers','purchaseOrderProducts')->where(['deleted_at'=>null,'status'=>$status]);
+        $purchaseSearchstatus=$request->purchaseSearchstatus;
+        $fields = $request->except('_token');
+        $hasValue = collect($fields)->some(fn($value) => !empty($value));
+        if(!$hasValue){
+            return response()->json(['success'=>false,'message'=>'Please fill in at least one field before searching.','data'=>array()]);
+        }
+        if($status == '' && $purchaseSearchstatus==''){
+            $query = PurchaseOrder::with('suppliers','purchaseOrderProducts')->where(['deleted_at'=>null]);
+        }else if(!empty($request->purchaseSearchstatus)){
+            $query = PurchaseOrder::with('suppliers','purchaseOrderProducts')->whereIn('status',$request->purchaseSearchstatus)->whereNull('deleted_at');
+        }else{
+            $query = PurchaseOrder::with('suppliers','purchaseOrderProducts')->where(['deleted_at'=>null,'status'=>$status]);
+        }
         // echo "<pre>";print_r($query->get());die;
         if ($request->filled('po_ref')) {
             $query->where('purchase_order_ref', $po_ref);
@@ -553,6 +597,9 @@ class Purchase_orderController extends Controller
         if ($request->filled('project')) {
             $query->where('project_id', $selectedProjectId);
         }
+        if ($request->filled('delivery_status')) {
+            $query->where('delivery_status', $delivery_status);
+        }
         if ($request->filled('keywords')) {
             $query->where(function ($q) use ($keywords) {
                 $q->where('purchase_order_ref', 'LIKE', '%' . $keywords . '%')
@@ -579,7 +626,6 @@ class Purchase_orderController extends Controller
             $total_amount=0;
             $vat_amount=0;
             $purchaseProductId=0;
-            $outstandingAmount=0;
             foreach($val->purchaseOrderProducts as $product){
                 $purchaseProductId=$product->id;
                 $qty=$product->qty*$product->price;
@@ -587,15 +633,46 @@ class Purchase_orderController extends Controller
                 $vat=$qty*$product->vat/100;
                 $vat_amount=$vat_amount+$vat;
                 $total_amount=$total_amount+$vat+$qty;
-                $outstandingAmount=$total_amount-$product->outstanding_amount;
             }
             $all_subTotalAmount=$all_subTotalAmount+$sub_total_amount;
             $all_vatTotalAmount=$all_vatTotalAmount+$vat_amount;
             $all_TotalAmount=$all_TotalAmount+$total_amount;
-            $outstandingAmountTotal=$outstandingAmountTotal+$outstandingAmount;
-            
+            $outstandingAmountTotal=$outstandingAmountTotal+$val->outstanding_amount;
+
+            if($list_status == ''){
+                $status = $val->status;
+                switch ($status) {
+                case 1:
+                    $list_status= "Draft";
+                    break;
+                case 2:
+                    $list_status= "Awaiting Approval";
+                    break;
+                case 3:
+                    $list_status= "Approved";
+                    break;
+                case 4:
+                    $list_status= "Actioned";
+                    break;
+                case 5:
+                    $list_status= "Paid";
+                    break;
+                case 6:
+                    $list_status= "Cancelled";
+                    break;
+                case 7:
+                    $list_status= "Invoice Received";
+                    break;
+                case 8:
+                    $list_status= "Rejected";
+                    break;
+
+                default:
+                $list_status= "";
+                }
+            }
             $array_data .= '<tr>
-                        <td><input type="checkbox" class="delete_checkbox" value="' . $val->id . '"></td>
+                        <td><div class="text-center"><input type="checkbox" class="delete_checkbox" value="' . $val->id . '"></div></td>
                         <td>' . ++$key . '</td>
                         <td>' . $val->purchase_order_ref . '</td>
                         <td>' . date('d/m/Y',strtotime($val->purchase_date)) . '</td>
@@ -606,71 +683,72 @@ class Purchase_orderController extends Controller
                         <td>£' . $sub_total_amount . '</td>
                         <td>£' . $vat_amount . '</td>
                         <td>£' . $total_amount . '</td>
-                        <td>£' . $outstandingAmount . '</td>
-                        <td>' . $list_status . '</td>';
-                        if($status == 1){
-                            $array_data.='<td>-</td>
-                            <td>
-                                <div class="d-flex justify-content-end">
-                                    <div class="nav-item dropdown">
-                                        <a href="#!" class="nav-link dropdown-toggle profileDrop" data-bs-toggle="dropdown" aria-expanded="false">
-                                            Action
-                                        </a>
-                                        <div class="dropdown-menu fade-up m-0">
-                                            <a href="'.url('purchase_order_edit?key=').''.base64_encode($val->id).'" class="dropdown-item">Edit</a>
-                                            <hr class="dropdown-divider">
-                                            <a href="'.url('preview?key=').''.base64_encode($val->id).'" target="_blank" class="dropdown-item">Preview</a>
-                                            <hr class="dropdown-divider">
-                                            <a href="'.url('purchase_order?duplicate=').''.base64_encode($val->id).'" target="_blank" class="dropdown-item">Duplicate</a>
-                                            <hr class="dropdown-divider">
-                                            <a href="javascript:void(0)" onclick="openApproveModal('.$val->id.','.$val->purchase_order_ref.')" class="dropdown-item">Approve</a>
-                                            <hr class="dropdown-divider">
-                                            <a href="#!" class="dropdown-item">CRM / History</a>
-                                            <hr class="dropdown-divider">
-                                            <a href="#!" class="dropdown-item">Start Timer</a>
+                        <td>£' . $val->outstanding_amount . '</td>
+                        <td>' . $list_status . '</td>
+                        <td>';
+                            if($status == 1){
+                                $array_data .= '-';
+                            }else{
+                                if($val->delivery_status == 1){
+                                    $array_data.='<span class="grencheck"><i class="fa-solid fa-check"></i></span>';
+                                }else if($val->delivery_status == 2){
+                                    $array_data.='<a href="javascript:void(0)" class="tutor-student-tooltip-col" style="color:red"><span class="" style="color:#FFCC66"><i class="fa-solid fa-check"></i></span><span class="tutor-student-tooltiptext3">Part Delivered</span></a>';
+                                }else{
+                                    $array_data.='<a href="javascript:void(0)" class="tutor-student-tooltip-col" style="color:red">X<span class="tutor-student-tooltiptext3">Not Delivered</span></a>';
+                                }
+                            }
+                        $array_data .= '</td><td>
+                                    <div class="d-flex justify-content-end">
+                                        <div class="nav-item dropdown">
+                                            <a href="#!" class="nav-link dropdown-toggle profileDrop" data-bs-toggle="dropdown" aria-expanded="false">
+                                                Action
+                                            </a>
+                                            <div class="dropdown-menu fade-up m-0" style="z-index:9999">';
+                                                if( $status != 1 && $status != 2){
+                                                    $array_data .= '<a href="javascript:void(0)" onclick="openRecordDeliveryModal(' . $val->id . ',\'' . $val->purchase_order_ref . '\')" class="dropdown-item">Record Delivery</a>
+                                                    <hr class="dropdown-divider">';
+                                                }
+                                                $array_data .= '<a href="' . url('purchase_order_edit?key=') . base64_encode($val->id) . '" class="dropdown-item">Edit</a>
+                                                <hr class="dropdown-divider">
+                                                <a href="'.url('preview?key=').''.base64_encode($val->id).'" target="_blank" class="dropdown-item">Preview</a>
+                                                <hr class="dropdown-divider">';
+                                                if( $status != 1 && $status != 2){
+                                                    $array_data .= '<a href="'.url('preview?key=').''.base64_encode($val->id).'" target="_blank" class="dropdown-item">Print</a>
+                                                    <hr class="dropdown-divider">
+                                                    <a href="javascript:void(0)" onclick="openEmailModal('.$val->id.',\'' . $val->purchase_order_ref . '\',\'' . $val->suppliers->email . '\',\'' . $val->suppliers->name . '\')" class="dropdown-item">Email</a>
+                                                    <hr class="dropdown-divider">';
+                                                }
+                                                $array_data .= '<a href="' . url('purchase_order?duplicate=') . base64_encode($val->id) . '" target="_blank" class="dropdown-item">Duplicate</a>
+                                                <hr class="dropdown-divider">';
+                                                if($status != 8 && $status != 1 ){
+                                                    $array_data .= '<a href="javascript:void(0)" onclick="openRejectModal(' . $val->id . ',\'' . $val->purchase_order_ref . '\')" class="dropdown-item">Reject</a>
+                                                    <hr class="dropdown-divider">';
+                                                }
+                                                if($status == 1 || $status == 2){
+                                                    $array_data .= '<a href="javascript:void(0)" onclick="openApproveModal('.$val->id.',\'' . $val->purchase_order_ref . '\')" class="dropdown-item">Approve</a>
+                                                    <hr class="dropdown-divider">';
+                                                }
+                                                if($status != 5 && $status != 1 && $status != 2){
+                                                    $array_data .= '<a href="javascript:void(0)" onclick="openRecordPaymentModal(' . $val->id . ',\'' . $val->purchase_order_ref . '\',\'' . $val->suppliers->name . '\',' . $total_amount . ',\'' . date('d/m/Y', strtotime($val->purchase_date)) . '\',' . $purchaseProductId . ',' . $val->outstanding_amount . ')" class="dropdown-item">Record Payment</a>
+                                                    <hr class="dropdown-divider">
+                                                    <a href="javascript:void(0)" onclick="openInvoiceRecieveModal(' . $val->id . ',\'' . $val->purchase_order_ref . '\',\'' . $val->suppliers->name . '\',' . $val->suppliers->id . ',' . $sub_total_amount . ',\'' . date('d/m/Y', strtotime($val->purchase_date)) . '\',' . $vat . ',' . $val->outstanding_amount . ')" class="dropdown-item">Invoice Received</a>
+                                                    <hr class="dropdown-divider">';
+                                                }
+                                                if($status == 8 || $status == 4 || $status == 5 || $status == 3){
+                                                    if($val->delivery_status !=1){
+                                                        $array_data .= '<a href="#!" class="dropdown-item">Cancel Purchase Order</a>
+                                                        <hr class="dropdown-divider">';
+                                                    }
+                                                }
+                                                $array_data .= '<a href="#!" class="dropdown-item">CRM / History</a>
+                                                <hr class="dropdown-divider">
+                                                <a href="#!" class="dropdown-item">Start Timer</a>
+                                                
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </td>';
-                        }else{
-                            $array_data.='<td>';
-                            if($val->delivery_status == 1){
-                                $array_data.='<span class="grencheck"><i class="fa-solid fa-check"></i></span>';
-                            }else{
-                                $array_data.='<a href="javascript:void(0)" class="tutor-student-tooltip-col" style="color:red">X<span class="tutor-student-tooltiptext3">Not Delivered</span></a>';
-                            }
-                            $array_data .= '</td>
-                                        <td>
-                                            <div class="d-flex justify-content-end">
-                                                <div class="nav-item dropdown">
-                                                    <a href="#!" class="nav-link dropdown-toggle profileDrop" data-bs-toggle="dropdown" aria-expanded="false">
-                                                        Action
-                                                    </a>
-                                                    <div class="dropdown-menu fade-up m-0">
-                                                        <a href="javascript:void(0)" onclick="openRecordDeliveryModal(' . $val->id . ',\'' . $val->purchase_order_ref . '\')" class="dropdown-item">Record Delivery</a>
-                                                        <hr class="dropdown-divider">
-                                                        <a href="' . url('purchase_order_edit?key=') . base64_encode($val->id) . '" class="dropdown-item">Edit</a>
-                                                        <hr class="dropdown-divider">
-                                                        <a href="'.url('preview?key=').''.base64_encode($val->id).'" target="_blank" class="dropdown-item">Preview</a>
-                                                        <hr class="dropdown-divider">
-                                                        <a href="'.url('preview?key=').''.base64_encode($val->id).'" target="_blank" class="dropdown-item">Print</a>
-                                                        <hr class="dropdown-divider">
-                                                        <a href="#!" class="dropdown-item">Email</a>
-                                                        <hr class="dropdown-divider">
-                                                        <a href="' . url('purchase_order?duplicate=') . base64_encode($val->id) . '" target="_blank" class="dropdown-item">Duplicate</a>
-                                                        <hr class="dropdown-divider">
-                                                        <a href="javascript:void(0)" onclick="openRejectModal(' . $val->id . ',\'' . $val->purchase_order_ref . '\')" class="dropdown-item">Reject</a>
-                                                        <hr class="dropdown-divider">
-                                                        <a href="javascript:void(0)" onclick="openRecordPaymentModal(' . $val->id . ',\'' . $val->purchase_order_ref . '\',\'' . $val->suppliers->name . '\',' . $total_amount . ',\'' . date('d/m/Y', strtotime($val->purchase_date)) . '\',' . $purchaseProductId . ',' . $outstandingAmount . ')" class="dropdown-item">Record Payment</a>
-                                                        <hr class="dropdown-divider">
-                                                        <a href="javascript:void(0)" onclick="openInvoiceRecieveModal(' . $val->id . ',\'' . $val->purchase_order_ref . '\',\'' . $val->suppliers->name . '\',' . $val->suppliers->id . ',' . $sub_total_amount . ',\'' . date('d/m/Y', strtotime($val->purchase_date)) . '\',' . $vat . ',' . $outstandingAmount . ')" class="dropdown-item">Invoice Received</a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </td>';
-                        }
-                        
-                    $array_data.='</tr>';
+                    </tr>';
+                    $list_status='';
         }
 
         return response()->json(['data' => $array_data,'all_subTotalAmount'=>$all_subTotalAmount,'all_vatTotalAmount'=>$all_vatTotalAmount,'all_TotalAmount'=>$all_TotalAmount,'outstandingAmountTotal'=>$outstandingAmountTotal]);
@@ -821,14 +899,23 @@ class Purchase_orderController extends Controller
                 // echo "<pre>";print_r($data);die;
                 try{
                     PurchaseOrderProduct::savePurchaseOrderProduct($data);
-                    PurchaseOrder::find($po_id)->update(['delivery_status' => 1]);
-                    return response()->json(['success'=>true,'message'=>'The Purchase Order Delivered has been saved successfully.']);
+                    $checkAlreadyDelivered=$this->checkAlreadyDelivered($purchase_product_id[$i],$request->qty[$i],$po_id);
                 }catch (\Exception $e) {
                     Log::error('Error: ' . $e->getMessage());
                     return response()->json(['error' => $e->getMessage()], 500);
                 }
                 
             }
+            return response()->json(['success'=>true,'message'=>'The Purchase Order Delivered has been saved successfully.']);
+        }
+    }
+    private function checkAlreadyDelivered($id,$qty,$po_id){
+        // return $qty;
+        $check=PurchaseOrderProduct::find($id);
+        if($check->deliverd_qty == $qty){
+            PurchaseOrder::find($po_id)->update(['delivery_status' => 1]);
+        }else{
+            PurchaseOrder::find($po_id)->update(['delivery_status' => 2]);
         }
     }
     // public function record_payment_details(Request $request){
@@ -858,10 +945,17 @@ class Purchase_orderController extends Controller
         $data['home_id']=Auth::user()->home_id;
         $data['loginUserId']=Auth::user()->id;
         $data['loginUserName']=Auth::user()->name;
-        $recordPayment_ppurchaseProduct=$request->recordPayment_ppurchaseProduct;
         try{
             $orderRecord=PurchaseOrderRecordPayment::savePurchaseOrderRecordPayment($data);
-            $itt=PurchaseOrderProduct::find($recordPayment_ppurchaseProduct)->update(['outstanding_amount' => $request->record_amount_paid]);
+            $calculation_amount=$request->total_amount-$request->record_amount_paid;
+            $tablePurchaseOrder=PurchaseOrder::find($request->po_id);
+            $tablePurchaseOrder->outstanding_amount=$calculation_amount;
+            if($calculation_amount == 0){
+                $tablePurchaseOrder->status=5;
+            }
+            $tablePurchaseOrder->save();
+            // PurchaseOrder::find($request->po_id)->update(['outstanding_amount' => $request->outstanding_amount]);
+            // $itt=PurchaseOrderProduct::find($recordPayment_ppurchaseProduct)->update(['outstanding_amount' => $request->record_amount_paid]);
             return response()->json(['success'=>true,'message'=>'The Record Payment has been saved successfully.','data'=>$orderRecord]);
         }catch (\Exception $e) {
             Log::error('Error: ' . $e->getMessage());
@@ -895,6 +989,7 @@ class Purchase_orderController extends Controller
         }
         $requestData['loginUserId']=Auth::user()->id;
         $requestData['home_id']=Auth::user()->home_id;
+        $requestData['oustanding_amount']=$request->gross_amount;
         // echo "<pre>";print_r($requestData);die;
         try {
             $invoice=PurchaseOrderInvoiceReceives::purchaseOrderInvoiceReceives_save($requestData);
@@ -1017,13 +1112,23 @@ class Purchase_orderController extends Controller
             return response()->json(['vali_error' => $validator->errors()->first()]);
         }
         try{
+            $po_id=explode(',',$request->po_id);
+            // echo"<pre>"; print_r($po_id);die;
             $data=$request->all();
             $data['home_id']=Auth::user()->home_id;
             $data['loginUserId']=Auth::user()->home_id;
             $data['to'] = json_encode(explode(',', $request->selectedToEmail));
             $data['cc'] = $request->selectedToEmail1 ? json_encode(explode(',', $request->selectedToEmail1)) : json_encode([]);
+            if(count($po_id)>1){
+                for($i=0;$i<count($po_id);$i++){
+                    $data['po_id']=$po_id[$i];
+                    $email=PurchaseOrderEmail::saveEmail($data);
+                }
+            }else{
+                $email=PurchaseOrderEmail::saveEmail($data);
+            }
             // echo "<pre>";print_r($data);die;
-            $email=PurchaseOrderEmail::saveEmail($data);
+            
             return response()->json(['success'=>true,'message'=>'The Email has been saved successfully.','data'=>$email]);
         }catch (\Exception $e) {
             Log::error('Error: ' . $e->getMessage());
@@ -1057,4 +1162,447 @@ class Purchase_orderController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+    public function purchase_orders_search(Request $request){
+        $home_id=Auth::user()->home_id;
+        $data['list']=array();
+        $data['draftCount']=PurchaseOrder::where(['user_id'=>Auth::user()->id,'deleted_at'=>null,'status'=>1])->count();
+        $data['awaitingApprovalCount']=PurchaseOrder::where(['user_id'=>Auth::user()->id,'deleted_at'=>null,'status'=>2])->count();
+        $data['approvedCount']=PurchaseOrder::where(['user_id'=>Auth::user()->id,'deleted_at'=>null])->whereIn('status',[3,9])->count();
+        $data['rejectedCount']=PurchaseOrder::where(['user_id'=>Auth::user()->id,'deleted_at'=>null,'status'=>8])->count();
+        $data['actionedCount']=PurchaseOrder::where(['user_id'=>Auth::user()->id,'deleted_at'=>null,'status'=>4])->count();
+        $data['paidCount']=PurchaseOrder::where(['user_id'=>Auth::user()->id,'deleted_at'=>null,'status'=>5])->count();
+        $data['customer_data'] = Customer::get_customer_list_Attribute($home_id, 'ACTIVE');
+        $data['users'] = User::where('home_id', $home_id)->select('id', 'name','email','phone_no')->where('is_deleted', 0)->get();
+        $data['paymentTypeList']=Payment_type::getActivePaymentType($home_id);
+        // echo "<pre>";print_r($data['list']);die;
+        return view('frontEnd.salesAndFinance.purchase_order.search_purchaseOrder',$data);
+    }
+    public function purchase_order_statements(Request $request){
+        $home_id=Auth::user()->home_id;
+        $data['list']=array();
+        $data['draftCount']=PurchaseOrder::where(['user_id'=>Auth::user()->id,'deleted_at'=>null,'status'=>1])->count();
+        $data['awaitingApprovalCount']=PurchaseOrder::where(['user_id'=>Auth::user()->id,'deleted_at'=>null,'status'=>2])->count();
+        $data['approvedCount']=PurchaseOrder::where(['user_id'=>Auth::user()->id,'deleted_at'=>null])->whereIn('status',[3,9])->count();
+        $data['rejectedCount']=PurchaseOrder::where(['user_id'=>Auth::user()->id,'deleted_at'=>null,'status'=>8])->count();
+        $data['actionedCount']=PurchaseOrder::where(['user_id'=>Auth::user()->id,'deleted_at'=>null,'status'=>4])->count();
+        $data['paidCount']=PurchaseOrder::where(['user_id'=>Auth::user()->id,'deleted_at'=>null,'status'=>5])->count();
+        // echo "<pre>";print_r($data['list']);die;
+        return view('frontEnd.salesAndFinance.purchase_order.purchaseOrderStatement',$data);
+    }
+    public function searchPurchaseOrdersStatements(Request $request){
+        // echo "<pre>";print_r($request->all());die;
+        $po_startDate = date('Y-m-d', strtotime(str_replace('/', '-', $request->po_startDate)));
+        $po_endDate=date('Y-m-d', strtotime(str_replace('/', '-', $request->po_endDate)));
+        
+        $purchaseOrderquery=PurchaseOrder::with('suppliers','purchaseOrderProducts')->where('supplier_id',$request->selectedsupplierId)->whereNull('deleted_at');
+        if ($request->filled('po_startDate') && $request->filled('po_endDate')) {
+            $purchaseOrderquery->whereBetween('purchase_date', [$po_startDate, $po_endDate]);
+        }
+        $purchase_orders=$purchaseOrderquery->get();
+        // return $purchase_orders;
+        $allRecords = collect();
+        foreach($purchase_orders as $val){
+            $orderGross_amount=0;
+            foreach($val->purchaseOrderProducts as $orderProduct){
+                $order_calculateAmount=$orderProduct->qty*$orderProduct->price;
+                $order_calculatepercentage=$order_calculateAmount*$orderProduct->vat/100;
+                $orderGross_amount=$orderGross_amount+$order_calculatepercentage+$order_calculateAmount;
+                $allRecords->push([
+                    'date' => $val->purchase_date,
+                    'ref'=>$val->purchase_order_ref,
+                    'address'=>$val->address,
+                    'supplier_ref'=>'',
+                    'net_amount'=>$orderProduct->qty*$orderProduct->price,
+                    'vat'=>$order_calculatepercentage,
+                    'paid_amount'=>'',
+                    'total_amount'=>$orderGross_amount,
+                    'type'=>'purchase',
+                ]);
+            }
+            $allocateData=CreditNoteAllocate::where('po_id',$val->id)->whereNull('deleted_at')->get();
+            foreach($allocateData as $allocate){
+                $ref=CreditNote::find($allocate->credit_id);
+                $allRecords->push([
+                    'date' => $allocate->date,
+                    'ref'=>$ref->credit_ref,
+                    'address'=>$ref->address,
+                    'supplier_ref'=>'',
+                    'net_amount'=>'',
+                    'vat'=>'',
+                    'paid_amount'=>$allocate->amount_paid,
+                    'total_amount'=>'',
+                    'type'=>'allocate',
+                ]);
+            }
+            $recordPaymentData=PurchaseOrderRecordPayment::where('po_id',$val->id)->whereNull('deleted_at')->get();
+            foreach($recordPaymentData as $record){
+                $allRecords->push([
+                    'date' => $record->record_payment_date,
+                    'ref'=>$val->purchase_order_ref,
+                    'address'=>$val->address,
+                    'supplier_ref'=>'',
+                    'net_amount'=>'',
+                    'vat'=>'',
+                    'paid_amount'=>$record->record_amount_paid,
+                    'total_amount'=>'',
+                    'type'=>'record_payment',
+                ]);
+            }
+            
+        }
+        $sortedData = $allRecords->sortBy('date');
+        $all_data= $sortedData->values(); 
+        // return $all_data;
+        $data_array='';
+        $gross_amount=0;
+        $grandNetAmount=0;
+        $grandVatAmount=0;
+        $grandTotalAmount=0;
+        $grandPaidAmount=0;
+        foreach($all_data as $dataVal){
+            $netAmount = isset($dataVal['net_amount']) && $dataVal['net_amount'] !== "" ? '£' . $dataVal['net_amount'] : '';
+            $vatAmount = isset($dataVal['vat']) && $dataVal['vat'] !== "" ? '£' . $dataVal['vat'] : '';
+            $totalAmount = isset($dataVal['total_amount']) && $dataVal['total_amount'] !== "" ? '£' . $dataVal['total_amount'] : '';
+            $paidAmount = isset($dataVal['paid_amount']) && $dataVal['paid_amount'] !== "" ? '£' . $dataVal['paid_amount'] : '';
+            $minPaidAmount=$gross_amount-(float)$dataVal['paid_amount'];
+            $addAllAmount=(float)$dataVal['total_amount']+$minPaidAmount;
+            $gross_amount=$addAllAmount;
+
+            $grandNetAmount=$grandNetAmount+(float)$dataVal['net_amount'];
+            $grandVatAmount=$grandVatAmount+(float)$dataVal['vat'];
+            $grandTotalAmount=$grandTotalAmount+(float)$dataVal['total_amount'];
+            $grandPaidAmount=$grandPaidAmount+(float)$dataVal['paid_amount'];
+            $data_array .= '<tr>
+                    <td>' . date('d/m/Y', strtotime($dataVal['date'])) . '</td>
+                    <td>' . $dataVal['ref'] . '</td>
+                    <td></td>
+                    <td>' . (strip_tags($dataVal['address']) ?? "") . '</td>
+                    <td>' . ($netAmount ?? "") . '</td>
+                    <td>' . ($vatAmount ?? "") . '</td>
+                    <td>' . ($totalAmount ?? "") . '</td>
+                    <td>' . ($paidAmount ?? "") . '</td>
+                    <td>£'.$gross_amount.'</td>
+                </tr>';
+        }
+        // return $sortedData->values(); 
+        return response()->json(['data' => $data_array,'grandNetAmount'=>$grandNetAmount,'all_vatTotalAmount'=>$grandVatAmount,'all_TotalAmount'=>$grandTotalAmount,'outstandingAmountTotal'=>$grandPaidAmount,'grandGrossAmount'=>$gross_amount]);
+        
+    }
+    public function searchPurchaseOrdersStatementsOutstanding(Request $request){
+        // echo "<pre>";print_r($request->all());die;
+        // getAllPaymentPaid($po_id)
+        $po_startDate = date('Y-m-d', strtotime(str_replace('/', '-', $request->po_startDate)));
+        $po_endDate=date('Y-m-d', strtotime(str_replace('/', '-', $request->po_endDate)));
+        
+        $purchaseOrderquery=PurchaseOrder::with('suppliers','purchaseOrderProducts')->where('supplier_id',$request->selectedsupplierId)->whereNull('deleted_at')->whereNot('outstanding_amount',0);
+        if ($request->filled('po_startDate') && $request->filled('po_endDate')) {
+            $purchaseOrderquery->whereBetween('purchase_date', [$po_startDate, $po_endDate]);
+        }
+        $purchase_orders=$purchaseOrderquery->get();
+        // return $purchase_orders;
+        $data_array='';
+        $final_netAmount=0;
+        $final_vatAmount=0;
+        $final_totalAmount=0;
+        $final_paidAmount=0;
+        foreach($purchase_orders as $val){
+            // return $valOrders->purchaseOrderProducts;
+            $paid_amount=$this->getAllPaymentPaid($val->id);
+            $totalAmount=0;
+            $gross_amount=0;
+            foreach($val->purchaseOrderProducts as $product){
+                $calculation=$product->qty*$product->price;
+                $percentageValue=$calculation*$product->vat/100;
+                $subTotal=$calculation+$percentageValue;
+                $minPaidAmount=$gross_amount-$paid_amount;
+                $addAllAmount=$subTotal+$minPaidAmount;
+                $gross_amount=$addAllAmount;
+
+                $final_netAmount=$final_netAmount+$calculation;
+                $final_vatAmount=$final_vatAmount+$percentageValue;
+                $final_totalAmount=$final_totalAmount+$subTotal;
+                $final_paidAmount=$final_paidAmount+$paid_amount;
+            }
+            $data_array .= '<tr>
+                    <td>' . date('d/m/Y', strtotime($val->purchase_date)) . '</td>
+                    <td>' . $val->purchase_order_ref . '</td>
+                    <td></td>
+                    <td>' . (strip_tags($val->address) ?? "") . '</td>
+                    <td>' . ($calculation ?? "") . '</td>
+                    <td>' . ($percentageValue ?? "") . '</td>
+                    <td>' . ($subTotal ?? "") . '</td>
+                    <td>' . ($paid_amount ?? "") . '</td>
+                    <td>£'.$gross_amount.'</td>
+                </tr>';
+            
+        }
+        // return $data_array; 
+        return response()->json(['data' => $data_array,'grandNetAmount'=>$final_netAmount,'all_vatTotalAmount'=>$final_vatAmount,'all_TotalAmount'=>$final_totalAmount,'outstandingAmountTotal'=>$final_paidAmount,'grandGrossAmount'=>$gross_amount]);
+        return $purchase_orders;
+    }
+    public function purchase_order_invoices(Request $request){
+        $home_id=Auth::user()->home_id;
+        $data['list']=PurchaseOrderInvoiceReceives::with('suppliers','purchaseOrders')->where(['loginUserId'=>Auth::user()->id,'deleted_at'=>null])->get();
+        $data['draftCount']=PurchaseOrder::where(['user_id'=>Auth::user()->id,'deleted_at'=>null,'status'=>1])->count();
+        $data['awaitingApprovalCount']=PurchaseOrder::where(['user_id'=>Auth::user()->id,'deleted_at'=>null,'status'=>2])->count();
+        $data['approvedCount']=PurchaseOrder::where(['user_id'=>Auth::user()->id,'deleted_at'=>null])->whereIn('status',[3,9])->count();
+        $data['rejectedCount']=PurchaseOrder::where(['user_id'=>Auth::user()->id,'deleted_at'=>null,'status'=>8])->count();
+        $data['actionedCount']=PurchaseOrder::where(['user_id'=>Auth::user()->id,'deleted_at'=>null,'status'=>4])->count();
+        $data['paidCount']=PurchaseOrder::where(['user_id'=>Auth::user()->id,'deleted_at'=>null,'status'=>5])->count();
+        // echo "<pre>";print_r($data['list']);die;
+        return view('frontEnd.salesAndFinance.purchase_order.purchase_order_invoicelist',$data);
+    }
+    public function searchPurchaseOrdersInvoice(Request $request){
+        // echo "<pre>";print_r($request->all());die;
+        $query = PurchaseOrderInvoiceReceives::with('suppliers','purchaseOrders')->where(['deleted_at'=>null]);
+    
+        // echo "<pre>";print_r($query->get());die;
+        $selectedsupplierId=$request->selectedsupplierId;
+        if ($request->filled('po_ref')) {
+            $query->where('purchase_order_ref', $po_ref);
+        }
+        if ($request->filled('supplier')) {
+            $query->where('supplier_id', $selectedsupplierId);
+        }
+        if ($request->filled('id_startDate') && $request->filled('id_endDate')) {
+            $query->whereBetween('expected_deleveryDate', [$edd_startDate, $edd_endDate]);
+        }
+        if ($request->filled('created_startDate') && $request->filled('created_endDate')) {
+            $query->whereBetween('purchase_date', [$po_startDate, $po_endDate]);
+        }
+        
+        if ($request->filled('paid_status')) {
+            $query->where('delivery_status', $delivery_status);
+        }
+        $search_data = $query->where('loginUserId',Auth::user()->id)->get();
+        return $search_data;
+    }
+    public function getAllPurchaseInvoices(Request $request){
+        // echo "<pre>";print_r($request->all());die;
+        $po_id=$request->po_id;
+        // $data = PurchaseOrderInvoiceReceives::with('suppliers','purchaseOrders')->where(['po_id'=>$po_id,'deleted_at'=>null])->orderBy('id', 'desc')->paginate(10);
+        $data = PurchaseOrderInvoiceReceives::with('suppliers','purchaseOrders')->where(['po_id'=>$po_id,'deleted_at'=>null])->orderBy('id', 'desc')->get();
+
+        return response()->json([
+            'success' => true, 'list_data' => $data, 
+            // 'pagination' => [
+            //         'total' => $data->total(),
+            //         'current_page' => $data->currentPage(),
+            //         'last_page' => $data->lastPage(),
+            //         'per_page' => $data->perPage(),
+            //         'next_page_url' => $data->nextPageUrl(),
+            //         'prev_page_url' => $data->previousPageUrl(),
+            //     ]
+        ]);
+    }
+    public function getAllPaymentPaids(Request $request){
+        // echo "<pre>";print_r($request->all());die;
+        // $data=PurchaseOrderRecordPayment::where('po_id',$request->po_id)->get();
+        $purchaseOrderquery = DB::table('purchase_order_record_payments')->select(DB::raw('id,home_id,po_id,supplier_id,product_id,record_amount_paid,record_payment_date as date,record_payment_type,created_at,loginUserName,record_type'))->where(['po_id'=>$request->po_id,'deleted_at'=>null]);
+        
+        $purchase_order=$purchaseOrderquery->get();
+        // return $purchase_order;
+        $creditquery = DB::table('credit_note_allocates')->where(['po_id'=>$request->po_id,'deleted_at'=>null]);
+        
+        $credit_allocate=$creditquery->get();
+        $mergedData = $purchase_order->merge($credit_allocate);
+        $sortedData = $mergedData->sortBy('date');
+
+        $sortedArray = $sortedData->values()->all();
+        // return $sortedArray;
+        $html_data='';
+        foreach($sortedArray as $val){
+            if(isset($val->credit_id) && $val->credit_id !=''){
+                $type='Credit Note';
+                $ref=CreditNote::find($val->credit_id)->value('credit_ref');
+                // $ref='';
+                $reference='';
+                $description='';
+                $amount=$val->amount_paid;
+                $delete_from='credit_allocate';
+            }else{
+                $type=Payment_type::find($val->record_payment_type)->value('title');
+                if($val->record_type==1){
+                    // $ref=PurchaseOrder::find($val->po_id)->value('purchase_order_ref');
+                    $ref='';
+                }else{
+                    $ref=PurchaseOrderInvoiceReceives::find($val->po_id)->value('inv_ref');
+                }
+                $amount=$val->record_amount_paid;
+                $reference='';
+                $description='';
+                $delete_from='record_payements';
+            }
+            $html_data.='<tr>
+                        <td>'.date('m/d/Y',strtotime($val->created_at)).'</td>
+                        <td>'.$val->loginUserName.'</td>
+                        <td>'.$val->date.'</td>
+                        <td>'.$type.'</td>
+                        <td>'.$ref.'</td>
+                        <td>'.$reference.'</td>
+                        <td>'.$description.'</td>
+                        <td>PAYMENT</td>
+                        <td>'.$amount.'</td>
+                        <td><img src="'.url("public/frontEnd/jobs/images/delete.png").'" alt="" class="image_delete_payment_paid" data-delete="'.$val->id.'" data-delete_from="'.$delete_from.'"></td>
+                        </tr>';
+        }
+        return response()->json(['success'=>true,'data'=>$html_data,'len'=>count($sortedArray)]);
+
+    }
+    public function paymentPaidDelete(Request $request){
+        // echo "<pre>";print_r($request->all());die;
+        if($request->delete_from === 'record_payements'){
+            try{
+                // PurchaseOrderRecordPayment::find($request->id)->update(['deleted_at' => now()]);
+                $data=PurchaseOrderRecordPayment::find($request->id);
+                $data->update(['deleted_at'=>now()]);
+                $purchaseOrder=PurchaseOrder::find($data->po_id);
+                $calculated_amount=$purchaseOrder->outstanding_amount+$data->record_amount_paid;
+                $purchaseOrder->update(['outstanding_amount'=>$calculated_amount]);
+                return response()->json(['success'=>true,'message'=>'Deleted Successfully Done']);
+            }catch (\Exception $e) {
+                return response()->json(['error' => $e->getMessage()], 500);
+            }
+        }else{
+            try{
+                CreditNoteAllocate::find($request->id)->update(['deleted_at' => now()]);
+                return response()->json(['success'=>true,'message'=>'Deleted Successfully Done']);
+            }catch (\Exception $e) {
+                return response()->json(['error' => $e->getMessage()], 500);
+            }
+        }
+    }
+    public function preview_multiple_purchaseOrders(Request $request){
+        // echo "<pre>";print_r($request->all());die;
+        try{
+            $po_id = explode(',', $request->key);
+            $po_details=PurchaseOrder::with('suppliers','purchaseOrderProducts')->whereIn('id', $po_id)->where('deleted_at', null)
+            ->get();
+            // echo "<pre>";print_r(count($po_details));die;
+            
+            $data=[
+                'email'=>Auth::user()->email,
+                'phone_no'=>Auth::user()->phone_no,
+                'job_title'=>Auth::user()->job_title,
+                'current_location'=>Auth::user()->current_location,
+                'company'=>Admin::find(Auth::user()->company_id)->company ?? "",
+                'po_details'=>$po_details,
+            ];
+            // echo "<pre>";print_r($data);die;
+            $pdf = PDF::loadView('frontEnd.salesAndFinance.purchase_order.multiplepurchaseOrderPDF',$data);
+            return $pdf->stream('frontEnd.salesAndFinance.purchase_order.multiplepurchaseOrderPDF');
+            // return $pdf->download('purchaseOrderPDF.pdf');
+        }catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+    public function purchase_order_approveMultiple(Request $request){
+        // return response()->json(['sueccess'=>true,'data'=>$request->all()]);
+        $po_id=$request->approveids;
+        // return response()->json(['sueccess'=>true,'data'=>$po_id]);
+        try{
+            for($i=0;$i<count($po_id);$i++){
+                $purchaseOrder=PurchaseOrder::find($po_id[$i]);
+                if($purchaseOrder->outstanding_amount != 0 && $purchaseOrder->status != 5){
+                    $purchaseOrder->status=3;
+                    $purchaseOrder->save();
+                }
+            }
+            // PurchaseOrder::whereIn('id', $po_id)->update(['status' => 3]);
+            return response()->json(['success'=>true,'message'=>'Purchase Order Apporoved']);
+        }catch (\Exception $e) {
+            Log::error('Error: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+    public function searchPurchase_ref(Request $request){
+        // echo "<pre>";print_r($request->all());die;
+        $query = $request->input('purchase_ref');  
+        $home_id = Auth::user()->home_id;
+
+        $QuoteSearchData = PurchaseOrder::with('suppliers')->where('purchase_order_ref', 'LIKE', "%$query%")
+            ->where('home_id', $home_id)
+            // ->where('status', 1)
+            ->whereNull('deleted_at')
+            ->take(10)
+            ->get();
+        return response()->json(['data' => $QuoteSearchData]);
+    }
+    public function saveBulkInvoiceModal(Request $request){
+        // echo "<pre>";print_r($request->all());die;
+        try {
+            for($i=0;$i<count($request->inv_ref);$i++){
+                if($request->inv_ref[$i] == ''){
+                    return response()->json(['success'=>false,'message'=>'Invoice Ref field is required.','invoice'=>array()]);
+                }
+                $data=[
+                    'home_id'=>Auth::user()->home_id,
+                    'loginUserId'=>Auth::user()->id,
+                    'po_id'=>$request->po_id[$i],
+                    'supplier_id'=>$request->supplier_id[$i],
+                    'inv_ref'=>$request->inv_ref[$i],
+                    'net_amount'=>$request->net_amount[$i],
+                    'vat_id'=>$request->vat_id[$i],
+                    'vat_amount'=>$request->vat_amount[$i],
+                    'gross_amount'=>$request->gross_amount[$i],
+                    'oustanding_amount'=>$request->gross_amount[$i],
+                    'invoice_date'=>Carbon::createFromFormat('d/m/Y', $request->invoice_date[$i])->format('Y-m-d'),
+                ];
+                $invoice=PurchaseOrderInvoiceReceives::purchaseOrderInvoiceReceives_save($data);
+            }
+            // return $data;die;
+            
+            if($request->id == ''){
+                return response()->json(['success' => true,'message'=>'Invoice has been saved', 'invoice' => $invoice]);
+            }else{
+                return response()->json(['success' => true,'message'=>'Invoice has been updated', 'invoice' => $invoice]);
+            }
+            
+        } catch (\Exception $e) {
+            Log::error('Error saving Bulk Invoices purchase order: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+    public function saveBulkRecordPaymentModal(Request $request){
+        // echo "<pre>";print_r($request->all());die;
+        try{
+            for($i=0;$i<count($request->po_id);$i++){
+                if($request->outstanding_amount[$i] == 0 || $request->record_amount_paid[$i] == 0){
+
+                }else{
+                    $data=[
+                        'home_id'=>Auth::user()->home_id,
+                        'loginUserId'=>Auth::user()->id,
+                        'loginUserName'=>Auth::user()->name,
+                        'po_id'=>$request->po_id[$i],
+                        'supplier_id'=>$request->supplier_id[$i],
+                        'record_amount_paid'=>$request->record_amount_paid[$i],
+                        'record_payment_date'=>$request->record_payment_date[$i],
+                        'record_payment_type'=>$request->record_payment_type[$i],
+                        'record_reference'=>$request->record_reference[$i] ?? "",
+                        'record_type'=>$request->record_type,
+                    ];
+                    $orderRecord=PurchaseOrderRecordPayment::savePurchaseOrderRecordPayment($data);
+                    $calculation_amount=$request->outstanding_amount[$i]-$request->record_amount_paid[$i];
+                    $tablePurchaseOrder=PurchaseOrder::find($request->po_id[$i]);
+                    $tablePurchaseOrder->outstanding_amount=$calculation_amount;
+                    if($calculation_amount == 0){
+                        $tablePurchaseOrder->status=5;
+                    }
+                    $tablePurchaseOrder->save();
+                }
+                
+            }
+            
+            return response()->json(['success'=>true,'message'=>'The Record Payment has been saved successfully.','data'=>array()]);
+        }catch (\Exception $e) {
+            Log::error('Error: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+    public function finance_dashboard(){
+        
+        return view('frontEnd.salesAndFinance.common.finance_dasboard');
+    }
+    
 }

@@ -11,13 +11,20 @@
     <link rel="stylesheet" href="https://www.ville-pont-eveque.fr/tools/library/DataTables/media/css/jquery.dataTables.css">
     <link rel="stylesheet" type="text/css" href="https://www.ville-pont-eveque.fr/tools/library/DataTables/extensions/Select/css/select.dataTables.css" />
     <link rel="stylesheet" type="text/css" href="{{ url('public/frontEnd/jobs/css/custom.css')}}" />
+    <link rel="stylesheet" type="text/css" href="{{ url('public/frontEnd/jobs/css/dashboard.css')}}" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
-
-    <!-- <link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/43.0.0/ckeditor5.css"> -->
-    <!-- <script src="https://cdn.ckeditor.com/ckeditor5/ckeditor.js"></script> -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
+    <script type="importmap">
+        {
+        "imports": {
+            "my-module": "/path/to/my-module.js"
+        }
+    }
+    </script>
+    
     <style>
         table.dataTable td.select-checkbox:before {
             display: none;
@@ -26,28 +33,40 @@
         .modal.show .modal-dialog {
             box-shadow: 0px 0px 10px #34343447;
         }
-        .numberHifan{
-            text-align:center;
-            font-size:20px;
+
+        .numberHifan {
+            text-align: center;
+            font-size: 20px;
         }
+
         .table_responsive div#exampleOne_wrapper {
             overflow: auto;
         }
+
         .calendar_icon {
-            color: red;
+            color: #e10078;
             display: flex;
             align-items: center;
+        }
+
+        .ActiveBtn {
+            background-color: #1f88b5;
+            color: #fff;
+        }
+
+        .ActiveBtn span i {
+            color: #fff !important;
         }
     </style>
 </head>
 <?php
 $rights = App\User::where('id', Auth::user()->id)->where('is_deleted', 0)->first()->access_rights;
 $access_rights = explode(',', $rights);
+$current_url = last(request()->segments());
 ?>
 
 <body>
     <header>
-
         <div class="topbaar">
             <div class="container-fluid bg-light p-0">
                 <div class="row gx-0 d-none d-lg-flex">
@@ -56,7 +75,7 @@ $access_rights = explode(',', $rights);
                             <a href="{{url('sales-finance/dashboard')}}" class="brand_logo"><img src="{{ url('public/images/ewm_logo.png')}}" alt="ewm_logo"></a>
                         </div>
                     </div>
-                    <div class="col-lg-9 px-3 text-end toprigihticon">
+                    <!-- <div class="col-lg-9 px-3 text-end toprigihticon">
                         <?php //if (isset($page) && $page == 'job_index') { 
                         ?>
                         <div class="d-inline-flex align-items-center me-5 topbaarBtn">
@@ -68,23 +87,22 @@ $access_rights = explode(',', $rights);
                             <a href="#!" class="profileDrop"> <i class="material-symbols-outlined"> handshake </i> Partners </a>
                             <a href="{{url('/')}}" class="profileDrop"> <i class="fa fa-home"> </i> Home </a>
                         </div>
-                        <?php //} else { 
+                        <?php //} else {
                         ?>
-
-                        <!-- <div class="h-100 d-inline-flex align-items-center me-5">
+                        <div class="h-100 d-inline-flex align-items-center me-5">
                                 <a class="btn btn-sm-square bg-white text-primary me-1" href="#!"><i class="material-symbols-outlined"> group</i></a>
                                 <a class="btn btn-sm-square bg-white text-primary me-1" href="#!"><i class="material-symbols-outlined"> dns</i></a>
                                 <a class="btn btn-sm-square bg-white text-primary me-1" href="#!"><i class="material-symbols-outlined"> mail </i></a>
                                 <a class="btn btn-sm-square bg-white text-primary me-0" href="#!"><i class="material-symbols-outlined"> notifications </i></a>
-                            </div> -->
+                            </div>
                         <?php //} 
                         ?>
-                    </div>
+                    </div> -->
                 </div>
             </div>
         </div>
 
-        <div class="menubaar">
+        <!-- <div class="menubaar">
             <div class="container-fluid">
                 <nav class="navbar navbar-expand-lg navbar-light sticky-top px-3">
                     <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
@@ -174,7 +192,7 @@ $access_rights = explode(',', $rights);
                                 </div>
                             </div>
 
-                            <!-- {{url('planner_day')}} -->
+                            
                             <div class="nav-item dropdown">
                                 <a href="#!" class="nav-item nav-link dropdown-toggle" data-bs-toggle="dropdown">
                                     <span><i class="material-symbols-outlined"> planner_review </i></span>
@@ -202,9 +220,7 @@ $access_rights = explode(',', $rights);
                             </div>
 
                             <div class="nav-item1 dropdown1">
-                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <span><i class="material-symbols-outlined">finance_mode </i></span> Finance
-                                </a>
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><span><i class="material-symbols-outlined">finance_mode </i></span> Finance</a>
                                 <ul class="dropdown-menu dropdown-menu1 fade-up m-0">
                                     <li class="nav-item1 dropend">
                                         <a class="dropdown-item" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -258,13 +274,13 @@ $access_rights = explode(',', $rights);
                                             <li><a class="dropdown-item" href="{{ url('draft_purchase_order?list_mode=Rejected') }}"><span><i class="fa fa-check"></i>Rejected Purchase Orders </span></a></li>
                                             <li><a class="dropdown-item" href="{{ url('draft_purchase_order?list_mode=Actioned') }}"><span><i class="fa fa-check"></i>Actioned Purchase Orders</span></a></li>
                                             <li><a class="dropdown-item" href="{{ url('draft_purchase_order?list_mode=Paid') }}"><span><i class="fa fa-thumbs-up"></i>Paid Purchase Orders</span></a></li>
-                                            <li><a class="dropdown-item" href="#"><span><i class="fa fa-search"></i>Search Purchase Orders</span></a></li>
-                                            <li><a class="dropdown-item" href="#"><span><i class="fa fa-file"></i>Invoices Received</span></a></li>
-                                            <li><a class="dropdown-item" href="#"><span><i class="fa fa-file"></i>Purchase Orders Statements</span></a></li>
+                                            <li><a class="dropdown-item" href="{{url('purchase-orders-search')}}"><span><i class="fa fa-search"></i>Search Purchase Orders</span></a></li>
+                                            <li><a class="dropdown-item" href="{{url('purchase-order-invoices')}}"><span><i class="fa fa-file"></i>Invoices Received</span></a></li>
+                                            <li><a class="dropdown-item" href="{{url('purchase-order-statements')}}"><span><i class="fa fa-file"></i>Purchase Orders Statements</span></a></li>
                                             <li><a class="dropdown-item" href="#"><span><i class="fa fa-rotate-right"></i>Recurring Purchase Orders</span></a></li>
                                             <li class="dropend"><a class="dropdown-item" href="credit_notes.html" data-bs-toggle="dropdown" aria-expanded="false"><span><i class="fa fa-list"></i>Credit Notes</span> <i class="fa-solid fa-angle-right"></i></a>
                                                 <ul class="dropdown-menu dropdown-menu1 fade-up m-0">
-                                                    <li><a class="dropdown-item" href="new_credit_note.html"><span><i class="fa fa-plus"></i> New Credit Note</span></a></li>
+                                                    <li><a class="dropdown-item" href="{{url('new_credit_notes')}}"><span><i class="fa fa-plus"></i> New Credit Note</span></a></li>
                                                     <li><a class="dropdown-item" href="{{url('credit_notes?list_mode=Approved')}}"><span><i class="fa fa-check"></i>Approved Credit Notes</span></a></li>
                                                     <li><a class="dropdown-item" href="{{url('credit_notes?list_mode=Paid')}}"><span><i class="fa fa-thumbs-up"></i>Paid Credit Notes </span></a></li>
                                                     <li><a class="dropdown-item" href="{{url('credit_notes?list_mode=Cancelled')}}"><span><i class="fa fa-times"></i>Cancelled Credit Notes</span></a></li>
@@ -292,9 +308,7 @@ $access_rights = explode(',', $rights);
                                         </ul>
                                     </li>
                                     <li class="nav-item1 dropend">
-                                        <a class="dropdown-item" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                            <span><i class="fa fa-users"></i> Suppliers</span> <span><i class="fa-solid fa-angle-right"></i></span>
-                                        </a>
+                                        <a class="dropdown-item" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"> <span><i class="fa fa-users"></i> Suppliers</span> <span><i class="fa-solid fa-angle-right"></i></span></a>
                                         <ul class="dropdown-menu dropdown-menu1 fade-up m-0">
                                             <li><a class="dropdown-item" href="{{url('supplier_add')}}"><span><i class="fa fa-plus"></i>New Supllier</span></a></li>
                                             <li><a class="dropdown-item" href="{{ url('supplier?list_mode=ACTIVE') }}"><span><i class="fa fa-check-circle"></i>Active Suppliers</span></a></li>
@@ -303,11 +317,9 @@ $access_rights = explode(',', $rights);
                                     </li>
                                 </ul>
                             </div>
-
                             <div class="nav-item dropdown">
                                 <a href="#!" class="nav-item nav-link dropdown-toggle @if(isset($page)) @if($page == 'item') active @endif @endif" data-bs-toggle="dropdown">
-                                    <span><i class="material-symbols-outlined"> production_quantity_limits</i></span>
-                                    Items
+                                    <span><i class="material-symbols-outlined"> production_quantity_limits</i></span>Items
                                 </a>
                                 <div class="dropdown-menu fade-up m-0">
                                     <a href="{{ url('/item/product_categories') }}" class="dropdown-item">Product Categories</a>
@@ -316,16 +328,9 @@ $access_rights = explode(',', $rights);
                                     <a href="{{ url('/item/item-groups') }}" class="dropdown-item">Product Groups</a>
                                 </div>
                             </div>
-
-                            <a href="{{url('/expenses')}}" class="nav-item nav-link">
-                                <span><i class="material-symbols-outlined"> calculate </i></span>
-                                Expenses
-                            </a>
+                            <a href="{{url('/expenses')}}" class="nav-item nav-link"><span><i class="material-symbols-outlined"> calculate </i></span>Expenses</a>
                             <div class="nav-item dropdown">
-                                <a href="#!" class="nav-item nav-link dropdown-toggle" data-bs-toggle="dropdown">
-                                    <span><i class="material-symbols-outlined"> diversity_2 </i></span>
-                                    Users
-                                </a>
+                                <a href="#!" class="nav-item nav-link dropdown-toggle" data-bs-toggle="dropdown"><span><i class="material-symbols-outlined"> diversity_2 </i></span>Users</a>
                                 <div class="dropdown-menu fade-up m-0">
                                     <a href="#!" class="dropdown-item"><span><i class="fa fa-user"></i>Users </span></a>
                                     <a href="#!" class="dropdown-item"><span><i class="fa fa-users"></i>Team Members </span></a>
@@ -334,10 +339,7 @@ $access_rights = explode(',', $rights);
                                 </div>
                             </div>
                             <div class="nav-item dropdown">
-                                <a href="#" class="nav-item nav-link dropdown-toggle" data-bs-toggle="dropdown">
-                                    <span><i class="material-symbols-outlined"> partner_reports </i></span>
-                                    Reports
-                                </a>
+                                <a href="#" class="nav-item nav-link dropdown-toggle" data-bs-toggle="dropdown"> <span><i class="material-symbols-outlined"> partner_reports </i></span>Reports</a>
                                 <div class="dropdown-menu fade-up m-0">
                                     <a href="#!" class="dropdown-item"><span><i class="fa fa-users"></i> Customers </span></a>
                                     <a href="#!" class="dropdown-item"><span><i class="fa fa-file-text"></i> Quote </span></a>
@@ -352,21 +354,16 @@ $access_rights = explode(',', $rights);
                                     <a href="#!" class="dropdown-item"><span><i class="fa fa-bell"></i> Reminder Report </span></a>
                                     <a href="#!" class="dropdown-item"><span><i class="fa fa-list"></i> Task Report </span></a>
                                     <a href="#!" class="dropdown-item"><span><i class="fa fa-list"></i> Report Builder </span></a>
-
                                 </div>
                             </div>
                             <div class="nav-item dropdown">
-                                <a href="#!" class="nav-item nav-link dropdown-toggle" data-bs-toggle="dropdown">
-                                    <span><i class="material-symbols-outlined"> bookmark_manager</i></span>
-                                    File Manager
-                                </a>
+                                <a href="#!" class="nav-item nav-link dropdown-toggle" data-bs-toggle="dropdown"> <span><i class="material-symbols-outlined"> bookmark_manager</i></span>File Manager</a>
                                 <div class="dropdown-menu fade-up m-0">
                                     <a href="#!" class="dropdown-item"> <span><i class="fa fa-paperclip"></i> Attachments </span></a>
                                     <a href="#!" class="dropdown-item"> <span><i class="fa fa-print"></i> Digital Documents</span></a>
                                     <a href="#!" class="dropdown-item"> <span><i class="fa fa-list"></i> Completed Questionnaires</span> </a>
                                 </div>
                             </div>
-
                             <div class="nav-item1 dropdown1">
                                 <a class="nav-link dropdown-toggle @if(isset($page)) @if($page == 'setting') active @endif @endif" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     <span><i class="material-symbols-outlined"> construction</i></span> Settings
@@ -478,13 +475,1676 @@ $access_rights = explode(',', $rights);
                                     <li class="nav-item1"><a class="dropdown-item" href="#" role="button"><span><i class="fa fa-check-circle"></i> Quick Setup Wizard</span></a></li>
                                 </ul>
                             </div>
+                            <div class="nav-item dropdown ">
+                                <a href="#!" class="nav-item nav-link dropdown-toggle @if(isset($page) && $page == 'dayBook') active @endif" data-bs-toggle="dropdown"><span><i class="material-symbols-outlined">  book_5 </i></span>Day Book</a>
+                                <div class="dropdown-menu fade-up m-0">
+                                    <a href="{{ url('/sales/sales-day-book') }}" class="dropdown-item"> <span><i class="fa fa-book"></i> Sales Day Book </span></a>
+                                    <a href="{{ url('/purchase/purchase-day-book') }}" class="dropdown-item"> <span><i class="fa fa-book"></i> Purchasee Day book</span></a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </nav>
             </div>
-        </div>
+        </div> -->
+
     </header>
 
+    <section class="dashbord-main-info">
+        <div class="container-fluid p-0">
+            <div class="row m-0">
+                <!-- Left Side Bar Section Start Here -->
+                <div class="col-lg-1 p-0">
+                    <div class="left-sidebar-info">
+                        <div class="nav-links">
+                            <nav>
+                                <ul>
+                                    <!-- <li>
+                                        <a href="index.html" class="p-0">
+                                            <div class="logo-details">
+                                                <a href="{{url('sales-finance/dashboard')}}" class="brand_logo"><img src="{{ url('public/images/ewm_logo.png')}}" alt="ewm_logo"></a>
+                                            </div>
+                                        </a>
+                                    </li> -->
+                                    <div class="scroll">
+                                        <!-- Lead start here -->
+                                        <li>
+                                            <button href="#" class="openbtn @if(isset($page)) @if($page == 'leads') ActiveBtn @endif @endif" onclick="openNav(event, 'mySidepanel1')">
+                                                <span class="plus_icon">
+                                                    <i class="material-symbols-outlined"> keep_public </i>
+                                                </span>Lead
+                                            </button>
+                                            <div id="mySidepanel1" class="sidepanel">
+                                                <ul>
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <h5>Lead</h5>
+                                                        <a href="javascript:void(0)" class="closebtn" onclick="closeNav('mySidepanel1')">
+                                                            <svg width="40px" height="40px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                                                                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                                                                <g id="SVGRepo_iconCarrier">
+                                                                    <path d="M6.99486 7.00636C6.60433 7.39689 6.60433 8.03005 6.99486 8.42058L10.58 12.0057L6.99486 15.5909C6.60433 15.9814 6.60433 16.6146 6.99486 17.0051C7.38538 17.3956 8.01855 17.3956 8.40907 17.0051L11.9942 13.4199L15.5794 17.0051C15.9699 17.3956 16.6031 17.3956 16.9936 17.0051C17.3841 16.6146 17.3841 15.9814 16.9936 15.5909L13.4084 12.0057L16.9936 8.42059C17.3841 8.03007 17.3841 7.3969 16.9936 7.00638C16.603 6.61585 15.9699 6.61585 15.5794 7.00638L11.9942 10.5915L8.40907 7.00636C8.01855 6.61584 7.38538 6.61584 6.99486 7.00636Z" fill="#0F0F0F"></path>
+                                                                </g>
+                                                            </svg>
+                                                        </a>
+                                                    </div>
+                                                    <li>
+                                                        <a href="{{ url('/leads/add') }}">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined"> add_circle</i>
+                                                                <span>New Lead</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{{ url('/leads/leads') }}">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">leaderboard</i>
+                                                                <span>All Leads</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{{ url('/lead/myLeads') }}">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined"> supervisor_account </i>
+                                                                <span>My Leads</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{{ url('/leads/unassigned') }}">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined"> person_off</i>
+                                                                <span>Unassigned Leads</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{{ url('/lead/actioned') }}">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined"> task_alt </i>
+                                                                <span>Actioned Leads</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{{ url('/lead/rejected') }}">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined"> task_alt </i>
+                                                                <span>Rejected Leads</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{{ url('/lead/authorization') }}">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined"> verified_user</i>
+                                                                <span>Authorization</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{{ url('/leads/converted') }}">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined"> compare_arrows</i>
+                                                                <span>Converted Leads</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{{ url('leads/search') }}">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">search </i>
+                                                                <span>Search Leads</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{{ url('/leads/tasks') }}">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined"> event_note </i>
+                                                                <span>Lead Tasks</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </li>
+                                        <!-- Quotes start here -->
+                                        <li>
+                                            <button href="#" class="openbtn @if(isset($page)) @if($page == 'quotes') ActiveBtn @endif @endif" onclick="openNav(event, 'mySidepanel2')"><span class="plus_icon"><i class="material-symbols-outlined">description </i></span>Quotes</button>
+                                            <div id="mySidepanel2" class="sidepanel">
+                                                <ul>
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <h5>Quotes</h5>
+                                                        <a href="javascript:void(0)" class="closebtn" onclick="closeNav('mySidepanel2')">
+                                                            <svg width="40px" height="40px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                                                                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                                                                <g id="SVGRepo_iconCarrier">
+                                                                    <path d="M6.99486 7.00636C6.60433 7.39689 6.60433 8.03005 6.99486 8.42058L10.58 12.0057L6.99486 15.5909C6.60433 15.9814 6.60433 16.6146 6.99486 17.0051C7.38538 17.3956 8.01855 17.3956 8.40907 17.0051L11.9942 13.4199L15.5794 17.0051C15.9699 17.3956 16.6031 17.3956 16.9936 17.0051C17.3841 16.6146 17.3841 15.9814 16.9936 15.5909L13.4084 12.0057L16.9936 8.42059C17.3841 8.03007 17.3841 7.3969 16.9936 7.00638C16.603 6.61585 15.9699 6.61585 15.5794 7.00638L11.9942 10.5915L8.40907 7.00636C8.01855 6.61584 7.38538 6.61584 6.99486 7.00636Z" fill="#0F0F0F">
+                                                                    </path>
+                                                                </g>
+                                                            </svg>
+                                                        </a>
+                                                    </div>
+                                                    <li>
+                                                        <a href="{{ url('/quote/dashboard') }}">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">speed </i>
+                                                                <span>Dashboard</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{{ url('/quote/add') }}">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined"> add_circle </i>
+                                                                <span>New Quote</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{{ url('/quote/draft') }}">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">edit_note </i>
+                                                                <span>Draft Quote</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{{ url('/quote/actioned') }}">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">task_alt </i>
+                                                                <span>Actioned Quote</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{{ url('/quote/callBack') }}">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">call_made </i>
+                                                                <span>Call Back Quote</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{{ url('/quote/accepted') }}">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">check_circle </i>
+                                                                <span>Accepted Quote</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#!">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">compare_arrows </i>
+                                                                <span>Converted Quote</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#!">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined"> reminder </i>
+                                                                <span>Quote Reminders</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{{ url('quote/search') }}">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined"> search </i>
+                                                                <span>Search Quote</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li class="custom_dropdown">
+                                                        <a class="dropbtn">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined"> calendar_month </i>
+                                                                <span>Appointment</span>
+                                                                <i class="fa-solid fa-angle-right arrow"></i>
+                                                            </div>
+                                                        </a>
+                                                        <div class="dropdown_content">
+                                                            <a href="#!">
+                                                                <div
+                                                                    class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined">
+                                                                        calendar_month </i>
+                                                                    <span>Sales Appointment</span>
+                                                                </div>
+                                                            </a>
+                                                        </div>
+                                                    </li>
+                                                    <li class="custom_dropdown">
+                                                        <a class="dropbtn">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">restart_alt </i>
+                                                                <span>Recurring Quote</span>
+                                                                <i class="fa-solid fa-angle-right arrow"></i>
+                                                            </div>
+                                                        </a>
+                                                        <div class="dropdown_content">
+                                                            <a href="#!" class="m-0">
+                                                                <div
+                                                                    class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined">
+                                                                        restart_alt </i>
+                                                                    <span>New Recurring Quote</span>
+                                                                </div>
+                                                            </a>
+                                                            <a href="#!" class="m-0">
+                                                                <div
+                                                                    class="d-flex align-items-center gap-2">
+                                                                    <i class="material-symbols-outlined">
+                                                                        restart_alt </i>
+
+                                                                    <span> Recurring Quote</span>
+                                                                </div>
+                                                            </a>
+                                                        </div>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </li>
+                                        <!-- Jobs start here -->
+                                        <li>
+                                            <button href="#" class="openbtn @if(isset($page)) @if($page == 'jobs') ActiveBtn @endif @endif" onclick="openNav(event, 'mySidepanel3')">
+                                                <span class="plus_icon">
+                                                    <i class="material-symbols-outlined">work </i>
+                                                </span>Jobs
+                                            </button>
+                                            <div id="mySidepanel3" class="sidepanel">
+                                                <ul>
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <h5>Jobs</h5>
+                                                        <a href="javascript:void(0)" class="closebtn" onclick="closeNav('mySidepanel3')">
+                                                            <svg width="40px" height="40px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                                                                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                                                                <g id="SVGRepo_iconCarrier">
+                                                                    <path d="M6.99486 7.00636C6.60433 7.39689 6.60433 8.03005 6.99486 8.42058L10.58 12.0057L6.99486 15.5909C6.60433 15.9814 6.60433 16.6146 6.99486 17.0051C7.38538 17.3956 8.01855 17.3956 8.40907 17.0051L11.9942 13.4199L15.5794 17.0051C15.9699 17.3956 16.6031 17.3956 16.9936 17.0051C17.3841 16.6146 17.3841 15.9814 16.9936 15.5909L13.4084 12.0057L16.9936 8.42059C17.3841 8.03007 17.3841 7.3969 16.9936 7.00638C16.603 6.61585 15.9699 6.61585 15.5794 7.00638L11.9942 10.5915L8.40907 7.00636C8.01855 6.61584 7.38538 6.61584 6.99486 7.00636Z" fill="#0F0F0F"></path>
+                                                                </g>
+                                                            </svg></a>
+                                                    </div>
+                                                    <li>
+                                                        <a href="#!">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">speed </i>
+                                                                <span>Dashboard</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{{url('/jobs_create')}}">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">add_circle</i>
+                                                                <span>New Jobs</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{{url('jobs_list')}}">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">toggle_on </i>
+                                                                <span>Active Jobs</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{{url('job_type')}}">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">work </i>
+                                                                <span>Job Type</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#!">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">person_off</i>
+                                                                <span>Unassigned Jobs</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#!">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">priority_high</i>
+                                                                <span>Action Required Jobs</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#!">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">event_busy</i>
+                                                                <span>Overdue Jobs</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#!">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">verified_user</i>
+                                                                <span> Authorization Jobs</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#!">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">pause_circle</i>
+                                                                <span>On Hold</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#!">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">search</i>
+                                                                <span>Search Jobs</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#!">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">schedule</i>
+                                                                <span>Appointments</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#!">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">restart_alt</i>
+                                                                <span>Recurring Jobs</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </li>
+                                        <!-- Planner start here -->
+                                        <li>
+                                            <button href="#" class="openbtn" onclick="openNav(event, 'mySidepanel4')">
+                                                <span class="plus_icon">
+                                                    <i class="material-symbols-outlined"> planner_review</i>
+                                                </span>Planner
+                                            </button>
+                                            <div id="mySidepanel4" class="sidepanel">
+                                                <ul>
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <h5>Planner</h5>
+                                                        <a href="javascript:void(0)" class="closebtn" onclick="closeNav('mySidepanel4')">
+                                                            <svg width="40px" height="40px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                                                                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                                                                <g id="SVGRepo_iconCarrier">
+                                                                    <path d="M6.99486 7.00636C6.60433 7.39689 6.60433 8.03005 6.99486 8.42058L10.58 12.0057L6.99486 15.5909C6.60433 15.9814 6.60433 16.6146 6.99486 17.0051C7.38538 17.3956 8.01855 17.3956 8.40907 17.0051L11.9942 13.4199L15.5794 17.0051C15.9699 17.3956 16.6031 17.3956 16.9936 17.0051C17.3841 16.6146 17.3841 15.9814 16.9936 15.5909L13.4084 12.0057L16.9936 8.42059C17.3841 8.03007 17.3841 7.3969 16.9936 7.00638C16.603 6.61585 15.9699 6.61585 15.5794 7.00638L11.9942 10.5915L8.40907 7.00636C8.01855 6.61584 7.38538 6.61584 6.99486 7.00636Z" fill="#0F0F0F"></path>
+                                                                </g>
+                                                            </svg>
+                                                        </a>
+                                                    </div>
+                                                    <li>
+                                                        <a href="#!">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">schedule</i>
+                                                                <span>Time Planner</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#!">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">workspaces</i>
+                                                                <span>Project Planner</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#!">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">explore</i>
+                                                                <span>Geo Planner</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#!">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">directions_car</i>
+                                                                <span>Vehicle Tracking</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#!">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">location_on</i>
+                                                                <span>Mobile Tracking</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </li>
+                                        <!-- Project start here -->
+                                        <li>
+                                            <button href="#" class="openbtn" onclick="openNav(event, 'mySidepanel5')">
+                                                <span class="plus_icon">
+                                                    <i class="material-symbols-outlined"> business_center</i>
+                                                </span>Projects
+                                            </button>
+                                            <div id="mySidepanel5" class="sidepanel">
+                                                <ul>
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <h5>Projects</h5>
+                                                        <a href="javascript:void(0)" class="closebtn" onclick="closeNav('mySidepanel5')">
+                                                            <svg width="40px" height="40px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                                                                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                                                                <g id="SVGRepo_iconCarrier">
+                                                                    <path d="M6.99486 7.00636C6.60433 7.39689 6.60433 8.03005 6.99486 8.42058L10.58 12.0057L6.99486 15.5909C6.60433 15.9814 6.60433 16.6146 6.99486 17.0051C7.38538 17.3956 8.01855 17.3956 8.40907 17.0051L11.9942 13.4199L15.5794 17.0051C15.9699 17.3956 16.6031 17.3956 16.9936 17.0051C17.3841 16.6146 17.3841 15.9814 16.9936 15.5909L13.4084 12.0057L16.9936 8.42059C17.3841 8.03007 17.3841 7.3969 16.9936 7.00638C16.603 6.61585 15.9699 6.61585 15.5794 7.00638L11.9942 10.5915L8.40907 7.00636C8.01855 6.61584 7.38538 6.61584 6.99486 7.00636Z" fill="#0F0F0F"></path>
+                                                                </g>
+                                                            </svg></a>
+                                                    </div>
+                                                    <li>
+                                                        <a href="#!">
+                                                            <div  class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">note_add </i>
+                                                                <span>New Project</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#!">
+                                                            <div
+                                                                class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">trending_up </i>
+                                                                <span>Active Projects</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#!">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">block</i>
+                                                                <span>Inactive Projects</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#!">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">check_circle</i>
+                                                                <span>Completed Projects</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </li>
+                                        <!-- Finance start here -->
+                                        <li>
+                                            <button href="#" class="openbtn @if(isset($page)) @if($page == 'finance' || $page == 'invoice') ActiveBtn @endif @endif" onclick="openNav(event, 'mySidepanel6')"><span class="plus_icon"><i class="material-symbols-outlined"> finance_mode </i></span>Finance</button>
+                                            <div id="mySidepanel6" class="sidepanel">
+                                                <ul>
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <h5>Finance</h5>
+                                                        <a href="javascript:void(0)" class="closebtn" onclick="closeNav('mySidepanel6')">
+                                                            <svg width="40px" height="40px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                                                                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                                                                <g id="SVGRepo_iconCarrier">
+                                                                    <path d="M6.99486 7.00636C6.60433 7.39689 6.60433 8.03005 6.99486 8.42058L10.58 12.0057L6.99486 15.5909C6.60433 15.9814 6.60433 16.6146 6.99486 17.0051C7.38538 17.3956 8.01855 17.3956 8.40907 17.0051L11.9942 13.4199L15.5794 17.0051C15.9699 17.3956 16.6031 17.3956 16.9936 17.0051C17.3841 16.6146 17.3841 15.9814 16.9936 15.5909L13.4084 12.0057L16.9936 8.42059C17.3841 8.03007 17.3841 7.3969 16.9936 7.00638C16.603 6.61585 15.9699 6.61585 15.5794 7.00638L11.9942 10.5915L8.40907 7.00636C8.01855 6.61584 7.38538 6.61584 6.99486 7.00636Z" fill="#0F0F0F">
+                                                                    </path>
+                                                                </g>
+                                                            </svg>
+                                                        </a>
+                                                    </div>
+                                                    <li class="custom_dropdown">
+                                                        <a class="dropbtn">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined"> receipt_long </i>
+                                                                <span>Invoice</span>
+                                                                <i class="fa-solid fa-angle-right arrow"></i>
+                                                            </div>
+                                                        </a>
+                                                        <div class="dropdown_content">
+                                                            <a href="#!">
+                                                                <div
+                                                                    class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined">
+                                                                        keyboard_double_arrow_right</i>
+                                                                    <span>Dashboard</span>
+                                                                </div>
+                                                            </a>
+                                                            <a href="{{url('invoices/add')}}">
+                                                                <div
+                                                                    class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined">
+                                                                        keyboard_double_arrow_right</i>
+                                                                    <span>New Invoice</span>
+                                                                </div>
+                                                            </a>
+                                                            <a href="{{url('invoices/invoice?key=Draft')}}">
+                                                                <div
+                                                                    class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined">
+                                                                        keyboard_double_arrow_right</i>
+                                                                    <span>Draft Invoices</span>
+                                                                </div>
+                                                            </a>
+                                                            <a href="{{url('invoices/invoice?key=Outstanding')}}">
+                                                                <div
+                                                                    class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined">
+                                                                        keyboard_double_arrow_right</i>
+                                                                    <span>Outstanding Invoices</span>
+                                                                </div>
+                                                            </a>
+                                                            <a href="{{url('invoices/invoice?key=Overdue')}}">
+                                                                <div
+                                                                    class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined">
+                                                                        keyboard_double_arrow_right</i>
+
+                                                                    <span>Overdue Invoices
+                                                                    </span>
+                                                                </div>
+                                                            </a>
+                                                            <a href="{{url('invoices/invoice?key=Paid')}}">
+                                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+                                                                        <span>Paid Invoices </span>
+                                                                </div>
+                                                            </a>
+                                                            <a href="#!">
+                                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+                                                                    <span>Search Invoices</span>
+                                                                </div>
+                                                            </a>
+                                                            <a href="#!">
+                                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined">keyboard_double_arrow_right</i>
+                                                                        <span>Account Statements
+                                                                    </span>
+                                                                </div>
+                                                            </a>
+                                                            <a href="#!">
+                                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+
+                                                                    <span>Reminders</span>
+                                                                </div>
+                                                            </a>
+                                                            <div class="custom_dropdown2">
+                                                                <a tabindex=0>
+                                                                    <div class="d-flex align-items-center gap-2 mb-2">
+                                                                        <i class="material-symbols-outlined">keyboard_double_arrow_right</i>
+
+                                                                        <span>Recurring Invoices</span>
+                                                                        <i class="fa-solid fa-angle-right ms-auto second-arrow"></i>
+                                                                    </div>
+                                                                </a>
+                                                                <div class="dropdown-content">
+                                                                    <a href="#!">
+                                                                        <div class="d-flex align-items-center gap-2 mb-2">
+                                                                            <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+                                                                            <span>New Recurring Invoice </span>
+                                                                        </div>
+                                                                    </a>
+                                                                    <a href="#!">
+                                                                        <div class="d-flex align-items-center gap-2 mb-2">
+                                                                            <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+                                                                            <span> Recurring Invoice</span>
+
+                                                                        </div>
+                                                                    </a>
+                                                                </div>
+                                                            </div>
+                                                            <div class="custom_dropdown2">
+                                                                <a tabindex=0>
+                                                                    <div class="d-flex align-items-center gap-2 mb-2">
+                                                                        <i class="material-symbols-outlined">keyboard_double_arrow_right</i>
+                                                                        <span>Credit Notes</span>
+                                                                        <i class="fa-solid fa-angle-right ms-auto second-arrow"></i>
+                                                                    </div>
+                                                                </a>
+                                                                <div class="dropdown-content">
+
+                                                                    <a href="#!">
+                                                                        <div class="d-flex align-items-center gap-2 mb-2">
+                                                                            <i class="material-symbols-outlined">keyboard_double_arrow_right</i>
+                                                                            <span> New Credit Note</span>
+                                                                        </div>
+                                                                    </a>
+                                                                    <a href="#!">
+                                                                        <div class="d-flex align-items-center gap-2 mb-2">
+                                                                            <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+                                                                            <span>Draft Credit Note</span>
+                                                                        </div>
+                                                                    </a>
+                                                                    <a href="#!">
+                                                                        <div class="d-flex align-items-center gap-2 mb-2">
+                                                                            <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+                                                                            <span> Awaiting Approval Credit Note</span>
+                                                                        </div>
+                                                                    </a>
+                                                                    <a href="#!">
+                                                                        <div class="d-flex align-items-center gap-2 mb-2">
+                                                                            <i class="material-symbols-outlined">keyboard_double_arrow_right</i>
+                                                                            <span>Approval Credit Note</span>
+                                                                        </div>
+                                                                    </a>
+                                                                    <a href="#!">
+                                                                        <div class="d-flex align-items-center gap-2 mb-2">
+                                                                            <i class="material-symbols-outlined">keyboard_double_arrow_right</i>
+                                                                            <span>Paid Credit Note</span>
+                                                                        </div>
+                                                                    </a>
+                                                                    <a href="#!">
+                                                                        <div class="d-flex align-items-center gap-2 mb-2">
+                                                                            <i class="material-symbols-outlined">keyboard_double_arrow_right</i>
+                                                                            <span>Cancelled Credit Note</span>
+
+                                                                        </div>
+                                                                    </a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                    <li class="custom_dropdown">
+                                                        <a class="dropbtn">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">shopping_cart </i>
+                                                                <span>Purchase Orders</span>
+                                                                <i class="fa-solid fa-angle-right arrow"></i>
+                                                            </div>
+                                                        </a>
+                                                        <div class="dropdown_content">
+
+                                                            <a href="#!">
+                                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined">keyboard_double_arrow_right</i>
+                                                                    <span>Dashboard</span>
+
+                                                                </div>
+                                                            </a>
+                                                            <a href="{{url('purchase_order')}}">
+                                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+                                                                    <span>New Purchase Order </span>
+                                                                </div>
+                                                            </a>
+                                                            <a href="{{url('draft_purchase_order')}}">
+                                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+                                                                    <span> Draft Purchase Order </span>
+                                                                </div>
+                                                            </a>
+                                                            <a href="{{ url('draft_purchase_order?list_mode=AwaitingApprivalPurchaseOrders') }}">
+                                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined">keyboard_double_arrow_right</i>
+                                                                    <span> Awaiting Approval Purchase Orders</span>
+                                                                </div>
+                                                            </a>
+                                                            <a href="{{ url('draft_purchase_order?list_mode=Approved') }}">
+                                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+                                                                    <span>Approved Purchase Order </span>
+                                                                </div>
+                                                            </a>
+                                                            <!-- <a href="#!">Active Customers</a> -->
+                                                            <a href="{{ url('draft_purchase_order?list_mode=Rejected') }}">
+                                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined">keyboard_double_arrow_right</i>
+                                                                    <span> Rejected Purchase Order </span>
+                                                                </div>
+                                                            </a>
+                                                            <a href="{{ url('draft_purchase_order?list_mode=Actioned') }}">
+                                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+                                                                    <span> Actioned Purchase Order </span>
+                                                                </div>
+                                                            </a>
+                                                            <a href="{{ url('draft_purchase_order?list_mode=Paid') }}">
+                                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+                                                                    <span> Paid Purchase Order </span>
+                                                                </div>
+                                                            </a>
+                                                            <a href="{{url('purchase-orders-search')}}">
+                                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+                                                                    <span> Search Purchase Orders </span>
+                                                                </div>
+                                                            </a>
+                                                            <a href="{{url('purchase-order-invoices')}}">
+                                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+                                                                    <span> Invoices Received </span>
+                                                                </div>
+                                                            </a>
+                                                            <a href="{{url('purchase-order-statements')}}">
+                                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+                                                                    <span> Purchase Orders Statements</span>
+                                                                </div>
+                                                            </a>
+                                                            <div class="custom_dropdown2">
+                                                                <a tabindex=0>
+                                                                    <div class="d-flex align-items-center gap-2 mb-2">
+                                                                        <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+                                                                        <span>Recurring Purchase Orders</span>
+                                                                        <i class="fa-solid fa-angle-right ms-auto second-arrow"></i>
+                                                                    </div>
+                                                                </a>
+                                                                <div class="dropdown-content">
+
+                                                                    <a href="#!">
+                                                                        <div class="d-flex align-items-center gap-2 mb-2">
+                                                                            <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+                                                                            <span> New Recurring Purchase Order</span>
+                                                                        </div>
+                                                                    </a>
+                                                                    <a href="#!">
+                                                                        <div class="d-flex align-items-center gap-2 mb-2">
+                                                                            <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+                                                                            <span> Recurring Purchase Orders</span>
+
+                                                                        </div>
+                                                                    </a>
+                                                                </div>
+                                                            </div>
+                                                            <div class="custom_dropdown2">
+                                                                <a tabindex=0>
+                                                                    <div class="d-flex align-items-center gap-2 mb-2">
+                                                                        <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+                                                                        <span>Credit Notes</span>
+                                                                        <i class="fa-solid fa-angle-right ms-auto second-arrow"></i>
+                                                                    </div>
+                                                                </a>
+                                                                <div class="dropdown-content">
+                                                                    <a href="{{url('new_credit_notes')}}">
+                                                                        <div class="d-flex align-items-center gap-2 mb-2">
+                                                                            <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+                                                                            <span> New Credit Note </span>
+                                                                        </div>
+                                                                    </a>
+                                                                    <a href="{{url('credit_notes?list_mode=Approved')}}">
+                                                                        <div class="d-flex align-items-center gap-2 mb-2">
+                                                                            <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+                                                                            <span> Approval Credit Note</span>
+                                                                        </div>
+                                                                    </a>
+                                                                    <a href="{{url('credit_notes?list_mode=Paid')}}">
+                                                                        <div class="d-flex align-items-center gap-2 mb-2">
+                                                                            <i class="material-symbols-outlined">keyboard_double_arrow_right</i>
+                                                                            <span> Paid Credit Note</span>
+                                                                        </div>
+                                                                    </a>
+                                                                    <a href="{{url('credit_notes?list_mode=Cancelled')}}">
+                                                                        <div class="d-flex align-items-center gap-2 mb-2">
+                                                                            <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+                                                                            <span> Cancelled Credit Note</span>
+                                                                        </div>
+                                                                    </a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </li>
+                                        <!-- Contacts start here -->
+                                        <li>
+                                            <button href="#" class="openbtn @if(isset($page)) @if($page == 'customers') ActiveBtn @endif @endif" onclick="openNav(event, 'mySidepanel7')"><span class="plus_icon"><i class="material-symbols-outlined"> contact_page </i></span>Contacts</button>
+                                            <div id="mySidepanel7" class="sidepanel">
+                                                <ul>
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <h5>Contacts</h5>
+                                                        <a href="javascript:void(0)" class="closebtn" onclick="closeNav('mySidepanel7')">
+                                                            <svg width="40px" height="40px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                                                                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                                                                <g id="SVGRepo_iconCarrier">
+                                                                    <path d="M6.99486 7.00636C6.60433 7.39689 6.60433 8.03005 6.99486 8.42058L10.58 12.0057L6.99486 15.5909C6.60433 15.9814 6.60433 16.6146 6.99486 17.0051C7.38538 17.3956 8.01855 17.3956 8.40907 17.0051L11.9942 13.4199L15.5794 17.0051C15.9699 17.3956 16.6031 17.3956 16.9936 17.0051C17.3841 16.6146 17.3841 15.9814 16.9936 15.5909L13.4084 12.0057L16.9936 8.42059C17.3841 8.03007 17.3841 7.3969 16.9936 7.00638C16.603 6.61585 15.9699 6.61585 15.5794 7.00638L11.9942 10.5915L8.40907 7.00636C8.01855 6.61584 7.38538 6.61584 6.99486 7.00636Z" fill="#0F0F0F">
+                                                                    </path>
+                                                                </g>
+                                                            </svg>
+                                                        </a>
+                                                    </div>
+                                                    <li class="custom_dropdown">
+                                                        <a class="dropbtn">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">group_add </i>
+                                                                <span>Customers</span>
+                                                                <i class="fa-solid fa-angle-right arrow"></i>
+                                                            </div>
+                                                        </a>
+                                                        <div class="dropdown_content">
+                                                            <a href="{{url('customer_add_edit')}}">
+                                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+                                                                    <span> New Customers</span>
+                                                                </div>
+                                                            </a>
+                                                            <a href="{{ url('customers?list_mode=ACTIVE') }}">
+                                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined">keyboard_double_arrow_right</i>
+                                                                    <span> Active Customers</span>
+                                                                </div>
+                                                            </a>
+                                                            <a href="{{ url('customers?list_mode=INACTIVE') }}">
+                                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+                                                                    <span>Inactive Customers</span>
+                                                                </div>
+                                                            </a>
+                                                            <a href="#">
+                                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+                                                                    <span> Customers Logins</span>
+                                                                </div>
+                                                            </a>
+                                                        </div>
+                                                    </li>
+                                                    <li class="custom_dropdown">
+                                                        <a class="dropbtn">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined"> storefront </i>
+                                                                <span>Suppliers</span>
+                                                                <i class="fa-solid fa-angle-right arrow"></i>
+                                                            </div>
+                                                        </a>
+                                                        <div class="dropdown_content">
+                                                            <a href="{{url('supplier_add')}}">
+                                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+                                                                    <span> New Suppliers</span>
+                                                                </div>
+                                                            </a>
+                                                            <a href="{{ url('supplier?list_mode=ACTIVE') }}">
+                                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+                                                                    <span> Active Suppliers</span>
+                                                                </div>
+                                                            </a>
+                                                            <a href="{{ url('supplier?list_mode=INACTIVE') }}">
+                                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined">keyboard_double_arrow_right</i>
+                                                                    <span> Inactive Suppliers</span>
+                                                                </div>
+                                                            </a>
+                                                        </div>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </li>
+                                        <!-- Items start here -->
+                                        <li>
+                                            <button href="#" class="openbtn @if(isset($page)) @if($page == 'item') ActiveBtn @endif @endif" onclick="openNav(event, 'mySidepanel8')">
+                                                <span class="plus_icon"> <i class="material-symbols-outlined"> align_items_stretch</i></span>Items
+                                            </button>
+                                            <div id="mySidepanel8" class="sidepanel">
+                                                <ul>
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <h5>Items</h5>
+                                                        <a href="javascript:void(0)" class="closebtn" onclick="closeNav('mySidepanel8')">
+                                                            <svg width="40px" height="40px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                                                                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                                                                <g id="SVGRepo_iconCarrier">
+                                                                    <path d="M6.99486 7.00636C6.60433 7.39689 6.60433 8.03005 6.99486 8.42058L10.58 12.0057L6.99486 15.5909C6.60433 15.9814 6.60433 16.6146 6.99486 17.0051C7.38538 17.3956 8.01855 17.3956 8.40907 17.0051L11.9942 13.4199L15.5794 17.0051C15.9699 17.3956 16.6031 17.3956 16.9936 17.0051C17.3841 16.6146 17.3841 15.9814 16.9936 15.5909L13.4084 12.0057L16.9936 8.42059C17.3841 8.03007 17.3841 7.3969 16.9936 7.00638C16.603 6.61585 15.9699 6.61585 15.5794 7.00638L11.9942 10.5915L8.40907 7.00636C8.01855 6.61584 7.38538 6.61584 6.99486 7.00636Z" fill="#0F0F0F">
+                                                                    </path>
+                                                                </g>
+                                                            </svg>
+                                                        </a>
+                                                    </div>
+                                                    <li>
+                                                        <a href="{{ url('/item/product_categories') }}">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">view_list</i>
+                                                                <span>Product Categories</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{{ url('/item/products') }}">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">category</i>
+                                                                <span>Products</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{{ url('/item/catalogues') }}">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">apps</i>
+                                                                <span>Product Groups</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{{ url('/item/item-groups') }}">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">menu_book </i>
+                                                                <span>Catalogues</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </li>
+                                        <!-- Expenses start here -->
+                                        <li>
+                                            <a href="{{url('/expenses')}}" class="@if(isset($page)) @if($page == 'expenses') ActiveBtn @endif @endif">
+                                                <span class="plus_icon">
+                                                    <i class="material-symbols-outlined"> calculate </i>
+                                                </span>Expenses
+                                            </a>
+                                        </li>
+                                        <!-- Users start here -->
+
+                                        <!-- <li>
+
+                                            <button href="#" class="openbtn" onclick="openNav(event, 'mySidepanel9')"> <span class="plus_icon"> <i class="material-symbols-outlined"> diversity_2 </i></span>Users
+                                            </button>
+                                            <div id="mySidepanel9" class="sidepanel">
+                                                <ul>
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <h5>Users</h5>
+                                                        <a href="javascript:void(0)" class="closebtn" onclick="closeNav('mySidepanel9')">
+                                                            <svg width="40px" height="40px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                                                                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                                                                <g id="SVGRepo_iconCarrier">
+                                                                    <path d="M6.99486 7.00636C6.60433 7.39689 6.60433 8.03005 6.99486 8.42058L10.58 12.0057L6.99486 15.5909C6.60433 15.9814 6.60433 16.6146 6.99486 17.0051C7.38538 17.3956 8.01855 17.3956 8.40907 17.0051L11.9942 13.4199L15.5794 17.0051C15.9699 17.3956 16.6031 17.3956 16.9936 17.0051C17.3841 16.6146 17.3841 15.9814 16.9936 15.5909L13.4084 12.0057L16.9936 8.42059C17.3841 8.03007 17.3841 7.3969 16.9936 7.00638C16.603 6.61585 15.9699 6.61585 15.5794 7.00638L11.9942 10.5915L8.40907 7.00636C8.01855 6.61584 7.38538 6.61584 6.99486 7.00636Z" fill="#0F0F0F"></path>
+                                                                </g>
+                                                            </svg>
+                                                        </a>
+                                                    </div>
+                                                    <li>
+                                                        <a href="#!">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">group</i>
+                                                                <span> Users</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#!">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">diversity_3</i>
+                                                                <span>Team Members</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#!">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">alarm_off</i>
+                                                                <span>Timeoff</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#!">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">person</i>
+                                                                <span>Lone Worker Active List</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </li> -->
+                                        <!-- Reports start here -->
+                                        <li>
+                                            <button href="#" class="openbtn" onclick="openNav(event, 'mySidepanel10')">
+                                                <span class="plus_icon">
+                                                    <i class="material-symbols-outlined"> partner_reports </i>
+                                                </span>Reports
+                                            </button>
+                                            <div id="mySidepanel10" class="sidepanel">
+                                                <ul>
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <h5>Reports</h5>
+                                                        <a href="javascript:void(0)" class="closebtn" onclick="closeNav('mySidepanel10')">
+                                                            <svg width="40px" height="40px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                                                                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                                                                <g id="SVGRepo_iconCarrier">
+                                                                    <path d="M6.99486 7.00636C6.60433 7.39689 6.60433 8.03005 6.99486 8.42058L10.58 12.0057L6.99486 15.5909C6.60433 15.9814 6.60433 16.6146 6.99486 17.0051C7.38538 17.3956 8.01855 17.3956 8.40907 17.0051L11.9942 13.4199L15.5794 17.0051C15.9699 17.3956 16.6031 17.3956 16.9936 17.0051C17.3841 16.6146 17.3841 15.9814 16.9936 15.5909L13.4084 12.0057L16.9936 8.42059C17.3841 8.03007 17.3841 7.3969 16.9936 7.00638C16.603 6.61585 15.9699 6.61585 15.5794 7.00638L11.9942 10.5915L8.40907 7.00636C8.01855 6.61584 7.38538 6.61584 6.99486 7.00636Z" fill="#0F0F0F"></path>
+                                                                </g>
+                                                            </svg>
+                                                        </a>
+                                                    </div>
+                                                    <li>
+                                                        <a href="#!">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">group</i>
+                                                                <span> Customers</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#!">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">description</i>
+                                                                <span> Quote</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#!">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">  
+                                                                <i class="material-symbols-outlined">work</i>
+                                                                <span>Jobs</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#!">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">receipt_long </i>
+                                                                <span> Invoices</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#!">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">group</i>
+                                                                <span>Users</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#!">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">shopping_cart</i>
+                                                                <span>Purchase Orders</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#!">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">shopping_bag</i>
+                                                                <span>Products</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#!">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">directions_car</i>
+                                                                <span>Vehicle Tracking</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#!">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">sms</i>
+                                                                <span>SMS Report</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#!">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">attach_email</i>
+                                                                <span>Email Report</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#!">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">event_note</i>
+                                                                <span>Reminder Report</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#!">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">insert_chart</i>
+                                                                <span>Task Report</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#!">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">table_chart</i>
+                                                                <span>Report Builder</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </li>
+                                        <!-- File Manager start here -->
+                                        <li>
+                                            <button href="#" class="openbtn" onclick="openNav(event, 'mySidepanel11')">
+                                                <span class="plus_icon">
+                                                    <i class="material-symbols-outlined">bookmark_manager</i>
+                                                </span>File Manager
+                                            </button>
+                                            <div id="mySidepanel11" class="sidepanel">
+                                                <ul>
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <h5>File Manager</h5>
+                                                        <a href="javascript:void(0)" class="closebtn" onclick="closeNav('mySidepanel11')">
+                                                            <svg width="40px" height="40px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                                                                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                                                                <g id="SVGRepo_iconCarrier">
+                                                                    <path d="M6.99486 7.00636C6.60433 7.39689 6.60433 8.03005 6.99486 8.42058L10.58 12.0057L6.99486 15.5909C6.60433 15.9814 6.60433 16.6146 6.99486 17.0051C7.38538 17.3956 8.01855 17.3956 8.40907 17.0051L11.9942 13.4199L15.5794 17.0051C15.9699 17.3956 16.6031 17.3956 16.9936 17.0051C17.3841 16.6146 17.3841 15.9814 16.9936 15.5909L13.4084 12.0057L16.9936 8.42059C17.3841 8.03007 17.3841 7.3969 16.9936 7.00638C16.603 6.61585 15.9699 6.61585 15.5794 7.00638L11.9942 10.5915L8.40907 7.00636C8.01855 6.61584 7.38538 6.61584 6.99486 7.00636Z" fill="#0F0F0F"></path>
+                                                                </g>
+                                                            </svg></a>
+                                                    </div>
+                                                    <li>
+                                                        <a href="#!">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">attachment</i>
+                                                                <span>Attachments </span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#!">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">article </i>
+                                                                <span>Digital Documents</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#!">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">task_alt </i>
+                                                                <span>Completed Questionnaires</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </li>
+                                        <!-- Settings start here -->
+                                        <li>
+                                            <button href="#" class="openbtn @if(isset($page)) @if($page == 'setting' || $current_url == 'complaint_type' || $current_url =='CRM_section_types') ActiveBtn @endif @endif" onclick="openNav(event, 'mySidepanel12')"><span class="plus_icon"><i class="material-symbols-outlined"> construction </i></span>Settings</button>
+                                            <div id="mySidepanel12" class="sidepanel">
+                                                <ul>
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <h5>Settings</h5>
+                                                        <a href="javascript:void(0)" class="closebtn" onclick="closeNav('mySidepanel12')">
+                                                            <svg width="40px" height="40px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                <g id="SVGRepo_bgCarrier" stroke-width="0"> </g>
+                                                                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                                                                <g id="SVGRepo_iconCarrier">
+                                                                    <path d="M6.99486 7.00636C6.60433 7.39689 6.60433 8.03005 6.99486 8.42058L10.58 12.0057L6.99486 15.5909C6.60433 15.9814 6.60433 16.6146 6.99486 17.0051C7.38538 17.3956 8.01855 17.3956 8.40907 17.0051L11.9942 13.4199L15.5794 17.0051C15.9699 17.3956 16.6031 17.3956 16.9936 17.0051C17.3841 16.6146 17.3841 15.9814 16.9936 15.5909L13.4084 12.0057L16.9936 8.42059C17.3841 8.03007 17.3841 7.3969 16.9936 7.00638C16.603 6.61585 15.9699 6.61585 15.5794 7.00638L11.9942 10.5915L8.40907 7.00636C8.01855 6.61584 7.38538 6.61584 6.99486 7.00636Z" fill="#0F0F0F">
+                                                                    </path>
+                                                                </g>
+                                                            </svg>
+                                                        </a>
+                                                    </div>
+                                                    <li>
+                                                        <a href="#!">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">settings</i>
+                                                                <span>General Settings</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#!">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined"> description </i>
+                                                                <span>Digital Doc. Manager</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#!">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined"> quiz</i>
+                                                                <span>Questionnaires</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#!">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined"> edit_note </i>
+                                                                <span>Template Editor</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#!">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined"> edit </i>
+                                                                <span>Custom Field Management</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#!">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined"> bolt </i>
+                                                                <span>Triggers</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li class="custom_dropdown">
+                                                        <a class="dropbtn">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined"> group </i>
+                                                                <span>Leads </span>
+                                                                <i class="fa-solid fa-angle-right arrow"></i>
+                                                            </div>
+                                                        </a>
+                                                        <div class="dropdown_content">
+                                                            <a href="#!">
+                                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+                                                                    <span> Lead Settings</span>
+                                                                </div>
+                                                            </a>
+                                                            <a href="{{ url('/lead/lead_sources') }}">
+                                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+                                                                    <span> Lead Sources</span>
+                                                                </div>
+                                                            </a>
+                                                            <a href="{{ url('/lead/lead_status') }}">
+                                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+                                                                    <span> Lead Status</span>
+                                                                </div>
+                                                            </a>
+                                                            <a href="{{ url('/lead/lead_task_type') }}">
+                                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+                                                                    <span> Lead Task Types</span>
+                                                                </div>
+                                                            </a>
+                                                            <a href="{{ url('/lead/lead_reject_types') }}">
+                                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+                                                                    <span> Lead Reject Types</span>
+                                                                </div>
+                                                            </a>
+                                                            <a href="{{ url('/lead/lead_notes_type') }}">
+                                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+                                                                    <span> Lead Notes Type</span>
+                                                                </div>
+                                                            </a>
+                                                        </div>
+                                                    </li>
+                                                    <li class="custom_dropdown">
+                                                        <a class="dropbtn">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined"> comment </i>
+                                                                <span> Quotes </span>
+                                                                <i class="fa-solid fa-angle-right arrow"></i>
+                                                            </div>
+                                                        </a>
+                                                        <div class="dropdown_content">
+                                                            <a href="{{ url('/quote/quote_type') }}">
+                                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+                                                                    <span> Quote Type </span>
+                                                                </div>
+                                                            </a>
+                                                            <a href="{{ url('/quote/quote_sources') }}">
+                                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+                                                                    <span> Quote Source </span>
+                                                                </div>
+                                                            </a>
+                                                            <a href="{{ url('/quote/quote_reject_types') }}">
+                                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+                                                                    <span> Quote Reject </span>
+                                                                </div>
+                                                            </a>
+                                                        </div>
+                                                    </li>
+                                                    <li class="custom_dropdown">
+                                                        <a class="dropbtn">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined"> work </i><span> Jobs </span>
+                                                                <i class="fa-solid fa-angle-right arrow"></i>
+                                                            </div>
+                                                        </a>
+                                                        <div class="dropdown_content">
+                                                            <a href="{{url('job_type')}}">
+                                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+                                                                    <span> Job Type </span>
+                                                                </div>
+                                                            </a>
+                                                            <a href="{{url('job_appointment_type_list')}}">
+                                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+                                                                    <span> Job Appointment Type </span>
+                                                                </div>
+                                                            </a>
+                                                            <a href="{{url('appointment_rejection_cat_list')}}">
+                                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+                                                                    <span> Rejection Categories </span>
+                                                                </div>
+                                                            </a>
+                                                        </div>
+                                                    </li>
+                                                    <li class="custom_dropdown">
+                                                        <a class="dropbtn">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined"> description </i>
+                                                                <span> Invoices </span>
+                                                                <i class="fa-solid fa-angle-right arrow"></i>
+                                                            </div>
+                                                        </a>
+                                                        <div class="dropdown_content">
+                                                            <a href="{{url('/account_codes')}}">
+                                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+                                                                    <span>Account Codes </span>
+                                                                </div>
+                                                            </a>
+                                                            <a href="{{url('/tax_rate')}}">
+                                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+                                                                    <span> Tax Rate</span>
+                                                                </div>
+                                                            </a>
+                                                        </div>
+                                                    </li>
+                                                    <li class="custom_dropdown">
+                                                        <a class="dropbtn">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined"> shopping_cart </i>
+                                                                <span>Purchase Orders </span>
+                                                                <i class="fa-solid fa-angle-right arrow"></i>
+                                                            </div>
+                                                        </a>
+                                                        <div class="dropdown_content">
+                                                            <a href="{{url('departments')}}">
+                                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+                                                                    <span> Departments</span>
+                                                                </div>
+                                                            </a>
+                                                        </div>
+                                                    </li>
+                                                    <li class="custom_dropdown">
+                                                        <a class="dropbtn">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">group_add</i>
+                                                                <span> Customers </span>
+                                                                <i class="fa-solid fa-angle-right arrow"></i>
+                                                            </div>
+                                                        </a>
+                                                        <div class="dropdown_content">
+                                                            <a href="{{url('customer_type')}}">
+                                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+                                                                    <span> Customer Type</span>
+                                                                </div>
+                                                            </a>
+                                                            <a href="{{url('job_titles')}}">
+                                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+                                                                    <span> Customer Job Title </span>
+                                                                </div>
+                                                            </a>
+                                                            <a href="{{url('complaint_type')}}">
+                                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+                                                                    <span> Complaint Type</span>
+                                                                </div>
+                                                            </a>
+                                                        </div>
+                                                    </li>
+                                                    <li class="custom_dropdown">
+                                                        <a class="dropbtn">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined"> group </i>
+                                                                <span> Users </span>
+                                                                <i class="fa-solid fa-angle-right arrow"></i>
+                                                            </div>
+                                                        </a>
+                                                        <div class="dropdown_content">
+                                                            <a href="#!">
+                                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+                                                                    <span> User Type </span>
+                                                                </div>
+                                                            </a>
+                                                            <a href="#!">
+                                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+                                                                    <span> User Profiles </span>
+                                                                </div>
+                                                            </a>
+                                                            <a href="#!">
+                                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+                                                                    <span> User Working Areas </span>
+                                                                </div>
+                                                            </a>
+                                                            <a href="#!">
+                                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+                                                                    <span> Personal Time Type </span>
+                                                                </div>
+                                                            </a>
+                                                            <a href="#!">
+                                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+                                                                    <span> User Contractors </span>
+                                                                </div>
+                                                            </a>
+                                                            <a href="#!">
+                                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+                                                                    <span> User Location </span>
+                                                                </div>
+                                                            </a>
+                                                        </div>
+                                                    </li>
+                                                    <li class="custom_dropdown">
+                                                        <a class="dropbtn">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined"> database </i>
+                                                                <span> CRM </span>
+                                                                <i class="fa-solid fa-angle-right arrow"></i>
+                                                            </div>
+                                                        </a>
+                                                        <div class="dropdown_content">
+                                                            <a href="{{ url('/lead/CRM_section_types') }}">
+                                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+                                                                    <span> CRM Section Types</span>
+                                                                </div>
+                                                            </a>
+                                                        </div>
+                                                    </li>
+                                                    <li class="custom_dropdown">
+                                                        <a class="dropbtn">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined"> settings </i>
+                                                                <span> General </span>
+                                                                <i class="fa-solid fa-angle-right arrow"></i>
+                                                            </div>
+                                                        </a>
+                                                        <div class="dropdown_content">
+                                                            <a href="{{url('/attachments_types')}}">
+                                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+                                                                    <span> Attachment Types</span>
+                                                                </div>
+                                                            </a>
+                                                            <a href="{{url('/Payment_type')}}">
+                                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+                                                                    <span> Payment Types </span>
+                                                                </div>
+                                                            </a>
+                                                            <a href="{{url('/regions')}}">
+                                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+                                                                    <span>Regions </span>
+                                                                </div>
+                                                            </a>
+                                                            <a href="{{url('/task_types')}}">
+                                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+                                                                    <span> Task Types </span>
+                                                                </div>
+                                                            </a>
+                                                            <a href="{{url('/tags')}}">
+                                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                                    <i class="material-symbols-outlined"> keyboard_double_arrow_right</i>
+                                                                    <span> Tags</span>
+                                                                </div>
+                                                            </a>
+                                                        </div>
+                                                    </li>
+                                                    <li>
+                                                        <a href="quick_setup_wizard.html">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined"> auto_mode </i>
+                                                                <span> Quick Setup Wizard </span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </li>
+                                        <!-- Day Book start here -->
+                                        <li>
+                                            <button href="#" class="openbtn @if(isset($page)) @if($page == 'dayBook') ActiveBtn @endif @endif" onclick="openNav(event, 'mySidepanel13')">
+                                                <span class="plus_icon">
+                                                    <i class="material-symbols-outlined"> book_5 </i>
+                                                </span>Day Book
+                                            </button>
+                                            <div id="mySidepanel13" class="sidepanel">
+                                                <ul>
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <h5>Day Book</h5>
+                                                        <a href="javascript:void(0)" class="closebtn" onclick="closeNav('mySidepanel13')">
+                                                            <svg width="40px" height="40px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                <g id="SVGRepo_bgCarrier" stroke-width="0"> </g>
+                                                                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                                                                <g id="SVGRepo_iconCarrier">
+                                                                    <path d="M6.99486 7.00636C6.60433 7.39689 6.60433 8.03005 6.99486 8.42058L10.58 12.0057L6.99486 15.5909C6.60433 15.9814 6.60433 16.6146 6.99486 17.0051C7.38538 17.3956 8.01855 17.3956 8.40907 17.0051L11.9942 13.4199L15.5794 17.0051C15.9699 17.3956 16.6031 17.3956 16.9936 17.0051C17.3841 16.6146 17.3841 15.9814 16.9936 15.5909L13.4084 12.0057L16.9936 8.42059C17.3841 8.03007 17.3841 7.3969 16.9936 7.00638C16.603 6.61585 15.9699 6.61585 15.5794 7.00638L11.9942 10.5915L8.40907 7.00636C8.01855 6.61584 7.38538 6.61584 6.99486 7.00636Z" fill="#0F0F0F"></path>
+                                                                </g>
+                                                            </svg>
+                                                        </a>
+                                                    </div>
+                                                    <li>
+                                                        <a href="{{ url('purchase/purchase-expenses') }}">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">book_5 </i>
+                                                                <span>Purchase Expenses</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{{ url('purchase/purchase-day-book') }}">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">book_5 </i>
+                                                                <span>Purchase Day Book</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{{ url('/sales/sales-day-book') }}">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">book_5 </i>
+                                                                <span>Sales Day Book</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </li>
+                                        <!-- Fixed Asset start here -->
+                                        <li>
+                                            <button href="#" class="openbtn @if(isset($page)) @if($page == 'assets') ActiveBtn @endif @endif" onclick="openNav(event, 'mySidepanel14')">
+                                                <span class="plus_icon">
+                                                    <i class="material-symbols-outlined"> web_asset</i>
+                                                </span>Fixed Assets
+                                            </button>
+                                            <div id="mySidepanel14" class="sidepanel">
+                                                <ul>
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <h5>Fixed Assets</h5>
+                                                        <a href="javascript:void(0)" class="closebtn" onclick="closeNav('mySidepanel14')">
+                                                            <svg width="40px" height="40px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                                                                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                                                                <g id="SVGRepo_iconCarrier">
+                                                                    <path d="M6.99486 7.00636C6.60433 7.39689 6.60433 8.03005 6.99486 8.42058L10.58 12.0057L6.99486 15.5909C6.60433 15.9814 6.60433 16.6146 6.99486 17.0051C7.38538 17.3956 8.01855 17.3956 8.40907 17.0051L11.9942 13.4199L15.5794 17.0051C15.9699 17.3956 16.6031 17.3956 16.9936 17.0051C17.3841 16.6146 17.3841 15.9814 16.9936 15.5909L13.4084 12.0057L16.9936 8.42059C17.3841 8.03007 17.3841 7.3969 16.9936 7.00638C16.603 6.61585 15.9699 6.61585 15.5794 7.00638L11.9942 10.5915L8.40907 7.00636C8.01855 6.61584 7.38538 6.61584 6.99486 7.00636Z" fill="#0F0F0F"></path>
+                                                                </g>
+                                                            </svg>
+                                                        </a>
+                                                    </div>
+                                                    <li>
+                                                        <a href="{{url('sales-finance/assets/asset-category')}}">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">web_asset </i>
+                                                                <span>Asset Catetgory</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li class="custom_dropdown">
+                                                        <a href="{{url('sales-finance/assets/depreciation-type')}}">
+
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined"> web_asset </i>
+                                                                <span> Depreciation Type </span>
+                                                            </div>
+                                                        </a>
+
+                                                    </li>
+                                                    <li>
+                                                        <a href="{{url('sales-finance/assets/asset-register')}}">
+                                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                                <i class="material-symbols-outlined">app_registration</i>
+                                                                <span>Asset Register</span>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </li>
+                                        <!-- end here -->
+                                    </div>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
     <!-- Button trigger modal -->
 
     <!-- Modal -->
@@ -493,32 +2153,32 @@ $access_rights = explode(',', $rights);
             <div class="modal-content add_Customer">
                 <div class="modal-header terques-bg">
                     <h5 class="modal-title pupTitle" id="CRMHeaderPopupLabel">CRM View</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">×</button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body crmModelCont pt-2">
                     <div class="jobsection pb-2 hideandshow">
                         <button class="profileDrop" id="onclickbtnHideShow">Hide/Show</button>
                     </div>
                     <div id="showDivCont">
-                        <div class="newJobForm mb-4 p-1 px-3">
+                        <div class="newJobForm mb-4 p-3">
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="">
                                         <h4 class="contTitle text-center">Contact Details</h4>
                                     </div>
-                                    <div class="row pt-3">
+                                    <div class="row">
                                         <label class="col-md-4 col-form-label"> <strong>Full Name:</strong></label>
                                         <div class="col-md-8">
                                             <span id="" class="editInput"> Arjun Kumar</span>
                                         </div>
                                     </div>
-                                    <div class="row pt-3">
+                                    <div class="row pt-2">
                                         <label class="col-md-4 col-form-label"> <strong>Email Address:</strong></label>
                                         <div class="col-md-8">
                                             <span id="" class="editInput">arjun@gmail.com</span>
                                         </div>
                                     </div>
-                                    <div class="row pt-3">
+                                    <div class="row pt-2">
                                         <label class="col-md-4 col-form-label"> <strong>Telephone:</strong></label>
                                         <div class="col-md-8">
                                             <span id="" class="editInput">+91-1234567890</span>
@@ -529,15 +2189,14 @@ $access_rights = explode(',', $rights);
                                     <div class="">
                                         <h4 class="contTitle text-center"> <strong>Lead Details</strong></h4>
                                     </div>
-                                    <div class="row pt-3">
+                                    <div class="row">
                                         <label class="col-md-4 col-form-label"><strong>Lead Ref.:</strong></label>
                                         <div class="col-md-8">
                                             <span id="" class="editInput">Default</span>
                                             <input type="hidden" id="" name="">
-
                                         </div>
                                     </div>
-                                    <div class="row pt-3">
+                                    <div class="row pt-2">
                                         <label class="col-md-4 col-form-label"> <strong>Lead Status:</strong></label>
                                         <div class="col-md-8">
                                             <span id="" class="editInput">425</span>
@@ -552,7 +2211,6 @@ $access_rights = explode(',', $rights);
                             <button class="nav-link active" id="pills-userCRMfullHistory-tab" data-bs-toggle="pill" data-bs-target="#CRMpills-fullHistory" type="button" role="tab" aria-controls="pills-fullHistory" aria-selected="true">Full History</button>
                         </li>
                         <li class="nav-item" role="presentation">
-
                             <button class="nav-link" id="" data-bs-toggle="pill" data-bs-target="#CRMpills-Calls" type="button" role="tab" aria-controls="pills-Calls" aria-selected="false" tabindex="-1">Calls</button>
                         </li>
                         <li class="nav-item" role="presentation">
@@ -569,8 +2227,6 @@ $access_rights = explode(',', $rights);
                         </li>
                     </ul>
 
-
-
                     <div class="tab-content" id="pills-tabContent">
                         <div class="tab-pane fade show active" id="CRMpills-fullHistory" role="tabpanel" aria-labelledby="pills-userCRMfullHistory-tab" tabindex="0">
                             <div class="newJobForm mt-4">
@@ -579,8 +2235,8 @@ $access_rights = explode(',', $rights);
                                     <div class="col-sm-3">
                                         <form class="searchForm" action="">
                                             <div class="input-group mb-3 mt-3">
-                                                <input type="text" class="form-control editInput" placeholder="Your Email" name="email">
-                                                <button type="button" class="input-group-text sarchBtn">Search</button>
+                                                <input type="text" class="form-control editInput ps-3" placeholder="Your Email" name="email">
+                                                <button type="button" class="input-group-text profileDrop">Search</button>
                                             </div>
                                         </form>
                                     </div>
@@ -624,9 +2280,6 @@ $access_rights = explode(',', $rights);
                                             <a href="#" class="profileDrop p-2 crmNewBtn" id="userCRMCallsModel"> New</a>
                                         </div>
                                     </div>
-
-
-
                                     <div class="col-sm-3">
                                         <form class="searchForm" action="">
                                             <div class="input-group mb-3  mt-3">
@@ -842,13 +2495,8 @@ $access_rights = explode(',', $rights);
                                                                         </div>
                                                                     </form>
                                                                 </div>
-
                                                             </div>
-
-                                                            <form class="">
-
-                                                            </form>
-
+                                                            <!-- <form class=""></form> -->
                                                         </div>
                                                         <div class="tab-pane fade" id="CRMnav-Timer" role="tabpanel" aria-labelledby="CRMnav-Timer-tab">
                                                             <div class="row">
@@ -931,7 +2579,7 @@ $access_rights = explode(',', $rights);
                                                 <div class="modal-body">
                                                     <form action="" id="">
                                                         <div class="mb-3 row">
-                                                            <label for="inputJobRef" class="col-sm-3 col-form-label">Task Type <span class="radStar ">*</span></label>
+                                                            <label for="inputJobRef" class="col-sm-3 col-form-label">Task Type <span class="radStar">*</span></label>
                                                             <div class="col-sm-9">
                                                                 <input type="text" name="title" class="form-control editInput" id="inputJobRef" value="" placeholder="Task Type">
                                                             </div>
@@ -1153,7 +2801,7 @@ $access_rights = explode(',', $rights);
                             </div>
                         </div>
                         <div class="mb-2 row">
-                            <label for="calls_type" class="col-sm-3 col-form-label">Type <span class="radStar ">*</span> </label>
+                            <label for="calls_type" class="col-sm-3 col-form-label">Type <span class="radStar">*</span> </label>
                             <div class="col-sm-7">
                                 <select name="crm_type_id" class="form-control editInput">
                                     <option value="">Select</option>
@@ -1164,7 +2812,7 @@ $access_rights = explode(',', $rights);
                             </div>
                         </div>
                         <div class="mb-2 row">
-                            <label for="calls_notes" class="col-sm-3 col-form-label">Notes <span class="radStar ">*</span> </label>
+                            <label for="calls_notes" class="col-sm-3 col-form-label">Notes <span class="radStar">*</span> </label>
                             <div class="col-sm-9">
                                 <div id="UserEditor">
                                 </div>
@@ -1189,7 +2837,7 @@ $access_rights = explode(',', $rights);
                         </div>
                         <div class="">
                             <div class="mb-2 row">
-                                <label for="user_notifiy" class="col-sm-3 col-form-label">Notify Who?<span class="radStar ">*</span> </label>
+                                <label for="user_notifiy" class="col-sm-3 col-form-label">Notify Who? <span class="radStar">*</span> </label>
                                 <div class="col-sm-9">
                                     <select name="notify_user" class="form-control editInput" id="user_notifiy">
                                         <option value=""></option>
@@ -1197,7 +2845,7 @@ $access_rights = explode(',', $rights);
                                 </div>
                             </div>
                             <div class="mb-2 row">
-                                <label class="col-sm-3 col-form-label">Send As<span class="radStar ">*</span> </label>
+                                <label class="col-sm-3 col-form-label">Send As <span class="radStar">*</span> </label>
                                 <div class="col-sm-9">
                                     <label for="calls_notify_who1" class="editInput"><input type="checkbox" name="notification" id="calls_notify_who1" value="1"> Notification (User Only) </label>
                                     <label for="calls_notify_who2" class="editInput"><input type="checkbox" name="sms" id="calls_notify_who2" value="1"> SMS </label>
@@ -1237,7 +2885,7 @@ $access_rights = explode(',', $rights);
                 <div class="modal-body">
                     <form action="" id="">
                         <div class="mb-2 row">
-                            <label for="type_title" class="col-sm-3 col-form-label">Type <span class="radStar ">*</span> </label>
+                            <label for="type_title" class="col-sm-3 col-form-label">Type <span class="radStar">*</span> </label>
                             <div class="col-sm-9">
                                 <input type="text" class="form-control editInput" name="title" id="type_title" value="">
                                 <input type="hidden" class="form-control editInput" name="crm_section" id="" value="1">
@@ -1272,7 +2920,7 @@ $access_rights = explode(',', $rights);
                 <div class="modal-body">
                     <form action="" id="" enctype='multipart/form-data'>
                         <div class="mb-2 row">
-                            <label for="type_title" class="col-sm-3 col-form-label">To <span class="radStar ">*</span> </label>
+                            <label for="type_title" class="col-sm-3 col-form-label">To <span class="radStar">*</span> </label>
                             <div class="col-sm-9">
                                 <input type="hidden" class="form-control editInput" name="crm_lead_email_id" id="">
                                 <input type="text" class="form-control editInput" name="to" id="" value="">
@@ -1285,13 +2933,13 @@ $access_rights = explode(',', $rights);
                             </div>
                         </div>
                         <div class="mb-2 row">
-                            <label for="type_title" class="col-sm-3 col-form-label">Subject <span class="radStar ">*</span> </label>
+                            <label for="type_title" class="col-sm-3 col-form-label">Subject <span class="radStar">*</span> </label>
                             <div class="col-sm-9">
                                 <input type="text" class="form-control editInput" name="subject" id="">
                             </div>
                         </div>
                         <div class="mb-2 row">
-                            <label for="type_title" class="col-sm-3 col-form-label">Message <span class="radStar ">*</span> </label>
+                            <label for="type_title" class="col-sm-3 col-form-label">Message <span class="radStar">*</span> </label>
                             <div class="col-sm-9">
                                 <div class="col-form-label">
                                     <div id="">
@@ -1324,7 +2972,7 @@ $access_rights = explode(',', $rights);
                         </div>
                         <div id="user_notification_email_div">
                             <div class="mb-2 row">
-                                <label for="user_notifiy" class="col-sm-3 col-form-label">Notify Who?<span class="radStar ">*</span> </label>
+                                <label for="user_notifiy" class="col-sm-3 col-form-label">Notify Who? <span class="radStar">*</span> </label>
                                 <div class="col-sm-9">
                                     <select name="notify_user" class="form-control editInput" id="user_notifiy">
                                         <option value=""></option>
@@ -1332,7 +2980,7 @@ $access_rights = explode(',', $rights);
                                 </div>
                             </div>
                             <div class="mb-2 row">
-                                <label class="col-sm-3 col-form-label">Send As<span class="radStar ">*</span> </label>
+                                <label class="col-sm-3 col-form-label">Send As <span class="radStar">*</span> </label>
                                 <div class="col-sm-9">
                                     <label for="calls_notify_who1" class="editInput">
                                         <input type="checkbox" name="notification" id="calls_notify_who1" value="1"> Notification (User Only)
@@ -1378,14 +3026,14 @@ $access_rights = explode(',', $rights);
                 <div class="modal-body">
                     <form action="" id="">
                         <div class="mb-2 row">
-                            <label for="type_title" class="col-sm-3 col-form-label">Type <span class="radStar ">*</span> </label>
+                            <label for="type_title" class="col-sm-3 col-form-label">Type <span class="radStar">*</span> </label>
                             <div class="col-sm-9">
                                 <input type="hidden" class="form-control editInput" name="crm_lead_notes_id" id="">
                                 <select class="form-control editInput" name="crm_section_type_id" id=""></select>
                             </div>
                         </div>
                         <div class="mb-2 row">
-                            <label for="type_title" class="col-sm-3 col-form-label">Notes <span class="radStar ">*</span> </label>
+                            <label for="type_title" class="col-sm-3 col-form-label">Notes <span class="radStar">*</span> </label>
                             <div class="col-sm-9">
                                 <div class="col-form-label">
                                     <div id="userNotesEditor">
@@ -1412,7 +3060,7 @@ $access_rights = explode(',', $rights);
                         </div>
                         <div id="user_notification_notes_div">
                             <div class="mb-2 row">
-                                <label for="user_notifiy" class="col-sm-3 col-form-label">Notify Who?<span class="radStar ">*</span> </label>
+                                <label for="user_notifiy" class="col-sm-3 col-form-label">Notify Who? <span class="radStar">*</span> </label>
                                 <div class="col-sm-9">
                                     <select name="user_id" class="form-control editInput" id="">
                                         <option>dfgdfg</option>
@@ -1421,7 +3069,7 @@ $access_rights = explode(',', $rights);
                                 </div>
                             </div>
                             <div class="mb-2 row">
-                                <label class="col-sm-3 col-form-label">Send As<span class="radStar ">*</span> </label>
+                                <label class="col-sm-3 col-form-label">Send As <span class="radStar">*</span> </label>
                                 <div class="col-sm-9">
                                     <label for="calls_notify_who1" class="editInput">
                                         <input type="checkbox" name="notification" id="calls_notify_who1" value="1"> Notification (User Only)
@@ -1467,7 +3115,7 @@ $access_rights = explode(',', $rights);
                 <div class="modal-body">
                     <form action="" id="">
                         <div class="mb-2 row">
-                            <label for="type_title" class="col-sm-3 col-form-label">Type <span class="radStar ">*</span> </label>
+                            <label for="type_title" class="col-sm-3 col-form-label">Type <span class="radStar">*</span> </label>
                             <div class="col-sm-9">
                                 <input type="hidden" class="form-control editInput" name="crm_lead_complaint_id" id="">
                                 <select class="form-control editInput" name="crm_section_type_id" id="">
@@ -1476,7 +3124,7 @@ $access_rights = explode(',', $rights);
                             </div>
                         </div>
                         <div class="mb-2 row">
-                            <label for="type_title" class="col-sm-3 col-form-label">Notes <span class="radStar ">*</span> </label>
+                            <label for="type_title" class="col-sm-3 col-form-label">Notes <span class="radStar">*</span> </label>
                             <div class="col-sm-9">
                                 <div class="col-form-label">
                                     <div id="userComplaintEditor">
@@ -1503,7 +3151,7 @@ $access_rights = explode(',', $rights);
                         </div>
                         <div id="">
                             <div class="mb-2 row">
-                                <label for="user_notifiy" class="col-sm-3 col-form-label">Notify Who?<span class="radStar ">*</span> </label>
+                                <label for="user_notifiy" class="col-sm-3 col-form-label">Notify Who? <span class="radStar">*</span> </label>
                                 <div class="col-sm-9">
                                     <select name="user_id" class="form-control editInput" id="user_notifiy">
                                         <option value="">default1</option>
@@ -1512,7 +3160,7 @@ $access_rights = explode(',', $rights);
                                 </div>
                             </div>
                             <div class="mb-2 row">
-                                <label class="col-sm-3 col-form-label">Send As<span class="radStar ">*</span> </label>
+                                <label class="col-sm-3 col-form-label">Send As <span class="radStar">*</span> </label>
                                 <div class="col-sm-9">
                                     <label for="calls_complaint_who1" class="editInput">
                                         <input type="checkbox" name="notification" id="" value="1"> Notification (User Only)
@@ -1546,6 +3194,74 @@ $access_rights = explode(',', $rights);
         }
     }
 </script>
+
+    <script>
+        function openNav(event, panelId) {
+            event.stopPropagation();
+            closeAllPanels();
+            document.getElementById(panelId).classList.add('remove_add');
+        }
+
+        function closeNav(panelId) {
+            document.getElementById(panelId).classList.remove('remove_add');
+        }
+
+        function closeAllPanels() {
+            let panels = document.querySelectorAll('.sidepanel');
+            panels.forEach(panel => panel.classList.remove('remove_add'));
+        }
+
+        window.onclick = function() {
+            closeAllPanels();
+        };
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const dropdownButtons = document.querySelectorAll(".dropbtn");
+
+            dropdownButtons.forEach((button) => {
+                button.addEventListener("click", function(event) {
+                    event.stopPropagation();
+                    let dropdownContent = this.nextElementSibling;
+
+                    // Close all other dropdowns
+                    document.querySelectorAll(".dropdown_content").forEach((menu) => {
+                        if (menu !== dropdownContent) {
+                            menu.classList.remove("show");
+                            setTimeout(() => {
+                                menu.style.display = "none"; // Hide after animation
+                            }, 10);
+                        }
+                    });
+
+                    // Toggle clicked dropdown
+                    if (dropdownContent.classList.contains("show")) {
+                        dropdownContent.classList.remove("show");
+                        setTimeout(() => {
+                            dropdownContent.style.display = "none"; // Hide after animation
+                        }, 300);
+                    } else {
+                        dropdownContent.style.display = "block"; // Show first
+                        setTimeout(() => {
+                            dropdownContent.classList.add("show");
+                        }, 10);
+                    }
+                });
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener("click", function() {
+                document.querySelectorAll(".dropdown_content").forEach((menu) => {
+                    if (menu.classList.contains("show")) {
+                        menu.classList.remove("show");
+                        setTimeout(() => {
+                            menu.style.display = "none"; // Hide after animation
+                        }, 10);
+                    }
+                });
+            });
+        });
+    </script>
     <!-- calls CK editor Js -->
     <script type="module">
         import {
@@ -1575,7 +3291,7 @@ $access_rights = explode(',', $rights);
                     // Get the CKEditor content
                     document.getElementById('calls_notes').value = editor.getData();
                     // console.log(document.getElementById('calls_notes').value);
-                    // var formData = $('#CRM_calls_form').serialize();
+                    // var formData = $('#CRM_calls_form').serialize(); 
 
 
                 });
@@ -1604,11 +3320,11 @@ $access_rights = explode(',', $rights);
             $('#userCallsModal').modal('hide');
         }
 
-        window.onclick = function(event) {
-            if (event.target === userCallsModal) {
-                $('#userCallsModal').modal('hide');
-            }
-        }
+        // window.onclick = function(event) {
+        //     if (event.target === userCallsModal) {
+        //         $('#userCallsModal').modal('hide');
+        //     }
+        // }
         // CRM Complaint Js End for model show
 
 
@@ -1627,11 +3343,11 @@ $access_rights = explode(',', $rights);
             $('#typeCrmModel').modal('hide');
         }
 
-        window.onclick = function(event) {
-            if (event.target === typeCrmModel) {
-                $('#typeCrmModel').modal('hide');
-            }
-        }
+        // window.onclick = function(event) {
+        //     if (event.target === typeCrmModel) {
+        //         $('#typeCrmModel').modal('hide');
+        //     }
+        // }
         // CRM Section Type Js End for model show
 
 
@@ -1650,11 +3366,11 @@ $access_rights = explode(',', $rights);
             $('#userEmailModel').modal('hide');
         }
 
-        window.onclick = function(event) {
-            if (event.target === userEmailModel) {
-                $('#userEmailModel').modal('hide');
-            }
-        }
+        // window.onclick = function(event) {
+        //     if (event.target === userEmailModel) {
+        //         $('#userEmailModel').modal('hide');
+        //     }
+        // }
         // CRM email Js End for model show
 
 
@@ -1673,11 +3389,11 @@ $access_rights = explode(',', $rights);
             $('#TasksecondModal').modal('hide');
         }
 
-        window.onclick = function(event) {
-            if (event.target === TasksecondModal) {
-                $('#TasksecondModal').modal('hide');
-            }
-        }
+        // window.onclick = function(event) {
+        //     if (event.target === TasksecondModal) {
+        //         $('#TasksecondModal').modal('hide');
+        //     }
+        // }
         // CRM task Js End for model show
 
         // CRM task third Js Start for model show
@@ -1695,11 +3411,11 @@ $access_rights = explode(',', $rights);
             $('#third3Modal').modal('hide');
         }
 
-        window.onclick = function(event) {
-            if (event.target === compliantsModal) {
-                $('#third3Modal').modal('hide');
-            }
-        }
+        // window.onclick = function(event) {
+        //     if (event.target === compliantsModal) {
+        //         $('#third3Modal').modal('hide');
+        //     }
+        // }
         // CRM task third Js End for model show
 
         // CRM Notes Js Start for model show
@@ -1717,11 +3433,11 @@ $access_rights = explode(',', $rights);
             $('#NotesCrmModel').modal('hide');
         }
 
-        window.onclick = function(event) {
-            if (event.target === NotesCrmModel) {
-                $('#NotesCrmModel').modal('hide');
-            }
-        }
+        // window.onclick = function(event) {
+        //     if (event.target === NotesCrmModel) {
+        //         $('#NotesCrmModel').modal('hide');
+        //     }
+        // }
         // CRM Notes Js End for model show
 
 
@@ -1740,11 +3456,11 @@ $access_rights = explode(',', $rights);
             $('#CompHistoryModal').modal('hide');
         }
 
-        window.onclick = function(event) {
-            if (event.target === compliantsModal) {
-                $('#CompHistoryModal').modal('hide');
-            }
-        }
+        // window.onclick = function(event) {
+        //     if (event.target === compliantsModal) {
+        //         $('#CompHistoryModal').modal('hide');
+        //     }
+        // }
 
         // Function to set z-index
         function setZIndexForBackdrop(zIndex) {
@@ -1818,7 +3534,7 @@ $access_rights = explode(',', $rights);
                     response.Data.forEach(user => {
                         const option = document.createElement('option');
                         option.value = user.id;
-                        option.text =  user.name + " " + "(+" + user.code +")";
+                        option.text = user.name + " " + "(+" + user.code + ")";
                         selectElement.appendChild(option);
                     });
                 },
@@ -1827,6 +3543,4 @@ $access_rights = explode(',', $rights);
                 }
             });
         }
-
-
     </script>

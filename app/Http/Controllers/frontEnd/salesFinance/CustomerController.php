@@ -301,6 +301,7 @@ class CustomerController extends Controller
         $data['country'] = Country::all_country_list();
         $data['country_code']=Country::getCountriesNameCode();
         // echo "<pre>";print_r($data['country_code']);die;
+        $data['page']="customers";
         return view('frontEnd.salesAndFinance.jobs.active_customer', $data);
     }
     private function customer_email_to($home_id){
@@ -322,6 +323,7 @@ class CustomerController extends Controller
         $home_id = Auth::user()->home_id;
         $data['customer_type'] = Customer_type::whereNUll('deleted_at')->get();
         $data['home_id'] = $home_id;
+        $data['page']='setting';
         // echo "<pre>";print_r($customer_type);die;
         return view('frontEnd.salesAndFinance.jobs.customer_type', $data);
     }
@@ -1211,7 +1213,7 @@ class CustomerController extends Controller
         return response()->json(['success'=>true,'data'=>$data]);
         
     }
-    public function getAllCustomerList(Request $request){
+    public function getAllCustomerList(){
         $home_id = Auth::user()->home_id;
         $customer = Customer::get_customer_list_Attribute($home_id, 'ACTIVE');
         return response()->json(['success'=>true,'data'=>$customer]);

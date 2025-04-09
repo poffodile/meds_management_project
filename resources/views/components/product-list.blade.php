@@ -581,7 +581,7 @@
                     $('#productGroupModalData').html(productGroupModalDesign);
                 }else{
                     document.getElementById('productGroupModalLabel').innerHTML='Product Group: ';
-                    $('#productGroupModalData').html('<tr><td colspan="8" class="text-center" style="color:red">Sorry, there are no items available</td></tr>');
+                    $('#productGroupModalData').html('<tr><td colspan="8" class="text-center" style="color: #e10078;">Sorry, there are no items available</td></tr>');
                 }
             },
             error: function(xhr, status, error) {
