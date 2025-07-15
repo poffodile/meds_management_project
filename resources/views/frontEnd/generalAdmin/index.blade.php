@@ -12,16 +12,16 @@
                 <section class="panel">
                     <header class="panel-heading">
                         General Admin
-                        <span class="tools pull-right">
+                        <!-- <span class="tools pull-right">
                             <a href="javascript:;" class="fa fa-times"></a>
-                        </span>
+                        </span> -->
                     </header>
                     <div class="panel-body cus-panelbody">
                         <div class="col-md-6 col-sm-6 col-xs-6 petty-cash">
                             <div class="sys-mngmnt-box" >
                                 <!-- data-toggle="modal" data-target="#addServiceUserModal" -->
                                 <div class="sys-mngmnticon"> <i class="fa fa-money"></i> </div>
-                                <p>Petty Cash</p>
+                                <p>Petty Cash </p>
                             </div>
                         </div>
                         <div class="col-md-6 col-sm-6 col-xs-6 log_book">

@@ -75,7 +75,8 @@
 
     .contact h3 .currentAdd {
         color: #767676;
-        background: #f1f2f7;
+        /* background: #f1f2f7; */
+        background: #ffffff;
         font-family: 'Open Sans', sans-serif;
         font-size: 13px;
         font-weight: 500;
@@ -480,6 +481,24 @@ span.ps10 {
                                                             </section>
                                                         </div>
                                                     </div>
+                                                    <!-- Pre Invoice -->
+                                                    <div class="col-md-2 col-sm-4 col-xs-12">
+                                                        <div class="profile-nav alt">
+                                                            <a href="{{ url('/service/invoice/'.$service_user_id) }}">
+                                                                <section class="panel text-center profile-square">
+                                                                    <div class="user-heading alt wdgt-row label-inverse">
+                                                                        <i class="fa fa-file"></i>
+                                                                        <!-- <i class="fa fa-heartbeat"></i> -->
+                                                                    </div>
+                                                                    <div class="panel-body">
+                                                                        <div class="wdgt-value">Pre-Invoice</div>
+                                                                    </div>
+                                                                </section>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                    <!-- end here -->
+
                                                 </div>
                                             </div>
 

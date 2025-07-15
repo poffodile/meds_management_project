@@ -71,6 +71,8 @@ class ExpenseControllerAdmin extends Controller
             $data['users'] = User::getHomeUsers($home_id);
             $data['rate']=Construction_tax_rate::getAllTax_rate($home_id,'Active');
             $data['customer']=Customer::get_customer_list_Attribute($home_id,'ACTIVE');
+        }else {
+            return redirect('admin/')->with('error',NO_HOME_ERR);
         }
         return view('backEnd.salesFinance.expense.expense',$data);
     }

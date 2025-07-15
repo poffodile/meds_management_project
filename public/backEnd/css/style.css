@@ -8028,3 +8028,91 @@ td.action-icn {
     color: #00A8B3;
     font-weight: 600;
 }
+
+/* 1 may 2025 Swapnil */
+.clearfix_space{
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: end;
+    gap: 10px;
+}
+
+.adv-table .dataTables_length {
+    padding: 0;
+    margin-left: 14px;
+}
+ .adv-table .dataTables_length label select {
+    height: 34px;
+    width: 98px;
+}
+.dataTables_filter {
+    padding-top: 0 !important;
+}
+.dataTables_filter label input {
+    float: right;
+    margin-left: 10px;
+    width: 78%;
+    height: 34px;
+}
+.dt-buttons button.dt-button {
+    background-color: #1ca59e !important;
+    border-color: #1ca59e !important;
+    color: #FFFFFF !important;
+    display: inline-block;
+    margin-bottom: 0;
+    font-weight: 400 !important;
+    text-align: center;
+    vertical-align: middle;
+    cursor: pointer;
+    background-image: none;
+    border: 1px solid transparent !important;
+    white-space: nowrap;
+    padding: 6px 12px !important;
+    font-size: 14px !important;
+    line-height: 1.428571429 !important;
+    border-radius: 3px !important;
+    transition: .7s;
+}
+
+.dt-buttons button.dt-button:hover{
+    background-color: #1ca59e !important;
+    border-color: #1ca59e !important;
+    color: #FFFFFF;
+}
+
+/* ***********custom datatable visibility ************* */
+
+.dt-button-collection .dt-button{
+    border: 1px solid trancparent
+}
+div.dt-button-collection{
+    padding: 0 !important;
+}
+div.dt-button-collection div .dt-button {
+    background-color: #d5d5d5 !important;
+    margin-bottom: 2px;
+    border-radius: 0 !important;
+}.dt-button-collection .dt-button span{
+    color: #000;
+    border: 0;
+}
+div.dt-button-collection .dt-button-active:after{
+    color: #000 !important;
+}
+.dt-button-collection .dt-button:hover{
+    background-color: #1ca59e !important;
+    border-color: #1ca59e !important;
+    border: 1px solid #1ca59e !important;
+    border-radius: 0px;
+}
+
+/* .add-council-tax {
+    padding: 40px 0;
+} */
+.council-tax-btn {
+    margin-top: 40px;
+}
+
+header.panel-heading {
+    margin-bottom: 15px;
+}

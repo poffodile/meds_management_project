@@ -190,10 +190,12 @@
             var home_id = '<?php echo $home_id; ?>';
             var id = $("#id").val();
             var message;
-
+            var url;
             if (id == '') {
+                url='{{ url("/save_task_type") }}';
                 message = "Added Successfully Done";
             } else {
+                url='{{ url("/edit_task_type") }}';
                 message = "Edited Successfully Done";
             }
 
@@ -203,7 +205,7 @@
             } else {
                 $.ajax({
                     type: "POST",
-                    url: '{{ url("/save_task_type") }}',
+                    url: url,
                     data: {
                         id: id,
                         home_id: home_id,
@@ -250,7 +252,7 @@
             var model = "Task_type";
             $.ajax({
                 type: "POST",
-                url: "{{url('/status_change')}}",
+                url: "{{url('/task_type_status_change')}}",
                 data: {
                     id: id,
                     status: status,

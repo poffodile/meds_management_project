@@ -12,7 +12,9 @@ class ServiceUserManagementController extends Controller
 	  
 	public function service_users() {
 		
-		$home_id  = Auth::user()->home_id;
+		$home_ids  = Auth::user()->home_id;
+        $ex_home_id=explode(',',$home_ids);
+        $home_id=$ex_home_id[0];
        
 		$patients = DB::table('service_user')->where('home_id',$home_id)->where('is_deleted','0')->get();
         //echo "<pre>"; print_r($patients); die;

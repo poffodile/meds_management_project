@@ -1,4 +1,8 @@
-@include('frontEnd.salesAndFinance.jobs.layout.header')
+@extends('frontEnd.layouts.master')
+<meta name="csrf-token" content="{{ csrf_token() }}">
+@section('title','Invoices')
+<link rel="stylesheet" type="text/css" href="{{ url('public/frontEnd/jobs/css/custom.css')}}" />
+@section('content')
 <style>
     .currency {
         padding: 2px 3px 2px 5px;
@@ -14,7 +18,7 @@
     }
 
     #active_inactive {
-        background-color: #474747;
+        background-color: #57c8f1;
     }
 
     .tutor-student-tooltip-col {
@@ -112,361 +116,360 @@
         overflow: auto;
     }
 
-    .tag_box {
-        background: #f5f5f5;
-        display: grid;
-        border: 1px solid #dee2e6;
+    .dropdown-item {
+        padding: 6px 15px;
+        font-size: 13px;
+        color: #212529;
+        text-align: inherit;
+        text-decoration: none;
+        display: block;
+        width: 100%;
+        background-color: transparent;
+        border: 0;
+        border-radius: 0;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .dropdown-item:hover {
+        background-color: #f8f9fa;
+        color: #212529;
     }
 </style>
-<section class="main_section_page px-3">
+<section class="wrapper">
     <div class="container-fluid">
         <div class="row">
-            <div class="col-md-4 col-lg-4 col-xl-4 ">
-                <div class="pageTitle">
-                    <h3>{{ucfirst($key_mode)}} Invoices</h3>
-                </div>
-            </div>
-            <div class="col-md-8 col-lg-8 col-xl-8 px-3">
-                <div class="pageTitleBtn">
-                    <a href="{{url('purchase-orders-search')}}" class="profileDrop"> Search Invoices</a>
-                    <a href="{{url('purchase-order-statements')}}" class="profileDrop">Account Statements</a>
-                </div>
-            </div>
-        </div>
-
-
-            <div class="row">
-                <div class="col-md-12 col-lg-12 col-xl-12 px-3">
-                    <div class="jobsection">
-                        <div class="d-inline-flex align-items-center ">
-                            <div class="nav-item dropdown">
-                                <a href="#" class="nav-link dropdown-toggle profileDrop" data-bs-toggle="dropdown" aria-expanded="false">
-                                    New
-                                </a>
-                                <div class="dropdown-menu fade-up m-0">
-                                    <a href="{{url('invoices/add')}}" class="dropdown-item">Invoice</a>
-                                    <a href="{{url('new_credit_notes')}}" class="dropdown-item">Credit Note</a>
-                                    <!-- <a href="#!" class="dropdown-item">Print</a>
-                                    <a href="#!" class="dropdown-item">Email</a> -->
+            <div class="col-sm-12 p-0">
+                <div class="panel">
+                    <header class="panel-heading px-5">
+                        <h4>{{ucfirst($key_mode)}} Invoices</h4>
+                    </header>
+                    <div class="panel-body">
+                        <div class="col-lg-12 mt-4">
+                            <div class="jobsection justify-content-end">
+                                <a href="{{url('purchase-orders-search')}}" class="btn btn-warning"> Search Invoices</a>
+                                <a href="{{url('purchase-order-statements')}}" class="btn btn-warning">Account Statements</a>
                             </div>
                         </div>
-                    </div>
-                    <a href="{{ url('invoices/invoice?key=draft') }}" class="profileDrop" id="active_inactive">Draft <span>({{$draft_invoice}})</span></a>
-                    <a href="{{ url('invoices/invoice?key=Outstanding') }}" class="profileDrop" >Outstanding<span>({{$outstanding_invoice}})</span></a>
-                    <a href="{{ url('invoices/invoice?key=Overdue') }}" class="profileDrop">Overdue<span>({{$overdue_invoice}})</span></a>
-                    <a href="{{ url('invoices/invoice?key=Paid') }}" class="profileDrop">Paid<span>({{$paid_invoice}})</span></a>
-
-                </div>
-            </div>
-
-        </div>
-        <di class="row">
-            <div class="col-lg-12">
-                <div class="maimTable">
-                    <div class="printExpt">
-                        <div class="prntExpbtn">
-                            <a href="#!">Print</a>
-                            <a href="#!">Export</a>
-                        </div>
-                        <div class="searchFilter">
-                            <a href="#!" onclick="hideShowDiv()" class="hidebtn">Show Search Filter</a>
-                        </div>
-
-                    </div>
-
-                    <div class="searchJobForm" id="divTohide" style="display:none">
-                        <form id="search_dataForm" class="p-4">
-                            <div class="row">
-                                <div class="col-md-3">
-                                    <div class="row form-group mb-2">
-                                        <label class="col-md-4 col-form-label text-end">Invoice Ref:</label>
-                                        <div class="col-md-8">
-                                            <input type="text" class="form-control editInput" id="po_ref">
-                                        </div>
-                                    </div>
-                                    <div class="row form-group mb-2">
-                                        <label class="col-md-4 col-form-label text-end">Department:</label>
-                                        <div class="col-md-8 position-relative">
-                                            <input type="text" class="form-control editInput" id="department">
-                                            <input type="hidden" id="selectedDeptId" name="selectedDeptId">
-                                            <div class="parent-container department-container"></div>
-                                        </div>
-                                    </div>
-                                    <div class="row form-group mb-2">
-                                        <label class="col-md-4 col-form-label text-end">Tag:</label>
-                                        <div class="col-md-8 position-relative">
-                                            <input type="text" class="form-control editInput" id="tag">
-                                            <input type="hidden" id="selectedTagtId" name="selectedTagtId">
-                                            <div class="parent-container tag-container"></div>
-                                        </div>
-                                    </div>
-                                    <div class="row form-group mb-2">
-
-                                        <label class="col-md-4 col-form-label text-end ">
-                                            <a href="#!" class="tutor-student-tooltip-col">
-                                                EDD From:
-
-                                                <span class="tutor-student-tooltiptext3">Expedcted Delivery Date</span>
-                                            </a>
-                                        </label>
-
-                                        <div class="col-md-4">
-                                            <input type="date" class="form-control editInput" id="edd_startDate">
-                                        </div>
-
-                                        <div class="col-md-4">
-                                            <input type="date" class="form-control editInput" id="edd_endDate">
-                                        </div>
-                                    </div>
-
-                                </div>
-
-                                <div class="col-md-3">
-                                    <div class="row form-group mb-2">
-                                        <label class="col-md-4 col-form-label text-end">Supplier:</label>
-                                        <div class="col-md-8 position-relative">
-                                            <input type="text" class="form-control editInput" id="supplier">
-                                            <input type="hidden" id="selectedsupplierId" name="selectedsupplierId">
-                                            <div class="parent-container supplier-container"></div>
-                                        </div>
-                                    </div>
-                                    <div class="row form-group mb-2">
-                                        <label class="col-md-4 col-form-label text-end">PO Date From:</label>
-                                        <div class="col-md-4">
-                                            <input type="date" class="form-control editInput" id="po_startDate">
-                                        </div>
-                                        <div class="col-md-4">
-                                            <input type="date" class="form-control editInput" id="po_endDate">
-                                        </div>
+                        <div class="col-lg-12 mb-4">
+                            <div class="jobsection">
+                                <div class="nav-item dropdown">
+                                    <a href="#" class="nav-link btn btn-warning" data-toggle="dropdown" aria-expanded="false"> New <i class="fa fa-caret-down"></i></a>
+                                    <div class="dropdown-menu fade-up m-0">
+                                        <a href="{{url('invoices/add')}}" class="dropdown-item">Invoice</a>
+                                        <a href="{{url('new_credit_notes')}}" class="dropdown-item">Credit Note</a>
+                                        <!-- <a href="#!" class="dropdown-item">Print</a>
+                                        <a href="#!" class="dropdown-item">Email</a> -->
                                     </div>
                                 </div>
-
-                                <div class="col-md-3">
-                                    <div class="row form-group mb-2">
-                                        <label class="col-md-4 col-form-label text-end">Customer:</label>
-                                        <div class="col-md-8 position-relative">
-                                            <input type="text" class="form-control editInput" id="customer">
-                                            <input type="hidden" id="selectedCustomerId" name="selectedCustomerId">
-                                            <div class="parent-container customer-container"></div>
-                                        </div>
-                                    </div>
-
-                                    <div class="row form-group mb-2">
-                                        <label class="col-md-4 col-form-label text-end">Created By:</label>
-                                        <div class="col-md-8 position-relative">
-                                            <input type="text" class="form-control editInput" id="created_by">
-                                            <input type="hidden" id="selectedcreatedById" name="selectedcreatedById">
-                                            <div class="parent-container createdBy-container"></div>
-                                        </div>
-                                    </div>
-                                    <div class="row form-group mb-2">
-                                        <label class="col-md-4 col-form-label text-end">PO Posted:</label>
-                                        <div class="col-md-8">
-                                            <select class="form-control editInput selectOptions" id="po_posted">
-                                                <option selected disabled>--Any--</option>
-                                                <option value="1">Yes</option>
-                                                <option value="0">No</option>
-                                            </select>
-                                        </div>
-                                    </div>
+                                <a href="{{ url('invoices/invoice/Draft') }}" class="btn btn-warning"
+                                    <?php if ($key_mode === 'Draft') {
+                                        echo 'id="active_inactive"';
+                                    } ?>>Draft <span>({{$draft_invoice}})</span></a>
+                                <a href="{{ url('invoices/invoice/Outstanding') }}" class="btn btn-warning"
+                                    <?php if ($key_mode === 'Outstanding') {
+                                        echo 'id="active_inactive"';
+                                    } ?>>Outstanding <span>({{$outstanding_invoice}})</span></a>
+                                <a href="{{ url('invoices/invoice/Overdue') }}" class="btn btn-warning"
+                                    <?php if ($key_mode === 'Overdue') {
+                                        echo 'id="active_inactive"';
+                                    } ?>>Overdue <span>({{$overdue_invoice}})</span></a>
+                                <a href="{{ url('invoices/invoice/Paid') }}" class="btn btn-warning"
+                                    <?php if ($key_mode === 'Paid') {
+                                        echo 'id="active_inactive"';
+                                    } ?>>Paid <span>({{$paid_invoice}})</span></a>
+                                <div class="searchFilter">
+                                    <a href="#!" onclick="hideShowDiv()" class="hidebtn btn btn-default2">Show Search Filter</a>
                                 </div>
-
-                                <div class="col-md-3">
-                                    <div class="row form-group mb-2">
-                                        <label class="col-md-4 col-form-label text-end">Project:</label>
-                                        <div class="col-md-8 position-relative">
-                                            <input type="text" class="form-control editInput" id="project">
-                                            <input type="hidden" id="selectedProjectId" name="selectedProjectId">
-                                            <div class="parent-container project-container"></div>
-                                        </div>
-                                    </div>
-                                    <div class="row form-group mb-2">
-                                        <label class="col-md-4 col-form-label text-end">Keywords:</label>
-                                        <div class="col-md-8 position-relative">
-                                            <input type="text" class="form-control editInput" id="keywords">
-                                        </div>
-                                    </div>
-                                    <div class="row form-group mb-2">
-                                        <label class="col-md-4 col-form-label text-end">Delivery Status:</label>
-                                        <div class="col-md-8">
-                                            <input type="text" class="form-control editInput" id="delivery_status">
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-12">
-                                    <div class="pageTitleBtn justify-content-center">
-                                        <a href="javascript:void(0)" onclick="searchBtn()" class="profileDrop px-3">Search </a>
-                                        <a href="javascript:void(0)" onclick="clearBtn()" class="profileDrop px-3">Clear</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="markendDelete">
-                        <div class="row">
-                            <div class="col-md-8">
-                                <div class="jobsection">
-                                    <a href="javascript:void(0)" id="deleteSelectedRows" class="profileDrop">Delete</a>
-                                    <a href="javascript:void(0)" id="preview_purchase_orderBoxes" class="profileDrop">Preview Purchase Order</a>                                    
-                                    <a href="javascript:void(0)" id="preview_purchase_orderBoxes" class="profileDrop">Preview Invoice</a>                                    
-                                    <a href="javascript:void(0)" id="bulkInvoiceReceived" class="profileDrop">Change To Invoice</a>
-                                    <div class=" d-inline-flex align-items-center">
-                                        <div class="nav-item dropdown">
-                                            <a href="#!" class="nav-link dropdown-toggle profileDrop" data-bs-toggle="dropdown" aria-expanded="false">
-                                                Email Purchase Order
-                                            </a>
-                                            <div class="dropdown-menu fade-up m-0">
-                                                <a href="javascript:void(0)" class="dropdown-item email_sendCheck" onclick="email_sendCheck(1)">Send As Single Email</a>
-                                                <hr class="dropdown-divider emialSend" style="display:none">
-                                                <a href="javascript:void(0)" class="dropdown-item emialSend email_sendCheck" onclick="email_sendCheck(2)" style="display:none">Send As Multiple Emails</a>
+                                <div class="searchJobForm" id="divTohide" style="display:none">
+                                    <form id="search_dataForm" class="p-4">
+                                        <div class="row">
+                                            <div class="col-sm-3">
+                                                <div class="mb-3">
+                                                    <label class="col-form-label mb-2">Invoice Ref:</label>
+                                                    <input type="text" class="form-control editInput" id="po_ref">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="col-form-label mb-2">Department:</label>
+                                                    <div class="position-relative">
+                                                        <input type="text" class="form-control editInput" id="department">
+                                                        <input type="hidden" id="selectedDeptId" name="selectedDeptId">
+                                                        <div class="parent-container department-container"></div>
+                                                    </div>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="col-form-label mb-2">Tag:</label>
+                                                    <div class="position-relative">
+                                                        <input type="text" class="form-control editInput" id="tag">
+                                                        <input type="hidden" id="selectedTagtId" name="selectedTagtId">
+                                                        <div class="parent-container tag-container"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <div class="mb-3">
+                                                    <label class="col-form-label mb-2">Supplier:</label>
+                                                    <div class="position-relative">
+                                                        <input type="text" class="form-control editInput" id="supplier">
+                                                        <input type="hidden" id="selectedsupplierId" name="selectedsupplierId">
+                                                        <div class="parent-container supplier-container"></div>
+                                                    </div>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="col-form-label mb-2">PO Date From:</label>
+                                                    <div class="row">
+                                                        <div class="col-sm-6">
+                                                            <input type="date" class="form-control editInput" id="po_startDate">
+                                                        </div>
+                                                        <div class="col-sm-6">
+                                                            <input type="date" class="form-control editInput" id="po_endDate">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="col-form-label mb-2"><a href="#!" class="tutor-student-tooltip-col">EDD From:
+                                                            <span class="tutor-student-tooltiptext3">Expedcted Delivery Date</span></a>
+                                                    </label>
+                                                    <div class="row">
+                                                        <div class="col-sm-6">
+                                                            <input type="date" class="form-control editInput" id="edd_startDate">
+                                                        </div>
+                                                        <div class="col-sm-6">
+                                                            <input type="date" class="form-control editInput" id="edd_endDate">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <div class="mb-3">
+                                                    <label class="col-form-label mb-2">Customer:</label>
+                                                    <div class="position-relative">
+                                                        <input type="text" class="form-control editInput" id="customer">
+                                                        <input type="hidden" id="selectedCustomerId" name="selectedCustomerId">
+                                                        <div class="parent-container customer-container"></div>
+                                                    </div>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="col-form-label mb-2">Created By:</label>
+                                                    <div class="position-relative">
+                                                        <input type="text" class="form-control editInput" id="created_by">
+                                                        <input type="hidden" id="selectedcreatedById" name="selectedcreatedById">
+                                                        <div class="parent-container createdBy-container"></div>
+                                                    </div>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="col-form-label mb-2">PO Posted:</label>
+                                                    <select class="form-control editInput selectOptions" id="po_posted">
+                                                        <option selected disabled>--Any--</option>
+                                                        <option value="1">Yes</option>
+                                                        <option value="0">No</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <div class="mb-3">
+                                                    <label class="col-form-label mb-2">Project:</label>
+                                                    <div class="position-relative">
+                                                        <input type="text" class="form-control editInput" id="project">
+                                                        <input type="hidden" id="selectedProjectId" name="selectedProjectId">
+                                                        <div class="parent-container project-container"></div>
+                                                    </div>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="col-form-label mb-2">Keywords:</label>
+                                                    <div class="position-relative">
+                                                        <input type="text" class="form-control editInput" id="keywords">
+                                                    </div>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="col-form-label mb-2">Delivery Status:</label>
+                                                    <input type="text" class="form-control editInput" id="delivery_status">
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-12 mt-4">
+                                                <div class="jobsection justify-content-center">
+                                                    <a href="javascript:void(0)" onclick="searchBtn()" class="btn btn-warning px-3">Search </a>
+                                                    <a href="javascript:void(0)" onclick="clearBtn()" class="btn btn-warning px-3">Clear</a>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </form>
                                 </div>
                             </div>
-                            <!-- <div class="col-md-5">
+                            <div class="jobsection">
+                                <a href="javascript:void(0)" id="deleteSelectedRows" class="btn btn-danger">Delete</a>
+                                <a href="javascript:void(0)" id="preview_purchase_orderBoxes" class="btn btn-warning">Preview Purchase Order</a>
+                                <a href="javascript:void(0)" id="preview_purchase_orderBoxes" class="btn btn-warning">Preview Invoice</a>
+                                <a href="javascript:void(0)" id="bulkInvoiceReceived" class="btn btn-warning">Change To Invoice</a>
+                                <div class=" d-inline-flex align-items-center">
+                                    <div class="dropdown">
+                                        <a href="#!" class="btn btn-warning" data-toggle="dropdown" aria-expanded="false">Email Purchase Order
+                                            <i class="fa fa-caret-down"></i>
+                                        </a>
+                                        <div class="dropdown-menu fade-up m-0">
+                                            <a href="javascript:void(0)" class="dropdown-item email_sendCheck" onclick="email_sendCheck(1)">Send As Single Email</a>
+                                            <hr class="dropdown-divider emialSend" style="display:none">
+                                            <a href="javascript:void(0)" class="dropdown-item emialSend email_sendCheck" onclick="email_sendCheck(2)" style="display:none">Send As Multiple Emails</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- <div class="col-sm-5">
                                     <div class="pageTitleBtn p-0">
-                                        <a href="#" class="profileDrop"> <i class="material-symbols-outlined"> settings </i></a>        
+                                        <a href="#" class="btn btn-warning"> <i class="material-symbols-outlined"> settings </i></a>        
                                     </div>
                                 </div> -->
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="maimtable table-responsive productDetailTable">
+                                <table id="exampleOne" class="table border-top border-bottom tablechange" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center" style=" width:30px;"><input type="checkbox" id="selectAllCheckBoxes"></th>
+                                            <th>#</th>
+                                            <th>Invoice Ref</th>
+                                            <th>Invoice Date</th>
+                                            <th>Customer</th>
+                                            <th>Customer Ref</th>
+                                            <th>Site/Delivery</th>
+                                            <th>Sub Total</th>
+                                            <th>VAT</th>
+                                            <th>Total </th>
+                                            <th>Outstanding </th>
+                                            <th>Status</th>
+                                            <th>Printed</th>
+                                            <th>Emailed</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody id="search_data">
+                                        <?php
+                                        $all_subTotalAmount = 0;
+                                        $all_vatTotalAmount = 0;
+                                        $all_TotalAmount = 0;
+                                        $outstandingAmountTotal = 0;
+                                        foreach ($invoice as $key => $val) {
+                                            $sub_total = 0;
+                                            $vat = 0;
+                                            $total = 0;
+                                            foreach ($val->invoiceProducts as $product) {
+                                                $price = $product->price * $product->qty;
+                                                $sub_total = $sub_total + $price;
+                                                $percentage = $product->price * $product->vat / 100;
+                                                $vat = $vat + $percentage;
+                                                $total = $total + $sub_total + $vat;
+                                            }
+                                            $all_subTotalAmount = $all_subTotalAmount + $sub_total;
+                                            $all_vatTotalAmount = $all_vatTotalAmount + $vat;
+                                            $all_TotalAmount = $all_TotalAmount + $total;
+                                            $outstandingAmountTotal = $outstandingAmountTotal + $val->outstanding;
+                                        ?>
+                                            <tr>
+                                                <td>
+                                                    <div class="text-center"><input type="checkbox" id="" class="delete_checkbox" value="{{$val->id}}"></div>
+                                                </td>
+                                                <td>{{++$key}}</td>
+                                                <td>{{$val->invoice_ref}}</td>
+                                                <td>{{$val->invoice_date}}</td>
+                                                <td>{{$val->customers->name}}</td>
+                                                <td></td>
+                                                <td>
+                                                    @if(isset($val->sites) && !empty($val->sites))
+                                                    {{$val->sites->site_name}}<br>
+                                                    {{$val->sites->address}}
+                                                    @else
+                                                    {{$val->customers->name}}<br>
+                                                    {{$val->customers->address}}
+                                                    @endif
+                                                </td>
+                                                <td>£{{$sub_total}}.00</td>
+                                                <td>£{{$vat}}.00</td>
+                                                <td>£{{$total}}.00</td>
+                                                <td>£{{$val->outstanding}}</td>
+                                                <td>{{ucfirst($key_mode)}}</td>
+                                                <td>
+                                                    @if($val->is_printed == 1)
+                                                    <span class="grencheck"><i class="fa fa-check-circle"></i></span>
+                                                    @else
+                                                    -
+                                                    @endif
+                                                </td>
+                                                <td>
+                                                    @if($val->is_emailed == 1)
+                                                    <span class="grencheck"><i class="fa fa-check-circle"></i></span>
+                                                    @else
+                                                    -
+                                                    @endif
+                                                </td>
+                                                <td>
+                                                    <div class="d-flex justify-content-end">
+                                                        <div class="nav-item dropdown">
+                                                            <a href="#!" class="nav-link dropdown-toggle btn btn-primary btn-sm" data-toggle="dropdown" aria-expanded="false">
+                                                                Action <i class="fa fa-caret-down"></i>
+                                                            </a>
+                                                            <div class="dropdown-menu dropdown-menu-right fade-up m-0" style="z-index:9999">
+                                                                <a href="javascript:void(0)" class="dropdown-item">Send SMS</a>
+                                                                <a href="{{url('invoices/edit?key=')}}{{base64_encode($val->id)}}" class="dropdown-item">Edit</a>
+                                                                <a href="{{url('invoices/preview?key=')}}{{base64_encode($val->id)}}&url=preview" target="_blank" class="dropdown-item">Preview</a>
+                                                                <a href="{{url('invoices/print?key=')}}{{base64_encode($val->id)}}&url=print" target="_blank" class="dropdown-item">Print</a>
+                                                                <a href="javascript:void(0)" class="dropdown-item">Email</a>
+                                                                <a href="#!" target="_blank" class="dropdown-item">Duplicate</a>
+                                                                <a href="javascript:void(0)" class="dropdown-item">Change To Invoice</a>
+                                                                <a href="javascript:void(0)" class="dropdown-item">Cancel Invoice</a>
+                                                                <a href="#!" class="dropdown-item">CRM / History</a>
+                                                                <a href="#!" class="dropdown-item">Start Timer</a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        <?php } ?>
+                                    </tbody>
+
+                                    <tr class="calcualtionShowHide">
+                                        <th colspan="2"> <label class="col-form-label p-0">Page Sub Total:</label></th>
+                                        <th colspan="13"></th>
+                                    </tr>
+                                    <tr class="calcualtionShowHide">
+                                        <td colspan="7"></td>
+                                        <td id="Tablesub_total_amount">£{{$all_subTotalAmount}}.00</td>
+                                        <td id="Tablevat_amount">£{{$all_vatTotalAmount}}.00</td>
+                                        <td id="Tabletotal_amount">£{{$all_TotalAmount}}.00</td>
+                                        <td id="Tableoutstanding_amount" colspan="8">£{{$outstandingAmountTotal}}.00</td>
+                                    </tr>
+                                </table>
+                            </div>
                         </div>
                     </div>
-
-                    <table id="exampleOne" class="display tablechange" cellspacing="0" width="100%">
-                        <thead>
-                            <tr>
-                                <th class="text-center" style=" width:30px;"><input type="checkbox" id="selectAllCheckBoxes"></th>
-                                <th>#</th>
-                                <th>Invoice Ref</th>
-                                <th>Invoice Date</th>
-                                <th>Customer</th>
-                                <th>Customer Ref</th>
-                                <th>Site/Delivery</th>
-                                <th>Sub Total</th>
-                                <th>VAT</th>
-                                <th>Total </th>
-                                <th>Outstanding </th>
-                                <th>Status</th>
-                                <th>Printed</th>
-                                <th>Emailed</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-
-                        <tbody id="search_data">
-                            <?php 
-                            $all_subTotalAmount=0;
-                            $all_vatTotalAmount=0;
-                            $all_TotalAmount=0;
-                            $outstandingAmountTotal=0;
-                                foreach($invoice as $key=>$val){
-                                    $sub_total=0;
-                                    $vat=0;
-                                    $total=0;
-                                    foreach($val->invoiceProducts as $product){
-                                        $price=$product->price*$product->qty;
-                                        $sub_total=$sub_total+$price;
-                                        $percentage=$product->price*$product->vat/100;
-                                        $vat=$vat+$percentage;
-                                        $total=$total+$sub_total+$vat;
-                                    }
-                                    $all_subTotalAmount = $all_subTotalAmount + $sub_total;
-                                    $all_vatTotalAmount = $all_vatTotalAmount + $vat;
-                                    $all_TotalAmount = $all_TotalAmount + $total;
-                                    $outstandingAmountTotal = $outstandingAmountTotal + $val->outstanding;
-                            ?>
-                            <tr>
-                                <td><div class="text-center"><input type="checkbox" id="" class="delete_checkbox" value="{{$val->id}}"></div></td>
-                                <td>{{++$key}}</td>
-                                <td>{{$val->invoice_ref}}</td>
-                                <td>{{$val->invoice_date}}</td>
-                                <td>{{$val->customers->name}}</td>
-                                <td></td>
-                                <td>
-                                    @if(isset($val->sites) && !empty($val->sites))
-                                        {{$val->sites->site_name}}<br>
-                                        {{$val->sites->address}}
-                                    @else
-                                        {{$val->customers->name}}<br>
-                                        {{$val->customers->address}}
-                                    @endif
-                                </td>
-                                <td>£{{$sub_total}}.00</td>
-                                <td>£{{$vat}}.00</td>
-                                <td>£{{$total}}.00</td>
-                                <td>£{{$val->outstanding}}</td>
-                                <td>{{ucfirst($key_mode)}}</td>
-                                <td>
-                                    @if($val->is_printed == 1)
-                                        <span class="grencheck"><i class="fa-solid fa-circle-check"></i></span>
-                                    @else
-                                        -
-                                    @endif
-                                </td>
-                                <td>
-                                    @if($val->is_emailed == 1)
-                                        <span class="grencheck"><i class="fa-solid fa-circle-check"></i></span>
-                                    @else
-                                        -
-                                    @endif
-                                </td>
-                                <td>
-                                <div class="d-flex justify-content-end">
-                                        <div class="nav-item dropdown">
-                                            <a href="#!" class="nav-link dropdown-toggle profileDrop" data-bs-toggle="dropdown" aria-expanded="false">
-                                                Action
-                                            </a>
-                                            <div class="dropdown-menu fade-up m-0" style="z-index:9999">
-                                               
-                                                <a href="javascript:void(0)" class="dropdown-item">Send SMS</a>
-                                                <hr class="dropdown-divider">
-                                                <a href="{{url('invoices/edit?key=')}}{{base64_encode($val->id)}}" class="dropdown-item">Edit</a>
-                                                <hr class="dropdown-divider">
-                                                <a href="{{url('invoices/preview?key=')}}{{base64_encode($val->id)}}&url=preview" target="_blank" class="dropdown-item">Preview</a>
-                                                <hr class="dropdown-divider">
-                                                <a href="{{url('invoices/print?key=')}}{{base64_encode($val->id)}}&url=print" target="_blank" class="dropdown-item">Print</a>
-                                                <hr class="dropdown-divider">
-                                                <a href="javascript:void(0)" class="dropdown-item">Email</a>
-                                                <hr class="dropdown-divider">
-                                                <a href="#!" target="_blank" class="dropdown-item">Duplicate</a>
-                                                <hr class="dropdown-divider">
-                                                <a href="javascript:void(0)" class="dropdown-item">Change To Invoice</a>
-                                                <hr class="dropdown-divider">
-                                                <a href="javascript:void(0)" class="dropdown-item">Cancel Invoice</a>
-                                                <hr class="dropdown-divider">
-                                                <a href="#!" class="dropdown-item">CRM / History</a>
-                                                <hr class="dropdown-divider">
-                                                <a href="#!" class="dropdown-item">Start Timer</a>
-                                                
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                            <?php }?>
-                        </tbody>
-                       
-                        <tr class="calcualtionShowHide">
-                            <th colspan="2"> <label class="col-form-label p-0">Page Sub Total:</label></th>
-                            <th colspan="13"></th>
-                        </tr>
-                        <tr class="calcualtionShowHide">
-                            <td colspan="7"></td>
-                            <td id="Tablesub_total_amount">£{{$all_subTotalAmount}}.00</td>
-                            <td id="Tablevat_amount">£{{$all_vatTotalAmount}}.00</td>
-                            <td id="Tabletotal_amount">£{{$all_TotalAmount}}.00</td>
-                            <td id="Tableoutstanding_amount" colspan="8">£{{$outstandingAmountTotal}}.00</td>
-                        </tr>
-                        
-                    </table>
-
                 </div> <!-- End off main Table -->
             </div>
-        </di>
+        </div>
     </div>
 </section>
+
+
 <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
 
+<script>
+    // search leads show search Filter
+    function hideShowDiv() {
+        let div = document.getElementById("divTohide");
+
+        if (div.style.display === 'none' || div.style.opacity === '0') {
+            div.style.display = 'block';
+            div.style.height = div.scrollHeight + 'px'; // Ensures the height is set for the transition
+            div.style.opacity = '1';
+        } else {
+            div.style.height = '0px';
+            div.style.opacity = '0';
+            // Use a timeout to set display to none after the transition
+            setTimeout(() => {
+                div.style.display = 'none';
+            }, 500); // 500ms matches the CSS transition duration
+        }
+    }
+    // end search leads show search Filter js
+</script>
 <script>
     $("#deleteSelectedRows").on('click', function() {
         let ids = [];
@@ -515,17 +518,18 @@
         }
         shoeHideEmailSend();
     });
-    $('#selectAllCheckBoxes').on('click', function () {
+    $('#selectAllCheckBoxes').on('click', function() {
         $('.delete_checkbox').prop('checked', $(this).prop('checked'));
-        shoeHideEmailSend(); 
-  });
-  function shoeHideEmailSend(){
-    if($('.delete_checkbox:checked').length>1){
-        $('.emialSend').show();
-    }else{
-        $('.emialSend').hide();
+        shoeHideEmailSend();
+    });
+
+    function shoeHideEmailSend() {
+        if ($('.delete_checkbox:checked').length > 1) {
+            $('.emialSend').show();
+        } else {
+            $('.emialSend').hide();
+        }
     }
-  }
 </script>
 <script>
     function clearBtn() {
@@ -635,7 +639,7 @@
                         },
                         info: "Showing _START_ to _END_ of _TOTAL_ entries",
                         infoEmpty: "No entries available",
-                        emptyTable: '<span style="color: #e10078; font-weight: bold;">Sorry, there are no items available</span>',
+                        emptyTable: '<span style="color: #dc3545; font-weight: bold;">Sorry, there are no items available</span>',
                         infoFiltered: "(filtered from _MAX_ total entries)",
                         lengthMenu: "Show _MENU_ entries",
                         search: "Search:",
@@ -1341,10 +1345,10 @@
                 var paginationControlsProductDetail = $("#pagination-controls-recordDelivery");
                 paginationControlsProductDetail.empty();
                 if (paginationProductDetails.prev_page_url) {
-                    paginationControlsProductDetail.append('<button type="button" class="profileDrop" onclick="getProductDetail(' + id + ', \'' + paginationContact.prev_page_url + '\')">Previous</button>');
+                    paginationControlsProductDetail.append('<button type="button" class="btn btn-warning" onclick="getProductDetail(' + id + ', \'' + paginationContact.prev_page_url + '\')">Previous</button>');
                 }
                 if (paginationProductDetails.next_page_url) {
-                    paginationControlsProductDetail.append('<button type="button" class="profileDrop" onclick="getProductDetail(' + id + ', \'' + paginationContact.next_page_url + '\')">Next</button>');
+                    paginationControlsProductDetail.append('<button type="button" class="btn btn-warning" onclick="getProductDetail(' + id + ', \'' + paginationContact.next_page_url + '\')">Next</button>');
                 }
             },
             error: function(xhr, status, error) {
@@ -1353,7 +1357,7 @@
             }
         });
     }
-    document.addEventListener('input', function (event) {
+    document.addEventListener('input', function(event) {
         if (event.target.classList.contains('already_deliver') || event.target.classList.contains('receive_more')) {
             const row = event.target.closest('tr');
             const qty = parseInt(row.querySelector('.qty').value, 10);
@@ -1410,7 +1414,7 @@
 
     }
 
-    function openRecordPaymentModal(id, po_ref, supplier_name, total_amount, date, product_id, outstandingAmount,supplier_id) {
+    function openRecordPaymentModal(id, po_ref, supplier_name, total_amount, date, product_id, outstandingAmount, supplier_id) {
         // alert(outstandingAmount)
         $("#purchaseOrderRecordDate").text(po_ref + ' On ' + date);
         $("#recordPayment_po_id").val(id);
@@ -1545,21 +1549,22 @@
         editor.setData(message);
         $("#emailModal").modal('show');
     }
-    function getAllPurchaseInvices(data){
+
+    function getAllPurchaseInvices(data) {
         location.reload();
     }
-$('#bulkInvoiceReceived').on('click', function(){
-    const tableBody = document.querySelector(`#bulkInvoiceReceived_result tbody`);
-    tableBody.innerHTML='';
-    tableBody.innerHTML='<tr><td colspan="9" class="text text-danger text-center" id="norecorderror">Sorry, no records to show</td> </tr>';
-    $("#bulkInvoiceReceivedModal").modal('show');
-});
-$('#BulkRecordPaymentBTN').on('click', function(){
-    const tableBody = document.querySelector(`#bulkRecordPayment_result tbody`);
-    tableBody.innerHTML='';
-    tableBody.innerHTML='<tr><td colspan="8" class="text text-danger text-center" id="norecorderrorRecordPayment">Sorry, no records to show</td> </tr>';
-    $("#bulkRecordPaymentModal").modal('show');
-});
-
+    $('#bulkInvoiceReceived').on('click', function() {
+        const tableBody = document.querySelector(`#bulkInvoiceReceived_result tbody`);
+        tableBody.innerHTML = '';
+        tableBody.innerHTML = '<tr><td colspan="9" class="text text-danger text-center" id="norecorderror">Sorry, no records to show</td> </tr>';
+        $("#bulkInvoiceReceivedModal").modal('show');
+    });
+    $('#BulkRecordPaymentBTN').on('click', function() {
+        const tableBody = document.querySelector(`#bulkRecordPayment_result tbody`);
+        tableBody.innerHTML = '';
+        tableBody.innerHTML = '<tr><td colspan="8" class="text text-danger text-center" id="norecorderrorRecordPayment">Sorry, no records to show</td> </tr>';
+        $("#bulkRecordPaymentModal").modal('show');
+    });
 </script>
-@include('frontEnd.salesAndFinance.jobs.layout.footer')
+
+@endsection

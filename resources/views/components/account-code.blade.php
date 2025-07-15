@@ -1,41 +1,35 @@
 <!-- The best way to take care of the future is to take care of the present moment. - Thich Nhat Hanh -->
 <div class="modal fade" id="accountCodeModal" tabindex="-1" aria-labelledby="accountCodeModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-        <div class="modal-content add_Customer">
+        <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="thirdModalLabel">Departmental Code - Add</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">&times;</button>
+                <h4 class="modal-title" id="thirdModalLabel">Departmental Code - Add</h4>
             </div>
-            <div class="modal-body">
-                <form id="accountCodeForm">
-                    <div class="mb-3 row">
-                        <label for="inputJobRef" class="col-sm-4 col-form-label">Name <span class="radStar">*</span></label>
-                        <div class="col-sm-8">
-                            <input type="hidden" name="account_code_id" id="account_code_id">
-                            <input type="text" name="name" class="form-control editInput" id="">
-                        </div>
+            <form id="accountCodeForm">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label>Name <span class="radStar">*</span></label>
+                        <input type="hidden" name="account_code_id" id="account_code_id">
+                        <input type="text" name="name" class="form-control editInput" id="">
                     </div>
-                    <div class="mb-3 row">
-                        <label for="inputJobRef" class="col-sm-4 col-form-label">Departmental Code </label>
-                        <div class="col-sm-8">
-                            <input type="text" name="departmental_code" class="form-control editInput" id="">
-                        </div>
+                    <div class="mb-3">
+                        <label>Departmental Code </label>
+                        <input type="text" name="departmental_code" class="form-control editInput" id="">
                     </div>
-                    <div class="mb-3 row">
-                        <label for="inputJobRef" class="col-sm-4 col-form-label">Status</label>
-                        <div class="col-sm-8">
-                            <select id="" name="status" class="form-control editInput">
-                                <option value="1">Active</option>
-                                <option value="0">Inactive</option>
-                            </select>
-                        </div>
+                    <div class="mb-3">
+                        <label>Status</label>
+                        <select id="" name="status" class="form-control editInput">
+                            <option value="1">Active</option>
+                            <option value="0">Inactive</option>
+                        </select>
                     </div>
-                    <div class="pageTitleBtn">
-                        <button type="button" class="profileDrop" onclick="saveAccountCode();" id="">Save</button>
-                        <button type="button" class="profileDrop" data-bs-dismiss="modal">Cancel</button>
-                    </div>
-                </form>
-            </div>
+                </div>
+                <div class="modal-footer customer_Form_Popup">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <a href="javascript:void(0)" class="btn btn-warning" onclick="saveAccountCode();" id=""> Save</a>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -49,7 +43,7 @@
     function saveAccountCode() {
 
         let JobTitleId = document.getElementById('account_code_id').getAttribute('data-accountCode-id');
-     
+
         var formData = $('#accountCodeForm').serialize();
         console.log(formData);
         $.ajax({
@@ -89,5 +83,4 @@
             }
         });
     }
-
 </script>

@@ -12,12 +12,14 @@ class RmpController extends ServiceUserManagementController
     public function index($service_user_id = null) {
 
         $su_home_id = ServiceUser::where('id',$service_user_id)->value('home_id');
-        
-        if(Auth::user()->home_id != $su_home_id){
+        $home_ids = Auth::user()->home_id;
+        $ex_home_ids = explode(',', $home_ids);
+        $home_id=$ex_home_ids[0];
+        if($home_id != $su_home_id){
             die; 
         }
                  
-        $home_id   = Auth::user()->home_id;
+        // $home_id   = Auth::user()->home_id;
 
         //in search case editing start for plan,details and review
         if(isset($_POST)) {
@@ -32,7 +34,7 @@ class RmpController extends ServiceUserManagementController
                         // $record = ServiceUserRmp::find($record_id);
                         $record = DynamicForm::find($record_id);
                         $su_home_id = ServiceUser::where('id',$record->service_user_id)->value('home_id');
-                        if(Auth::user()->home_id == $su_home_id) {
+                        if($home_id == $su_home_id) {
                             $record->details = $data['edit_rmp_details'][$key];
                             // $record->plan    = $data['edit_rmp_plan'][$key];
                             // $record->review  = $data['edit_rmp_review'][$key];
@@ -195,6 +197,9 @@ class RmpController extends ServiceUserManagementController
 
         $data = $request->all();
         if(isset($data['su_rmp_id'])) {
+            $home_ids = Auth::user()->home_id;
+            $ex_home_ids = explode(',', $home_ids);
+            $home_id=$ex_home_ids[0];
 
             $su_rmp_ids = $data['su_rmp_id'];
                 if(!empty($su_rmp_ids)) { 
@@ -202,7 +207,7 @@ class RmpController extends ServiceUserManagementController
                         //$record = ServiceUserRmp::find($record_id);
                         $record = DynamicForm::find($record_id);
                         $su_home_id = ServiceUser::where('id',$record->service_user_id)->value('home_id');
-                        if(Auth::user()->home_id == $su_home_id) {
+                        if($home_id == $su_home_id) {
                             $record->details = $data['edit_rmp_details'][$key];
                             // $record->plan    = $data['edit_rmp_plan'][$key];
                             // $record->review  = $data['edit_rmp_review'][$key];
@@ -214,7 +219,7 @@ class RmpController extends ServiceUserManagementController
                                 $notification->event_id                   = $record->id;
                                 $notification->notification_event_type_id = '9';
                                 $notification->event_action               = 'EDIT';
-                                $notification->home_id                    = Auth::user()->home_id;
+                                $notification->home_id                    = $home_id;
                                 $notification->user_id                    = Auth::user()->id;
                                 $notification->save();
                             }

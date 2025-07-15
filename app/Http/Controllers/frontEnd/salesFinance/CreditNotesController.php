@@ -28,8 +28,10 @@ class CreditNotesController extends Controller
 {
     public function credit_notes(Request $request){
         // echo "<pre>";print_r($request->all());die;
+        $key=collect(explode('/', trim($request->path(), '/')))->last();
+        $lastSegment = $key;
         $home_id=Auth::user()->home_id;
-        $lastSegment = $request->list_mode;
+        // $lastSegment = $request->list_mode;
         $segment_check=$this->check_segment_CreditNote($lastSegment);
         // echo "<pre>"; print_r($segment_check);die;
         $data['list']=CreditNote::with('suppliers','creditNoteProducts')->where(['loginUserId'=>Auth::user()->id,'deleted_at'=>null,'status'=>$segment_check['status']])->get();

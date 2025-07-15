@@ -191,10 +191,12 @@
                 var home_id = '<?php echo $home_id;?>';
                 var id = $("#id").val();
                 var message;
-
+                var url;
                 if (id == '') {
+                    url="{{url('/save_attachment_type')}}";
                     message = "Added Successfully Done";
                 } else {
+                    url="{{url('/edit_attachment_type')}}";
                     message = "Edited Successfully Done";
                 }
 
@@ -204,7 +206,7 @@
                 } else {
                     $.ajax({
                         type: "POST",
-                        url: "{{url('/save_attachment_type')}}",
+                        url: url,
                         data: {id: id, home_id: home_id, title: title, status: status, _token: token},
                         success: function(data) {
                             console.log(data);
@@ -237,7 +239,7 @@
             var model="AttachmentType";
             $.ajax({
                 type: "POST",
-                url: "{{url('/status_change')}}",
+                url: "{{url('/attachment_type_status_change')}}",
                 data: {id:id,status:status,model:model,_token:token},
                 success: function(data) {
                     console.log(data);

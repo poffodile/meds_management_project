@@ -281,8 +281,10 @@ class InvoiceController extends Controller
     }
     public function invoice(Request $request){
         // echo "<pre>";print_r($request->all());die;
-        $data['key_mode']=$request->key;
-        $data['invoice']=Invoice::with(['customers','invoiceProducts','sites'])->where('status',$request->key)->whereNull('deleted_at')->get();
+        $key=collect(explode('/', trim($request->path(), '/')))->last();
+        // print_r($key);die;
+        $data['key_mode']=$key;
+        $data['invoice']=Invoice::with(['customers','invoiceProducts','sites'])->where('status',$key)->whereNull('deleted_at')->get();
         $data['draft_invoice']=Invoice::getAllInvoices(Auth::user()->home_id)->where('status','Draft')->count();
         $data['outstanding_invoice']=Invoice::getAllInvoices(Auth::user()->home_id)->where('status','Outstanding')->count();
         $data['overdue_invoice']=Invoice::getAllInvoices(Auth::user()->home_id)->where('status','Overdue')->count();

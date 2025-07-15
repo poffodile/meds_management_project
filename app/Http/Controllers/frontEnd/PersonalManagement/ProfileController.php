@@ -16,31 +16,31 @@ class ProfileController extends Controller
 
 {
 
-    public function index(Request $request, $manager_id){
+    public function index(Request $request, $manager_id)
+    {
 
-        
-      
-        $manager_profile = DB::table('user')->where('id',$manager_id)->first();
 
-        
 
-        if(!empty($manager_profile)){
+        $manager_profile = DB::table('user')->where('id', $manager_id)->first();
+
+
+
+        if (!empty($manager_profile)) {
 
 
 
             $home_id = Auth::user()->home_id;
 
-            if($manager_profile->home_id != $home_id){
+            if ($manager_profile->home_id != $home_id) {
 
-                return redirect('/')->with('error',UNAUTHORIZE_ERR); 
-
+                return redirect('/')->with('error', UNAUTHORIZE_ERR);
             }
 
             //get coordnate for map
 
             $current_location = $manager_profile->current_location;
 
-    
+
 
             //removing new line
 
@@ -52,9 +52,9 @@ class ProfileController extends Controller
 
 
 
-            $latitude = (isset($coordinates['results']['0']['geometry']['location']['lat'])) ? $coordinates['results']['0']['geometry']['location']['lat'] : ''; 
+            $latitude = (isset($coordinates['results']['0']['geometry']['location']['lat'])) ? $coordinates['results']['0']['geometry']['location']['lat'] : '';
 
-            $longitude = (isset($coordinates['results']['0']['geometry']['location']['lng'])) ? $coordinates['results']['0']['geometry']['location']['lng'] : ''; 
+            $longitude = (isset($coordinates['results']['0']['geometry']['location']['lng'])) ? $coordinates['results']['0']['geometry']['location']['lng'] : '';
 
             //get coordnate for map end
 
@@ -62,55 +62,54 @@ class ProfileController extends Controller
 
             //2nd tab access rights
 
-                //getting management headings and module headings
+            //getting management headings and module headings
 
             //$managements = ManagementSection::with('moduleList')->has('moduleList')->get()->toArray();
 
             $managements = ManagementSection::with('moduleList');
 
-           
+
 
             //dd($managements);
 
             //echo "<pre>"; print_r($managements); die;
 
-            foreach($managements as $key1 => $management){
+            foreach ($managements as $key1 => $management) {
 
 
 
-                foreach($management['module_list'] as $key2 => $module){
+                foreach ($management['module_list'] as $key2 => $module) {
 
-                   
 
-                    $right_types = AccessRight::where('module_code',$module['module_code'])
 
-                                        ->where('main_route_id',0)
+                    $right_types = AccessRight::where('module_code', $module['module_code'])
 
-                                        ->orderBy('submodule_name','asc')
+                        ->where('main_route_id', 0)
 
-                                        ->get()
+                        ->orderBy('submodule_name', 'asc')
 
-                                        ->toArray();
+                        ->get()
+
+                        ->toArray();
 
                     $managements[$key1]['module_list'][$key2]['sub_modules'] = $right_types;
 
                     // echo "<pre>"; print_r($managements); 
 
                 }
-
             }
 
 
 
-            $dashboard = AccessRight::where('module_code','DASH')
+            $dashboard = AccessRight::where('module_code', 'DASH')
 
-                                ->orderBy('module_name','asc')
+                ->orderBy('module_name', 'asc')
 
-                                ->get()
+                ->get()
 
-                                ->toArray();
+                ->toArray();
 
-            $user_rights = User::where('id',$manager_id)->where('home_id', Auth::user()->home_id)->where('is_deleted','0')->value('access_rights');
+            $user_rights = User::where('id', $manager_id)->where('home_id', Auth::user()->home_id)->where('is_deleted', '0')->value('access_rights');
 
             $user_rights = explode(',', $user_rights);
 
@@ -124,19 +123,17 @@ class ProfileController extends Controller
 
 
 
-            $my_qualification = DB::table('user_qualification')->select('id','name','image')->where('user_id',$manager_id)->where('is_deleted',0)->get();
+            $my_qualification = DB::table('user_qualification')->select('id', 'name', 'image')->where('user_id', $manager_id)->where('is_deleted', 0)->get();
 
             //echo '<pre>'; print_r($my_qualification); die;
 
-            $weekly_allowance = Home::where('id',Auth::user()->home_id)->value('weekly_allowance');
-            $admin_id = Home::where('id',Auth::user()->home_id)->value('admin_id');
+            $weekly_allowance = Home::where('id', Auth::user()->home_id)->value('weekly_allowance');
+            $admin_id = Home::where('id', Auth::user()->home_id)->value('admin_id');
 
             $qr_code_id =  Admin::where('id', $admin_id)->where('is_deleted', 0)->value('qr_code_id');
 
-            return view('frontEnd.personalManagement.profile',compact('manager_profile','manager_id','latitude','longitude','managements','dashboard','user_rights','my_qualification','weekly_allowance', 'admin_id','qr_code_id'));  
-
+            return view('frontEnd.personalManagement.profile', compact('manager_profile', 'manager_id', 'latitude', 'longitude', 'managements', 'dashboard', 'user_rights', 'my_qualification', 'weekly_allowance', 'admin_id', 'qr_code_id'));
         }
-
     }
 
 
@@ -151,7 +148,7 @@ class ProfileController extends Controller
 
     //         $data = $request->all();
 
-            
+
 
     //         $staff_id = $data['staff_id'];
 
@@ -209,7 +206,7 @@ class ProfileController extends Controller
 
     //         $data = $request->all();
 
-            
+
 
     //         $update_location = User::where('id', $data['staff_id'])
 
@@ -239,21 +236,21 @@ class ProfileController extends Controller
 
 
 
-      //function used in google map
+    //function used in google map
 
     public function get_long_lat($address)
 
     {
 
-        $this->layout="";
+        $this->layout = "";
 
-        $add=str_replace(' ','+',$address);
+        $add = str_replace(' ', '+', $address);
 
-        
+
 
         $api_key = env('GOOGLE_MAP_API_KEY');
 
-        $request = "https://maps.googleapis.com/maps/api/geocode/json?address=$add&key=".$api_key;
+        $request = "https://maps.googleapis.com/maps/api/geocode/json?address=$add&key=" . $api_key;
 
         $ch = curl_init($request);
 
@@ -265,8 +262,7 @@ class ProfileController extends Controller
 
         $arr = json_decode($response, true);
 
-        return($arr); 
-
+        return ($arr);
     }
 
 
@@ -315,13 +311,14 @@ class ProfileController extends Controller
 
     //5th tab settings
 
-    public function edit_profile_setting(Request $request) {
+    public function edit_profile_setting(Request $request)
+    {
 
-        
 
-        if($request->isMethod('post')) {
 
-            
+        if ($request->isMethod('post')) {
+
+
 
             $data = $request->input();
 
@@ -335,18 +332,17 @@ class ProfileController extends Controller
 
             $my_prfl = User::find($manager_id);
 
-            if(!empty($my_prfl)) {
+            if (!empty($my_prfl)) {
 
-                $staff_member = DB::table('user')->where('id',$manager_id)->where('is_deleted','0')
+                $staff_member = DB::table('user')->where('id', $manager_id)->where('is_deleted', '0')
 
-                                                //->where('access_level','1')
+                    //->where('access_level','1')
 
-                                                ->value('home_id');
+                    ->value('home_id');
 
-                if($staff_member != $home_id){
+                if ($staff_member != $home_id) {
 
-                    return redirect('/')->with('error',UNAUTHORIZE_ERR); 
-
+                    return redirect('/')->with('error', UNAUTHORIZE_ERR);
                 }
 
 
@@ -355,17 +351,17 @@ class ProfileController extends Controller
 
                 $my_prfl->name   = $data['name'];
 
-               // $my_prfl->job_title = $data['job_title'];
+                // $my_prfl->job_title = $data['job_title'];
 
                 $my_prfl->email  = $data['email'];
 
                 $my_prfl->description = $data['description'];
 
-               // $my_prfl->payroll     = $data['payroll'];
+                // $my_prfl->payroll     = $data['payroll'];
 
                 //$my_prfl->holiday_entitlement = $data['holiday_entitlement'];
 
-                $my_prfl->phone_no            = $data['phone_no'];   
+                $my_prfl->phone_no            = $data['phone_no'];
 
 
 
@@ -375,11 +371,11 @@ class ProfileController extends Controller
 
                 $my_prfl->banking_info        = nl2br(trim($data['banking_info']));
 
-               // $my_prfl->qualification_info  = nl2br(trim($data['qualification_info']));
+                // $my_prfl->qualification_info  = nl2br(trim($data['qualification_info']));
 
 
 
-                if(!empty($_FILES['image']['name'])) {
+                if (!empty($_FILES['image']['name'])) {
 
                     $tmp_image  =   $_FILES['image']['tmp_name'];
 
@@ -387,67 +383,43 @@ class ProfileController extends Controller
 
                     $ext        =   strtolower($image_info['extension']);
 
-                    $new_name   =   time().'.'.$ext; 
+                    $new_name   =   time() . '.' . $ext;
 
-                   
 
-                    if($ext == 'jpg' || $ext == 'jpeg' || $ext == 'png')
 
-                    {
+                    if ($ext == 'jpg' || $ext == 'jpeg' || $ext == 'png') {
 
-                        $destination=   base_path().userProfileImageBasePath; 
+                        $destination =   base_path() . userProfileImageBasePath;
 
-                        if(move_uploaded_file($tmp_image, $destination.'/'.$new_name))
+                        if (move_uploaded_file($tmp_image, $destination . '/' . $new_name)) {
 
-                        {
+                            if (!empty($my_old_image)) {
 
-                            if(!empty($my_old_image)){
+                                if (file_exists($destination . '/' . $my_old_image)) {
 
-                                if(file_exists($destination.'/'.$my_old_image))
-
-                                {
-
-                                    unlink($destination.'/'.$my_old_image);
-
+                                    unlink($destination . '/' . $my_old_image);
                                 }
-
                             }
 
                             $my_prfl->image = $new_name;
-
                         }
-
                     }
-
                 }
 
-                
 
-               if($my_prfl->save()) {
+
+                if ($my_prfl->save()) {
 
                     // echo "<pre>"; print_r($my_prfl->id); die;
 
-                    User::sendEmailToManager($my_prfl->id);//send alert email to manager when staff user update their personal information like bank detail etc.
+                    User::sendEmailToManager($my_prfl->id); //send alert email to manager when staff user update their personal information like bank detail etc.
 
-                   return redirect()->back()->with('success','My profile updated successfully.'); 
+                    return redirect()->back()->with('success', 'My profile updated successfully.');
+                } else {
 
-               } else {
-
-                    return redirect()->back()->with('error','My profile could not be Updated.'); 
-
-               } 
-
-
-
+                    return redirect()->back()->with('error', 'My profile could not be Updated.');
+                }
             }
-
-
-
         }
-
     }
-
-    
-
 }
-

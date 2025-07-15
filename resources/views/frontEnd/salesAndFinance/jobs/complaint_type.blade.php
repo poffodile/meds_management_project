@@ -257,9 +257,13 @@ $('.delete_checkbox').on('click', function() {
 
         $('#saveChanges').on('click', function() {
             var formData = $('#crm_section_type_form').serialize();
-
+            var id=$("#section_type_id").val();
+            var url='{{ route("lead.ajax.saveCRMSectionType") }}';
+            if(id !=''){
+                url='{{ route("lead.ajax.editCRMSectionType") }}';
+            }
             $.ajax({
-                url: '{{ route("lead.ajax.saveCRMSectionType") }}',
+                url: url,
                 method: 'POST',
                 data: formData,
                 success: function(response) {

@@ -3,12 +3,13 @@
 namespace App\Http\Controllers\frontend\salesFinance\DayBook;
 
 use App\Http\Controllers\Controller;
-use App\Models\Construction_tax_rate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Supplier;
 use Illuminate\Support\Carbon;
 use App\Models\PurchaseExpenses;
+
+use App\Services\DayBook\PurchaseDayBookService;
 
 use App\Http\Requests\Daybook\PurchaseDayBookRequest;
 use App\Models\DayBook\PurchaseDayBook;
@@ -17,39 +18,57 @@ use App\Home;
 
 class PurchaseController extends Controller
 {
+    
+    protected $purchaseDayBookService;
+
+    public function __construct(PurchaseDayBookService $purchaseService)
+    {
+        $this->purchaseDayBookService = $purchaseService;
+    }
+
     public function index(){
         $data['page'] = "dayBook";
-        $data['purchaseDayBook'] = PurchaseDayBook::join('suppliers', 'suppliers.id', '=', 'purchase_day_books.supplier_id')
-        ->join('construction_tax_rates', 'construction_tax_rates.id', '=', 'purchase_day_books.Vat')
-        ->leftjoin('purchase_expenses', 'purchase_expenses.id', '=', 'purchase_day_books.expense_type')
-        ->where('purchase_day_books.home_id', Auth::user()->home_id)
-        ->select('purchase_day_books.*', 'suppliers.name as customer_name', 'construction_tax_rates.name as tax_rate_name', 'purchase_expenses.title')
-        ->whereNull('purchase_day_books.deleted_at')
-        ->orderBy('purchase_day_books.created_at', 'desc')
-        ->get();
+    
         return view('frontEnd.salesAndFinance.purchase.purchase_day_book', $data);
     }
 
-    public function create(){
-        $data['page'] = "dayBook";
-        $data['taxRates'] = Construction_tax_rate::getAllTax_rate(Auth::user()->home_id, "Active");
-        $data['suppliers'] = Supplier::getActiveSuppliers(Auth::user()->home_id, Auth::user()->id);
-        $data['purchase_expenses'] = PurchaseExpenses::where('deleted_at', null)->where('status', true)->get();
-        // dd($data);
-        return view('frontEnd.salesAndFinance.purchase.purchase_day_book_form', $data);
+    public function getPurchaseDayBook(Request $request){
+        $home_id = Auth::user()->home_id;
+        $purchaseDayBooks = $this->purchaseDayBookService->getPurchaseDayBook($home_id, $request);
+
+        return response()->json([
+            'success' => (bool) $purchaseDayBooks,
+            'data' => $purchaseDayBooks ? $purchaseDayBooks : 'No data'
+        ]);
     }
 
-    public function store(PurchaseDayBookRequest $request)
+    // public function create(){
+    //     $data['page'] = "dayBook";
+    //     $data['taxRates'] = Construction_tax_rate::getAllTax_rate(Auth::user()->home_id, "Active");
+    //     $data['suppliers'] = Supplier::getActiveSuppliers(Auth::user()->home_id, Auth::user()->id);
+    //     $data['purchase_expenses'] = PurchaseExpenses::where('deleted_at', null)->where('status', true)->get();
+    //     // dd($data);
+    //     return view('frontEnd.salesAndFinance.purchase.purchase_day_book_form', $data);
+    // }
+
+    public function store(PurchaseDayBookRequest $request, PurchaseDayBookService $service)
     {
+
         $data = $request->validated();
+        $data['home_id'] = Auth::user()->home_id;    
+       
+        try {
+            $response = $service->save($data);
+        } catch (\Exception $e) {
+            return response()->json([  'success' => false, 'message' => 'Unable to save purchase day book.', 'data' => $e->getMessage()], 200);
+        }
 
-        $data['page'] = "dayBook";
-        $response = PurchaseDayBook::updateOrCreate(['id' => $data['purchase_day_book_id'] ?? null],  array_merge($data, ['home_id' => Auth::user()->home_id]));
-
-        if (isset($response->id)) {
-            return redirect()->Route('purchase.purchaseDayBook');
+        if ($response->wasRecentlyCreated) {
+            return response()->json([  'success' => true, 'message' => 'Purchase day book record created successfully!', 'data' => $response], 201);
+        } elseif ($response->wasChanged()) {
+            return response()->json([  'success' => true, 'message' => 'Purchase day book record updated successfully!', 'data' => $response], 200);
         } else {
-            return redirect()->Route('sales.puchaseDayBookCreate');
+            return response()->json([  'success' => false, 'message' => 'No changes made.', 'data' => $response], 200);
         }
     }
 
@@ -65,16 +84,31 @@ class PurchaseController extends Controller
         ]);
     }
 
-    public function editPurchaseDayBook($id){
-        $data['purchaseBook'] = PurchaseDayBook::findOrFail($id);
-        // dd($data);
-        $data['suppliers'] = Supplier::getActiveSuppliers(Auth::user()->home_id, Auth::user()->id);
-        $data['taxRates'] = Construction_tax_rate::getAllTax_rate(Auth::user()->home_id, "Active");
-        $data['purchase_expenses'] = PurchaseExpenses::where('deleted_at', null)->where('status', true)->get();
-        return view('frontEnd.salesAndFinance.purchase.purchase_day_book_form', $data);
+    
+    public function deletePurchaseExpenses($id ){
+        $purchaseExpenses = PurchaseExpenses::findOrFail($id);
+        $purchaseExpenses->deleted_at = Carbon::now(); // Update deleted_at with current timestamp
+        $purchaseExpenses->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Record deleted successfully!',
+            'deleted_at' => $purchaseExpenses->deleted_at->format('Y-m-d H:i:s')
+        ]);
     }
 
-    public function purchase_expenses(){
+    
+
+    // public function editPurchaseDayBook($id){
+    //     $data['purchaseBook'] = PurchaseDayBook::findOrFail($id);
+    //     // dd($data);
+    //     $data['suppliers'] = Supplier::getActiveSuppliers(Auth::user()->home_id, Auth::user()->id);
+    //     $data['taxRates'] = Construction_tax_rate::getAllTax_rate(Auth::user()->home_id, "Active");
+    //     $data['purchase_expenses'] = PurchaseExpenses::where('deleted_at', null)->where('status', true)->get();
+    //     return view('frontEnd.salesAndFinance.purchase.purchase_day_book_form', $data);
+    // }
+
+    public function purchase_type(){
 
         $data['purchase_expenses'] = PurchaseExpenses::where('deleted_at',  null)->get();
 
@@ -85,6 +119,7 @@ class PurchaseController extends Controller
 
         $validatedData = $request->validate([
             'title' => 'required|string|max:255',
+            'status' => 'required|boolean',
         ]);
 
         $data = PurchaseExpenses::updateOrCreate(['id' => $request['purchase_expense_id']], $validatedData);
@@ -92,12 +127,12 @@ class PurchaseController extends Controller
         if(empty($request['purchase_expense_id'])){
             return response()->json([
                 'success' => (bool) $data,
-                'message' => $data ? "Purchase expenses added successfully! " : 'Failed to save purchase expenses'
+                'message' => $data ? "Purchase expenses type added successfully! " : 'Failed to save purchase expenses type'
             ]);
         } else {
             return response()->json([
                 'success' => (bool) $data,
-                'message' => $data ? "Purchase expenses edited successfully! " : 'Failed to edit purchase expenses'
+                'message' => $data ? "Purchase expenses type edited successfully! " : 'Failed to edit purchase expenses type'
             ]);
         }
     }
@@ -119,6 +154,23 @@ class PurchaseController extends Controller
             'data' => $residual ? $residual : 0
         ]);
     }   
+
+    public function getSupplierData(){
+        $data = Supplier::getActiveSuppliers(Auth::user()->home_id, Auth::user()->id);
+
+        return response()->json([
+            'success' => (bool) $data,
+            'data' => $data ? $data : 'No data'
+        ]);
+    }
+
+    public function getPurchaseExpense(){
+        $data = PurchaseExpenses::where('deleted_at', null)->where('status', true)->get();
+        return response()->json([
+            'success' => (bool) $data,
+            'data' => $data ? $data : 'No data'
+        ]);
+    }
 
 }
 

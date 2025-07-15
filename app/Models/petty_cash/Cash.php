@@ -14,7 +14,7 @@ class Cash extends Model
     public static function saveCash($data){
         return self::updateOrCreate(['id'=>$data['id'] ?? null], $data);
     }
-    public static function getAllCash($home_id,$user_id){
-        return self::where(['home_id'=>$home_id,'loginUserId'=>$user_id])->whereNull('deleted_at');
+    public static function getAllCash(){
+        return self::whereNull('deleted_at');
     }
 }

@@ -173,10 +173,12 @@
                 mobile_visible = 1;
             }
             var message;
-
+            var url;
             if (id == '') {
+                url='{{ route("quote.ajax.saveRegion") }}';
                 message = "Added Successfully Done";
             } else {
+                url='{{ route("quote.ajax.editRegion") }}';
                 message = "Edited Successfully Done";
             }
 
@@ -186,7 +188,7 @@
             } else {
                 $.ajax({
                     type: "POST",
-                    url: '{{ route("quote.ajax.saveRegion") }}',
+                    url: url,
                     data: {
                         id: id,
                         home_id: home_id,
@@ -235,7 +237,7 @@
             var model = "Region";
             $.ajax({
                 type: "POST",
-                url: "{{url('/status_change')}}",
+                url: "{{url('/region_status_change')}}",
                 data: {
                     id: id,
                     status: status,

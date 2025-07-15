@@ -1,3 +1,6 @@
+@include('frontEnd.common.modify_request')
+@include('frontEnd.common.system_guide')
+@include('frontEnd.common.sticky_notification')
 <footer class="mainFooter">
     <div class="container">
         <div class="row">

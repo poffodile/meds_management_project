@@ -326,8 +326,8 @@
                                     <div class="row form-group">
                                         <label for="supplier_website" class="col-sm-3 col-form-label">Website</label>
                                         <div class="col-sm-2 pe-0">
-                                            <div class="tag_box text-center">
-                                                <span style="padding:7px">http://</span>
+                                            <div class="tag_box">
+                                                <span>http://</span>
                                             </div>
                                         </div>
                                         <div class="col-sm-7">
@@ -397,8 +397,8 @@
                                     <div class="row form-group">
                                         <label for="supplier_creadit_limit" class="col-sm-3 col-form-label">Credit Limit</label>
                                         <div class="col-sm-2 pe-0">
-                                            <div class="tag_box text-center">
-                                                <span style="padding:7px">£</span>
+                                            <div class="tag_box">
+                                                <span>£</span>
                                             </div>
                                         </div>
                                         <div class="col-sm-7">
@@ -1231,8 +1231,8 @@
                                             <input type="text" class="form-control" id="TagRate_input" name="TagRate_input" placeholder="Tax Rate" value="">
                                         </div>
                                         <div class="col-sm-2">
-                                            <div class="tag_box text-center">
-                                                <span style="padding:7px">%</span>
+                                            <div class="tag_box">
+                                                <span>%</span>
                                             </div>
                                         </div>
                                     </div>

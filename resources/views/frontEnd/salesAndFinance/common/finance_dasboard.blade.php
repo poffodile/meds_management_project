@@ -1,7 +1,5 @@
 @extends('frontEnd.layouts.master')
-
 @section('title','Finance')
-
 @section('content')
 
 <!--main content start-->
@@ -34,6 +32,96 @@
                         <div class="tab-content tasi-tab">
                             <div id="overview" class="tab-pane active">
                                 <div class="row tabs_finance">
+                                    <div class="col-lg-2 col-md-3 col-sm-4 col-xs-12 tab_finance" data-tab-finance-target="#Day_book">
+                                        <div class="profile-nav alt">
+                                            <div class="panel text-center">
+                                                <div class="user-heading alt wdgt-row bg-pink">
+                                                    <i class="fa fa-line-chart"></i>
+                                                </div>
+                                                <div class="panel-body">
+                                                    <div class="wdgt-value">
+                                                        <h4 class="count">Vat Quater</h4>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-2 col-md-3 col-sm-4 col-xs-12 tab_finance" data-tab-finance-target="#Fixed_Asset">
+                                        <div class="profile-nav alt">
+                                            <div class="panel text-center">
+                                                <div class="user-heading alt wdgt-row bg-green">
+                                                    <i class="fa fa-window-maximize" aria-hidden="true"></i>
+                                                </div>
+                                                <div class="panel-body">
+                                                    <div class="wdgt-value">
+                                                        <h4 class="count">Fixed Assets</h4>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-2 col-md-3 col-sm-4 col-xs-12 tab_finance">
+                                        <a href="{{ url('/finance/council-tax') }}">
+                                            <div class="profile-nav alt">
+                                                <div class="panel text-center">
+                                                    <div class="user-heading alt wdgt-row lightRed">
+                                                        <i class="fa fa-university" aria-hidden="true"></i>
+                                                    </div>
+                                                    <div class="panel-body">
+                                                        <div class="wdgt-value">
+                                                            <h4 class="count">Council Tax</h4>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div class="col-lg-2 col-md-3 col-sm-4 col-xs-12">
+                                        <a href="{{ url('/petty-cash/expend-card') }}">
+                                            <div class="profile-nav alt">
+                                                <div class="panel text-center">
+                                                    <div class="user-heading alt wdgt-row terques-bg">
+                                                        <i class="fa fa-money"></i>
+                                                    </div>
+                                                    <div class="panel-body">
+                                                        <div class="wdgt-value">
+                                                            <h4 class="count">Petty Cash</h4>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div class="col-lg-2 col-md-3 col-sm-4 col-xs-12">
+                                        <a href="{{ url('/expenses') }}">
+                                            <div class="profile-nav alt">
+                                                <div class="panel text-center">
+                                                    <div class="user-heading alt wdgt-row grayish_green">
+                                                        <i class="fa fa-calculator"></i>
+                                                    </div>
+                                                    <div class="panel-body">
+                                                        <div class="wdgt-value">
+                                                            <h4 class="count">Expenses</h4>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div class="col-lg-2 col-md-3 col-sm-4 col-xs-12 tab_finance" data-tab-finance-target="#Purchase_Order">
+                                        <div class="profile-nav alt">
+                                            <div class="panel text-center">
+                                                <div class="user-heading alt wdgt-row lavender_pink">
+                                                    <i class="fa fa-shopping-cart"></i>
+                                                </div>
+                                                <div class="panel-body">
+                                                    <div class="wdgt-value">
+                                                        <h4 class="count">Purchase Order</h4>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div class="col-lg-2 col-md-3 col-sm-4 col-xs-12 tab_finance" data-tab-finance-target="#Invoice">
                                         <div class="profile-nav alt">
                                             <div class="panel text-center">
@@ -48,36 +136,39 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-lg-2 col-md-3 col-sm-4 col-xs-12 tab_finance" data-tab-finance-target="#Purchase_Order">
+                                    <div class="col-lg-2 col-md-3 col-sm-4 col-xs-12 tab_finance" data-tab-finance-target="#Items">
                                         <div class="profile-nav alt">
                                             <div class="panel text-center">
-                                                <div class="user-heading alt wdgt-row lightRed">
-                                                    <i class="fa fa-shopping-cart"></i>
+                                                <div class="user-heading alt wdgt-row bg-blue">
+                                                    <i class="fa fa-archive"></i>
                                                 </div>
                                                 <div class="panel-body">
                                                     <div class="wdgt-value">
-                                                        <h4 class="count">Purchase Order</h4>
+                                                        <h4 class="count">Items</h4>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
+                                    <!-- <div class="col-lg-2 col-md-3 col-sm-4 col-xs-12">
+                                        <a href="{{ url('/finance/leave-tracker') }}">
+                                            <div class="profile-nav alt">
+                                                <div class="panel text-center">
+                                                    <div class="user-heading alt wdgt-row bg-yellow">
+                                                        <i class="fa fa-calculator"></i>
+                                                    </div>
+                                                    <div class="panel-body">
+                                                        <div class="wdgt-value">
+                                                            <h4 class="count">Leave Tracker</h4>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div> -->
                                     <!-- fa-hourglass-end  fa-life-ring  fa-hourglass-half  fa-hourglass-start  fa-clock-o  fa-tachometer  fa-sliders   -->
-                                    <div class="col-lg-2 col-md-3 col-sm-4 col-xs-12 tab_finance" data-tab-finance-target="#Petty_Cash">
-                                        <div class="profile-nav alt">
-                                            <div class="panel text-center">
-                                                <div class="user-heading alt wdgt-row terques-bg">
-                                                    <i class="fa fa-money"></i>
-                                                </div>
-                                                <div class="panel-body">
-                                                    <div class="wdgt-value">
-                                                        <h4 class="count">Petty Cash</h4>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-2 col-md-3 col-sm-4 col-xs-12">
+
+                                    <!-- <div class="col-lg-2 col-md-3 col-sm-4 col-xs-12">
                                         <a href="{{ url('/petty-cash/child_register') }}">
                                             <div class="profile-nav alt">
                                                 <div class="panel text-center">
@@ -92,7 +183,7 @@
                                                 </div>
                                             </div>
                                         </a>
-                                    </div>
+                                    </div> -->
                                     <!-- <div class="col-lg-2 col-md-3 col-sm-4 col-xs-12 tab_finance" data-tab-finance-target="#Quoting_System">
                                         <div class="profile-nav alt">
                                             <div class="panel text-center">
@@ -107,23 +198,8 @@
                                             </div>
                                         </div>
                                     </div> -->
-                                    <div class="col-lg-2 col-md-3 col-sm-4 col-xs-12">
-                                        <a href="{{ url('/expenses') }}">
-                                            <div class="profile-nav alt">
-                                                <div class="panel text-center">
-                                                    <div class="user-heading alt wdgt-row bg-blue">
-                                                        <i class="fa fa-calculator"></i>
-                                                    </div>
-                                                    <div class="panel-body">
-                                                        <div class="wdgt-value">
-                                                            <h4 class="count">Expenses</h4>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </a>
-                                    </div>
-                                    <div class="col-lg-2 col-md-3 col-sm-4 col-xs-12">
+
+                                    <!-- <div class="col-lg-2 col-md-3 col-sm-4 col-xs-12">
                                         <a href="#!">
                                             <div class="profile-nav alt">
                                                 <div class="panel text-center">
@@ -138,24 +214,24 @@
                                                 </div>
                                             </div>
                                         </a>
-                                    </div>
-                                    <div class="col-lg-2 col-md-3 col-sm-4 col-xs-12">
-                                        <a href="#!">
-                                            <div class="profile-nav alt">
-                                                <div class="panel text-center">
-                                                    <div class="user-heading alt wdgt-row light_yellow">
-                                                        <i class="fa fa-bullhorn"></i>
-                                                    </div>
-                                                    <div class="panel-body">
-                                                        <div class="wdgt-value">
-                                                            <h4 class="count">Marketing</h4>
-                                                        </div>
+                                    </div> -->
+                                    <!-- <div class="col-lg-2 col-md-3 col-sm-4 col-xs-12">
+                                    <a href="#!">
+                                        <div class="profile-nav alt">
+                                            <div class="panel text-center">
+                                                <div class="user-heading alt wdgt-row light_yellow">
+                                                    <i class="fa fa-bullhorn"></i>
+                                                </div>
+                                                <div class="panel-body">
+                                                    <div class="wdgt-value">
+                                                        <h4 class="count">Marketing</h4>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </a>
-                                    </div>
-                                    <div class="col-lg-2 col-md-3 col-sm-4 col-xs-12">
+                                        </div>
+                                    </a>
+                                    </div> -->
+                                        <!-- <div class="col-lg-2 col-md-3 col-sm-4 col-xs-12">
                                         <a href="#!">
                                             <div class="profile-nav alt">
                                                 <div class="panel text-center">
@@ -170,51 +246,8 @@
                                                 </div>
                                             </div>
                                         </a>
-                                    </div>
-                                    <div class="col-lg-2 col-md-3 col-sm-4 col-xs-12 tab_finance" data-tab-finance-target="#Day_book">
-                                        <div class="profile-nav alt">
-                                            <div class="panel text-center">
-                                                <div class="user-heading alt wdgt-row bg-green">
-                                                    <i class="fa fa-book"></i>
-                                                </div>
-                                                <div class="panel-body">
-                                                    <div class="wdgt-value">
-                                                        <h4 class="count">Day Book</h4>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-2 col-md-3 col-sm-4 col-xs-12 tab_finance" data-tab-finance-target="#Fixed_Asset">
-                                        <div class="profile-nav alt">
-                                            <div class="panel text-center">
-                                                <div class="user-heading alt wdgt-row light_blue">
-                                                    <i class="fa fa-window-maximize" aria-hidden="true"></i>
-                                                </div>
-                                                <div class="panel-body">
-                                                    <div class="wdgt-value">
-                                                        <h4 class="count">Fixed Assets</h4>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <a href="{{ url('/finance/council-tax') }}" style="text-decoration: none; color: inherit;">
-                                        <div class="col-lg-2 col-md-3 col-sm-4 col-xs-12 tab_finance" data-tab-finance-target="#">
-                                            <div class="profile-nav alt">
-                                                <div class="panel text-center">
-                                                    <div class="user-heading alt wdgt-row lavender_pink">
-                                                        <i class="fa fa-university" aria-hidden="true"></i>
-                                                    </div>
-                                                    <div class="panel-body">
-                                                        <div class="wdgt-value">
-                                                            <h4 class="count">Council Tax</h4>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </a>
+                                    </div> -->
+
                                 </div>
                                 <div class="tab_finance-content">
                                     <div id="Invoice" data-tab-finance-content>
@@ -251,7 +284,7 @@
                                                     </div>
                                                     <div class="col-md-3 col-sm-6">
                                                         <div class="inner_cards">
-                                                            <a href="{{url('invoices/invoice?key=Draft')}}">
+                                                            <a href="{{url('invoices/invoice/Draft')}}">
                                                                 <div>
                                                                     <div class="icon icon3">
                                                                         <i class="fa fa-floppy-o" aria-hidden="true"></i>
@@ -265,7 +298,7 @@
                                                     </div>
                                                     <div class="col-md-3 col-sm-6">
                                                         <div class="inner_cards">
-                                                            <a href="{{url('invoices/invoice?key=Outstanding')}}">
+                                                            <a href="{{url('invoices/invoice/Outstanding')}}">
                                                                 <div>
                                                                     <div class="icon icon4">
                                                                         <i class="fa fa-calendar-check-o" aria-hidden="true"></i>
@@ -279,7 +312,7 @@
                                                     </div>
                                                     <div class="col-md-3 col-sm-6">
                                                         <div class="inner_cards">
-                                                            <a href="{{url('invoices/invoice?key=Overdue')}}">
+                                                            <a href="{{url('invoices/invoice/Overdue')}}">
                                                                 <div>
                                                                     <div class="icon icon3">
                                                                         <i class="fa fa-warning" aria-hidden="true"></i>
@@ -293,7 +326,7 @@
                                                     </div>
                                                     <div class="col-md-3 col-sm-6">
                                                         <div class="inner_cards">
-                                                            <a href="{{url('invoices/invoice?key=Paid')}}">
+                                                            <a href="{{url('invoices/invoice/Paid')}}">
                                                                 <div>
                                                                     <div class="icon icon6">
                                                                         <i class="fa fa-thumbs-up" aria-hidden="true"></i>
@@ -392,37 +425,37 @@
                                                                 </a>
                                                             </div>
                                                             <div class="show_dropdown show_inner_card_dropdown2 " style="display: none;">
-                                                                <a href="#!">
+                                                                <a href="{{url('new_credit_notes')}}">
                                                                     <div>
                                                                         <i class="fa fa-angle-double-right" aria-hidden="true"></i>
                                                                         <span> New Credit Note</span>
                                                                     </div>
                                                                 </a>
-                                                                <a href="#!">
+                                                                <a href="{{url('credit_notes/Approved')}}">
                                                                     <div>
                                                                         <i class="fa fa-angle-double-right" aria-hidden="true"></i>
-                                                                        <span>Draft Credit Note</span>
+                                                                        <span>Approved Credit Note</span>
                                                                     </div>
                                                                 </a>
-                                                                <a href="#!">
+                                                                <!-- <a href="{{url('new_credit_notes')}}">
                                                                     <div>
                                                                         <i class="fa fa-angle-double-right" aria-hidden="true"></i>
                                                                         <span> Awaiting Approval Credit Note</span>
                                                                     </div>
                                                                 </a>
-                                                                <a href="#!">
+                                                                <a href="{{url('new_credit_notes')}}">
                                                                     <div>
                                                                         <i class="fa fa-angle-double-right" aria-hidden="true"></i>
                                                                         <span>Approval Credit Note</span>
                                                                     </div>
-                                                                </a>
-                                                                <a href="#!">
+                                                                </a> -->
+                                                                <a href="{{url('credit_notes/Paid')}}">
                                                                     <div>
                                                                         <i class="fa fa-angle-double-right" aria-hidden="true"></i>
                                                                         <span>Paid Credit Note</span>
                                                                     </div>
                                                                 </a>
-                                                                <a href="#!">
+                                                                <a href="{{url('credit_notes/Cancelled')}}">
                                                                     <div>
                                                                         <i class="fa fa-angle-double-right" aria-hidden="true"></i>
                                                                         <span>Cancelled Credit Note</span>
@@ -430,6 +463,34 @@
                                                                     </div>
                                                                 </a>
                                                             </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3 col-sm-6">
+                                                        <div class="inner_cards">
+                                                            <a href="{{url('/account_codes')}}">
+                                                                <div>
+                                                                    <div class="icon icon1">
+                                                                        <i class="fa fa-calculator " aria-hidden="true"></i>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="card_name">
+                                                                    <h4>Account Codes</h4>
+                                                                </div>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3 col-sm-6">
+                                                        <div class="inner_cards">
+                                                            <a href="{{url('/tax_rate')}}">
+                                                                <div>
+                                                                    <div class="icon icon2">
+                                                                        <i class="fa fa-percent " aria-hidden="true"></i>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="card_name">
+                                                                    <h4>Tax Rate</h4>
+                                                                </div>
+                                                            </a>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -440,7 +501,7 @@
                                         <div class="row">
                                             <div class="col-md-12">
                                                 <div class="row">
-                                                    <div class="col-md-3 col-sm-6">
+                                                    <!-- <div class="col-md-3 col-sm-6">
                                                         <div class="inner_cards">
                                                             <a href="#">
                                                                 <div>
@@ -453,7 +514,7 @@
                                                                 </div>
                                                             </a>
                                                         </div>
-                                                    </div>
+                                                    </div> -->
                                                     <div class="col-md-3 col-sm-6">
                                                         <div class="inner_cards">
                                                             <a href="{{url('purchase_order')}}">
@@ -484,7 +545,7 @@
                                                     </div>
                                                     <div class="col-md-3 col-sm-6">
                                                         <div class="inner_cards">
-                                                            <a href="{{ url('draft_purchase_order?list_mode=AwaitingApprivalPurchaseOrders') }}">
+                                                            <a href="{{ url('draft_purchase_order/AwaitingApprivalPurchaseOrders') }}">
                                                                 <div>
                                                                     <div class="icon icon4">
                                                                         <i class="fa fa-hourglass-half"></i>
@@ -498,7 +559,7 @@
                                                     </div>
                                                     <div class="col-md-3 col-sm-6">
                                                         <div class="inner_cards">
-                                                            <a href="{{ url('draft_purchase_order?list_mode=Approved') }}">
+                                                            <a href="{{ url('draft_purchase_order/Approved') }}">
                                                                 <div>
                                                                     <div class="icon icon5">
                                                                         <i class="fa fa-check-circle"></i>
@@ -512,7 +573,7 @@
                                                     </div>
                                                     <div class="col-md-3 col-sm-6">
                                                         <div class="inner_cards">
-                                                            <a href="{{ url('draft_purchase_order?list_mode=Rejected') }}">
+                                                            <a href="{{ url('draft_purchase_order/Rejected') }}">
                                                                 <div>
                                                                     <div class="icon icon6">
                                                                         <i class="fa fa-times-circle"></i>
@@ -526,7 +587,7 @@
                                                     </div>
                                                     <div class="col-md-3 col-sm-6">
                                                         <div class="inner_cards">
-                                                            <a href="{{ url('draft_purchase_order?list_mode=Actioned') }}">
+                                                            <a href="{{ url('draft_purchase_order/Actioned') }}">
                                                                 <div>
                                                                     <div class="icon icon7">
                                                                         <i class="fa fa-file-text"></i>
@@ -540,7 +601,7 @@
                                                     </div>
                                                     <div class="col-md-3 col-sm-6">
                                                         <div class="inner_cards">
-                                                            <a href="{{ url('draft_purchase_order?list_mode=Paid') }}">
+                                                            <a href="{{ url('draft_purchase_order/Paid') }}">
                                                                 <div>
                                                                     <div class="icon icon8">
                                                                         <i class="fa fa-thumbs-up"></i>
@@ -645,19 +706,19 @@
                                                                         <span> New Credit Note </span>
                                                                     </div>
                                                                 </a>
-                                                                <a href="{{url('credit_notes?list_mode=Approved')}}">
+                                                                <a href="{{url('credit_notes/Approved')}}">
                                                                     <div>
                                                                         <i class="fa fa-angle-double-right" aria-hidden="true"></i>
                                                                         <span> Approval Credit Note</span>
                                                                     </div>
                                                                 </a>
-                                                                <a href="{{url('credit_notes?list_mode=Paid')}}">
+                                                                <a href="{{url('credit_notes/Paid')}}">
                                                                     <div>
                                                                         <i class="fa fa-angle-double-right" aria-hidden="true"></i>
                                                                         <span> Paid Credit Note</span>
                                                                     </div>
                                                                 </a>
-                                                                <a href="{{url('credit_notes?list_mode=Cancelled')}}">
+                                                                <a href="{{url('credit_notes/Cancelled')}}">
                                                                     <div>
                                                                         <i class="fa fa-angle-double-right" aria-hidden="true"></i>
                                                                         <span> Cancelled Credit Note</span>
@@ -666,11 +727,25 @@
                                                             </div>
                                                         </div>
                                                     </div>
+                                                    <div class="col-md-3 col-sm-6">
+                                                        <div class="inner_cards">
+                                                            <a href="{{url('departments')}}">
+                                                                <div>
+                                                                    <div class="icon icon4">
+                                                                        <i class="fa fa-sitemap "></i>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="card_name">
+                                                                    <h4>Departments</h4>
+                                                                </div>
+                                                            </a>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div id="Petty_Cash" data-tab-finance-content>
+                                    <!-- <div id="Petty_Cash" data-tab-finance-content>
                                         <div class="row">
                                             <div class="col-md-12">
                                                 <div class="row">
@@ -705,7 +780,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> -->
                                     <div id="Day_book" data-tab-finance-content>
                                         <div class="row">
                                             <div class="col-md-12">
@@ -740,14 +815,14 @@
                                                     </div>
                                                     <div class="col-md-3 col-sm-6">
                                                         <div class="inner_cards">
-                                                            <a href="{{ url('purchase/purchase-expenses') }}">
+                                                            <a href="{{ url('purchase/purchase-type') }}">
                                                                 <div>
                                                                     <div class="icon icon3">
-                                                                        <i class="fa fa-book"></i>
+                                                                        <i class="fa fa-money"></i>
                                                                     </div>
                                                                 </div>
                                                                 <div class="card_name">
-                                                                    <h4>Purchase Type</h4>
+                                                                    <h4>Purchase Expenses Type</h4>
                                                                 </div>
                                                             </a>
                                                         </div>
@@ -762,7 +837,7 @@
                                                 <div class="row">
                                                     <div class="col-md-3 col-sm-6">
                                                         <div class="inner_cards">
-                                                            <a href="{{ url('/petty-cash/expend-card') }}">
+                                                            <a href="{{ url('sales-finance/assets/asset-category') }}">
                                                                 <div>
                                                                     <div class="icon icon10">
                                                                         <i class="fa fa-window-maximize" aria-hidden="true"></i>
@@ -776,7 +851,7 @@
                                                     </div>
                                                     <div class="col-md-3 col-sm-6">
                                                         <div class="inner_cards">
-                                                            <a href="">
+                                                            <a href="{{ url('/sales-finance/assets/depreciation-type') }}">
                                                                 <div>
                                                                     <div class="icon icon7">
                                                                         <i class="fa fa-file-text-o" aria-hidden="true"></i>
@@ -790,7 +865,7 @@
                                                     </div>
                                                     <div class="col-md-3 col-sm-6">
                                                         <div class="inner_cards">
-                                                            <a href="">
+                                                            <a href="{{ url('sales-finance/assets/asset-register') }}">
                                                                 <div>
                                                                     <div class="icon icon3">
                                                                         <i class="fa fa-bullseye" aria-hidden="true"></i>
@@ -848,6 +923,70 @@
                                                                 </div>
                                                                 <div class="card_name">
                                                                     <h4>Council Tax 3</h4>
+                                                                </div>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="Items" data-tab-finance-content>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="row">
+                                                    <div class="col-md-3 col-sm-6">
+                                                        <div class="inner_cards">
+                                                            <a href="{{ url('/item/product_categories') }}">
+                                                                <div>
+                                                                    <div class="icon icon10">
+                                                                        <i class="fa fa-th-large" aria-hidden="true"></i>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="card_name">
+                                                                    <h4>Product Categories</h4>
+                                                                </div>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3 col-sm-6">
+                                                        <div class="inner_cards">
+                                                            <a href="{{ url('/item/products') }}">
+                                                                <div>
+                                                                    <div class="icon icon7">
+                                                                        <i class="fa fa-square" aria-hidden="true"></i>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="card_name">
+                                                                    <h4>Products</h4>
+                                                                </div>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3 col-sm-6">
+                                                        <div class="inner_cards">
+                                                            <a href="{{ url('/item/item-groups') }}">
+                                                                <div>
+                                                                    <div class="icon icon3">
+                                                                        <i class="fa fa-th-large" aria-hidden="true"></i>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="card_name">
+                                                                    <h4>Product Groups</h4>
+                                                                </div>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3 col-sm-6">
+                                                        <div class="inner_cards">
+                                                            <a href="{{ url('/item/catalogues') }}">
+                                                                <div>
+                                                                    <div class="icon icon9">
+                                                                        <i class="fa fa-folder-open" aria-hidden="true"></i>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="card_name">
+                                                                    <h4>Catalogues</h4>
                                                                 </div>
                                                             </a>
                                                         </div>

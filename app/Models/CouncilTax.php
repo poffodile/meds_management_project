@@ -9,9 +9,9 @@ class CouncilTax extends Model
 {
     use HasFactory;
 
-    protected $table="council_tax";
+    protected $table = "council_tax";
 
-    protected $fillable=[
+    protected $fillable = [
         'flat_number',
         'address',
         'post_code',
@@ -19,13 +19,12 @@ class CouncilTax extends Model
         'no_of_bedrooms',
         'owned_by_omega',
         'occupancy',
-        'exempt', 
-        'account_number', 
-        'last_bill_date', 
-        'bill_period_start_date', 
-        'bill_period_end_date', 
-        'amount_paid', 
-        'additional', 
+        'exempt',
+        'account_number',
+        'last_bill_date',
+        'bill_period_start_date',
+        'bill_period_end_date',
+        'amount_paid',
+        'additional',
     ];
-
 }

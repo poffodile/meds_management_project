@@ -405,7 +405,7 @@ ul.sidebar-menu li a.active i {
     padding: 30px;
     width: 100%;
     margin-top: 80px;
-
+    min-height: calc(100vh - 120px);
 }
 
 .brand {

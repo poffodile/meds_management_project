@@ -182,9 +182,13 @@
 
         $('#saveChanges').on('click', function() {
             var formData = $('#quote_type_form').serialize();
-
+            var id=$("#quote_type_id").val();
+            var url='{{ route("quote.ajax.saveQuoteType") }}';
+            if(id !=''){
+                url='{{ route("quote.ajax.editQuoteType") }}';
+            }
             $.ajax({
-                url: '{{ route("quote.ajax.saveQuoteType") }}',
+                url: url,
                 method: 'POST',
                 data: formData,
                 success: function(response) {
@@ -289,7 +293,7 @@ function status_change(id, status){
             var model="QuoteType";
             $.ajax({
                 type: "POST",
-                url: "{{url('/status_change')}}",
+                url: "{{url('/QuoteType_status_change')}}",
                 data: {id:id,status:status,model:model,_token:token},
                 success: function(data) {
                     console.log(data);

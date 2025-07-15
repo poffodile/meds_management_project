@@ -1,199 +1,199 @@
-@include('frontEnd.salesAndFinance.jobs.layout.header')
-
+@extends('frontEnd.layouts.master')
 <meta name="csrf-token" content="{{ csrf_token() }}">
+@section('title','Product Group')
+<link rel="stylesheet" type="text/css" href="{{ url('public/frontEnd/jobs/css/custom.css')}}" />
+@section('content')
+
 <style>
     .parent-container {
         position: absolute;
         background: #fff;
     }
-    #productListTable th, 
+
+    #productListTable th,
     #productListTable td {
         text-align: center;
     }
+
+    .dropdown-item {
+        padding: 6px 15px;
+        font-size: 13px;
+        color: #212529;
+        text-align: inherit;
+        text-decoration: none;
+        display: block;
+        width: 100%;
+        background-color: transparent;
+        border: 0;
+        border-radius: 0;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .dropdown-item:hover {
+        background-color: #f8f9fa;
+        color: #212529;
+    }
 </style>
-<section class="main_section_page px-3 pt-0">
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-md-4 col-lg-4 col-xl-4 ">
-            <div class="pageTitle">
-                <h3>Product Group</h3>
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-md-12 col-lg-12 col-xl-12 px-3">
-            <div class="jobsection">
-                <a href="javascript:void(0)" class="profileDrop" onclick="open_productgroupmodal()">Add</a>
-            </div>
-        </div>
-
-
-        <!--Start Import/Export Popup -->
-        {{-- <div id="importExportpopup" class="importExportMrgin">
-            <div class="popup-content">
-                <div class="popupTitle">
-                    <span class="">Import/Export - Product</span>
-                    <span class="close" id="closeimportExportPopup">&times;</span>
-                </div>
-                <div class="contantbodypopup">
-                    <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 text-center p-0 mt-3 mb-2">
-                        <div class="card">
-                            <form id="msform">
-                                <!-- progressbar -->
-                                <ul id="progressbar">
-                                    <li class="active" id="account"><strong>Import/Export</strong></li>
-                                    <li id="personal"><strong>Action</strong></li>
-                                    <li id="payment"><strong>Upload</strong></li>
-                                    <li id="confirm"><strong>Summary</strong></li>
-                                </ul>
-
-                                <fieldset>
-                                    <div class="form-card">
-                                        <div class="newJobForm p-3 mb-3">
-                                            <h4 class="contTitle text-start">Import Templates</h4>
-                                            <label class="col-form-label">Download an empty template to add new products or prices</label>
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <label class="importTemp">Product & price <a href="#!"> <span class="material-symbols-outlined">download</span></a></label>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <label class="importTemp"> Supplier & price <a href="#!"> <span class="material-symbols-outlined">download</span> </a> </label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="newJobForm p-3">
-                                            <h4 class="contTitle text-start">Import</h4>
-                                        </div>
-                                    </div>
-                                    <input type="button" name="next" class="next action-button" value="Next" />
-                                </fieldset>
-
-                                <fieldset>
-                                    <div class="form-card">
-                                        <label class="fieldlabels">First Name: *</label> <input type="text" />
-                                    </div>
-                                    <input type="button" name="next" class="next action-button" value="Next" />
-                                    <input type="button" name="previous" class="previous action-button-previous" value="Previous" />
-                                </fieldset>
-
-
-                                <fieldset>
-                                    <div class="form-card">
-                                        <label class="fieldlabels">Upload Your Photo:</label>
-                                        <input type="file" name="pic" accept="image/*">
-                                    </div> 
-                                    <input type="button" name="next" class="next action-button" value="Submit" /> 
-                                    <input type="button" name="previous" class="previous action-button-previous" value="Previous" />
-                                </fieldset>
-
-
-                                <fieldset>
-                                    <div class="form-card">
-                                        <h2 class="purple-text text-center"><strong>SUCCESS !</strong></h2> <br>
-                                        <div class="row justify-content-center">
-                                            <div class="col-3"> <img src="https://i.imgur.com/GwStPmg.png" class="fit-image"> </div>
-                                        </div> <br><br>
-                                        <div class="row justify-content-center">
-                                            <div class="col-7 text-center">
-                                                <h5 class="purple-text text-center">You Have Successfully Signed Up </h5>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <input type="button" name="previous" class="previous action-button-previous" value="Previous" />
-                                </fieldset>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div> --}}
-        <!-- End off Import/Export Popup -->
-
-    </div>
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="maimTable mt-2">
-                <div class="printExpt">
-                    <div class="prntExpbtn">
-                        <a href="#!">Print</a>
-                        <a href="#!">Export</a>
-                    </div>
-                    <div class="searchFilter">
-                        <a href="#!">Show Search Filter</a>
-                    </div>
-                </div>
-                <div class="markendDelete">
-                    <div class="row">
-                        <div class="col-md-7">
-                            <div class="jobsection">
-                                <a href="javascript:void(0)" id="deleteSelectedRows" class="profileDrop">Delete</a>
-                                <span class="alert text-danger text-center deletemsg"></span>
+<section class="wrapper">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12 p-0">
+                <div class="panel">
+                    <header class="panel-heading px-5">
+                        <h4>Product Group </h4>
+                    </header>
+                    <div class="panel-body">
+                        <div class="col-md-12 col-lg-12 col-xl-12 px-3">
+                            <div class="jobsection justify-content-end">
+                                <a href="javascript:void(0)" class="btn btn-warning" onclick="open_productgroupmodal()"><i class="fa fa-plus"></i> Add</a>
+                                <a href="javascript:void(0)" id="deleteSelectedRows" class="btn btn-danger">Delete</a>
+                                <span class="text-danger text-center deletemsg"></span>
                             </div>
                         </div>
-                    </div>
-                </div>
 
-                <table id="exampleOne" class="display tablechange" cellspacing="0" width="100%">
-                    <thead>
-                        <tr>
-                            <th class="text-center" style=" width:60px;"><input type="checkbox" id="selectAll"> <label for="selectAll"> </label></th>
-                            <th>#</th>
-                            <th>Product Group</th>
-                            <th>Description</th>
-                            <th>Cost Price</th>
-                            <th>Price</th>
-                            <th>Status</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($productGroups as $productGroup)
-                        <tr>
-                            <td class="text-center"><input type="checkbox" id="" class="delete_checkbox" value="{{$productGroup->id}}"></td>
-                            <td>{{ $loop->iteration }}</td>
-                            <td>{{ $productGroup->name }}</td>
-                            <td>{{ $productGroup->description }}</td>
-                            <td>{{ $productGroup->cost }}</td>
-                            <td>{{ $productGroup->price }}</td>
-                            <td>
-                                @if($productGroup->status == 1)
-                                    <span class="grencheck"><i class="fa-solid fa-circle-check"></i></span>
-                                @else
-                                    <span class="grayCheck"><i class="fa-solid fa-circle-check"></i></span>
-                                @endif
-                            </td>
-                            <td>
-                                <div class="d-inline-flex align-items-center ">
-                                    <div class="nav-item dropdown">
-                                        <a href="#" class="nav-link dropdown-toggle profileDrop" data-bs-toggle="dropdown">
-                                            Action
-                                        </a>
-                                        <div class="dropdown-menu fade-up m-0">
-                                            <a href="javascript:void(0)" class="dropdown-item fetch_data" data-id="{{$productGroup->id}}" data-home_id="{{$productGroup->home_id}}" data-name="{{$productGroup->name}}" data-description="{{$productGroup->description}}" data-code="{{$productGroup->code}}" data-cost="{{$productGroup->cost}}" data-price="{{$productGroup->price}}" data-status="{{$productGroup->status}}">Edit Details</a>
+                        <!--Start Import/Export Popup -->
+                        {{-- <div id="importExportpopup" class="importExportMrgin">
+                                <div class="popup-content">
+                                    <div class="popupTitle">
+                                        <span class="">Import/Export - Product</span>
+                                        <span class="close" id="closeimportExportPopup">&times;</span>
+                                    </div>
+                                    <div class="contantbodypopup">
+                                        <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 text-center p-0 mt-3 mb-2">
+                                            <div class="card">
+                                                <form id="msform">
+                                                    <!-- progressbar -->
+                                                    <ul id="progressbar">
+                                                        <li class="active" id="account"><strong>Import/Export</strong></li>
+                                                        <li id="personal"><strong>Action</strong></li>
+                                                        <li id="payment"><strong>Upload</strong></li>
+                                                        <li id="confirm"><strong>Summary</strong></li>
+                                                    </ul>
+
+                                                    <fieldset>
+                                                        <div class="form-card">
+                                                            <div class="newJobForm p-3 mb-3">
+                                                                <h4 class="contTitle text-start">Import Templates</h4>
+                                                                <label class="col-form-label">Download an empty template to add new products or prices</label>
+                                                                <div class="row">
+                                                                    <div class="col-md-6">
+                                                                        <label class="importTemp">Product & price <a href="#!"> <span class="material-symbols-outlined">download</span></a></label>
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <label class="importTemp"> Supplier & price <a href="#!"> <span class="material-symbols-outlined">download</span> </a> </label>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="newJobForm p-3">
+                                                                <h4 class="contTitle text-start">Import</h4>
+                                                            </div>
+                                                        </div>
+                                                        <input type="button" name="next" class="next action-button" value="Next" />
+                                                    </fieldset>
+
+                                                    <fieldset>
+                                                        <div class="form-card">
+                                                            <label class="fieldlabels">First Name: *</label> <input type="text" />
+                                                        </div>
+                                                        <input type="button" name="next" class="next action-button" value="Next" />
+                                                        <input type="button" name="previous" class="previous action-button-previous" value="Previous" />
+                                                    </fieldset>
+
+
+                                                    <fieldset>
+                                                        <div class="form-card">
+                                                            <label class="fieldlabels">Upload Your Photo:</label>
+                                                            <input type="file" name="pic" accept="image/*">
+                                                        </div> 
+                                                        <input type="button" name="next" class="next action-button" value="Submit" /> 
+                                                        <input type="button" name="previous" class="previous action-button-previous" value="Previous" />
+                                                    </fieldset>
+
+
+                                                    <fieldset>
+                                                        <div class="form-card">
+                                                            <h2 class="purple-text text-center"><strong>SUCCESS !</strong></h2> <br>
+                                                            <div class="row justify-content-center">
+                                                                <div class="col-3"> <img src="https://i.imgur.com/GwStPmg.png" class="fit-image"> </div>
+                                                            </div> <br><br>
+                                                            <div class="row justify-content-center">
+                                                                <div class="col-7 text-center">
+                                                                    <h5 class="purple-text text-center">You Have Successfully Signed Up </h5>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <input type="button" name="previous" class="previous action-button-previous" value="Previous" />
+                                                    </fieldset>
+                                                </form>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                            </div> --}}
+                        <!-- End off Import/Export Popup -->
 
+                        <div class="col-lg-12">
+                            <div class="maimTable productDetailTable mb-4 table-responsive">
+                                <table id="myTable" class="table border-top border-bottom" cellspacing="0" width="100%">
+                                    <thead>
+                                        <tr>
+                                            <th><input type="checkbox" id="selectAll"> <label for="selectAll"> </label></th>
+                                            <th>#</th>
+                                            <th>Product Group</th>
+                                            <th>Description</th>
+                                            <th>Cost Price</th>
+                                            <th>Price</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($productGroups as $productGroup)
+                                        <tr>
+                                            <td><input type="checkbox" id="" class="delete_checkbox" value="{{$productGroup->id}}"></td>
+                                            <td>{{ $loop->iteration }}</td>
+                                            <td>{{ $productGroup->name }}</td>
+                                            <td>{{ $productGroup->description }}</td>
+                                            <td>{{ $productGroup->cost }}</td>
+                                            <td>{{ $productGroup->price }}</td>
+                                            <td>
+                                                @if($productGroup->status == 1)
+                                                <span class="grencheck"><i class="fa fa-check-circle"></i></span>
+                                                @else
+                                                <span class="grayCheck"><i class="fa fa-check-circle"></i></span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                <div class="dropdown">
+                                                    <a href="#" class="btn btn-primary btn-sm" data-toggle="dropdown">
+                                                        Action <i class="fa fa-caret-down"></i>
+                                                    </a>
+                                                    <div class="dropdown-menu fade-up m-0">
+                                                        <a href="javascript:void(0)" class="dropdown-item fetch_data" data-id="{{$productGroup->id}}" data-home_id="{{$productGroup->home_id}}" data-name="{{$productGroup->name}}" data-description="{{$productGroup->description}}" data-code="{{$productGroup->code}}" data-cost="{{$productGroup->cost}}" data-price="{{$productGroup->price}}" data-status="{{$productGroup->status}}">Edit Details</a>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- End off main Table -->
+                        </div>
+                    </div>
+                </div>
             </div>
-            <!-- End off main Table -->
         </div>
-    </di>
-</div>
+    </div>
 </section>
 
-
 <!-- ********************************** -->
-<div class="modal fade" id="itemsCatagoryModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="itemsCatagoryModalLabel" aria-hidden="true">
+<div class="modal fade" id="itemsCatagoryModal" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="itemsCatagoryModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
-        <div class="modal-content add_Customer">
+        <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title fs-5" id="itemsCatagoryModalLabel">Product Groups</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">&times;</button>
+                <h4 class="modal-title fs-5" id="itemsCatagoryModalLabel">Product Groups</h4>
             </div>
             <div class="modal-body ">
                 <div class="contantbodypopup p-0">
@@ -202,69 +202,59 @@
                         <input type="hidden" id="id" name="id">
                         <div class="row pt-3">
                             <div class="col-lg-6">
-                                <div class="mb-2 row">
-                                    <label for="inputCity" class="col-sm-4 col-form-label">Product Group <span class="radStar">*</span></label>
-                                    <div class="col-sm-8">
-                                        <input type="text" class="form-control editInput" name="name" id="name" value="">
-                                    </div>
+                                <div class="mb-3">
+                                    <label class="mb-2 col-form-label">Product Group <span class="radStar">*</span></label>
+                                    <input type="text" class="form-control editInput" name="name" id="name" value="">
                                 </div>
-                                <div class="mb-2 row">
-                                    <label for="inputCity" class="col-sm-4 col-form-label">Description</label>
-                                    <div class="col-sm-8">
-                                        <textarea class="form-control textareaInput" name="description" id="description" rows="3" placeholder=""></textarea>
-                                    </div>
+                                <div class="mb-3">
+                                    <label class="mb-2 col-form-label">Description</label>
+                                    <textarea class="form-control textareaInput" name="description" id="description" rows="3" placeholder=""></textarea>
                                 </div>
                             </div>
                             <div class="col-lg-6">
-                                <div class="mb-2 row">
-                                    <label for="inputCity" class="col-sm-3 col-form-label">Code</label>
-                                    <div class="col-sm-9">
-                                        <input type="text" class="form-control editInput" id="code" name="code" value="">
-                                    </div>
+                                <div class="mb-3">
+                                    <label class="mb-2 col-form-label">Code</label>
+                                    <input type="text" class="form-control editInput" id="code" name="code" value="">
                                 </div>
-                                <div class="mb-2 row">
-                                    <label for="inputCity" class="col-sm-3 col-form-label">Status</label>
-                                    <div class="col-sm-4">
-                                        <select class="form-control editInput selectOptions" status="status" id="status">
-                                            <option> Active </option>
-                                            <option> Inactive </option>
-                                        </select>
-                                    </div>
+                                <div class="mb-3">
+                                    <label class="mb-2 col-form-label">Status</label>
+                                    <select class="form-control editInput selectOptions" status="status" id="status">
+                                        <option> Active </option>
+                                        <option> Inactive </option>
+                                    </select>
                                 </div>
-                                <div class="mb-2 row">
-                                    <label for="inputCity" class="col-sm-3 col-form-label">Cost Price</label>
-                                    <div class="col-sm-9">
-                                        <input type="text" class="form-control editInput" name="cost" id="costPrice" oninput="this.value = this.value.replace(/[^0-9]/g, '');" value="0.00">
-                                    </div>
+                                <div class="mb-3">
+                                    <label class="mb-2 col-form-label">Cost Price</label>
+                                    <input type="text" class="form-control editInput" name="cost" id="costPrice" oninput="this.value = this.value.replace(/[^0-9]/g, '');" value="0.00">
                                 </div>
-                                <div class="mb-2 row">
-                                    <label for="inputCity" class="col-sm-3 col-form-label">Price</label>
-                                    <div class="col-sm-9">
-                                        <input type="text" class="form-control editInput" id="productPrice" name="price" oninput="this.value = this.value.replace(/[^0-9]/g, '');" value="0.00">
-                                    </div>
+                                <div class="mb-3">
+                                    <label class="mb-2 col-form-label">Price</label>
+                                    <input type="text" class="form-control editInput" id="productPrice" name="price" oninput="this.value = this.value.replace(/[^0-9]/g, '');" value="0.00">
                                 </div>
                             </div>
                             <div class="col-sm-12">
-                                <h4 class="contTitle text-start mb-2 mt-2">Product Details</h4>
-                                <div class="mb-3 row">
-                                    <label for="inputCountry" class="col-sm-2 col-form-label">Select product</label>
-                                    <div class="col-sm-3">
-                                        <input type="text" class="form-control editInput" id="search-product" placeholder="Type to add product">
-                                        <div class="parent-container"></div>
-                                    </div>
-                                    <div class="col-sm-7">
-                                        <div class="plusandText">
-                                            <span class="afterPlusText"> (Type to add product or <a href="javascript:void(0)" onclick="openProductListModal();" id="proClickHerePopup">Click here</a> to view all product)</span>
+                                <h4 class="contTitle">Product Details</h4>
+                                <div class="mb-3">
+                                    <div class="row d-flex align-items-center">
+                                        <label class="col-sm-2 col-form-label">Select product</label>
+                                        <div class="col-sm-3">
+                                            <input type="text" class="form-control editInput" id="search-product" placeholder="Type to add product">
+                                            <div class="parent-container"></div>
                                         </div>
+                                        <div class="col-sm-7">
+                                            <div class="plusandText">
+                                                <span class="afterPlusText"> (Type to add product or <a href="javascript:void(0)" onclick="openProductListModal();" id="proClickHerePopup" class="taxt_blue">Click here</a> to view all product)</span>
+                                            </div>
 
-                                        <!--Start (Type to add product or Popup -->
-                                        @include('components.product-list')
-                                        <!-- End off (Type to add product or Popup -->
+                                            <!--Start (Type to add product or Popup -->
+                                            @include('components.product-list')
+                                            <!-- End off (Type to add product or Popup -->
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="productDetailTable">
-                                    <table class="table" id="productListTable">
-                                        <thead class="table-light">
+                                <div class="maimTable productDetailTable mb-4 table-responsive">
+                                    <table class="table border-top border-bottom" id="productListTable">
+                                        <thead>
                                             <tr>
                                                 <th>Code</th>
                                                 <th>Product </th>
@@ -276,7 +266,6 @@
                                             </tr>
                                         </thead>
                                         <tbody id="product_group_products_list">
-
                                         </tbody>
                                         <tfoot class="table totlepayment add_table_insrt33" id="containerA">
                                     </table>
@@ -287,14 +276,13 @@
                 </div>
             </div> <!-- end modal body -->
             <div class="modal-footer customer_Form_Popup">
-                <button type="button" class="btn profileDrop" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn profileDrop" onclick="saveProductGroup()">Save</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-warning" onclick="saveProductGroup()">Save</button>
             </div>
         </div>
     </div>
 </div>
 <!-- ***************************************** -->
-</div>
 
 <script>
     function saveProductGroup() {
@@ -323,10 +311,15 @@
         });
 
         console.log(products);
+        var id = $("#id").val();
+        var url = '{{ route("item.ajax.saveProductGroup") }}';
+        if (id != '') {
+            url = '{{ route("item.ajax.editProductGroup") }}';
+        }
 
         FormData = $('#add_product_group_form').serialize();
         $.ajax({
-            url: '{{ route("item.ajax.saveProductGroup") }}',
+            url: url,
             method: 'Post',
             data: {
                 FormData: FormData,
@@ -337,6 +330,9 @@
             success: function(response) {
                 // Show the message div
                 console.log(response);
+                if (isAuthenticated(response) == false) {
+                    return false;
+                }
                 const messageDiv = document.getElementById('message');
                 messageDiv.style.display = 'block';
 
@@ -346,7 +342,7 @@
                     messageDiv.classList.remove('error-message');
                     messageDiv.classList.add('success-message');
                     messageDiv.textContent = response.message;
-                    
+
                     // Optionally hide the modal after success
                     setTimeout(function() {
                         $('#itemsCatagoryModal').modal('hide');
@@ -412,6 +408,9 @@
                     success: function(response) {
                         console.log(response);
                         // $('#results').html(response);
+                        if (isAuthenticated(response) == false) {
+                            return false;
+                        }
                         divList.innerHTML = "";
                         const div = document.createElement('div');
                         div.className = 'container'; // Optional: Add a class to the div for styling
@@ -466,6 +465,9 @@
             },
             success: function(response) {
                 console.log(response);
+                if (isAuthenticated(response) == false) {
+                    return false;
+                }
                 productGroupTable(response.data, 'productListTable');
             },
             error: function(xhr, status, error) {
@@ -474,13 +476,14 @@
         });
     }
 
-    var totalAmount=0;
-    var GrandCostPrice=0;
-    var GrandPrice=0;
+    var totalAmount = 0;
+    var GrandCostPrice = 0;
+    var GrandPrice = 0;
+
     function productGroupTable(data, tableId) {
         // Get the table body element
         const tableBody = document.querySelector(`#${tableId} tbody`);
-        
+
         // Check if data array is empty
         if (data.length === 0) {
             // Create a row to display the "No products found" message
@@ -527,7 +530,7 @@
                 inputCost.className = 'cost_price input50';
                 inputCost.name = 'cost_price[]'; // Set input name (useful for form submission)
                 inputCost.value = item.cost_price; // Set the default value (optional)
-                GrandCostPrice=GrandCostPrice+Number(item.cost_price);
+                GrandCostPrice = GrandCostPrice + Number(item.cost_price);
                 costCell.appendChild(inputCost);
                 row.appendChild(costCell);
 
@@ -540,7 +543,7 @@
                 });
                 inputPrice.name = 'product_price[]'; // Set input name (useful for form submission)
                 inputPrice.value = item.price; // Set the default value (optional)
-                GrandPrice=GrandPrice+Number(item.price);
+                GrandPrice = GrandPrice + Number(item.price);
                 priceCell.appendChild(inputPrice);
                 row.appendChild(priceCell);
 
@@ -557,10 +560,10 @@
                 row.appendChild(qtyCell);
 
                 const amountCell = document.createElement('td');
-                amountCell.innerHTML = '$'+ parseFloat(item.price).toFixed(2);
+                amountCell.innerHTML = '$' + parseFloat(item.price).toFixed(2);
                 amountCell.className = "price";
                 row.appendChild(amountCell);
-                totalAmount=totalAmount+Number(item.price);
+                totalAmount = totalAmount + Number(item.price);
                 const deleteCell = document.createElement('td');
                 deleteCell.innerHTML = '<i class="fas fa-times fa-2x deleteRow" style="color: red;"></i>';
                 row.appendChild(deleteCell);
@@ -572,9 +575,9 @@
             });
             $("#costPrice").val(parseFloat(GrandCostPrice).toFixed(2));
             $("#productPrice").val(parseFloat(GrandPrice).toFixed(2));
-            var htmlCode=`<tr>
+            var htmlCode = `<tr>
                                 <td colspan="4"></td>
-                                <td>Total</td><td id="GrandTotalAmount">$`+parseFloat(totalAmount).toFixed(2)+`</td>
+                                <td>Total</td><td id="GrandTotalAmount">$` + parseFloat(totalAmount).toFixed(2) + `</td>
                                 <td></td>
                           </tr>`;
             $("#containerA").html(htmlCode);
@@ -591,10 +594,10 @@
                 const amountCell = row.querySelector(".price");
                 const amount = parseFloat(amountCell.textContent.replace(/[^\d.]/g, "")) || 0;
                 totalAmount -= amount;
-                if(totalAmount === 0){
+                if (totalAmount === 0) {
                     $("#costPrice").val('0.00');
-                   $("#containerA").hide();
-                }else{
+                    $("#containerA").hide();
+                } else {
                     $("#containerA").show();
                 }
                 document.getElementById("GrandTotalAmount").textContent = "$" + totalAmount.toFixed(2);
@@ -642,17 +645,17 @@
         const price = parseFloat(priceInput.value) || 0; // Default to 0 if not a valid number
         const qty = parseInt(qtyInput.value) || 1; // Default to 0 if not a valid number
         const amount = price * qty; // Calculate the amount
-        amountCell.textContent = '$'+amount.toFixed(2); // Update the amount cell with the calculated amount
+        amountCell.textContent = '$' + amount.toFixed(2); // Update the amount cell with the calculated amount
 
-        var calculation=0;
-        $('.price').each(function () {
+        var calculation = 0;
+        $('.price').each(function() {
             const priceText = $(this).text();
             const numericValue = parseFloat(priceText.replace(/[^\d.]/g, ''));
             // console.log(typeof(numericValue));
-            calculation=calculation+numericValue;
+            calculation = calculation + numericValue;
         });
-        totalAmount=calculation;
-        document.getElementById('GrandTotalAmount').innerHTML='$'+totalAmount.toFixed(2);
+        totalAmount = calculation;
+        document.getElementById('GrandTotalAmount').innerHTML = '$' + totalAmount.toFixed(2);
         $("#productPrice").val(totalAmount.toFixed(2));
     }
 
@@ -664,16 +667,17 @@
         });
     });
 </script>
+
 <script>
-    $('.fetch_data').on('click', function(){
-        
-        var id=$(this).data('id');
-        var name=$(this).data('name');
-        var description=$(this).data('description');
-        var code=$(this).data('code');
-        var cost=$(this).data('cost');
-        var price=$(this).data('price');
-        var status=$(this).data('status');
+    $('.fetch_data').on('click', function() {
+
+        var id = $(this).data('id');
+        var name = $(this).data('name');
+        var description = $(this).data('description');
+        var code = $(this).data('code');
+        var cost = $(this).data('cost');
+        var price = $(this).data('price');
+        var status = $(this).data('status');
 
         $("#id").val(id);
         $("#name").val(name);
@@ -687,103 +691,107 @@
             url: '{{ url("item/ProductGroupProductsList") }}',
             method: 'Post',
             data: {
-                _token:'{{ csrf_token() }}',id:id 
+                _token: '{{ csrf_token() }}',
+                id: id
             },
             success: function(response) {
                 console.log(response);
+                if (isAuthenticated(response) == false) {
+                    return false;
+                }
                 const tableBody = document.querySelector(`#productListTable tbody`);
                 if (response.data.length === 0) {
                     const noDataRow = document.createElement('tr');
-                    noDataRow.id='EmptyError'
-                        const noDataCell = document.createElement('td');
-                        noDataCell.setAttribute('colspan', 7);
-                        noDataCell.innerHTML = '<span class="text-center" style="color:#e10078;">Sorry, there are no items available</span>';
-                        noDataCell.style.textAlign = 'center';
-                        noDataRow.appendChild(noDataCell);
-                        tableBody.appendChild(noDataRow);
-                }else{
+                    noDataRow.id = 'EmptyError'
+                    const noDataCell = document.createElement('td');
+                    noDataCell.setAttribute('colspan', 7);
+                    noDataCell.innerHTML = '<span class="text-center" style="color:#dc3545;">Sorry, there are no items available</span>';
+                    noDataCell.style.textAlign = 'center';
+                    noDataRow.appendChild(noDataCell);
+                    tableBody.appendChild(noDataRow);
+                } else {
                     tableBody.innerHTML = '';
-                    totalAmount=0;
+                    totalAmount = 0;
                     response.data.forEach(item => {
-                            const row = document.createElement('tr');
-                            const codeCell = document.createElement('td');
-                            codeCell.textContent = item.product_code;
-                            row.appendChild(codeCell);
+                        const row = document.createElement('tr');
+                        const codeCell = document.createElement('td');
+                        codeCell.textContent = item.product_code;
+                        row.appendChild(codeCell);
 
-                            const hiddenInputId = document.createElement('input');
-                            hiddenInputId.type = 'hidden';
-                            hiddenInputId.className = 'ids';
-                            hiddenInputId.name = 'ids[]'; 
-                            hiddenInputId.value = item.id;
-                            row.appendChild(hiddenInputId);
+                        const hiddenInputId = document.createElement('input');
+                        hiddenInputId.type = 'hidden';
+                        hiddenInputId.className = 'ids';
+                        hiddenInputId.name = 'ids[]';
+                        hiddenInputId.value = item.id;
+                        row.appendChild(hiddenInputId);
 
-                            const hiddenInput = document.createElement('input');
-                            hiddenInput.type = 'hidden';
-                            hiddenInput.className = 'product_id';
-                            hiddenInput.name = 'product_ids[]'; 
-                            hiddenInput.value = item.product_id;
-                            row.appendChild(hiddenInput);
+                        const hiddenInput = document.createElement('input');
+                        hiddenInput.type = 'hidden';
+                        hiddenInput.className = 'product_id';
+                        hiddenInput.name = 'product_ids[]';
+                        hiddenInput.value = item.product_id;
+                        row.appendChild(hiddenInput);
 
-                            const nameCell = document.createElement('td');
-                            nameCell.innerHTML = item.product_name;
-                            row.appendChild(nameCell);
+                        const nameCell = document.createElement('td');
+                        nameCell.innerHTML = item.product_name;
+                        row.appendChild(nameCell);
 
-                            const costCell = document.createElement('td');
-                            const inputCost = document.createElement('input');
-                            inputCost.type = 'text'; 
-                            inputCost.className = 'cost_price input50';
-                            inputCost.name = 'cost_price[]'; 
-                            inputCost.value = item.cost_price;
-                            GrandCostPrice=GrandCostPrice+Number(item.cost_price);
-                            costCell.appendChild(inputCost);
-                            row.appendChild(costCell);
+                        const costCell = document.createElement('td');
+                        const inputCost = document.createElement('input');
+                        inputCost.type = 'text';
+                        inputCost.className = 'cost_price input50';
+                        inputCost.name = 'cost_price[]';
+                        inputCost.value = item.cost_price;
+                        GrandCostPrice = GrandCostPrice + Number(item.cost_price);
+                        costCell.appendChild(inputCost);
+                        row.appendChild(costCell);
 
-                            const priceCell = document.createElement('td');
-                            const inputPrice = document.createElement('input');
-                            inputPrice.type = 'text'; 
-                            inputPrice.className = 'product_price input50';
-                            inputPrice.addEventListener('input', function() {
-                                updateAmount(row);
-                            });
-                            inputPrice.name = 'product_price[]'; 
-                            inputPrice.value = item.price;
-                            GrandPrice=GrandPrice+Number(item.price);
-                            priceCell.appendChild(inputPrice);
-                            row.appendChild(priceCell);
-
-                            const qtyCell = document.createElement('td');
-                            const inputQty = document.createElement('input');
-                            inputQty.type = 'text'; 
-                            inputQty.className = 'qty input50';
-                            inputQty.addEventListener('input', function() {
-                                updateAmount(row);
-                            });
-                            inputQty.name = 'qty[]';
-                            inputQty.value = item.quantity; 
-                            qtyCell.appendChild(inputQty);
-                            row.appendChild(qtyCell);
-
-                            const amountCell = document.createElement('td');
-                            amountCell.innerHTML = '$'+ item.quantity*parseFloat(item.price).toFixed(2);
-                            amountCell.className = "price";
-                            row.appendChild(amountCell);
-                            totalAmount=totalAmount+Number(item.price)*item.quantity;
-                            const deleteCell = document.createElement('td');
-                            deleteCell.innerHTML = '<i class="fas fa-times fa-2x deleteRow" style="color: red;"></i>';
-                            row.appendChild(deleteCell);
-                            tableBody.appendChild(row);
-
+                        const priceCell = document.createElement('td');
+                        const inputPrice = document.createElement('input');
+                        inputPrice.type = 'text';
+                        inputPrice.className = 'product_price input50';
+                        inputPrice.addEventListener('input', function() {
+                            updateAmount(row);
                         });
-                        $("#costPrice").val(parseFloat(cost).toFixed(2));
-                        $("#productPrice").val(parseFloat(price).toFixed(2));
-                        var htmlCode=`<tr>
+                        inputPrice.name = 'product_price[]';
+                        inputPrice.value = item.price;
+                        GrandPrice = GrandPrice + Number(item.price);
+                        priceCell.appendChild(inputPrice);
+                        row.appendChild(priceCell);
+
+                        const qtyCell = document.createElement('td');
+                        const inputQty = document.createElement('input');
+                        inputQty.type = 'text';
+                        inputQty.className = 'qty input50';
+                        inputQty.addEventListener('input', function() {
+                            updateAmount(row);
+                        });
+                        inputQty.name = 'qty[]';
+                        inputQty.value = item.quantity;
+                        qtyCell.appendChild(inputQty);
+                        row.appendChild(qtyCell);
+
+                        const amountCell = document.createElement('td');
+                        amountCell.innerHTML = '$' + item.quantity * parseFloat(item.price).toFixed(2);
+                        amountCell.className = "price";
+                        row.appendChild(amountCell);
+                        totalAmount = totalAmount + Number(item.price) * item.quantity;
+                        const deleteCell = document.createElement('td');
+                        deleteCell.innerHTML = '<i class="fas fa-times fa-2x deleteRow" style="color: red;"></i>';
+                        row.appendChild(deleteCell);
+                        tableBody.appendChild(row);
+
+                    });
+                    $("#costPrice").val(parseFloat(cost).toFixed(2));
+                    $("#productPrice").val(parseFloat(price).toFixed(2));
+                    var htmlCode = `<tr>
                                             <td colspan="4"></td>
-                                            <td>Total</td><td id="GrandTotalAmount">$`+parseFloat(totalAmount).toFixed(2)+`</td>
+                                            <td>Total</td><td id="GrandTotalAmount">$` + parseFloat(totalAmount).toFixed(2) + `</td>
                                             <td></td>
                                     </tr>`;
-                        $("#containerA").html(htmlCode); 
-                     
-                    }
+                    $("#containerA").html(htmlCode);
+
+                }
             },
             error: function(xhr, status, error) {
                 console.error(error);
@@ -791,7 +799,8 @@
         });
         $("#itemsCatagoryModal").modal('show');
     });
-    function open_productgroupmodal(){
+
+    function open_productgroupmodal() {
         $('#add_product_group_form')[0].reset();
         const tableBody = document.querySelector(`#productListTable tbody`);
         const tableFoot = document.querySelector(`#productListTable tfoot`);
@@ -800,48 +809,59 @@
         $("#itemsCatagoryModal").modal('show');
     }
 </script>
+
 <script>
-   $("#deleteSelectedRows").on('click', function() {
-    let ids = [];
-    
-    $('.delete_checkbox:checked').each(function() {
-        ids.push($(this).val());
-    });
-    if(ids.length == 0){
-        alert("Please check the checkbox for delete");
-    }else{
-        if(confirm("Are you sure to delete?")){
-            // console.log(ids);
-            var token='<?php echo csrf_token();?>'
-            var model='ProductGroup';
-            $.ajax({
-                type: "POST",
-                url: "{{url('/bulk_delete')}}",
-                data: {ids:ids,model:model,_token:token},
-                success: function(data) {
-                    console.log(data);
-                    if(data){
-                        location.reload();
-                    }else{
-                        alert("Something went wrong");
+    $("#deleteSelectedRows").on('click', function() {
+        let ids = [];
+
+        $('.delete_checkbox:checked').each(function() {
+            ids.push($(this).val());
+        });
+        if (ids.length == 0) {
+            alert("Please check the checkbox for delete");
+        } else {
+            if (confirm("Are you sure to delete?")) {
+                // console.log(ids);
+                var token = '<?php echo csrf_token(); ?>'
+                var model = 'ProductGroup';
+                $.ajax({
+                    type: "POST",
+                    url: "{{url('/bulk_delete')}}",
+                    data: {
+                        ids: ids,
+                        model: model,
+                        _token: token
+                    },
+                    success: function(data) {
+                        console.log(data);
+                        if (isAuthenticated(data) == false) {
+                            return false;
+                        }
+                        if (data) {
+                            location.reload();
+                        } else {
+                            alert("Something went wrong");
+                        }
+                        // return false;
+                    },
+                    error: function(xhr, status, error) {
+                        var errorMessage = xhr.status + ': ' + xhr.statusText;
+                        alert('Error - ' + errorMessage + "\nMessage: " + xhr.responseJSON.message);
                     }
-                    // return false;
-                },
-                error: function(xhr, status, error) {
-                   var errorMessage = xhr.status + ': ' + xhr.statusText;
-                    alert('Error - ' + errorMessage + "\nMessage: " + xhr.responseJSON.message);
-                }
-            });
+                });
+            }
         }
-    }
-    
-});
-$('.delete_checkbox').on('click', function() {
-    if ($('.delete_checkbox:checked').length === $('.delete_checkbox').length) {
-        $('#selectAll').prop('checked', true);
-    } else {
-        $('#selectAll').prop('checked', false);
-    }
-});
- </script> 
-@include('frontEnd.salesAndFinance.jobs.layout.footer')
+
+    });
+    $('.delete_checkbox').on('click', function() {
+        if ($('.delete_checkbox:checked').length === $('.delete_checkbox').length) {
+            $('#selectAll').prop('checked', true);
+        } else {
+            $('#selectAll').prop('checked', false);
+        }
+    });
+</script>
+
+@include('frontEnd.salesAndFinance.item.common.addcataloguemodal')
+
+@endsection

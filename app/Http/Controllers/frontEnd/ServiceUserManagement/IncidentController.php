@@ -12,12 +12,14 @@ class IncidentController extends ServiceUserManagementController
     public function index($service_user_id = null) {
 
         $su_home_id = ServiceUser::where('id', $service_user_id)->value('home_id');
-        
-        if(Auth::user()->home_id != $su_home_id) {
+        $home_ids = Auth::user()->home_id;
+        $ex_home_ids = explode(',', $home_ids);
+        $home_id=$ex_home_ids[0];
+        if($home_id != $su_home_id) {
             die;
         }
 
-        $home_id = Auth::user()->home_id;
+        // $home_id = Auth::user()->home_id;
 
         $this_location_id = DynamicFormLocation::getLocationIdByTag('incident_report');
         $incident_record  = DynamicForm::where('location_id',$this_location_id)
@@ -210,7 +212,10 @@ class IncidentController extends ServiceUserManagementController
                 $formdata = '';
             }
 
-            $home_id  = Auth::user()->home_id;
+            // $home_id  = Auth::user()->home_id;
+            $home_ids = Auth::user()->home_id;
+            $ex_home_ids = explode(',', $home_ids);
+            $home_id=$ex_home_ids[0];
             $edit_incident = ServiceUserIncidentReport::find($su_incident_id);
             if(!empty($edit_incident)) {
                 $su_home_id = ServiceUser::where('id', $edit_incident->service_user_id)->value('home_id');
@@ -228,7 +233,7 @@ class IncidentController extends ServiceUserManagementController
                         //$notification->event_type      = 'SU_HR';
                         $notification->notification_event_type_id = '10';
                         $notification->event_action               = 'EDIT';    
-                        $notification->home_id                    = Auth::user()->home_id;
+                        $notification->home_id                    = $home_id;
                         $notification->user_id                    = Auth::user()->id;                  
                         $notification->save();
 

@@ -28,7 +28,7 @@
                          <div class="row"> 
                           <div class="col-lg-12">  
                           
-                            <div class="">
+                            <div class="clearfix">
                                 <div class="btn-group mr-3">
                                     <a href="javascript:void(0)" onclick="modal_show()">
                                     <!-- {{ url('admin/sales-finance/expense_add') }} -->
@@ -36,36 +36,31 @@
                                             Add <i class="fa fa-plus"></i>
                                         </button>
                                     </a>    
-                                </div>
-                                <div class="btn-group mr-3">
+                           
                                     <a href="{{ url('admin/sales-finance/expense?key=authorised&value=0') }}">
                                         <button id="bgcolor1" class="btn btn-primary bgcolor">
                                         Unauthorised ({{$unauthorisedCount}})
                                         </button>
                                     </a>    
-                                </div>
-                                <div class="btn-group mr-3">
+                             
                                     <a href="{{ url('admin/sales-finance/expense?key=authorised&value=1') }}">
                                         <button id="bgcolor2" class="btn btn-primary bgcolor">
                                         Authorised ({{$authorisedCount}}) 
                                         </button>
                                     </a>    
-                                </div>
-                                <div class="btn-group mr-3">
+                               
                                     <a href="{{ url('admin/sales-finance/expense?key=reject&value=1') }}">
                                         <button id="bgcolor3" class="btn btn-primary bgcolor">
                                         Rejected ({{$rejectCount}}) 
                                         </button>
                                     </a>    
-                                </div>
-                                <div class="btn-group mr-3">
+                                
                                     <a href="{{ url('admin/sales-finance/expense?key=paid&value=1') }}">
                                         <button id="bgcolor4" class="btn btn-primary bgcolor">
                                         Paid ({{$paidCount}}) 
                                         </button>
                                     </a>    
-                                </div>
-                                <div class="btn-group mr-3">
+                              
                                     <a href="{{ url('admin/sales-finance/expense') }}">
                                         <button id="bgcolor5" class="btn btn-primary bgcolor">
                                         All ({{$expenseCount}}) 

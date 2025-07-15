@@ -1,4 +1,9 @@
 <!--header start-->
+<style>
+    .adv-table .clearfix {
+    margin-bottom: 12px;
+}
+</style>
 <header class="header fixed-top clearfix">
 <!--logo start-->
 <div class="brand">

@@ -147,7 +147,7 @@
             var model="LeadTaskType";
             $.ajax({
                 type: "POST",
-                url: "{{url('/status_change')}}",
+                url: "{{url('/LeadTaskType_status_change')}}",
                 data: {id:id,status:status,model:model,_token:token},
                 success: function(data) {
                     console.log(data);
@@ -194,9 +194,14 @@
 
         $('#saveChanges').on('click', function() {
             var formData = $('#lead_task_type_form').serialize();
+            var id=$("#lead_task_type_id").val();
+            var url='{{ route("lead.ajax.saveLeadTaskType") }}';
+            if(id !=''){
+                url='{{ route("lead.ajax.editLeadTaskType") }}';
+            }
 
             $.ajax({
-                url: '{{ route("lead.ajax.saveLeadTaskType") }}',
+                url: url,
                 method: 'POST',
                 data: formData,
                 success: function(response) {

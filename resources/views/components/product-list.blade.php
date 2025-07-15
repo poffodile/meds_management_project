@@ -4,27 +4,257 @@
         background-color: #edf6fb;
         margin: 0;
     }
+
     .addProduvtBg.costUpdatePop p {
         font-size: 13px;
         margin-bottom: 0;
         color: #168fdb;
     }
-    /* .addProduvtBg.costUpdatePop a.udateBtn{
 
-    } */
+    /* .addProduvtBg.costUpdatePop a.udateBtn{} */
 </style>
 
 <!-- Because you are alive, everything is possible. - Thich Nhat Hanh -->
-<div class="modal fade" id="productModalBAC" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="productModalBACLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content add_Customer">
+<div class="modal fade" id="productModalBAC" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="productModalBACLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title fs-5" id="productModalBACLabel">Product List</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">&times;</button>
+                <h4 class="modal-title fs-5" id="productModalBACLabel">Product List</h4>
             </div>
-            <div class="modal-body ">
-                <div class="modal-body ">
-                    <div class="extraInformationTab">
+            <div class="modal-body">
+                <div class="tab-teaser">
+                    <div class="tab-menu">
+                        <ul>
+                            <li><a href="javascript:void(0)" class="active btn" data-rel="Product">Product(s) <span class="productCount" id="productCount"></span></a></li>
+
+                            <li><a href="javascript:void(0)" data-rel="Service" class="btn">Service(s) <span class="productCount" id="serviceCount"></span></a></li>
+
+                            <li><a href="javascript:void(0)" data-rel="Consumable" class="btn">Consumable(s) <span class="productCount" id="consumableCount"></span></a></li>
+
+                            <li><a href="javascript:void(0)" data-rel="ProductGroup" class="btn">Product Group(s) <span class="productCount" id="groupCount"></span></a></li>
+                        </ul>
+                    </div>
+                    <div class="tab-main-box">
+                        <div class="tab-box" id="Product" style="display:block;">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="row">
+                                        <div class="col-lg-3">
+                                            <input type="hidden" id="selectedProductIds" name="product_ids" value="[]">
+                                            <select class="form-control editInput selectOptions" id="product_categories">
+                                                <option>--Any Category--</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-lg-4">
+                                            <input type="text" class="form-control editInput" placeholder="Search Term" aria-label="Recipient's username" aria-describedby="button-addon2">
+                                        </div>
+                                        <div class="col-lg-5">
+                                            <button class="btn btn-primary" type="button" id="button-addon2">Search</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 my-3">
+                                    <div id="alphabeticListHolder">
+                                        <ul class="alphabeticList">
+                                            <li><a href="#" class="alphabeticLink" data-term="all" data-search_mode="ALL">All</a></li>
+                                            @for ($i = 65; $i <= 90; $i++)
+                                                <li><a href="#" class="alphabeticLink" data-term="{{ chr($i) }}" data-search_mode="STARTS">{{ chr($i) }}</a></li>
+                                                @endfor
+                                                <li>&nbsp;</li>
+                                                @for($j = 0; $j <= 9; $j++)
+                                                    <li><a href="#" class="alphabeticLink" data-term="{{ $j }}" data-search_mode="STARTS">{{ $j }}</a></li>
+                                                    @endfor
+                                        </ul>
+                                        <br class="clear">
+                                    </div>
+                                </div>
+                                <div class="col-sm-12">
+                                    <div class="pagecounter pb-2">
+                                        <h6>1-1 of 1 product(s) </h6>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12">
+                                    <div class="table-responsive productDetailTable">
+                                        <table id="setProductInTable" class="table border-top border-bottom tablechange" cellspacing="0">
+                                            <thead>
+                                                <tr>
+                                                    <th>Code</th>
+                                                    <th>Category </th>
+                                                    <th>Product</th>
+                                                    <th>Description </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="insrt_product_and_detail">
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-box" id="Service">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="row">
+                                        <div class="col-lg-3">
+                                            <select class="form-control editInput selectOptions" id="product_categories">
+                                                <option>--Any Category--</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-lg-4">
+                                            <input type="text" class="form-control editInput" placeholder="Search Term" aria-label="Recipient's username" aria-describedby="button-addon2">
+                                        </div>
+                                        <div class="col-lg-5">
+                                            <button class="btn btn-primary" type="button" id="button-addon2">Search</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 my-3">
+                                    <div id="alphabeticListHolder">
+                                        <ul class="alphabeticList">
+                                            <li><a href="#" class="alphabeticLink" data-term="all" data-search_mode="ALL">All</a></li>
+                                            @for ($i = 65; $i <= 90; $i++)
+                                                <li><a href="#" class="alphabeticLink" data-term="{{ chr($i) }}" data-search_mode="STARTS">{{ chr($i) }}</a></li>
+                                                @endfor
+                                                <li>&nbsp;</li>
+                                                @for($j = 0; $j <= 9; $j++)
+                                                    <li><a href="#" class="alphabeticLink" data-term="{{ $j }}" data-search_mode="STARTS">{{ $j }}</a></li>
+                                                    @endfor
+                                        </ul>
+                                        <br class="clear">
+                                    </div>
+                                </div>
+                                <div class="col-sm-12">
+                                    <div class="pagecounter pb-2">
+                                        <h6>1-1 of 1 product(s) </h6>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12">
+                                    <div class="table-responsive productDetailTable">
+                                        <table id="setServiceInTable" class="table border-top border-bottom tablechange" cellspacing="0">
+                                            <thead>
+                                                <tr>
+                                                    <th>Code</th>
+                                                    <th>Category </th>
+                                                    <th>Product</th>
+                                                    <th>Description </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="insrt_product_and_detail">
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-box" id="Consumable">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="row">
+                                        <div class="col-lg-3">
+                                            <select class="form-control editInput selectOptions" id="product_categories">
+                                                <option>--Any Category--</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-lg-4">
+                                            <input type="text" class="form-control editInput" placeholder="Search Term" aria-label="Recipient's username" aria-describedby="button-addon2">
+                                        </div>
+                                        <div class="col-lg-5">
+                                            <button class="btn btn-primary" type="button" id="button-addon2">Search</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 my-3">
+                                    <div id="alphabeticListHolder">
+                                        <ul class="alphabeticList">
+                                            <li><a href="#" class="alphabeticLink" data-term="all" data-search_mode="ALL">All</a></li>
+                                            @for ($i = 65; $i <= 90; $i++)
+                                                <li><a href="#" class="alphabeticLink" data-term="{{ chr($i) }}" data-search_mode="STARTS">{{ chr($i) }}</a></li>
+                                                @endfor
+                                                <li>&nbsp;</li>
+                                                @for($j = 0; $j <= 9; $j++)
+                                                    <li><a href="#" class="alphabeticLink" data-term="{{ $j }}" data-search_mode="STARTS">{{ $j }}</a></li>
+                                                    @endfor
+                                        </ul>
+                                        <br class="clear">
+                                    </div>
+                                </div>
+                                <div class="col-sm-12">
+                                    <div class="pagecounter pb-2">
+                                        <h6>1-1 of 1 product(s) </h6>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12">
+                                    <div class="table-responsive productDetailTable">
+                                        <table id="setConsumableInTable" class="table border-top border-bottom tablechange" cellspacing="0">
+                                            <thead>
+                                                <tr>
+                                                    <th>Code</th>
+                                                    <th>Category </th>
+                                                    <th>Product</th>
+                                                    <th>Description </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="insrt_product_and_detail">
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-box" id="ProductGroup">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="row">
+                                        <div class="col-lg-6">
+                                            <input type="text" class="form-control editInput" placeholder="Search Term" aria-label="Recipient's username" aria-describedby="button-addon2">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <button class="btn btn-primary" type="button" id="button-addon2">Search</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 my-3">
+                                    <div id="alphabeticListHolder">
+                                        <ul class="alphabeticList">
+                                            <li><a href="#" class="alphabeticLink" data-term="all" data-search_mode="ALL">All</a></li>
+                                            @for ($i = 65; $i <= 90; $i++)
+                                                <li><a href="#" class="alphabeticLink" data-term="{{ chr($i) }}" data-search_mode="STARTS">{{ chr($i) }}</a></li>
+                                                @endfor
+                                                <li>&nbsp;</li>
+                                                @for($j = 0; $j <= 9; $j++)
+                                                    <li><a href="#" class="alphabeticLink" data-term="{{ $j }}" data-search_mode="STARTS">{{ $j }}</a></li>
+                                                    @endfor
+                                        </ul>
+                                        <br class="clear">
+                                    </div>
+                                </div>
+                                <div class="col-sm-12">
+                                    <div class="pagecounter pb-2">
+                                        <h6>1-1 of 1 product(s) </h6>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12">
+                                    <div class="table-responsive productDetailTable">
+                                        <table id="setGroupInTable" class="table border-top border-bottom tablechange" cellspacing="0">
+                                            <thead>
+                                                <tr>
+                                                    <th>Product Group</th>
+                                                    <th>Description </th>
+                                                    <th></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="insrt_product_and_detail">
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- <div class="extraInformationTab">
                         <nav>
                             <div class="nav nav-tabs" id="nav-tab" role="tablist">
                                 <button class="nav-link active" id="nav-product-tab" data-bs-toggle="tab" data-bs-target="#nav-product" type="button" role="tab" aria-controls="nav-Notes" aria-selected="true">Product(s) <span class="productCount" id="productCount"></span></button>
@@ -55,11 +285,11 @@
                                             <li><a href="#" class="alphabeticLink" data-term="all" data-search_mode="ALL">All</a></li>
                                             @for ($i = 65; $i <= 90; $i++)
                                                 <li><a href="#" class="alphabeticLink" data-term="{{ chr($i) }}" data-search_mode="STARTS">{{ chr($i) }}</a></li>
-                                            @endfor
-                                            <li>&nbsp;</li>
-                                            @for($j = 0; $j <= 9; $j++)
-                                                <li><a href="#" class="alphabeticLink" data-term="{{ $j }}" data-search_mode="STARTS">{{ $j }}</a></li>
-                                            @endfor
+                                                @endfor
+                                                <li>&nbsp;</li>
+                                                @for($j = 0; $j <= 9; $j++)
+                                                    <li><a href="#" class="alphabeticLink" data-term="{{ $j }}" data-search_mode="STARTS">{{ $j }}</a></li>
+                                                    @endfor
                                         </ul>
                                         <br class="clear">
                                     </div>
@@ -111,11 +341,11 @@
                                             <li><a href="#" class="alphabeticLink" data-term="all" data-search_mode="ALL">All</a></li>
                                             @for ($i = 65; $i <= 90; $i++)
                                                 <li><a href="#" class="alphabeticLink" data-term="{{ chr($i) }}" data-search_mode="STARTS">{{ chr($i) }}</a></li>
-                                            @endfor
-                                            <li>&nbsp;</li>
-                                            @for($j = 0; $j <= 9; $j++)
-                                                <li><a href="#" class="alphabeticLink" data-term="{{ $j }}" data-search_mode="STARTS">{{ $j }}</a></li>
-                                            @endfor
+                                                @endfor
+                                                <li>&nbsp;</li>
+                                                @for($j = 0; $j <= 9; $j++)
+                                                    <li><a href="#" class="alphabeticLink" data-term="{{ $j }}" data-search_mode="STARTS">{{ $j }}</a></li>
+                                                    @endfor
                                         </ul>
                                         <br class="clear">
                                     </div>
@@ -205,7 +435,7 @@
                             <div class="tab-pane fade" id="nav-productGroup" role="tabpanel" aria-labelledby="nav-productGroup-tab" tabindex="0">
                                 <div class="py-4">
                                     <div class="row">
-                                       <div class="col-lg-7">
+                                        <div class="col-lg-7">
                                             <div class="input-group mb-3">
                                                 <input type="text" class="form-control editInput" placeholder="Search Term" aria-label="Recipient's username" aria-describedby="button-addon2">
                                                 <button class="btn btn-outline-secondary editInput profileDrop" type="button" id="button-addon2">Search</button>
@@ -252,12 +482,12 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                        </div> -->
                 </div>
             </div>
             <!-- end modal body -->
             <div class="modal-footer customer_Form_Popup">
-                <button type="button" class="btn profileDrop" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 <!-- <button type="button" class="btn profileDrop" id="listAllProduct">Save changes</button> -->
             </div>
         </div>
@@ -273,9 +503,9 @@
             </div>
             <div class="modal-body">
                 <h4 class="contTitle text-start">Product</h4>
-                <div class="productDetailTable mt-2">
-                    <table class="table" id="containerA">
-                        <thead class="table-light">
+                <div class="table-responsive productDetailTable">
+                    <table id="containerA" class="table border-top border-bottom tablechange" cellspacing="0">
+                        <thead>
                             <tr>
                                 <th>Group Code</th>
                                 <th>Group Product </th>
@@ -288,18 +518,18 @@
                             </tr>
                         </thead>
                         <tbody id="productGroupModalData">
-                        
+
                         </tbody>
                     </table>
                 </div>
 
                 <h4 class="contTitle text-start">Products</h4>
                 <div class="addProduvtBg costUpdatePop row">
-                 <div class="col-md-10">
-                    <p>One or moere product prices have been changed. Select 'Update' next to each item to use the default product price. <br>Alternatively select 'Update All Prices' to use the default product price for all items.</p>
-                  </div>
+                    <div class="col-md-10">
+                        <p>One or moere product prices have been changed. Select 'Update' next to each item to use the default product price. <br>Alternatively select 'Update All Prices' to use the default product price for all items.</p>
+                    </div>
                     <div class="col-md-2">
-                       <a href="#!" class="profileDrop">Update All Prices </a>
+                        <a href="#!" class="profileDrop">Update All Prices </a>
                     </div>
                 </div>
                 <div class="mb-3 mt-2 row">
@@ -315,9 +545,9 @@
                 </div>
 
                 <div class="costProdut">
-                    <div class="productDetailTable">
-                        <table class="table" id="containerA">
-                            <thead class="table-light">
+                    <div class="table-responsive productDetailTable">
+                        <table id="containerA" class="table border-top border-bottom tablechange" cellspacing="0">
+                            <thead>
                                 <tr>
                                     <th>Code</th>
                                     <th>Product </th>
@@ -405,8 +635,8 @@
 
     function populateTable(data, tableId) {
         console.log("tableId", tableId);
-        var type=data.type;
-        var data=data.data;
+        var type = data.type;
+        var data = data.data;
         const tableBody = document.querySelector(`#${tableId} tbody`);
         tableBody.innerHTML = ''; // Clear the table body
 
@@ -422,10 +652,10 @@
             tableBody.appendChild(noDataRow);
         } else {
             data.forEach(item => {
-             
+
                 const row = document.createElement('tr');
                 row.setAttribute('data-id', item.id);
-                if(type == 4){
+                if (type == 4) {
                     row.addEventListener('click', (event) => {
                         if (event.target && event.target.nodeName === 'TD') {
                             const clickedRow = event.target.parentNode;
@@ -440,7 +670,7 @@
                             }
                             productIdsInput.value = JSON.stringify(productIds);
                             // getProductData(productId);
-                            
+
                         }
                     });
                     const nameCell = document.createElement('td');
@@ -452,9 +682,9 @@
                     row.appendChild(descriptionCell);
 
                     const ModalCell = document.createElement('td');
-                    ModalCell.innerHTML = '<a href="javascript:void(0)" class="formicon" id="openPopupButton" onclick="get_modal('+item.id+')"><i class="fa-solid fa-square-plus"></i></a>';
+                    ModalCell.innerHTML = '<a href="javascript:void(0)" class="formicon" id="openPopupButton" onclick="get_modal(' + item.id + ')"><i class="fa-solid fa-square-plus"></i></a>';
                     row.appendChild(ModalCell);
-                }else{
+                } else {
                     row.addEventListener('click', (event) => {
                         if (event.target && event.target.nodeName === 'TD') {
                             const clickedRow = event.target.parentNode;
@@ -469,7 +699,7 @@
                             }
                             productIdsInput.value = JSON.stringify(productIds);
                             getProductData(productId);
-                            
+
                         }
                     });
 
@@ -516,72 +746,74 @@
             }
         });
     }
-    function get_modal(id){
+
+    function get_modal(id) {
         $("#calculatePop").modal('show');
         $.ajax({
             url: '{{ url("item/ProductGroupProductsdetails") }}',
             method: 'Post',
             data: {
-                id: id, _token:'{{ csrf_token() }}'
+                id: id,
+                _token: '{{ csrf_token() }}'
             },
             success: function(response) {
                 if (response.data && response.data.length > 0 && response.data[0].name) {
-                    var productGroupModalData=response.data[0];
-                    document.getElementById('productGroupModalLabel').innerHTML='Product Group: '+productGroupModalData.name;
-                    var productGroupModalDesign='';
+                    var productGroupModalData = response.data[0];
+                    document.getElementById('productGroupModalLabel').innerHTML = 'Product Group: ' + productGroupModalData.name;
+                    var productGroupModalDesign = '';
                     productGroupModalData.product_group_product.forEach(item => {
-                        const amount=item.price*item.quantity;
-                        const profit=amount-item.cost_price;
-                        productGroupModalDesign+=`<tr>
+                        const amount = item.price * item.quantity;
+                        const profit = amount - item.cost_price;
+                        productGroupModalDesign += `<tr>
                                 <td>
                                     <div class="CSPlus">
                                         <span class="plusandText">
-                                            <input type="text" class="form-control editInput input80" name="modal_code" id="modal_code" value="`+item.product_code+`">
+                                            <input type="text" class="form-control editInput input80" name="modal_code" id="modal_code" value="` + item.product_code + `">
                                         </span>
                                     </div>
                                 </td>
                                 <td>
                                     <div class="">
-                                        <input type="text" class="form-control editInput" name="modal_group_product" id="modal_group_product" value="`+item.product_name+`">
+                                        <input type="text" class="form-control editInput" name="modal_group_product" id="modal_group_product" value="` + item.product_name + `">
                                     </div>
                                 </td>
                                 <td>
                                     <div class="">
-                                        <textarea class="form-control textareaInput rounded-0" name="modal_description" id="modal_description" rows="1" placeholder="Description">`+productGroupModalData.description+`</textarea>
+                                        <textarea class="form-control textareaInput rounded-0" name="modal_description" id="modal_description" rows="1" placeholder="Description">` + productGroupModalData.description + `</textarea>
                                     </div>
                                 </td>
                                 <td>
                                     <div class="">
-                                        <input type="text" class="form-control editInput input50" id="modal_qty" name="modal_qty" value="`+item.quantity+`">
+                                        <input type="text" class="form-control editInput input50" id="modal_qty" name="modal_qty" value="` + item.quantity + `">
                                     </div>
                                 </td>
                                 <td>
                                     <div class="">
-                                        <input type="text" class="form-control editInput input50" id="modal_cost" name="modal_cost" value="`+item.cost_price+`">
+                                        <input type="text" class="form-control editInput input50" id="modal_cost" name="modal_cost" value="` + item.cost_price + `">
                                     </div>
                                 </td>
                                 <td>
                                     <div class="">
-                                        <input type="text" class="form-control editInput input50" id="modal_price" name="modal_price" value="`+item.price+`">
+                                        <input type="text" class="form-control editInput input50" id="modal_price" name="modal_price" value="` + item.price + `">
                                     </div>
                                 </td>
 
                                 <td>
                                     <div class="">
-                                        <input type="text" class="form-control editInput input50" id="modal_amount" name="modal_amount" value="`+amount+`">
+                                        <input type="text" class="form-control editInput input50" id="modal_amount" name="modal_amount" value="` + amount + `">
                                     </div>
                                 </td>
                                 <td>
                                     <div class="">
-                                        <input type="text" class="form-control editInput input50" id="modal_profit" name="modal_profit" value="`+profit+`">
+                                        <input type="text" class="form-control editInput input50" id="modal_profit" name="modal_profit" value="` + profit + `">
                                     </div>
                                 </td>
                             </tr>`;
                     });
                     $('#productGroupModalData').html(productGroupModalDesign);
-                }else{
-                    document.getElementById('productGroupModalLabel').innerHTML='Product Group: ';
-                    $('#productGroupModalData').html('<tr><td colspan="8" class="text-center" style="color: #e10078;">Sorry, there are no items available</td></tr>');
+                } else {
+                    document.getElementById('productGroupModalLabel').innerHTML = 'Product Group: ';
+                    $('#productGroupModalData').html('<tr><td colspan="8" class="text-center" style="color: #dc3545;">Sorry, there are no items available</td></tr>');
                 }
             },
             error: function(xhr, status, error) {

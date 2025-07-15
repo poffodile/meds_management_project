@@ -1,41 +1,37 @@
 <div class="modal fade" id="cutomer_type_modal" tabindex="-1" aria-labelledby="thirdModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content add_Customer">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="thirdModalLabel">Add Customer Type</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div id="alert_message_customer_type" style="display:none" class="alert alert-success mt-3"></div>
-                <div class="modal-body">
-                    <form id="customer_type_form">
-                        @csrf
-                        <input type="hidden" id="customer_type_home_id" name="home_id" value="{{Auth::user()->home_id;}}">
-                        <div class="mb-3 row">
-                            <label for="inputJobRef" class="col-sm-3 col-form-label">Customer Type <span class="radStar ">*</span></label>
-                            <div class="col-sm-9">
-                                <input type="text" name="title" class="form-control editInput" id="customer_type_name" value="" placeholder="Customer Type">
-                            </div>
-                        </div>
-                        <div class="mb-3 row">
-                            <label for="inputJobRef" class="col-sm-3 col-form-label">Status</label>
-                            <div class="col-sm-9">
-                                <select id="customer_type_status" name="status" class="form-control editInput">
-                                    <option value="1">Active</option>
-                                    <option value="0">Inactive</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="pageTitleBtn">
-                            <a href="#" class="profileDrop p-2 crmNewBtn" onclick="save_customer_type()"> Save</a>
-                            <button type="button" class="profileDrop" data-bs-dismiss="modal">Cancel</button>
-                        </div>
-                    </form>
-                </div>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">&times;</button>
+                <h4 class="modal-title" id="thirdModalLabel">Add Customer Type</h4>
             </div>
+            <form id="customer_type_form">
+                @csrf
+                <div class="modal-body">
+                    <div id="alert_message_customer_type" style="display:none" class="alert alert-success"></div>
+                    <input type="hidden" id="customer_type_home_id" name="home_id" value="{{Auth::user()->home_id;}}">
+                    <div class="mb-3">
+                        <label>Customer Type <span class="radStar ">*</span></label>
+                        <input type="text" name="title" class="form-control editInput" id="customer_type_name" value="" placeholder="Customer Type">
+                    </div>
+                    <div class="mb-3">
+                        <label>Status</label>
+                        <select id="customer_type_status" name="status" class="form-control editInput">
+                            <option value="1">Active</option>
+                            <option value="0">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer customer_Form_Popup">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-warning" onclick="save_customer_type()">Save</button>
+                </div>
+            </form>
         </div>
     </div>
+</div>
 <script>
-    function save_customer_type(){
+    function save_customer_type() {
         $.ajax({
             type: "POST",
             url: "{{url('/save_customer_type')}}",
@@ -46,13 +42,13 @@
             processData: false,
             success: function(data) {
                 console.log(data);
-                if(data.vali_error){
+                if (data.vali_error) {
                     alert(data.vali_error);
                     $(window).scrollTop(0);
                     return false;
-                }else if($.trim(data)=="error"){
+                } else if ($.trim(data) == "error") {
                     alert("Something went wrong. Please try later!");
-                }else{
+                } else {
                     $(window).scrollTop(0);
                     $('#alert_message_customer_type').text("Customer type Added Successfully Done!").show();
                     getAllCustomerType(data);

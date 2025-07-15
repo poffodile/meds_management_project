@@ -169,9 +169,13 @@
 
         $('#saveChanges').on('click', function() {
             var formData = $('#lead_reject_type_form').serialize();
-
+            var id=$("#lead_reject_id").val();
+            var url='{{ route("lead.ajax.saveLeadRejectTypes") }}';
+            if(id !=''){
+                url='{{ route("lead.ajax.editLeadRejectTypes") }}';
+            }
             $.ajax({
-                url: '{{ route("lead.ajax.saveLeadRejectTypes") }}',
+                url: url,
                 method: 'POST',
                 data: formData,
                 success: function(response) {
@@ -234,7 +238,7 @@ function status_change(id, status){
             var model="LeadRejectType";
             $.ajax({
                 type: "POST",
-                url: "{{url('/status_change')}}",
+                url: "{{url('/LeadRejectType_status_change')}}",
                 data: {id:id,status:status,model:model,_token:token},
                 success: function(data) {
                     console.log(data);

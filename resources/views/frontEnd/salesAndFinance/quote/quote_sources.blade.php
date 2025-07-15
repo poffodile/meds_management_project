@@ -167,9 +167,13 @@
 
         $('#saveChanges').on('click', function() {
             var formData = $('#quote_source_form').serialize();
-
+            var id=$("#quote_source_id").val();
+            var url='{{ route("quote.ajax.saveQuoteSources") }}';
+            if(id !=''){
+                url='{{ route("quote.ajax.editQuoteSources") }}';
+            }
             $.ajax({
-                url: '{{ route("quote.ajax.saveQuoteSources") }}',
+                url:url ,
                 method: 'POST',
                 data: formData,
                 success: function(response) {
@@ -271,7 +275,7 @@ function status_change(id, status){
             var model="QuoteSource";
             $.ajax({
                 type: "POST",
-                url: "{{url('/status_change')}}",
+                url: "{{url('/QuoteSource_status_change')}}",
                 data: {id:id,status:status,model:model,_token:token},
                 success: function(data) {
                     console.log(data);

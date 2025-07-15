@@ -9,7 +9,10 @@ class LivingSkillController extends ServiceUserManagementController
     public function index($service_user_id = null)
     {   
         $su_home_id = ServiceUser::where('id',$service_user_id)->value('home_id');
-        if(Auth::user()->home_id != $su_home_id){
+        $home_ids = Auth::user()->home_id;
+        $ex_home_ids = explode(',', $home_ids);
+        $home_id=$ex_home_ids[0];
+        if($home_id != $su_home_id){
             die; 
         }
         //in search case editing start
@@ -177,8 +180,11 @@ class LivingSkillController extends ServiceUserManagementController
         if($request->isMethod('get'))
         {
             $data = $request->all();
+            $home_ids = Auth::user()->home_id;
+            $ex_home_ids = explode(',', $home_ids);
+            $home_id=$ex_home_ids[0];
             $su_home_id = ServiceUser::where('id',$data['service_user_id'])->value('home_id');
-            if(Auth::user()->home_id != $su_home_id){
+            if($home_id != $su_home_id){
                 echo '0'; die; 
             }
             //echo '<pre>'; print_r($data); die;
@@ -188,7 +194,7 @@ class LivingSkillController extends ServiceUserManagementController
             $su_liv_skill->am_pm           = $data['am_pm'];
             $su_liv_skill->details         = '';
             $su_liv_skill->status          = 1;
-            $su_liv_skill->home_id         = Auth::user()->home_id;
+            $su_liv_skill->home_id         = $home_id;
             // echo "<pre>"; print_r($su_liv_skill); die;
             if($su_liv_skill->save()){
                 //saving notification start
@@ -197,7 +203,7 @@ class LivingSkillController extends ServiceUserManagementController
                 $notification->event_id                   = $su_liv_skill->id;
                 $notification->notification_event_type_id = '6';
                 $notification->event_action               = 'ADD';      
-                $notification->home_id                    = Auth::user()->home_id;
+                $notification->home_id                    = $home_id;
                 $notification->user_id                    = Auth::user()->id;        
                 $notification->save();
                 //saving notification end
@@ -219,7 +225,10 @@ class LivingSkillController extends ServiceUserManagementController
     }
     public function _edit($data = array()){
         $service_user_id = '';
-        if(isset($data['edit_su_skill_id'])){ 
+        if(isset($data['edit_su_skill_id'])){
+            $home_ids = Auth::user()->home_id;
+            $ex_home_ids = explode(',', $home_ids);
+            $home_id=$ex_home_ids[0]; 
             $su_living_skill_ids = $data['edit_su_skill_id'];
             if(!empty($su_living_skill_ids)){
                 foreach ($su_living_skill_ids as $key => $liv_skill_id) {
@@ -227,7 +236,7 @@ class LivingSkillController extends ServiceUserManagementController
                     if(!empty($su_liv_skill)) {
                         $service_user_id = $su_liv_skill->service_user_id;
                         $su_home_id = ServiceUser::where('id',$service_user_id)->value('home_id');
-                        if(Auth::user()->home_id == $su_home_id){
+                        if($home_id == $su_home_id){
                             $su_liv_skill->scored  = $data['edit_su_skill_score'][$key];
                             $su_liv_skill->details = $data['edit_su_skill_detail'][$key];
                             if($su_liv_skill->save()){
@@ -245,7 +254,7 @@ class LivingSkillController extends ServiceUserManagementController
                 $notification->event_id                  = $updated_earning_star_id;
                 $notification->notification_event_type_id = '3';
                 $notification->event_action               = 'ADD_STAR';   
-                $notification->home_id                    = Auth::user()->home_id;
+                $notification->home_id                    = $home_id;
                 $notification->user_id                    = Auth::user()->id;             
                 $notification->save();
                 //saving notification end
@@ -256,7 +265,7 @@ class LivingSkillController extends ServiceUserManagementController
                 $notification->event_id                   = $su_liv_skill->id;
                 $notification->notification_event_type_id = '6';
                 $notification->event_action               = 'EDIT'; 
-                $notification->home_id                    = Auth::user()->home_id;
+                $notification->home_id                    = $home_id;
                 $notification->user_id                    = Auth::user()->id;               
                 $notification->save();
                 //saving notification end
@@ -265,10 +274,13 @@ class LivingSkillController extends ServiceUserManagementController
         return $service_user_id;
     }
     public function delete($su_living_skill_id = null){
+        $home_ids = Auth::user()->home_id;
+        $ex_home_ids = explode(',', $home_ids);
+        $home_id=$ex_home_ids[0];
         $su_ls = ServiceUserLivingSkill::where('id', $su_living_skill_id)->first(); 
         if(!empty($su_ls))  {
             $su_home_id = ServiceUser::where('id',$su_ls->service_user_id)->value('home_id');
-            if(Auth::user()->home_id != $su_home_id){
+            if($home_id != $su_home_id){
                 echo '0'; die; 
             }
             $su_ls->is_deleted = 1;

@@ -78,11 +78,11 @@
                             <div class="form-group">
                                 <label class="col-lg-3 control-label">Access Home</label>
                                 <div class="col-lg-9">
-                                   
-                                    <select class="form-control js-example-basic-single" name="home_id[]" {{ (isset($del_status)) ? $disabled: '' }} multiple="">
+                                   <!-- Ram 09/05/2025 comment below code for checkbox and design. if need it again then please don't uncomment the select home option -->
+                                    <!-- <select class="form-control js-example-basic-single" name="home_id[]" {{ (isset($del_status)) ? $disabled: '' }} multiple=""> -->
                                         <!-- <option value="">select home</option> -->
 
-                                        <?php foreach($access_homes as $key => $access_home){ 
+                                        <!-- <?php foreach($access_homes as $key => $access_home){ 
                                                 if(isset($agent_info->home_id)){
                                                     $array = explode(',', $agent_info->home_id);
                                                 }
@@ -91,7 +91,14 @@
                                             
                                             <option value="{{ $access_home['id'] }}" <?php if(isset($array)) { echo (in_array($access_home['id'], $array)) ? 'selected' : ''; } ?>>{{ $access_home['title'] }}</option>
                                         <?php } ?>
-                                    </select>
+                                    </select> -->
+                                    <?php foreach($access_homes as $key => $access_home){
+                                        if(isset($agent_info->home_id)){
+                                            $array = explode(',', $agent_info->home_id);}?>
+                                            <div class="checkbox">
+                                                <label> <input type="checkbox" name="home_id[]" value="{{ $access_home['id'] }}" class="home_ids"  <?php if(isset($array)) { echo (in_array($access_home['id'], $array)) ? 'checked' : ''; } ?> />{{ $access_home['title'] }}</label>
+                                            </div>
+                                    <?php  }?>
                                 </div>
                             </div>
                             <div class="form-group">

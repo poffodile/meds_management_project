@@ -11,7 +11,10 @@ class EducationRecordController extends ServiceUserManagementController
     public function index($service_user_id = null)
     {   
         $su_home_id = ServiceUser::where('id',$service_user_id)->value('home_id');
-        if(Auth::user()->home_id != $su_home_id){
+        $home_ids = Auth::user()->home_id;
+        $ex_home_ids = explode(',', $home_ids);
+        $home_id=$ex_home_ids[0];
+        if($home_id != $su_home_id){
             die; 
         }
         
@@ -202,9 +205,11 @@ class EducationRecordController extends ServiceUserManagementController
         if($request->isMethod('get'))
         {
             $data = $request->all();
-
+            $home_ids = Auth::user()->home_id;
+            $ex_home_ids = explode(',', $home_ids);
+            $home_id=$ex_home_ids[0];
             $su_home_id = ServiceUser::where('id',$data['service_user_id'])->value('home_id');
-            if(Auth::user()->home_id != $su_home_id){
+            if($home_id != $su_home_id){
                 echo '0'; die; 
             }
 
@@ -214,7 +219,7 @@ class EducationRecordController extends ServiceUserManagementController
             $su_er->am_pm               = $data['am_pm'];
             $su_er->details             = '';
             $su_er->status              = 1;
-            $su_er->home_id             = Auth::user()->home_id;
+            $su_er->home_id             = $home_id;
 
             if($su_er->save()){
 
@@ -224,7 +229,7 @@ class EducationRecordController extends ServiceUserManagementController
                 $notification->event_id                        = $su_er->id;
                 $notification->notification_event_type_id      = '7';
                 $notification->event_action                    = 'ADD';      
-                $notification->home_id                         = Auth::user()->home_id;
+                $notification->home_id                         = $home_id;
                 $notification->user_id                         = Auth::user()->id;        
                 $notification->save();
                 //saving notification end
@@ -242,12 +247,14 @@ class EducationRecordController extends ServiceUserManagementController
     public function delete($su_edu_record_id){
 
         if(!empty($su_edu_record_id)){
-
+            $home_ids = Auth::user()->home_id;
+            $ex_home_ids = explode(',', $home_ids);
+            $home_id=$ex_home_ids[0];
             $su_er = ServiceUserEducationRecord::where('id', $su_edu_record_id)->first();            
             if(!empty($su_er)){
              
                 $su_home_id = ServiceUser::where('id',$su_er->service_user_id)->value('home_id');
-                if(Auth::user()->home_id != $su_home_id){
+                if($home_id != $su_home_id){
                     echo '0'; die; 
                 }
 
@@ -274,6 +281,9 @@ class EducationRecordController extends ServiceUserManagementController
     public function _edit($data = array()){
         // echo "<pre>"; print_r($data); die;
         $service_user_id = '';
+        $home_ids = Auth::user()->home_id;
+        $ex_home_ids = explode(',', $home_ids);
+        $home_id=$ex_home_ids[0];
 
         if(isset($data['edit_su_record_id'])){ 
             $su_edu_rec_ids = $data['edit_su_record_id'];
@@ -289,7 +299,7 @@ class EducationRecordController extends ServiceUserManagementController
 
                         $su_home_id = ServiceUser::where('id',$service_user_id)->value('home_id');
                         
-                        if(Auth::user()->home_id == $su_home_id){
+                        if($home_id == $su_home_id){
                             
                             $su_er->scored  = $data['edit_su_edu_score'][$key];
                             $su_er->details = $data['edit_su_record_detail'][$key];
@@ -334,7 +344,7 @@ class EducationRecordController extends ServiceUserManagementController
                 $notification->event_id                   = $updated_earning_star_id;
                 $notification->notification_event_type_id = '3';
                 $notification->event_action               = 'ADD_STAR';   
-                $notification->home_id                    = Auth::user()->home_id;
+                $notification->home_id                    = $home_id;
                 $notification->user_id                    = Auth::user()->id;             
                 $notification->save();
                 //saving notification end
@@ -346,7 +356,7 @@ class EducationRecordController extends ServiceUserManagementController
                 $notification->event_id                    = $su_er->id;
                 $notification->notification_event_type_id  = '7';
                 $notification->event_action                = 'EDIT'; 
-                $notification->home_id                     = Auth::user()->home_id;
+                $notification->home_id                     = $home_id;
                 $notification->user_id                     = Auth::user()->id;               
                 $notification->save();
                 //saving notification end

@@ -3,7 +3,6 @@ $home_id = Auth::user()->home_id;
 $service_users = App\ServiceUser::where('home_id', $home_id)->get()->toArray();
 $dynamic_forms = App\DynamicFormBuilder::getFormList();
 $service_user_id = (isset($service_user_id)) ? $service_user_id : 0;
-
 ?>
 
 <!-- dynmic Form Modal -->
@@ -16,11 +15,6 @@ $service_user_id = (isset($service_user_id)) ? $service_user_id : 0;
             </div>
             <div class="modal-body">
                 <div class="row">
-                    <!-- <div class="form-group col-md-12 col-sm-12 col-xs-12 serch-btns text-right">
-                        <button class="btn label-default add-new-btn active" type="button"> Add New </button>
-                        <button class="btn label-default logged-btn dyn-logged-btn active logged-dyn-btn" type="button"> Logged Plans </button>
-                        <button class="btn label-default search-btn active" type="button"> Search </button>
-                    </div> -->
                     <!-- Add new Details -->
                     <div class="add-new-box risk-tabs custm-tabs">
                         <form method="post" action="" id="TopForms">
@@ -29,7 +23,7 @@ $service_user_id = (isset($service_user_id)) ? $service_user_id : 0;
                                 <div class="col-md-11 col-sm-11 col-xs-12">
                                     <div class="select-style">
                                         <select name="service_user_id" class="su_n_id">
-                                            <option value=""> Child </option>
+                                            <option value=""> Select Child </option>
                                             @foreach($service_users as $value)
                                             <option value="{{ $value['id'] }}" {{ ($service_user_id == $value['id']) ? 'selected' : '' }}>{{ ucfirst($value['name']) }}</option>
                                             @endforeach
@@ -44,16 +38,13 @@ $service_user_id = (isset($service_user_id)) ? $service_user_id : 0;
                                     <div class="select-style">
                                         <select name="dynamic_form_builder_id" class="dynamic_form_select">
                                             <option value="0"> Select Form </option>
-
                                             <?php
-                                                $this_location_id = App\DynamicFormLocation::getLocationIdByTag('top_profile_btn');
-                                                foreach ($dynamic_forms as $value) {
-
-                                                    $location_ids_arr = explode(',', $value['location_ids']);
-
-                                                    if (in_array($this_location_id, $location_ids_arr)) {
-                                                ?>
-                                                    <option value="{{ $value['id'] }}"> {{ ucfirst($value['title']) }} </option>
+                                            $this_location_id = App\DynamicFormLocation::getLocationIdByTag('top_profile_btn');
+                                            foreach ($dynamic_forms as $value) {
+                                                $location_ids_arr = explode(',', $value['location_ids']);
+                                                if (in_array($this_location_id, $location_ids_arr)) {
+                                            ?>
+                                                <option value="{{ $value['id'] }}"> {{ ucfirst($value['title']) }} </option>
                                             <?php }
                                             } ?>
                                         </select>

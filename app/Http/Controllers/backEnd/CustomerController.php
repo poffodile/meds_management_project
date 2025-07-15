@@ -297,4 +297,14 @@ class CustomerController extends Controller
         Session::flash('success','Deleted Successfully Done');
         echo "done";
     }
+
+    public function getCustomerList()
+    {
+        $data =  Customer::getCustomerList();
+
+        return response()->json([
+            'success' => (bool) $data,
+            'data' => $data ? $data : 'No data.'
+        ]);
+    }
 }

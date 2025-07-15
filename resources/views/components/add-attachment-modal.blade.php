@@ -1,59 +1,51 @@
 <div aria-hidden="true" aria-labelledby="myModalLabel" role="dialog" tabindex="-1" id="{{ $purchaseModalId }}" class="modal fade">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content add_Customer">
+    <div class="modal-dialog">
+        <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title pupTitle">{{ $modalTitle }}</h5>
-                <button aria-hidden="true" data-bs-dismiss="modal" class="btn-close" type="button"></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">&times;</button>
+                <h4 class="modal-title pupTitle">{{ $modalTitle }}</h4>
             </div>
-            <div id="attachment_messagse" class="mt-3 text-center"></div>
             <div class="modal-body">
+                <div id="attachment_messagse" class="mb-3 text-center"></div>
                 <form role="form" id="{{ $purchaseformId }}">
                     <input type="hidden" id="attachment_id" name="id">
                     <div><span id="error-message" class="error"></span></div>
-                    <div class="row form-group">
-                        <label class="col-lg-3 col-sm-3 col-form-label">{{ $refTitle }} Ref </label>
-                        <div class="col-md-9">
-                            <input type="text" class="form-control-plaintext editInput" id="{{$refTitle}}_ref" value="" name="{{$refTitle}}_ref" readonly>
+                    <div class="mb-3">
+                        <label>{{ $refTitle }} Ref </label>
+                        <div>
+                            <input type="text" class="form-control-plaintext border-0" id="{{$refTitle}}_ref" value="" name="{{$refTitle}}_ref" readonly>
                             <input type="hidden" class="form-control editInput" id="{{ $hiddenForeignId }}" name="{{ $hiddenForeignId }}">
                         </div>
                     </div>
-                    <div class="row form-group mt-3">
-                        <label class="col-lg-3 col-sm-3 col-form-label">Type</label>
-                        <div class="col-md-9">
-                        <?php $attachmentType = App\Models\AttachmentType::getActiveAttachmentType(Auth::user()->home_id);?>
-                            <select name="attachment_type" id="{{ $typeId }}" class="form-control editInput">
-                                <option value="" selected disabled>Please Select</option>
-                                @foreach($attachmentType as $value)
-                                <option value="{{ $value->id }}">{{ $value->title }}</option>
-                                @endforeach
-                            </select>
-                        </div>
+                    <div class="mb-3">
+                        <label>Type</label>
+                        <?php $attachmentType = App\Models\AttachmentType::getActiveAttachmentType(Auth::user()->home_id); ?>
+                        <select name="attachment_type" id="{{ $typeId }}" class="form-control editInput">
+                            <option value="" selected disabled>Please Select</option>
+                            @foreach($attachmentType as $value)
+                            <option value="{{ $value->id }}">{{ $value->title }}</option>
+                            @endforeach
+                        </select>
                     </div>
-                    <div class="row form-group mt-3">
-                        <label class="col-lg-3 col-sm-3 col-form-label">File Name <span class="radStar ">*</span></label>
-                        <div class="col-md-9">
-                            <input type="file" name="file" class="form-control editInput " placeholder="" id="{{ $selectfileName }}">
-                            <span class="col-form-label">(Max file size 25 MB)</span>
-                            <p id="fileSizeError" style="color: red;"></p>
-                        </div>
+                    <div class="mb-3">
+                        <label>File Name <span class="radStar ">*</span></label>
+                        <input type="file" name="file" class="form-control editInput " placeholder="" id="{{ $selectfileName }}">
+                        <span class="col-form-label">(Max file size 25 MB)</span>
+                        <p id="fileSizeError" style="color: red;"></p>
                     </div>
-                    <div class="row form-group mt-3">
-                        <label class="col-lg-3 col-sm-3 col-form-label">Title</label>
-                        <div class="col-md-9">
-                            <input type="text" name="title" class="form-control editInput " placeholder="Title" id="{{ $inputTitle }}">
-                        </div>
+                    <div class="mb-3">
+                        <label>Title</label>
+                        <input type="text" name="title" class="form-control editInput " placeholder="Title" id="{{ $inputTitle }}">
                     </div>
-                    <div class="row form-group mt-3">
-                        <label class="col-lg-3 col-sm-3 col-form-label">Description<br>(Max 500 characters)</label>
-                        <div class="col-md-9">
-                            <textarea name="description" class="form-control textareaInput" rows="4" placeholder="Description" id="{{ $inputDescription }}" maxlength="500"></textarea>
-                        </div>
+                    <div class="mb-3">
+                        <label>Description<br>(Max 500 characters)</label>
+                        <textarea name="description" class="form-control textareaInput" rows="4" placeholder="Description" id="{{ $inputDescription }}" maxlength="500"></textarea>
                     </div>
                 </form>
             </div>
             <div class="modal-footer customer_Form_Popup">
-                <button type="button" class="btn profileDrop" id="{{ $saveButtonId }}">Save</button>
-                <button type="button" class="btn profileDrop" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-warning" id="{{ $saveButtonId }}">Save</button>
             </div>
         </div>
     </div>
@@ -76,11 +68,11 @@
         }
     });
 
-    $("#{{$saveButtonId}}").on('click', function(){
-        if(errorMessage.textContent.length>0){
+    $("#{{$saveButtonId}}").on('click', function() {
+        if (errorMessage.textContent.length > 0) {
             alert("Please upload file max size of 25 MB");
             return false;
-        }else{
+        } else {
             $.ajax({
                 type: "POST",
                 url: "{{ $saveButtonUrl }}",
@@ -91,11 +83,11 @@
                 processData: false,
                 success: function(response) {
                     console.log(response);
-                    if(response.vali_error){
-                            alert(response.vali_error);
-                            $(window).scrollTop(0);
-                            return false;
-                    }else if(response.success === true){
+                    if (response.vali_error) {
+                        alert(response.vali_error);
+                        $(window).scrollTop(0);
+                        return false;
+                    } else if (response.success === true) {
                         $(window).scrollTop(0);
                         $('#attachment_messagse').addClass('success-message').text(response.message).show();
                         setTimeout(function() {
@@ -103,7 +95,7 @@
                             $("#{{$purchaseModalId}}").modal('hide');
                             getAllAttachment(response.data);
                         }, 3000);
-                    }else if(response.success === false){
+                    } else if (response.success === false) {
                         $('#attachment_messagse').addClass('error-message').text(response.message).show();
                         setTimeout(function() {
                             $('#attachment_messagse').text('').fadeOut();
@@ -114,9 +106,9 @@
                     var errorMessage = xhr.status + ': ' + xhr.statusText;
                     // alert('Error - ' + errorMessage + "\nMessage: " + error);
                     $('#attachment_messagse').addClass('error-message').text(error).show();
-                        setTimeout(function() {
-                            $('#attachment_messagse').text('').fadeOut();
-                        }, 3000);
+                    setTimeout(function() {
+                        $('#attachment_messagse').text('').fadeOut();
+                    }, 3000);
                 }
             });
         }

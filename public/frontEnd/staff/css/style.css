@@ -9,7 +9,10 @@ Sidebar Section CSS
 
 Typogrophy
 /*--- font-family: 'Poppins', sans-serif; ---*/
-@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300&display=swap');
+/* @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300&display=swap'); */
+@import url(http://fonts.googleapis.com/css?family=Open+Sans:400,300,300italic,400italic,600,600italic,700,700italic,800,800italic);
+@import url(http://fonts.googleapis.com/css?family=Lato:400,100,100italic,300,300italic,400italic,700,700italic,900,900italic);
+@import url(bucket-ico-fonts.css);
 
 
 html {
@@ -17,19 +20,27 @@ html {
 }
 
 body {
-    color: #222 !important;
+    /* color: #222 !important; */
     height: 100% !important;
-    line-height: 26px !important;
-    font-family: 'Poppins', sans-serif !important;
-    font-size: 16px !important;
-    background-color: #f7f7f9 !important;
+    /* line-height: 26px !important;
+    font-family: 'Poppins', sans-serif !important; */
+    /* font-size: 16px !important;
+    background-color: #f7f7f9 !important; */
+
+    color: #767676;
+    background: #f1f2f7;
+    font-family: 'Open Sans', sans-serif;
+    padding: 0px !important;
+    margin: 0px !important;
+    font-size: 13px;
+    text-rendering: optimizeLegibility;
 }
 
 p {
     color: #222;
     line-height: 26px;
-    font-family: 'Poppins', sans-serif;
-    font-size: 16px;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 15px;
     /* font-weight: 400; */
 }
 
@@ -62,7 +73,7 @@ h3,
 h4,
 h5,
 h6 {
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Open Sans', sans-serif;
 }
 
 /* custom select element css start */
@@ -414,11 +425,12 @@ Crical Bar Info
     position: absolute;
     transform: translate(5px, -70px);
     border: 7px solid #1f88b587;
+        cursor: pointer;
 }
 
 .stock-crical-info h2 {
     text-align: center;
-    line-height: 54px;
+    line-height: 14px;
     font-size: 20px;
     font-weight: 700;
     color: #1f88b5;
@@ -588,7 +600,7 @@ h4.my-summry-part {
     height: 110px;
     border-radius: 50%;
     position: absolute;
-    top: 40%;
+    top: 10%;
     background-color: #fff;
     border: 14px solid #1f88b5;
     transform: translate(10px, 10px);
@@ -596,7 +608,7 @@ h4.my-summry-part {
 
 .main-summery-box-strock h2 {
     text-align: center;
-    line-height: 89px;
+    line-height: 47px;
     font-size: 37px;
     font-weight: 600;
     color: #1f88b5;
@@ -619,9 +631,8 @@ aside.right-side-info {
     display: inline-block;
     border-radius: 6px;
     box-shadow: rgb(187 184 184 / 25%) 0px 2px 8px;
-    position: relative;
-
-    width: 94%;
+    position: relative; 
+    width: 100%;
 
 }
 
@@ -714,8 +725,8 @@ p.next {
     background-color: #fff;
     text-decoration: none;
     border: 2px solid #1f88b5;
-    padding: 10px 11px;
-    font-size: 13px;
+    padding: 10px 12px;
+    font-size: 16px;
     border-radius: 2px;
     font-weight: 400;
     color: #1f88b5;
@@ -727,8 +738,8 @@ p.next {
     text-decoration: none;
     color: rgb(112 196 249);
     border: 2px solid rgb(112, 196, 249);
-    padding: 11px 15px;
-    font-size: 12px;
+    padding: 10px 12px;
+    font-size: 16px;
     border-radius: 2px;
     font-weight: 400;
     margin-right: 13px;
@@ -1348,7 +1359,7 @@ h2.unpublice-titel {
 .content-info-title select {
     padding: 7px 26px;
     font-size: 15px;
-    margin-bottom: 20px;
+    margin-top: 20px;
     border: 1px solid #ccc;
     outline: none;
 }
@@ -2071,7 +2082,7 @@ margin: 0px 10px 0px 10px;
 }
 
 .working-time-pattern .first-section {
-    border-bottom: 1px solid #1f88b561;
+    /* border-bottom: 1px solid #1f88b561; */
     padding-bottom: 30px;
 }
 
@@ -3097,29 +3108,29 @@ margin: 0px 10px 0px 10px;
     border: 2px solid #ad005c;
 } */
 
-.annual-leave .absance-btn {
+/* .annual-leave .absance-btn {
     background-color: #1F88B5;
     color: #fff;
-    padding: 5px 10px;
-    border-radius: 5px;
+    padding: 7px 10px;
+    border-radius: 3px;
     font-weight: 600;
     margin-right: 10px;
-}
+} */
 
 .annual-leave .absance-btn:hover {
     background-color: #1F88B5;
     color: #fff;
 } 
 
-.annual-leave .dash-btn {
+.annual-leave .dash-btn, .annual-leave .absance-btn {
     background-color: #1F88B5;
     color:  #fff;
-    padding: 5px 10px;
-    border-radius: 5px;
+    padding: 7px 10px;
+    border-radius: 3px;
     transition: 0.3s;
     font-weight: 600;
-    margin-right: 10px;
     text-decoration: none;
+    border: none;
 }
 
 .annual-leave .dash-btn:hover {

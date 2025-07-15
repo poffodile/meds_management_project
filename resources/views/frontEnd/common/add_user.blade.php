@@ -201,7 +201,7 @@
 <script>
     $(document).ready(function() {
 
-        today = new Date;
+        var today = new Date;
         $('#new-date-su').datetimepicker({
             format: 'dd-mm-yyyy',
             endDate: today,

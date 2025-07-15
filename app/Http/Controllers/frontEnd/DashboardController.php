@@ -17,7 +17,10 @@ class DashboardController extends Controller
 
 		$accessRight = User::where('id', Auth::user()->id)->where('is_deleted', 0)->whereRaw("FIND_IN_SET(?, access_rights)", [319])->exists();
 		// dd($accessRight);
-		return view('frontEnd.dashboard',compact('page','guide_tag', 'accessRight'));
+		$rights = User::where('id', Auth::user()->id)->where('is_deleted', 0)->first()->access_rights;
+        $access_rights = explode(',', $rights);
+		// echo "<pre>";print_r($access_rights);die;
+		return view('frontEnd.dashboard',compact('page','guide_tag', 'accessRight','access_rights'));
 	}
 
 	//when a user is not authorized

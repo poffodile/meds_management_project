@@ -5,7 +5,7 @@ namespace App\Http\Controllers\backEnd\systemManage;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Session;
+use Illuminate\Support\Facades\Session;
 use App\DynamicFormBuilder, App\DynamicForm, App\DynamicFormLocation;
 use DB, Auth;
 use Hash;
@@ -54,12 +54,8 @@ class FormBuilderController extends Controller
         //echo '<pre>'; print_r($forms); die;
 
         $page = 'form-builder';
-        // echo "<pre>";
-        // print_r($forms);
-        //  die(); 
-        // echo "<pre>";
-        // print_r(compact('forms'));
-        // die();
+        // echo "<pre>";  print_r($forms); die(); 
+        // echo "<pre>";  print_r(compact('forms'));  die();
         return view('backEnd/systemManage/formBuilder/form_builder', compact('page', 'limit', 'forms', 'search')); //users.blade.php
     }
 

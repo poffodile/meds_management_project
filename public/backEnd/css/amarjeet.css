@@ -167,8 +167,6 @@ right:0px;
 
 
 
-
-
 /*record bullying incident page css start here*/
 
 .masterprintmainarea .formio-component-label-hidden {
@@ -195,9 +193,9 @@ margin: 0 0 auto 0;
 }
 
 
-.has-feedback.formio-component canvas {
+/* .has-feedback.formio-component canvas {
 max-width: 230px !important;
-}
+} */
 
 
 

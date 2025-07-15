@@ -169,9 +169,13 @@
 
         $('#saveChanges').on('click', function() {
             var formData = $('#quote_reject_type_form').serialize();
-
+            var id=$("#quote_reject_type_id").val();
+            var url='{{ route("quote.ajax.saveQuoteRejectType") }}';
+            if(id !=''){
+                url='{{ route("quote.ajax.editQuoteRejectType") }}';
+            }
             $.ajax({
-                url: '{{ route("quote.ajax.saveQuoteRejectType") }}',
+                url: url,
                 method: 'POST',
                 data: formData,
                 success: function(response) {
@@ -275,7 +279,7 @@ function status_change(id, status){
             var model="QuoteRejectType";
             $.ajax({
                 type: "POST",
-                url: "{{url('/status_change')}}",
+                url: "{{url('/QuoteRejectType_status_change')}}",
                 data: {id:id,status:status,model:model,_token:token},
                 success: function(data) {
                     console.log(data);

@@ -1,4 +1,8 @@
-@include('frontEnd.salesAndFinance.jobs.layout.header')
+@extends('frontEnd.layouts.master')
+<meta name="csrf-token" content="{{ csrf_token() }}">
+@section('title','Invoices')
+<link rel="stylesheet" type="text/css" href="{{ url('public/frontEnd/jobs/css/custom.css')}}" />
+@section('content')
 <style>
     .currency {
         padding: 2px 3px 2px 5px;
@@ -112,360 +116,317 @@
         overflow: auto;
     }
 
-    .tag_box {
-        background: #f5f5f5;
-        display: grid;
-        border: 1px solid #dee2e6;
+    .multiselect-dropdown {
+        height: auto;
     }
-    .multiselect-dropdown{
-        height:auto;
+
+    .dropdown-item {
+        padding: 6px 15px;
+        font-size: 13px;
+        color: #212529;
+        text-align: inherit;
+        text-decoration: none;
+        display: block;
+        width: 100%;
+        background-color: transparent;
+        border: 0;
+        border-radius: 0;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .dropdown-item:hover {
+        background-color: #f8f9fa;
+        color: #212529;
     }
 </style>
-<section class="main_section_page px-3">
+<section class="wrapper">
     <div class="container-fluid">
         <div class="row">
-            <div class="col-md-4 col-lg-4 col-xl-4 ">
-                <div class="pageTitle">
-                    <h3>Search Purchase Orders</h3>
-                </div>
-            </div>
-            <div class="col-md-8 col-lg-8 col-xl-8 px-3">
-                <div class="pageTitleBtn">
-                    <a href="#!" class="profileDrop"> Search Purchase Orders</a>
-                    <a href="#!" class="profileDrop"> Invoice Received</a>
-                    <a href="#!" class="profileDrop dropdown-toggle"> Statements</a>
-                </div>
-            </div>
-        </div>
-
-
-            <div class="row">
-                <div class="col-md-12 col-lg-12 col-xl-12 px-3">
-                    <div class="jobsection">
-                        <div class="d-inline-flex align-items-center ">
-                            <div class="nav-item dropdown">
-                                <a href="#" class="nav-link dropdown-toggle profileDrop" data-bs-toggle="dropdown" aria-expanded="false">
-                                    New
-                                </a>
-                                <div class="dropdown-menu fade-up m-0">
-                                    <a href="{{url('purchase_order')}}" class="dropdown-item">Purchase Order</a>
-                                    <a href="{{url('new_credit_notes')}}" class="dropdown-item">Credit Note</a>
-                                    <!-- <a href="#!" class="dropdown-item">Print</a>
-                                    <a href="#!" class="dropdown-item">Email</a> -->
+            <div class="col-sm-12 p-0">
+                <div class="panel">
+                    <header class="panel-heading px-5">
+                        <h4>Search Purchase Orders</h4>
+                    </header>
+                    <div class="panel-body">
+                        <div class="col-lg-12 mt-4">
+                            <div class="jobsection justify-content-end">
+                                <a href="#!" class="btn btn-default"> Search Purchase Orders</a>
+                                <a href="#!" class="btn btn-warning"> Invoice Received</a>
+                                <a href="#!" class="btn btn-warning dropdown-toggle"> Statements</a>
                             </div>
                         </div>
-                    </div>
-                    <a href="{{ url('draft_purchase_order') }}" class="profileDrop">Draft <span>({{$draftCount}})</span></a>
-                    <a href="{{ url('draft_purchase_order?list_mode=AwaitingApprivalPurchaseOrders') }}" class="profileDrop">Awaiting Approval<span>({{$awaitingApprovalCount}})</span></a>
-                    <a href="{{ url('draft_purchase_order?list_mode=Approved') }}" class="profileDrop">Approved<span>({{$approvedCount}})</span></a>
-                    <a href="{{ url('draft_purchase_order?list_mode=Rejected') }}" class="profileDrop">Rejected<span>({{$rejectedCount}})</span></a>
-                    <a href="{{ url('draft_purchase_order?list_mode=Actioned') }}" class="profileDrop">Actioned<span>({{$actionedCount}})</span></a>
-                    <a href="{{ url('draft_purchase_order?list_mode=Paid') }}" class="profileDrop">Paid<span>({{$paidCount}})</span></a>
-
-                </div>
-            </div>
-
-        </div>
-        <di class="row">
-            <div class="col-lg-12">
-                <div class="maimTable">
-                    <div class="printExpt">
-                        <div class="prntExpbtn">
-                            <a href="#!">Print</a>
-                            <a href="#!">Export</a>
-                        </div>
-                        <div class="searchFilter">
-                            <a href="#!" onclick="hideShowDiv()" class="hidebtn">Show Search Filter</a>
-                        </div>
-
-                    </div>
-
-                    <div class="searchJobForm" id="divTohide">
-                        <form id="search_dataForm" class="p-4">
-                            <div class="row">
-                                <div class="col-md-3">
-                                    <div class="row form-group mb-2">
-                                        <label class="col-md-4 col-form-label text-end">PO Ref:</label>
-                                        <div class="col-md-8">
-                                            <input type="text" class="form-control editInput" id="po_ref">
-                                        </div>
-                                    </div>
-                                    <div class="row form-group mb-2">
-                                        <label class="col-md-4 col-form-label text-end">Department:</label>
-                                        <div class="col-md-8">
-                                            <input type="text" class="form-control editInput" id="department">
-                                            <input type="hidden" id="selectedDeptId" name="selectedDeptId">
-                                            <div class="parent-container department-container"></div>
-                                        </div>
-                                    </div>
-                                    <div class="row form-group mb-2">
-                                        <label class="col-md-4 col-form-label text-end">Tag:</label>
-                                        <div class="col-md-8">
-                                            <input type="text" class="form-control editInput" id="tag">
-                                            <input type="hidden" id="selectedTagtId" name="selectedTagtId">
-                                            <div class="parent-container tag-container"></div>
-                                        </div>
-                                    </div>
-                                    <div class="row form-group mb-2">
-
-                                        <label class="col-md-4 col-form-label text-end ">
-                                            <a href="#!" class="tutor-student-tooltip-col">
-                                                EDD From:
-
-                                                <span class="tutor-student-tooltiptext3">Expedcted Delivery Date</span>
-                                            </a>
-                                        </label>
-
-                                        <div class="col-md-4">
-                                            <input type="date" class="form-control editInput" id="edd_startDate">
-                                        </div>
-
-                                        <div class="col-md-4">
-                                            <input type="date" class="form-control editInput" id="edd_endDate">
-                                        </div>
-                                    </div>
-
-                                </div>
-
-                                <div class="col-md-3">
-                                    <div class="row form-group mb-2">
-                                        <label class="col-md-4 col-form-label text-end">Supplier:</label>
-                                        <div class="col-md-8 position-relative">
-                                            <input type="text" class="form-control editInput" id="supplier">
-                                            <input type="hidden" id="selectedsupplierId" name="selectedsupplierId">
-                                            <div class="parent-container supplier-container"></div>
-                                        </div>
-                                    </div>
-                                    <div class="row form-group mb-2">
-                                        <label class="col-md-4 col-form-label text-end">PO Date From:</label>
-                                        <div class="col-md-4">
-                                            <input type="date" class="form-control editInput" id="po_startDate">
-                                        </div>
-                                        <div class="col-md-4">
-                                            <input type="date" class="form-control editInput" id="po_endDate">
-                                        </div>
-                                    </div>
-                                    <div class="row form-group mb-2">
-                                        <label class="col-md-4 col-form-label text-end">Status:</label>
-                                        <div class="col-md-8">
-                                            <select class="form-control editInput selectOptions" id="purchaseSearchstatus" name="purchaseSearchstatus" multiselect-search="true" multiselect-select-all="true" multiselect-max-items="4" multiple="multiple" style="height:auto;">
-                                                <option value="1">Draft</option>
-                                                <option value="2">Awaiting Approval</option>
-                                                <option value="3">Approved</option>
-                                                <option value="4">Actioned</option>
-                                                <option value="5">Paid</option>
-                                                <option value="6">Cancelled</option>
-                                                <option value="7">Invoice Received</option>
-                                                <option value="8">Reject</option>
-                                            </select>
+                        <div class="col-lg-12 mb-4">
+                            <div class="jobsection">
+                                <div class="d-inline-flex align-items-center">
+                                    <div class="nav-item dropdown">
+                                        <a href="#" class="nav-link dropdown-toggle btn btn-warning" data-toggle="dropdown" aria-expanded="false"> New <i class="fa fa-caret-down"></i></a>
+                                        <div class="dropdown-menu fade-up m-0">
+                                            <a href="{{url('purchase_order')}}" class="dropdown-item">Purchase Order</a>
+                                            <a href="{{url('new_credit_notes')}}" class="dropdown-item">Credit Note</a>
+                                            <!-- <a href="#!" class="dropdown-item">Print</a>
+                                             <a href="#!" class="dropdown-item">Email</a> -->
                                         </div>
                                     </div>
                                 </div>
-
-                                <div class="col-md-3">
-                                    <div class="row form-group mb-2">
-                                        <label class="col-md-4 col-form-label text-end">Customer:</label>
-                                        <div class="col-md-8">
-                                            <input type="text" class="form-control editInput" id="customer">
-                                            <input type="hidden" id="selectedCustomerId" name="selectedCustomerId">
-                                            <div class="parent-container customer-container"></div>
-                                        </div>
-                                    </div>
-
-                                    <div class="row form-group mb-2">
-                                        <label class="col-md-4 col-form-label text-end">Created By:</label>
-                                        <div class="col-md-8">
-                                            <input type="text" class="form-control editInput" id="created_by">
-                                            <input type="hidden" id="selectedcreatedById" name="selectedcreatedById">
-                                            <div class="parent-container createdBy-container"></div>
-                                        </div>
-                                    </div>
-                                    <div class="row form-group mb-2">
-                                        <label class="col-md-4 col-form-label text-end">PO Posted:</label>
-                                        <div class="col-md-8">
-                                            <select class="form-control editInput selectOptions" id="po_posted">
-                                                <option selected disabled>--Any--</option>
-                                                <option value="1">Yes</option>
-                                                <option value="0">No</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-md-3">
-                                    <div class="row form-group mb-2">
-                                        <label class="col-md-4 col-form-label text-end">Project:</label>
-                                        <div class="col-md-8">
-                                            <input type="text" class="form-control editInput" id="project">
-                                            <input type="hidden" id="selectedProjectId" name="selectedProjectId">
-                                            <div class="parent-container project-container"></div>
-                                        </div>
-                                    </div>
-                                    <div class="row form-group mb-2">
-                                        <label class="col-md-4 col-form-label text-end">Keywords:</label>
-                                        <div class="col-md-8">
-                                            <input type="text" class="form-control editInput" id="keywords">
-                                        </div>
-                                    </div>
-                                    <div class="row form-group mb-2">
-                                        <label class="col-md-4 col-form-label text-end">Delivery Status:</label>
-                                        <div class="col-md-8">
-                                            <!-- <input type="text" class="form-control editInput" id="delivery_status"> -->
-                                            <select class="form-control editInput selectOptions" id="delivery_status">
-                                                <option selected disabled>--All--</option>
-                                                <option value="0">Not Deliverd</option>
-                                                <option value="2">Partially Delivered</option>
-                                                <option value="1">Delivered</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-12">
-                                    <div class="pageTitleBtn justify-content-center">
-                                        <a href="javascript:void(0)" onclick="searchBtn()" class="profileDrop px-3">Search </a>
-                                        <a href="javascript:void(0)" onclick="clearBtn()" class="profileDrop px-3">Clear</a>
-                                    </div>
+                                <a href="{{ url('draft_purchase_order') }}" class="btn btn-warning">Draft <span>({{$draftCount}})</span></a>
+                                <a href="{{ url('draft_purchase_order?list_mode=AwaitingApprivalPurchaseOrders') }}" class="btn btn-warning">Awaiting Approval <span>({{$awaitingApprovalCount}})</span></a>
+                                <a href="{{ url('draft_purchase_order?list_mode=Approved') }}" class="btn btn-warning">Approved <span>({{$approvedCount}})</span></a>
+                                <a href="{{ url('draft_purchase_order?list_mode=Rejected') }}" class="btn btn-warning">Rejected <span>({{$rejectedCount}})</span></a>
+                                <a href="{{ url('draft_purchase_order?list_mode=Actioned') }}" class="btn btn-warning">Actioned <span>({{$actionedCount}})</span></a>
+                                <a href="{{ url('draft_purchase_order?list_mode=Paid') }}" class="btn btn-warning">Paid <span>({{$paidCount}})</span></a>
+                                <div class="searchFilter">
+                                    <a href="#!" onclick="hideShowDiv()" class="btn btn-primary hidebtn">Hide Search Filter</a>
                                 </div>
                             </div>
-                        </form>
-                    </div>
-                    <div style="display:none" id="showHideTable">
-                        <div class="markendDelete">
-                            <div class="row">
-                                <div class="col-md-8">
-                                    <div class="jobsection d-flex">
-                                        <a href="javascript:void(0)" id="deleteSelectedRows" class="profileDrop">Delete</a>
-                                        <a href="javascript:void(0)" id="preview_purchase_orderBoxes" class="profileDrop">Preview Purchase Order</a>
-                                        <a href="javascript:void(0)" id="approveBtn" class="profileDrop">Approve</a>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="searchJobForm mt-0" id="divTohide">
+                                <form id="search_dataForm" class="p-4">
+                                    <div class="row">
+                                        <div class="col-sm-3">
+                                            <div class="mb-3">
+                                                <label class="col-form-label mb-2">PO Ref:</label>
+                                                <input type="text" class="form-control editInput" id="po_ref">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="col-form-label mb-2">Department:</label>
+                                                <input type="text" class="form-control editInput" id="department">
+                                                <input type="hidden" id="selectedDeptId" name="selectedDeptId">
+                                                <div class="parent-container department-container"></div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="col-form-label mb-2">Tag:</label>
+                                                <input type="text" class="form-control editInput" id="tag">
+                                                <input type="hidden" id="selectedTagtId" name="selectedTagtId">
+                                                <div class="parent-container tag-container"></div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="col-form-label mb-2"><a href="#!" class="tutor-student-tooltip-col">EDD From:<span class="tutor-student-tooltiptext3">Expedcted Delivery Date</span></a>
+                                                </label>
+                                                <div class="row">
+                                                    <div class="col-sm-6">
+                                                        <input type="date" class="form-control editInput" id="edd_startDate">
+                                                    </div>
+                                                    <div class="col-sm-6">
+                                                        <input type="date" class="form-control editInput" id="edd_endDate">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <div class="mb-3">
+                                                <label class="col-form-label mb-2">Supplier:</label>
+                                                <div class="position-relative">
+                                                    <input type="text" class="form-control editInput" id="supplier">
+                                                    <input type="hidden" id="selectedsupplierId" name="selectedsupplierId">
+                                                    <div class="parent-container supplier-container"></div>
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="col-form-label mb-2">PO Date From:</label>
+                                                <div class="row">
+                                                    <div class="col-sm-6">
+                                                        <input type="date" class="form-control editInput" id="po_startDate">
+                                                    </div>
+                                                    <div class="col-sm-6">
+                                                        <input type="date" class="form-control editInput" id="po_endDate">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="col-form-label mb-2">Status:</label>
+                                                <select class="form-control editInput selectOptions" id="purchaseSearchstatus" name="purchaseSearchstatus" multiselect-search="true" multiselect-select-all="true" multiselect-max-items="4" multiple="multiple" style="height:auto;">
+                                                    <option value="1">Draft</option>
+                                                    <option value="2">Awaiting Approval</option>
+                                                    <option value="3">Approved</option>
+                                                    <option value="4">Actioned</option>
+                                                    <option value="5">Paid</option>
+                                                    <option value="6">Cancelled</option>
+                                                    <option value="7">Invoice Received</option>
+                                                    <option value="8">Reject</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <div class="mb-3">
+                                                <label class="col-form-label mb-2">Customer:</label>
+                                                <input type="text" class="form-control editInput" id="customer">
+                                                <input type="hidden" id="selectedCustomerId" name="selectedCustomerId">
+                                                <div class="parent-container customer-container"></div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="col-form-label mb-2">Created By:</label>
+                                                <input type="text" class="form-control editInput" id="created_by">
+                                                <input type="hidden" id="selectedcreatedById" name="selectedcreatedById">
+                                                <div class="parent-container createdBy-container"></div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="col-form-label mb-2">PO Posted:</label>
+                                                <select class="form-control editInput selectOptions" id="po_posted">
+                                                    <option selected disabled>--Any--</option>
+                                                    <option value="1">Yes</option>
+                                                    <option value="0">No</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <div class="mb-3">
+                                                <label class="col-form-label mb-2">Project:</label>
+                                                <input type="text" class="form-control editInput" id="project">
+                                                <input type="hidden" id="selectedProjectId" name="selectedProjectId">
+                                                <div class="parent-container project-container"></div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="col-form-label mb-2">Keywords:</label>
+                                                <input type="text" class="form-control editInput" id="keywords">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="col-form-label mb-2">Delivery Status:</label>
+                                                <!-- <input type="text" class="form-control editInput" id="delivery_status"> -->
+                                                <select class="form-control editInput selectOptions" id="delivery_status">
+                                                    <option selected disabled>--All--</option>
+                                                    <option value="0">Not Deliverd</option>
+                                                    <option value="2">Partially Delivered</option>
+                                                    <option value="1">Delivered</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <div class="jobsection justify-content-center">
+                                                <a href="javascript:void(0)" onclick="searchBtn()" class="btn btn-primary px-3">Search </a>
+                                                <a href="javascript:void(0)" onclick="clearBtn()" class="btn btn-default px-3">Clear</a>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                                <!-- <div class="col-md-5">
+                                </form>
+                            </div>
+                            <div style="display:none" id="showHideTable">
+                                <div class="markendDelete">
+                                    <div class="jobsection">
+                                        <a href="javascript:void(0)" id="deleteSelectedRows" class="btn btn-warning">Delete</a>
+                                        <a href="javascript:void(0)" id="preview_purchase_orderBoxes" class="btn btn-warning">Preview Purchase Order</a>
+                                        <a href="javascript:void(0)" id="approveBtn" class="btn btn-warning">Approve</a>
+                                    </div>
+                                    <!-- <div class="col-sm-5">
                                         <div class="pageTitleBtn p-0">
-                                            <a href="#" class="profileDrop"> <i class="material-symbols-outlined"> settings </i></a>        
+                                            <a href="#" class="btn btn-warning"> <i class="material-symbols-outlined"> settings </i></a>        
                                         </div>
                                     </div> -->
+                                </div>
+                            </div>
+                            <div class="table-responsive productDetailTable">
+                                <table id="exampleOne" class="table border-top border-bottom tablechange" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center" style=" width:30px;"><input type="checkbox" id="selectAll"></th>
+                                            <th>#</th>
+                                            <th>PO Ref</th>
+                                            <th>Date</th>
+                                            <th>Due Date</th>
+                                            <th>Supplier</th>
+                                            <th>Customer</th>
+                                            <th>Delivery</th>
+                                            <th>Sub Total</th>
+                                            <th>VAT</th>
+                                            <th>Total </th>
+                                            <th>Outstanding </th>
+                                            <th>Status</th>
+                                            <th>Delivery</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody id="search_data">
+
+                                    </tbody>
+                                    <tr class="calcualtionShowHide" style="display:none">
+                                        <th colspan="2"> <label class="col-form-label p-0">Page Sub Total:</label></th>
+                                        <th colspan="12"></th>
+                                    </tr>
+                                    <tr class="calcualtionShowHide" style="display:none">
+                                        <td colspan="8"></td>
+
+                                        <td id="Tablesub_total_amount">£0</td>
+                                        <td id="Tablevat_amount">£0</td>
+                                        <td id="Tabletotal_amount">£0</td>
+                                        <td id="Tableoutstanding_amount" colspan="8">£0</td>
+                                    </tr>
+                                </table>
                             </div>
                         </div>
-
-                        <table id="exampleOne" class="display tablechange" cellspacing="0" width="100%">
-                            <thead>
-                                <tr>
-                                    <th class="text-center" style=" width:30px;"><input type="checkbox" id="selectAll"></th>
-                                    <th>#</th>
-                                    <th>PO Ref</th>
-                                    <th>Date</th>
-                                    <th>Due Date</th>
-                                    <th>Supplier</th>
-                                    <th>Customer</th>
-                                    <th>Delivery</th>
-                                    <th>Sub Total</th>
-                                    <th>VAT</th>
-                                    <th>Total </th>
-                                    <th>Outstanding </th>
-                                    <th>Status</th>
-                                    <th>Delivery</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-
-                            <tbody id="search_data">
-                                
-                            </tbody>
-                            <tr class="calcualtionShowHide" style="display:none">
-                                <th colspan="2"> <label class="col-form-label p-0">Page Sub Total:</label></th>
-                                <th colspan="12"></th>
-                            </tr>
-                            <tr class="calcualtionShowHide" style="display:none">
-                                <td colspan="8"></td>
-
-                                <td id="Tablesub_total_amount">£0</td>
-                                <td id="Tablevat_amount">£0</td>
-                                <td id="Tabletotal_amount">£0</td>
-                                <td id="Tableoutstanding_amount" colspan="8">£0</td>
-                            </tr>
-                        </table>
+                        <!-- End off main Table -->
                     </div>
-
-                </div> <!-- End off main Table -->
+                </div>
             </div>
         </div>
     </div>
 </section>
 <!-- Approve Model Start Here -->
 <div class="modal fade" id="approveModal" tabindex="-1" aria-labelledby="customerModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content add_Customer">
+    <div class="modal-dialog">
+        <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="customerModalLabel">Authorise Purchase Order</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">&times;</button>
+                <h4 class="modal-title" id="customerModalLabel">Authorise Purchase Order</h4>
             </div>
             <div class="modal-body">
                 <div class="row">
                     <div class="text-center mt-3" id="message_approveModal" style="display:none"></div>
-                    <div class="col-md-12 col-lg-12 col-xl-12">
-                        <div class="formDtail">
-                            <form id="approveForm" class="customerForm pt-0">
-                                @csrf
-                                <input type="hidden" name="id" id="id">
-                                <input type="hidden" name="po_id" id="po_id">
-                                <div class="row">
-                                    <label for="inputName" class="col-md-12 col-lg-12 col-xl-12 col-sm-12 col-form-label">Would you like to notify anyone that this purchase order '<span id="purchaseOrderRef"></span>' has been approved?</label>
-                                </div>
-                                <div class="mb-2 row">
-                                    <label for="inputName" class="col-md-3 col-lg-3 col-xl-3 col-sm-3 col-form-label">Notify?</label>
-                                    <div class="col-sm-9">
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" name="notify_radio" id="radioNo" value="0" checked="">
-                                            <label class="form-check-label checkboxtext" for="inlineRadio2">No</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" name="notify_radio" value="1" id="radioYes">
-                                            <label class="form-check-label checkboxtext" for="inlineRadio1">Yes</label>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="mb-2 row notificationHideShow" style="display:none">
-                                    <label for="inputProject"
-                                        class="col-sm-3 col-form-label">Notify Who?</label>
-                                    <div class="col-sm-9">
-                                        <select class="form-control editInput selectOptions" id="notifywhoUser" name="notify_user_id">
-                                            <option value=""></option>
-                                            <option value="{{Auth::user()->id}}">Me - {{Auth::user()->email}} / {{Auth::user()->phone_no ?? 'No Mobile'}}</option>
-                                            @foreach($users as $value)
-                                            @if($value->id != Auth::user()->id)
-                                            <option value="{{ $value->id }}">{{ $value->name }} - {{$value->email}} / {{$value->phone_no ?? 'No Mobile'}}</option>
-                                            @endif
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="mb-2 row notificationHideShow" style="display:none">
-                                    <label class="col-sm-3 col-form-label">Send As <span class="radStar ">*</span> </label>
-                                    <div class="col-sm-9">
-                                        <label for="purchase_notify_who1" class="editInput">
-                                            <input type="checkbox" name="notification" id="purchase_notify_who1" value="1" checked=""> Notification (User Only)
-                                        </label>
-                                        <label for="purchase_notify_who2" class="editInput">
-                                            <input type="checkbox" name="sms" id="purchase_notify_who2" value="1"> SMS
-                                        </label>
-                                        <label for="purchase_notify_who3" class="editInput">
-                                            <input type="checkbox" name="email" id="purchase_notify_who3" value="1" checked=""> Email
-                                        </label>
-                                    </div>
-                                </div>
-                            </form>
+                    <div class="col-sm-12 col-lg-12 col-xl-12">
+                        <form id="approveForm">
+                            @csrf
+                            <input type="hidden" name="id" id="id">
+                            <input type="hidden" name="po_id" id="po_id">
+                            <label class=" mb-2 col-form-label">Would you like to notify anyone that this purchase order '<span id="purchaseOrderRef"></span>' has been approved?</label>
+                    </div>
+                    <div class="mb-2">
+                        <label class="mb-2 col-form-label">Notify?</label>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="notify_radio" id="radioNo" value="0" checked="">
+                            <label class="form-check-label checkboxtext" for="inlineRadio2">No</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="notify_radio" value="1" id="radioYes">
+                            <label class="form-check-label checkboxtext" for="inlineRadio1">Yes</label>
                         </div>
                     </div>
-                </div> <!-- End row -->
-            </div>
-            <div class="modal-footer customer_Form_Popup">
 
-                <button type="button" class="profileDrop" id="saveApproveModal" onclick="saveApproveModal()">Save</button>
-                <button type="button" class="profileDrop" data-bs-dismiss="modal">Cancel</button>
-            </div>
+                    <div class="mb-2 notificationHideShow" style="display:none">
+                        <label class="mb-2 col-form-label">Notify Who?</label>
+                        <select class="form-control editInput selectOptions" id="notifywhoUser" name="notify_user_id">
+                            <option value=""></option>
+                            <option value="{{Auth::user()->id}}">Me - {{Auth::user()->email}} / {{Auth::user()->phone_no ?? 'No Mobile'}}</option>
+                            @foreach($users as $value)
+                            @if($value->id != Auth::user()->id)
+                            <option value="{{ $value->id }}">{{ $value->name }} - {{$value->email}} / {{$value->phone_no ?? 'No Mobile'}}</option>
+                            @endif
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="mb-2  notificationHideShow" style="display:none">
+                        <label class="mb-2 col-form-label">Send As <span class="radStar ">*</span> </label>
+                        <div>
+                            <label for="purchase_notify_who1" class="editInput">
+                                <input type="checkbox" name="notification" id="purchase_notify_who1" value="1" checked=""> Notification (User Only)
+                            </label>
+                            <label for="purchase_notify_who2" class="editInput">
+                                <input type="checkbox" name="sms" id="purchase_notify_who2" value="1"> SMS
+                            </label>
+                            <label for="purchase_notify_who3" class="editInput">
+                                <input type="checkbox" name="email" id="purchase_notify_who3" value="1" checked=""> Email
+                            </label>
+                        </div>
+                    </div>
+                    </form>
+                </div>
+            </div> <!-- End row -->
+        </div>
+        <div class="modal-footer customer_Form_Popup">
+            <button type="button" class="btn btn-warning" data-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-warning" id="saveApproveModal" onclick="saveApproveModal()">Save</button>
         </div>
     </div>
+</div>
 </div>
 
 <!-- End here -->
@@ -480,39 +441,37 @@
             <div class="modal-body">
                 <div class="row">
                     <div class="text-center mt-3" id="message_recordDeliveryModal" style="display:none"></div>
-                    <div class="col-md-12 col-lg-12 col-xl-12">
-                        <div class="formDtail">
-                            <form id="recordDeliveryForm" class="customerForm pt-0">
-                                <input type="hidden" name="po_id" id="recordDelivery_po_id">
-                                @csrf
-                                <div class="col-sm-12">
-                                    <div class="productDetailTable">
-                                        <table class="table" id="recordDelivery_result">
-                                            <thead class="table-light">
-                                                <tr>
-                                                    <th>Code</th>
-                                                    <th>Product</th>
-                                                    <th>Description</th>
-                                                    <th>Price</th>
-                                                    <th>Qty</th>
-                                                    <th>Allredy Delivered</th>
-                                                    <th>Receive More</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody></tbody>
-                                        </table>
-                                        <div id="pagination-controls-recordDelivery"></div>
-                                    </div>
+                    <div class="col-sm-12 col-lg-12 col-xl-12">
+                        <form id="recordDeliveryForm">
+                            <input type="hidden" name="po_id" id="recordDelivery_po_id">
+                            @csrf
+                            <div class="col-sm-12">
+                                <div class="productDetailTable">
+                                    <table class="table" id="recordDelivery_result">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Code</th>
+                                                <th>Product</th>
+                                                <th>Description</th>
+                                                <th>Price</th>
+                                                <th>Qty</th>
+                                                <th>Allredy Delivered</th>
+                                                <th>Receive More</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                    <div id="pagination-controls-recordDelivery"></div>
                                 </div>
-                            </form>
-                        </div>
+                            </div>
+                        </form>
                     </div>
                 </div> <!-- End row -->
             </div>
             <div class="modal-footer customer_Form_Popup">
 
-                <button type="button" class="profileDrop" id="saverecordDeliveryModal" onclick="saverecordDeliveryModal()">Save</button>
-                <button type="button" class="profileDrop" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-default2" id="saverecordDeliveryModal" onclick="saverecordDeliveryModal()">Save</button>
+                <button type="button" class="btn btn-default2" data-bs-dismiss="modal">Cancel</button>
             </div>
         </div>
     </div>
@@ -529,14 +488,14 @@
             <div class="modal-body">
                 <div class="row">
                     <div class="text-center mt-3" id="message_recordPaymentModal" style="display:none"></div>
-                    <div class="col-md-12 col-lg-12 col-xl-12">
+                    <div class="col-sm-12 col-lg-12 col-xl-12">
                         <div class="formDtail">
-                            <form id="recordPaymentForm" class="customerForm pt-0">
+                            <form id="recordPaymentForm">
                                 <input type="hidden" name="po_id" id="recordPayment_po_id">
                                 <input type="hidden" name="recordPayment_ppurchaseProduct" id="recordPayment_ppurchaseProduct">
                                 @csrf
                                 <div class="row">
-                                    <div class="col-md-6 col-lg-6 col-xl-6">
+                                    <div class="col-sm-6 col-lg-6 col-xl-6">
                                         <div class="mb-2 row">
                                             <label for="inputAddress" class="col-sm-3 col-form-label">Purchase Order</label>
                                             <div class="col-sm-9">
@@ -564,8 +523,8 @@
                                         <div class="mb-2 row">
                                             <label for="inputAddress" class="col-sm-3 col-form-label">Amount Paid <span class="radStar">*</span></label>
                                             <div class="col-sm-1">
-                                                <div class="tag_box text-center">
-                                                    <span style="padding:3px">£</span>
+                                                <div class="tag_box">
+                                                    <span>£</span>
                                                 </div>
                                             </div>
                                             <div class="col-sm-8">
@@ -592,7 +551,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-6 col-lg-6 col-xl-6">
+                                    <div class="col-sm-6 col-lg-6 col-xl-6">
                                         <div class="mb-2 row">
                                             <label for="inputAddress" class="col-sm-3 col-form-label">Reference</label>
                                             <div class="col-sm-9">
@@ -614,8 +573,8 @@
             </div>
             <div class="modal-footer customer_Form_Popup">
 
-                <button type="button" class="profileDrop" id="saverecordPaymentModal" onclick="saverecordPaymentModal()">Save</button>
-                <button type="button" class="profileDrop" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-default2" id="saverecordPaymentModal" onclick="saverecordPaymentModal()">Save</button>
+                <button type="button" class="btn btn-default2" data-bs-dismiss="modal">Cancel</button>
             </div>
         </div>
     </div>
@@ -674,8 +633,7 @@
     selectBoxsubject="selectBoxsubject"
     body="emailbody"
     saveButtonId="emailSave"
-    saveUrl="{{url('purchaseOrderEmailSave')}}"
-     />
+    saveUrl="{{url('purchaseOrderEmailSave')}}" />
 <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
 <script src="{{url('public/backEnd/js/multiselect.js')}}"></script>
 
@@ -728,15 +686,16 @@
     });
 </script>
 <script>
-    var selectedValues=[];
+    var selectedValues = [];
     document.addEventListener("DOMContentLoaded", function() {
         document.getElementById("purchaseSearchstatus").addEventListener("change", function() {
             selectedValues = Array.from(this.selectedOptions).map(option => option.value);
             console.log(selectedValues); // This will log the selected values as an array
         });
     });
+
     function clearBtn() {
-        selectedValues='';
+        selectedValues = '';
         $("#search_dataForm")[0].reset();
     }
 
@@ -808,7 +767,7 @@
                 keywords: keywords,
                 delivery_status: delivery_status,
                 status: status,
-                purchaseSearchstatus:purchaseSearchstatus,
+                purchaseSearchstatus: purchaseSearchstatus,
                 _token: '{{ csrf_token() }}'
             },
             success: function(response) {
@@ -825,7 +784,7 @@
                     $("#Tableoutstanding_amount").text("£" + response.outstandingAmountTotal);
                     $(".calcualtionShowHide").show();
                 } else {
-                    if(response.success===false){
+                    if (response.success === false) {
                         alert(response.message);
                         // return false;
                     }
@@ -844,7 +803,7 @@
                         },
                         info: "Showing _START_ to _END_ of _TOTAL_ entries",
                         infoEmpty: "No entries available",
-                        emptyTable: '<span style="color: #e10078; font-weight: bold;">Sorry, there are no items available</span>',
+                        emptyTable: '<span style="color: #dc3545; font-weight: bold;">Sorry, there are no items available</span>',
                         infoFiltered: "(filtered from _MAX_ total entries)",
                         lengthMenu: "Show _MENU_ entries",
                         search: "Search:",
@@ -1549,10 +1508,10 @@
                 var paginationControlsProductDetail = $("#pagination-controls-recordDelivery");
                 paginationControlsProductDetail.empty();
                 if (paginationProductDetails.prev_page_url) {
-                    paginationControlsProductDetail.append('<button type="button" class="profileDrop" onclick="getProductDetail(' + id + ', \'' + paginationContact.prev_page_url + '\')">Previous</button>');
+                    paginationControlsProductDetail.append('<button type="button" class="btn btn-default2" onclick="getProductDetail(' + id + ', \'' + paginationContact.prev_page_url + '\')">Previous</button>');
                 }
                 if (paginationProductDetails.next_page_url) {
-                    paginationControlsProductDetail.append('<button type="button" class="profileDrop" onclick="getProductDetail(' + id + ', \'' + paginationContact.next_page_url + '\')">Next</button>');
+                    paginationControlsProductDetail.append('<button type="button" class="btn btn-default2" onclick="getProductDetail(' + id + ', \'' + paginationContact.next_page_url + '\')">Next</button>');
                 }
             },
             error: function(xhr, status, error) {
@@ -1706,71 +1665,73 @@
     }
 </script>
 <script>
-    $("#preview_purchase_orderBoxes").on('click', function(){
-    let previewids = [];
-    var name='';
-    let error=0;
-    $('.delete_checkbox:checked').each(function() {
-        const row = $(this).closest('tr');
-        const supplierName = row.get(0).querySelector('td:nth-child(6)').textContent.trim();
-        if(name == ''){
-            name=supplierName;
-        }
-        if(name !== supplierName){
-            error=1;
-            return false;
-        }
-        previewids.push($(this).val());
-    });
-    if(error){
-        alert("Sorry, you cannot preview purchase orders for multiple customers.");
-        return false;
-    }
-    if (previewids.length == 0) {
-        alert("Please select at least one purchase order for preview.");
-        return false;
-    }else{
-        // location.href="<?php echo url('preview-purchase-orders?key=');?>"+previewids;
-        window.open("<?php echo url('preview-purchase-orders?key=');?>" + previewids, "_blank");
-    }
-  });
-  $("#approveBtn").on('click',function(){
-    let approveids = [];
-
-    $('.delete_checkbox:checked').each(function() {
-        approveids.push($(this).val());
-    });
-    if (approveids.length == 0) {
-        alert("Please select at least one purchase order for approval.");
-    }else{
-        var token='<?php echo csrf_token();?>';
-        // var url = `{{ url('purchase_order_approveMultiple') }}?key=${approveids.join(',')}`;
-        var url=`{{ url('purchase_order_approveMultiple') }}`;
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': token
-            },
-            body: JSON.stringify({ approveids: approveids })
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log(data);
-            // return false;
-            if(data.success === true){
-                location.reload();
-            }else{
-                alert("Something went wrong");
+    $("#preview_purchase_orderBoxes").on('click', function() {
+        let previewids = [];
+        var name = '';
+        let error = 0;
+        $('.delete_checkbox:checked').each(function() {
+            const row = $(this).closest('tr');
+            const supplierName = row.get(0).querySelector('td:nth-child(6)').textContent.trim();
+            if (name == '') {
+                name = supplierName;
+            }
+            if (name !== supplierName) {
+                error = 1;
                 return false;
             }
-            
-        })
-        .catch(error => {
-            // $('.catsuccessdanger').text('There was an error submitting the form.');
-            console.error("Error: ",error);
+            previewids.push($(this).val());
         });
-    }
-  });
+        if (error) {
+            alert("Sorry, you cannot preview purchase orders for multiple customers.");
+            return false;
+        }
+        if (previewids.length == 0) {
+            alert("Please select at least one purchase order for preview.");
+            return false;
+        } else {
+            // location.href="<?php echo url('preview-purchase-orders?key='); ?>"+previewids;
+            window.open("<?php echo url('preview-purchase-orders?key='); ?>" + previewids, "_blank");
+        }
+    });
+    $("#approveBtn").on('click', function() {
+        let approveids = [];
+
+        $('.delete_checkbox:checked').each(function() {
+            approveids.push($(this).val());
+        });
+        if (approveids.length == 0) {
+            alert("Please select at least one purchase order for approval.");
+        } else {
+            var token = '<?php echo csrf_token(); ?>';
+            // var url = `{{ url('purchase_order_approveMultiple') }}?key=${approveids.join(',')}`;
+            var url = `{{ url('purchase_order_approveMultiple') }}`;
+            fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': token
+                    },
+                    body: JSON.stringify({
+                        approveids: approveids
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    // return false;
+                    if (data.success === true) {
+                        location.reload();
+                    } else {
+                        alert("Something went wrong");
+                        return false;
+                    }
+
+                })
+                .catch(error => {
+                    // $('.catsuccessdanger').text('There was an error submitting the form.');
+                    console.error("Error: ", error);
+                });
+        }
+    });
 </script>
-@include('frontEnd.salesAndFinance.jobs.layout.footer')
+@endsection

@@ -46,9 +46,55 @@ class DynamicForm extends Model //FormBuilder
                                 </div>
                                 <div class="col-md-12 col-sm-12 col-xs-12">
                                     <h3 class="m-t-0 m-b-20 clr-blue fnt-20 dynamic_form_h3"> Fill Form Details </h3>
-                              
+                                 </div>
+                                 <div class="col-md-12 col-sm-12 col-xs-12 cog-panel">
+                                     <div class="form-group col-md-12 col-sm-12 col-xs-12 p-0">
+                                         <label class="col-md-2 col-sm-2 col-xs-12 p-t-7"> Title: </label>
+                                         <div class="col-md-10 col-sm-10 col-xs-12 r-p-0">
+                                             <div class="input-group popovr">
+                                                 <input type="text" class="form-control trans static_title" placeholder="" name="title" value="" />
+                                             </div>
+                                         </div>
+                                     </div>
+                                 </div>
+
+                                 <div class="col-md-12 col-sm-12 col-xs-12 cog-panel datepicker-sttng">      
+                                     <div class="form-group col-md-12 col-sm-12 col-xs-12 p-0">
+                                         <label class="col-md-2 col-sm-2 col-xs-12 p-t-7"> Date: </label>
+                                         <div class="col-md-10 col-sm-10 col-xs-12 r-p-0">
+                                           <div data-date-viewmode="" data-date-format="dd-mm-yyyy" data-date="" class="input-group date dpYears">
+                                             <input name="date" size="16" readonly="" class="form-control trans" type="text" value="" >
+                                             <span class="input-group-btn add-on">
+                                               <button class="btn btn-primary" type="button"><i class="fa fa-calendar"></i></button>
+                                             </span>
+                                           </div>
+                                         </div>
+                                     </div>
+                                 </div>
+
+                                 <div class="col-md-12 col-sm-12 col-xs-12 cog-panel">
+                                     <div class="form-group col-md-12 col-sm-12 col-xs-12 p-0">
+                                         <label class="col-md-2 col-sm-2 col-xs-12 p-t-7"> Time: </label>
+                                         <div class="col-md-10 col-sm-12 col-xs-12 r-p-0">
+                                             <div class="input-group popovr">
+                                                 <input type="text" class="form-control trans static_title" placeholder="" name="time" value="" />
+                                             </div>
+                                         </div>
+                                     </div>
+                                 </div>
+                                 <div class="col-md-12 col-sm-12 col-xs-12 cog-panel">
+                                     <div class="form-group col-md-12 col-sm-12 col-xs-12 p-0">
+                                         <label class="col-md-2 col-sm-2 col-xs-12 p-t-7"> Detail: </label>
+                                         <div class="col-md-10 col-sm-12 col-xs-12 r-p-0">
+                                             <div class="input-group popovr">
+                                                 <textarea class="form-control trans" placeholder="" name="details" ></textarea>
+                                             </div>
+                                         </div>
+                                     </div>
+                                 </div>
                                 ';
             $formdata .= $static_fields;
+                                 
             $label_col_val = '1';
             $inp_col       = 10;
             $form_pattern = str_replace("'", "`", $form->pattern);
@@ -144,10 +190,9 @@ class DynamicForm extends Model //FormBuilder
                     </div>
                 </div>
                 ';
-
-                $formdata .= $static_field;
             }
             $formdata .= "<div class='col-md-12 col-sm-12 col-xs-12 cog-panel' id='formiotest'></div>";
+          
             $formdata .= '';
 
 
@@ -253,7 +298,7 @@ class DynamicForm extends Model //FormBuilder
                     $formdata .= '<div class="col-md-12 col-sm-12 col-xs-12 form-group">
                                     <div class="uploadimg222"> 
                                         <input type="hidden" name="formImage" class="uploded_image" id="imageName">                           
-                                        <input type="hidden" name="formImage2" class="" value="'.$form_info->image_path.'">                           
+                                        <input type="hidden" name="formImage2" class="" value="' . $form_info->image_path . '">                           
                                         <div id="previewContainer2" style="overflow: hidden; margin-bottom: 20px; height: 300px;">';
                     // Check if a previous image exists
                     if (!empty($form_info->image_path)) {
@@ -1399,8 +1444,9 @@ class DynamicForm extends Model //FormBuilder
 
     public static function saveForm($data)
     {
-        // return $data;
-        // die;
+        $home_ids = Auth::user()->home_id;
+        $ex_home_ids = explode(',', $home_ids);
+        $home_id=$ex_home_ids[0];
 
         if (isset($data['data'])) {
             $formdata = json_encode($data['data']);
@@ -1419,15 +1465,15 @@ class DynamicForm extends Model //FormBuilder
         // return $data['title'];
         // //return $formdata;
         // die;
-        if(isset($data['formImage'])){
+        if (isset($data['formImage'])) {
             $formImage = $data['formImage'];
         } else {
             $formImage = null;
         }
         /*----- June 07,2018 End ---*/
-
+        
         $form                   = new DynamicForm;
-        $form->home_id          = Auth::user()->home_id;
+        $form->home_id          = $home_id;
         $form->user_id          = Auth::user()->id;
         $form->form_builder_id  = $data['dynamic_form_builder_id'];
         $form->image_path       = $formImage;
@@ -1440,12 +1486,9 @@ class DynamicForm extends Model //FormBuilder
         /*----- June 07,2018 End ---*/
         // $form->service_user_id  = $service_user_id; 
         $form->location_id      = $data['location_id'];
-        // $form->title            = $data['title'];
-        $form->title            = null;
-        // $form->time             = $data['time']; 
-        $form->time             =  null;
-        // $form->details          = $data['details']; 
-        $form->details          = null;
+        $form->title            = $data['title'];
+        $form->time             = $data['time']; 
+        $form->details          = $data['details']; 
         $form->pattern_data     = $formdata;
 
         if (isset($data['alert_status'])) {
@@ -1480,7 +1523,7 @@ class DynamicForm extends Model //FormBuilder
                 $notification->event_id                   = $form->id;
                 $notification->notification_event_type_id = $notification_event_type_id;
                 $notification->event_action               = 'ADD';
-                $notification->home_id                    = Auth::user()->home_id;
+                $notification->home_id                    = $home_id;
                 $notification->user_id                    = Auth::user()->id;
                 $notification->save();
                 //saving notification end

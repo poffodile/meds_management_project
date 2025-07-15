@@ -173,8 +173,28 @@
                     $('#saveChanges').text('Add');
                 }
             });
+            $('#saveChanges').on('click', function() {
+                var formData = $('#lead_notes_type_form').serialize();
+                var id=$("#lead_notes_type_id").val();
+                var url='{{ route("lead.ajax.saveLeadNoteType") }}';
+                if(id !=''){
+                    url='{{ route("lead.ajax.editLeadNoteType") }}';
+                }
+                $.ajax({
+                    url: url,
+                    method: 'POST',
+                    data: formData,
+                    success: function(response) {
+                        alert(response.message);
+                        location.reload();
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(error);
+                    }
+                });
+            });
         });
-    });
+    // });
 </script>
 <script>
     $("#deleteSelectedRows").on('click', function() {
@@ -229,7 +249,7 @@
         var model = "LeadNoteType";
         $.ajax({
             type: "POST",
-            url: "{{url('/status_change')}}",
+            url: "{{url('/LeadNoteType_status_change')}}",
             data: {
                 id: id,
                 status: status,

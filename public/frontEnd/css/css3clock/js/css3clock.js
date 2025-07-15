@@ -15,7 +15,7 @@ var nd = new Date(utc + (3600000*offset));*/
         
     }, 1000 );
 
-    setInterval( function() {
+    setInterval( function() {   
         var hours = new Date().getHours();
         // var hours = nd.getHours();
         // alert(hours);
@@ -59,6 +59,7 @@ $(function() {
     setInterval( function() {
         var d     = new Date();
         var hours = d.getUTCHours() + 1;
+        // var hours = d.getUTCHours();
         var mins  = d.getUTCMinutes();
         // var hours = new Date().getHours();
         // var mins = new Date().getMinutes();

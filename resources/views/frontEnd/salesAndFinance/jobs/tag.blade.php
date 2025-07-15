@@ -199,10 +199,12 @@
                 var status = $.trim($('#statusModal option:selected').val());
                 var id = $("#id").val();
                 var message;
-
+                var url;
                 if (id == '') {
+                    url='{{ url("/save_tag") }}';
                     message = "Added Successfully Done";
                 } else {
+                    url='{{ url("/edit_tag") }}';
                     message = "Edited Successfully Done";
                 }
                 if (title.includes(',')) {
@@ -215,7 +217,7 @@
                     $("#name").removeClass('addError');
                     $.ajax({
                         type: "POST",
-                        url: '{{ url("/save_tag") }}',
+                        url: url,
                         data: {id: id, title: title, status: status, _token: token},
                         success: function(data) {
                             console.log(data);
@@ -260,7 +262,7 @@
             var model="Tag";
             $.ajax({
                 type: "POST",
-                url: "{{url('/status_change')}}",
+                url: "{{url('/tag_status_change')}}",
                 data: {id:id,status:status,model:model,_token:token},
                 success: function(data) {
                     console.log(data);

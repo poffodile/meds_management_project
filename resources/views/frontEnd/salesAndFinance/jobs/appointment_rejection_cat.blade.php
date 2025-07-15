@@ -207,10 +207,13 @@
             var home_id = '<?php echo $home_id; ?>'
             var id = $("#id").val();
             var message;
+            var url;
             if (id == '') {
                 message = "Added Successfully Done";
+                url="{{url('/appointment_rejection_cat_save')}}";
             } else {
                 message = "Edited Successfully Done";
+                url="{{url('/appointment_rejection_cat_edit')}}";
             }
             if (appointment_status == null) {
                 $("#appointment_status").addClass('addError');
@@ -222,7 +225,7 @@
             } else {
                 $.ajax({
                     type: "POST",
-                    url: "{{url('/appointment_rejection_cat_save')}}",
+                    url: url,
                     data: {
                         id: id,
                         home_id: home_id,
@@ -283,7 +286,7 @@
             var model = "construction_appointment_rejection_category";
             $.ajax({
                 type: "POST",
-                url: "{{url('/status_change')}}",
+                url: "{{url('/appointmentrejectioncat_status_change')}}",
                 data: {
                     id: id,
                     status: status,

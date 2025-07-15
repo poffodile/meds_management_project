@@ -1,202 +1,152 @@
-<div class="modal fade" id="contact_modal" tabindex="-1" aria-labelledby="contactModalLabel"
-                aria-hidden="true">
-                <div class="modal-dialog modal-xl">
-                    <div class="modal-content add_Customer">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="contactModalLabel"></h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                aria-label="Close"></button>
-                        </div>
-                        <div class="alert alert-success mt-3" id="alert_message_contactModal" style="display:none"></div>
-                        <div class="modal-body">
-                            <div class="row">
-                                <div class="col-md-6 col-lg-6 col-xl-6">
-                                    <div class="formDtail">
-                                        <form id="contact_form">
-                                            @csrf
-                                            <div class="mb-2 row">
-                                                <label for="inputName" class="col-sm-3 col-form-label" id="contactLabel"></label>
-                                                <div class="col-sm-9">
-                                                    <p id="contact_customer_name"></p>
-                                                </div>
-                                            </div>
-                                            <input type="hidden" id="contact_customer_id" name="customer_id">
-                                            <input type="hidden" id="userType" name="userType">
-                                            
-                                            <div class="mb-2 row" id="contact_billing_radio">
-                                                <label class="col-sm-3 col-form-label">Default Billing</label>
-                                                <div class="col-sm-9">
-
-                                                    <div class="form-check form-check-inline">
-                                                        <input class="form-check-input" type="radio" name="contact_radio" id="contact_default_yes">
-                                                        <label class="form-check-label checkboxtext"
-                                                            for="inlineRadio1">Yes</label>
-                                                    </div>
-                                                    <div class="form-check form-check-inline">
-                                                        <input class="form-check-input" type="radio" name="contact_radio" id="contact_default_no" checked>
-                                                        <label class="form-check-label checkboxtext"
-                                                            for="inlineRadio2">No</label>
-                                                    </div>
-                                                    <input type="hidden" id="default_billing" name="default_billing" value="0">
-                                                </div>
-                                            </div>
-
-                                            <div class="mb-2 row">
-                                                <label for="inputName" class="col-sm-3 col-form-label">Contact
-                                                    Name <span class="radStar ">*</span></label>
-                                                <div class="col-sm-9">
-                                                    <input type="text" class="form-control editInput"
-                                                        id="contact_contact_name" name="contact_name">
-                                                </div>
-                                            </div>
-
-                                            <div class="mb-2 row" id="contact_job_title_field">
-                                                <label for="inputProject" class="col-sm-3 col-form-label">Job
-                                                    Title (Position)</label>
-                                                <div class="col-sm-4">
-                                                    <select class="form-control editInput selectOptions get_job_title_result"
-                                                        id="contact_job_titile_id" name="job_title_id">
-                                                        <option selected disabled>Please Select
-                                                        </option>
-                                                        <?php foreach($job_title as $con_val_title){?>
-                                                            <option value="{{$con_val_title->id}}">{{$con_val_title->name}}</option>
-                                                            <?php }?>
-                                                    </select>
-                                                </div>
-                                                <div class="col-sm-2">
-                                                    <a href="javascript:void(0)" class="formicon" onclick="openjobTitleModal('contact_job_titile_id')"><i
-                                                            class="fa-solid fa-square-plus"></i></a>
-                                                </div>
-                                            </div>
-
-                                            <div class="mb-2 row">
-                                                <label for="inputEmail"
-                                                    class="col-sm-3 col-form-label">Email</label>
-                                                <div class="col-sm-9">
-                                                    <input type="text" class="form-control editInput" id="contact_email" name="email" onchange="CheckContactEmail()">
-                                                    <span style="color:red" id="CheckContactEmailErr"></span>
-                                                </div>
-                                            </div>
-
-                                            <div class="mb-2 row">
-                                                <label for="inputTelephone"
-                                                    class="col-sm-3 col-form-label">Telephone</label>
-                                                    <div class="col-sm-2">
-                                                    <select class="form-control editInput selectOptions" id="contact_telephone_code" name="telephone_country_code">
-                                                        <option selected disabled>Please Select</option>
-                                                        @foreach($country as $contacttelCode)
-                                                            <option value="{{$contacttelCode->id}}" <?php if($contacttelCode->id == 230){echo 'selected';}?>>+{{$contacttelCode->code}} - {{$contacttelCode->name}}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                                <div class="col-sm-7">
-                                                    <input type="text" class="form-control editInput"
-                                                        id="contact_phone" name="telephone" onkeypress="return event.charCode >= 48 && event.charCode <= 57">
-                                                        <span style="color:red;display:none" id="CheckContactTelephoneErr">Please enter 10 digit number</span>
-                                                </div>
-                                            </div>
-
-                                            <div class="mb-2 row">
-                                                <label for="inputMobile"
-                                                    class="col-sm-3 col-form-label">Mobile</label>
-                                                    <div class="col-sm-2">
-                                                        <select class="form-control editInput selectOptions" id="contact_mobile_code" name="mobile_country_code">
-                                                            <option selected disabled>Please Select</option>
-                                                            @foreach($country as $contactmobCode)
-                                                                <option value="{{$contactmobCode->id}}" <?php if($contactmobCode->id == 230){echo 'selected';}?>>+{{$contactmobCode->code}} - {{$contactmobCode->name}}</option>
-                                                            @endforeach
-                                                        </select>
-                                                    </div>
-                                                <div class="col-sm-7">
-                                                    <input type="text" class="form-control editInput" id="contact_mobile" name="mobile" onkeypress="return event.charCode >= 48 && event.charCode <= 57">
-                                                        <span style="color:red;display:none" id="CheckContactMobileErr">Please enter 10 digit number</span>
-                                                </div>
-                                            </div>
-
-                                            <div class="mb-2 row">
-                                                <label for="inputAddress"
-                                                    class="col-sm-3 col-form-label">Fax</label>
-                                                <div class="col-sm-9">
-                                                    <input type="text" class="form-control editInput"
-                                                        id="contact_fax" name="fax">
-                                                </div>
-                                            </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-md-6 col-lg-6 col-xl-6">
-                                    <div class="formDtail">
-                                        <div class="mb-2 row">
-                                            <label class="col-sm-3 col-form-label">Address Details</label>
-                                            <div class="col-sm-9 d-flex">
-                                                same as default
-                                                <div class="form-check form-check-inline ms-2">
-                                                    <input class="form-check-input" type="checkbox" name="inlineRadioOptions" id="contact_default_address" onchange="default_address()">
-                                                </div>
-                                            </div>
-                                        </div>
-                                            <div class="mb-2 row">
-                                                <label for="inputAddress"
-                                                    class="col-sm-3 col-form-label">Address <span class="radStar ">*</span></label>
-                                                <div class="col-sm-9">
-                                                    <textarea class="form-control textareaInput" id="contact_address" name="address" rows="3"></textarea>
-                                                </div>
-                                            </div>
-
-                                            <div class="mb-2 row">
-                                                <label for="inputCity"
-                                                    class="col-sm-3 col-form-label">City</label>
-                                                <div class="col-sm-9">
-                                                    <input type="text" class="form-control editInput"
-                                                        id="contact_city" name="city">
-                                                </div>
-                                            </div>
-                                            <div class="mb-2 row">
-                                                <label for="inputCounty"
-                                                    class="col-sm-3 col-form-label">County</label>
-                                                <div class="col-sm-9">
-                                                    <input type="text" class="form-control editInput"
-                                                        id="contact_country_input" name="country">
-                                                </div>
-                                            </div>
-                                            <div class="mb-2 row">
-                                                <label for="inputPincode"
-                                                    class="col-sm-3 col-form-label">Pincode</label>
-                                                <div class="col-sm-9">
-                                                    <input type="text" class="form-control editInput"
-                                                        id="contact_pincode" name="postcode">
-                                                </div>
-                                            </div>
-
-                                            <div class="mb-2 row">
-                                                <label for="inputCountry"
-                                                    class="col-sm-3 col-form-label">Country</label>
-                                                <div class="col-sm-9">
-                                                    <select class="form-control editInput selectOptions"
-                                                        id="contact_country_id" name="country_id">
-                                                        <option selected disabled>Select Coutry</option>
-                                                        <?php foreach($country as $countryval){?>
-                                                        <option value="{{$countryval->id}}" <?php if($countryval->id == 230){echo 'selected';}?> class="contact_country_id">{{$countryval->name}} ({{$countryval->code}})</option>
-                                                        <?php }?>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div> <!-- End row -->
-
-                        </div>
-                        <div class="modal-footer customer_Form_Popup">
-
-                            <button type="button" class="profileDrop" onclick="save_contact()">Save</button>
-                            <!-- <button type="button" class="profileDrop" onclick="save_contactClose()">Save &
-                                Close</button> -->
-                            <button type="button" class="profileDrop" data-bs-dismiss="modal">Cancel</button>
-                        </div>
-                    </div>
-                </div>
+<div class="modal fade" id="contact_modal" tabindex="-1" aria-labelledby="contactModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">&times;</button>
+                <h4 class="modal-title" id="contactModalLabel"></h4>
             </div>
+            <div class="modal-body">
+                <div class="alert alert-success" id="alert_message_contactModal" style="display:none"></div>
+                <form id="contact_form">
+                    @csrf
+                    <div class="row">
+                        <div class="col-sm-6 col-lg-6 col-xl-6">
+                            <div class="mb-3">
+                                <label id="contactLabel"></label>
+                                <p id="contact_customer_name"></p>
+                            </div>
+                            <input type="hidden" id="contact_customer_id" name="customer_id">
+                            <input type="hidden" id="userType" name="userType">
+                            <div class="mb-3" id="contact_billing_radio">
+                                <label>Default Billing</label>
+                                <div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="contact_radio" id="contact_default_yes">
+                                        <label class="form-check-label checkboxtext"
+                                            for="inlineRadio1">Yes</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="contact_radio" id="contact_default_no" checked>
+                                        <label class="form-check-label checkboxtext"
+                                            for="inlineRadio2">No</label>
+                                    </div>
+                                    <input type="hidden" id="default_billing" name="default_billing" value="0">
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label>Contact Name <span class="radStar ">*</span></label>
+                                <input type="text" class="form-control editInput" id="contact_contact_name" name="contact_name">
+                            </div>
+                            <div class="mb-3" id="contact_job_title_field">
+                                <label>Job Title (Position)</label>
+                                <div class="row">
+                                    <div class="col-sm-10 pe-0">
+                                        <select class="form-control editInput selectOptions get_job_title_result"
+                                            id="contact_job_titile_id" name="job_title_id">
+                                            <option selected disabled>Please Select</option>
+                                            <?php foreach($job_title as $con_val_title){?>
+                                                <option value="{{$con_val_title->id}}">{{$con_val_title->name}}</option>
+                                            <?php }?>
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <a href="javascript:void(0)" class="formicon" onclick="openjobTitleModal('contact_job_titile_id')">
+                                        <i class="fa fa-plus-square"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label>Email</label>
+                                <input type="text" class="form-control editInput" id="contact_email" name="email" onchange="CheckContactEmail()">
+                                <span style="color:red" id="CheckContactEmailErr"></span>
+                            </div>
+                            <div class="mb-3">
+                                <label>Telephone</label>
+                                <div class="row">
+                                    <div class="col-sm-4 pe-0">
+                                        <select class="form-control editInput selectOptions" id="contact_telephone_code" name="telephone_country_code">
+                                            <option selected disabled>Please Select</option>
+                                            @foreach($country as $contacttelCode)
+                                                <option value="{{$contacttelCode->id}}" <?php if($contacttelCode->id == 230){echo 'selected';}?>>+{{$contacttelCode->code}} - {{$contacttelCode->name}}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control editInput"
+                                            id="contact_phone" name="telephone" onkeypress="return event.charCode >= 48 && event.charCode <= 57">
+                                            <span style="color:red;display:none" id="CheckContactTelephoneErr">Please enter 10 digit number</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label>Mobile</label>
+                                <div class="row">
+                                    <div class="col-sm-4 pe-0">
+                                        <select class="form-control editInput selectOptions" id="contact_mobile_code" name="mobile_country_code">
+                                            <option selected disabled>Please Select</option>
+                                            @foreach($country as $contactmobCode)
+                                                <option value="{{$contactmobCode->id}}" <?php if($contactmobCode->id == 230){echo 'selected';}?>>+{{$contactmobCode->code}} - {{$contactmobCode->name}}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control editInput" id="contact_mobile" name="mobile" onkeypress="return event.charCode >= 48 && event.charCode <= 57">
+                                            <span style="color:red;display:none" id="CheckContactMobileErr">Please enter 10 digit number</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label>Fax</label>
+                                <input type="text" class="form-control editInput" id="contact_fax" name="fax">
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-lg-6 col-xl-6">
+                            <div class="mb-3">
+                                <label>Address Details</label>
+                                <div class="d-flex">same as default
+                                    <div class="form-check form-check-inline ms-2">
+                                        <input class="form-check-input" type="checkbox" name="inlineRadioOptions" id="contact_default_address" onchange="default_address()">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label>Address <span class="radStar ">*</span></label>
+                                <textarea class="form-control textareaInput" id="contact_address" name="address" rows="3"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label>City</label>
+                                <input type="text" class="form-control editInput" id="contact_city" name="city">
+                            </div>
+                            <div class="mb-3">
+                                <label>County</label>
+                                <input type="text" class="form-control editInput" id="contact_country_input" name="country">
+                            </div>
+                            <div class="mb-3">
+                                <label>Pincode</label>
+                                <input type="text" class="form-control editInput" id="contact_pincode" name="postcode">
+                            </div>
+                            <div class="mb-3">
+                                <label>Country</label>
+                                <select class="form-control editInput selectOptions"
+                                    id="contact_country_id" name="country_id">
+                                    <option selected disabled>Select Coutry</option>
+                                    <?php foreach($country as $countryval){?>
+                                    <option value="{{$countryval->id}}" <?php if($countryval->id == 230){echo 'selected';}?> class="contact_country_id">{{$countryval->name}} ({{$countryval->code}})</option>
+                                    <?php }?>
+                                </select>
+                            </div>
+                        </div>
+                    </div> <!-- End row -->
+                </form>
+            </div>
+            <div class="modal-footer customer_Form_Popup">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-warning" onclick="save_contact()">Save</button>
+                <!-- <button type="button" class="profileDrop" onclick="save_contactClose()">Save & Close</button> -->
+            </div>
+        </div>
+    </div>
+ </div>
 
 <script>
     function CheckContactEmail(){
@@ -305,6 +255,9 @@
                 processData: false,
                 success: function(data) {
                     console.log(data);
+                    if (isAuthenticated(data) == false) {
+                        return false;
+                    }
                     if(data.vali_error){
                         alert(data.vali_error);
                         $(window).scrollTop(0);

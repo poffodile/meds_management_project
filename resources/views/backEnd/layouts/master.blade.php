@@ -12,10 +12,9 @@
   <link rel='stylesheet' href='https://cdn.form.io/formiojs/formio.full.min.css'>
   <!--Core CSS -->
 
-
   <link href="{{ url('public/backEnd/css/bootstrap/bootstrap.min.css') }}" rel="stylesheet">
   <link href="{{ url('public/backEnd/css/bootstrap/bootstrap-reset.css') }}" rel="stylesheet">
-  
+
   <link href="{{ url('public/backEnd/js/jquery-ui-1.10.1.custom.min.css') }}" rel="stylesheet">
   <link href="{{ url('public/backEnd/js/jquery-jvectormap-1.2.2.css') }}" rel="stylesheet">
   <link href="{{ url('public/backEnd/css/clndr.css') }}" rel="stylesheet">
@@ -26,9 +25,9 @@
 
   <!-- Users table CSS Files -->
 
-  <!-- <link href="{{ url('public/backEnd/css/font-awesome.css') }}" rel="stylesheet" />
-    <link href="{{ url('public/backEnd/css/DT_bootstrap.css') }}" rel="stylesheet" />
-    <link href="{{ url('public/backEnd/css/margins-min.css') }}" rel="stylesheet"> -->
+  <link href="{{ url('public/backEnd/css/font-awesome.css') }}" rel="stylesheet" />
+  <link href="{{ url('public/backEnd/css/DT_bootstrap.css') }}" rel="stylesheet" />
+  <link href="{{ url('public/backEnd/css/margins-min.css') }}" rel="stylesheet">
 
   <!-- Custom styles for this template -->
   <link href="{{ url('public/backEnd/css/style.css') }}" rel="stylesheet">
@@ -43,6 +42,13 @@
   <script src="{{ url('public/backEnd/js/slimscroll.js') }}"></script>
 
   <script src="{{ url('public/frontEnd/js/autosize.js') }}"></script>
+
+  <!--dynamic table-->
+  <link href="{{ url('public/backEnd/css/demo_page.css') }}" rel="stylesheet" />
+  <link href="{{ url('public/backEnd/css/demo_table.css') }}" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.min.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
 
   <style>
     .loader-inner {
@@ -109,6 +115,20 @@
   <script src="{{ url('public/backEnd/js/jquery.scrollTo.min.js') }}"></script>
   <script src="{{ url('public/backEnd/js/jquery.slimscroll.js') }}"></script>
   <script src="{{ url('public/backEnd/js/jquery.nicescroll.js') }}"></script>
+  <script src="{{ url('public/backEnd/js/jquery.dataTables.js') }}"></script>
+  <script src="{{ url('public/backEnd/js/DT_bootstrap.js') }}"></script>
+  <script src="{{ url('public/backEnd/js/table-editable.js') }}"></script>
+
+  <!--dynamic table-->
+  <script type="text/javascript" language="javascript" src="{{ url('public/backEnd/js/jquery.dataTables.js') }}"></script>
+  <script type="text/javascript" language="javascript" src="{{ url('public/backEnd/js/dynamic_table_init.js') }}"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.colVis.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+  
+
 
   <!--Easy Pie Chart-->
   <!-- <script src="{{ url('public/backEnd/js/jquery.easypiechart.js') }}"></script> -->
@@ -131,7 +151,7 @@
   @if(Session::has('image_id'))
   <input type="hidden" id="image_id" value="{{ Session::get('image_id')}}">
   @endif
- 
+
 
   <script src="https://cdn.form.io/formiojs/formio.full.min.js"></script>
   <script type='text/javascript'>

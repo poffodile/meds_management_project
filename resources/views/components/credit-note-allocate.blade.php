@@ -251,6 +251,9 @@
             success: function (response) {
                 console.log(response); 
                 // return false;
+                if (isAuthenticated(response) == false) {
+                    return false;
+                }
                 if (response.vali_error) {
                     alert(response.vali_error);
                     $("#email").css('border', '1px solid red');

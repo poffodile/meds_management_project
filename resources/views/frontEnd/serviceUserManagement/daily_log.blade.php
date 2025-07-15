@@ -463,6 +463,7 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
 <!-- Daily Log Comments -->
 <script>
     function daily_log_comment(logId, service_user_id) {
+        // alert(service_user_id)
         localStorage.setItem('log_book_id', logId);
         $('.loader').show();
         $('body').addClass('body-overflow');
@@ -691,11 +692,11 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
 
                             if (resp.log_book_records[i]['category_name'])
                                 $(pannel_body).append($(
-                                    `<h1 class="title_time_log"><span style="color: ${resp.log_book_records[i]['category_color']}">${resp.log_book_records[i]['category_name']}</span> | <span>${resp.log_book_records[i]['title']}</span></h1>`
+                                    `<h1 class="title_time_log"><span style="color: ${resp.log_book_records[i]['category_color']}">${resp.log_book_records[i]['category_name']}</span> | <span>${resp.log_book_records[i]['title'] || ''}</span></h1>`
                                 ));
                             else
                                 $(pannel_body).append($(
-                                    `<h1 class="title_time_log"><span>${resp.log_book_records[i]['title']}</span></h1>`
+                                    `<h1 class="title_time_log"><span>${resp.log_book_records[i]['title'] || ''}</span></h1>`
                                 ));
 
                             var details = document.createElement("p");
@@ -741,7 +742,7 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                             // image
                             $(pannel_body).append($(` <div class="comment-number-bnt-info">
                             <a data-toggle="modal" onclick="daily_log_comment(${resp.log_book_records[i]['id']})" data-id="${resp.log_book_records[i]['date']}" href="#commentsModal" id="commentModal2" class="btn daily_log_comments_btn" style="background-color:#1f88b5;color:white;float:right;font-size: 10px;padding: 4px;margin-bottom:15px;">
-                            Comments <span id="_${resp.log_book_records[i]['id']}" class="badge badge-primary badge-pill comment_badge">${resp.log_book_records[i]['comments']}</span></a> </div>
+                            Comments <span id="_${resp.log_book_records[i]['id']}" class="badge badge-primary badge-pill comment_badge">${resp.log_book_records[i]['comments'] || 0}</span></a> </div>
                                         `));
 
                             pannel_body.append(date_field);
@@ -821,11 +822,11 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
 
                             if (resp.log_book_records[i]['category_name'])
                                 $(pannel_body).append($(
-                                    `<h1 class="title_time_log"><span style="color: ${resp.log_book_records[i]['category_color']}">${resp.log_book_records[i]['category_name']}</span> | <span>${resp.log_book_records[i]['title']}</span></h1>`
+                                    `<h1 class="title_time_log"><span style="color: ${resp.log_book_records[i]['category_color']}">${resp.log_book_records[i]['category_name']}</span> | <span>${resp.log_book_records[i]['title'] || ''}</span></h1>`
                                 ));
                             else
                                 $(pannel_body).append($(
-                                    `<h1 class="title_time_log"><span>${resp.log_book_records[i]['title']}</span></h1>`
+                                    `<h1 class="title_time_log"><span>${resp.log_book_records[i]['title'] || ''}</span></h1>`
                                 ));
 
                             var details = document.createElement("p");
@@ -873,7 +874,7 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                             $(pannel_body).append($(` <div class="comment-number-bnt-info">
                             <a data-toggle="modal" onclick="daily_log_comment(${resp.log_book_records[i]['id']})" data-id="${resp.log_book_records[i]['date']}" href="#commentsModal" id="commentModal2" class="btn daily_log_comments_btn" style="background-color:#1f88b5;color:white;float:right;font-size: 10px;padding: 4px;margin-bottom:15px;">
                                         Comments
-                                        <span id="_${resp.log_book_records[i]['id']}" class="badge badge-primary badge-pill comment_badge">${resp.log_book_records[i]['comments']}</span>
+                                        <span id="_${resp.log_book_records[i]['id']}" class="badge badge-primary badge-pill comment_badge">${resp.log_book_records[i]['comments'] || 0}</span>
                                         </a>
                                         `));
                             pannel_body.append(date_field);
@@ -1038,11 +1039,11 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
 
                             if (resp.log_book_records[i]['category_name'])
                                 $(pannel_body).append($(
-                                    `<h1 class="title_time_log"><span style="color: ${resp.log_book_records[i]['category_color']}">${resp.log_book_records[i]['category_name']}</span> | <span>${resp.log_book_records[i]['title']}</span></h1>`
+                                    `<h1 class="title_time_log"><span style="color: ${resp.log_book_records[i]['category_color']}">${resp.log_book_records[i]['category_name']}</span> | <span>${resp.log_book_records[i]['title'] || ''}</span></h1>`
                                 ));
                             else
                                 $(pannel_body).append($(
-                                    `<h1 class="title_time_log"><span>${escapeHtml(resp.log_book_records[i]['title'])}</span></h1>`
+                                    `<h1 class="title_time_log"><span>${escapeHtml(resp.log_book_records[i]['title'] || '')}</span></h1>`
                                 ));
 
                             var details = document.createElement("p");
@@ -1089,7 +1090,7 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                             $(pannel_body).append($(` <div class="comment-number-bnt-info">
                         <a data-toggle="modal" onclick="daily_log_comment(${resp.log_book_records[i]['id']})" data-id="${resp.log_book_records[i]['date']}" href="#commentsModal" id="commentModal2" class="btn daily_log_comments_btn" style="background-color:#1f88b5;color:white;float:right;font-size: 10px;padding: 4px;margin-bottom:15px;">
                                     Comments
-                                    <span id="_${resp.log_book_records[i]['id']}" class="badge badge-primary badge-pill comment_badge">${resp.log_book_records[i]['comments']}</span>
+                                    <span id="_${resp.log_book_records[i]['id']}" class="badge badge-primary badge-pill comment_badge">${resp.log_book_records[i]['comments'] || 0}</span>
                                     </a> </div>
                                     `));
                             pannel_body.append(date_field);
@@ -1176,11 +1177,11 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
 
                             if (resp.log_book_records[i]['category_name'])
                                 $(pannel_body).append($(
-                                    `<h1 class="title_time_log"><span style="color: ${resp.log_book_records[i]['category_color']}">${resp.log_book_records[i]['category_name']}</span> | <span>${resp.log_book_records[i]['title']}</span></h1>`
+                                    `<h1 class="title_time_log"><span style="color: ${resp.log_book_records[i]['category_color']}">${resp.log_book_records[i]['category_name']}</span> | <span>${resp.log_book_records[i]['title'] || ''}</span></h1>`
                                 ));
                             else
                                 $(pannel_body).append($(
-                                    `<h1 class="title_time_log"><span>${escapeHtml(resp.log_book_records[i]['title'])}</span></h1>`
+                                    `<h1 class="title_time_log"><span>${escapeHtml(resp.log_book_records[i]['title'] || '')}</span></h1>`
                                 ));
 
                             var details = document.createElement("p");
@@ -1228,7 +1229,7 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                             $(pannel_body).append($(`<div class="comment-number-bnt-info">
                         <a data-toggle="modal" onclick="daily_log_comment(${resp.log_book_records[i]['id']})" data-id="${resp.log_book_records[i]['date']}" href="#commentsModal" id="commentModal2" class="btn daily_log_comments_btn" style="background-color:#1f88b5;color:white;float:right;font-size: 10px;padding: 4px;margin-bottom:15px;">
                                     Comments
-                                    <span id="_${resp.log_book_records[i]['id']}" class="badge badge-primary badge-pill comment_badge">${resp.log_book_records[i]['comments']}</span>
+                                    <span id="_${resp.log_book_records[i]['id']}" class="badge badge-primary badge-pill comment_badge">${resp.log_book_records[i]['comments'] || 0}</span>
                                     </a></div>
                                     `));
                             pannel_body.append(date_field);
@@ -1383,11 +1384,11 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
 
                             if (resp.log_book_records[i]['category_name'])
                                 $(pannel_body).append($(
-                                    `<h1 class="title_time_log"><span style="color: ${resp.log_book_records[i]['category_color']}">${resp.log_book_records[i]['category_name']}</span> | <span>${resp.log_book_records[i]['title']}</span></h1>`
+                                    `<h1 class="title_time_log"><span style="color: ${resp.log_book_records[i]['category_color']}">${resp.log_book_records[i]['category_name']}</span> | <span>${resp.log_book_records[i]['title'] || ''}</span></h1>`
                                 ));
                             else
                                 $(pannel_body).append($(
-                                    `<h1 class="title_time_log"><span>${resp.log_book_records[i]['title']}</span></h1>`
+                                    `<h1 class="title_time_log"><span>${resp.log_book_records[i]['title'] || ''}</span></h1>`
                                 ));
 
                             var details = document.createElement("p");
@@ -1433,7 +1434,7 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                             $(pannel_body).append($(`
                             <div class="comment-number-bnt-info"> <a data-toggle="modal" onclick="daily_log_comment(${resp.log_book_records[i]['id']})" data-id="${resp.log_book_records[i]['date']}" href="#commentsModal" id="commentModal2" class="btn daily_log_comments_btn" style="background-color:#1f88b5;color:white;float:right;font-size: 10px;padding: 4px;margin-bottom:15px;">
                                         Comments
-                                        <span id="_${resp.log_book_records[i]['id']}" class="badge badge-primary badge-pill comment_badge">${resp.log_book_records[i]['comments']}</span>
+                                        <span id="_${resp.log_book_records[i]['id']}" class="badge badge-primary badge-pill comment_badge">${resp.log_book_records[i]['comments'] || 0}</span>
                                         </a> </div>
                                         `));
 
@@ -1520,11 +1521,11 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
 
                             if (resp.log_book_records[i]['category_name'])
                                 $(pannel_body).append($(
-                                    `<h1 class="title_time_log"><span style="color: ${resp.log_book_records[i]['category_color']}">${resp.log_book_records[i]['category_name']}</span> | <span>${resp.log_book_records[i]['title']}</span></h1>`
+                                    `<h1 class="title_time_log"><span style="color: ${resp.log_book_records[i]['category_color']}">${resp.log_book_records[i]['category_name']}</span> | <span>${resp.log_book_records[i]['title'] || ''}</span></h1>`
                                 ));
                             else
                                 $(pannel_body).append($(
-                                    `<h1 class="title_time_log"><span>${resp.log_book_records[i]['title']}</span></h1>`
+                                    `<h1 class="title_time_log"><span>${resp.log_book_records[i]['title'] || ''}</span></h1>`
                                 ));
 
                             var details = document.createElement("p");
@@ -1571,7 +1572,7 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                             $(pannel_body).append($(`
                             <div class="comment-number-bnt-info">  <a data-toggle="modal" onclick="daily_log_comment(${resp.log_book_records[i]['id']})" data-id="${resp.log_book_records[i]['date']}" href="#commentsModal" id="commentModal2" class="btn daily_log_comments_btn" style="background-color:#1f88b5;color:white;float:right;font-size: 10px;padding: 4px;margin-bottom:15px;">
                                         Comments
-                                        <span id="_${resp.log_book_records[i]['id']}" class="badge badge-primary badge-pill comment_badge">${resp.log_book_records[i]['comments']}</span>
+                                        <span id="_${resp.log_book_records[i]['id']}" class="badge badge-primary badge-pill comment_badge">${resp.log_book_records[i]['comments'] || 0}</span>
                                         </a> </div>
                                         `));
                             pannel_body.append(date_field);
@@ -1683,7 +1684,7 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                                 `${resp.log_book_records[i]['category_name']}`);
 
                             var fa_check = document.createElement("i");
-                            fa_check.setAttribute("class", resp.log_book_records[i]['category_icon']);
+                            fa_check.setAttribute("class", resp.log_book_records[i]['category_icon']|| 'fa fa-question');
 
                             timeline_icon.append(fa_check);
 
@@ -1720,11 +1721,11 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
 
                             if (resp.log_book_records[i]['category_name'])
                                 $(pannel_body).append($(
-                                    `<h1 class="title_time_log"><span style="color: ${resp.log_book_records[i]['category_color']}">${resp.log_book_records[i]['category_name']}</span> | <span>${resp.log_book_records[i]['title']}</span></h1>`
+                                    `<h1 class="title_time_log"><span style="color: ${resp.log_book_records[i]['category_color']}">${resp.log_book_records[i]['category_name']}</span> | <span>${resp.log_book_records[i]['title'] || ''}</span></h1>`
                                 ));
                             else
                                 $(pannel_body).append($(
-                                    `<h1 class="title_time_log"><span>${resp.log_book_records[i]['title']}</span></h1>`
+                                    `<h1 class="title_time_log"><span>${resp.log_book_records[i]['title'] || ''}</span></h1>`
                                 ));
 
                             var details = document.createElement("p");
@@ -1770,7 +1771,7 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                             $(pannel_body).append($(`
                             <div class="comment-number-bnt-info">  <a data-toggle="modal" onclick="daily_log_comment(${resp.log_book_records[i]['id']})" data-id="${resp.log_book_records[i]['date']}" href="#commentsModal" id="commentModal2" class="btn daily_log_comments_btn" style="background-color:#1f88b5;color:white;float:right;font-size: 10px;padding: 4px;margin-bottom:15px;">
                                         Comments
-                                        <span id="_${resp.log_book_records[i]['id']}" class="badge badge-primary badge-pill comment_badge">${resp.log_book_records[i]['comments']}</span>
+                                        <span id="_${resp.log_book_records[i]['id']}" class="badge badge-primary badge-pill comment_badge">${resp.log_book_records[i]['comments'] || 0}</span>
                                         </a></div>
                                         `));
 
@@ -1857,11 +1858,11 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
 
                             if (resp.log_book_records[i]['category_name'])
                                 $(pannel_body).append($(
-                                    `<h1 class="title_time_log"><span style="color: ${resp.log_book_records[i]['category_color']}">${resp.log_book_records[i]['category_name']}</span> | <span>${resp.log_book_records[i]['title']}</span></h1>`
+                                    `<h1 class="title_time_log"><span style="color: ${resp.log_book_records[i]['category_color']}">${resp.log_book_records[i]['category_name']}</span> | <span>${resp.log_book_records[i]['title'] || ''}</span></h1>`
                                 ));
                             else
                                 $(pannel_body).append($(
-                                    `<h1 class="title_time_log"><span>${resp.log_book_records[i]['title']}</span></h1>`
+                                    `<h1 class="title_time_log"><span>${resp.log_book_records[i]['title'] || ''}</span></h1>`
                                 ));
 
                             var details = document.createElement("p");
@@ -1908,7 +1909,7 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                             $(pannel_body).append($(`
                             <div class="comment-number-bnt-info"> <a data-toggle="modal" onclick="daily_log_comment(${resp.log_book_records[i]['id']})" data-id="${resp.log_book_records[i]['date']}" href="#commentsModal" id="commentModal2" class="btn daily_log_comments_btn" style="background-color:#1f88b5;color:white;float:right;font-size: 10px;padding: 4px;margin-bottom:15px;">
                                         Comments
-                                        <span id="_${resp.log_book_records[i]['id']}" class="badge badge-primary badge-pill comment_badge">${resp.log_book_records[i]['comments']}</span>
+                                        <span id="_${resp.log_book_records[i]['id']}" class="badge badge-primary badge-pill comment_badge">${resp.log_book_records[i]['comments'] || 0}</span>
                                         </a> </div>
                                         `));
                             pannel_body.append(date_field);
@@ -2060,11 +2061,11 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
 
                             if (resp.log_book_records[i]['category_name'])
                                 $(pannel_body).append($(
-                                    `<h1 class="title_time_log"><span style="color: ${resp.log_book_records[i]['category_color']}">${resp.log_book_records[i]['category_name']}</span> | <span>${resp.log_book_records[i]['title']}</span></h1>`
+                                    `<h1 class="title_time_log"><span style="color: ${resp.log_book_records[i]['category_color']}">${resp.log_book_records[i]['category_name']}</span> | <span>${resp.log_book_records[i]['title'] || ''}</span></h1>`
                                 ));
                             else
                                 $(pannel_body).append($(
-                                    `<h1 class="title_time_log"><span>${resp.log_book_records[i]['title']}</span></h1>`
+                                    `<h1 class="title_time_log"><span>${resp.log_book_records[i]['title'] || ''}</span></h1>`
                                 ));
 
                             var details = document.createElement("p");
@@ -2108,7 +2109,7 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                             $(pannel_body).append($(`
                             <div class="comment-number-bnt-info">  <a data-toggle="modal" onclick="daily_log_comment(${resp.log_book_records[i]['id']})" data-id="${resp.log_book_records[i]['date']}" href="#commentsModal" id="commentModal2" class="btn daily_log_comments_btn" style="background-color:#1f88b5;color:white;float:right;font-size: 10px;padding: 4px;margin-bottom:15px;">
                                         Comments
-                                        <span id="_${resp.log_book_records[i]['id']}" class="badge badge-primary badge-pill comment_badge">${resp.log_book_records[i]['comments']}</span>
+                                        <span id="_${resp.log_book_records[i]['id']}" class="badge badge-primary badge-pill comment_badge">${resp.log_book_records[i]['comments'] || 0}</span>
                                         </a> </div>
                                         `));
 
@@ -2195,11 +2196,11 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
 
                             if (resp.log_book_records[i]['category_name'])
                                 $(pannel_body).append($(
-                                    `<h1 class="title_time_log"><span style="color: ${resp.log_book_records[i]['category_color']}">${resp.log_book_records[i]['category_name']}</span> | <span>${resp.log_book_records[i]['title']}</span></h1>`
+                                    `<h1 class="title_time_log"><span style="color: ${resp.log_book_records[i]['category_color']}">${resp.log_book_records[i]['category_name']}</span> | <span>${resp.log_book_records[i]['title'] || ''}</span></h1>`
                                 ));
                             else
                                 $(pannel_body).append($(
-                                    `<h1 class="title_time_log"><span>${resp.log_book_records[i]['title']}</span></h1>`
+                                    `<h1 class="title_time_log"><span>${resp.log_book_records[i]['title'] || ''}</span></h1>`
                                 ));
 
                             var details = document.createElement("p");
@@ -2244,7 +2245,7 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                             $(pannel_body).append($(` <div class="comment-number-bnt-info">
                             <a data-toggle="modal" onclick="daily_log_comment(${resp.log_book_records[i]['id']})" data-id="${resp.log_book_records[i]['date']}" href="#commentsModal" id="commentModal2" class="btn daily_log_comments_btn" style="background-color:#1f88b5;color:white;float:right;font-size: 10px;padding: 4px;margin-bottom:15px;">
                                         Comments
-                                        <span id="_${resp.log_book_records[i]['id']}" class="badge badge-primary badge-pill comment_badge">${resp.log_book_records[i]['comments']}</span>
+                                        <span id="_${resp.log_book_records[i]['id']}" class="badge badge-primary badge-pill comment_badge">${resp.log_book_records[i]['comments'] || 0}</span>
                                         </a> </div>
                                         `));
                             pannel_body.append(date_field);

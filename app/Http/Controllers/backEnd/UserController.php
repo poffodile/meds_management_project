@@ -8,6 +8,7 @@ use App\User, App\Home, App\UserQualification, App\AccessLevel;
 use DB; 
 use Hash;
 use Illuminate\Support\Facades\Mail;
+use App\Models\CompanyDepartment;
 
 class UserController extends Controller
 {
@@ -160,12 +161,14 @@ class UserController extends Controller
                 } 
             else
                 {
-                     return redirect()->back()->with('error', 'Some error occurred. Please try after sometime.');
+                    return redirect()->back()->with('error', 'Some error occurred. Please try after sometime.');
                 }
         }
+        
         $access_levels  = AccessLevel::select('id','name')->where('home_id', $home_id)->get()->toArray();
         $page = 'users';
-        return view('backEnd.user_form', compact('page','access_levels'));
+        $company_departments = CompanyDepartment::getActiveCompanyDepartment();
+        return view('backEnd.user_form', compact('page','access_levels','company_departments'));
     }
             
     public function edit(Request $request, $user_id) {   
@@ -295,7 +298,8 @@ class UserController extends Controller
 
         $access_levels  = AccessLevel::select('id','name')->where('home_id', $home_id)->get()->toArray();
         $page = 'users';
-        return view('backEnd/user_form', compact('user_info','page','access_levels','del_status'));
+        $company_departments = CompanyDepartment::getActiveCompanyDepartment();
+        return view('backEnd/user_form', compact('user_info','page','access_levels','del_status', 'company_departments'));
     }
 
     public function delete($user_id) {   

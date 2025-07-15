@@ -150,3 +150,35 @@ $(document).on('click','.conf-del', function(){
         return false;
     }
 }); 
+
+
+
+
+
+
+
+  const inputs = document.querySelectorAll('.dd-input');
+
+  // Handle dropdown behavior like radio buttons
+  inputs.forEach(input => {
+    input.addEventListener('change', () => {
+      if (input.checked) {
+        inputs.forEach(otherInput => {
+          if (otherInput !== input) {
+            otherInput.checked = false;
+          }
+        });
+      }
+    });
+  });
+
+  // Close dropdown when clicking outside
+  document.addEventListener('click', function (e) {
+    inputs.forEach(input => {
+      // Check if the click target is outside the dropdown wrapper
+      const dropdown = input.closest('.dropdown'); // Adjust selector to match your wrapper
+      if (dropdown && !dropdown.contains(e.target)) {
+        input.checked = false;
+      }
+    });
+  });

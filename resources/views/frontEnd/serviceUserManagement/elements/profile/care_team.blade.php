@@ -1,5 +1,6 @@
 <?php 
-    $default_img = careTeam.'/default_user.jpg';
+    $name = '/default_user.jpg';
+    $default_img = url(careTeam.$name);
 ?>
 
 <div class="col-md-12">
@@ -8,15 +9,16 @@
         </h3>
         
         <?php foreach($care_team as $member){
-            $image = careTeam.'/default_user.jpg';
+        
+            $image = url(careTeam.$name);
             if(!empty($member->image)){
-                $image = careTeam.'/'.$member->image;
+                $image = url(careTeam.'/'.$member->image);
             }
         ?>
         <div class=" wk-progress tm-membr">
             <div class="col-md-2 col-xs-2">
                 <div class="tm-avatar">
-                    <img src="{{ env('ASSETS_URL') }}{{ $image }}" alt=""/>
+                    <img src="{{ $image }}" alt=""/>
                 </div>
             </div>
             <div class="col-md-7 col-xs-7">
@@ -163,9 +165,9 @@
 
 <?php    
     foreach ($care_team as $team) { 
-        $image1 = careTeam.'/default_user.jpg';
+        $image1 = url(careTeam.$name);
         if(!empty($team->image)) {
-            $image1 = careTeam.'/'.$team->image;
+            $image1 = url(careTeam.'/'.$team->image);
     }
 ?>
 

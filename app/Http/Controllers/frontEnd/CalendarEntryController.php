@@ -140,10 +140,13 @@ class CalendarEntryController extends Controller //appointment controller
 
 		if($request->isMethod('post')){
 			$data = $request->input();
-			//echo '<pre>'; print_r($request->input()); die;
+			// echo '<pre>'; print_r($request->input()); die;
+			$home_ids = Auth::user()->home_id;
+			$ex_home_ids = explode(',', $home_ids);
+			$home_id=$ex_home_ids[0];
 
             $su_home_id = ServiceUser::where('id',$data['service_user_ids'])->value('home_id');
-            if($su_home_id != Auth::user()->home_id){
+            if($su_home_id != $home_id){
                 return redirect('/')->with('error',UNAUTHORIZE_ERR); 
             }
 
@@ -155,7 +158,7 @@ class CalendarEntryController extends Controller //appointment controller
 			}
 
 			$entry 						= new ServiceUserCalendarEvent;
-			$entry->home_id 			= Auth::user()->home_id;
+			$entry->home_id 			= $home_id;
 			$entry->service_user_id 	= $data['service_user_ids'];
 			$entry->plan_builder_id 	= $data['plan_builder_id'];
 			$entry->title 				= $data['entry_title'];
@@ -171,7 +174,7 @@ class CalendarEntryController extends Controller //appointment controller
                 $notification->event_id                        = $entry->id;
                 $notification->notification_event_type_id      = '19';
                 $notification->event_action                    = 'ADD';      
-                $notification->home_id                         = Auth::user()->home_id;
+                $notification->home_id                         = $home_id;
                 $notification->user_id                         = Auth::user()->id;        
                 $notification->save();
                 //saving notification end
@@ -196,8 +199,10 @@ class CalendarEntryController extends Controller //appointment controller
 			$data = $request->input();
 			
 			$service_user_id = $data['su_id'];
-
-			$usr_home_id  = Auth::user()->home_id;
+			$home_ids = Auth::user()->home_id;
+			$ex_home_ids = explode(',', $home_ids);
+			// $usr_home_id  = Auth::user()->home_id;
+			$usr_home_id  = $ex_home_ids[0];
 			
 			$su_home_id   = ServiceUser::where('id',$service_user_id)->value('home_id');
             if($su_home_id != $usr_home_id){

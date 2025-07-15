@@ -4,6 +4,7 @@ namespace App\Http\Controllers\frontEnd\salesFinance\asset;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 use App\Models\DepreciationType;
 use App\Models\AssetCategory;
 use App\Models\AssetRegistration;
@@ -20,7 +21,18 @@ class AssetController extends Controller
     public function asset_register(Request $request){
 
         $data['page']='assets';
-        $data['list']=AssetRegistration::getAllAssetRegistration()->get();
+        $cat_id=base64_decode($request->cat);
+        $query=AssetRegistration::getAllAssetRegistration();
+        $selected_cat_id=0;
+        if(isset($cat_id) && $cat_id !=''){
+            $selected_cat_id=$cat_id;
+            $query->where('asset_type',$cat_id);
+        }
+        $data['list']=$query->orderBy('id','desc')->get();
+        // echo "<pre>";print_r($data['list']);die;
+        $data['AssetCategoryList']=AssetCategory::getAllAssetCategory()->where('status',1)->get();
+        $data['DepreciationTypeList']=DepreciationType::getDepreciationType()->where('status',1)->get();
+        $data['selected_cat_id']=$selected_cat_id;
         return view('frontEnd.salesAndFinance.asset.assetRegisterList',$data);
     }
     public function asset_regiser_add(Request $request){
@@ -74,9 +86,9 @@ class AssetController extends Controller
         try {
             $asset_category = AssetCategory::saveAssetCategory($request->all());
             if($request->id == ''){
-                return response()->json(['success' => true,'message'=>'The Aseet Category has been saved succesfully.', 'data' => $asset_category]);
+                return response()->json(['success' => true,'message'=>'The Aseet Category has been saved successfully.', 'data' => $asset_category]);
             }else{
-                return response()->json(['success' => true,'message'=>'The Aseet Category has been updated succesfully.', 'data' => $asset_category]);
+                return response()->json(['success' => true,'message'=>'The Aseet Category has been updated successfully.', 'data' => $asset_category]);
             }
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
@@ -107,9 +119,11 @@ class AssetController extends Controller
     }
     public function asset_register_search(Request $request){
         // echo "<pre>";print_r($request->all());die;
+        $startDate=Carbon::parse($request->start_date)->format('Y-m-d');
+        $endDate=Carbon::parse($request->end_date)->format('Y-m-d');
         $query = AssetRegistration::getAllAssetRegistration();
         if ($request->filled('start_date') && $request->filled('end_date')) {
-            $query->whereBetween('date', [$request->start_date, $request->end_date]);
+            $query->whereBetween('date', [$startDate, $endDate]);
         }
         $list = $query->get();
         return response()->json(['success' => true,'message'=>'Search List.', 'data' => $list]);
@@ -119,6 +133,16 @@ class AssetController extends Controller
         // echo "<pre>";print_r($request->all());die;
         try{
             AssetRegistration::find($request->id)->update(['deleted_at' => now()]);
+            return response()->json(['success'=>true,'message'=>'Deleted Successfully done']);
+        }catch (\Exception $e) {
+            // Log::error('Error saving Tag: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+    public function asset_category_delete(Request $request){
+        // echo "<pre>";print_r($request->all());die;
+        try{
+            AssetCategory::find($request->id)->update(['deleted_at' => now()]);
             return response()->json(['success'=>true,'message'=>'Deleted Successfully done']);
         }catch (\Exception $e) {
             // Log::error('Error saving Tag: ' . $e->getMessage());

@@ -9,13 +9,16 @@ class EarningSchemeController extends ServiceUserManagementController
 {
     public function index($service_user_id = null){
        
-        $home_id = Auth::user()->home_id;
+        // $home_id = Auth::user()->home_id;
+        $home_ids = Auth::user()->home_id;
+        $ex_home_ids = explode(',', $home_ids);
+        $home_id=$ex_home_ids[0];
         $today = date('Y-m-d 00:0:00');
         // update notify
         $updatenotify = array('read_notify'=>1);
-        DB::table('su_education_record')->where('service_user_id',$service_user_id)->where('home_id',Auth::user()->home_id)->update($updatenotify);
-        DB::table('su_living_skill')->where('service_user_id',$service_user_id)->where('home_id',Auth::user()->home_id)->update($updatenotify);
-        DB::table('su_daily_record')->where('service_user_id',$service_user_id)->where('home_id',Auth::user()->home_id)->update($updatenotify);
+        DB::table('su_education_record')->where('service_user_id',$service_user_id)->where('home_id',$home_id)->update($updatenotify);
+        DB::table('su_living_skill')->where('service_user_id',$service_user_id)->where('home_id',$home_id)->update($updatenotify);
+        DB::table('su_daily_record')->where('service_user_id',$service_user_id)->where('home_id',$home_id)->update($updatenotify);
         // update notify
         $su_home_id = ServiceUser::where('id',$service_user_id)->value('home_id');
         if($su_home_id != $home_id){
@@ -220,9 +223,11 @@ class EarningSchemeController extends ServiceUserManagementController
     public function add_to_calendar(Request $request) {
 
         $data = $request->input();
-        
+        $home_ids = Auth::user()->home_id;
+        $ex_home_ids = explode(',', $home_ids);
+        $home_id=$ex_home_ids[0];
         $su_home_id = ServiceUser::where('id',$data['service_user_id'])->value('home_id');
-        if($su_home_id != Auth::user()->home_id){
+        if($su_home_id != $home_id){
             return redirect()->back()->with("error",UNAUTHORIZE_ERR);
         }
 
@@ -258,7 +263,7 @@ class EarningSchemeController extends ServiceUserManagementController
                     $notification->event_id                   = $clndr_incentive->id;
                     $notification->notification_event_type_id = '3';
                     $notification->event_action               = 'SPEND_STAR';     
-                    $notification->home_id                    = Auth::user()->home_id;
+                    $notification->home_id                    = $home_id;
                     $notification->user_id                    = Auth::user()->id;                 
                     $notification->save();
 
@@ -276,7 +281,10 @@ class EarningSchemeController extends ServiceUserManagementController
     public function remove_star(Request $request, $service_user_id = null){
 
         $su_home_id = ServiceUser::where('id',$service_user_id)->value('home_id');
-        if($su_home_id != Auth::user()->home_id)    {
+        $home_ids = Auth::user()->home_id;
+        $ex_home_ids = explode(',', $home_ids);
+        $home_id=$ex_home_ids[0];
+        if($su_home_id != $home_id)    {
             return redirect()->back()->with("error",UNAUTHORIZE_ERR);
         }
 
@@ -302,7 +310,7 @@ class EarningSchemeController extends ServiceUserManagementController
                 //$notification->event_type      = 'SU_ER';
                 $notification->notification_event_type_id = '3';
                 $notification->event_action               = 'REMOVE_STAR';     
-                $notification->home_id                    = Auth::user()->home_id;
+                $notification->home_id                    = $home_id;
                 $notification->user_id                    = Auth::user()->id;                 
                 $notification->save();
                 //saving notification end
@@ -349,9 +357,11 @@ class EarningSchemeController extends ServiceUserManagementController
     public function incentive_suspend(Request $request) {
 
         $data = $request->input();
-
+        $home_ids = Auth::user()->home_id;
+        $ex_home_ids = explode(',', $home_ids);
+        $home_id=$ex_home_ids[0];
         $su_home_id = ServiceUser::where('id',$data['service_user_id'])->value('home_id');
-        if($su_home_id != Auth::user()->home_id){
+        if($su_home_id != $home_id){
             return redirect()->back()->with("error",UNAUTHORIZE_ERR);
         }
 
@@ -425,7 +435,10 @@ class EarningSchemeController extends ServiceUserManagementController
         $service_user_id = $data['service_user_id'];
 
         $su_home_id = ServiceUser::where('id',$service_user_id)->value('home_id');
-        if($su_home_id != Auth::user()->home_id){
+        $home_ids = Auth::user()->home_id;
+        $ex_home_ids = explode(',', $home_ids);
+        $home_id=$ex_home_ids[0];
+        if($su_home_id != $home_id){
             return redirect()->back()->with("error",UNAUTHORIZE_ERR);
         }
 

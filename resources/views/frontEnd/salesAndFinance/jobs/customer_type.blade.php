@@ -182,9 +182,12 @@
                 var home_id='<?php echo $home_id;?>'
                 var id=$("#id").val();
                 var message;
+                var url;
                 if(id == ''){
+                    url="{{url('/save_customer_type')}}";
                     message= "Added Successfully Done";
                 } else {
+                    url="{{url('/edit_customer_type')}}";
                     message= "Editted Successfully Done";
                 }
                 if(title == ''){
@@ -193,7 +196,7 @@
                 }else {
                         $.ajax({
                         type: "POST",
-                        url: "{{url('/save_customer_type')}}",
+                        url: url,
                         data: {id:id,home_id:home_id,title:title,status:status,_token:token},
                         success: function(data) {
                             console.log(data);
@@ -234,7 +237,7 @@
             var model="Customer_type";
             $.ajax({
                 type: "POST",
-                url: "{{url('/status_change')}}",
+                url: "{{url('/customer_type_status_change')}}",
                 data: {id:id,status:status,model:model,_token:token},
                 success: function(data) {
                     console.log(data);

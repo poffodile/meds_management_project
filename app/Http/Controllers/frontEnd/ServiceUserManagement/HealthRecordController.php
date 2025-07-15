@@ -4,18 +4,19 @@ namespace App\Http\Controllers\frontEnd\ServiceUserManagement;
 
 use App\Http\Controllers\frontEnd\ServiceUserManagementController;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use DB, Auth;
-use App\DynamicFormBuilder, App\DynamicForm, App\ServiceUserHealthRecord, App\Notification, App\ServiceUser, App\User, App\LogBook, App\ServiceUserLogBook, App\LogBookComment, App\CategoryFrontEnd, App\EarningScheme, App\DynamicFormLocation;
-//use App\User,App\LogBook, App\ServiceUserLogBook, App\LogBookComment, App\CategoryFrontEnd;
+use App\DynamicFormBuilder, App\DynamicForm, App\ServiceUserHealthRecord, App\Notification, App\ServiceUser, App\User, App\EarningScheme, App\DynamicFormLocation;
 
 class HealthRecordController extends ServiceUserManagementController
 {
     public function index(Request $request, $service_user_id = null)
     {
-
+        
         $data = $request->input();
-        $home_id = Auth::user()->home_id;
+        // $home_id = Auth::user()->home_id;
+        $home_ids = Auth::user()->home_id;
+        $ex_home_ids = explode(',', $home_ids);
+        $home_id=$ex_home_ids[0];
         $user_id = Auth::user()->id;
         $today = date('Y-m-d 00:0:00');
         $service_users = ServiceUser::select('id', 'name')
@@ -23,7 +24,7 @@ class HealthRecordController extends ServiceUserManagementController
             ->where('is_deleted', '0')
             ->get();
         $staff_members  =   User::where('is_deleted', '0')
-            ->where('home_id', Auth::user()->home_id)
+            ->where('home_id', $home_id)
             ->get();
 
         $su_home_id = ServiceUser::where('id', $service_user_id)->value('home_id');
@@ -33,7 +34,7 @@ class HealthRecordController extends ServiceUserManagementController
         //filter
         //    update notify
         $updatenotify = array('read_notify' => 1);
-        DB::table('su_health_record')->where('service_user_id', $service_user_id)->where('home_id', Auth::user()->home_id)->update($updatenotify);
+        DB::table('su_health_record')->where('service_user_id', $service_user_id)->where('home_id', $home_id)->update($updatenotify);
         //    update notify
 
         if (!empty($data)) {
@@ -134,32 +135,29 @@ class HealthRecordController extends ServiceUserManagementController
     // }
     public function add(Request $request)
     {
-
         $data = $request->input();
-
+        // dd($data);
 
         if (!empty($data)) {
-
             //save form
+            $home_ids = Auth::user()->home_id;
+            $ex_home_ids = explode(',', $home_ids);
+            $home_id=$ex_home_ids[0];
             $formdata = json_encode($data);
-            $service_user_id = $data['service_user_id'];
+            $service_user_id        = $data['service_user_id'];
             $form                   = new DynamicForm;
-            $form->home_id          = Auth::user()->home_id;
+            $form->home_id          = $home_id;
             $form->user_id          = Auth::user()->id;
             $form->form_builder_id  = $data['dynamic_form_builder_id'];
-            $form->service_user_id = $data['service_user_id'];
+            $form->service_user_id  = $data['service_user_id'];
             $form->location_id      = $data['location_id'];
-            // $form->title            = $data['title'];
-            $form->title            = null;
-            // $form->time             = $data['time']; 
-            $form->time             = null;
-            // $form->details          = $data['details']; 
-            $form->details          = null;
+            $form->title            = $data['title'];
+            $form->time             = $data['time']; 
+            $form->details          = $data['details']; 
             $form->pattern_data     = $formdata;
 
             if (isset($data['alert_status'])) {
                 $form->alert_status     = $data['alert_status'];
-
                 if ($data['alert_status'] == '1') {
                     if (!empty($data['alert_date'])) {
                         $form->alert_date   = date('Y-m-d', strtotime($data['alert_date']));
@@ -175,7 +173,6 @@ class HealthRecordController extends ServiceUserManagementController
             }
 
             if ($form->save()) {
-
                 $location_id = $data['location_id'];
                 $location_tag = DynamicFormLocation::where('id', $location_id)->value('tag');
                 $notification_event_type_id = DB::table('notification_event_type')->where('table_linked', 'LIKE', 'su_' . $location_tag)->value('id');
@@ -185,7 +182,7 @@ class HealthRecordController extends ServiceUserManagementController
                     $notification->event_id                   = $form->id;
                     $notification->notification_event_type_id = $notification_event_type_id;
                     $notification->event_action               = 'ADD';
-                    $notification->home_id                    = Auth::user()->home_id;
+                    $notification->home_id                    = $home_id;
                     $notification->user_id                    = Auth::user()->id;
                     $notification->save();
                 }
@@ -195,10 +192,9 @@ class HealthRecordController extends ServiceUserManagementController
                         $s_type = explode('-', $sender);
 
                         if ($s_type[0] == 'ct') {
-
                             $type = 'ct';
                             $care_team_id = $s_type[1];
-                            //Parent::sendEmailNotificationDynamicForm($care_team_id, $type, $data['service_user_id'], $data['dynamic_form_builder_id']);
+                            // Parent::sendEmailNotificationDynamicForm($care_team_id, $type, $data['service_user_id'], $data['dynamic_form_builder_id']);
                         } else if ($s_type[0] ==  'sc') {
                             // echo "sc_yes";
                             $type = 'sc';
@@ -211,8 +207,7 @@ class HealthRecordController extends ServiceUserManagementController
             } else {
                 $form_insert_id = '0';
             }
-            // print_r($form_insert_id);
-            // die;
+            // echo "<br>"; print_r($form_insert_id);  die;
 
             if ($form_insert_id != 0) {
 
@@ -234,7 +229,7 @@ class HealthRecordController extends ServiceUserManagementController
                         'category_icon' => 'fa fa-users',
                         'date' => date('Y-m-d H:i:s', strtotime($data['date'])),
                         'details' => $data['details'],
-                        'home_id' => Auth::user()->home_id,
+                        'home_id' => $home_id,
                         'user_id' => Auth::user()->id,
                         'image_name' => '',
                         'is_late' => 0,
@@ -258,22 +253,19 @@ class HealthRecordController extends ServiceUserManagementController
                     }
                 } else {
                     $insert_su_health_record = array(
-                        'home_id' => Auth::user()->home_id,
+                        'home_id' => $home_id,
                         'service_user_id' => $data['service_user_id'],
                         'contact_id' => 0,
                         'care_team_id' => 0,
-                        // 'title'=>$data['title'],
-                        'title' => null,
+                        'title'=>$data['title'],
                         'status' => 1,
-                        // 'details'=>$data['details'],
-                        'details' => null,
+                        'details'=>$data['details'],
                         'is_deleted' => 0,
                         'created_at' => date('Y-m-d H:i:s'),
                         'updated_at' => date('Y-m-d H:i:s'),
                     );
                     DB::table('su_health_record')->insert($insert_su_health_record);
                 }
-
                 //sourabh log insert
 
                 return 'true';
@@ -281,7 +273,6 @@ class HealthRecordController extends ServiceUserManagementController
                 return 'false';
             }
         } else {
-
             return 'false';
         }
     }
@@ -292,7 +283,9 @@ class HealthRecordController extends ServiceUserManagementController
         if ($request->isMethod('post')) {
 
             $data = $request->input();
-
+            $home_ids = Auth::user()->home_id;
+            $ex_home_ids = explode(',', $home_ids);
+            $home_id=$ex_home_ids[0];
             if (isset($data['edit_health_record_id'])) {
 
                 $edit_health_record_id = $data['edit_health_record_id'];
@@ -303,7 +296,7 @@ class HealthRecordController extends ServiceUserManagementController
 
                     $su_home_id = ServiceUser::where('id', $health_record->service_user_id)->value('home_id');
 
-                    if ($su_home_id == Auth::user()->home_id) {
+                    if ($su_home_id == $home_id) {
 
                         $health_record->title = $data['edit_health_record_title'][$key];
                         $health_record->save();
@@ -312,13 +305,13 @@ class HealthRecordController extends ServiceUserManagementController
             }
 
             //saving notification start
-            $notification                             = new Notification;
+            $notification                             = new Notification;   
             $notification->service_user_id            = $data['service_user_id'];
             $notification->event_id                   = $health_record->id;
             // $notification->event_type      = 'SU_HR';
             $notification->notification_event_type_id = '1';
             $notification->event_action               = 'EDIT';
-            $notification->home_id                    = Auth::user()->home_id;
+            $notification->home_id                    = $home_id;
             $notification->user_id                    = Auth::user()->id;
             $notification->save();
             //saving notification end
@@ -332,12 +325,14 @@ class HealthRecordController extends ServiceUserManagementController
     public function delete($su_health_record_id = null)
     {
         $health_record = ServiceUserHealthRecord::find($su_health_record_id);
-
+        $home_ids = Auth::user()->home_id;
+        $ex_home_ids = explode(',', $home_ids);
+        $home_id=$ex_home_ids[0];
         if (!empty($health_record)) {
 
             $su_home_id = ServiceUser::where('id', $health_record->service_user_id)->value('home_id');
 
-            if ($su_home_id == Auth::user()->home_id) {
+            if ($su_home_id == $home_id) {
 
                 $res = ServiceUserHealthRecord::where('id', $su_health_record_id)->delete();
                 echo $res;

@@ -11,7 +11,10 @@ class MFCController extends ServiceUserManagementController
     // Listing in LOGGED & SEARCH MFC 
     public function index($service_user_id = null) {   
         $su_home_id = ServiceUser::where('id',$service_user_id)->value('home_id');
-        if(Auth::user()->home_id != $su_home_id){
+        $home_ids = Auth::user()->home_id;
+        $ex_home_ids = explode(',', $home_ids);
+        $home_id=$ex_home_ids[0];
+        if($home_id != $su_home_id){
             die; 
         }
         
@@ -174,6 +177,9 @@ class MFCController extends ServiceUserManagementController
     public function add(Request $request) {
         
         $data = $request->all();
+        $home_ids = Auth::user()->home_id;
+        $ex_home_ids = explode(',', $home_ids);
+        $home_id=$ex_home_ids[0];
         if($request->isMethod('post')) {
 
             if(isset($data['formdata'])){
@@ -183,13 +189,13 @@ class MFCController extends ServiceUserManagementController
             }
             $su_home_id = ServiceUser::where('id', $data['service_user_id'])->value('home_id');
 
-            if(Auth::user()->home_id != $su_home_id)  {
+            if($home_id != $su_home_id)  {
                 echo '0'; die;
             }
 
             $su_mfc                   = new ServiceUserMFC;
             $su_mfc->service_user_id  = $data['service_user_id'];
-            $su_mfc->home_id          = Auth::user()->home_id;
+            $su_mfc->home_id          = $home_id;
             $su_mfc->mfc_id           = $data['mfc_id'];
             $su_mfc->formdata         = $formdata;
 
@@ -217,7 +223,9 @@ class MFCController extends ServiceUserManagementController
     public function edit(Request $request, $su_mfc_id=null)  {
         
         $data=$request->all();
-        
+        $home_ids = Auth::user()->home_id;
+        $ex_home_ids = explode(',', $home_ids);
+        $home_id=$ex_home_ids[0];
         if($request->isMethod('post'))  {
 
             if(isset($data['formdata']))  {
@@ -228,10 +236,10 @@ class MFCController extends ServiceUserManagementController
             }
         }
 
-        $home_id = Auth::user()->home_id;
+        // $home_id = Auth::user()->home_id;
         $su_home_id = ServiceUser::where('id', $data['service_user_id'])->value('home_id');
         
-        if($su_home_id != Auth::user()->home_id) {
+        if($su_home_id != $home_id) {
             echo 0; die;
         }
         

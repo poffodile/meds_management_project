@@ -169,9 +169,13 @@
 
         $('#saveChanges').on('click', function() {
             var formData = $('#lead_source_form').serialize();
-
+            var id=$("#lead_source_id").val();
+            var url='{{ route("lead.ajax.saveLeadSource") }}';
+            if(id !=''){
+                url ='{{ route("lead.ajax.editLeadSource") }}';
+            }
             $.ajax({
-                url: '{{ route("lead.ajax.saveLeadSource") }}',
+                url: url,
                 method: 'POST',
                 data: formData,
                 success: function(response) {

@@ -11,7 +11,10 @@ class RiskController extends ServiceUserManagementController
 {
     public function index(Request $request,$service_user_id = null){
         $data = $request->input();
-        $home_id = Auth::user()->home_id;
+        $home_ids = Auth::user()->home_id;
+        $ex_home_ids = explode(',', $home_ids);
+        $home_id=$ex_home_ids[0];
+        // $home_id = Auth::user()->home_id;
         $user_id = Auth::user()->id;
         $today = date('Y-m-d 00:0:00');
         $service_users = ServiceUser::select('id','name')
@@ -19,7 +22,7 @@ class RiskController extends ServiceUserManagementController
                             ->where('is_deleted','0')
                             ->get();       
         $staff_members  =   User::where('is_deleted','0')
-                                ->where('home_id', Auth::user()->home_id)
+                                ->where('home_id', $home_id)
                                 ->get();
         
            $su_home_id = ServiceUser::where('id',$service_user_id)->value('home_id');
@@ -106,7 +109,7 @@ class RiskController extends ServiceUserManagementController
         
         
         $su_home_id = ServiceUser::where('id',$service_user_id)->value('home_id');
-        if($su_home_id != Auth::user()->home_id){
+        if($su_home_id != $home_id){
             echo ''; die;
         }
 

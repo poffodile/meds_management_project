@@ -497,7 +497,7 @@ if (isset($system_calendar)) {
                                             // $user_name = $log_book['staff_name'];
                                             if (empty($log_book['calendar_id'])) {
                                                 $pre_exist = 'Y'; ?>
-                                                <div class='external-event label label-log-book del_log_bok_rec' event_id="{{ $log_book['id'] }}" event_type="{{ $log_book['event_type'] }}" su_id="0" rec_type="log_book"> {{ $log['title'] }}
+                                                <div class='external-event label label-log-book del_log_bok_rec' event_id="{{ $log_book['id'] }}" event_type="{{ $log_book['event_type'] }}" su_id="0" rec_type="log_book"> {{ $log['title'] ?? "" }}
                                                     <span class="fa fa-close pull-right del_log_bok_rec dele"></span>
                                                 </div>
                                     <?php }

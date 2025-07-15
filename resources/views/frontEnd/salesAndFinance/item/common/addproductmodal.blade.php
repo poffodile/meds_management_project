@@ -1,5 +1,5 @@
 <style>
-    .generate-button {
+    /* .generate-button {
         height: 32px;
         padding: 0px 9px;
         background: #0877bd;
@@ -9,29 +9,40 @@
     .generate-button:hover {
         background-color: #0877bd;
         border-color: #0877bd;
+    } */
+
+    .producthidemessage {
+        display: none
     }
-    .producthidemessage{display:none}
-    .producthidemessagedanger{display:none}  
-   .Img_Title{
-    font-size: 18px;
-    font-weight: 500;
-    color: #000;
-   }
-    .uploadImgSec{
+
+    .producthidemessagedanger {
+        display: none
+    }
+
+    .Img_Title {
+        font-size: 18px;
+        font-weight: 500;
+        color: #000;
+    }
+
+    .uploadImgSec {
         padding: 0;
         list-style: none;
     }
-    .uploadImgSec li{
+
+    .uploadImgSec li {
         width: 112px;
         border: 1px solid #ddd;
         display: inline-block;
         margin-bottom: 4px;
         position: relative;
     }
+
     .uploadImgSec li img {
         width: 100%;
     }
-    .imgclose{
+
+    .imgclose {
         position: absolute;
         top: -13px;
         right: 0;
@@ -39,290 +50,225 @@
         font-size: 27px;
         text-decoration: none;
     }
-    .productimages{
+
+    .productimages {
         display: none;
     }
-    .productuploadedit{
+
+    .productuploadedit {
         display: none;
     }
 </style>
-<div class="modal fade" id="itemsAddProductModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false"
-    aria-labelledby="customerModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content add_Customer">
+<div class="modal fade" id="itemsAddProductModal" tabindex="-1" data-backdrop="static" data-keyboard="false" aria-labelledby="customerModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="customerModalLabel">Product</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">&times;</button>
+                <h4 class="modal-title" id="customerModalLabel">Product</h4>
             </div>
-            <div class="modal-body">
-                <form class="row g-3 needs-validationp" novalidate id="productform">
-                    @csrf
+            <form class="needs-validationp" novalidate id="productform">
+                @csrf
+                <div class="modal-body">
                     <div class="alert alert-success text-center productsuccess producthidemessage"></div>                              
                     <div class="alert alert-danger text-center productsuccessdanger producthidemessagedanger"></div>
-                <div class="row">
-                    <div class="col-md-6 col-lg-6 col-xl-6">
-                        <div class="formDtail mt-3">
-                            
-                            <div class="mb-2 row">
-                                <label for="inputName" class="col-sm-4 col-form-label">Customer</label>
-                                <div class="col-sm-8">
-                                    <div id="customerlist">
-                                        <select class="form-control editInput selectOptions" id="getCustomerList" name="customer_only">
-                                            <option value="">-All-</option>
+                    <div class="row">
+                        <div class="col-md-6 col-lg-6 col-xl-6">
+                            <div class="mb-3">
+                                <label>Customer</label>
+                                <div id="customerlist">
+                                    <select class="form-control editInput selectOptions" id="getCustomerList" name="customer_only">
+                                        <option value="">-All-</option>
+                                    </select>
+                                </div>
+                                <div id="onecustomer">
+                                    <label class="editInput"><input type="checkbox" name="customer_only" value=""> Yes Display for this customer only</label>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label>Product  Category</label>
+                                <div class="row">
+                                    <div class="col-sm-10">
+                                        <select class="form-control editInput selectOptions" id="productcategorylist" name="cat_id">
+                                            <option value="">- Any Category -</option>
                                         </select>
                                     </div>
-                                    <div id="onecustomer">
-                                        <label class="editInput"><input type="checkbox" name="customer_only" value=""> Yes Display for this customer only</label>
+                                    <div class="col-sm-2 ps-0">
+                                        <a href="#!" class="formicon" id="productCetagoryPopup"
+                                            onclick="additemsCatagoryModal(2)"><i class="fa fa-plus-square"></i></a>
                                     </div>
-                                    
                                 </div>
                             </div>
-                            <div class="mb-2 row">
-                                <label for="productcategorylist" class="col-sm-4 col-form-label">Product
-                                    Category</label>
-                                <div class="col-sm-7">
-                                    <select class="form-control editInput selectOptions" id="productcategorylist" name="cat_id">
-                                        <option value="">- Any Category -</option>
-                                    </select>
-                                </div>
-                                <div class="col-sm-1 ps-0">
-                                    <a href="#!" class="formicon" id="productCetagoryPopup"
-                                        onclick="additemsCatagoryModal(2)"><i class="fa-solid fa-square-plus"></i></a>
+                            <div class="mb-3">
+                                <label>Product Name <span class="radStar">*</span></label>
+                                <input type="text" class="form-control editInput" name="product_name" id="productname" value="" required>
+                            </div>
+                            <div class="mb-3">
+                                <label>Product Type</label>
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <select class="form-control editInput selectOptions" id="product_type" name="product_type">
+                                            <option value="1">Product</option>
+                                            <option value="2">Services</option>
+                                            <option value="3">Consumable</option>
+                                        </select>
+                                    </div>
+                                 <!-- <div class="col-sm-1 ps-0">
+                                        <a href="#!" class="formicon"><i class="fa fa-plus-square"></i></a>
+                                    </div> -->
                                 </div>
                             </div>
-
-                            <div class="mb-2 row">
-                                <label for="productname" class="col-sm-4 col-form-label">Product
-                                    Name <span class="radStar ">*</span></label>
-                                <div class="col-sm-8">
-                                    <input type="text" class="form-control editInput" name="product_name" id="productname"
-                                        value="" required>
-                                </div>
-                            </div>
-
-                            <div class="mb-2 row">
-                                <label for="inputProject" class="col-sm-4 col-form-label">Product
-                                    Type</label>
-                                <div class="col-sm-7">
-                                    <select class="form-control editInput selectOptions" id="product_type" name="product_type">
-                                        <option value="1">Product</option>
-                                        <option value="2">Services</option>
-                                        <option value="3">Consumable</option>
-                                    </select>
-                                </div>
-                                {{-- <div class="col-sm-1 ps-0">
-                                                    <a href="#!" class="formicon"><i
-                                                            class="fa-solid fa-square-plus"></i></a>
-                                                </div> --}}
-                            </div>
-
-                            <div class="mb-2 row">
-                                <label for="product_code" class="col-sm-4 col-form-label">Product
-                                    Code </label>
-                                <div class="col-sm-5">
-                                    <input type="text" class="form-control editInput" id="product_code"
-                                        placeholder="Product Code" name="product_code" value="">
-
-                                </div>
-                                <div class="col-sm-1 ps-0">
-                                    <button type="button" class="btn btn-primary generate-button"
-                                        id="generateproductcode">Generate</button>
+                            <div class="mb-3">
+                                <label>Product Code </label>
+                                <div class="row">
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control editInput" id="product_code" placeholder="Product Code" name="product_code" value="">
+                                    </div>
+                                    <div class="col-sm-4 ps-0">
+                                        <button type="button" class="btn btn-primary"
+                                            id="generateproductcode">Generate</button>
+                                    </div>
                                 </div>
                                 <span class="text-danger productcode_error"></span>
-
                             </div>
-                            <div class="mb-2 row">
-                                <label for="cost_price" class="col-sm-4 col-form-label">Cost Price
-                                </label>
-                                <div class="col-sm-8">
-                                    <input type="text" class="form-control editInput" id="cost_price" name="cost_price" value="">
-                                </div>
+                            <div class="mb-3">
+                                <label>Cost Price</label>
+                                <input type="text" class="form-control editInput" id="cost_price" name="cost_price" value="">
                             </div>
-                            <div class="mb-2 row">
-                                <label for="margin" class="col-sm-4 col-form-label">Markup</label>
-                                <div class="col-sm-8">
-                                    <input type="text" class="form-control editInput" id="margin" name="margin"
-                                        value="">
-                                </div>
-
+                            <div class="mb-3">
+                                <label>Markup</label>
+                                <input type="text" class="form-control editInput" id="Markup" name="Markup" value="">
                             </div>
-
-                            <div class="mb-2 row">
-                                <label for="inputMobile" class="col-sm-4 col-form-label">Price
-                                <span class="radStar ">*</span></label>
-                                <div class="col-sm-8">
-                                    <input type="text" class="form-control editInput" id="price" name="price" value="" required>
-                                </div>
+                            <div class="mb-3">
+                                <label>Price <span class="radStar ">*</span></label>
+                                <input type="text" class="form-control editInput" id="price" name="price" value="" required>
                             </div>
-
-                            <div class="mb-2 row">
-                                <label for="inputCounty" class="col-sm-4 col-form-label">Description</label>
-                                <div class="col-sm-8">
-                                    <textarea class="form-control textareaInput"  id="description" name="description" rows="3"
-                                        placeholder="Description"></textarea>
-                                </div>
+                            <div class="mb-3">
+                                <label>Description</label>
+                                <textarea class="form-control textareaInput"  id="description" name="description" rows="3" placeholder="Description"></textarea>
                             </div>
-
-                            <div class="mb-2 row">
-                                <label for="inputCounty" class="col-sm-4 col-form-label pt-0">
-                                    Show on Template
-                                </label>
-                                <div class="col-sm-8">
-                                    <span class="oNOfswich">
-                                        <input type="checkbox" name="show_temp" id="show_temp" value="1" checked>
-                                    </span>
-                                </div>
+                            <div class="mb-3 d-flex align-items-center gap-3">
+                                <label class="mb-0">Show on Template</label>
+                                <span class="oNOfswich p-0">
+                                    <input type="checkbox" name="show_temp" class="mt-0" id="show_temp" value="1" checked>
+                                </span>
                             </div>
-
-                            
                         </div>
-                    </div>
-
-                    <div class="col-md-6 col-lg-6 col-xl-6">
-                        <div class="formDtail mt-3">
-                            
-                                <div class="mb-2 row">
-                                    <label for="bar_code" class="col-sm-4 col-form-label">Bar
-                                        Code</label>
-                                    <div class="col-sm-8">
-                                        <input type="text" class="form-control editInput" id="bar_code"
-                                            value="" name="bar_code">
-                                    </div>
-                                </div>
-                                <div class="mb-2 row">
-                                    <label for="inputProject" class="col-sm-4 col-form-label">Sales
-                                        Tax Rate</label>
-                                    <div class="col-sm-7">
+                        <div class="col-md-6 col-lg-6 col-xl-6">
+                            <div class="mb-3">
+                                <label>Bar Code</label>
+                                <input type="text" class="form-control editInput" id="bar_code" value="" name="bar_code">
+                            </div>
+                            <div class="mb-3">
+                                <label>Sales Tax Rate</label>
+                                <div class="row">
+                                    <div class="col-sm-10">
                                         <select class="form-control editInput selectOptions" id="salestax"
                                             onclick="taxratelist(1)" name="tax_rate">
                                             <!-- <option value="20">Vat-20</option> -->
                                             <option value="">-Please Select-</option>
                                         </select>
                                     </div>
-                                    <div class="col-sm-1 ps-0">
+                                    <div class="col-sm-2 ps-0">
                                         <a href="#!" class="formicon" id="" onclick="taxrate(1)">
-                                            <i class="fa-solid fa-square-plus"></i>
+                                            <i class="fa fa-plus-square"></i>
                                         </a>
                                     </div>
-
                                 </div>
-
-                                <div class="mb-2 row">
-                                    <label for="inputProject" class="col-sm-4 col-form-label">Purchase
-                                        Tax Rate</label>
-                                    <div class="col-sm-7">
+                            </div>
+                            <div class="mb-3">
+                                <label>Purchase Tax Rate</label>
+                                <div class="row">
+                                    <div class="col-sm-10">
                                         <select class="form-control editInput selectOptions" id="purchasetax"
                                             onclick="taxratelist(2)" name="tax_id">
                                             <option value="">-Please Select-</option>
                                         </select>
                                     </div>
-                                    <div class="col-sm-1 ps-0">
+                                    <div class="col-sm-2 ps-0">
                                         <a href="#!" class="formicon" id="purchaseTaxRatePop"
                                             onclick="taxrate(2)">
-                                            <i class="fa-solid fa-square-plus"></i>
+                                            <i class="fa fa-plus-square"></i>
                                         </a>
                                     </div>
-
-
                                 </div>
-
-                                <div class="mb-2 row">
-                                    <label for="inputAddress" class="col-sm-4 col-form-label">Nominal
-                                        Code
-                                    </label>
-                                    <div class="col-sm-8">
-                                        <input type="text" class="form-control editInput" id="nominal_code"
-                                            value="" name="nominal_code">
-                                    </div>
-                                </div>
-
-                                <div class="mb-2 row">
-                                    <label for="inputCity" class="col-sm-4 col-form-label">Sales
-                                        A/c Code</label>
-                                    <div class="col-sm-8">
-                                        <select class="form-control editInput selectOptions" id="salesaccountcode"
-                                            onclick="accountcode(1)" name="sales_acc_code">
-                                            <option value="">--Please Select--</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="mb-2 row">
-                                    <label for="inputCity" class="col-sm-4 col-form-label">Purchase
-                                        A/c Code
-                                    </label>
-                                    <div class="col-sm-8">
-                                        <select class="form-control editInput selectOptions" id="purchaseaccountcode"
-                                            onclick="accountcode(2)" name="purchase_acc_code">
-                                            <option value="">--Please Select--</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="mb-2 row">
-                                    <label for="inputCity" class="col-sm-4 col-form-label">Expense
-                                        A/c Code</label>
-                                    <div class="col-sm-8">
-                                        <select class="form-control editInput selectOptions" id="Expenseaccountcode"
-                                            onclick="accountcode(3)" name="expense_acc_code">
-                                            <option value="">--Please Select--</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="mb-2 row">
-                                    <label for="location" class="col-sm-4 col-form-label">Location</label>
-                                    <div class="col-sm-8">
-                                        <input type="text" class="form-control editInput" id="location"
-                                            placeholder="Location" name="">
-                                    </div>
-                                </div>
-
-                                <div class="mb-2 row">
-                                    <label for="status" class="col-sm-4 col-form-label">Status</label>
-                                    <div class="col-sm-8">
-                                        <select class="form-control editInput selectOptions" id="status" name="status">
-                                            <option value="1">Active</option>
-                                            <option value="0">Inactive</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-
-                                <div class="mb-2 row">
-                                    <label for="attachment" class="col-sm-4 col-form-label">Attachment</label>
-                                    <div class="col-sm-8">
-                                        <input type="file" class="form-control editInput" id="attachment" name="attachment">
-                                        <input type="button" class="profileDrop productuploadedit" onclick="uploadproductimage()" value="Upload Image">
-                                    </div>
-                                    
-                                </div>
-                                <div class="mb-2 row productimages">
-                                    
-                                    <div class="col-sm-12">
-                                        <label class="Img_Title">Images</label>
-                                        <ul class="uploadImgSec" id="image-list">
-                                             {{-- <li> 
-                                                <img src="{{url('public/product/1729249431.jpg')}}" alt="uploadImg"> 
-                                                <a href="#!" class="imgclose">×</a>
-                                            </li>
-                                            <li> 
-                                                <img src="{{url('public/product/1729249431.jpg')}}" alt="uploadImg"> 
-                                                <a href="#!" class="imgclose">×</a>
-                                            </li>
-                                            <li> 
-                                                <img src="{{url('public/product/1729249431.jpg')}}" alt="uploadImg"> 
-                                                <a href="#!" class="imgclose">×</a>
-                                            </li>
-                                            <li> 
-                                                <img src="{{url('public/product/1729249431.jpg')}}" alt="uploadImg"> 
-                                                <a href="#!" class="imgclose">×</a>
-                                            </li> --}}
-                                             
-
-                                        </ul>                                       
-                                    </div>
-                                    
-                                </div>
-
-                            
+                            </div>
+                            <div class="mb-3">
+                                <label>Nominal Code</label>
+                                <input type="text" class="form-control editInput" id="nominal_code" value="" name="nominal_code">
+                            </div>
+                            <div class="mb-3">
+                                <label>Sales A/c Code</label>
+                                <select class="form-control editInput selectOptions" id="salesaccountcode"
+                                    onclick="accountcode(1)" name="sales_acc_code">
+                                    <option value="">--Please Select--</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label>Purchase A/c Code</label>
+                                <select class="form-control editInput selectOptions" id="purchaseaccountcode"
+                                    onclick="accountcode(2)" name="purchase_acc_code">
+                                    <option value="">--Please Select--</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label>Expense A/c Code</label>
+                                <select class="form-control editInput selectOptions" id="Expenseaccountcode"
+                                    onclick="accountcode(3)" name="expense_acc_code">
+                                    <option value="">--Please Select--</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label>Location</label>
+                                <input type="text" class="form-control editInput" id="location" placeholder="Location" name="">
+                            </div>
+                            <div class="mb-3">
+                                <label>Status</label>
+                                <select class="form-control editInput selectOptions" id="status" name="status">
+                                    <option value="1">Active</option>
+                                    <option value="0">Inactive</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label>Attachment</label>
+                                <!-- <div class="col-md-12 p-0">
+                                        <div class="fileupload fileupload-new" data-provides="fileupload">
+                                            <div class="fileupload-new thumbnail" style="max-width: 200px; max-height: 150px; min-width: 150px; min-height: 100px; line-height: 100px;">
+                                                <img src="{{url('public/images/noimage.jpg')}}" alt="No Image" />
+                                            </div>
+                                            <div class="fileupload-preview fileupload-exists thumbnail" style="max-width: 200px; max-height: 150px; min-width: 150px; min-height: 100px; line-height: 20px;"></div>
+                                            <div>
+                                                <span class="btn btn-white btn-file">
+                                                    <span class="fileupload-new"><i class="fa fa-paper-clip"></i> Select image</span>
+                                                    <span class="fileupload-exists"><i class="fa fa-undo"></i> Change</span>
+                                                    <input name="attachment" type="file" class="default" id="attachment"  onclick="uploadproductimage()"  />
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div> -->
+                                <input type="file" class="form-control editInput" id="attachment" name="attachment">
+                                <input type="button" class="profileDrop productuploadedit" onclick="uploadproductimage()" value="Upload Image">
+                            </div>
+                            <div class="mb-2 productimages">
+                                <label class="Img_Title">Images</label>
+                                <ul class="uploadImgSec" id="image-list">
+                                        {{-- <li> 
+                                        <img src="{{url('public/product/1729249431.jpg')}}" alt="uploadImg"> 
+                                        <a href="#!" class="imgclose">×</a>
+                                    </li>
+                                    <li> 
+                                        <img src="{{url('public/product/1729249431.jpg')}}" alt="uploadImg"> 
+                                        <a href="#!" class="imgclose">×</a>
+                                    </li>
+                                    <li> 
+                                        <img src="{{url('public/product/1729249431.jpg')}}" alt="uploadImg"> 
+                                        <a href="#!" class="imgclose">×</a>
+                                    </li>
+                                    <li> 
+                                        <img src="{{url('public/product/1729249431.jpg')}}" alt="uploadImg"> 
+                                        <a href="#!" class="imgclose">×</a>
+                                    </li> --}}
+                                </ul>                                       
+                            </div>
                         </div>
                         {{-- <div class="productDetailTable">
                             <table class="table" id="containerA">
@@ -333,7 +279,7 @@
                                         <th>Cost Price</th>
                                         <th>
                                             <a href="#!" class="formicon" id="openPopupButton">
-                                                <i class="fa-solid fa-square-plus"></i>
+                                                <i class="fa fa-plus-square"></i>
                                             </a>
                                         </th>
                                     </tr>
@@ -344,15 +290,14 @@
                             </table>
                         </div> --}}
                     </div>
-                </div> <!-- End row -->
-            </div>
-            <div class="modal-footer customer_Form_Popup">
-                <input type="hidden" name="productID" id="productID">
-                <input type="hidden" name="producttype" id="producttype">
-                <button type="submit" class="profileDrop">Save</button>                
-                <button type="button" class="profileDrop" data-bs-dismiss="modal">Cancel</button>
+                </div>
+                <div class="modal-footer customer_Form_Popup">
+                    <input type="hidden" name="productID" id="productID">
+                    <input type="hidden" name="producttype" id="producttype">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-warning">Save</button>                
+                </div>
             </form>
-            </div>
         </div>
     </div>
 </div>
@@ -380,7 +325,12 @@ Array.prototype.slice.call(forms)
                 var formData = new FormData(form);
                 var producttype = $('#producttype').val();
                 var productname = $('#productname').val();
-                fetch('{{ route("item.saveproductdata") }}', {
+                var id=$("#productID").val();
+                var url='{{ route("item.saveproductdata") }}';
+                if(id !=''){
+                    url='{{ route("item.editproductdata") }}';
+                }
+                fetch(url, {
                     method: 'POST',
                     body: formData
                 })

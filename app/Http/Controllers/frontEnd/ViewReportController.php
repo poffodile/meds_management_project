@@ -200,7 +200,7 @@ class ViewReportController extends Controller
 				echo "<option value=".$query['id'].">".$query['name']."</option>";
 			}
 		} else {
-			continue;
+			// continue;
 		}
 	}
 

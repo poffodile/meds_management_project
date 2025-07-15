@@ -17,9 +17,15 @@ class GeneralController extends Controller
 {
     // Attachment Types
     public function attachment_types_index(){
-        $page = 'attachment_types';
-        $attachment_types = AttachmentType::where('deleted_at', null)->get();
-        return view('backEnd/salesFinance/general/attachment_types', compact('page', 'attachment_types'));
+        $admin   = Session::get('scitsAdminSession');
+        $home_id = $admin->home_id;
+        if($home_id){
+            $page = 'attachment_types';
+            $attachment_types = AttachmentType::where('deleted_at', null)->get();
+            return view('backEnd/salesFinance/general/attachment_types', compact('page', 'attachment_types'));
+        }else{
+            return redirect('admin/')->with('error',NO_HOME_ERR);
+        }
     }
 
     public function saveAttachmentType(Request $request){
@@ -49,10 +55,16 @@ class GeneralController extends Controller
     }
 
     public function payment_types(){
-        $data['page'] = 'payment_types';
-        $data['payment_types'] = Payment_type::whereNull('deleted_at')->get();
-        $data['home_id']=Session::get('scitsAdminSession')->home_id;
-        return view('backEnd/salesFinance/general/payment_types', $data);
+        $admin   = Session::get('scitsAdminSession');
+        $home_id = $admin->home_id;
+        if($home_id){
+            $data['page'] = 'payment_types';
+            $data['payment_types'] = Payment_type::whereNull('deleted_at')->get();
+            $data['home_id']=Session::get('scitsAdminSession')->home_id;
+            return view('backEnd/salesFinance/general/payment_types', $data);
+        }else{
+            return redirect('admin/')->with('error',NO_HOME_ERR);
+        }
     }
     public function SavePaymentType(Request $request){
         // echo "<pre>";print_r($request->all());die;
@@ -76,10 +88,16 @@ class GeneralController extends Controller
         }
     }
     public function regins(){
-        $data['page'] = 'regions';
-        $data['region'] = Region::whereNull('deleted_at')->get();
-        $data['home_id']=Session::get('scitsAdminSession')->home_id;
-        return view('backEnd/salesFinance/general/region', $data);
+        $admin   = Session::get('scitsAdminSession');
+        $home_id = $admin->home_id;
+        if($home_id){
+            $data['page'] = 'regions';
+            $data['region'] = Region::whereNull('deleted_at')->get();
+            $data['home_id']=Session::get('scitsAdminSession')->home_id;
+            return view('backEnd/salesFinance/general/region', $data);
+        }else{
+            return redirect('admin/')->with('error',NO_HOME_ERR);
+        }
     }
     public function saveRegion(Request $request){
         // echo "<pre>";print_r($request->all());die;
@@ -110,10 +128,16 @@ class GeneralController extends Controller
         }
     }
     public function task_types(){
-        $data['page'] = 'task_type';
-        $data['task_type'] = Task_type::whereNull('deleted_at')->get();
-        $data['home_id']=Session::get('scitsAdminSession')->home_id;
-        return view('backEnd/salesFinance/general/task_type', $data);
+        $admin   = Session::get('scitsAdminSession');
+        $home_id = $admin->home_id;
+        if($home_id){
+            $data['page'] = 'task_type';
+            $data['task_type'] = Task_type::whereNull('deleted_at')->get();
+            $data['home_id']=Session::get('scitsAdminSession')->home_id;
+            return view('backEnd/salesFinance/general/task_type', $data);
+        }else{
+            return redirect('admin/')->with('error',NO_HOME_ERR);
+        }
     }
     public function saveTaskType(Request $request){
         $validator = Validator::make($request->all(), [
@@ -136,10 +160,16 @@ class GeneralController extends Controller
         }
     }
     public function tags(){
-        $data['page'] = 'tags';
-        $data['tags'] = Tag::whereNull('deleted_at')->get();
-        $data['home_id']=Session::get('scitsAdminSession')->home_id;
-        return view('backEnd/salesFinance/general/tags', $data);
+        $admin   = Session::get('scitsAdminSession');
+        $home_id = $admin->home_id;
+        if($home_id){
+            $data['page'] = 'tags';
+            $data['tags'] = Tag::whereNull('deleted_at')->get();
+            $data['home_id']=Session::get('scitsAdminSession')->home_id;
+            return view('backEnd/salesFinance/general/tags', $data);
+        }else{
+            return redirect('admin/')->with('error',NO_HOME_ERR);
+        }
     }
     public function saveTag(Request $request){
         $validator = Validator::make($request->all(), [

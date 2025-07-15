@@ -23,6 +23,10 @@ class Supplier extends Model
     }
 
     public static function getActiveSuppliers( $home_id, $user_id){
+
+        if($user_id == null){
+            return self::where('home_id', $home_id)->where('status', 1)->where('deleted_at', null)->get();
+        }
         return self::where('home_id', $home_id)->where('user_id', $user_id)->where('status', 1)->where('deleted_at', null)->get();
     }
 

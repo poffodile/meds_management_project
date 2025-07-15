@@ -1806,6 +1806,10 @@
                     lead_id: lead_id
                 },
                 success: function(response) {
+                    if (isAuthenticated(response) == false) {
+                        alert(1)
+                        return false;
+                    }
                     console.log(response.data);
 
                     // Call the function to populate the table with the data array
@@ -1827,6 +1831,10 @@
                     lead_id: lead_id
                 },
                 success: function(response) {
+                    if (isAuthenticated(response) == false) {
+                        alert(2)
+                        return false;
+                    }
                     console.log(response.data);
 
                     // Call the function to populate the table with the data array
@@ -1847,6 +1855,10 @@
                     lead_id: lead_id
                 },
                 success: function(response) {
+                    if (isAuthenticated(response) == false) {
+                        alert(3)
+                        return false;
+                    }
                     console.log(response.data);
 
                     // Call the function to populate the table with the data array
@@ -1867,6 +1879,10 @@
                     lead_id: lead_id
                 },
                 success: function(response) {
+                    if (isAuthenticated(response) == false) {
+                        alert(4)
+                        return false;
+                    }
                     console.log(response.data);
 
                     // Call the function to populate the table with the data array
@@ -1887,6 +1903,10 @@
                     lead_id: lead_id
                 },
                 success: function(response) {
+                    if (isAuthenticated(response) == false) {
+                        alert(5)
+                        return false;
+                    }
                     console.log(response.data);
 
                     // Call the function to populate the table with the data array
@@ -1909,6 +1929,10 @@
                 lead_id: lead_id
             },
             success: function(response) {
+                if (isAuthenticated(response) == false) {
+                    alert(6)
+                    return false;
+                }
                 console.log(response.data);
 
                 // Get the table body element
@@ -1986,6 +2010,10 @@
                 lead_ref: lead_id
             },
             success: function(response) {
+                if (isAuthenticated(response) == false) {
+                    alert(7)
+                    return false;
+                }
                 console.log(response.data);
 
                 // Get the table body element
@@ -2062,6 +2090,7 @@
                 lead_id: lead_id
             },
             success: function(response) {
+                alert(8)
                 console.log(response.data);
 
                 // Get the table body element
@@ -2138,6 +2167,10 @@
                 lead_id: lead_id
             },
             success: function(response) {
+                if (isAuthenticated(response) == false) {
+                    alert(9)
+                    return false;
+                }
                 console.log(response.data);
 
                 // Get the table body element
@@ -2210,6 +2243,10 @@
                 lead_id: lead_id
             },
             success: function(response) {
+                if (isAuthenticated(response) == false) {
+                    alert(10)
+                    return false;
+                }
                 console.log(response.data);
 
                 // Get the table body element
@@ -2303,6 +2340,10 @@
                 lead_id: lead_id
             },
             success: function(response) {
+                if (isAuthenticated(response) == false) {
+                    alert(11)
+                    return false;
+                }
                 console.log("History response", response.data);
                 console.log("length", (response.data).length);
 
@@ -2375,6 +2416,10 @@
             url: '{{ route("lead.ajax.getLeadTaskType") }}',
             method: 'GET',
             success: function(response) {
+                if (isAuthenticated(response) == false) {
+                    alert(12)
+                    return false;
+                }
                 console.log(response.data);
                 const selectElement = document.getElementById('lead_task_types');
                 const selectElementTimer = document.getElementById('lead_task_types_timer');
@@ -2409,6 +2454,10 @@
             url: '{{ route("lead.ajax.getUserList") }}',
             method: 'GET',
             success: function(response) {
+                if (isAuthenticated(response) == false) {
+                    alert(13)
+                    return false;
+                }
                 console.log(response.data);
                 const selectElement = document.getElementById('getUserList');
 
@@ -2433,6 +2482,10 @@
             url: '{{ route("lead.ajax.getCRMTypeData") }}',
             method: 'GET',
             success: function(response) {
+                if (isAuthenticated(response) == false) {
+                    alert(14)
+                    return false;
+                }
                 console.log(response.Data);
                 const selectElement = document.getElementById('calls_type');
                 const lead_notes_crm = document.getElementById('lead_notes_crm');
@@ -2483,6 +2536,10 @@
                     id: id
                 },
                 success: function(response) {
+                    if (isAuthenticated(response) == false) {
+                        alert(15)
+                        return false;
+                    }
                     document.getElementById('taskTitle').value = response.data[0]['title'];
                     if (response.data[0]['is_recurring'] === true) {
                         document.getElementById('isRecurring').checked = true;
@@ -2663,6 +2720,10 @@
                 method: 'POST',
                 data: formData,
                 success: function(response) {
+                    if (isAuthenticated(response) == false) {
+                        alert(17)
+                        return false;
+                    }
                     alert(response.message);
                     if (type === 3) {
                         $('#crmTypeModelNotes').modal('hide');
@@ -2714,6 +2775,10 @@
                 method: 'POST',
                 data: formData,
                 success: function(response) {
+                    if (isAuthenticated(response) == false) {
+                        alert(18)
+                        return false;
+                    }
                     alert(response.message);
                     $('#crmTypeModel').modal('hide');
                     getCRMTypeData();
@@ -2732,6 +2797,10 @@
                 method: 'POST',
                 data: formData,
                 success: function(response) {
+                    if (isAuthenticated(response) == false) {
+                        alert(19)
+                        return false;
+                    }
                     alert(response.message);
                     $('#thirdModal').modal('hide');
                     getLeadTaskType();
@@ -2750,6 +2819,10 @@
                 method: 'POST',
                 data: formData,
                 success: function(response) {
+                    if (isAuthenticated(response) == false) {
+                        alert(20)
+                        return false;
+                    }
                     alert(response.message);
                     $('#secondModal').modal('hide');
                     location.reload();
@@ -2768,6 +2841,10 @@
                 method: 'POST',
                 data: formData,
                 success: function(response) {
+                    if (isAuthenticated(response) == false) {
+                        alert(21)
+                        return false;
+                    }
                     alert(response.message);
                     $('#secondModal').modal('hide');
                     location.reload();
@@ -2792,6 +2869,10 @@
                 method: 'POST',
                 data: formData,
                 success: function(response) {
+                    if (isAuthenticated(response) == false) {
+                        alert(22)
+                        return false;
+                    }
                     alert(response.message);
                     $('#secondModal').modal('hide');
                     // location.reload();
@@ -3015,6 +3096,10 @@
                     method: 'POST',
                     data: formData,
                     success: function(response) {
+                        if (isAuthenticated(response) == false) {
+                            alert(23)
+                            return false;
+                        }
                         alert(response.message);
                         $('#callsModal').modal('hide');
                         getCallDataAjax();
@@ -3116,6 +3201,10 @@
                     processData: false, // Important: Don't process the data
                     contentType: false,
                     success: function(response) {
+                        if (isAuthenticated(response) == false) {
+                            alert(24)
+                            return false;
+                        }
                         alert(response.message);
                         $('#NewEmailModel').modal('hide');
                         getEmailDataAjaxCall();
@@ -3157,6 +3246,10 @@
                     // processData: false,  
                     // contentType: false,  
                     success: function(response) {
+                        if (isAuthenticated(response) == false) {
+                            alert(25)
+                            return false;
+                        }
                         alert(response.message);
                         $('#NewNotesModel').modal('hide');
                         getNotesDataAjax();
@@ -3200,6 +3293,10 @@
                     // processData: false,  
                     // contentType: false,  
                     success: function(response) {
+                        if (isAuthenticated(response) == false) {
+                            alert(26)
+                            return false;
+                        }
                         alert(response.message);
                         getComplaintDataAjax();
                         $('#compliantsModal').modal('hide');
@@ -3242,6 +3339,10 @@
                     },
                     success: function(data) {
                         console.log(data);
+                        if (isAuthenticated(response) == false) {
+                            alert(27)
+                            return false;
+                        }
                         if (data) {
                             // location.reload();
                         } else {

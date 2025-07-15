@@ -1,3 +1,6 @@
+$(document).ready(function(){
+    calculate();
+});
 $(document).on('input', '.numberInput', function () {
     let val = $(this).val().replace(/[^0-9.]/g, '');
     if ((val.match(/\./g) || []).length > 1) {
@@ -63,6 +66,9 @@ function getSaveData() {
             success: function (response) {
                 console.log(response);
                 // return false;
+                if (isAuthenticated(response) == false) {
+                    return false;
+                }
                 if (response.vali_error) {
                     alert(response.vali_error);
                     $(window).scrollTop(0);
@@ -70,14 +76,20 @@ function getSaveData() {
                 } else if (response.success === true) {
                     $(window).scrollTop(0);
                     $('#message_save').addClass('success-message').text(response.message).show();
+                    $(".popup_success").fadeIn();
+                    $('.popup_success_txt').text(response.message).show();
                     setTimeout(function () {
                         $('#message_save').removeClass('success-message').text('').hide();
+                        $(".popup_success").fadeOut();
                         location.href = redirectUrl;
                     }, 3000);
                 } else if (response.success === false) {
                     $('#message_save').addClass('error-message').text(response.message).show();
+                    $(".popup_error").fadeIn();
+                    $('.popup_success_txt').text(response.message).show();
                     setTimeout(function () {
                         $('#error-message').text('').fadeOut();
+                        $(".popup_error").fadeOut();
                     }, 3000);
                 } else {
                     alert("Something went wrong");
@@ -92,11 +104,18 @@ function getSaveData() {
     }
 }
 function openAssetCategoryModal() {
-    $("#assetCategoryModalLabel").text("Add Asset Category");
+    $("#assetCategoryModalLabel").text("Add Asset Categories");
+    $("#assetCategoryForm")[0].reset();
+    $("#id").val('');
     $("#assetCategoryModal").modal('show');
 }
 function saveassetCategoryModal() {
     var name = $("#name").val();
+    var id=$("#id").val();
+    var cat_url=assetCatSaveUrl;
+    if(id !=''){
+        cat_url=assetCatEditUrl;
+    }
     if (name == '') {
         $("#name").css('border', '1px solid red');
         return false;
@@ -104,7 +123,7 @@ function saveassetCategoryModal() {
         $("#name").css('border', '');
         $.ajax({
             type: "POST",
-            url: assetCatSaveUrl,
+            url: cat_url,
             data: new FormData($("#assetCategoryForm")[0]),
             async: false,
             contentType: false,
@@ -113,21 +132,30 @@ function saveassetCategoryModal() {
             success: function (response) {
                 console.log(response);
                 // return false;
+                if (isAuthenticated(response) == false) {
+                    return false;
+                }
                 if (response.vali_error) {
                     alert(response.vali_error);
                     $(window).scrollTop(0);
                     return false;
                 } else if (response.success === true) {
                     $(window).scrollTop(0);
-                    $('#messageAssetCategory').addClass('success-message').text(response.message).show();
+                    // $('#messageAssetCategory').addClass('success-message').text(response.message).show();
+                    $(".popup_success").fadeIn();
+                    $('.popup_success_txt').text(response.message).show();
                     setTimeout(function () {
-                        $('#messageAssetCategory').removeClass('success-message').text('').hide();
+                        // $('#messageAssetCategory').removeClass('success-message').text('').hide();
+                        // $('.popup_success_txt').text('').hide();
+                        $(".popup_success").fadeOut();
                         location.reload();
                     }, 3000);
                 } else if (response.success === false) {
-                    $('#messageAssetCategory').addClass('error-message').text(response.message).show();
+                    // $('#messageAssetCategory').addClass('error-message').text(response.message).show();
+                    $(".popup_error").fadeIn();
+                    $('.popup_success_txt').text(response.message).show();
                     setTimeout(function () {
-                        $('#error-message').text('').fadeOut();
+                        $(".popup_error").fadeOut();
                     }, 3000);
                 } else {
                     alert("Something went wrong");
@@ -143,7 +171,7 @@ function saveassetCategoryModal() {
 }
 $(document).on('click', '.assetCatemodal_dataFetch', function () {
     // alert()
-    $("#assetCategoryModalLabel").text("Edit Asset Category");
+    $("#assetCategoryModalLabel").text("Edit Asset Categories");
     var id = $(this).data('id');
     var name = $(this).data('name');
     var status = $(this).data('status');
@@ -153,6 +181,7 @@ $(document).on('click', '.assetCatemodal_dataFetch', function () {
     $("#statusAssetModal").val(status);
 });
 function opendepreciation_typesModal() {
+    $("#depreciation_typesForm")[0].reset();
     $("#depreciation_typesModalLabel").text("Add Depreciation Type");
     $("#depreciation_typesModal").modal('show');
 }
@@ -172,6 +201,11 @@ $(document).on('click', '.depreciation_typeModal_dataFetch', function () {
 function savedepreciation_typesModal() {
     var name = $("#name").val();
     var percentage = $("#percentage").val();
+    var id=$("#id").val();
+    var assetDepreciationTypeUrl=assetDepreciationTypeSaveUrl;
+    if(id !=''){
+        assetDepreciationTypeUrl=assetDepreciationTypeEditUrl;
+    }
     if (name == '') {
         $("#name").css('border', '1px solid red');
         return false;
@@ -184,7 +218,7 @@ function savedepreciation_typesModal() {
         $("#percentage").css('border', '');
         $.ajax({
             type: "POST",
-            url: assetDepreciationTypeSaveUrl,
+            url: assetDepreciationTypeUrl,
             data: new FormData($("#depreciation_typesForm")[0]),
             async: false,
             contentType: false,
@@ -193,6 +227,9 @@ function savedepreciation_typesModal() {
             success: function (response) {
                 console.log(response);
                 // return false;
+                if (isAuthenticated(response) == false) {
+                    return false;
+                }
                 if (response.vali_error) {
                     alert(response.vali_error);
                     $(window).scrollTop(0);
@@ -200,14 +237,20 @@ function savedepreciation_typesModal() {
                 } else if (response.success === true) {
                     $(window).scrollTop(0);
                     $('#messagedepreciation_types').addClass('success-message').text(response.message).show();
+                    $(".popup_success").fadeIn();
+                    $('.popup_success_txt').text(response.message).show();
                     setTimeout(function () {
                         $('#messagedepreciation_types').removeClass('success-message').text('').hide();
+                        $(".popup_success").fadeOut();
                         location.reload();
                     }, 3000);
                 } else if (response.success === false) {
                     $('#messagedepreciation_types').addClass('error-message').text(response.message).show();
+                    $(".popup_error").fadeIn();
+                    $('.popup_success_txt').text(response.message).show();
                     setTimeout(function () {
                         $('#error-message').text('').fadeOut();
+                        $(".popup_error").fadeOut();
                     }, 3000);
                 } else {
                     alert("Something went wrong");
@@ -248,157 +291,76 @@ function searchBtn() {
         success: function (response) {
 
             console.log(response);
+            // return false;
 
             if (response.success === true) {
-                const tableData = `<div class="productDetailTable asset_layer" style="">
-                <table class="table" id="containerA">
-                  <thead class="table-light">
-                    <tr class="text-center">
-                      <th class="col-1"></th>
-                      <th class="col-1"></th>
-                      <th class="col-1">Total</th>
-                      <th class="col-1"></th>
-                      <th class="col-1">Property</th>
-                      <th class="col-1">Household</th>
-                      <th class="col-1">F&F</th>
-                      <th class="col-1">Motor Vehicle</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <th colspan="8">Cost</th>
-                    </tr>
-                    <tr>
-                      <td></td>
-                      <td class="text-start">Bfwd</td>
-                      <td>1,334,736</td>
-                      <td></td>
-                      <td>901,506</td>
-                      <td>163,814</td>
-                      <td>102,164</td>
-                      <td>167,252</td>
-                    </tr>
-                    <tr>
-                      <td></td>
-                      <td class="text-start">Additions</td>
-                      <td>276,688</td>
-                      <td></td>
-                      <td>-</td>
-                      <td>40,065</td>
-                      <td>100,083</td>
-                      <td>136,540</td>
-                    </tr>
-                    <tr>
-                      <td></td>
-                      <td class="text-start">Disposals</td>
-                      <td>70,149</td>
-                      <td></td>
-                      <td>-</td>
-                      <td>- 159</td>
-                      <td>-</td>
-                      <td>- 69,990</td>
-                    </tr>
-                    <tr class="total">
-                      <td></td>
-                      <td class="text-start">Cfwd</td>
-                      <td class="line">1,541,275</td>
-                      <td></td>
-                      <td class="line">901,506</td>
-                      <td class="line">203,720</td>
-                      <td class="line">202,247</td>
-                      <td class="line">233,802</td>
-                    </tr>
-                    <tr>
-                      <td colspan="8"></td>
-                    </tr>
-                    <tr>
-                      <th colspan="8">Depreciation</th>
-                    </tr>
-                    <tr>
-                      <td></td>
-                      <td class="text-start">Bfwd</td>
-                      <td>255,441</td>
-                      <td></td>
-                      <td>26,105</td>
-                      <td>107,375</td>
-                      <td>74,817</td>
-                      <td>47,144</td>
-                    </tr>
-                    <tr>
-                      <td></td>
-                      <td class="text-start">Charge For Year</td>
-                      <td>140,732</td>
-                      <td></td>
-                      <td>18,030</td>
-                      <td>31,831</td>
-                      <td>36,306</td>
-                      <td>54,565</td>
-                    </tr>
-                    <tr>
-                      <td></td>
-                      <td class="text-start">Eliminated on disposals</td>
-                      <td>17,538</td>
-                      <td></td>
-                      <td>-</td>
-                      <td>- 40</td>
-                      <td>-</td>
-                      <td>- 17,498</td>
-                    </tr>
-                    <tr class="total">
-                      <td></td>
-                      <td class="text-start">Cfwd</td>
-                      <td class="line">378,635</td>
-                      <td></td>
-                      <td class="line">44,136</td>
-                      <td class="line">139,166</td>
-                      <td class="line">111,123</td>
-                      <td class="line">84,211</td>
-                    </tr>
-                    <tr>
-                      <td colspan="8"></td>
-                    </tr>
-                    <tr class="total2">
-                      <td></td>
-                      <th class="text-start">NBV Cfwd</th>
-                      <td class="line">1,162,640</td>
-                      <td></td>
-                      <td class="line">857,371</td>
-                      <td class="line">64,554</td>
-                      <td class="line">91,124</td>
-                      <td class="line">149,591</td>
-                    </tr>
-                    <tr>
-                      <td colspan="8"></td>
-                    </tr>
-                    <tr class="total2">
-                      <td></td>
-                      <th class="text-start">NBV Bfwd</th>
-                      <td class="line">1,079,295</td>
-                      <td></td>
-                      <td class="line">875,401</td>
-                      <td class="line">56,440</td>
-                      <td class="line">27,347</td>
-                      <td class="line">120,108</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>`;
-                $("#search_data").append(tableData);
+                var data=response.data;
+                var table=document.getElementById('assetRegisterList');
+                if(data.length === 0){
+                    $("#footer_table").hide();
+                    table.innerHTML="<tr><td class='text text-center text-danger' colspan='15'>Data Not Found</td></tr>";
+                }else{
+                    table.innerHTML='';
+                    let cost_bfwd = 0, cost_disposal = 0, cost_addition = 0, cost_fwd = 0;
+                    let depreciation_bfwd = 0, depreciation = 0, charge = 0, depreciation_cfwd = 0;
+                    let nbv_bfwd = 0, nbv_cfwd = 0;
+                    let tableData = '';
+                    data.forEach(function(val, key) {
+                    cost_bfwd += val.cost_bfwd;
+                    cost_disposal += val.cost_disposal;
+                    cost_addition += val.cost_addition;
+                    cost_fwd += val.cost_fwd;
+                    depreciation_bfwd += val.depreciation_bfwd;
+                    depreciation += val.depreciation;
+                    charge += val.charge;
+                    depreciation_cfwd += val.depreciation_cfwd;
+                    nbv_bfwd += val.nbv_bfwd;
+                    nbv_cfwd += val.nbv_cfwd;
 
-                // $("#search_data").show();
+                    tableData += `<tr>
+                        <td>${key + 1}</td>
+                        <td>${val.asset_name}</td>
+                        <td>${new Date(val.date).toLocaleDateString('en-GB')}</td>
+                        <td>${val.cost_bfwd ? '£' + val.cost_bfwd : ''}</td>
+                        <td>${val.cost_disposal ? '£' + val.cost_disposal : ''}</td>
+                        <td>${val.cost_addition ? '£' + val.cost_addition : ''}</td>
+                        <td>${val.cost_fwd ? '£' + val.cost_fwd : ''}</td>
+                        <td>${val.depreciation_bfwd ? '£' + val.depreciation_bfwd : ''}</td>
+                        <td>${val.depreciation ? '£' + val.depreciation : ''}</td>
+                        <td>${val.charge ? '£' + val.charge : ''}</td>
+                        <td>${val.depreciation_cfwd ? '£' + val.depreciation_cfwd : ''}</td>
+                        <td>${val.nbv_bfwd ? '£' + val.nbv_bfwd : ''}</td>
+                        <td>${val.nbv_cfwd ? '£' + val.nbv_cfwd : ''}</td>
+                        <td>
+                        <a href="sales-finance/assets/asset-register-edit?key=${btoa(val.id)}" class="openModalBtn">
+                            <i class="fa fa-pencil" aria-hidden="true"></i>
+                        </a> |
+                        <a href="#!" class="register_delete" data-id="${val.id}">
+                            <i class="fa fa-trash text-danger" aria-hidden="true"></i>
+                        </a>
+                        </td>
+                    </tr>`;
+                    });
 
-                // alert(typeof(response.cost_bfwd))
-                // $("#assetRegisterList").html(response.html_data);
-                // $("#cost_bfwd").text("£"+response.cost_bfwd.toFixed(2));
-                // $("#cost_disposal").text("£"+response.cost_disposal.toFixed(2));
-                // $("#cost_addition").text("£"+response.cost_addition.toFixed(2));
-                // $("#cost_fwd").text("£"+response.cost_fwd.toFixed(2));
-                // $("#depreciation_bfwd").text("£"+response.depreciation_bfwd.toFixed(2));
-                // $("#depreciation").text("£"+response.depreciation.toFixed(2));
-                // $("#charge").text("£"+response.charge.toFixed(2));
-                // $("#depreciation_cfwd").text("£"+response.depreciation_cfwd.toFixed(2));
-                // $("#nbv_bfwd").text("£"+response.nbv_bfwd.toFixed(2));
-                // $("#nbv_cfwd").text("£"+response.nbv_cfwd.toFixed(2));
+                    $("#assetRegisterList").append(tableData);
+                    
+                    
+
+                    // $("#search_data").show();
+                    $("#footer_table").show();
+                    // alert(typeof(response.cost_bfwd))
+                    // $("#assetRegisterList").html(response.html_data);
+                    $("#tablecost_bfwd").text("£"+response.cost_bfwd.toFixed(2));
+                    $("#tablecost_disposal").text("£"+response.cost_disposal.toFixed(2));
+                    $("#tablecost_addition").text("£"+response.cost_addition.toFixed(2));
+                    $("#tablecost_fwd").text("£"+response.cost_fwd.toFixed(2));
+                    $("#tabledepreciation_bfwd").text("£"+response.depreciation_bfwd.toFixed(2));
+                    $("#tabledepreciation").text("£"+response.depreciation.toFixed(2));
+                    $("#tablecharge").text("£"+response.charge.toFixed(2));
+                    $("#tabledepreciation_cfwd").text("£"+response.depreciation_cfwd.toFixed(2));
+                    $("#tablenbv_bfwd").text("£"+response.nbv_bfwd.toFixed(2));
+                    $("#tablenbv_cfwd").text("£"+response.nbv_cfwd.toFixed(2));
+                }
             } else {
                 alert("Something went wrong");
                 return false;
@@ -412,26 +374,35 @@ function searchBtn() {
 }
 function clearBtn(form_id) {
     $("#" + form_id)[0].reset();
+    location.reload();
     // $('#configform')[0].reset();
 }
 $("#edd_endDate").change(function () {
-    var startDate = document.getElementById("edd_startDate").value;
-    var endDate = document.getElementById("edd_endDate").value;
-
+    var startDateStr = document.getElementById("edd_startDate").value;
+    var endDateStr = document.getElementById("edd_endDate").value;
+    var startDate = parseDateDMY(startDateStr);
+    var endDate = parseDateDMY(endDateStr);
     if ((Date.parse(startDate) >= Date.parse(endDate))) {
         alert("End date should be greater than Start date");
         document.getElementById("edd_endDate").value = "";
     }
 });
 $("#edd_startDate").change(function () {
-    var startDate = document.getElementById("edd_startDate").value;
-    var endDate = document.getElementById("edd_endDate").value;
-
+    var startDateStr = document.getElementById("edd_startDate").value;
+    var endDateStr = document.getElementById("edd_endDate").value;
+    var startDate = parseDateDMY(startDateStr);
+    var endDate = parseDateDMY(endDateStr);
     if ((Date.parse(endDate) <= Date.parse(startDate))) {
         alert("Start date should be less than End date");
         document.getElementById("edd_startDate").value = "";
+    }else{
+        $("#edd_endDate").removeAttr('disabled','disabled');
     }
 });
+function parseDateDMY(dateStr) {
+    var parts = dateStr.split("-");
+    return new Date(parts[2], parts[1] - 1, parts[0]);
+}
 $(document).on('click', '.register_delete', function () {
     var id = $(this).data('id');
     if (confirm("Are you sure you want to delete?")) {
@@ -443,6 +414,9 @@ $(document).on('click', '.register_delete', function () {
             success: function (response) {
                 console.log(response);
                 // return false;
+                if (isAuthenticated(response) == false) {
+                    return false;
+                }
                 if (response.success === true) {
                     location.reload();
                 } else {
@@ -457,3 +431,74 @@ $(document).on('click', '.register_delete', function () {
         });
     }
 });
+
+$(document).on('click', '.close-msg-btn', function() {
+    $('.popup_alrt_msg').hide();
+});
+$(document).on('click','.delete_assetCat',function(){
+    var id = $(this).data('id');
+    if (confirm("Are you sure you want to delete?")) {
+        var token = $('meta[name="csrf-token"]').attr('content');
+        $.ajax({
+            type: "POST",
+            url: assetCatDeleteUrl,
+            data: { id: id, _token: token },
+            success: function (response) {
+                console.log(response);
+                // return false;
+                if (isAuthenticated(response) == false) {
+                    return false;
+                }
+                if (response.success === true) {
+                    location.reload();
+                } else {
+                    alert("Something went wrong");
+                    return false;
+                }
+            },
+            error: function (xhr, status, error) {
+                var errorMessage = xhr.status + ': ' + xhr.statusText;
+                alert('Error - ' + errorMessage + "\nMessage: " + error);
+            }
+        });
+    }
+});
+$('#assetCatTable').DataTable({
+    dom: 'Blfrtip',
+    buttons: [
+        {
+            extend: 'csv',
+            text: 'Export',
+            bom: true,
+            exportOptions: {
+                columns: [ 1, 2,]
+            }
+        }
+    ],
+});
+$('#Depreciation_typeTable').DataTable({
+    dom: 'Blfrtip',
+    buttons: [
+        {
+            extend: 'csv',
+            text: 'Export',
+            bom: true,
+            exportOptions: {
+                columns: [ 1, 2,3]
+            }
+        }
+    ],
+});
+// $('#assetRegisterTable').DataTable({
+//     dom: 'Blfrtip',
+//     buttons: [
+//         {
+//             extend: 'csv',
+//             text: 'Export',
+//             bom: true,
+//             exportOptions: {
+//                 columns: [ 0,1, 2,3,4,5]
+//             }
+//         }
+//     ],
+// });

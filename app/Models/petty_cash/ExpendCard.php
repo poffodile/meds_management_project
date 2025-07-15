@@ -13,7 +13,7 @@ class ExpendCard extends Model
     public static function saveExpenseCard($data){
         return self::updateOrCreate(['id'=>$data['id'] ?? null], $data);
     }
-    public static function getAllExpendCard($home_id,$user_id){
-        return self::where(['home_id'=>$home_id,'loginUserId'=>$user_id])->whereNull('deleted_at');
+    public static function getAllExpendCard(){
+        return self::whereNull('deleted_at');
     }
 }

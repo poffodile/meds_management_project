@@ -282,7 +282,9 @@ class FileController extends ServiceUserManagementController
 
                         if(move_uploaded_file($tmp_file, $file_dest.'/'.$new_name)) {
 
-
+                            $home_ids = Auth::user()->home_id;
+                            $ex_home_ids = explode(',', $home_ids);
+                            $home_id=$ex_home_ids[0];
 
                             $file                  = new FileManager;
 
@@ -292,7 +294,7 @@ class FileController extends ServiceUserManagementController
 
                             $file->file            = $new_name;
 
-                            $file->home_id         = Auth::user()->home_id;
+                            $file->home_id         = $home_id;
 
                             $file->save();
 

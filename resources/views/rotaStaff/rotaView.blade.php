@@ -1,24 +1,22 @@
+@extends('frontEnd.layouts.master')
+@include('rotaStaff.components.header')
 <script>
   // Ignore this in your implementation
   window.isMbscDemo = true;
 </script>
-@include('rotaStaff.components.header')
 <style>
-  / Dropdown Button / .dropbtn {
-    /* background-color: #3498DB;
-  color: white;
-  padding: 16px; */
+  .dropbtn {
     font-size: 16px;
     border: none;
     cursor: pointer;
   }
 
-  / The container <div>- needed to position the dropdown content / .dropdown {
+  .dropdown {
     position: relative;
     display: inline-block;
   }
 
-  / Dropdown Content (Hidden by Default) / .dropdown-content {
+  .dropdown-content {
     display: none;
     position: absolute;
     right: 0px;
@@ -28,7 +26,7 @@
     z-index: 1;
   }
 
-  / Links inside the dropdown / .dropdown-content a,
+  .dropdown-content a,
   .dropdown-content button {
     color: #1f88b5;
     padding: 5px 12px;
@@ -99,6 +97,7 @@
   .modal-header {
     background-color: #1f88b5;
     color: #fff;
+    display: block;
   }
 
   .modal-dialog .close_btn_modal {
@@ -184,33 +183,46 @@
     margin-left: 30px;
     margin-top: 25px;
   }
+
+  section#container {
+    height: auto;
+  }
+
+  /* .tab-content>.active {
+    display: block;
+    opacity: 1;
+} */
 </style>
 <!-- Top Bar Info Section End Here -->
-<div class="col-lg-9">
 
-  <div class="row">
-    <div class="col-lg-12">
-      <ul class="nav nav-tabs rotas" id="myTab" role="tablist">
-        <li class="nav-item" role="presentation">
-          <button class="nav-link active" id="activerotas-tab" data-bs-toggle="tab" data-bs-target="#activerotas" type="button" role="tab" aria-controls="activerotas" aria-selected="true">Active Rotas</button>
+
+
+<section class="wrapper">
+
+
+  <div class="panel">
+    <header class="panel-heading tab-bg-dark-navy-blue ">
+      <ul class="nav nav-tabs">
+        <li class="active">
+          <a data-toggle="tab" href="#activeRotas">Active Rotas</a>
         </li>
-        <li class="nav-item" role="presentation">
-          <button class="nav-link" id="oldrotas-tab" data-bs-toggle="tab" data-bs-target="#oldrotas" type="button" role="tab" aria-controls="oldrotas" aria-selected="false">Old Rotas</button>
+        <li class="">
+          <a data-toggle="tab" href="#oldRotas">Old Rotas</a>
         </li>
-        <li class="nav-item" role="presentation">
-          <button class="nav-link" id="createrota-tab" data-bs-toggle="tab" data-bs-target="#createrota" type="button" role="tab" aria-controls="createrota" aria-selected="false">Create rota </button>
+        <li class="">
+          <a data-toggle="tab" href="#createRota">Create rota</a>
         </li>
       </ul>
-      <div class="tab-content" id="myTabContent">
-        <div class="tab-pane fade show active" id="activerotas" role="tabpanel" aria-labelledby="activerotas-tab">
+    </header>
+    <div class="panel-body">
+      <div class="tab-content">
+        <div id="activeRotas" class="tab-pane active">
           <form class="active-rots-slt-from">
-
             <div class="row">
               <div class="col-lg-9">
                 <div class="paraentBtnRota">
                   <h3>Active rotas</h3>
                   <div class="rotaBtn">
-                    <!-- <button id="createrota-tab2" type="button">Create Rota</button> -->
                   </div>
                 </div>
               </div>
@@ -224,7 +236,7 @@
                 <button type="button" class="filter_btn">Clear all filter</button>
               </div>
               <div class="col-lg-3 col-md-3">
-                <select name="sortBy" class="form-select fotm-control">
+                <select name="sortBy" class="form-select form-control">
                   <option value="Name (A-Z)">Name (A-Z)</option>
                   <option value="Name (Z-A)">Name (Z-A)</option>
                   <option value="Start date (Newest first)">Start date (Newest first)</option>
@@ -275,53 +287,9 @@
               <h2>No rotas to see here yet...</h2>
             </div>
           </div>
-          <!-- <div class="box-shod-info-part">
-                      <div class="row">
-                        <div class="cl-lg-2 col-md-2 col-sm-2">
-                          <div class="icon_info-part"> <i class="fa fa-calendar-check-o"></i> </div>
-                        </div>
-                        <div class="cl-lg-10 col-md-10 col-sm-9">
-                          <div class="content-active-tabsinfo">
-                            <h2>Create & manage</h2>
-                            <p>Create, plan and manage rotas all in one place. Add multiple staff to shifts, edit
-                              ongoing shifts and get an up-to-date view of who's working when. </p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="box-shod-info-part">
-                      <div class="row">
-                        <div class="cl-lg-10 col-md-10 col-sm-9">
-                          <div class="content-active-tabsinfo">
-                            <h2>Share with employees
-                            </h2>
-                            <p>Create, plan and manage rotas all in one place. Add multiple staff to shifts, edit
-                              ongoing shifts and get an up-to-date view of who's working when. </p>
-                          </div>
-                        </div>
-                        <div class="cl-lg-2 col-md-2 col-sm-2">
-                          <div class="icon_info-part"> <i class="fa fa-user" aria-hidden="true"></i> </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="box-shod-info-part">
-                      <div class="row">
-                        <div class="cl-lg-2 col-md-2 col-sm-2">
-                          <div class="icon_info-part"> <i class="fa fa-laptop" aria-hidden="true"></i> </div>
-                        </div>
-                        <div class="cl-lg-10 col-md-10 col-sm-9">
-                          <div class="content-active-tabsinfo">
-                            <h2>Everything in one place
-                            </h2>
-                            <p>Create, plan and manage rotas all in one place. Add multiple staff to shifts, edit
-                              ongoing shifts and get an up-to-date view of who's working when. </p>
-                          </div>
-                        </div>
-                      </div>
-                    </div> -->
         </div>
-        <div class="tab-pane fade" id="oldrotas" role="tabpanel" aria-labelledby="oldrotas-tab">
-          <form class="active-rots-slt-from">
+        <div id="oldRotas" class="tab-pane">
+            <form class="active-rots-slt-from">
             <div class="row">
               <div class="col-lg-9">
                 <h3>Old rotas</h3>
@@ -340,7 +308,7 @@
               </div>
               <div class="row">
                 <div class="col-md-3 col-lg-3">
-                  <select name="" class="form-select fotm-control" id="">
+                  <select name="" class="form-select form-control" id="">
                     <option value="">Name (A-Z)</option>
                     <option value="">Name (Z-A )</option>
                     <option value="">Start date (Newest first)</option>
@@ -387,29 +355,8 @@
             </div>
           </div>
         </div>
-        <!-- </div> -->
-        <div class="tab-pane fade" id="createrota" role="tabpanel" aria-labelledby="createrota-tab">
-          <!-- <div class="row">
-                        <div class="col-lg-12 create-a-rota-info">
-                          <h2>Create a rota
-                          </h2>
-                          <p>Create and manage staggered shift patterns to support your back to work plans and manage
-                            shift rotas for employees who regularly change their hours of work.
-                          </p>
-                          <h3>What would you like to do?</h3>
-                        </div>
-                        <div class="col-lg-4 select-rota" onclick="creatNewRota()">
-                          <div class="box-createrota-boz card-btn card">
-                            <input type="radio" class="radio-btn" name="select-btn">
-                            <div class="bg-color">
-                              <i class="fa fa-calendar"></i>
-                              <h3>Create a new rota</h3>
-                              <p>Create a new bespoke rota for your business. Choose your shift times, assign employees
-                                and add notes before publishing.</p>
-                            </div>
-                        </div>
-                      </div> -->
-          <form action="{{ url('/add-rota-data') }}" method="POST" class="select-rota formOne" id="createRota">
+        <div id="createRota" class="tab-pane">
+           <form action="{{ url('/add-rota-data') }}" method="POST" class="select-rota formOne" id="createRota">
             <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">
             <div class="row">
               <div class="col-md-12 mt-4">
@@ -609,18 +556,10 @@
           </form>
         </div>
       </div>
-
     </div>
+</div>
 
-  </div>
-</div>
-</div>
-<!-- Col Md 9 End -->
-</div>
-</div>
-</div>
-</div>
-</div>
+  
 </section>
 <!-- Rename Modal -->
 <div class="modal fade" id="renameModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -745,11 +684,11 @@
   </div>
 </div>
 <!-- Modal View end -->
-@include('rotaStaff.components.footer')
+@include('rotaStaff.components.footer') 
 <script>
   $(document).ready(function() {
 
-    $('#createrota-tab2').on('click',function(){
+    $('#createrota-tab2').on('click', function() {
       var tab1 = document.getElementById("activerotas-tab");
       var div1 = document.getElementById("activerotas");
       tab1.classList.remove("active");
@@ -761,7 +700,7 @@
       tab3.className += " active";
       div3.className += " active";
       div3.className += " show";
-});
+    });
 
     const selectDate = document.getElementById('select-date');
     selectDate.addEventListener('change', (event) => {
@@ -831,7 +770,6 @@
           }
         }
 
-
       }
     });
     const source = document.getElementById('rota_name_search');
@@ -856,8 +794,6 @@
 
     source.addEventListener('input', inputHandler);
     source.addEventListener('propertychange', inputHandler);
-
-
 
     $('#rename_save_btn').on('click', function() {
       var rota_id = document.getElementById('renameid').value;

@@ -71,12 +71,20 @@ class Purchase_orderControllerAdmin extends Controller
             $data['users'] = User::getHomeUsers($home_id);
             $data['rate']=Construction_tax_rate::getAllTax_rate($home_id,'Active');
             $data['customer']=Customer::get_customer_list_Attribute($home_id,'ACTIVE');
+        }else{
+            return redirect('admin/')->with('error',NO_HOME_ERR);
         }
         return view('backEnd.salesFinance.purchase_order.purchase_order',$data);
     }
     public function purchase_order_add(){
-        $data['task']="Add";
-        $data['page']="Purchase Order";
-        return view('backEnd.salesFinance.purchase_order.purchase_order_form',$data);
+        $admin   = Session::get('scitsAdminSession');
+        $home_id = $admin->home_id;
+        if($home_id){
+            $data['task']="Add";
+            $data['page']="Purchase Order";
+            return view('backEnd.salesFinance.purchase_order.purchase_order_form',$data);
+        }else{
+            return redirect('admin/')->with('error',NO_HOME_ERR);
+        }
     }
 }

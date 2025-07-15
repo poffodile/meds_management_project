@@ -1,4 +1,8 @@
-@include('frontEnd.salesAndFinance.jobs.layout.header1')
+@extends('frontEnd.layouts.master')
+<meta name="csrf-token" content="{{ csrf_token() }}">
+@section('title','Invoices')
+<link rel="stylesheet" type="text/css" href="{{ url('public/frontEnd/jobs/css/custom.css')}}" />
+@section('content')
 <style>
     .currency {
         padding: 2px 3px 2px 5px;
@@ -59,920 +63,811 @@
         vertical-align: baseline;
     }
 </style>
-<section class="main_section_page px-3">
+<section class="wrapper">
     <div class="container-fluid">
         <div class="row">
-            <div class="col-md-4 col-lg-4 col-xl-4 ">
-                <div class="pageTitle">
-                    @if((isset($key) && $key !='') && (isset($duplicate) && $duplicate ==''))
-                    <h3 class="header_text">{{$purchase_orders->purchase_order_ref}}</h3>
-                    @else
-                    <h3 class="header_text">New Purchase Order</h3>
-                    @endif
-                </div>
-            </div>
-            <div class="col-md-4 col-lg-4 col-xl-4">
-                <div class="mt-1 mb-0 text-center" id="message_save"></div>
-            </div>
-            <div class="col-md-4 col-lg-4 col-xl-4 px-3">
-
-                <div class="pageTitleBtn">
-                    <a href="javascript:void(0)" class="profileDrop" onclick="save_all_data()"><i class="fa-solid fa-floppy-disk"></i> Save</a>
-                    <a href="{{url('draft_purchase_order')}}" class="profileDrop"><i class="fa-solid fa-arrow-left"></i> Back</a>
-
-                </div>
-            </div>
-        </div>
-        <form class="customerForm" id="all_data">
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="newJobForm">
-                        <div class="row">
-                            <div class="col-md-4 col-lg-4 col-xl-4">
-                                <div class="formDtail">
-                                    <h4 class="contTitle mb-3">Supplier Details</h4>
-                                    @csrf
-                                    <input type="hidden" id="id" name="id" value="<?php if ((isset($purchase_orders) && $purchase_orders != '') && (isset($duplicate) && $duplicate == '')) {
-                                                                                        echo $purchase_orders->id;
-                                                                                    } ?>">
-                                    <div class="mb-3 row">
-                                        <label for="inputCustomer"
-                                            class="col-sm-3 col-form-label">Supplier <span class="radStar">*</span></label>
-                                        <div class="col-sm-7">
-                                            <select class="form-control editInput selectOptions PurchaseOrdercheckError" id="purchase_supplier_id" name="supplier_id" onchange="get_supplier_details()">
-                                                <option selected disabled>Select Supplier</option>
-                                                <?php foreach ($suppliers as $suppVal) { ?>
-                                                    <option value="{{$suppVal->id}}" <?php if (isset($purchase_orders) && $suppVal->id == $purchase_orders->supplier_id) {
-                                                                                            echo 'selected';
-                                                                                        } ?>>{{$suppVal->name}}</option>
-                                                <?php } ?>
-                                            </select>
-                                        </div>
-                                        <div class="col-sm-1">
-                                            <a href="javascript:void(0)" class="formicon" data-bs-toggle="modal" data-bs-target="#supplierPop">
-                                                <i class="fa-solid fa-square-plus"></i></a>
-                                        </div>
-                                        <div class="col-sm-1" id="clock" style="display:none">
-                                            <a href="#!" class="formicon"><i class="fa-solid fa-clock"></i></a>
-                                        </div>
-                                    </div>
-                                    <div class="mb-3 row">
-                                        <label for="inputContact"
-                                            class="col-sm-3 col-form-label">Contact</label>
-                                        <div class="col-sm-7">
-                                            <select class="form-control editInput selectOptions" id="purchase_contact_id" name="contact_id" <?php if (!isset($purchase_orders) && $purchase_orders == '') {
-                                                                                                                                                echo 'disabled';
-                                                                                                                                            } ?>>
-                                                <option selected disabled>Select Supplier First</option>
-                                                @foreach($additional_contact as $addContact)
-                                                <option value="{{$addContact->id}}" <?php if (isset($purchase_orders) && $purchase_orders->contact_id == $addContact->id) {
-                                                                                        echo 'selected';
-                                                                                    } ?>>{{$addContact->contact_name}}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div class="col-sm-2">
-                                            <a href="javascript:void(0)" class="formicon" onclick="get_modal(1)"><i
-                                                    class="fa-solid fa-square-plus"></i></a>
-                                        </div>
-                                    </div>
-
-                                    <div class="mb-3 row">
-                                        <label for="inputName" class="col-sm-3 col-form-label">Name <span
-                                                class="radStar">*</span></label>
-                                        <div class="col-sm-9">
-                                            <input type="text" class="form-control editInput textareaInput PurchaseOrdercheckError" name="name" id="purchase_name" value="<?php if (isset($purchase_orders) && $purchase_orders != '') {
-                                                                                                                                                                                echo $purchase_orders->name;
-                                                                                                                                                                            } ?>" placeholder="Enter Your Full Name">
-                                        </div>
-                                    </div>
-                                    <div class="mb-3 row">
-                                        <label for="inputAddress"
-                                            class="col-sm-3 col-form-label">Address <span
-                                                class="radStar">*</span></label>
-                                        <div class="col-sm-9">
-                                            <textarea class="form-control textareaInput PurchaseOrdercheckError" id="purchase_address" name="address" rows="3" placeholder="Enter Your Address"><?php if (isset($purchase_orders) && $purchase_orders != '') {
-                                                                                                                                                                                                    echo $purchase_orders->address;
-                                                                                                                                                                                                } ?></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="mb-3 row">
-                                        <label for="inputCity" class="col-sm-3 col-form-label">City</label>
-                                        <div class="col-sm-9">
-                                            <input type="text" class="form-control editInput textareaInput" id="purchase_city" name="city" value="<?php if (isset($purchase_orders) && $purchase_orders != '') {
-                                                                                                                                                        echo $purchase_orders->city;
-                                                                                                                                                    } ?>" placeholder="Enter Your City">
-                                        </div>
-                                    </div>
-                                    <div class="mb-3 row">
-                                        <label for="inputCounty" class="col-sm-3 col-form-label">County</label>
-                                        <div class="col-sm-9">
-                                            <input type="text" class="form-control editInput textareaInput" id="purchase_county" name="county" value="<?php if (isset($purchase_orders) && $purchase_orders != '') {
-                                                                                                                                                            echo $purchase_orders->county;
-                                                                                                                                                        } ?>" placeholder="Enter Your County">
-                                        </div>
-                                    </div>
-                                    <div class="mb-3 row">
-                                        <label for="inputPincode"
-                                            class="col-sm-3 col-form-label">Postcode</label>
-                                        <div class="col-sm-9">
-                                            <input type="text" class="form-control editInput textareaInput" id="purchase_postcode" name="postcode" value="<?php if (isset($purchase_orders) && $purchase_orders != '') {
-                                                                                                                                                                echo $purchase_orders->postcode;
-                                                                                                                                                            } ?>" placeholder="Enter Your Postcode">
-                                        </div>
-                                    </div>
-                                    <div class="mb-3 row field">
-                                        <label for="inputTelephone"
-                                            class="col-sm-3 col-form-label">Telephone</label>
-                                        <div class="col-sm-3">
-                                            <select class="form-control editInput selectOptions" id="purchase_telephone_code" name="telephone_code">
-                                                @foreach($country as $Codeval)
-                                                <option value="{{$Codeval->id}}" <?php if (isset($purchase_orders) && $purchase_orders->telephone_code == $Codeval->id) {
-                                                                                        echo 'selcted';
-                                                                                    } else if ($Codeval->id == 230) {
-                                                                                        echo 'selected';
-                                                                                    } ?>>+{{$Codeval->code}} - {{$Codeval->name}}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <input type="text" class="form-control editInput textareaInput" id="purchase_telephone" name="telephone" value="<?php if (isset($purchase_orders) && $purchase_orders != '') {
-                                                                                                                                                                echo $purchase_orders->telephone;
-                                                                                                                                                            } ?>" placeholder="Enter Your Telephone" onkeypress="return event.charCode >= 48 && event.charCode <= 57">
-                                            <span style="color:red;display:none" id="CheckpurchaseTelephoneErr">Please enter 10 digit number</span>
-                                        </div>
-                                    </div>
-                                    <div class="mb-3 row field">
-                                        <label for="inputMobile" class="col-sm-3 col-form-label">Mobile</label>
-                                        <div class="col-sm-3">
-                                            <select class="form-control editInput selectOptions" id="purchase_mobile_code" name="mobile_code">
-                                                @foreach($country as $Codeval)
-                                                <option value="{{$Codeval->id}}" <?php if (isset($purchase_orders) && $purchase_orders->mobile_code == $Codeval->id) {
-                                                                                        echo 'selcted';
-                                                                                    } else if ($Codeval->id == 230) {
-                                                                                        echo 'selected';
-                                                                                    } ?>>+{{$Codeval->code}} - {{$Codeval->name}}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <input type="text" class="form-control editInput textareaInput" id="purchase_mobile" name="mobile" value="<?php if (isset($purchase_orders) && $purchase_orders != '') {
-                                                                                                                                                            echo $purchase_orders->mobile;
-                                                                                                                                                        } ?>" placeholder="Enter Your Mobile No." onkeypress="return event.charCode >= 48 && event.charCode <= 57">
-                                            <span style="color:red;display:none" id="CheckpurchaseMobileErr">Please enter 10 digit number</span>
-                                        </div>
-                                    </div>
-                                    <div class="mb-3 row">
-                                        <label for="inputEmail" class="col-sm-3 col-form-label">Email</label>
-                                        <div class="col-sm-9">
-                                            <input type="text" class="form-control editInput textareaInput" id="purchase_email" name="email" value="<?php if (isset($purchase_orders) && $purchase_orders != '') {
-                                                                                                                                                        echo $purchase_orders->email;
-                                                                                                                                                    } ?>" placeholder="Enter Your Email" onchange="purchase_check_email()">
-                                            <span style="color:red" id="purchaseemailErr"></span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4 col-lg-4 col-xl-4">
-                                <div class="formDtail">
-                                    <h4 class="contTitle mb-3">Customer / Delivery Details</h4>
-                                    <!-- <form class="customerForm"> -->
-                                    <div class="mb-3 row">
-                                        <label for="inputCustomer" class="col-sm-3 col-form-label">Customer</label>
-                                        <div class="col-sm-7">
-                                            <select class="form-control editInput selectOptions" <?php if (!isset($key) && $key == '') {
-                                                                                                        echo 'disabled';
-                                                                                                    } ?> id="purchase_customer_id" name="customer_id" onchange="get_customer_details()">
-                                                <option selected disabled>Select Customer</option>
-                                                <?php foreach ($customers as $cust) { ?>
-                                                    <option value="{{$cust->id}}" <?php if (isset($purchase_orders) && $purchase_orders->customer_id == $cust->id) {
-                                                                                        echo 'selected';
-                                                                                    } ?>>{{$cust->name}}</option>
-                                                <?php } ?>
-                                            </select>
-                                            <!-- <input type="text"  id="staticEmail"> -->
-                                        </div>
-                                        <div class="col-sm-1">
-                                            <a href="javascript:void(0)" class="formicon" onclick="get_modal(2)"><i
-                                                    class="fa-solid fa-square-plus"></i></a>
-                                        </div>
-                                    </div>
-                                    <div class="mb-3 row">
-                                        <label for="inputProject"
-                                            class="col-sm-3 col-form-label">Project</label>
-                                        <div class="col-sm-7">
-                                            <select class="form-control editInput selectOptions" id="purchase_project_id" name="project_id" <?php if (!isset($purchase_orders) && $purchase_orders == '') {
-                                                                                                                                                echo 'disabled';
-                                                                                                                                            } ?>>
-                                                <option selected disabled></option>
-                                                @foreach($projects as $project)
-                                                <option value="{{$project->id}}" <?php if (isset($purchase_orders) && $purchase_orders->project_id == $project->id) {
-                                                                                        echo 'selected';
-                                                                                    } ?>>{{$project->project_name}}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div class="col-sm-2">
-                                            <a href="javascript:void(0)" class="formicon" onclick="get_modal(3)"><i
-                                                    class="fa-solid fa-square-plus"></i></a>
-                                        </div>
-                                    </div>
-                                    <div class="mb-3 row">
-                                        <label for="inputCustomer" class="col-sm-3 col-form-label">Site</label>
-                                        <div class="col-sm-7">
-                                            <select class="form-control editInput selectOptions get_site_result" onchange="siteDetail()" id="purchase_site_id" name="site_id" <?php if (!isset($purchase_orders) && $purchase_orders == '') {
-                                                                                                                                                                                    echo 'disabled';
-                                                                                                                                                                                } ?>>
-                                                <option selected disabled value="">None</option>
-                                                <option <?php if (isset($purchase_orders) && $purchase_orders->site_id == 0) {
-                                                            echo 'selected';
-                                                        } ?> value="0">Same as customer</option>
-                                                @foreach($site as $siteVal)
-                                                <option value="{{$siteVal->id}}" <?php if (isset($purchase_orders) && $purchase_orders->site_id == $siteVal->id) {
-                                                                                        echo 'selected';
-                                                                                    } ?>>{{$siteVal->site_name}}</option>
-                                                @endforeach
-                                            </select>
-                                            <!-- <input type="text"  id="staticEmail"> -->
-                                        </div>
-                                        <div class="col-sm-1">
-                                            <a href="javascript:void(0)" class="formicon" onclick="get_modal(4)"><i
-                                                    class="fa-solid fa-square-plus"></i></a>
-                                        </div>
-
-
-
-                                    </div>
-
-                                    <div class="mb-3 row">
-                                        <label for="inputContact"
-                                            class="col-sm-3 col-form-label">Name <span class="radStar">*</span></label>
-                                        <div class="col-sm-9">
-                                            <input type="text" name="user_name" id="purchase_user_name" class="form-control editInput textareaInput PurchaseOrdercheckError" value="<?php if (isset($purchase_orders) && $purchase_orders->user_name != '') {
-                                                                                                                                                                                        echo $purchase_orders->user_name;
-                                                                                                                                                                                    } else {
-                                                                                                                                                                                        echo Auth::user()->name;
-                                                                                                                                                                                    } ?>" placeholder="Enter Your Name">
-                                        </div>
-                                    </div>
-                                    <div class="mb-3 row">
-                                        <label for="inputContact"
-                                            class="col-sm-3 col-form-label">Company</label>
-                                        <div class="col-sm-9">
-                                            <input type="text" name="company_name" id="purchase_company_name" class="form-control editInput textareaInput" value="<?php if (isset($purchase_orders) && $purchase_orders->company_name != '') {
-                                                                                                                                                                        echo $purchase_orders->company_name;
-                                                                                                                                                                    } else {
-                                                                                                                                                                        echo $company_name;
-                                                                                                                                                                    } ?>" placeholder="Enter Comapny Name">
-                                        </div>
-                                    </div>
-                                    <div class="mb-3 row">
-                                        <label for="inputAddress"
-                                            class="col-sm-3 col-form-label">Address <span class="radStar">*</span></label>
-                                        <div class="col-sm-9">
-                                            <textarea class="form-control textareaInput PurchaseOrdercheckError" id="purchase_user_address" name="user_address" rows="3" placeholder="Enter Your Address"><?php if (isset($purchase_orders) && $purchase_orders->user_address != '') {
-                                                                                                                                                                                                                echo $purchase_orders->user_address;
-                                                                                                                                                                                                            } else {
-                                                                                                                                                                                                                echo Auth::user()->current_location;
-                                                                                                                                                                                                            } ?></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="mb-3 row">
-                                        <label for="inputName" class="col-sm-3 col-form-label">City</label>
-                                        <div class="col-sm-9">
-                                            <input type="text" class="form-control  editInput textareaInput" id="purchase_user_city" name="user_city" value="<?php if (isset($purchase_orders) && $purchase_orders->user_city != '') {
-                                                                                                                                                                    echo $purchase_orders->user_city;
-                                                                                                                                                                } ?>" placeholder="Enter Your City">
-                                        </div>
-                                    </div>
-                                    <div class="mb-3 row">
-                                        <label for="inputName" class="col-sm-3 col-form-label">County</label>
-                                        <div class="col-sm-9">
-                                            <input type="text" class="form-control editInput textareaInput" id="purchase_user_county" name="user_county" value="<?php if (isset($purchase_orders) && $purchase_orders->user_county != '') {
-                                                                                                                                                                    echo $purchase_orders->user_county;
-                                                                                                                                                                } ?>" placeholder="Enter Your County">
-                                        </div>
-                                    </div>
-                                    <div class="mb-3 row">
-                                        <label for="inputEmail" class="col-sm-3 col-form-label">Postcode</label>
-                                        <div class="col-sm-9">
-                                            <input type="text" class="form-control editInput textareaInput" id="purchase_user_post_code" name="user_post_code" value="<?php if (isset($purchase_orders) && $purchase_orders->user_post_code != '') {
-                                                                                                                                                                            echo $purchase_orders->user_post_code;
-                                                                                                                                                                        } ?>" placeholder="Enter Your Postcode">
-                                        </div>
-                                    </div>
-                                    <div class="mb-3 row field">
-                                        <label for="inputTelephone"
-                                            class="col-sm-3 col-form-label">Telephone</label>
-                                        <div class="col-sm-3">
-                                            <select class="form-control editInput selectOptions" id="purchase_user_telephone_code" name="user_telephone_code">
-                                                @foreach($country as $Codeval)
-                                                <option value="{{$Codeval->id}}" <?php if (isset($purchase_orders) && $purchase_orders->user_telephone_code == $Codeval->id) {
-                                                                                        echo 'selected';
-                                                                                    } ?>>+{{$Codeval->code}}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <input type="text" class="form-control editInput textareaInput" id="purchase_user_telephone" name="user_telephone" value="<?php if (isset($purchase_orders) && $purchase_orders->user_telephone != '') {
-                                                                                                                                                                            echo $purchase_orders->user_telephone;
-                                                                                                                                                                        } else {
-                                                                                                                                                                            echo Auth::user()->phone_no;
-                                                                                                                                                                        } ?>" placeholder="Enter Your Telephone" onkeypress="return event.charCode >= 48 && event.charCode <= 57">
-                                            <span style="color:red;display:none" id="CheckpurchaseUserTelephoneErr">Please enter 10 digit number</span>
-                                        </div>
-                                    </div>
-                                    <div class="mb-3 row field">
-                                        <label for="inputMobile" class="col-sm-3 col-form-label">Mobile</label>
-                                        <div class="col-sm-3">
-                                            <select class="form-control editInput selectOptions" id="purchase_user_mobile_code" name="user_mobile_code">
-                                                @foreach($country as $Codeval)
-                                                <option value="{{$Codeval->id}}" <?php if (isset($purchase_orders) && $purchase_orders->user_telephone_code == $Codeval->id) {
-                                                                                        echo 'selected';
-                                                                                    } ?>>+{{$Codeval->code}}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <input type="text" class="form-control editInput textareaInput" id="purchase_user_mobile" name="user_mobile" value="<?php if (isset($purchase_orders) && $purchase_orders->user_mobile != '') {
-                                                                                                                                                                    echo $purchase_orders->user_mobile;
-                                                                                                                                                                } else {
-                                                                                                                                                                    echo Auth::user()->mobile;
-                                                                                                                                                                } ?>" placeholder="Enter Your Mobile No." onkeypress="return event.charCode >= 48 && event.charCode <= 57">
-                                            <span style="color:red;display:none" id="CheckpurchaseUserMobileErr">Please enter 10 digit number</span>
-                                        </div>
-                                    </div>
-                                    <div class="mb-3 row align-items-center">
-                                        <label for="inputAddress"
-                                            class="col-sm-3 pe-0 col-form-label">Expected Delivery On</label>
-                                        <div class="col-sm-9">
-                                            <?php
-                                            $expectedDeliveryDate = isset($purchase_orders) && !empty($purchase_orders->expected_deleveryDate)
-                                                ? $purchase_orders->expected_deleveryDate
-                                                : date('Y-m-d', strtotime('+1 day'));
-                                            ?>
-                                            <input type="date" class="form-control editInput textareaInput" id="purchase_expected_deleveryDate" name="expected_deleveryDate" value="<?php echo $expectedDeliveryDate; ?>">
-                                        </div>
-                                        <!-- <div class="col-sm-2 calendar_icon">
-                                            <i class="fa fa-calendar-alt"></i>
-                                        </div> -->
-
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4 col-lg-4 col-xl-4">
-                                <div class="formDtail">
-                                    <h4 class="contTitle mb-3">Purchase Order Details</h4>
-                                    <!-- <form class="customerForm"> -->
-                                    <div class="mb-3 row">
-                                        <label for="inputJobRef" class="col-sm-4 col-form-label">Purchase Order Ref.</label>
-                                        <div class="col-sm-8">
-                                            <input type="text" class="form-control-plaintext editInput" id="inputJobRef" value="<?php if (isset($purchase_orders) && $purchase_orders->purchase_order_ref != '') {
-                                                                                                                                    echo $purchase_orders->purchase_order_ref;
-                                                                                                                                } else {
-                                                                                                                                    echo 'Auto generate';
-                                                                                                                                } ?>" readonly>
-                                        </div>
-                                    </div>
-                                    <div class="mb-3 row">
-                                        <label for="inputJobType" class="col-sm-3 col-form-label">Department</label>
-                                        <div class="col-sm-7">
-                                            <select class="form-control editInput selectOptions" id="purchase_department_id" name="department_id">
-                                                <option selected disabled>Please Select</option>
-                                                <?php foreach ($department as $dept) { ?>
-                                                    <option value="{{$dept->id}}" <?php if (isset($purchase_orders) && $purchase_orders->department_id == $dept->id) {
-                                                                                        echo 'selected';
-                                                                                    } ?>>{{$dept->title}}</option>
-                                                <?php } ?>
-                                            </select>
-                                        </div>
-                                        <div class="col-sm-2">
-                                            <a href="javascript:void(0)" class="formicon" onclick="get_modal(5)"><i
-                                                    class="fa-solid fa-square-plus"></i></a>
-                                        </div>
-                                    </div>
-                                    <div class="mb-3 row">
-                                        <label for="inputTelephone" class="col-sm-3 pe-0 col-form-label">Purchase Date <span class="radStar">*</span></label>
-                                        <div class="col-sm-9">
-                                            <input type="date" class="form-control editInput PurchaseOrdercheckError" id="purchase_purchase_date" name="purchase_date" value="">
-                                        </div>
-                                        <!-- <div class="col-sm-2 calendar_icon">
-                                            <i class="fa fa-calendar-alt"></i>
-                                        </div> -->
-                                    </div>
-                                    <div class="mb-3 row">
-                                        <label for="inputCustomer" class="col-sm-3 col-form-label">Reference</label>
-                                        <div class="col-sm-9">
-                                            <input type="text" class="form-control editInput textareaInput" id="purchase_reference" name="reference" placeholder="Reference(if any)" value="<?php if (isset($purchase_orders) && $purchase_orders->reference != '') {
-                                                                                                                                                                                                echo $purchase_orders->reference;
-                                                                                                                                                                                            } ?>">
-                                        </div>
-                                    </div>
-                                    <div class="mb-3 row">
-                                        <label for="inputCustomer" class="col-sm-3 col-form-label">Quote Ref</label>
-                                        <div class="col-sm-7 position-relative">
-                                            <input type="text" class="form-control editInput textareaInput" id="purchase_qoute_ref" name="purchase_qoute_ref" placeholder="Quote, if any" value="<?php if (isset($purchase_orders) && $purchase_orders->qoute_ref != '') {
-                                                                                                                                                                                                        echo $purchase_orders->qoute_ref;
-                                                                                                                                                                                                    } ?>">
-                                            <input type="hidden" id="selectedPurchaseQuotRefId" name="qoute_ref">
-                                            <div class="search-container purchase_qoute_ref-container"></div>
-                                        </div>
-                                        <div class="col-sm-2">
-                                            <div class="formicon" onclick="show_searchModal(1)">
-                                                <i class="fas fa-magnifying-glass"></i>
+            <div class="col-sm-12 p-0">
+                <div class="panel">
+                    <header class="panel-heading px-5">
+                        @if((isset($key) && $key !='') && (isset($duplicate) && $duplicate ==''))
+                        <h4 class="header_text">{{$purchase_orders->purchase_order_ref}}</h4>
+                        @else
+                        <h4 class="header_text">New Purchase Order</h4>
+                        @endif
+                    </header>
+                    <div class="panel-body">
+                        <div class="col-md-12">
+                            <form class="customerForm" id="all_data">
+                                <div class="row separate_section">
+                                    <div class="col-lg-12">
+                                        <h4 class="m-t-0 m-b-20 clr-blue fnt-20 text-center">Supplier Details</h4>
+                                        @csrf
+                                        <input type="hidden" id="id" name="id" value="<?php if((isset($purchase_orders) && $purchase_orders != '') && (isset($duplicate) && $duplicate == '')) {echo $purchase_orders->id; } ?>">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="mb-3">
+                                                    <label class="col-form-label mb-2">Supplier <span class="radStar">*</span></label>
+                                                        <div class="row">
+                                                            <div class="col-sm-10">
+                                                                <select class="form-control editInput selectOptions PurchaseOrdercheckError" id="purchase_supplier_id" name="supplier_id" onchange="get_supplier_details()">
+                                                                    <option selected disabled>Select Supplier</option>
+                                                                    <?php foreach ($suppliers as $suppVal) { ?>
+                                                                        <option value="{{$suppVal->id}}" <?php if (isset($purchase_orders) && $suppVal->id == $purchase_orders->supplier_id) {echo 'selected';} ?>>{{$suppVal->name}}</option>
+                                                                    <?php } ?>
+                                                                </select>
+                                                            </div>
+                                                            <div class="col-sm-1">
+                                                                <a href="javascript:void(0)" class="formicon" data-toggle="modal" data-target="#supplierPop">
+                                                                    <i class="fa fa-plus-square"></i></a>
+                                                            </div>
+                                                            <div class="col-sm-1" id="clock" style="display:none">
+                                                                <a href="#!" class="formicon"><i class="fa fa-clock"></i></a>
+                                                            </div>
+                                                        </div>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="col-form-label mb-2">Contact</label>
+                                                    <div class="row">
+                                                        <div class="col-sm-10">
+                                                            <select class="form-control editInput selectOptions" id="purchase_contact_id" name="contact_id" <?php if (!isset($purchase_orders) && $purchase_orders == '') {echo 'disabled'; } ?>>
+                                                                <option selected disabled>Select Supplier First</option>
+                                                                @foreach($additional_contact as $addContact)
+                                                                <option value="{{$addContact->id}}" <?php if (isset($purchase_orders) && $purchase_orders->contact_id == $addContact->id) { echo 'selected'; } ?>>{{$addContact->contact_name}}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-sm-2">
+                                                            <a href="javascript:void(0)" class="formicon" onclick="get_modal(1)">
+                                                                <i class="fa fa-plus-square"></i>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="col-form-label mb-2">Name <span class="radStar">*</span></label>
+                                                    <input type="text" class="form-control editInput textareaInput PurchaseOrdercheckError" name="name" id="purchase_name" value="<?php if (isset($purchase_orders) && $purchase_orders != '') {echo $purchase_orders->name; } ?>" placeholder="Enter Your Full Name">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="col-form-label mb-2">Address <span class="radStar">*</span></label>
+                                                    <textarea class="form-control textareaInput PurchaseOrdercheckError" id="purchase_address" name="address" rows="2" placeholder="Enter Your Address"><?php if (isset($purchase_orders) && $purchase_orders != '') {echo $purchase_orders->address; } ?></textarea>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="mb-3">
+                                                    <label class="col-form-label mb-2">City</label>
+                                                    <input type="text" class="form-control editInput textareaInput" id="purchase_city" name="city" value="<?php if (isset($purchase_orders) && $purchase_orders != '') { echo $purchase_orders->city; } ?>" placeholder="Enter Your City">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="col-form-label mb-2">County</label>
+                                                    <input type="text" class="form-control editInput textareaInput" id="purchase_county" name="county" value="<?php if (isset($purchase_orders) && $purchase_orders != '') {echo $purchase_orders->county; } ?>" placeholder="Enter Your County">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="col-form-label mb-2">Postcode</label>
+                                                    <input type="text" class="form-control editInput textareaInput" id="purchase_postcode" name="postcode" value="<?php if (isset($purchase_orders) && $purchase_orders != '') {echo $purchase_orders->postcode;} ?>" placeholder="Enter Your Postcode">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="mb-3 field">
+                                                    <label class="col-form-label mb-2">Telephone</label>
+                                                    <div class="row">
+                                                        <div class="col-sm-3 pe-0">
+                                                            <select class="form-control editInput selectOptions" id="purchase_telephone_code" name="telephone_code">
+                                                                @foreach($country as $Codeval)
+                                                                <option value="{{$Codeval->id}}" <?php if (isset($purchase_orders) && $purchase_orders->telephone_code == $Codeval->id) {echo 'selcted'; } else if ($Codeval->id == 230) {echo 'selected'; } ?>>+{{$Codeval->code}} - {{$Codeval->name}}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-sm-9">
+                                                            <input type="text" class="form-control editInput textareaInput" id="purchase_telephone" name="telephone" value="<?php if (isset($purchase_orders) && $purchase_orders != '') { echo $purchase_orders->telephone; } ?>" placeholder="Enter Your Telephone" onkeypress="return event.charCode >= 48 && event.charCode <= 57">
+                                                            <span style="color:red;display:none" id="CheckpurchaseTelephoneErr">Please enter 10 digit number</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="mb-3 field">
+                                                    <label class="col-form-label mb-2">Mobile</label>
+                                                    <div class="row">
+                                                        <div class="col-sm-3 pe-0">
+                                                            <select class="form-control editInput selectOptions" id="purchase_mobile_code" name="mobile_code">
+                                                                @foreach($country as $Codeval)
+                                                                <option value="{{$Codeval->id}}" <?php if (isset($purchase_orders) && $purchase_orders->mobile_code == $Codeval->id) {echo 'selcted'; } else if ($Codeval->id == 230) { echo 'selected';} ?>>+{{$Codeval->code}} - {{$Codeval->name}}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-sm-9">
+                                                            <input type="text" class="form-control editInput textareaInput" id="purchase_mobile" name="mobile" value="<?php if (isset($purchase_orders) && $purchase_orders != '') { echo $purchase_orders->mobile;} ?>" placeholder="Enter Your Mobile No." onkeypress="return event.charCode >= 48 && event.charCode <= 57">
+                                                            <span style="color:red;display:none" id="CheckpurchaseMobileErr">Please enter 10 digit number</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="col-form-label mb-2">Email</label>
+                                                    <input type="text" class="form-control editInput textareaInput" id="purchase_email" name="email" value="<?php if (isset($purchase_orders) && $purchase_orders != '') {echo $purchase_orders->email;} ?>" placeholder="Enter Your Email" onchange="purchase_check_email()"><span style="color:red" id="purchaseemailErr"></span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="mb-3 row">
-                                        <label for="inputPurchase" class="col-sm-3 col-form-label">Job Ref</label>
-                                        <div class="col-sm-7 position-relative">
-                                            <input type="text" class="form-control editInput textareaInput" id="purchase_job_ref" name="purchase_job_ref" placeholder="Job Ref, if any" value="<?php if (isset($purchase_orders) && $purchase_orders->job_ref != '') {
-                                                                                                                                                                                                    echo $purchase_orders->job_ref;
-                                                                                                                                                                                                } ?>">
-                                            <input type="hidden" id="selectedPurchaseJobRefId" name="job_ref">
-                                            <div class="search-container purchase_job_ref-container"></div>
-                                        </div>
-                                        <div class="col-sm-2">
-                                            <div class="formicon" onclick="show_searchModal(2)">
-                                                <i class="fas fa-magnifying-glass"></i>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="mb-3 row">
-                                        <label for="inputPurchase" class="col-sm-3 col-form-label">Invoice Ref</label>
-                                        <div class="col-sm-7">
-                                            <input type="text" class="form-control editInput textareaInput" id="purchase_invoice_ref" name="invoice_ref" placeholder="Invoice Ref, if any" value="<?php if (isset($purchase_orders) && $purchase_orders->invoice_ref != '') {
-                                                                                                                                                                                                        echo $purchase_orders->invoice_ref;
-                                                                                                                                                                                                    } ?>">
-                                        </div>
-                                        <div class="col-sm-2">
-                                            <div class="formicon" onclick="show_searchModal(3)">
-                                                <i class="fas fa-magnifying-glass"></i>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="mb-2 row">
-                                        <label class="col-sm-3 col-form-label">Payment Terms</label>
-                                        <div class="col-sm-6">
-                                            <select class="form-control editInput selectOptions" id="purchase_payment_terms" name="payment_terms" onchange="updateDueDate()">
-
-                                                </option>
-                                                <?php for ($i = 0; $i <= 90; $i++) { ?>
-                                                    <option value="{{$i}}" <?php if (isset($purchase_orders) && $purchase_orders->payment_terms == $i) {
-                                                                                echo 'selected';
-                                                                            } ?>>{{$i}}</option>
-                                                <?php } ?>
-                                            </select>
-                                        </div>
-                                        <div class="col-sm-3">
-                                            <label class="form-check-label checkboxtext" for="checkalrt">
-                                                days</label>
-                                        </div>
-
-                                    </div>
-                                    <div class="mb-3 row align-items-center">
-                                        <label for="inputTelephone" class="col-sm-3 pe-0 col-form-label">Payment Due Date</label>
-                                        <div class="col-sm-9">
-                                            <input type="date" class="form-control editInput" id="purchase_payment_due_date" name="payment_due_date" value="">
-                                        </div>
-                                        <!-- <div class="col-sm-2 calendar_icon">
-                                            <i class="fa fa-calendar-alt"></i>
-                                        </div> -->
-                                    </div>
-
-                                    <div class="mb-3 row">
-                                        <label for="inputPriority"
-                                            class="col-sm-3 col-form-label">Status</label>
-                                        <div class="col-sm-9">
-                                            <select class="form-control editInput selectOptions" id="purchase_status" name="status">
-                                                <option value="1" <?php if (isset($purchase_orders) && $purchase_orders->status == 1) {
-                                                                        echo 'selected';
-                                                                    } else {
-                                                                        echo 'selected';
-                                                                    } ?>>Draft</option>
-                                                <option value="2" <?php if (isset($purchase_orders) && $purchase_orders->status == 2) {
-                                                                        echo 'selected';
-                                                                    } ?>>Awaiting Approval</option>
-                                                <option value="3" <?php if (isset($purchase_orders) && $purchase_orders->status == 3) {
-                                                                        echo 'selected';
-                                                                    } ?>>Approved</option>
-                                                <option value="4" <?php if (isset($purchase_orders) && $purchase_orders->status == 4) {
-                                                                        echo 'selected';
-                                                                    } ?>>Actioned</option>
-                                                <option value="5" disabled>Paid</option>
-                                                <option value="6" <?php if (isset($purchase_orders) && $purchase_orders->status == 6) {
-                                                                        echo 'selected';
-                                                                    } ?>>Cancelled</option>
-                                                <option value="7" <?php if (isset($purchase_orders) && $purchase_orders->status == 7) {
-                                                                        echo 'selected';
-                                                                    } ?>>Invoice Received</option>
-                                                <option value="8" disabled>Rejected</option>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <div class="mb-3 row">
-                                        <label for="inputCountry" class="col-sm-3 col-form-label">Tags</label>
-                                        <div class="col-sm-7">
-                                            <select class="form-control editInput selectOptions" id="purchase_tag_id" name="tag_id">
-                                                <option selected disabled>None</option>
-                                                @foreach($tag as $tagval)
-                                                <option value="{{$tagval->id}}" <?php if (isset($purchase_orders) && $purchase_orders->tag_id == $tagval->id) {
-                                                                                    echo 'selected';
-                                                                                } ?>>{{$tagval->title}}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div class="col-sm-2">
-                                            <a href="javascript:void(0)" class="formicon">
-                                                <i class="fa-solid fa-square-plus" onclick="get_modal(6)"></i></a>
-                                        </div>
-                                    </div>
-                                    <div class="mb-3 row">
-                                        <label for="" class="col-sm-5 col-form-label">
-                                            <a href="javascript:void(0)" onclick="openReminderModal(<?php if (isset($purchase_orders) && $purchase_orders != '') {
-                                                                                                        echo $purchase_orders->id;
-                                                                                                    } ?>)" class="profileDrop pink"> <i class="fa fa-clock"></i> Set
-                                                Riminder </a>
-                                        </label>
-
-                                    </div>
-                                    <div class="setRiminderTable" style="display:none">
-                                        <div class="productDetailTable">
-                                            <table class="table" id="">
-                                                <thead class="table-light">
-                                                    <tr>
-                                                        <th>Title </th>
-                                                        <th>Date </th>
-                                                        <th>Time</th>
-                                                        <th>Status </th>
-                                                        <th>Action</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody id="reminder_data">
-                                                    @foreach($reminder_data as $reminderVal)
-                                                    <tr>
-                                                        <td>{{$reminderVal->title}}</td>
-                                                        <td>{{$reminderVal->reminder_date}}</td>
-                                                        <td>{{$reminderVal->reminder_time}}</td>
-                                                        @if($reminderVal->status == 1)
-                                                        <td><span class="iconColrGreen">Sent</span></td>
-                                                        <td>
-
-                                                            <a href="javascript:void(0)" data-id="{{$reminderVal->id}}" data-title="{{$reminderVal->title}}" data-user_id="{{$reminderVal->user_id}}" data-reminder_date="{{$reminderVal->reminder_date}}" data-reminder_time="{{$reminderVal->reminder_time}}" data-notification="{{$reminderVal->notification}}" data-sms="{{$reminderVal->sms}}" data-email="{{$reminderVal->email}}" data-notes="{{$reminderVal->notes}}" data-icon="eye" class="fecth_data"><i class="material-symbols-outlined">
-                                                                    visibility
-                                                                </i></a>
-                                                            <a href="#!" class="iconColrGreen"><i class="material-symbols-outlined">
-                                                                    check_circle
-                                                                </i></a>
-                                                        </td>
-                                                        @else
-                                                        <td><span class="iconColrRad">Pending</span></td>
-                                                        <td>
-                                                            <a href="javascript:void(0)" class="iconColrGreen fecth_data" data-id="{{$reminderVal->id}}" data-title="{{$reminderVal->title}}" data-user_id="{{$reminderVal->user_id}}" data-reminder_date="{{$reminderVal->reminder_date}}" data-reminder_time="{{$reminderVal->reminder_time}}" data-notification="{{$reminderVal->notification}}" data-sms="{{$reminderVal->sms}}" data-email="{{$reminderVal->email}}" data-notes="{{$reminderVal->notes}}" data-icon="edit"><i class="material-symbols-outlined">edit</i></a>
-                                                            <a href="javascript:void(0)" class="iconColrRad"><i class="material-symbols-outlined">close</i></a>
-                                                        </td>
-                                                        @endif
-                                                    </tr>
-                                                    @endforeach
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-
-                                    <!-- </form> -->
                                 </div>
+                                <div class="row separate_section">
+                                    <div class="col-lg-12">  
+                                        <h4 class="m-t-0 m-b-20 clr-blue fnt-20 text-center">Customer / Delivery Details</h4>
+                                        <!-- <form class="customerForm"> -->
+                                        <div class="row">
+                                            <div class="col-sm-4">
+                                                <div class="mb-3">
+                                                    <label class="col-form-label mb-2">Customer</label>
+                                                    <div class="row">
+                                                        <div class="col-sm-10">
+                                                            <select class="form-control editInput selectOptions" <?php if (!isset($key) && $key == '') { echo 'disabled'; } ?> id="purchase_customer_id" name="customer_id" onchange="get_customer_details()">
+                                                                <option selected disabled>Select Customer</option>
+                                                                <?php foreach ($customers as $cust) { ?>
+                                                                    <option value="{{$cust->id}}" <?php if (isset($purchase_orders) && $purchase_orders->customer_id == $cust->id) {echo 'selected'; } ?>>{{$cust->name}}</option>
+                                                                <?php } ?>
+                                                            </select>
+                                                            <!-- <input type="text"  id="staticEmail"> -->
+                                                        </div>
+                                                        <div class="col-sm-2">
+                                                            <a href="javascript:void(0)" class="formicon" onclick="get_modal(2)"><i
+                                                                    class="fa fa-plus-square"></i></a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="col-form-label mb-2">Project</label>
+                                                    <div class="row">
+                                                        <div class="col-sm-10">
+                                                            <select class="form-control editInput selectOptions" id="purchase_project_id" name="project_id" <?php if (!isset($purchase_orders) && $purchase_orders == '') {echo 'disabled';} ?>>
+                                                                <option selected disabled></option>
+                                                                @foreach($projects as $project)
+                                                                <option value="{{$project->id}}" <?php if (isset($purchase_orders) && $purchase_orders->project_id == $project->id) {echo 'selected';} ?>>{{$project->project_name}}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-sm-2">
+                                                            <a href="javascript:void(0)" class="formicon" onclick="get_modal(3)"><i
+                                                                    class="fa fa-plus-square"></i></a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="col-form-label mb-2">Site</label>
+                                                    <div class="row">
+                                                        <div class="col-sm-10">
+                                                            <select class="form-control editInput selectOptions get_site_result" onchange="siteDetail()" id="purchase_site_id" name="site_id" <?php if (!isset($purchase_orders) && $purchase_orders == '') {echo 'disabled'; } ?>>
+                                                                <option selected disabled value="">None</option>
+                                                                <option <?php if (isset($purchase_orders) && $purchase_orders->site_id == 0) {
+                                                                            echo 'selected';
+                                                                        } ?> value="0">Same as customer</option>
+                                                                @foreach($site as $siteVal)
+                                                                <option value="{{$siteVal->id}}" <?php if (isset($purchase_orders) && $purchase_orders->site_id == $siteVal->id) { echo 'selected'; } ?>>{{$siteVal->site_name}}</option>
+                                                                @endforeach
+                                                            </select>
+                                                            <!-- <input type="text"  id="staticEmail"> -->
+                                                        </div>
+                                                        <div class="col-sm-2">
+                                                            <a href="javascript:void(0)" class="formicon" onclick="get_modal(4)"><i class="fa fa-plus-square"></i></a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="col-form-label mb-2">Name <span class="radStar">*</span></label>
+                                                    <input type="text" name="user_name" id="purchase_user_name" class="form-control editInput textareaInput PurchaseOrdercheckError" value="<?php if (isset($purchase_orders) && $purchase_orders->user_name != '') {echo $purchase_orders->user_name;} else {echo Auth::user()->name; } ?>" placeholder="Enter Your Name">
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <div class="mb-3">
+                                                    <label class="col-form-label mb-2">Company</label>
+                                                    <input type="text" name="company_name" id="purchase_company_name" class="form-control editInput textareaInput" value="<?php if (isset($purchase_orders) && $purchase_orders->company_name != '') {echo $purchase_orders->company_name;} else {echo $company_name;} ?>" placeholder="Enter Comapny Name">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="col-form-label mb-2">Address <span class="radStar">*</span></label>
+                                                    <textarea class="form-control textareaInput PurchaseOrdercheckError" id="purchase_user_address" name="user_address" rows="2" placeholder="Enter Your Address"><?php if (isset($purchase_orders) && $purchase_orders->user_address != '') { echo $purchase_orders->user_address;} else {echo Auth::user()->current_location; } ?></textarea>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="col-form-label mb-2">City</label>
+                                                    <input type="text" class="form-control  editInput textareaInput" id="purchase_user_city" name="user_city" value="<?php if (isset($purchase_orders) && $purchase_orders->user_city != '') { echo $purchase_orders->user_city;} ?>" placeholder="Enter Your City">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="col-form-label mb-2">County</label>
+                                                    <input type="text" class="form-control editInput textareaInput" id="purchase_user_county" name="user_county" value="<?php if (isset($purchase_orders) && $purchase_orders->user_county != '') { echo $purchase_orders->user_county; } ?>" placeholder="Enter Your County">
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <div class="mb-3">
+                                                    <label class="col-form-label">Postcode</label>
+                                                    <input type="text" class="form-control editInput textareaInput" id="purchase_user_post_code" name="user_post_code" value="<?php if (isset($purchase_orders) && $purchase_orders->user_post_code != '') {echo $purchase_orders->user_post_code;} ?>" placeholder="Enter Your Postcode">
+                                                </div>
+                                                <div class="mb-3 field">
+                                                    <label class="col-form-label mb-2">Telephone</label>
+                                                    <div class="row">
+                                                        <div class="col-sm-3">
+                                                            <select class="form-control editInput selectOptions" id="purchase_user_telephone_code" name="user_telephone_code">
+                                                                @foreach($country as $Codeval)
+                                                                <option value="{{$Codeval->id}}" <?php if (isset($purchase_orders) && $purchase_orders->user_telephone_code == $Codeval->id) {echo 'selected'; } ?>>+{{$Codeval->code}}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-sm-9">
+                                                            <input type="text" class="form-control editInput textareaInput" id="purchase_user_telephone" name="user_telephone" value="<?php if (isset($purchase_orders) && $purchase_orders->user_telephone != '') { echo $purchase_orders->user_telephone; } else {echo Auth::user()->phone_no; } ?>" placeholder="Enter Your Telephone" onkeypress="return event.charCode >= 48 && event.charCode <= 57">
+                                                            <span style="color:red;display:none" id="CheckpurchaseUserTelephoneErr">Please enter 10 digit number</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="mb-3 field">
+                                                    <label class="col-form-label mb-2">Mobile</label>
+                                                    <div class="row">
+                                                        <div class="col-sm-3">
+                                                            <select class="form-control editInput selectOptions" id="purchase_user_mobile_code" name="user_mobile_code">
+                                                                @foreach($country as $Codeval)
+                                                                <option value="{{$Codeval->id}}" <?php if (isset($purchase_orders) && $purchase_orders->user_telephone_code == $Codeval->id) { echo 'selected'; } ?>>+{{$Codeval->code}}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-sm-9">
+                                                            <input type="text" class="form-control editInput textareaInput" id="purchase_user_mobile" name="user_mobile" value="<?php if (isset($purchase_orders) && $purchase_orders->user_mobile != '') { echo $purchase_orders->user_mobile; } else { echo Auth::user()->mobile; } ?>" placeholder="Enter Your Mobile No." onkeypress="return event.charCode >= 48 && event.charCode <= 57">
+                                                            <span style="color:red;display:none" id="CheckpurchaseUserMobileErr">Please enter 10 digit number</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="col-form-label mb-2">Expected Delivery On</label>
+                                                    <?php
+                                                    $expectedDeliveryDate = isset($purchase_orders) && !empty($purchase_orders->expected_deleveryDate)
+                                                        ? $purchase_orders->expected_deleveryDate
+                                                        : date('Y-m-d', strtotime('+1 day'));
+                                                    ?>
+                                                    <input type="date" class="form-control editInput textareaInput" id="purchase_expected_deleveryDate" name="expected_deleveryDate" value="<?php echo $expectedDeliveryDate; ?>">
+                                                    <!-- <div class="col-sm-2 calendar_icon">
+                                                        <i class="fa fa-calendar-alt"></i>
+                                                    </div> -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row separate_section">
+                                    <div class="col-lg-12">
+                                        <h4 class="m-t-0 m-b-20 clr-blue fnt-20 text-center">Purchase Order Details</h4>
+                                        <!-- <form class="customerForm"> -->
+                                        <div class="row">
+                                            <div class="col-sm-4">
+                                                <div class="mb-3">
+                                                    <label class="col-form-label mb-2">Purchase Order Ref.</label>
+                                                    <input type="text" class="form-control editInput" id="inputJobRef" value="<?php if (isset($purchase_orders) && $purchase_orders->purchase_order_ref != '') { echo $purchase_orders->purchase_order_ref; } else { echo 'Auto generate'; } ?>" readonly>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="col-form-label mb-2">Department</label>
+                                                    <div class="row">
+                                                        <div class="col-sm-10">
+                                                            <select class="form-control editInput selectOptions" id="purchase_department_id" name="department_id">
+                                                                <option selected disabled>Please Select</option>
+                                                                <?php foreach ($department as $dept) { ?>
+                                                                    <option value="{{$dept->id}}" <?php if (isset($purchase_orders) && $purchase_orders->department_id == $dept->id) { echo 'selected'; } ?>>{{$dept->title}}</option>
+                                                                <?php } ?>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-sm-2">
+                                                            <a href="javascript:void(0)" class="formicon" onclick="get_modal(5)"><i
+                                                                    class="fa fa-plus-square"></i></a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="col-form-label mb-2">Purchase Date <span class="radStar">*</span></label>
+                                                    <input type="date" class="form-control editInput PurchaseOrdercheckError" id="purchase_purchase_date" name="purchase_date" value="">
+                                                    <!-- <div class="col-sm-2 calendar_icon">
+                                                        <i class="fa fa-calendar-alt"></i>
+                                                    </div> -->
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="col-form-label mb-2">Reference</label>
+                                                    <input type="text" class="form-control editInput textareaInput" id="purchase_reference" name="reference" placeholder="Reference(if any)" value="<?php if (isset($purchase_orders) && $purchase_orders->reference != '') { echo $purchase_orders->reference; } ?>">
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <div class="mb-3">
+                                                    <label class="col-form-label mb-2">Quote Ref</label>
+                                                    <div class="row">
+                                                        <div class="col-sm-10 position-relative">
+                                                            <input type="text" class="form-control editInput textareaInput" id="purchase_qoute_ref" name="purchase_qoute_ref" placeholder="Quote, if any" value="<?php if (isset($purchase_orders) && $purchase_orders->qoute_ref != '') { echo $purchase_orders->qoute_ref; } ?>">
+                                                            <input type="hidden" id="selectedPurchaseQuotRefId" name="qoute_ref">
+                                                            <div class="search-container purchase_qoute_ref-container"></div>
+                                                        </div>
+                                                        <div class="col-sm-2">
+                                                            <div class="formicon" onclick="show_searchModal(1)">
+                                                                <i class="fa fa-search"></i>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="col-form-label mb-2">Job Ref</label>
+                                                    <div class="row">
+                                                        <div class="col-sm-10 position-relative">
+                                                            <input type="text" class="form-control editInput textareaInput" id="purchase_job_ref" name="purchase_job_ref" placeholder="Job Ref, if any" value="<?php if (isset($purchase_orders) && $purchase_orders->job_ref != '') { echo $purchase_orders->job_ref; } ?>">
+                                                            <input type="hidden" id="selectedPurchaseJobRefId" name="job_ref">
+                                                            <div class="search-container purchase_job_ref-container"></div>
+                                                        </div>
+                                                        <div class="col-sm-2">
+                                                            <div class="formicon" onclick="show_searchModal(2)">
+                                                                <i class="fa fa-search"></i>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="col-form-label mb-2">Invoice Ref</label>
+                                                    <div class="row">
+                                                        <div class="col-sm-10">
+                                                            <input type="text" class="form-control editInput textareaInput" id="purchase_invoice_ref" name="invoice_ref" placeholder="Invoice Ref, if any" value="<?php if (isset($purchase_orders) && $purchase_orders->invoice_ref != '') { echo $purchase_orders->invoice_ref; } ?>">
+                                                        </div>
+                                                        <div class="col-sm-2">
+                                                            <div class="formicon" onclick="show_searchModal(3)">
+                                                                <i class="fa fa-search"></i>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="col-form-label mb-2">Payment Terms</label>
+                                                    <div class="row">
+                                                        <div class="col-sm-8">
+                                                            <select class="form-control editInput selectOptions" id="purchase_payment_terms" name="payment_terms" onchange="updateDueDate()">
+                                                                </option>
+                                                                <?php for ($i = 0; $i <= 90; $i++) { ?>
+                                                                    <option value="{{$i}}" <?php if (isset($purchase_orders) && $purchase_orders->payment_terms == $i) { echo 'selected'; } ?>>{{$i}}</option>
+                                                                <?php } ?>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-sm-4">
+                                                            <label class="form-check-label checkboxtext" for="checkalrt">
+                                                                days</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <div class="mb-3">
+                                                    <label class="col-form-label mb-2">Payment Due Date</label>
+                                                    <input type="date" class="form-control editInput" id="purchase_payment_due_date" name="payment_due_date" value="">
+                                                    <!-- <div class="col-sm-2 calendar_icon">
+                                                        <i class="fa fa-calendar-alt"></i>
+                                                    </div> -->
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="col-form-label mb-2">Status</label>
+                                                    <select class="form-control editInput selectOptions" id="purchase_status" name="status">
+                                                        <option value="1" <?php if (isset($purchase_orders) && $purchase_orders->status == 1) {echo 'selected'; } else { echo 'selected'; } ?>>Draft</option>
+                                                        <option value="2" <?php if (isset($purchase_orders) && $purchase_orders->status == 2) { echo 'selected'; } ?>>Awaiting Approval</option>
+                                                        <option value="3" <?php if (isset($purchase_orders) && $purchase_orders->status == 3) { echo 'selected'; } ?>>Approved</option>
+                                                        <option value="4" <?php if (isset($purchase_orders) && $purchase_orders->status == 4) { echo 'selected'; } ?>>Actioned</option>
+                                                        <option value="5" disabled>Paid</option>
+                                                        <option value="6" <?php if (isset($purchase_orders) && $purchase_orders->status == 6) {  echo 'selected'; } ?>>Cancelled</option>
+                                                        <option value="7" <?php if (isset($purchase_orders) && $purchase_orders->status == 7) { echo 'selected'; } ?>>Invoice Received</option>
+                                                        <option value="8" disabled>Rejected</option>
+                                                    </select>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="col-form-label mb-2">Tags</label>
+                                                    <div class="row">
+                                                        <div class="col-sm-10">
+                                                            <select class="form-control editInput selectOptions" id="purchase_tag_id" name="tag_id">
+                                                                <option selected disabled>None</option>
+                                                                @foreach($tag as $tagval)
+                                                                <option value="{{$tagval->id}}" <?php if (isset($purchase_orders) && $purchase_orders->tag_id == $tagval->id) { echo 'selected'; } ?>>{{$tagval->title}}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-sm-2">
+                                                            <a href="javascript:void(0)" class="formicon">
+                                                            <i class="fa fa-plus-square" onclick="get_modal(6)"></i></a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="mb-3 mt-4">
+                                                    <label class="col-form-label mb-2">
+                                                        <a href="javascript:void(0)" onclick="openReminderModal(<?php if (isset($purchase_orders) && $purchase_orders != '') {echo $purchase_orders->id; } ?>)" class="btn btn-primary"> <i class="fa fa-clock-o"></i> Set Reminder </a>
+                                                    </label>
+                                                </div>
+                                        <!-- </form> -->
+                                            </div>
+                                            <div class="col-md-12 col-lg-12 col-sm-12 mt-4">
+                                                <div class="setRiminderTable" style="display:none">
+                                                    <div class="table-responsive productDetailTable ">
+                                                        <table class="table border-top border-bottom" id="">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Title </th>
+                                                                    <th>Date </th>
+                                                                    <th>Time</th>
+                                                                    <th>Status </th>
+                                                                    <th>Action</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody id="reminder_data">
+                                                                @foreach($reminder_data as $reminderVal)
+                                                                <tr>
+                                                                    <td>{{$reminderVal->title}}</td>
+                                                                    <td>{{$reminderVal->reminder_date}}</td>
+                                                                    <td>{{$reminderVal->reminder_time}}</td>
+                                                                    @if($reminderVal->status == 1)
+                                                                    <td><span class="iconColrGreen">Sent</span></td>
+                                                                    <td>
+
+                                                                        <a href="javascript:void(0)" data-id="{{$reminderVal->id}}" data-title="{{$reminderVal->title}}" data-user_id="{{$reminderVal->user_id}}" data-reminder_date="{{$reminderVal->reminder_date}}" data-reminder_time="{{$reminderVal->reminder_time}}" data-notification="{{$reminderVal->notification}}" data-sms="{{$reminderVal->sms}}" data-email="{{$reminderVal->email}}" data-notes="{{$reminderVal->notes}}" data-icon="eye" class="fecth_data"><i class="material-symbols-outlined">
+                                                                                visibility
+                                                                            </i></a>
+                                                                        <a href="#!" class="iconColrGreen"><i class="material-symbols-outlined">
+                                                                                check_circle
+                                                                            </i></a>
+                                                                    </td>
+                                                                    @else
+                                                                    <td><span class="iconColrRad">Pending</span></td>
+                                                                    <td>
+                                                                        <a href="javascript:void(0)" class="iconColrGreen fecth_data" data-id="{{$reminderVal->id}}" data-title="{{$reminderVal->title}}" data-user_id="{{$reminderVal->user_id}}" data-reminder_date="{{$reminderVal->reminder_date}}" data-reminder_time="{{$reminderVal->reminder_time}}" data-notification="{{$reminderVal->notification}}" data-sms="{{$reminderVal->sms}}" data-email="{{$reminderVal->email}}" data-notes="{{$reminderVal->notes}}" data-icon="edit"><i class="fa fa-pencil" aria-hidden="true"></i></a> | 
+                                                                        <a href="javascript:void(0)" class="iconColrRad"><i class="fa fa-times" aria-hidden="true"></i></a>
+                                                                    </td>
+                                                                    @endif
+                                                                </tr>
+                                                                @endforeach
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row separate_section">
+                                    <div class="col-lg-12">
+                                        <h4 class="m-t-0 m-b-20 clr-blue fnt-20 text-center">Product Details</h4>
+                                        <div class="row">
+                                            <div class="col-sm-12">
+                                                <div class="mb-3 row d-flex align-items-center">
+                                                    <label for="inputCountry" class="col-sm-2 col-form-label">Select product</label>
+                                                    <div class="col-sm-3 position-relative">
+                                                        <input type="text" class="form-control editInput textareaInput" id="search-product" placeholder="Type to add product">
+                                                        <div class="parent-container"></div>
+                                                    </div>
+                                                    <div class="col-sm-7">
+                                                        <div class="plusandText">
+                                                            <a href="javascript:void(0)" class="formicon" onclick="get_modal(7)"><i class="fa fa-plus-square"></i>
+                                                            </a>
+                                                            <span class="afterPlusText"> (Type to view product or <a href="Javascript:void(0)" onclick="openProductmodal();"class="taxt_blue">Click here</a> to view all assets)</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- <div class="col-sm-3">
+                                                <div class="pageTitleBtn p-0">
+                                                    <a href="#" class="btn btn-default2">Add Title</a>
+                                                    <a href="#" class="btn btn-default2">Show Variations</a>
+                                                    <a href="#" class="btn btn-default2 bg-secondary">Export</a>
+                                                </div>
+                                            </div> -->
+                                            <div class="col-sm-12">
+                                                <div class="productDetailTable table-responsive input_style">
+                                                    <table class="table border-top border-bottom" id="result">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Job </th>
+                                                                <th>Product </th>
+                                                                <th>Code</th>
+                                                                <th class="col-2">Description </th>
+                                                                <th>
+                                                                    <div class="tableplusBTN">
+                                                                        <span>Account Code </span>
+                                                                        <span class="plusandText ps-3">
+                                                                            <a href="javascript:void(0)" class="formicon p-0" onclick="openAccountCodeModal(null)"> <i class="fa fa-plus-square"></i> </a>
+                                                                        </span>
+                                                                    </div>
+                                                                </th>
+                                                                <th>QTY</th>
+                                                                <th>Price</th>
+                                                                <th>
+                                                                    <div class="tableplusBTN">
+                                                                        <span>Price VAT(%) </span>
+                                                                        <span class="plusandText ps-3">
+                                                                            <a href="javascript:void(0)" class="formicon p-0" onclick="get_modal(9)"> <i class="fa fa-plus-square"></i> </a>
+                                                                        </span>
+                                                                    </div>
+                                                                </th>
+                                                                <th>VAT </th>
+                                                                <th>Amount</th>
+                                                                <th>Delivered QTY</th>
+                                                                <th>Quantity Available</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="product_result">
+
+                                                        </tbody>
+                                                        <tfoot class="insrt_product_and_detail product_Det" id="product_calculation" style="display:none">
+                                                            <tr>
+                                                                <td class="border_tran" colspan="5"></td>
+                                                                <td colspan="3">Sub Total (exc. VAT)</td>
+                                                                <td id="exact_vat"></td>
+                                                                <td class="border_tran" colspan="3"></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="border_tran" colspan="5"></td>
+                                                                <td colspan="3">VAT</td>
+                                                                <td id="vat"></td>
+                                                                <td class="border_tran" colspan="3"></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="border_tran" colspan="5"></td>
+                                                                <td colspan="3"><strong>Total(inc.VAT)</strong></td>
+                                                                <td><strong id="total_vat"></strong></td>
+                                                                <td class="border_tran" colspan="3"></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="border_tran" colspan="5"></td>
+                                                                <td colspan="3"><strong>Paid</strong></td>
+                                                                <td><strong id="paid_amount">-£0.00</strong></td>
+                                                                <td class="border_tran" colspan="3"></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="border_tran" colspan="5"></td>
+                                                                <td colspan="3"><strong>Outstanding (inc.VAT)</strong></td>
+                                                                <td><strong id="outstanding_vat"></strong></td>
+                                                                <td class="border_tran" colspan="3"></td>
+                                                            </tr>
+                                                        </tfoot>
+                                                    </table>
+                                                    <div id="pagination-controls-Produc-details"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row separate_section">
+                                    <div class="col-lg-12">
+                                        <h4 class="m-t-0 m-b-20 clr-blue fnt-20 text-center">Notes</h4>
+                                        <div class="row">
+                                            <div class="col-sm-4">
+                                                <div class="">
+                                                    <h4 class="contTitle text-left mb-0">Supplier Notes</h4>
+                                                    <div class="mt-3">
+                                                        <textarea cols="40" rows="5" id="purchase_supplier_notes" name="supplier_notes"><?php if (isset($purchase_orders) && $purchase_orders->supplier_notes != '') { echo $purchase_orders->supplier_notes; } ?></textarea>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <div class="">
+                                                    <h4 class="contTitle text-left mb-0">Delivery Notes</h4>
+                                                    <div class="mt-3">
+                                                        <textarea cols="40" rows="5" id="purchase_delivery_notes" name="delivery_notes"><?php if (isset($purchase_orders) && $purchase_orders->delivery_notes != '') { echo $purchase_orders->delivery_notes; } ?></textarea>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <div class="">
+                                                    <h4 class="contTitle text-left mb-0">Internal Notes</h4>
+                                                    <div class="mt-3">
+                                                        <textarea cols="40" rows="5" id="purchase_internal_notes" name="internal_notes"><?php if (isset($purchase_orders) && $purchase_orders->internal_notes != '') {  echo $purchase_orders->internal_notes; } ?></textarea>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- <div class="row separate_section">
+                                    <div class="col-lg-12">
+                                        <label class="m-t-0 m-b-20 clr-blue fnt-20 text-center">Attachments</label>
+                                        <div class="row">
+                                            <div class="col-sm-12">
+                                                <div class="py-4">
+                                                    <div class="jobsection">
+                                                        <input type="file" id="purchase_attachment" name="attachment" class="btn btn-default2">Upload Attachments
+                                                        <span><?php if (isset($purchase_orders) && $purchase_orders->file_original_name != '') { echo $purchase_orders->file_original_name; } ?></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div> -->
+                                <div id="SupplierInvoiceList" style="display:none">
+                                    <div class="row separate_section">
+                                        <div class="col-lg-12">
+                                            <h4 class="m-t-0 m-b-20 clr-blue fnt-20 text-center">Supplier Invoices</h4>
+                                            <div class="row">
+                                                @if((isset($key) && $key !='') && (isset($duplicate) && $duplicate ==''))
+                                                <div class="col-sm-12">
+                                                    <div class="table-responsive productDetailTable ">
+                                                        <table class="table border-top border-bottom" id="supplier_invoice_table">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Recorded Date</th>
+                                                                    <th>Recorded By</th>
+                                                                    <th>Invoice Ref</th>
+                                                                    <th>Invoice Date</th>
+                                                                    <th>Due Date</th>
+                                                                    <th>Description</th>
+                                                                    <th>Attachment</th>
+                                                                    <th>Paid</th>
+                                                                    <th>Net Amount</th>
+                                                                    <th>VAT Amount</th>
+                                                                    <th>Amount</th>
+                                                                    <th>Paid</th>
+                                                                    <th>Outstanding</th>
+                                                                    <th></th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody id="supplierInvoices_result"></tbody>
+                                                        </table>
+                                                        <div id="pagination-controls-Invoices"></div>
+                                                    </div>
+                                                </div>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="PaymentsPaid" style="display:none">
+                                    <div class="row separate_section">
+                                        <div class="col-lg-12">
+                                            <h4 class="m-t-0 m-b-20 clr-blue fnt-20 text-center">Payments Paid</h4>
+                                            <div class="row">
+                                                @if((isset($key) && $key !='') && (isset($duplicate) && $duplicate ==''))
+                                                <div class="col-sm-12">
+                                                    <div class="table-responsive productDetailTable ">
+                                                        <table class="table border-top border-bottom" id="">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Recorded Date</th>
+                                                                    <th>Recorded By</th>
+                                                                    <th>Payment Date</th>
+                                                                    <th>Payment Type</th>
+                                                                    <th>Invoice</th>
+                                                                    <th>Reference</th>
+                                                                    <th>Description</th>
+                                                                    <th>Type</th>
+                                                                    <th>Amount</th>
+                                                                    <th></th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody id="payment_paid_result"></tbody>
+                                                        </table>
+                                                        <div id="pagination-controls-Payment_paid"></div>
+                                                    </div>
+                                                </div>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row separate_section">
+                                    <div class="col-lg-12">
+                                        <h4 class="m-t-0 m-b-20 clr-blue fnt-20 text-center">Attachments</h4>
+                                        <div class="row">
+                                            <div class="col-sm-12 mb-3 mt-2">
+                                                <div class="jobsection">
+                                                    <a href="javascript:void(0)" class="btn btn-primary" onclick="get_modal(10)">New Attachment</a>
+                                                    @if((isset($key) && $key !='') && (isset($duplicate) && $duplicate ==''))
+                                                    <a href="javascript:void(0)" id="deleteSelectedRows" class="btn btn-primary" style="display:none">Delete Attachment(s)</a>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                            @if((isset($key) && $key !='') && (isset($duplicate) && $duplicate ==''))
+                                            <div class="col-sm-12">
+                                                <div class="productDetailTable input_style">
+                                                    <table class="table border-top border-bottom">
+                                                        <thead>
+                                                            <tr>
+                                                                <th style=" width:30px;"><input type="checkbox" id="selectAll"> <label for="selectAll"></label></th>
+                                                                <th>Type</th>
+                                                                <th class="col-2">Title</th>
+                                                                <th>Description</th>
+                                                                <th>Section</th>
+                                                                <th>File Name</th>
+                                                                <th>Mime Type / Size</th>
+                                                                <th>Created On</th>
+                                                                <th></th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="attachments_result"></tbody>
+                                                    </table>
+                                                    <div id="pagination-controls-Attachments"></div>
+                                                </div>
+                                            </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row separate_section">
+                                    <div class="col-lg-12">
+                                        <h4 class="m-t-0 m-b-20 clr-blue fnt-20 text-center">Tasks</h4>
+                                        <div class="row">
+                                            <div class="col-sm-12">
+                                                <div class="d-flex justify-content-between">
+                                                    <div class="jobsection">
+                                                        <a href="javascript:void(0)" class="btn btn-default2 bgColour" id="task_active_inactive" @if(isset($key) || $key !='' ) style="background-color:#57c8f1" @endif onclick="bgColorChange(1)">Tasks</a>
+                                                        <a href="javascript:void(0)" class="btn btn-default2 bgColour" id="recurring_active_inactive" onclick="bgColorChange(2)">Recurring Tasks</a>
+                                                    </div>
+                                                    <div class="jobsection">
+                                                        <a href="javascript:void(0)" class="btn btn-default2 @if(!isset($key) || $key == '' || isset($duplicate) && $duplicate) disabled-tab @endif" @if(!isset($key) || $key=='' || isset($duplicate) && $duplicate) disabled @else onclick="get_modal(11)" @endif>New Task</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-sm-12" id="taskHideShow">
+                                                <div class="productDetailTable">
+                                                    <table class="table border-top border-bottom">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Date</th>
+                                                                <th>Ref</th>
+                                                                <th>User</th>
+                                                                <th>Type</th>
+                                                                <th>Title</th>
+                                                                <th>Notes</th>
+                                                                <th>Created On</th>
+                                                                <th>Executed</th>
+                                                                <th></th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="newtask_result"></tbody>
+                                                    </table>
+                                                    <div id="pagination-controls-New-task"></div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-12" id="recurringHideShow" style="display:none">
+                                                <div class="productDetailTable">
+                                                    <table class="table border-top border-bottom">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Date</th>
+                                                                <th>Ref</th>
+                                                                <th>User</th>
+                                                                <th>Type</th>
+                                                                <th>Title</th>
+                                                                <th>Notes</th>
+                                                                <th>Created On</th>
+                                                                <th>Executed</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id=""></tbody>
+                                                    </table>
+                                                    <div id="pagination-controls-recurring"></div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="col-md-12 col-lg-12 col-xl-12 px-3">
+                            <div class="pageTitleBtn">
+                                <div class="mt-1 mb-0 text-center" id="message_save"></div>
+                                    <a href="javascript:void(0)" class="btn btn-warning" onclick="save_all_data()"><i class="fa fa-floppy-o"></i> Save</a>
+                                    <a href="{{url('draft_purchase_order')}}" class="btn btn-default2 ms-3"><i class="fa fa-arrow-left"></i> Back</a>
                             </div>
                         </div>
-                    </div>
-                    <div class="newJobForm mt-4">
-                        <label class="upperlineTitle">Product Details</label>
-                        <div class="row">
-                            <div class="col-sm-9">
-                                <div class="mb-3 row">
-                                    <label for="inputCountry" class="col-sm-2 col-form-label">Select product</label>
-                                    <div class="col-sm-3 position-relative">
-                                        <input type="text" class="form-control editInput textareaInput" id="search-product" placeholder="Type to add product">
-                                        <div class="parent-container"></div>
-                                    </div>
-                                    <div class="col-sm-7">
-                                        <div class="plusandText">
-                                            <a href="javascript:void(0)" class="formicon" onclick="get_modal(7)"><i class="fa-solid fa-square-plus"></i>
+                        <!-- <div class="row">
+                            <div class="col-md-4 col-lg-4 col-xl-4 ">
+                                <div class="pageTitle">
+                                    <h3 class="header_text">New Jobs</h3>
+                                </div>
+                            </div>
+                            <div class="col-md-8 col-lg-8 col-xl-8 px-3">
+                                <div class="jobsection">
+                                    <a href="javascript:void(0)" class="btn btn-default2" onclick="save_all_data()"><i class="fa fa-floppy-o"></i> Save</a>
+                                    <a href="{{url('draft_purchase_order')}}" class="btn btn-default2"><i class="fa fa-arrow-left"></i> Back</a>
+                                    <div class="jobsection p-0">
+                                        <div class="nav-item dropdown">
+                                            <a href="#" class="nav-link dropdown-toggle btn btn-default2" data-bs-toggle="dropdown" aria-expanded="false">
+                                                Actions
                                             </a>
-                                            <span class="afterPlusText"> (Type to view product or <a href="Javascript:void(0)" onclick="openProductmodal();">Click
-                                                    here</a> to view all assets)</span>
+                                            <div class="dropdown-menu fade-up m-0 d-none">
+                                                <a href="http://localhost/socialcareitsolution/job_edit?key=MQ==" class="dropdown-item col-form-label">Edit</a>
+                                                <hr class="dropdown-divider">
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                            <div class="col-sm-3">
-                                <div class="pageTitleBtn p-0">
-                                    <!-- <a href="#" class="profileDrop">Add Title</a> -->
-                                    <!-- <a href="#" class="profileDrop">Show Variations</a>
-                                        <a href="#" class="profileDrop bg-secondary">Export</a> -->
-
-                                </div>
-                            </div>
-
-                            <div class="col-sm-12">
-                                <div class="productDetailTable table-responsive input_style">
-                                    <table class="table" id="result">
-                                        <thead class="table-light">
-                                            <tr>
-                                                <th>Job </th>
-                                                <th>Product </th>
-                                                <th>Code</th>
-                                                <th class="col-2">Description </th>
-                                                <th>Account Code <a href="javascript:void(0)" class="formicon" onclick="openAccountCodeModal(null)"><i class="fa-solid fa-square-plus"></i>
-                                                    </a> </th>
-                                                <th>QTY</th>
-                                                <th>Price</th>
-                                                <th>Price VAT(%) <a href="javascript:void(0)" class="formicon" onclick="get_modal(9)"><i class="fa-solid fa-square-plus"></i>
-                                                    </a></th>
-                                                <th>VAT </th>
-                                                <th>Amount</th>
-                                                <th>Delivered QTY</th>
-                                                <th>Quantity Available</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="product_result">
-
-                                        </tbody>
-                                        <tfoot class="insrt_product_and_detail product_Det" id="product_calculation" style="display:none">
-                                            <tr>
-                                                <td class="border_tran" colspan="5"></td>
-                                                <td colspan="3">Sub Total (exc. VAT)</td>
-                                                <td id="exact_vat"></td>
-                                                <td class="border_tran" colspan="3"></td>
-                                            </tr>
-                                            <tr>
-                                                <td class="border_tran" colspan="5"></td>
-                                                <td colspan="3">VAT</td>
-                                                <td id="vat"></td>
-                                                <td class="border_tran" colspan="3"></td>
-                                            </tr>
-                                            <tr>
-                                                <td class="border_tran" colspan="5"></td>
-                                                <td colspan="3"><strong>Total(inc.VAT)</strong></td>
-                                                <td><strong id="total_vat"></strong></td>
-                                                <td class="border_tran" colspan="3"></td>
-                                            </tr>
-                                            <tr>
-                                                <td class="border_tran" colspan="5"></td>
-                                                <td colspan="3"><strong>Paid</strong></td>
-                                                <td><strong id="paid_amount">-£0.00</strong></td>
-                                                <td class="border_tran" colspan="3"></td>
-                                            </tr>
-                                            <tr>
-                                                <td class="border_tran" colspan="5"></td>
-                                                <td colspan="3"><strong>Outstanding (inc.VAT)</strong></td>
-                                                <td><strong id="outstanding_vat"></strong></td>
-                                                <td class="border_tran" colspan="3"></td>
-                                            </tr>
-                                        </tfoot>
-                                    </table>
-                                    <div id="pagination-controls-Produc-details"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="newJobForm mt-4">
-                        <label class="upperlineTitle">Notes</label>
-                        <div class="row">
-                            <div class="col-sm-4">
-                                <div class="">
-                                    <h4 class="contTitle text-start">Supplier Notes</h4>
-                                    <div class="mt-3">
-                                        <textarea cols="40" rows="5" id="purchase_supplier_notes" name="supplier_notes"><?php if (isset($purchase_orders) && $purchase_orders->supplier_notes != '') {
-                                                                                                                            echo $purchase_orders->supplier_notes;
-                                                                                                                        } ?></textarea>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-sm-4">
-                                <div class="">
-                                    <h4 class="contTitle text-start">Delivery Notes</h4>
-                                    <div class="mt-3">
-                                        <textarea cols="40" rows="5" id="purchase_delivery_notes" name="delivery_notes"><?php if (isset($purchase_orders) && $purchase_orders->delivery_notes != '') {
-                                                                                                                            echo $purchase_orders->delivery_notes;
-                                                                                                                        } ?></textarea>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-sm-4">
-                                <div class="">
-                                    <h4 class="contTitle text-start">Internal Notes</h4>
-                                    <div class="mt-3">
-                                        <textarea cols="40" rows="5" id="purchase_internal_notes" name="internal_notes"><?php if (isset($purchase_orders) && $purchase_orders->internal_notes != '') {
-                                                                                                                            echo $purchase_orders->internal_notes;
-                                                                                                                        } ?></textarea>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- <div class="newJobForm mt-4">
-                            <label class="upperlineTitle">Attachments</label>
-                            <div class="row">
-                            <div class="col-sm-12">
-
-                                <div class="py-4">
-                                    <div class="jobsection">
-                                        <input type="file" id="purchase_attachment" name="attachment" class="profileDrop">Upload Attachments
-                                        <span><?php if (isset($purchase_orders) && $purchase_orders->file_original_name != '') {
-                                                    echo $purchase_orders->file_original_name;
-                                                } ?></span>
-                                    </div>
-                                </div>
                                 </div>
                             </div>
                         </div> -->
-
-                    <div class="newJobForm mt-4" id="SupplierInvoiceList" style="display:none">
-                        <label class="upperlineTitle">Supplier Invoices</label>
-                        <div class="row">
-                            @if((isset($key) && $key !='') && (isset($duplicate) && $duplicate ==''))
-                            <div class="col-sm-12">
-                                <div class="productDetailTable">
-                                    <table class="table" id="supplier_invoice_table">
-                                        <thead class="table-light">
-                                            <tr>
-                                                <th>Recorded Date</th>
-                                                <th>Recorded By</th>
-                                                <th>Invoice Ref</th>
-                                                <th>Invoice Date</th>
-                                                <th>Due Date</th>
-                                                <th>Description</th>
-                                                <th>Attachment</th>
-                                                <th>Paid</th>
-                                                <th>Net Amount</th>
-                                                <th>VAT Amount</th>
-                                                <th>Amount</th>
-                                                <th>Paid</th>
-                                                <th>Outstanding</th>
-                                                <th></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="supplierInvoices_result"></tbody>
-                                    </table>
-                                    <div id="pagination-controls-Invoices"></div>
-                                </div>
-                            </div>
-                            @endif
-                        </div>
                     </div>
-                    <div class="newJobForm mt-4" id="PaymentsPaid" style="display:none">
-                        <label class="upperlineTitle">Payments Paid</label>
-                        <div class="row">
-                            @if((isset($key) && $key !='') && (isset($duplicate) && $duplicate ==''))
-                            <div class="col-sm-12">
-                                <div class="productDetailTable">
-                                    <table class="table">
-                                        <thead class="table-light">
-                                            <tr>
-                                                <th>Recorded Date</th>
-                                                <th>Recorded By</th>
-                                                <th>Payment Date</th>
-                                                <th>Payment Type</th>
-                                                <th>Invoice</th>
-                                                <th>Reference</th>
-                                                <th>Description</th>
-                                                <th>Type</th>
-                                                <th>Amount</th>
-                                                <th></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="payment_paid_result"></tbody>
-                                    </table>
-                                    <div id="pagination-controls-Payment_paid"></div>
-                                </div>
-                            </div>
-                            @endif
-                        </div>
-                    </div>
-                    <div class="newJobForm mt-4">
-                        <label class="upperlineTitle">Attachments</label>
-                        <div class="row">
-                            <div class="col-sm-12 mb-3 mt-2">
-                                <div class="jobsection">
-                                    <a href="javascript:void(0)" class="profileDrop" onclick="get_modal(10)">New Attachment</a>
-                                    @if((isset($key) && $key !='') && (isset($duplicate) && $duplicate ==''))
-                                    <a href="javascript:void(0)" id="deleteSelectedRows" class="profileDrop" style="display:none">Delete Attachment(s)</a>
-                                    @endif
-                                </div>
-                            </div>
-                            @if((isset($key) && $key !='') && (isset($duplicate) && $duplicate ==''))
-                            <div class="col-sm-12">
-                                <div class="productDetailTable input_style">
-                                    <table class="table">
-                                        <thead class="table-light">
-                                            <tr>
-                                                <th style=" width:30px;"><input type="checkbox" id="selectAll"> <label for="selectAll"></label></th>
-                                                <th>Type</th>
-                                                <th class="col-2">Title</th>
-                                                <th>Description</th>
-                                                <th>Section</th>
-                                                <th>File Name</th>
-                                                <th>Mime Type / Size</th>
-                                                <th>Created On</th>
-                                                <th></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="attachments_result"></tbody>
-                                    </table>
-                                    <div id="pagination-controls-Attachments"></div>
-                                </div>
-                            </div>
-                            @endif
-                        </div>
-                    </div>
-                    <div class="newJobForm mt-4">
-                        <label class="upperlineTitle">Tasks</label>
-                        <div class="row">
-                            <div class="col-sm-12 mb-3 mt-2">
-                                <div class="jobsection">
-                                    <a href="javascript:void(0)" class="profileDrop @if(!isset($key) || $key == '' || isset($duplicate) && $duplicate) disabled-tab @endif" @if(!isset($key) || $key=='' || isset($duplicate) && $duplicate) disabled @else onclick="get_modal(11)" @endif>New Task</a>
-
-                                </div>
-                            </div>
-                            <div class="col-sm-12 mb-3 mt-2">
-                                <div class="jobsection">
-                                    <a href="javascript:void(0)" class="profileDrop bgColour" id="task_active_inactive" @if(isset($key) || $key !='' ) style="background-color:#474747" @endif onclick="bgColorChange(1)">Tasks</a>
-                                    <a href="javascript:void(0)" class="profileDrop bgColour" id="recurring_active_inactive" onclick="bgColorChange(2)">Recurring Tasks</a>
-                                </div>
-                            </div>
-
-                            <div class="col-sm-12" id="taskHideShow">
-                                <div class="productDetailTable">
-                                    <table class="table">
-                                        <thead class="table-light">
-                                            <tr>
-                                                <th>Date</th>
-                                                <th>Ref</th>
-                                                <th>User</th>
-                                                <th>Type</th>
-                                                <th>Title</th>
-                                                <th>Notes</th>
-                                                <th>Created On</th>
-                                                <th>Executed</th>
-                                                <th></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="newtask_result"></tbody>
-                                    </table>
-                                    <div id="pagination-controls-New-task"></div>
-                                </div>
-                            </div>
-                            <div class="col-sm-12" id="recurringHideShow" style="display:none">
-                                <div class="productDetailTable">
-                                    <table class="table">
-                                        <thead class="table-light">
-                                            <tr>
-                                                <th>Date</th>
-                                                <th>Ref</th>
-                                                <th>User</th>
-                                                <th>Type</th>
-                                                <th>Title</th>
-                                                <th>Notes</th>
-                                                <th>Created On</th>
-                                                <th>Executed</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id=""></tbody>
-                                    </table>
-                                    <div id="pagination-controls-recurring"></div>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </form>
-        <div class="row">
-            <div class="col-md-4 col-lg-4 col-xl-4 ">
-                <div class="pageTitle">
-
-                    <!-- <h3 class="header_text">New Jobs</h3> -->
-                </div>
-            </div>
-            <div class="col-md-8 col-lg-8 col-xl-8 px-3">
-                <div class="pageTitleBtn">
-                    <a href="javascript:void(0)" class="profileDrop" onclick="save_all_data()"><i class="fa-solid fa-floppy-disk"></i> Save</a>
-                    <a href="{{url('draft_purchase_order')}}" class="profileDrop"><i class="fa-solid fa-arrow-left"></i> Back</a>
-                    <div class="pageTitleBtn p-0">
-                        <div class="nav-item dropdown">
-                            <a href="#" class="nav-link dropdown-toggle profileDrop" data-bs-toggle="dropdown" aria-expanded="false">
-                                Actions
-                            </a>
-                            <div class="dropdown-menu fade-up m-0 d-none">
-                                <a href="http://localhost/socialcareitsolution/job_edit?key=MQ==" class="dropdown-item col-form-label">Edit</a>
-                                <!-- <hr class="dropdown-divider"> -->
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
             </div>
         </div>
@@ -1027,8 +922,8 @@
                                         <div class="mb-2 row">
                                             <label for="inputAddress" class="col-sm-3 col-form-label">Amount Paid <span class="radStar">*</span></label>
                                             <div class="col-sm-1">
-                                                <div class="tag_box text-center">
-                                                    <span style="padding:3px">£</span>
+                                                <div class="tag_box">
+                                                    <span>£</span>
                                                 </div>
                                             </div>
                                             <div class="col-sm-8">
@@ -1051,7 +946,7 @@
                                                 </select>
                                             </div>
                                             <div class="col-sm-2">
-                                                <a href="javascript:void(0)" class="formicon" onclick="openPaymentTypeModal()"><i class="fa-solid fa-square-plus"></i></a>
+                                                <a href="javascript:void(0)" class="formicon" onclick="openPaymentTypeModal()"><i class="fa fa-plus-square"></i></a>
                                             </div>
                                         </div>
                                     </div>
@@ -1076,9 +971,8 @@
                 </div> <!-- End row -->
             </div>
             <div class="modal-footer customer_Form_Popup">
-
-                <button type="button" class="profileDrop" id="saverecordPaymentModal" onclick="saverecordPaymentModal()">Save</button>
-                <button type="button" class="profileDrop" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-default2" id="saverecordPaymentModal" onclick="saverecordPaymentModal()">Save</button>
+                <button type="button" class="btn btn-default2" data-bs-dismiss="modal">Cancel</button>
             </div>
         </div>
     </div>
@@ -1178,6 +1072,7 @@
 <!-- End here -->
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/ckeditor/4.3.2/ckeditor.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
+
 <script>
     //Text Editer
 
@@ -1447,7 +1342,6 @@
         });
     }
 </script>
-
 <script>
     function get_modal(modal) {
         // alert(modal)
@@ -1613,6 +1507,9 @@
                 processData: false,
                 success: function(response) {
                     console.log(response);
+                    if (isAuthenticated(response) == false) {
+                        return false;
+                    }
                     if (response.vali_error) {
                         alert(response.vali_error);
                         $(window).scrollTop(0);
@@ -1664,6 +1561,9 @@
                 processData: false,
                 success: function(response) {
                     // console.log(response);
+                    if (isAuthenticated(response) == false) {
+                        return false;
+                    }
                     if (response.vali_error) {
                         alert(response.vali_error);
                         $(window).scrollTop(0);
@@ -2087,7 +1987,10 @@
                         query: query
                     },
                     success: function(response) {
-                        // console.log(response);
+                        console.log(response);
+                        if (isAuthenticated(response) == false) {
+                            return false;
+                        }
                         // $('#results').html(response);
                         divList.innerHTML = "";
                         const div = document.createElement('div');
@@ -2214,10 +2117,10 @@
                 var paginationControlsAttachment = $("#pagination-controls-Attachments");
                 paginationControlsAttachment.empty();
                 if (paginationAttachment.prev_page_url) {
-                    paginationControlsAttachment.append('<button type="button" class="profileDrop" onclick="getAttachment(' + id + ', \'' + paginationAttachment.prev_page_url + '\')">Previous</button>');
+                    paginationControlsAttachment.append('<button type="button" class="btn btn-default2" onclick="getAttachment(' + id + ', \'' + paginationAttachment.prev_page_url + '\')">Previous</button>');
                 }
                 if (paginationAttachment.next_page_url) {
-                    paginationControlsAttachment.append('<button type="button" class="profileDrop" onclick="getAttachment(' + id + ', \'' + paginationAttachment.next_page_url + '\')">Next</button>');
+                    paginationControlsAttachment.append('<button type="button" class="btn btn-default2" onclick="getAttachment(' + id + ', \'' + paginationAttachment.next_page_url + '\')">Next</button>');
                 }
             },
             error: function(xhr, status, error) {
@@ -2459,10 +2362,10 @@
                 // var paginationControlsProductDetail = $("#pagination-controls-Produc-details");
                 // paginationControlsProductDetail.empty();
                 // if (paginationProductDetails.prev_page_url) {
-                //     paginationControlsProductDetail.append('<button type="button" class="profileDrop" onclick="getProductDetail(' + id + ', \'' + paginationContact.prev_page_url + '\')">Previous</button>');
+                //     paginationControlsProductDetail.append('<button type="button" class="btn btn-default2" onclick="getProductDetail(' + id + ', \'' + paginationContact.prev_page_url + '\')">Previous</button>');
                 // }
                 // if (paginationProductDetails.next_page_url) {
-                //     paginationControlsProductDetail.append('<button type="button" class="profileDrop" onclick="getProductDetail(' + id + ', \'' + paginationContact.next_page_url + '\')">Next</button>');
+                //     paginationControlsProductDetail.append('<button type="button" class="btn btn-default2" onclick="getProductDetail(' + id + ', \'' + paginationContact.next_page_url + '\')">Next</button>');
                 // }
             },
             error: function(xhr, status, error) {
@@ -2518,10 +2421,10 @@
                 var paginationControlsNewTask = $("#pagination-controls-New-task");
                 paginationControlsNewTask.empty();
                 if (paginationNewTask.prev_page_url) {
-                    paginationControlsNewTask.append('<button type="button" class="profileDrop" onclick="getAllNewTaskList(' + id + ', \'' + paginationNewTask.prev_page_url + '\')">Previous</button>');
+                    paginationControlsNewTask.append('<button type="button" class="btn btn-default2" onclick="getAllNewTaskList(' + id + ', \'' + paginationNewTask.prev_page_url + '\')">Previous</button>');
                 }
                 if (paginationNewTask.next_page_url) {
-                    paginationControlsNewTask.append('<button type="button" class="profileDrop" onclick="getAllNewTaskList(' + id + ', \'' + paginationNewTask.next_page_url + '\')">Next</button>');
+                    paginationControlsNewTask.append('<button type="button" class="btn btn-default2" onclick="getAllNewTaskList(' + id + ', \'' + paginationNewTask.next_page_url + '\')">Next</button>');
                 }
             },
             error: function(xhr, status, error) {
@@ -2602,6 +2505,9 @@
                     },
                     success: function(data) {
                         // console.log(data);
+                        if (isAuthenticated(data) == false) {
+                            return false;
+                        }
                         if (data) {
                             location.reload();
                         } else {
@@ -2656,10 +2562,10 @@
         $("#taskHideShow").hide();
         if (button == 1) {
             $("#taskHideShow").show();
-            $("#task_active_inactive").css('background-color', '#474747');
+            $("#task_active_inactive").css('background-color', '#57c8f1');
         } else {
             $("#recurringHideShow").show();
-            $("#recurring_active_inactive").css('background-color', '#474747');
+            $("#recurring_active_inactive").css('background-color', '#57c8f1');
         }
     }
 
@@ -2855,8 +2761,8 @@
             <td>` + data.reminder_time + `</td>    
             <td><span class="iconColrRad">Pending</span></td>    
             <td>
-                <a href="javascript:void(0)" class="iconColrGreen fecth_data" data-id="` + data.id + `" data-title="` + data.title + `" data-user_id="` + data.user_id + `" data-reminder_date="` + data.reminder_date + `" data-reminder_time="` + data.reminder_time + `" data-notification="` + data.notification + `" data-sms="` + data.sms + `" data-email="` + data.email + `" data-notes="` + data.notes + `" data-icon="edit"><i class="material-symbols-outlined">edit</i></a>
-                <a href="javascript:void(0)" class="iconColrRad"><i class="material-symbols-outlined">close</i></a>
+                <a href="javascript:void(0)" class="iconColrGreen fecth_data" data-id="` + data.id + `" data-title="` + data.title + `" data-user_id="` + data.user_id + `" data-reminder_date="` + data.reminder_date + `" data-reminder_time="` + data.reminder_time + `" data-notification="` + data.notification + `" data-sms="` + data.sms + `" data-email="` + data.email + `" data-notes="` + data.notes + `" data-icon="edit"><i class="fa fa-pencil" aria-hidden="true"></i></a> | 
+                <a href="javascript:void(0)" class="iconColrRad"><i class="fa fa-times" aria-hidden="true"></i></a>
             </td>    
         </tr>`);
     }
@@ -2871,7 +2777,6 @@
         document.getElementById('purchase_payment_due_date').value = formattedDate;
     }
 </script>
-
 <script>
     $(document).on('click', '.fecth_data', function() {
         $("#ReminderModal").modal('show');
@@ -3024,7 +2929,7 @@
 
                         const invActionHtml = `<div class="d-flex justify-content-end">
                                         <div class="nav-item dropdown">
-                                            <a href="#!" class="nav-link dropdown-toggle profileDrop" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <a href="#!" class="nav-link dropdown-toggle btn btn-default2" data-bs-toggle="dropdown" aria-expanded="false">
                                                 Action
                                             </a>
                                             <div class="dropdown-menu fade-up m-0">
@@ -3054,10 +2959,10 @@
                 // var paginationControlsProductDetail = $("#pagination-controls-Produc-details");
                 // paginationControlsProductDetail.empty();
                 // if (paginationProductDetails.prev_page_url) {
-                //     paginationControlsProductDetail.append('<button type="button" class="profileDrop" onclick="getProductDetail(' + id + ', \'' + paginationContact.prev_page_url + '\')">Previous</button>');
+                //     paginationControlsProductDetail.append('<button type="button" class="btn btn-default2" onclick="getProductDetail(' + id + ', \'' + paginationContact.prev_page_url + '\')">Previous</button>');
                 // }
                 // if (paginationProductDetails.next_page_url) {
-                //     paginationControlsProductDetail.append('<button type="button" class="profileDrop" onclick="getProductDetail(' + id + ', \'' + paginationContact.next_page_url + '\')">Next</button>');
+                //     paginationControlsProductDetail.append('<button type="button" class="btn btn-default2" onclick="getProductDetail(' + id + ', \'' + paginationContact.next_page_url + '\')">Next</button>');
                 // }
             },
             error: function(xhr, status, error) {
@@ -3182,8 +3087,6 @@
         }
     });
 </script>
-
-@include('frontEnd.salesAndFinance.jobs.layout.footer')
 <script>
     function defualt_date(type) {
         if (type == 1) {
@@ -3217,3 +3120,25 @@
         $("#refrence_purchase_seacrh_modal").modal('show');
     }
 </script>
+
+<script>
+    $('.tab-menu li a').on('click', function () {
+        var $this = $(this);
+        var target = $this.attr('data-rel');
+        
+        // find the closest tab-menu
+        var $tabMenu = $this.closest('.tab-menu');
+        var $tabContentContainer = $this.closest('.tab-teaser, .tab-container'); // adjust container if needed
+
+        $tabMenu.find('li a').removeClass('active');
+        $this.addClass('active');
+
+        // Show the related tab-box inside the same section
+        $tabContentContainer.find(".tab-box").hide();
+        $tabContentContainer.find("#" + target).fadeIn('slow');
+
+        return false;
+    });
+</script>
+
+@endsection

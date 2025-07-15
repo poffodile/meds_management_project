@@ -108,6 +108,17 @@ padding: 5px 0px 15px 0px;
 									</select>
                                 </div>
                             </div>   
+                            
+                            <div class="form-group">
+                                <label class="col-lg-3 control-label">Department</label>
+                                <div class="col-lg-9">
+                                	<select class="form-control" name="department" id="">
+                                        @foreach($company_departments as $company_department)
+                                        <option value="{{ $company_department->id }}">{{ $company_department->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
 
                             <div class="form-group">
                                 <label class="col-lg-3 control-label">Description</label>

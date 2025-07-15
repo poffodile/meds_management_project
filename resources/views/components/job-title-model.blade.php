@@ -1,36 +1,32 @@
 <!-- He who is contented is rich. - Laozi -->
 <div class="modal fade" id="jobTitleModal" tabindex="-1" aria-labelledby="jobTitleLabel" aria-hidden="true">
     <div class="modal-dialog">
-        <div class="modal-content add_Customer">
+        <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="thirdModalLabel">Job Title - Add</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">&times;</button>
+                <h4 class="modal-title" id="thirdModalLabel">Job Title - Add</h4>
             </div>
-            <div class="modal-body">
-                <form id="jobTitleForm">
-                    @csrf
-                    <div class="mb-3 row">
-                        <label for="inputJobRef" class="col-sm-3 col-form-label">Job Title <span class="radStar ">*</span></label>
-                        <div class="col-sm-9">
-                            <input type="hidden" name="job_title_id" id="job_title_id">
-                            <input type="text" name="name" class="form-control editInput" id="job_title" value="" placeholder="Job Title">
-                        </div>
+            <form id="jobTitleForm">
+                @csrf
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label>Job Title <span class="radStar ">*</span></label>
+                        <input type="hidden" name="job_title_id" id="job_title_id">
+                        <input type="text" name="name" class="form-control editInput" id="job_title" value="" placeholder="Job Title">
                     </div>
-                    <div class="mb-3 row">
-                        <label for="inputJobRef" class="col-sm-3 col-form-label">Status</label>
-                        <div class="col-sm-9">
-                            <select id="status" name="status" class="form-control editInput">
-                                <option value="1">Active</option>
-                                <option value="0">Inactive</option>
-                            </select>
-                        </div>
+                    <div class="mb-3">
+                        <label>Status</label>
+                        <select id="status" name="status" class="form-control editInput">
+                            <option value="1">Active</option>
+                            <option value="0">Inactive</option>
+                        </select>
                     </div>
-                    <div class="pageTitleBtn">
-                        <button type="button" class="profileDrop" onclick="saveJobTitle()" id="">Save</button>
-                        <button type="button" class="profileDrop" data-bs-dismiss="modal">Cancel</button>
-                    </div>
-                </form>
-            </div>
+                </div>
+                <div class="modal-footer customer_Form_Popup">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-warning" onclick="saveJobTitle()" id="">Save</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

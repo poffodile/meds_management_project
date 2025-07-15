@@ -218,10 +218,12 @@
                     mobile_visible=1;
                 }
                 var message;
-
+                var url;
                 if (id == '') {
+                    url="{{url('/save_payment_type')}}";
                     message = "Added Successfully Done";
                 } else {
+                    url="{{url('/edit_payment_type')}}";
                     message = "Edited Successfully Done";
                 }
 
@@ -231,7 +233,7 @@
                 } else {
                     $.ajax({
                         type: "POST",
-                        url: "{{url('/save_payment_type')}}",
+                        url: url,
                         data: {id: id, home_id: home_id, title: title,mobile_visible:mobile_visible, status: status, _token: token},
                         success: function(data) {
                             console.log(data);
@@ -272,7 +274,7 @@
             var model="Payment_type";
             $.ajax({
                 type: "POST",
-                url: "{{url('/status_change')}}",
+                url: "{{url('/payment_type_status_change')}}",
                 data: {id:id,status:status,model:model,_token:token},
                 success: function(data) {
                     console.log(data);

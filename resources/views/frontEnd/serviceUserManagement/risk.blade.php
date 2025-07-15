@@ -128,7 +128,7 @@ function time_diff_string($from, $to, $full = false) {
             </div> -->
             <!-- sourabh -->
             <div class="col-md-2 col-lg-2" style="padding-bottom:10px; margin-left: -10px;">                
-                <input type="text" class="form-control" id="keywordhr" onKeyPress="hrmyFunctionkey()" onKeyUp="hrmyFunctionkey()" name="keywordhr" placeholder="Keyword">
+                <input type="text" class="form-control" id="keywordhr"  onKeyUp="hrmyFunctionkey()" name="keywordhr" placeholder="Keyword">
             </div>
             <!-- sourabh -->
             <!-- <div class="col-md-4 filter_buttons" style="text-align:right;padding-right:150px;display:inline-block;">
@@ -547,7 +547,7 @@ function removeAllChildNodes(parent) {
             url:"{{ url('/service/risks') }}"+'/'+{{ $service_user_id }},
             data:data,
             success:function(resp)  {
-                //console.log(resp)
+                console.log(resp)
                 //return false;
                 //$('.first').css('display','none')
                 if (isAuthenticated(resp) == false){
@@ -796,7 +796,7 @@ function removeAllChildNodes(parent) {
             url:"{{ url('/service/risks') }}"+'/'+{{ $service_user_id }},
             data:data,
             success:function(resp)  {
-                //console.log(resp)
+                console.log(resp)
                 //return false;
                 //$('.first').css('display','none')
                 if (isAuthenticated(resp) == false){

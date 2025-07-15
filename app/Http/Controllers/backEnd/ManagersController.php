@@ -556,8 +556,7 @@ class ManagersController extends Controller
 
     public function delete($manager_id)
     {
-        $manager_delete = CompanyManagers::where('id', $manager_id)
-            ->update(['is_deleted' => '1']);
+        $manager_delete = User::where('id', $manager_id)->update(['is_deleted' => '1']);
         if ($manager_delete) {
             return redirect('admin/managers')->with('success', 'Record deleted successfully.');
         } else {

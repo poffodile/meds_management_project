@@ -163,14 +163,6 @@
         color: #fff !important;
     }
 
-    /* .top_tabs {
-        padding-bottom: 20px;
-        display: flex;
-        justify-content: end;
-        align-items: center;
-        gap: 10px;
-    } */
-
     .notifiNumberRadColor {
         width: 16px;
         height: 16px;
@@ -367,6 +359,40 @@
                                                     </section>
                                                 </div>
                                             </div>
+                                            <div class="col-md-3 col-sm-4 col-xs-12" manager_id="{{ $manager_id }}">
+                                                <div class="profile-nav alt">
+                                                    <a href="{{ url('/my-profile/' . $manager_id . '/time-sheet') }}">
+                                                        <section class="panel text-center">
+                                                            <div class="user-heading alt wdgt-row label-inverse">
+                                                                <i class="fa fa-file"></i>
+                                                            </div>
+                                                            <div class="panel-body">
+                                                                <div class="wdgt-value">
+                                                                    <h4 class="count">Add Time<br>  </h4>
+                                                                    <p></p>
+                                                                </div>
+                                                            </div>
+                                                        </section>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                            <!-- <div class="col-md-2 col-sm-4 col-xs-12 leave_tracker_form">
+                                                <div class="profile-nav alt">
+                                                    <a href="{{ url('/my-profile/' . $manager_id . '/time-sheet') }}">
+                                                        <section class="panel text-center profile-square">
+                                                            <div class="user-heading alt wdgt-row label-inverse">
+                                                                <i class="fa fa-file"></i>
+                                                            </div>
+                                                            <div class="panel-body">
+                                                                <div class="wdgt-value">
+                                                                    <h4 class="count">Add Leave<br>Tracker</h4>
+                                                                    <p></p></div>
+                                                            </div>
+                                                        </section>
+                                                    </a>
+                                                </div>
+                                            </div> -->
+
                                             <!-- <div class="col-md-12 col-sm-12 col-xs-12">
                                                 <div class="below-divider"></div>
                                             </div> -->

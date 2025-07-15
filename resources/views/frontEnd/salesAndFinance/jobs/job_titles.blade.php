@@ -182,9 +182,12 @@
                 var home_id='<?php echo $home_id;?>'
                 var id=$("#id").val();
                 var message;
+                var url;
                 if(id == ''){
+                    url="{{url('/save_job_title')}}";
                     message= "Added Successfully Done";
                 } else {
+                    url="{{url('/edit_job_title')}}";
                     message= "Editted Successfully Done";
                 }
                 if(name == ''){
@@ -193,7 +196,7 @@
                 }else {
                         $.ajax({
                         type: "POST",
-                        url: "{{url('/save_job_title')}}",
+                        url: url,
                         data: {id:id,home_id:home_id,name:name,status:status,_token:token},
                         success: function(data) {
                             console.log(data);
@@ -233,7 +236,7 @@
             var model="job_title";
             $.ajax({
                 type: "POST",
-                url: "{{url('/status_change')}}",
+                url: "{{url('/job_title_status_change')}}",
                 data: {id:id,status:status,model:model,_token:token},
                 success: function(data) {
                     console.log(data);

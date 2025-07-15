@@ -11,15 +11,17 @@ use DB;
 class CalendarController extends Controller
 {
 	public function index($service_user_id = null) {
-		
+		$home_ids = Auth::user()->home_id;
+		$ex_home_ids = explode(',', $home_ids);
+		$home_id=$ex_home_ids[0];
 		$staff_members  =   User::where('is_deleted','0')
-									->where('home_id', Auth::user()->home_id)
+									->where('home_id', $home_id)
 									->get();
 		
         $service_user = ServiceUser::select('home_id','name')->where('id',$service_user_id)->first();
 		
 		if(!empty($service_user)){
-			$home_id = Auth::user()->home_id;	
+			// $home_id = Auth::user()->home_id;	
 	        
 	        if($service_user->home_id != $home_id){
 	            return redirect('/')->with('error',UNAUTHORIZE_ERR); 
@@ -236,7 +238,10 @@ class CalendarController extends Controller
 		if($request->isMethod('post')) {
 			$data = $request->input();
 
-			$home_id    = Auth::user()->home_id;
+			// $home_id    = Auth::user()->home_id;
+			$home_ids = Auth::user()->home_id;
+			$ex_home_ids = explode(',', $home_ids);
+			$home_id=$ex_home_ids[0];
 			$su_home_id = ServiceUser::where('id',$data['service_user_id'])->value('home_id');
             if($su_home_id != $home_id){
                 //return redirect('/')->with('error',UNAUTHORIZE_ERR); 
@@ -269,9 +274,11 @@ class CalendarController extends Controller
 
 		$calendar = Calendar::find($event_calendar_id);
 		if(!empty($calendar)) {
-		
+			$home_ids = Auth::user()->home_id;
+			$ex_home_ids = explode(',', $home_ids);
+			$home_id=$ex_home_ids[0];
 			$su_home_id = ServiceUser::where('id',$calendar->service_user_id)->value('home_id');
-            if($su_home_id != Auth::user()->home_id){
+            if($su_home_id != $home_id){
                 echo 'false'; die;
             }
 			

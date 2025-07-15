@@ -428,11 +428,10 @@ if (isset($form)) {
                                                 <input type="hidden" name="send_to" value="N" />
                                                 <input type="hidden" name="dynamic_form_builder_id" value="{{ (isset($form->id)) ? $form->id : '' }}">
                                                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                                                <input type="hidden" name="formdata" value="" id="setformdata">
+                                                <input type="hidden" name="formdata" value="{{ (isset($form->pattern)) ? $form->pattern : '' }}" id="setformdata">
 
                                                 <div class="submit-btn-main-area">
-                                                    <button type="submit" class="btn green btn-primary save-appointmnt-form " name="submit1">
-                                                        Save </button>
+                                                    <button type="submit" class="btn green btn-primary save-appointmnt-form " name="submit1"> Save </button>
 
                                                     <a href="{{ url('admin/form-builder') }}">
                                                         <button type="button" class="btn btn-default" name="cancel">Cancel</button>
@@ -528,7 +527,5 @@ if (isset($form)) {
         $('input[name=send_to]').val($(this).val());
     });
 </script>
-
-
 
 @endsection
