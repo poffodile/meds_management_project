@@ -37,7 +37,7 @@ class DynamicFormController extends Controller
             // dd($request);
             $home_ids = Auth::user()->home_id;
             $ex_home_ids = explode(',', $home_ids);
-            $home_id=$ex_home_ids[0];
+            $home_id = $ex_home_ids[0];
             $form_insert_id = DynamicForm::saveForm($data);
 
             if ($form_insert_id != 0) {
@@ -98,9 +98,9 @@ class DynamicFormController extends Controller
                             'service_user_id' => $data['service_user_id'],
                             'contact_id' => 0,
                             'care_team_id' => 0,
-                            'title'=>$data['title'],
+                            'title' => $data['title'],
                             'status' => 1,
-                            'details'=>$data['details'],
+                            'details' => $data['details'],
                             'is_deleted' => 0,
                             'created_at' => date('Y-m-d H:i:s'),
                             'updated_at' => date('Y-m-d H:i:s'),
@@ -124,7 +124,7 @@ class DynamicFormController extends Controller
                             'event_id' => 1,
                             'notification_event_type_id' => '11',
                             'event_action' => 'ADD',
-                            'home_id' =>$home_id,
+                            'home_id' => $home_id,
                             'user_id' => Auth::user()->id,
                             'created_at' => date('Y-m-d H:i:s'),
                             'updated_at' => date('Y-m-d H:i:s'),
@@ -134,7 +134,7 @@ class DynamicFormController extends Controller
                         //Behaviour Management
                         $insert_behaviour_managment = array(
                             'service_user_id' => $data['service_user_id'],
-                            'title'=> $data['title'],
+                            'title' => $data['title'],
                             'details' => $data['details'],
                             'sent_to' => 2,
                             'formdata' => json_encode($data['data']),
@@ -159,9 +159,9 @@ class DynamicFormController extends Controller
                         //plans
                         $insert_plans_managment = array(
                             'service_user_id' => $data['service_user_id'],
-                            'task'=>$data['title'],
+                            'task' => $data['title'],
                             'date' => date('Y-m-d'),
-                            'description'=>$data['details'],
+                            'description' => $data['details'],
                             'qqa_review' => "",
                             'formdata' => json_encode($data['data']),
                             'home_id' => $home_id,
@@ -285,7 +285,7 @@ class DynamicFormController extends Controller
         if (!empty($data)) {
             $home_ids = Auth::user()->home_id;
             $ex_home_ids = explode(',', $home_ids);
-            $home_id=$ex_home_ids[0];
+            $home_id = $ex_home_ids[0];
             // $home_id = Auth::user()->home_id;
             $dynamic_form_id = $request->dynamic_form_id;
             $form            = DynamicForm::where('dynamic_form.id', $dynamic_form_id)->first();
@@ -295,9 +295,9 @@ class DynamicFormController extends Controller
             //($data['data']==null)?"hello" +die() :json_encode($data['data']);
             //  die();
 
-            if(isset($data['formImage'])){
+            if (isset($data['formImage'])) {
                 $formImage = $data['formImage'];
-            } else if(isset($data['formImage2'])) {
+            } else if (isset($data['formImage2'])) {
                 $formImage = $data['formImage2'];
             } else {
                 $formImage = null;
@@ -408,23 +408,26 @@ class DynamicFormController extends Controller
                 $pagination .= '</div>';
             }
         }
+        $loop = 1;
 
+        $colors = ['#8fd6d6', '#E13533', '#bda4ec', '#fed65a', '#81b56b'];
+        shuffle($colors); // Randomizes the order
+
+        // dd($dyn_forms);
         foreach ($dyn_forms as $key => $value) {
+            // $title = DynamicFormBuilder::where('id', $value->form_builder_id)->value('title');
 
-
-            $title = DynamicFormBuilder::where('id', $value->form_builder_id)->value('title');
-
-            // if ($value->date == '') {
-            //     $date = '';
-            // } else {
-            //     $date = date('d-m-Y', strtotime($value->date));
-            // }
-
-            if ($value->created_at == '') {
+            if ($value->date == '') {
                 $date = '';
             } else {
-                $date = \Carbon\Carbon::parse($value->created_at)->format('d-m-Y');
+                $date = date('d-m-Y', strtotime($value->date));
             }
+
+            // if ($value->created_at == '') {
+            //     $date = '';
+            // } else {
+            //     $date = \Carbon\Carbon::parse($value->created_at)->format('d-m-Y');
+            // }
 
             if ((!empty($date)) || (!empty($value->time))) {
                 $start_brct = '(';
@@ -434,57 +437,75 @@ class DynamicFormController extends Controller
                 $end_brct = '';
             }
 
-            echo '<div class="col-md-12 col-sm-12 col-xs-12 cog-panel rows">
-                <div class="form-group col-md-12 col-sm-12 col-xs-12 p-0 add-rcrd">
-                    <!-- <label class="col-md-1 col-sm-1 col-xs-12 p-t-7"></label> -->
-                    <div class="col-md-12 col-sm-11 col-xs-12 r-p-0">
-                        <div class="input-group popovr">
+            $color = $colors[$key % count($colors)]; // Cycle through colors if more records than colors
 
-                            <!-- <input type="hidden" name="su_bmp_id[]" value="' . $value->id . '" disabled="disabled" class="edit_bmp_id_' . $value->id . '"> -->
-                            <a href="#" class="dyn-form-view-data" id="' . $value->id . '"><span><input type="text" class="form-control" style="cursor:pointer" name="" readonly value="' . $title . ' ' . $start_brct . $date . ' ' .  $end_brct . '" maxlength="255"/></span></a>
 
-                            <span class="input-group-addon cus-inpt-grp-addon clr-blue settings">
-                                <i class="fa fa-cog"></i>
-                                <div class="pop-notifbox">
-                                    <ul class="pop-notification" type="none">
-                                        <li> <a href="#" data-dismiss="modal" aria-hidden="true" class="dyn-form-view-data" id="' . $value->id . '"> <span> <i class="fa fa-eye"></i> </span> View/Edit</a> </li>
-                                        <li> <a href="#" class="dyn_form_del_btn" id="' . $value->id . '"> <span class="color-red"> <i class="fa fa-exclamation-circle"></i> </span> Remove </a> </li>
-                                        <li> <a href="#" class="dyn_form_daily_log" dyn_form_id="' . $value->id . '" logtype="1"> <span class="color-green"> <i class="fa fa-plus-circle"></i> </span>Send to Daily Log Book (In development)</a> </li>
-                                        <li> <a href="#" class="dyn_form_daily_log" dyn_form_id="' . $value->id . '" logtype="2"> <span class="color-green"> <i class="fa fa-plus-circle"></i> </span> Send to Weekly Log Book (In development)</a> </li>
-                                        <li> <a href="#" class="dyn_form_daily_log" dyn_form_id="' . $value->id . '" logtype="3"> <span class="color-green"> <i class="fa fa-plus-circle"></i> </span> Send to Monthly Log Book (In development)</a> </li>
-                                    </ul>
-                                </div>
-                            </span>
+            if ($loop % 2 == 0) {
+
+                echo '<div class="col-md-6 col-sm-6 col-xs-6 cog-panel rows">
+                        <div class="form-group col-md-12 col-sm-12 col-xs-12 p-0 add-rcrd">
+                        <!-- <label class="col-md-1 col-sm-1 col-xs-12 p-t-7"></label> -->
+                        <div class="col-md-12 col-sm-11 col-xs-12 r-p-0">
+                            <div class="input-group popovr rightSideInput">
+
+                                <!-- <input type="hidden" name="su_bmp_id[]" value="' . $value->id . '" disabled="disabled" class="edit_bmp_id_' . $value->id . '"> -->
+
+                                
+                                <a href="#" class="dyn-form-view-data" id="' . $value->id . '"><span><input type="text" class="form-control" style="cursor:pointer; background-color: '.$color.';" name="" readonly value="' . $value->title . ' " maxlength="255"/></span></a>
+                                <span class=" rightdate"> '. $date .' </span>
+                              
+
+                                <span class="input-group-addon cus-inpt-grp-addon clr-blue settings">
+                                    <i class="fa fa-cog"></i>
+                                    <div class="pop-notifbox">
+                                        <ul class="pop-notification" type="none">
+                                            <li> <a href="#" data-dismiss="modal" aria-hidden="true" class="dyn-form-view-data" id="' . $value->id . '"> <span> <i class="fa fa-eye"></i> </span> View/Edit</a> </li>
+                                            <li> <a href="#" class="dyn_form_del_btn" id="' . $value->id . '"> <span class="color-red"> <i class="fa fa-exclamation-circle"></i> </span> Remove </a> </li>
+                                            <li> <a href="#" class="dyn_form_daily_log" dyn_form_id="' . $value->id . '" logtype="1"> <span class="color-green"> <i class="fa fa-plus-circle"></i> </span>Send to Daily Log Book (In development)</a> </li>
+                                            <li> <a href="#" class="dyn_form_daily_log" dyn_form_id="' . $value->id . '" logtype="2"> <span class="color-green"> <i class="fa fa-plus-circle"></i> </span> Send to Weekly Log Book (In development)</a> </li>
+                                            <li> <a href="#" class="dyn_form_daily_log" dyn_form_id="' . $value->id . '" logtype="3"> <span class="color-green"> <i class="fa fa-plus-circle"></i> </span> Send to Monthly Log Book (In development)</a> </li>
+                                        </ul>
+                                    </div>
+                                </span>
+                            </div>
                         </div>
-                    </div>
-                </div>
-            </div>  ';
+                        </div>
+                    </div>  ';
+            } else {
 
-            // echo '<div class="col-md-12 col-sm-12 col-xs-12 cog-panel rows">
-            //             <div class="form-group col-md-12 col-sm-12 col-xs-12 p-0 add-rcrd">
-            //                 <!-- <label class="col-md-1 col-sm-1 col-xs-12 p-t-7"></label> -->
-            //                 <div class="col-md-12 col-sm-11 col-xs-12 r-p-0">
-            //                     <div class="input-group popovr">
+                echo '<div class="col-md-6 col-sm-6 col-xs-6 cog-panel rows">
+                        <div class="form-group col-md-12 col-sm-12 col-xs-12 p-0 add-rcrd">
+                        <!-- <label class="col-md-1 col-sm-1 col-xs-12 p-t-7"></label> -->
+                        <div class="col-md-12 col-sm-11 col-xs-12 r-p-0">
+                            <div class="input-group popovr timelineInput">
 
-            //                         <!-- <input type="hidden" name="su_bmp_id[]" value="' . $value->id . '" disabled="disabled" class="edit_bmp_id_' . $value->id . '"> -->
-            //                         <input type="text" class="form-control" name="" disabled value="' . $value->title . ' ' . $start_brct . $date . ' ' . $value->time . $end_brct . '" maxlength="255"/>
+                               <!-- <input type="hidden" name="su_bmp_id[]" value="' . $value->id . '" disabled="disabled" class="edit_bmp_id_' . $value->id . '"> -->
+                                <a href="#" class="dyn-form-view-data" id="' . $value->id . '"><span>
+                                <input type="text" class="form-control" style="cursor:pointer; background-color: '. $color .';" name="" readonly value="' . $value->title . '" maxlength="255"/></span></a>
+                                <span class="timLineDate">' . $date . '</span>
+                                <span class="arrow"></span>
 
-            //                         <span class="input-group-addon cus-inpt-grp-addon clr-blue settings">
-            //                             <i class="fa fa-cog"></i>
-            //                             <div class="pop-notifbox">
-            //                                 <ul class="pop-notification" type="none">
-            //                                     <li> <a href="#" data-dismiss="modal" aria-hidden="true" class="dyn-form-view-data" id="' . $value->id . '"> <span> <i class="fa fa-eye"></i> </span> View/Edit</a> </li>
-            //                                     <li> <a href="#" class="dyn_form_del_btn" id="' . $value->id . '"> <span class="color-red"> <i class="fa fa-exclamation-circle"></i> </span> Remove </a> </li>
-            //                                     <li> <a href="#" class="dyn_form_daily_log" dyn_form_id="' . $value->id . '"> <span class="color-green"> <i class="fa fa-plus-circle"></i> </span> Daily Log Book </a> </li>
-            //                                 </ul>
-            //                             </div>
-            //                         </span>
-            //                     </div>
-            //                 </div>
-            //             </div>
-            //         </div>  ';
+                                <span class="input-group-addon cus-inpt-grp-addon clr-blue settings">
+                                    <i class="fa fa-cog"></i>
+                                    <div class="pop-notifbox">
+                                        <ul class="pop-notification" type="none">
+                                            <li> <a href="#" data-dismiss="modal" aria-hidden="true" class="dyn-form-view-data" id="' . $value->id . '"> <span> <i class="fa fa-eye"></i> </span> View/Edit</a> </li>
+                                            <li> <a href="#" class="dyn_form_del_btn" id="' . $value->id . '"> <span class="color-red"> <i class="fa fa-exclamation-circle"></i> </span> Remove </a> </li>
+                                            <li> <a href="#" class="dyn_form_daily_log" dyn_form_id="' . $value->id . '" logtype="1"> <span class="color-green"> <i class="fa fa-plus-circle"></i> </span>Send to Daily Log Book (In development)</a> </li>
+                                            <li> <a href="#" class="dyn_form_daily_log" dyn_form_id="' . $value->id . '" logtype="2"> <span class="color-green"> <i class="fa fa-plus-circle"></i> </span> Send to Weekly Log Book (In development)</a> </li>
+                                            <li> <a href="#" class="dyn_form_daily_log" dyn_form_id="' . $value->id . '" logtype="3"> <span class="color-green"> <i class="fa fa-plus-circle"></i> </span> Send to Monthly Log Book (In development)</a> </li>
+                                        </ul>
+                                    </div>
+                                </span>
+                            </div>
+                        </div>
+                        </div>
+                    </div>  ';
+            }
+
+            $loop++;
         }
-        //echo $pagination;
+        // echo $pagination;
     }
 
     public function su_daily_log_add(Request $request)
@@ -502,7 +523,7 @@ class DynamicFormController extends Controller
             $title_detail = DynamicFormBuilder::where('id', $dyn_form->form_builder_id)->first();
             // echo "<pre>";print_r($title_detail);die;
 
-            $check_log_record = LogBook::where('dynamic_form_id', $data['dyn_form_id'])->where('logType',$data['logtype'])->get()->toArray();
+            $check_log_record = LogBook::where('dynamic_form_id', $data['dyn_form_id'])->where('logType', $data['logtype'])->get()->toArray();
             // echo "<pre>"; print_r($check_log_record); die;
             if (!empty($check_log_record)) {
                 foreach ($check_log_record as $key => $log_record) {
@@ -510,11 +531,11 @@ class DynamicFormController extends Controller
                     // echo "<pre>"; print_r($su_log_yp); die;
 
                     if (!empty($su_log_yp)) {
-                        if($data['logtype']==1){
+                        if ($data['logtype'] == 1) {
                             echo "already_daily";
-                        }else if($data['logtype']==2){
+                        } else if ($data['logtype'] == 2) {
                             echo "already_weekly";
-                        }else if($data['logtype']==3){
+                        } else if ($data['logtype'] == 3) {
                             echo "already_monthly";
                         }
                         //echo "already";
@@ -526,7 +547,7 @@ class DynamicFormController extends Controller
 
             $s_category_id = $data['s_category_id'] ?? null;
             $category_data = $s_category_id ? CategoryFrontEnd::where('id', $s_category_id)->first() : null;
-            
+
             $log_book                  = new LogBook;
             $log_book->dynamic_form_id = $data['dyn_form_id'] ?? null;
             $log_book->home_id         = $home_id;
@@ -539,7 +560,7 @@ class DynamicFormController extends Controller
             $log_book->category_icon   = $category_data ? $category_data->icon : null;
             $log_book->logType         = $data['logtype'] ?? null;
             $log_book->save();
-            
+
 
             $su_log_record                  = new ServiceUserLogBook;
             $su_log_record->user_id         = Auth::user()->id;

@@ -195,8 +195,6 @@
     });
 </script>
 
-
-
 <script>
     $(document).ready(function() {
         $('.dynamic_form_select').on('change', function() {
@@ -432,9 +430,9 @@
                 dataType: 'json',
                 success: function(resp) {
 
-                    if (isAuthenticated(resp) == false) {
-                        return false;
-                    }
+                    // if (isAuthenticated(resp) == false) {
+                    //     return false;
+                    // }
 
 
                     var response = resp['response'];
@@ -637,35 +635,7 @@
     });
 </script>
 
-<script>
-    //logged btn click view bmp title
-    $(document).ready(function() {
-        $(document).on('click', '.logged-dyn-btn', function() {
 
-            $('.loader').show();
-            $('body').addClass('body-overflow');
-
-            $.ajax({
-                type: 'get',
-                url: "{{ url('/service/dynamic-forms') }}",
-                success: function(resp) {
-                    if (isAuthenticated(resp) == false) {
-                        return false;
-                    }
-                    if (resp == '') {
-                        $('.view-dyn-record').html('<div class="text-center p-b-20" style="width:100%">No Records found.</div>');
-                    } else {
-                        $('.view-dyn-record').html(resp);
-                    }
-
-                    $('.loader').hide();
-                    $('body').removeClass('body-overflow');
-                }
-            });
-            return false;
-        });
-    });
-</script>
 
 <script>
     //pagination of bmp

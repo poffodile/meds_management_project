@@ -208,7 +208,8 @@ class DynamicForm extends Model //FormBuilder
     }
 
     public static function showFormWithValue($dynamic_form_id = null, $enable = false)
-    { //show filled form
+    { 
+        //show filled form
 
         /* Note:
             the form fields will be shown according to the latest form pattern 
@@ -285,6 +286,52 @@ class DynamicForm extends Model //FormBuilder
                                         </div>
                                     </div>
                                 </div>
+                                <div class="col-md-12 col-sm-12 col-xs-12 cog-panel">
+                                     <div class="form-group col-md-12 col-sm-12 col-xs-12 p-0">
+                                         <label class="col-md-2 col-sm-2 col-xs-12 p-t-7"> Title: </label>
+                                         <div class="col-md-10 col-sm-10 col-xs-12 r-p-0">
+                                             <div class="input-group popovr">
+                                                 <input type="text" class="form-control trans static_title" placeholder="" '.$disabled.' name="title" value="'.$form_info->title.'" readonly/>
+                                             </div>
+                                         </div>
+                                     </div>
+                                 </div>
+
+                                 <div class="col-md-12 col-sm-12 col-xs-12 cog-panel datepicker-sttng">      
+                                     <div class="form-group col-md-12 col-sm-12 col-xs-12 p-0">
+                                         <label class="col-md-2 col-sm-2 col-xs-12 p-t-7"> Date: </label>
+                                         <div class="col-md-10 col-sm-10 col-xs-12 r-p-0">
+                                           <div data-date-viewmode="" data-date-format="dd-mm-yyyy" data-date="" class="input-group date dpYears">
+                                             <input name="date" size="16" readonly="" class="form-control trans" type="text" '.$disabled.' value="'.date('d-m-Y h:i a', strtotime($form_info->date)).'" readonly>
+                                             <span class="input-group-btn add-on">
+                                               <button class="btn btn-primary" type="button"><i class="fa fa-calendar"></i></button>
+                                             </span>
+                                           </div>
+                                         </div>
+                                     </div>
+                                 </div>
+
+                                 <div class="col-md-12 col-sm-12 col-xs-12 cog-panel">
+                                     <div class="form-group col-md-12 col-sm-12 col-xs-12 p-0">
+                                         <label class="col-md-2 col-sm-2 col-xs-12 p-t-7"> Time: </label>
+                                         <div class="col-md-10 col-sm-12 col-xs-12 r-p-0">
+                                             <div class="input-group popovr">
+                                                 <input type="text" class="form-control trans static_title" placeholder="" '.$disabled.' name="time" value="'. $form_info->time .'" readonly/>
+                                             </div>
+                                         </div>
+                                     </div>
+                                 </div>
+                                 <div class="col-md-12 col-sm-12 col-xs-12 cog-panel">
+                                     <div class="form-group col-md-12 col-sm-12 col-xs-12 p-0">
+                                         <label class="col-md-2 col-sm-2 col-xs-12 p-t-7"> Detail: </label>
+                                         <div class="col-md-10 col-sm-12 col-xs-12 r-p-0">
+                                             <div class="input-group popovr">
+                                                <textarea class="form-control trans" placeholder="" '.$disabled.' name="details" readonly>'. $form_info->details .'</textarea>
+                                             </div>
+                                         </div>
+                                     </div>
+                                 </div>
+
                              ';
 
             $formdata = '';

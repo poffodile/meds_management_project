@@ -1,5 +1,5 @@
 @extends('frontEnd.layouts.master')
-@section('title','Daily Logs')
+@section('title','Forms')
 @section('content')
 
 <link rel="stylesheet" href="{{ url('public\frontEnd\css\time-line.css') }}">
@@ -36,10 +36,69 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
 }
 }
 $service_user_id = (isset($service_user_id)) ? $service_user_id : 0;
-$service_user_name  = (isset($service_user_name )) ? $service_user_name  : 0;
+$service_user_name = (isset($service_user_name )) ? $service_user_name : 0;
 @endphp
 
+<style>
+    .timelineInput {
+        display: flex;
+    }
 
+    .timelineInput a {
+        order: 1;
+        width: 84%;
+    }
+
+    .timelineInput a span input, .rightSideInput  a span input{
+        color: #fff;
+        height: 40px;
+    }
+
+    .timLineDate {
+        background-color: #777;
+        color: #fff;
+        border-radius: 4px;
+        padding: 7px 6px;
+        order: 3;
+        display: block;
+        margin-left: 12px;
+        line-height: 24px;
+        position: relative;
+    }
+
+    .rightSideInput {
+        margin-top: 46px;
+        display: flex;
+    }
+
+     .rightSideInput .rightdate {
+        background-color: #777;
+        color: #fff;
+        border-radius: 4px;
+        padding: 7px 6px;
+        order: 1;
+        display: block;
+        margin-left: 12px;
+        line-height: 24px;
+        position: relative;
+    }
+
+    .pop-notifbox.active {
+        opacity: 1;
+        visibility: visible;
+    }
+    .arrow {
+    border-bottom: 8px solid transparent;
+    border-top: 8px solid transparent;
+    border-left: 8px solid #777777 !important;
+    display: block;
+    height: 0;
+    right: -8px;
+    position: absolute;
+    top: 13px;
+    width: 0;
+}
+</style>
 <section id="container">
     <!--main content start-->
     <section id="main-content">
@@ -64,11 +123,11 @@ $service_user_name  = (isset($service_user_name )) ? $service_user_name  : 0;
                     <select class="form-control" name="staff_member" id="staff_member">
                         <option value="">Select Staff Member</option>
                         @foreach($staff_members as $val)
-                        <option value="{{$val->id}}" <?php  if(isset(Auth::user()->id)) {
-                            if(Auth::user()->id == $val->id ) {
-                                echo "Selected";
-                            }
-                        } ?>>{{$val->name}}</option>
+                        <option value="{{$val->id}}" <?php if (isset(Auth::user()->id)) {
+                                                            if (Auth::user()->id == $val->id) {
+                                                                echo "Selected";
+                                                            }
+                                                        } ?>>{{$val->name}}</option>
                         @endforeach
                     </select>
                 </div>
@@ -100,7 +159,7 @@ $service_user_name  = (isset($service_user_name )) ? $service_user_name  : 0;
                         </div>
                     </div>
                 </div>
-             
+
                 <!-- sourabh -->
                 <div class="Select_staff_inner">
                     <!-- <input type="text" class="form-control" id="keyword" onKeyPress="myFunctionkey()" onKeyUp="myFunctionkey()" name="keyword" placeholder="Keyword"> -->
@@ -118,7 +177,7 @@ $service_user_name  = (isset($service_user_name )) ? $service_user_name  : 0;
                             </div>
                         </article>
 
-                        <div class="timeline-messages">
+                        <div class="timeline-messages view-dyn-record">
                             <!-- Comment -->
                             <div class="msg-time-chat">
                                 <div class="message-body msg-in rightmsg">
@@ -139,8 +198,8 @@ $service_user_name  = (isset($service_user_name )) ? $service_user_name  : 0;
                                                         <li><a href="#!"> <i class="fa fa-calendar-o"></i> Daily</a></li>
                                                         <li><a href="#!"> <i class="fa fa-calendar-o"></i> Weekly</a></li>
                                                         <li><a href="#!"> <i class="fa fa-calendar-o"></i> Monthly</a></li>
-                                                    </ul>                                                    
-                                                </label>                                                 
+                                                    </ul>
+                                                </label>
                                             </span>
                                         </div>
                                     </div>
@@ -164,8 +223,8 @@ $service_user_name  = (isset($service_user_name )) ? $service_user_name  : 0;
                                                         <li><a href="#!"> <i class="fa fa-calendar-o"></i> Daily</a></li>
                                                         <li><a href="#!"> <i class="fa fa-calendar-o"></i> Weekly</a></li>
                                                         <li><a href="#!"> <i class="fa fa-calendar-o"></i> Monthly</a></li>
-                                                    </ul>                                                    
-                                                </label> 
+                                                    </ul>
+                                                </label>
                                             </span>
                                             <p>Completed Provition period and Appointed as a permanent Employee</p>
                                         </div>
@@ -176,7 +235,7 @@ $service_user_name  = (isset($service_user_name )) ? $service_user_name  : 0;
                                 </div>
                             </div>
                             <!-- /comment -->
-                            
+
                             <!-- Comment -->
                             <div class="msg-time-chat">
                                 <div class="message-body msg-in rightmsg">
@@ -197,8 +256,8 @@ $service_user_name  = (isset($service_user_name )) ? $service_user_name  : 0;
                                                         <li><a href="#!"> <i class="fa fa-calendar-o"></i> Daily</a></li>
                                                         <li><a href="#!"> <i class="fa fa-calendar-o"></i> Weekly</a></li>
                                                         <li><a href="#!"> <i class="fa fa-calendar-o"></i> Monthly</a></li>
-                                                    </ul>                                                    
-                                                </label> 
+                                                    </ul>
+                                                </label>
                                             </span>
                                         </div>
                                     </div>
@@ -222,8 +281,8 @@ $service_user_name  = (isset($service_user_name )) ? $service_user_name  : 0;
                                                         <li><a href="#!"> <i class="fa fa-calendar-o"></i> Daily</a></li>
                                                         <li><a href="#!"> <i class="fa fa-calendar-o"></i> Weekly</a></li>
                                                         <li><a href="#!"> <i class="fa fa-calendar-o"></i> Monthly</a></li>
-                                                    </ul>                                                    
-                                                </label> 
+                                                    </ul>
+                                                </label>
                                             </span>
                                             <p>Got Promotion and become area manager of California</p>
                                         </div>
@@ -234,7 +293,7 @@ $service_user_name  = (isset($service_user_name )) ? $service_user_name  : 0;
                                 </div>
                             </div>
                             <!-- /comment -->
-                            
+
                             <!-- Comment -->
                             <div class="msg-time-chat">
                                 <div class="message-body msg-in rightmsg">
@@ -255,8 +314,8 @@ $service_user_name  = (isset($service_user_name )) ? $service_user_name  : 0;
                                                         <li><a href="#!"> <i class="fa fa-calendar-o"></i> Daily</a></li>
                                                         <li><a href="#!"> <i class="fa fa-calendar-o"></i> Weekly</a></li>
                                                         <li><a href="#!"> <i class="fa fa-calendar-o"></i> Monthly</a></li>
-                                                    </ul>                                                    
-                                                </label> 
+                                                    </ul>
+                                                </label>
                                             </span>
                                         </div>
                                     </div>
@@ -280,8 +339,8 @@ $service_user_name  = (isset($service_user_name )) ? $service_user_name  : 0;
                                                         <li><a href="#!"> <i class="fa fa-calendar-o"></i> Daily</a></li>
                                                         <li><a href="#!"> <i class="fa fa-calendar-o"></i> Weekly</a></li>
                                                         <li><a href="#!"> <i class="fa fa-calendar-o"></i> Monthly</a></li>
-                                                    </ul>                                                    
-                                                </label> 
+                                                    </ul>
+                                                </label>
                                             </span>
                                             <p> Got Promotion and become Product Manager and was transper from Branch to Head Office. Lorem ipsum dolor sit amet</p>
                                         </div>
@@ -292,7 +351,7 @@ $service_user_name  = (isset($service_user_name )) ? $service_user_name  : 0;
                                 </div>
                             </div>
                             <!-- /comment -->
-                            
+
                             <!-- Comment -->
                             <div class="msg-time-chat">
                                 <div class="message-body msg-in rightmsg">
@@ -313,15 +372,15 @@ $service_user_name  = (isset($service_user_name )) ? $service_user_name  : 0;
                                                         <li><a href="#!"> <i class="fa fa-calendar-o"></i> Daily</a></li>
                                                         <li><a href="#!"> <i class="fa fa-calendar-o"></i> Weekly</a></li>
                                                         <li><a href="#!"> <i class="fa fa-calendar-o"></i> Monthly</a></li>
-                                                    </ul>                                                    
-                                                </label> 
+                                                    </ul>
+                                                </label>
                                             </span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <!-- /comment -->
-                            
+
                             <!-- Comment -->
                             <div class="msg-time-chat">
                                 <div class="message-body msg-in leftmsg">
@@ -338,8 +397,8 @@ $service_user_name  = (isset($service_user_name )) ? $service_user_name  : 0;
                                                         <li><a href="#!"> <i class="fa fa-calendar-o"></i> Daily</a></li>
                                                         <li><a href="#!"> <i class="fa fa-calendar-o"></i> Weekly</a></li>
                                                         <li><a href="#!"> <i class="fa fa-calendar-o"></i> Monthly</a></li>
-                                                    </ul>                                                    
-                                                </label> 
+                                                    </ul>
+                                                </label>
                                             </span>
                                             <p>Take 15 days leave for his wedding and Honeymoon & Christmas</p>
                                         </div>
@@ -352,13 +411,13 @@ $service_user_name  = (isset($service_user_name )) ? $service_user_name  : 0;
                             <!-- /comment -->
 
                         </div>
-                        <article class="timeline-item alt">
+                        <!-- <article class="timeline-item alt">
                             <div class="text-right">
                                 <div class="time-show first">
                                     <a href="#" class="btn btn-primary" id="today">08/07/2025</a>
                                 </div>
                             </div>
-                        </article>
+                        </article> -->
                     </div>
                 </div>
             </div>
@@ -376,23 +435,21 @@ $service_user_name  = (isset($service_user_name )) ? $service_user_name  : 0;
                 </div>
                 <div class="modal-body">
                     <div class="actionForm">
-                       <div class="p-b-10">
+                        <div class="p-b-10">
                             <form class="form-horizontal" role="form">
                                 <div class="form-group">
                                     <label for="" class="col-lg-2 col-sm-2 control-label">Email</label>
                                     <div class="col-lg-10">
-                                        <input type="email" class="form-control" id="" placeholder="Email">                                        
+                                        <input type="email" class="form-control" id="" placeholder="Email">
                                     </div>
                                 </div>
-                                
                                 <div class="form-group">
                                     <label for="" class="col-lg-2 col-sm-2 control-label">Password</label>
                                     <div class="col-lg-10">
                                         <input type="password" class="form-control" id="" placeholder="Password">
                                     </div>
                                 </div>
-
-                                <div class="modal-footer m-t-0 m-b-15 p-r-0 modal-bttm">  
+                                <div class="modal-footer m-t-0 m-b-15 p-r-0 modal-bttm">
                                     <button type="submit" class="btn btn-danger">Save</button>
                                 </div>
                             </form>
@@ -403,23 +460,39 @@ $service_user_name  = (isset($service_user_name )) ? $service_user_name  : 0;
         </div>
     </div>
 
+    <script>
+        //logged btn click view bmp title
+        $(document).ready(function() {
+            // $(document).on('click', '.logged-dyn-btn', function() {
+
+            // $('.loader').show();
+            // $('body').addClass('body-overflow');
+            $.ajax({
+                type: 'get',
+                url: "{{ url('/service/dynamic-forms') }}",
+                success: function(resp) {
+                    if (isAuthenticated(resp) == false) {
+                        return false;
+                    }
+                    console.log("resp from the ", resp);
+                    if (resp == '') {
+                        $('.view-dyn-record').html('<div class="text-center p-b-20" style="width:100%">No Records found.</div>');
+                    } else {
+                        $('.view-dyn-record').html("");
+                        $('.view-dyn-record').html(resp);
+                    }
+
+                    $('.loader').hide();
+                    $('body').removeClass('body-overflow');
+                }
+            });
+            // return false;
+            // });
+        });
+    </script>
 
 </section>
-<script>
-  const inputs = document.querySelectorAll('.dd-input');
 
-  inputs.forEach(input => {
-    input.addEventListener('change', () => {
-      if (input.checked) {
-        inputs.forEach(otherInput => {
-          if (otherInput !== input) {
-            otherInput.checked = false;
-          }
-        });
-      }
-    });
-  });
-</script>
 
 <!-- Date Range Initialization -->
 <script>
@@ -495,9 +568,9 @@ $service_user_name  = (isset($service_user_name )) ? $service_user_name  : 0;
             dataType: 'json',
 
             success: function(resp) {
-                if (isAuthenticated(resp) == false) {
-                    return false;
-                }
+                // if (isAuthenticated(resp) == false) {
+                //     return false;
+                // }
                 let ul_list_items = '';
                 resp.data.forEach((comment) => {
                     // ul_list_items += '<li>'+ comment + '</li>';

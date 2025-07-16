@@ -1,4 +1,3 @@
-
 //checking ajax response. if it is unauthorized, show message 
 function isAuthenticated(resp){ //alert(2);
 	if(resp == 'unauthorize' || resp == '"unauthorize"'){

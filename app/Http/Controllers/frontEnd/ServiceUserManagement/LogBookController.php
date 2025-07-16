@@ -725,6 +725,8 @@ class LogBookController extends ServiceUserManagementController
             ->get();
 
         $data['dynamic_forms'] = DynamicFormBuilder::getFormList();
+
+        
         // dd($dynamic_forms);
 
 
