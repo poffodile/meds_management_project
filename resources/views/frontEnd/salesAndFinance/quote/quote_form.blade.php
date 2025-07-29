@@ -1,5 +1,5 @@
-@include('frontEnd.salesAndFinance.jobs.layout.header')
-@section('title','Quotes')
+@extends('frontEnd.layouts.master')
+<!-- @section('title','Quotes') -->
 <meta name="csrf-token" content="{{ csrf_token() }}">
 
 <style>
@@ -21,15 +21,12 @@
     }
 </style>
 
-<section class="main_section_page px-3 pt-0">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-4 col-lg-4 col-xl-4 ">
-                <div class="pageTitle">
-                    <h3>New Quote</h3>
-                </div>
-            </div>
-        </div>
+<section class="wrapper">
+    <div class="panel">
+
+         <header class="panel-heading px-5">
+            <h4>New Quote</h4>
+         </header>
 
         <div class="row">
             <div class="col-lg-12">

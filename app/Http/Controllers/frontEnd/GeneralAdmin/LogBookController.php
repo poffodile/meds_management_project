@@ -12,9 +12,12 @@ class LogBookController extends GeneralAdminController
     public function index()
     {   
         //in search case editing start
+        $home_ids = Auth::user()->home_id;
+        $ex_home_ids = explode(',', $home_ids);
+        $home_id=$ex_home_ids[0];
         $log_book_records = LogBook::select('log_book.*','u.name as staff_name')
                                     ->where('log_book.is_deleted','0')
-                                    ->where('log_book.home_id', Auth::user()->home_id)
+                                    ->where('log_book.home_id', $home_id)
                                     ->orderBy('log_book.id','desc')
                                     ->orderBy('log_book.date','asc')
                                     ->leftJoin('user as u','u.id','log_book.user_id');
@@ -164,6 +167,9 @@ class LogBookController extends GeneralAdminController
 
         if($request->isMethod('post')) {
             $data = $request->all();
+            $home_ids = Auth::user()->home_id;
+            $ex_home_ids = explode(',', $home_ids);
+            $home_id=$ex_home_ids[0];
             // echo "<pre>"; print_r($data); die;
             /*$su_home_id = ServiceUser::where('id',$data['service_user_id'])->value('home_id');
             if(Auth::user()->home_id != $su_home_id){
@@ -176,7 +182,7 @@ class LogBookController extends GeneralAdminController
             $log_book_record->details   = $data['log_detail'];
             // $log_book_record->date    = '';
             // $log_book_record->status  = 1;
-            $log_book_record->home_id   = Auth::user()->home_id;
+            $log_book_record->home_id   = $home_id;
             $log_book_record->user_id   = Auth::user()->id;
             if($log_book_record->save()){
                 if(!empty($data['select_usr_id'])){
@@ -218,9 +224,11 @@ class LogBookController extends GeneralAdminController
     }
 
     public function serviceuserlist(Request $request) {
-        
+        $home_ids = Auth::user()->home_id;
+        $ex_home_ids = explode(',', $home_ids);
+        $home_id=$ex_home_ids[0];
         $serviceuserlist = ServiceUser::where('is_deleted','0')
-                                ->where('home_id', Auth::user()->home_id)
+                                ->where('home_id', $home_id)
                                 ->select('id', 'name', 'user_name')->get();
         // echo "<pre>"; print_r($serviceuserlist); die;
 

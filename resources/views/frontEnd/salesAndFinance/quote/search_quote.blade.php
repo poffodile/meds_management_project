@@ -1,17 +1,20 @@
-@include('frontEnd.salesAndFinance.jobs.layout.header')
-<section class="main_section_page px-3">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-4 col-lg-4 col-xl-4 ">
-                <div class="pageTitle">
-                    <h3>Search Quote</h3>
-                </div>
-            </div>
-        </div>
-        @include('frontEnd.salesAndFinance.quote.quote_buttons')
+@extends('frontEnd.layouts.master')
+<section class="wrapper">
+    <div class="panel">
+       <header class="panel-heading px-5">
+            <h4>Search Quote</h4>
+       </header>
+
+
+        
         <di class="row">
             <div class="col-lg-12">
-                <div class="maimTable">
+                <div class="maimTable">                 
+                    <div class="row">
+                         <div class="col-md-10 p-t-15 p-l-20">
+                           @include('frontEnd.salesAndFinance.quote.quote_buttons')
+                        </div>
+                    </div>
                     <div class="printExpt">
                         <div class="prntExpbtn">
                             <a href="#!">Print</a>
@@ -430,4 +433,3 @@
 </script>
 
 
-@include('frontEnd.salesAndFinance.jobs.layout.footer')

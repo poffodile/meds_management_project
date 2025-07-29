@@ -437,7 +437,9 @@ $page_title = '';
                 },
                 dataType: 'json',
                 success: function(resp) {
-
+                    if (isAuthenticated(resp) == false) {
+                        return false;
+                    }
                     var response = resp['response'];
                     var calendar_id = resp['calendar_id'];
                     if (response == true) {
@@ -490,6 +492,9 @@ $page_title = '';
                         'event_date': event_date
                     },
                     success: function(resp) {
+                        if (isAuthenticated(resp) == false) {
+                            return false;
+                        }
                         if (resp == 'false') {
                             revertFunc();
                             $('.ajax-alert-err').show();
@@ -803,6 +808,9 @@ Note: here in calender month is one number in minus
             },
             success: function(resp) {
                 // console.log(resp);
+                if (isAuthenticated(resp) == false) {
+                    return false;
+                }
                 if (resp == '1') {
                     var leng = Number(length) - 1;
                     // console.log(l);

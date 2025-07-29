@@ -302,6 +302,11 @@
 .dd-menu.rightSidedrop {
     left: -183px;
 }
+
+.contectOrImg{
+    display: flex;
+    justify-content: space-between;
+}
 /* new left side white design  */
 /* 
 .message-body.msg-in.leftWhite {
@@ -456,7 +461,7 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                     <div class="datepicker-sttng date-sttng">
                         <label style="display: none;"> Category: </label>
                         <div>
-                            <select class="form-control" style="min-width:200px;" id="select_category" name="category_timeline" required />
+                            <select class="form-control" style="min-width:200px;" id="select_category" name="category_timeline" required >
                             <!-- <option disabled value> -- select an option -- </option> -->
                             <option selected value="all">All</option>
                             @foreach ($categorys as $key )
@@ -609,16 +614,19 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                                             <i class="fa fa-tags"></i>
                                         </span>
                                         <span class="timeline-date">11:35 am</span>
-                                        <h1 class="blue">10 hours ago</h1>
-                                        <p>3 new photo Uploaded on facebook fan page</p>
-                                        <div class="album">
-                                            <a href="#">
-                                                <img alt="" src="http://localhost/socialcareitsolution/public/images/userProfileImages/1686647448.jpg">
-                                            </a>
-                                            <a href="#">
-                                                <img alt="" src="http://localhost/socialcareitsolution/public/images/userProfileImages/1686647448.jpg">
-                                            </a>
-                                           
+                                        <div class="contectOrImg">
+                                            <div class="">
+                                                <h1 class="blue">10 hours ago</h1>
+                                                <p>3 new photo Uploaded on facebook fan page</p>
+                                            </div>
+                                            <div class="album">
+                                                <a href="#">
+                                                    <img alt="" src="http://localhost/socialcareitsolution/public/images/userProfileImages/1686647448.jpg">
+                                                </a>
+                                                <a href="#">
+                                                    <img alt="" src="http://localhost/socialcareitsolution/public/images/userProfileImages/1686647448.jpg">
+                                                </a>                                           
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -690,10 +698,7 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                                         </span>
                                         <span class="timeline-date">3:20 pm</span>
                                         <h1 class="purple">4:30</h1>
-                                        <p>Outdoor visit at California State Route 85 with John Boltana & Harry Piterson regarding to setup a new show room.</p>
-                                        <p>
-                                            <i class=" fa fa-exclamation-sign"></i> New task added for <span><a href="#" class="purple">Denial Collins</a></span>
-                                        </p>
+                                        <p>Outdoor visit at California State Route 85 with John Boltana & Harry Piterson regarding to setup room.</p>
                                     </div>
                                 </div>
                             </div>
@@ -703,7 +708,6 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                                 <div class="panel">
                                     <div class="panel-body">
                                         <span class="arrow-alt"></span>
-
                                         <span class="timeline-icon light-green">
                                             <i class="fa fa-user-md"></i>
                                         </span>
@@ -743,7 +747,6 @@ return $string ? implode(', ', $string) . ' ago' : 'just now';
                                 <div class="panel">
                                     <div class="panel-body">
                                         <span class="arrow-alt"></span>
-
                                         <span class="timeline-icon ">
                                             <i class="fa fa-download"></i>
                                         </span>

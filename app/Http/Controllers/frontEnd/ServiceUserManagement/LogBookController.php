@@ -11,8 +11,9 @@ use Illuminate\Support\Facades\Log;
 use App\Notification;
 use Exception;
 use DB, Auth;
-use PDF;
-use Carbon\Carbon;
+// use PDF;
+// use Carbon\Carbon;
+use App\DynamicForm;
 
 class LogBookController extends ServiceUserManagementController
 {
@@ -209,7 +210,8 @@ class LogBookController extends ServiceUserManagementController
 
     public function add(Request $request)
     {
-        // echo "<pre>";print_r($request->all());die;
+        // dd($request);
+        // echo "<pre>"; print_r($request->all());die;
         if ($request->isMethod('post')) {
             //sourabh geo location
             // $ip = '49.35.41.195'; //For static IP address get
@@ -272,12 +274,11 @@ class LogBookController extends ServiceUserManagementController
                 $login_home_id = @$home_ids;
             }
 
+            $form_insert_id = DynamicForm::saveForm($data);
 
-            $latest_date    = LogBook::select('log_book.*')
-                ->orderBy('date', 'desc')->take(1)->value('date');
-
-            $latest_date    = date('Y-m-d H:i:s', strtotime($latest_date));
-            $given_date    = date('Y-m-d H:i:s', strtotime($data['log_date']));
+            $latest_date  = LogBook::select('log_book.*')->orderBy('date', 'desc')->take(1)->value('date');
+            $latest_date  = date('Y-m-d H:i:s', strtotime($latest_date));
+            $given_date   = date('Y-m-d H:i:s', strtotime($data['log_date']));
             // $given_date    = date('Y-m-d H:i:s');
             $latest_date_without_time    = date('Y-m-d', strtotime($latest_date));
             $given_date_without_time    = date('Y-m-d', strtotime($given_date));
@@ -294,6 +295,9 @@ class LogBookController extends ServiceUserManagementController
 
             $log_book_record->title   = $data['log_title'];
             $log_book_record->category_id = $data['category'];
+            $log_book_record->formdata = json_encode($data['data']);
+            $log_book_record->start_date =  date('Y-m-d');
+            $log_book_record->dynamic_form_id = $form_insert_id;
             $log_book_record->category_name   = $category_name;
             $log_book_record->category_icon   = $category_icon;
             $log_book_record->date    = date('Y-m-d H:i:s', strtotime($data['log_date']));

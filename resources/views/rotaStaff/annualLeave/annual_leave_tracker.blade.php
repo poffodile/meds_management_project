@@ -9,6 +9,14 @@
     .omegaCareAnnual tbody tr td {
         white-space: nowrap;
     }
+.selectYr{
+    font-size: 14px;
+    font-weight: 500;
+    text-transform: capitalize;
+    line-height: 35px;
+    text-align: end;
+    display: block;
+    }
 </style>
 
 <!--main content start-->
@@ -22,16 +30,18 @@
                     </header>
                     <div class="panel-body">
                         <div class="col-lg-12">
-                            <div class="row">
-                                <!-- <div class="col-md-4"></div>
-                                <div class="col-md-4"></div> -->
-                                <div class="col-md-4">
-                                    <div class="jobsection justify-content-end mb-0">
+                            <div class="row justify-content-end">
+                                <!-- <div class="col-md-4"></div> -->
+    
+                            <div class="col-md-1 col-md-offset-10">
+                                <label class="selectYr">Select years</label>
+                            </div>
+                            <div class="col-md-1">
+                                    <div class="jobsection mb-0">
                                         @php
                                         $startYear = 2000;
                                         $currentYear = date('Y');
                                         @endphp
-
                                         <select name="year" class="form-control">
                                             @for ($year = $startYear; $year <= $currentYear; $year++)
                                                 <option value="{{ $year }}" {{ $year == $currentYear ? 'selected' : '' }}>{{ $year }}</option>

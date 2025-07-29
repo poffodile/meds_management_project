@@ -11,7 +11,10 @@ class PoliciesController extends ServiceUserManagementController
     public function index()
     {
         $user_id = Auth::user()->id;
-        $home_id = Auth::user()->home_id;
+        $home_ids = Auth::user()->home_id;
+        $ex_home_ids = explode(',', $home_ids);
+        $home_id=$ex_home_ids[0];
+        // $home_id = Auth::user()->home_id;
         //,'uap.id as accepted_id'
         $policy_query = Policies::select('polices.id','polices.file','user_accepted_policy.id as user_accepted_id')
                                 ->where('polices.home_id',$home_id)
@@ -171,6 +174,9 @@ class PoliciesController extends ServiceUserManagementController
             print_r($_FILES);
             print_r($data['files']);
             die;*/
+            $home_ids = Auth::user()->home_id;
+            $ex_home_ids = explode(',', $home_ids);
+            $home_id=$ex_home_ids[0];
             $user_id = Auth::user()->id;
 
             if(!empty($_FILES['files']['name'])) {
@@ -206,7 +212,7 @@ class PoliciesController extends ServiceUserManagementController
                             $file                  = new Policies;
                             $file->user_id         = $user_id;
                             $file->file            = $new_name;
-                            $file->home_id         = Auth::user()->home_id;
+                            $file->home_id         = $home_id;
                             
                             if($file->save()){
                                 $result[$key]['response']   = true;
@@ -247,7 +253,9 @@ class PoliciesController extends ServiceUserManagementController
         
         $su_home_id = User::where('id',$user_id)->value('home_id');
         if(Auth::user()->home_id == $su_home_id){
-       
+            $home_ids = Auth::user()->home_id;
+            $ex_home_ids = explode(',', $home_ids);
+            $home_id=$ex_home_ids[0];
             if(!empty($_FILES['file']['name']))
             {  
                 $tmp_image  =   $_FILES['file']['tmp_name'];
@@ -277,7 +285,7 @@ class PoliciesController extends ServiceUserManagementController
                         $file                  = new Policies;
                         $file->user_id         = $user_id;
                         $file->file            = $new_name;
-                        $file->home_id         = Auth::user()->home_id;
+                        $file->home_id         = $home_id;
                         
                         if($file->save()) {
                             //$save_id = base64_encode(convert_uuencode($file->id));

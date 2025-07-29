@@ -13,7 +13,10 @@ class PettyCashController extends GeneralAdminController
     public function index()
     {
         //in search 
-        $expense_reports = PettyCash::where('home_id', Auth::user()->home_id)->where('txn_type', 'W');
+        $home_ids = Auth::user()->home_id;
+        $ex_home_ids = explode(',', $home_ids);
+        $home_id=$ex_home_ids[0];
+        $expense_reports = PettyCash::where('home_id', $home_id)->where('txn_type', 'W');
 
         $today = date('Y-m-d 00:0:00');
 
@@ -133,8 +136,10 @@ class PettyCashController extends GeneralAdminController
         // echo "<pre>"; print_r($request->input()); die;
         if ($request->isMethod('post')) {
             $data = $request->all();
-
-            $balance = (float)PettyCash::where('home_id', Auth::user()->home_id)->orderBy('id', 'desc')->value('balance');
+            $home_ids = Auth::user()->home_id;
+            $ex_home_ids = explode(',', $home_ids);
+            $home_id=$ex_home_ids[0];
+            $balance = (float)PettyCash::where('home_id', $home_id)->orderBy('id', 'desc')->value('balance');
             $expense_report     = new PettyCash;
             $transaction_amount = (float)$data['expense_amount'];
             //echo $remaining_balance; die;
@@ -145,7 +150,7 @@ class PettyCashController extends GeneralAdminController
                 $remaining_balance = $balance - $transaction_amount;
                 //echo $remaining_balance; die;
 
-                $expense_report->home_id    = Auth::user()->home_id;
+                $expense_report->home_id    = $home_id;
                 $expense_report->user_id    = Auth::user()->id;
                 $expense_report->title      = $data['expense_title'];
                 $expense_report->details    = $data['expense_detail'];
@@ -178,7 +183,7 @@ class PettyCashController extends GeneralAdminController
                         //send email alert to staff members who has authority to add petty cash
                         $access_right_id      = AccessRight::where('tag', 'PROFILE_PETTY_CASH_ADD')->value('id');
                         $users                = User::select('id', 'name', 'email', 'user_name')
-                            ->where('home_id', Auth::user()->home_id)
+                            ->where('home_id', $home_id)
                             ->whereRaw('FIND_IN_SET(?,access_rights)', $access_right_id)
                             ->where('is_deleted', 0)
                             ->get();
@@ -210,7 +215,10 @@ class PettyCashController extends GeneralAdminController
 
     public function get_petty_balance()
     {
-        $home_id = Auth::user()->home_id;
+        $home_ids = Auth::user()->home_id;
+        $ex_home_ids = explode(',', $home_ids);
+        $home_id=$ex_home_ids[0];
+        // $home_id = Auth::user()->home_id;
 
         $balance = PettyCash::where('home_id', $home_id)->orderBy('id', 'desc')->value('balance');
 
@@ -224,7 +232,10 @@ class PettyCashController extends GeneralAdminController
     public function view($expnse_rep_id = null)
     {
         $user_id = Auth::user()->id;
-        $home_id = Auth::user()->home_id;
+        $home_ids = Auth::user()->home_id;
+        $ex_home_ids = explode(',', $home_ids);
+        $home_id=$ex_home_ids[0];
+        // $home_id = Auth::user()->home_id;
 
         $expense_report = PettyCash::where('home_id', $home_id)->where('user_id', $user_id)->where('id', $expnse_rep_id)->first();
 

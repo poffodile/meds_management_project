@@ -18,7 +18,10 @@ class TrainingController extends Controller
 		} else{
 			$year = date("Y");
 		}
-		$list_training = Training::where('home_id',Auth::user()->home_id)->where('training_year',$year)->where('is_deleted', '0')->orderBy('training_month','asc')->get()->toArray(); 
+		$home_ids = Auth::user()->home_id;
+		$ex_home_ids = explode(',', $home_ids);
+		$home_id=$ex_home_ids[0];
+		$list_training = Training::where('home_id',$home_id)->where('training_year',$year)->where('is_deleted', '0')->orderBy('training_month','asc')->get()->toArray(); 
 		if(!empty($list_training)){
 			foreach ($list_training as $key => $training) {
 				$trainings[$training['training_month']][$key]['id']		= $training['id'];
@@ -32,8 +35,11 @@ class TrainingController extends Controller
 
 	public function add(Request $r){
 		$data = $r->input();
+		$home_ids = Auth::user()->home_id;
+		$ex_home_ids = explode(',', $home_ids);
+		$home_id=$ex_home_ids[0];
 		$training 					= new Training;
-		$training->home_id			= Auth::user()->home_id;
+		$training->home_id			= $home_id;
 		$training->training_name	= $data['name'];
 		$training->training_provider= $data['training_provider'];
 		$training->training_desc	= $data['desc'];
@@ -48,6 +54,9 @@ class TrainingController extends Controller
 	}
 
 	public function view($id=null){
+		$home_ids = Auth::user()->home_id;
+		$ex_home_ids = explode(',', $home_ids);
+		$home_id=$ex_home_ids[0];
 		$completed_training = 	DB::table('user')
 								->join('staff_training', 'staff_training.user_id', '=', 'user.id')
 								->where('staff_training.training_id',$id)
@@ -71,7 +80,7 @@ class TrainingController extends Controller
 								// $not_completed_training = DB::table('user')
 								// ->paginate(1);
 
-		$home_id = Auth::user()->home_id;
+		$home_id = $home_id;
 		// $home_users = ServiceUser::select('name','id')->where('home_id',$home_id)->get()->toArray();
 		$home_users = User::select('name','id')->where('home_id',$home_id)->where('is_deleted','0')->get()->toArray();
 		
@@ -184,6 +193,9 @@ class TrainingController extends Controller
 
 	public function add_user_training(Request $r){
 		$data = $r->input();
+		$home_ids = Auth::user()->home_id;
+		$ex_home_ids = explode(',', $home_ids);
+		$home_id=$ex_home_ids[0];
 
 		if(isset($data['user_ids'])){
 			foreach ($data['user_ids'] as $key => $value) {
@@ -196,7 +208,7 @@ class TrainingController extends Controller
 			if($train){
 
 				$training_id = $r->training_id;
-				$home_id     = Auth::User()->home_id;
+				// $home_id     = Auth::User()->home_id;
 				$training    = Training::where('home_id', $home_id)->where('id', $training_id)->first();
 				
 				$trainee_id  = $train->user_id;
@@ -229,8 +241,10 @@ class TrainingController extends Controller
 	}
 	
 	public function view_fields(Request $request, $training_id)	{
-
-		$home_id = Auth::User()->home_id;
+		$home_ids = Auth::user()->home_id;
+		$ex_home_ids = explode(',', $home_ids);
+		$home_id=$ex_home_ids[0];
+		// $home_id = Auth::User()->home_id;
 		$training = Training::where('home_id', $home_id)->where('id', $training_id)->first();
 
 		if(!empty($training)) {
@@ -282,8 +296,10 @@ class TrainingController extends Controller
 	}
 
 	public function delete($training_id) {
-		
-		$delete_record = Training::where('id', $training_id)->where('home_id',Auth::user()->home_id)->update(['is_deleted' => '1']);
+		$home_ids = Auth::user()->home_id;
+		$ex_home_ids = explode(',', $home_ids);
+		$home_id=$ex_home_ids[0];
+		$delete_record = Training::where('id', $training_id)->where('home_id',$home_id)->update(['is_deleted' => '1']);
 		if($delete_record) {
 			return redirect()->back()->with('success', 'Training record deleted successfully.');
 		} else {

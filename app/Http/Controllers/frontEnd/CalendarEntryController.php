@@ -229,7 +229,9 @@ class CalendarEntryController extends Controller //appointment controller
 		if($request->isMethod('post')) {
 			$data = $request->input();
 			$service_user_id = $data['su_id_ml'];
-			$usr_home_id  = Auth::user()->home_id;
+			$home_ids = Auth::user()->home_id;
+			$ex_home_ids = explode(',', $home_ids);
+			$usr_home_id  = $ex_home_ids[0];
 			$su_home_id   = ServiceUser::where('id',$service_user_id)->value('home_id');
 			if($su_home_id != $usr_home_id){
                 return redirect('/')->with('error', UNAUTHORIZE_ERR); 

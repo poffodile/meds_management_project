@@ -13,7 +13,10 @@ class ProfileController extends StaffManagementController
 
         if(!empty($staff_member)){
 
-            $home_id = Auth::user()->home_id;
+            // $home_id = Auth::user()->home_id;
+            $home_ids = Auth::user()->home_id;
+            $ex_home_ids = explode(',', $home_ids);
+            $home_id=$ex_home_ids[0];
             if($staff_member->home_id != $home_id){
                 return redirect('/')->with('error',UNAUTHORIZE_ERR); 
             }
@@ -53,7 +56,7 @@ class ProfileController extends StaffManagementController
                             ->get()
                             ->toArray();
                             
-            $user_rights = User::where('id',$staff_id)->where('home_id', Auth::user()->home_id)->where('is_deleted','0')->value('access_rights');
+            $user_rights = User::where('id',$staff_id)->where('home_id', $home_id)->where('is_deleted','0')->value('access_rights');
             $user_rights = explode(',', $user_rights);
 
             $staff_qualification = DB::table('user_qualification')->select('id','name','image')->where('user_id',$staff_id)->where('is_deleted',0)->get();
@@ -68,6 +71,9 @@ class ProfileController extends StaffManagementController
 
         if($request->isMethod('post')) {
             $data = $request->all();
+            $home_ids = Auth::user()->home_id;
+            $ex_home_ids = explode(',', $home_ids);
+            $home_id=$ex_home_ids[0];
             
             $staff_id = $data['staff_id'];
             unset($data['staff_id']);
@@ -75,7 +81,7 @@ class ProfileController extends StaffManagementController
 
             foreach ($data as $key => $value) {
                 $update_info = User::where('id', $staff_id)
-                                ->where('home_id', Auth::user()->home_id)
+                                ->where('home_id', $home_id)
                                 ->where('is_deleted','0')
                                 ->update([
                                     $key => nl2br(trim($value))
@@ -96,9 +102,11 @@ class ProfileController extends StaffManagementController
        // echo "1";
         if($request->isMethod('post')) {
             $data = $request->all();
-            
+            $home_ids = Auth::user()->home_id;
+            $ex_home_ids = explode(',', $home_ids);
+            $home_id=$ex_home_ids[0];
             $update_location = User::where('id', $data['staff_id'])
-                            ->where('home_id', Auth::user()->home_id)
+                            ->where('home_id', $home_id)
                             ->where('is_deleted', '0')
                             ->update(['current_location' => nl2br(trim($data['current_location']))
                             ]);
@@ -131,9 +139,11 @@ class ProfileController extends StaffManagementController
 
         if($request->isMethod('post')) {
             $data = $request->all();
-
+            $home_ids = Auth::user()->home_id;
+            $ex_home_ids = explode(',', $home_ids);
+            $home_id=$ex_home_ids[0];
             $update_contact = User::where('id', $data['staff_id'])
-                            ->where('home_id', Auth::user()->home_id)
+                            ->where('home_id', $home_id)
                             ->where('is_deleted' ,'0')
                             ->update([
                                 'phone_no' => $data['phone_no'],
@@ -156,7 +166,10 @@ class ProfileController extends StaffManagementController
             $data = $request->input();
 
             $staff_id     = $data['staff_id'];
-            $home_id      = Auth::user()->home_id;
+            $home_ids = Auth::user()->home_id;
+            $ex_home_ids = explode(',', $home_ids);
+            $home_id=$ex_home_ids[0];
+            // $home_id      = Auth::user()->home_id;
 
             $staff_prfl = User::find($staff_id);
             if(!empty($staff_prfl)) {

@@ -1,28 +1,28 @@
-@include('frontEnd.salesAndFinance.jobs.layout.header')
+@extends('frontEnd.layouts.master')
+
 <meta name="csrf-token" content="{{ csrf_token() }}">
 
-<section class="main_section_page px-3">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-4 col-lg-4 col-xl-4 ">
-                <div class="pageTitle">
-                    <h3>Quote Reject Type</h3>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-12 col-lg-12 col-xl-12 px-3">
-                <div class="jobsection">
-                    <a href="#!" data-bs-toggle="modal" data-bs-target="#statusModel" class="profileDrop open-modal">Add</a>
-                </div>
-            </div>
-        </div>
+<section class="wrapper">
+    <div class="panel">
+       <header class="panel-heading px-5">
+            <h4>Quote Reject Type</h4>
+       </header>
+
+
         <div class="alert alert-success text-center mt-1" id="msg" style="display:none;height:50px">
             <p id="status_meesage"></p>
         </div>
         <di class="row">
             <div class="col-lg-12">
                 <div class="maimTable">
+
+                <div class="p-t-15">
+                        <div class="jobsection">
+                            <a href="#!" data-bs-toggle="modal" data-bs-target="#statusModel" class="profileDrop open-modal">Add</a>
+                            <a href="javascript:void(0)" id="deleteSelectedRows" class="profileDrop">Delete</a>
+                        </div>
+                   </div>
+
                     <div class="printExpt">
                         <div class="prntExpbtn">
                             <a href="#!">Print</a>
@@ -32,22 +32,7 @@
                             <a href="#!">Show Search Filter</a>
                         </div>
                     </div>
-                    <!-- Ram 15/10/2024 here code for bulk delete -->
-                    <div class="markendDelete">
-                        <div class="row">
-                            <div class="col-md-7">
-                                <div class="jobsection">
-                                    <a href="javascript:void(0)" id="deleteSelectedRows" class="profileDrop">Delete</a>
-                                    <!-- <a href="#" class="profileDrop">Mark As completed</a> -->
-                                </div>
-                            </div>
-                            <div class="col-md-5">
-                                <div class="pageTitleBtn p-0">
-                                    <!-- <a href="#" class="profileDrop"> <i class="material-symbols-outlined"> settings </i></a> -->
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                  
                     <!-- end here -->
                     <table id="exampleOne" class="display tablechange" cellspacing="0" width="100%">
                         <thead>
@@ -139,7 +124,7 @@
     </div>
 </div>
 <!-- end Popup  -->
-@include('frontEnd.salesAndFinance.jobs.layout.footer')
+
 <script>
     $(document).ready(function() {
         $('.open-modal').on('click', function() {

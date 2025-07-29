@@ -697,15 +697,13 @@ if (isset($system_calendar)) {
                 },
                 dataType: 'json',
                 success: function(resp) {
+                    if (isAuthenticated(resp) == false) {
+                        return false;
+                    }
                     var response = resp['response'];
                     var calendar_id = resp['calendar_id'];
 
                     if (response == true) {
-
-                        if (isAuthenticated(response) == false) {
-                            return false;
-                        }
-
                         // we need to copy it, so that multiple events don't have a reference to the same object
                         var copiedEventObject = $.extend({}, originalEventObject);
 
@@ -757,9 +755,9 @@ if (isset($system_calendar)) {
                         'event_date': event_date
                     },
                     success: function(resp) {
-                        // {   if(isAuthenticated(resp) == false){
-                        //         return false;
-                        //     }
+                           if(isAuthenticated(resp) == false){
+                                return false;
+                            }
                         if (resp == 'false') {
                             revertFunc();
                             $('.ajax-alert-err').show();
@@ -1176,6 +1174,9 @@ if (isset($system_calendar)) {
                 },
                 success: function(resp) {
                     console.log(resp);
+                    if (isAuthenticated(resp) == false) {
+                        return false;
+                    }
                     $('.sel_users').html(resp);
                     $('.sel_user_type').val(user_type);
                     $('.loader').hide();
@@ -1205,6 +1206,9 @@ if (isset($system_calendar)) {
             },
             success: function(resp) {
                 // console.log(resp);
+                if (isAuthenticated(resp) == false) {
+                    return false;
+                }
                 if (resp == '1') {
                     var leng = Number(length) - 1;
                     // console.log(l);

@@ -1,25 +1,34 @@
-@include('frontEnd.salesAndFinance.jobs.layout.header')
 
-<section class="main_section_page px-3">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-4 col-lg-4 col-xl-4 ">
-                <div class="pageTitle">
-                    <h3>Call Back Quotes</h3>
-                </div>
-            </div>
-            <div class="col-md-8 col-lg-8 col-xl-8 px-3">
-                <div class="pageTitleBtn">
-                    <a href="#" class="profileDrop">Search Quotes</a>
-                </div>
-            </div>
-        </div>
+@extends('frontEnd.layouts.master')
 
-        @include('frontEnd.salesAndFinance.quote.quote_buttons')
+<section class="wrapper">
+    <div class="panel">
+
+         <header class="panel-heading px-5">
+            <h4>Back Quotes</h4>
+         </header>
+
+
+ 
+        
 
         <di class="row">
             <div class="col-lg-12">
                 <div class="maimTable">
+                <div class="row">
+                         <div class="col-md-10 p-t-15 p-l-20">
+                            @include('frontEnd.salesAndFinance.quote.quote_buttons')
+                        </div>
+                        <div class="col-md-2">
+                            <div class="pageTitleBtn">
+                                <a href="#" class="profileDrop">Search Quotes</a>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+
                     <div class="printExpt">
                         <div class="prntExpbtn">
                             <a href="#!">Print</a>
@@ -29,7 +38,7 @@
                             <a href="#!">Show Search Filter</a>
                         </div>
                     </div>
-                    <div class="markendDelete">
+                    <!-- <div class="markendDelete">
                         <div class="row">
                             <div class="col-md-7">
                             </div>
@@ -39,7 +48,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                     <div class="productDetailTable pt-3">
                         <table id="containerA" class="table mb-0" cellspacing="0" width="100%">
                             <thead class="table-light">
@@ -165,4 +174,3 @@
 
 @include('components.quote.call-back')
 
-@include('frontEnd.salesAndFinance.jobs.layout.footer')

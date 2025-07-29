@@ -1,152 +1,123 @@
 @include('frontEnd.salesAndFinance.jobs.layout.header')
+@extends('frontEnd.layouts.master')
 
 
-<section class="home_section_cont px-3 ">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="card">
-                    <div class="card-body row">
-                        <div class="col-md-3">
-                            <div class="pageTitle p-1">
-                                <h3>Quote Dashboard</h3>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="">
+<section class="wrapper">
+    <div class="panel">
+        <header class="panel-heading px-5">
+            <h4>Quote Dashboard</h4>
+        </header>
 
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="pageTitleBtn p-0">
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="">
+        <div class="p-20">
             <div class="row">
                 <div class="col-lg-3">
-                    <div class="card link_box mt-4">
-                        <div class="card-body">
-                            <h4 class="card-title">Total Quotes</h4>
-                            <div class="row card_text mt-3">
-                                <div class="col-6">
-                                    <h6 class="numberCount"><a href="#!" class="up_arrow">22 <i class="material-symbols-outlined">
-                                                arrow_upward_alt
-                                            </i></a> </h6>
+                    <div class="panel panel-default" style="margin-top: 20px;">
+                        <div class="panel-body">
+                            <h4 class="panel-title">Total Quotes</h4>
+                            <div class="row" style="margin-top: 15px;">
+                                <div class="col-xs-6">
+                                    <h6 class="numberCount"><a href="#!" class="up_arrow">22 <i class="fa fa-angle-double-up"></i></a></h6>
                                     <span>Count</span>
                                 </div>
-                                <div class="col-6">
-                                    <h6 class="numberCount"><a href="#!">0</a> </h6>
+                                <div class="col-xs-6">
+                                    <h6 class="numberCount"><a href="#!">0</a></h6>
                                     <span>Last Month</span>
                                 </div>
                             </div>
-                            <div class="row card_text mt-3">
-                                <div class="col-6">
-                                    <h6 class="slry_pakage"><a href="#!" class="up_arrow">$55.00 <i class="material-symbols-outlined">
-                                                arrow_upward_alt
-                                            </i></a> </h6>
+                            <div class="row" style="margin-top: 15px;">
+                                <div class="col-xs-6">
+                                    <h6 class="slry_pakage"><a href="#!" class="up_arrow">$55.00 <i class="fa fa-angle-double-up"></i></a></h6>
                                     <span>This Month</span>
                                 </div>
-                                <div class="col-6">
-                                    <h6 class="slry_pakage"><a href="#!">$0.00</a> </h6>
+                                <div class="col-xs-6">
+                                    <h6 class="slry_pakage"><a href="#!">$0.00</a></h6>
                                     <span>Last Month</span>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- Quotes In Draft -->
                 <div class="col-lg-3">
-                    <div class="card link_box mt-4">
-                        <div class="card-body">
-                            <h4 class="card-title">Quotes In Draft</h4>
-                            <div class="row card_text mt-3">
-                                <div class="col-6">
-                                    <h6 class="numberCount"><a href="#!" class="up_arrow">22 <i class="material-symbols-outlined">
-                                                arrow_upward_alt
-                                            </i></a> </h6>
+                    <div class="panel panel-default" style="margin-top: 20px;">
+                        <div class="panel-body">
+                            <h4 class="panel-title">Quotes In Draft</h4>
+                            <div class="row" style="margin-top: 15px;">
+                                <div class="col-xs-6">
+                                    <h6 class="numberCount"><a href="#!" class="up_arrow">22 <i class="fa fa-angle-double-up"></i></a></h6>
                                     <span>Count</span>
                                 </div>
-                                <div class="col-6">
-                                    <h6 class="numberCount"><a href="#!">0</a> </h6>
+                                <div class="col-xs-6">
+                                    <h6 class="numberCount"><a href="#!">0</a></h6>
                                     <span>Last Month</span>
                                 </div>
                             </div>
-                            <div class="row card_text mt-3">
-                                <div class="col-6">
-                                    <h6 class="slry_pakage"><a href="#!" class="up_arrow">$55.00 <i class="material-symbols-outlined">
-                                                arrow_upward_alt
-                                            </i></a> </h6>
+                            <div class="row" style="margin-top: 15px;">
+                                <div class="col-xs-6">
+                                    <h6 class="slry_pakage"><a href="#!" class="up_arrow">$55.00 <i class="fa fa-angle-double-up"></i></a></h6>
                                     <span>This Month</span>
                                 </div>
-                                <div class="col-6">
-                                    <h6 class="slry_pakage"><a href="#!">$0.00</a> </h6>
+                                <div class="col-xs-6">
+                                    <h6 class="slry_pakage"><a href="#!">$0.00</a></h6>
                                     <span>Last Month</span>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- Quotes Being Actioned -->
                 <div class="col-lg-3">
-                    <div class="card link_box mt-4">
-                        <div class="card-body">
-                            <h4 class="card-title">Quotes Being Actioned</h4>
-                            <div class="row card_text mt-3">
-                                <div class="col-6">
-                                    <h6 class="numberCount"><a href="#!" class="up_arrow">22 <i class="material-symbols-outlined">
-                                                arrow_upward_alt
-                                            </i></a> </h6>
+                    <div class="panel panel-default" style="margin-top: 20px;">
+                        <div class="panel-body">
+                            <h4 class="panel-title">Quotes Being Actioned</h4>
+                            <div class="row" style="margin-top: 15px;">
+                                <div class="col-xs-6">
+                                    <h6 class="numberCount"><a href="#!" class="up_arrow">22 <i class="fa fa-angle-double-up"></i></a></h6>
                                     <span>Count</span>
                                 </div>
-                                <div class="col-6">
-                                    <h6 class="numberCount"><a href="#!">0</a> </h6>
+                                <div class="col-xs-6">
+                                    <h6 class="numberCount"><a href="#!">0</a></h6>
                                     <span>Last Month</span>
                                 </div>
                             </div>
-                            <div class="row card_text mt-3">
-                                <div class="col-6">
-                                    <h6 class="slry_pakage"><a href="#!" class="up_arrow">$55.00 <i class="material-symbols-outlined">
-                                                arrow_upward_alt
-                                            </i></a> </h6>
+                            <div class="row" style="margin-top: 15px;">
+                                <div class="col-xs-6">
+                                    <h6 class="slry_pakage"><a href="#!" class="up_arrow">$55.00 <i class="fa fa-angle-double-up"></i></a></h6>
                                     <span>This Month</span>
                                 </div>
-                                <div class="col-6">
-                                    <h6 class="slry_pakage"><a href="#!">$0.00</a> </h6>
+                                <div class="col-xs-6">
+                                    <h6 class="slry_pakage"><a href="#!">$0.00</a></h6>
                                     <span>Last Month</span>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- Quotes Accepted & Converted -->
                 <div class="col-lg-3">
-                    <div class="card link_box mt-4">
-                        <div class="card-body">
-                            <h4 class="card-title">Quotes Accepted & Converted</h4>
-                            <div class="row card_text mt-3">
-                                <div class="col-6">
-                                    <h6 class="numberCount"><a href="#!" class="up_arrow">22 <i class="material-symbols-outlined">
-                                                arrow_upward_alt
-                                            </i></a> </h6>
+                    <div class="panel panel-default" style="margin-top: 20px;">
+                        <div class="panel-body">
+                            <h4 class="panel-title">Quotes Accepted & Converted</h4>
+                            <div class="row" style="margin-top: 15px;">
+                                <div class="col-xs-6">
+                                    <h6 class="numberCount"><a href="#!" class="up_arrow">22 <i class="fa fa-angle-double-up"></i></a></h6>
                                     <span>Count</span>
                                 </div>
-                                <div class="col-6">
-                                    <h6 class="numberCount"><a href="#!">0</a> </h6>
+                                <div class="col-xs-6">
+                                    <h6 class="numberCount"><a href="#!">0</a></h6>
                                     <span>Last Month</span>
                                 </div>
                             </div>
-                            <div class="row card_text mt-3">
-                                <div class="col-6">
-                                    <h6 class="slry_pakage"><a href="#!" class="up_arrow">$55.00 <i class="material-symbols-outlined">
-                                                arrow_upward_alt
-                                            </i></a> </h6>
+                            <div class="row" style="margin-top: 15px;">
+                                <div class="col-xs-6">
+                                    <h6 class="slry_pakage"><a href="#!" class="up_arrow">$55.00 <i class="fa fa-angle-double-up"></i></a></h6>
                                     <span>This Month</span>
                                 </div>
-                                <div class="col-6">
-                                    <h6 class="slry_pakage"><a href="#!">$0.00</a> </h6>
+                                <div class="col-xs-6">
+                                    <h6 class="slry_pakage"><a href="#!">$0.00</a></h6>
                                     <span>Last Month</span>
                                 </div>
                             </div>
@@ -154,65 +125,67 @@
                     </div>
                 </div>
             </div>
+
             <div class="row">
                 <div class="col-lg-3">
                     <div class="row">
                         <div class="col-lg-12">
-                            <div class="card link_box mt-4">
-                                <div class="card-body">
-                                    <h4 class="card-title">Quotes Rejected</h4>
-                                    <div class="row card_text mt-3">
-                                        <div class="col-6">
-                                            <h6 class="numberCount"><a href="#!" class="up_arrow">22 <i class="material-symbols-outlined">
-                                                        arrow_upward_alt
-                                                    </i></a> </h6>
+                            <div class="panel panel-default link_box" style="margin-top: 20px;">
+                                <div class="panel-body">
+                                    <h4 class="panel-title">Quotes Rejected</h4>
+                                    <div class="row card_text" style="margin-top: 15px;">
+                                        <div class="col-xs-6">
+                                            <h6 class="numberCount">
+                                                <a href="#!" class="up_arrow">22 <i class="fa fa-angle-double-up"></i></a>
+                                            </h6>
                                             <span>Count</span>
                                         </div>
-                                        <div class="col-6">
-                                            <h6 class="numberCount"><a href="#!">0</a> </h6>
+                                        <div class="col-xs-6">
+                                            <h6 class="numberCount"><a href="#!">0</a></h6>
                                             <span>Last Month</span>
                                         </div>
                                     </div>
-                                    <div class="row card_text mt-3">
-                                        <div class="col-6">
-                                            <h6 class="slry_pakage"><a href="#!" class="up_arrow">$55.00 <i class="material-symbols-outlined">
-                                                        arrow_upward_alt
-                                                    </i></a> </h6>
+                                    <div class="row card_text" style="margin-top: 15px;">
+                                        <div class="col-xs-6">
+                                            <h6 class="slry_pakage">
+                                                <a href="#!" class="up_arrow">$55.00 <i class="fa fa-angle-double-up"></i></a>
+                                            </h6>
                                             <span>This Month</span>
                                         </div>
-                                        <div class="col-6">
-                                            <h6 class="slry_pakage"><a href="#!">$0.00</a> </h6>
+                                        <div class="col-xs-6">
+                                            <h6 class="slry_pakage"><a href="#!">$0.00</a></h6>
                                             <span>Last Month</span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+
                         <div class="col-lg-12">
-                            <div class="card link_box mt-4">
-                                <div class="card-body">
-                                    <h4 class="card-title">Potential Sales Figure</h4>
-                                    <div class="row card_text mt-3">
-                                        <div class="col-6">
-                                            <h6 class="numberCount"><a href="#!" class="up_arrow">22 <i class="material-symbols-outlined">
-                                                        arrow_upward_alt
-                                                    </i></a> </h6>
+                            <div class="panel panel-default link_box" style="margin-top: 20px;">
+                                <div class="panel-body">
+                                    <h4 class="panel-title">Potential Sales Figure</h4>
+                                    <div class="row card_text" style="margin-top: 15px;">
+                                        <div class="col-xs-6">
+                                            <h6 class="numberCount">
+                                                <a href="#!" class="up_arrow">22 <i class="fa fa-angle-double-up"></i></a>
+                                            </h6>
                                             <span>Count</span>
                                         </div>
-                                        <div class="col-6">
-                                            <h6 class="numberCount"><a href="#!">0</a> </h6>
+                                        <div class="col-xs-6">
+                                            <h6 class="numberCount"><a href="#!">0</a></h6>
                                             <span>Last Month</span>
                                         </div>
                                     </div>
-                                    <div class="row card_text mt-3">
-                                        <div class="col-6">
-                                            <h6 class="slry_pakage"><a href="#!" class="up_arrow">$55.00 <i class="material-symbols-outlined">
-                                                        arrow_upward_alt
-                                                    </i></a> </h6>
+                                    <div class="row card_text" style="margin-top: 15px;">
+                                        <div class="col-xs-6">
+                                            <h6 class="slry_pakage">
+                                                <a href="#!" class="up_arrow">$55.00 <i class="fa fa-angle-double-up"></i></a>
+                                            </h6>
                                             <span>This Month</span>
                                         </div>
-                                        <div class="col-6">
-                                            <h6 class="slry_pakage"><a href="#!">$0.00</a> </h6>
+                                        <div class="col-xs-6">
+                                            <h6 class="slry_pakage"><a href="#!">$0.00</a></h6>
                                             <span>Last Month</span>
                                         </div>
                                     </div>
@@ -221,27 +194,26 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-3">
-                    <div class="card link_box mt-4">
-                        <div class="card-body">
-                            <div id='PieChart'></div>
+
+             <div class="col-lg-3">
+                <div class="card link_box mt-4">
+                    <div class="card-body">
+                        <div id='PieChart'></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card link_box mt-4">
+                    <div class="card-body">
+                        <div id="lineChart">
+                            <a href="https://www.zingchart.com/" rel="noopener" class="zc-ref">Powered by ZingChart</a>
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-6">
-                    <div class="card link_box mt-4">
-                        <div class="card-body">
-                            <div id="lineChart">
-                                <a href="https://www.zingchart.com/" rel="noopener" class="zc-ref">Powered by ZingChart</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            </div>
             </div>
         </div>
     </div>
 </section>
 
-<script src="https://cdn.zingchart.com/zingchart.min.js"></script>
 
-@include('frontEnd.salesAndFinance.jobs.layout.footer')

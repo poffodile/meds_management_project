@@ -1,5 +1,4 @@
-@include('frontEnd.salesAndFinance.jobs.layout.header')
-
+@extends('frontEnd.layouts.master')
 
 <section class="main_section_page px-3 pt-0">
     <div class="container-fluid">
@@ -533,13 +532,6 @@
                                     </div>
                                     <!-- End off Customer popup -->
 
-
-
-
-
-
-
-
                                     <div class="mb-3 row">
                                         <label for="inputName" class="col-sm-3 col-form-label">Status</label>
                                         <div class="col-sm-9">
@@ -923,7 +915,6 @@
 </section>
 
 
-@include('frontEnd.salesAndFinance.jobs.layout.footer')
 
 
 <script src="assets/js/jquery-3.7.1.min.js"></script>

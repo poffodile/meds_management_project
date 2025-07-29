@@ -102,6 +102,7 @@ class FormBuilderController extends Controller
                 $form->is_image     = $is_imageUpload;
                 $form->reminder_day =  $data['form_reminder_day'];
                 $form->send_to      =  $data['send_to'];
+                $form->logtype      =  $data['logtypes'];
 
                 if (!$form->save()) {
                     return redirect()->back()->with('error', 'Some error occurred. Please try again later.');
@@ -131,7 +132,7 @@ class FormBuilderController extends Controller
         if ($request->isMethod('post')) {
 
             $data = $request->input();
-            //echo '<pre>'; print_r($data); die;
+            // echo '<pre>'; print_r($data); die;
 
             if (isset($data['formdata'])) {
                 $datatableedit = DynamicFormBuilder::where('id', $data['dynamic_form_builder_id'])->first();

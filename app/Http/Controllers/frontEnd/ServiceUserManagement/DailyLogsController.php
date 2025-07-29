@@ -5,8 +5,11 @@ namespace App\Http\Controllers\frontEnd\ServiceUserManagement;
 use App\Http\Controllers\frontEnd\ServiceUserManagementController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use DB, Auth;
-use App\LogBook, App\ServiceUser, App\ServiceUserLogBook, App\LogBookComment, App\CategoryFrontEnd, App\DynamicFormBuilder, App\User;
+use Auth;
+use Illuminate\Support\Facades\DB;
+// use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
+use App\LogBook, App\ServiceUser, App\ServiceUserLogBook, App\LogBookComment, App\CategoryFrontEnd, App\DynamicFormBuilder, App\User, App\DynamicForm;
 use Illuminate\Support\Arr;
 
 class DailyLogsController extends ServiceUserManagementController
@@ -22,7 +25,7 @@ class DailyLogsController extends ServiceUserManagementController
         $data = $request->input();
         $home_ids = Auth::user()->home_id;
         $ex_home_ids = explode(',', $home_ids);
-        $home_id=$ex_home_ids[0];
+        $home_id = $ex_home_ids[0];
         // $home_id = Auth::user()->home_id;
         $user_id = Auth::user()->id;
         $today = date('Y-m-d 00:0:00');
@@ -37,8 +40,7 @@ class DailyLogsController extends ServiceUserManagementController
             ->get();
         //$service_user_id ="";
         if ($service_user_id != '') {
-            //print_r($data);
-            // die();
+            //print_r($data);  die();
             $su_home_id = ServiceUser::where('id', $service_user_id)->value('home_id');
             $service_user_name = ServiceUser::where('id', $service_user_id)->value('name');
             // if($su_home_id != $home_id){
@@ -56,11 +58,11 @@ class DailyLogsController extends ServiceUserManagementController
                 if (!empty($data)) {
                     $log_book_records = DB::table('log_book')
                         ->select('log_book.*', 'user.name as staff_name', 'category.color as category_color')
-                        ->where('log_book.logType', 1)
+                        // ->where('log_book.logType', 1)
                         ->whereIn('log_book.id', $su_logs)
                         ->join('user', 'log_book.user_id', '=', 'user.id')
                         ->join('category', 'log_book.category_id', '=', 'category.id')
-                        ->where('log_book.home_id',$home_id)
+                        ->where('log_book.home_id', $home_id)
                         ->orderBy('date', 'desc');
                     // $log_book_records = LogBook::select('log_book.*')
                     //                         ->orderBy('date','desc');
@@ -113,21 +115,58 @@ class DailyLogsController extends ServiceUserManagementController
             }
 
             Log::info($su_logs);
+            // $today = date('Y-m-d');
+            // $log_book_records = DB::table('log_book')
+            //     ->select('log_book.*', 'user.name as staff_name')
+            //     // ->where('log_book.logType', 1)
+            //     ->whereIn('log_book.id', $su_logs)
+            //     ->whereDate('log_book.date', '=', $today)
+            //     ->join('user', 'log_book.user_id', '=', 'user.id')
+            //     // ->join('category', 'log_book.category_id', '=', 'category.id')
+            //     ->where('log_book.home_id',$home_id)
+            //     ->orderBy('date', 'desc')->get();
+
             $today = date('Y-m-d');
+
             $log_book_records = DB::table('log_book')
                 ->select('log_book.*', 'user.name as staff_name')
-                ->where('log_book.logType', 1)
-                ->whereIn('log_book.id', $su_logs)
-                ->whereDate('log_book.date', '=', $today)
                 ->join('user', 'log_book.user_id', '=', 'user.id')
-                // ->join('category', 'log_book.category_id', '=', 'category.id')
-                ->where('log_book.home_id',$home_id)
-                ->orderBy('date', 'desc')->get();
+                ->whereIn('log_book.id', $su_logs)
+                ->where('log_book.home_id', $home_id)
+                ->where(function ($query) use ($today) {
+                    $query->where(function ($q) use ($today) {
+                        $q->where('log_book.logType', 1)
+                            ->whereDate('log_book.date', '=', $today);
+                    })
+                        ->orWhere(function ($q) use ($today) {
+                            $q->where('log_book.logType', 2)
+                                ->whereDate('log_book.start_date', '<=', $today)
+                                ->whereDate('log_book.end_date', '>=', $today);
+                        })
+                        ->orWhere(function ($q) use ($today) {
+                            $q->where('log_book.logType', 3)
+                                ->whereDate('log_book.start_date', '<=', $today)
+                                ->whereDate('log_book.end_date', '>=', $today);
+                        });
+                })
+                ->orderBy('log_book.dynamic_form_id') // Sort for grouping
+                ->orderByRaw("FIELD(log_book.logType, 1, 2, 3)") // Prioritize: daily > weekly > monthly
+                ->orderBy('log_book.date', 'desc')
+                ->get()
+                ->unique('dynamic_form_id') // ✅ Only one log per dynamic_form_id
+                ->values();
+
+
+
+
             //  echo "<pre>"; print_r($log_book_records); die;
 
             $log_book_records = collect($log_book_records)->map(function ($x) {
                 return (array) $x;
             })->toArray();
+
+
+            // dd($log_book_records);
             // $log_book_records = LogBook::select('log_book.*')
             //                             ->whereIn('log_book.id',$su_logs)
             //                             ->whereDate('log_book.date', '=', $today)
@@ -196,11 +235,11 @@ class DailyLogsController extends ServiceUserManagementController
 
                     $log_book_records = DB::table('log_book')
                         ->select('log_book.*', 'user.name as staff_name', 'category.color as category_color')
-                        ->where('log_book.logType', 1)
+                        // ->where('log_book.logType', 1)
                         ->whereIn('log_book.id', $su_logss)
                         ->join('user', 'log_book.user_id', '=', 'user.id')
                         ->join('category', 'log_book.category_id', '=', 'category.id')
-                        ->where('log_book.home_id',$home_id)
+                        ->where('log_book.home_id', $home_id)
                         ->orderBy('date', 'desc');
                     //print_r($log_book_records);
                     //die;
@@ -266,15 +305,58 @@ class DailyLogsController extends ServiceUserManagementController
             $log_book_records = DB::table('log_book')
                 ->select('log_book.*', 'user.name as staff_name', 'category.color as category_color')
                 //->select('log_book.*', 'user.name as staff_name')
-                ->where('log_book.logType', 1)
+                // ->where('log_book.logType', 1)
                 ->whereIn('log_book.id', $su_logs)
                 ->whereDate('log_book.date', '=', $today)
                 ->join('user', 'log_book.user_id', '=', 'user.id')
                 ->join('category', 'log_book.category_id', '=', 'category.id')
-                ->where('log_book.home_id',$home_id)
+                ->where('log_book.home_id', $home_id)
                 ->orderBy('date', 'desc')->get();
-            //print_r($log_book_records);
-            //die;
+
+            
+            // $today = Carbon::today();
+            // $startOfWeek = $today->copy()->startOfWeek();  // Monday
+            // $endOfWeek = $today->copy()->endOfWeek();      // Sunday
+            // $startOfMonth = $today->copy()->startOfMonth();
+            // $endOfMonth = $today->copy()->endOfMonth();
+
+            // $log_book_records = DB::table('log_book')
+            //     ->select(
+            //         'log_book.dynamic_form_id',
+            //         DB::raw('MIN(log_book.created_at) as created_at'),
+            //         DB::raw('MIN(log_book.id) as id'),
+            //         DB::raw('MIN(log_book.date) as date'),
+            //         DB::raw('MIN(user.name) as staff_name'),
+            //         DB::raw('MIN(log_book.is_late) as is_late'),
+            //         DB::raw('MIN(log_book.logType) as logType'),
+            //         DB::raw('MIN(category.name) as category_name'),
+            //         DB::raw('MIN(log_book.details) as details'),
+            //         DB::raw('MIN(category.color) as category_color'),
+            //         DB::raw('MIN(category.icon) as category_icon')
+            //     )
+            //     ->join('user', 'log_book.user_id', '=', 'user.id')
+            //     ->join('category', 'log_book.category_id', '=', 'category.id')
+            //     ->whereIn('log_book.id', $su_logs)
+            //     ->where('log_book.home_id', $home_id)
+            //     ->where(function ($query) use ($today, $startOfWeek, $endOfWeek, $startOfMonth, $endOfMonth) {
+            //         $query->where(function ($q) use ($today) {
+            //             $q->where('log_book.logType', 1)
+            //                 ->whereDate('log_book.date', '=', $today);
+            //         })->orWhere(function ($q) use ($startOfWeek, $endOfWeek) {
+            //             $q->where('log_book.logType', 2)
+            //                 ->whereDate('log_book.date', '>=', $startOfWeek)
+            //                 ->whereDate('log_book.date', '<=', $endOfWeek);
+            //         })->orWhere(function ($q) use ($startOfMonth, $endOfMonth) {
+            //             $q->where('log_book.logType', 3)
+            //                 ->whereDate('log_book.date', '>=', $startOfMonth)
+            //                 ->whereDate('log_book.date', '<=', $endOfMonth);
+            //         });
+            //     })
+            //     ->groupBy('log_book.dynamic_form_id', 'log_book.date')
+            //     ->orderBy('log_book.date', 'desc')
+            //     ->get();
+
+            // echo "<pre>"; print_r($log_book_records);die;
 
             $log_book_records = collect($log_book_records)->map(function ($x) {
                 return (array) $x;
@@ -291,6 +373,8 @@ class DailyLogsController extends ServiceUserManagementController
                 //$key['comments']=$comments->count();
                 if ($key['is_late']) {
                     $given_date_without_time    = date('Y-m-d', strtotime($key['date']));
+
+
                     $created_at_without_time    = date('Y-m-d', strtotime($key['created_at']));
                     if ($given_date_without_time == $created_at_without_time) {
                         $key = Arr::add($key, 'late_time_text', date('H:i', strtotime($key['created_at'])));
@@ -311,9 +395,9 @@ class DailyLogsController extends ServiceUserManagementController
                 }
             }
         }
+        // dd($log_book_records);
 
         $dynamic_forms = DynamicFormBuilder::getFormList();
-        // dd($dynamic_forms);
 
 
         return view('frontEnd.serviceUserManagement.daily_log', compact('user_id', 'service_user_id', 'service_user_name', 'home_id', 'su_home_id', 'log_book_records', 'su_logs', 'categorys', 'service_users', 'staff_members', 'dynamic_forms'));
@@ -336,7 +420,8 @@ class DailyLogsController extends ServiceUserManagementController
         $service_users = ServiceUser::select('id', 'name')
             ->where('home_id', $home_id)
             ->where('is_deleted', '0')
-            ->get(); $service_users = ServiceUser::select('id', 'name')
+            ->get();
+        $service_users = ServiceUser::select('id', 'name')
             ->where('home_id', $home_id)
             ->where('is_deleted', '0')
             ->get();
@@ -733,7 +818,7 @@ class DailyLogsController extends ServiceUserManagementController
                 ->orderBy('date', 'desc')->get();
 
             //  echo "<pre>"; print_r($log_book_records); die;
-            
+
             $log_book_records = collect($log_book_records)->map(function ($x) {
                 return (array) $x;
             })->toArray();
@@ -918,7 +1003,7 @@ class DailyLogsController extends ServiceUserManagementController
         }
 
 
-        
+
         $dynamic_forms = DynamicFormBuilder::getFormList();
 
         return view('frontEnd.serviceUserManagement.daily_log3', compact('user_id', 'service_user_id', 'service_user_name', 'home_id', 'su_home_id', 'log_book_records', 'su_logs', 'categorys', 'service_users', 'staff_members', 'dynamic_forms'));
@@ -930,6 +1015,7 @@ class DailyLogsController extends ServiceUserManagementController
     }
     public function weekly_log(Request $request)
     {
+        // dd($request);
         //echo "string";
         //die();
         if (isset($_GET['key'])) {
@@ -1235,7 +1321,6 @@ class DailyLogsController extends ServiceUserManagementController
             $service_user_id = "";
         }
 
-
         $data = $request->input();
         $home_id = Auth::user()->home_id;
         $user_id = Auth::user()->id;
@@ -1517,10 +1602,13 @@ class DailyLogsController extends ServiceUserManagementController
             }
         }
 
-
-
-
         return view('frontEnd.serviceUserManagement.monthly_log', compact('user_id', 'service_user_id', 'service_user_name', 'home_id', 'su_home_id', 'log_book_records', 'su_logs', 'categorys', 'service_users', 'staff_members'));
     }
-}
 
+
+    public function view_log_form_data($dynamic_form_id = null)
+    {
+        $result = DynamicForm::showFormLogWithValue($dynamic_form_id, false);
+        return $result;
+    }
+}

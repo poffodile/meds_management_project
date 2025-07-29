@@ -6,7 +6,7 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 <h4 class="modal-title" id="myModalLabel"> Suspended Incentive - Add </h4>
             </div>
-            <form method="post" action="{{ url('/service/earning-scheme/incentive/suspend') }}">
+            <form method="post" action="{{ url('/service/earning-scheme/incentive/suspend/save') }}">
                 <div class="modal-body">
                     <div class="row">
                         <div class="form-group col-md-12 col-sm-12 col-xs-12">

@@ -13,7 +13,10 @@ class ViewReportController extends Controller
 		
 		$page = 'index';
 		$guide_tag = 'sys_mngmt';
-		$home_id = Auth::user()->home_id;
+		// $home_id = Auth::user()->home_id;
+		$home_ids = Auth::user()->home_id;
+		$ex_home_ids = explode(',', $home_ids);
+		$home_id=$ex_home_ids[0];
 
 		$su_in_danger = ServiceUserCareCenter::join('service_user as su','su.id','su_care_center.service_user_id')
 												->where('su.home_id', $home_id)
@@ -180,7 +183,10 @@ class ViewReportController extends Controller
     // public function get_user($user_type_id = null) {
 	public function get_user(Request $request) {
 
-		$home_id      = Auth::user()->home_id;
+		// $home_id      = Auth::user()->home_id;
+		$home_ids = Auth::user()->home_id;
+		$ex_home_ids = explode(',', $home_ids);
+		$home_id=$ex_home_ids[0];
 		$user_type_id = $request->user_type_id;
 		
 		if($user_type_id == 'STAFF') {
@@ -229,7 +235,10 @@ class ViewReportController extends Controller
 		// }
 		$report_type = $data['report_type'];
 		$user_type   = $data['user_type'];
-		$home_id = Auth::user()->home_id;
+		// $home_id = Auth::user()->home_id;
+		$home_ids = Auth::user()->home_id;
+		$ex_home_ids = explode(',', $home_ids);
+		$home_id=$ex_home_ids[0];
 		if($data['user_type'] == 'SERVICE_USER') {
 			if($data['report_type'] == 'INDIVIDUAL') {
 				$select_user = $data['select_user_id'];
@@ -478,7 +487,10 @@ class ViewReportController extends Controller
 				// echo "11"; die;
 				/*$record = $this->index();
 				echo $record; */
-				$home_id = Auth::user()->home_id;
+				// $home_id = Auth::user()->home_id;
+				$home_ids = Auth::user()->home_id;
+				$ex_home_ids = explode(',', $home_ids);
+				$home_id=$ex_home_ids[0];
 
 				$su_in_danger_query = ServiceUserCareCenter::join('service_user as su','su.id','su_care_center.service_user_id')
 														->where('su.home_id', $home_id)

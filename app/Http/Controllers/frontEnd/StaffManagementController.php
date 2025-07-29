@@ -9,8 +9,10 @@ class StaffManagementController extends Controller
 {
 	  
 	public function staff_member(){
-		
-		$home_id = Auth::user()->home_id;
+		$home_ids = Auth::user()->home_id;
+		$ex_home_ids = explode(',', $home_ids);
+		$home_id=$ex_home_ids[0];
+		// $home_id = Auth::user()->home_id;
 		// $staff = DB::table('user')->where('home_id',$home_id)->where('is_deleted', '0')->where('id','!=',Auth::user()->id)->get();
 		$staff = DB::table('user')->where('home_id',$home_id)->where('is_deleted', '0')->get();
 		$guide_tag = 'staff_mngmt';

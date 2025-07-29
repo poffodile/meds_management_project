@@ -4,7 +4,7 @@ namespace App\Http\Controllers\frontEnd;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Auth, DB;
+use Auth, DB,Log;
 use App\User, App\ServiceUser, App\Admin, App\Home, App\LogBook;
 use Hash, Session;
 use Carbon\Carbon;
@@ -36,6 +36,8 @@ class UserController extends Controller
 			//echo "<pre>"; print_r($user_info);  
 
 			if (!empty($user_info)) {
+				$login_ip = $request->ip();
+				// print_r($login_ip);die;
 				$searchString = ',';
 				//$homde_id = 1,2
 				if (strpos($user_info->home_id, $searchString) !== false) {
@@ -66,21 +68,33 @@ class UserController extends Controller
 									//Session::put('LAST_ACTIVITY',time());
 									//check is user already logged in
 									$logged_in = Auth::user()->logged_in;
-									if ($logged_in == '1') {
-										$last_activity = Auth::user()->last_activity_time;
+									$last_activity = Auth::user()->last_activity_time;
+									$last_activity = Carbon::parse($last_activity);
+									$diff_mint     = $last_activity->diffInMinutes();
+									if ($logged_in == '1' && $diff_mint < 60 && $login_ip != Auth::user()->login_ip) {
+										// $last_activity = Auth::user()->last_activity_time;
 										$current_time  = date('Y-m-d H:i:s');
-										$last_activity = Carbon::parse($last_activity);
-										$diff_mint     = $last_activity->diffInMinutes();
+										// $last_activity = Carbon::parse($last_activity);
+										// $diff_mint     = $last_activity->diffInMinutes();
 										if ($diff_mint > SESSION_TIMEOUT) {
 										} else {
 											Auth::logout();
-											return redirect()->back()->with('error', 'You are already logged in from some other device.');
+											Session::put('user_name',$data['username']);
+											Session::put('password',$data['password']);
+											Session::put('home_id',$data['home']);
+											// return redirect()->back()->with('error', 'You are already logged in from some other device.');
+											return redirect()->back()->with('login_error', 'This account is currently logged in on another device.Do you want to log out from the other device and continue logging in here?');
 										}
 									}
+									$session_id_update=User::find(Auth::user()->id);
+									$session_id_update->login_ip=$login_ip;
+									$session_id_update->save();
 									User::setUserLogInStatus(1);
 									//echo csrf_token(); die;
 									//echo "222"; die;
 									return redirect('/')->with('success', 'Welcome back ' . Auth::user()->user_name);
+								}else {
+									return redirect()->back()->with('error', 'Incorrect email or password combination.');
 								}
 							} elseif ($user_info->user_type == 'N') {
 
@@ -100,15 +114,21 @@ class UserController extends Controller
 									//Session::put('LAST_ACTIVITY',time());
 									//check is user already logged in
 									$logged_in = Auth::user()->logged_in;
-									if ($logged_in == '1') {
-										$last_activity = Auth::user()->last_activity_time;
+									$last_activity = Auth::user()->last_activity_time;
+									$last_activity = Carbon::parse($last_activity);
+									$diff_mint     = $last_activity->diffInMinutes();
+									if ($logged_in == '1' && $diff_mint < 60 && $login_ip != Auth::user()->login_ip) {
+										// $last_activity = Auth::user()->last_activity_time;
 										$current_time  = date('Y-m-d H:i:s');
-										$last_activity = Carbon::parse($last_activity);
-										$diff_mint     = $last_activity->diffInMinutes();
+										// $last_activity = Carbon::parse($last_activity);
+										// $diff_mint     = $last_activity->diffInMinutes();
 										if ($diff_mint > SESSION_TIMEOUT) {
 										} else {
 											Auth::logout();
-											return redirect()->back()->with('error', 'You are already logged in from some other device.');
+											Session::put('user_name',$data['username']);
+											Session::put('password',$data['password']);
+											Session::put('home_id',$data['home']);
+											return redirect()->back()->with('login_error', 'This account is currently logged in on another device.Do you want to log out from the other device and continue logging in here?');
 										}
 									}
 
@@ -123,6 +143,9 @@ class UserController extends Controller
 											//this function is used to login staff user with their previous home, not to assigned home because assigned staff user date is expired.
 										}
 									}
+									$session_id_update=User::find(Auth::user()->id);
+									$session_id_update->login_ip=$login_ip;
+									$session_id_update->save();
 									User::setUserLogInStatus(1);
 									//echo csrf_token(); die;
 									return redirect('/')->with('success', 'Welcome back ' . Auth::user()->user_name);
@@ -144,21 +167,30 @@ class UserController extends Controller
 							if (Auth::attempt(['user_name' => $data['username'], 'password' => $data['password'], 'login_home_id' => $user_info->login_home_id])) {
 								//check is user already logged in
 								$logged_in = Auth::user()->logged_in;
-								if ($logged_in == '1') {
-									$last_activity = Auth::user()->last_activity_time;
+								$last_activity = Auth::user()->last_activity_time;
+								$last_activity = Carbon::parse($last_activity);
+								$diff_mint     = $last_activity->diffInMinutes();
+								if ($logged_in == '1' && $diff_mint < 60 && $login_ip != Auth::user()->login_ip) {
+									// $last_activity = Auth::user()->last_activity_time;
 									$current_time  = date('Y-m-d H:i:s');
-									$last_activity = Carbon::parse($last_activity);
-									$diff_mint     = $last_activity->diffInMinutes();
+									// $last_activity = Carbon::parse($last_activity);
+									// $diff_mint     = $last_activity->diffInMinutes();
 									if ($diff_mint > SESSION_TIMEOUT) {
 									} else {
 										Auth::logout();
-										return redirect()->back()->with('error', 'You are already logged in from some other device.');
+										Session::put('user_name',$data['username']);
+										Session::put('password',$data['password']);
+										Session::put('home_id',$data['home']);
+										// return redirect()->back()->with('error', 'You are already logged in from some other device.');
+										return redirect()->back()->with('login_error', 'This account is currently logged in on another device.Do you want to log out from the other device and continue logging in here?');
 									}
 								}
 								$home_id  = $user_info->login_home_id . ',' . $user_info->home_id;
 								$update   = User::where('id', $user_info->id)->update(['home_id' => $home_id]);
 								// echo "<pre>"; print_r($home_id); die;
-
+								$session_id_update=User::find(Auth::user()->id);
+								$session_id_update->login_ip=$login_ip;
+								$session_id_update->save();
 								User::setUserLogInStatus(1);
 								//echo csrf_token(); die;
 								return redirect('/')->with('success', 'Welcome back ' . Auth::user()->user_name);
@@ -187,15 +219,22 @@ class UserController extends Controller
 						//Session::put('LAST_ACTIVITY',time());
 						//check is user already logged in
 						$logged_in = Auth::user()->logged_in;
-						if ($logged_in == '1') {
-							$last_activity = Auth::user()->last_activity_time;
+						$last_activity = Auth::user()->last_activity_time;
+						$last_activity = Carbon::parse($last_activity);
+						$diff_mint     = $last_activity->diffInMinutes();
+						if ($logged_in == '1' && $diff_mint < 60 && $login_ip != Auth::user()->login_ip) {
+							// $last_activity = Auth::user()->last_activity_time;
 							$current_time  = date('Y-m-d H:i:s');
-							$last_activity = Carbon::parse($last_activity);
-							$diff_mint     = $last_activity->diffInMinutes();
+							// $last_activity = Carbon::parse($last_activity);
+							// $diff_mint     = $last_activity->diffInMinutes();
 							if ($diff_mint > SESSION_TIMEOUT) {
 							} else {
 								Auth::logout();
-								return redirect()->back()->with('error', 'You are already logged in from some other device.');
+								Session::put('user_name',$data['username']);
+								Session::put('password',$data['password']);
+								Session::put('home_id',$data['home']);
+								// return redirect()->back()->with('error', 'You are already logged in from some other device.');
+								return redirect()->back()->with('login_error', 'This account is currently logged in on another device.Do you want to log out from the other device and continue logging in here?');
 							}
 						}
 						//if another staff user date is expired(user_info->login_date) then his home_id is updated 
@@ -210,6 +249,9 @@ class UserController extends Controller
 								}
 							}
 						}
+						$session_id_update=User::find(Auth::user()->id);
+						$session_id_update->login_ip=$login_ip;
+						$session_id_update->save();
 						User::setUserLogInStatus(1);
 						//echo csrf_token(); die;
 						return redirect('/')->with('success', 'Welcome back ' . Auth::user()->user_name);
@@ -223,6 +265,48 @@ class UserController extends Controller
 		}
 		return view('frontEnd.login');
 	}
+	public function yes_logout(Request $request){
+		try{
+			if (Auth::attempt(['user_name' => Session()->get('user_name'), 'password' => Session()->get('password')])) {
+				
+				DB::beginTransaction();
+				$user=User::find(Auth::user()->id);
+				$user->login_ip='';
+				$user->session_token='';
+				$user->logged_in=0;
+				$user->save();
+				DB::commit();
+				$request->merge([
+					'username' => Session::get('user_name'),
+					'password' => Session::get('password'),
+					'home'     => Session::get('home_id'),
+					'_token'   => csrf_token(),
+				]);
+				$request->setMethod('POST');
+				Auth::logout();
+				Session::forget('user_name');
+				Session::forget('password');
+				Session::forget('home_id');
+				return app()->call([new self, 'login'], ['request' => $request]);
+			}else{
+				return response()->json(['success'=>false,'message'=>'Something went wrong! Please try again later']);
+			}
+		}catch (\Exception $e) {
+			DB::rollBack();
+			Log::error("Yes Logout Error:(" . date('d-m-Y H:i') . "): " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong!',
+                'data'   => $e->getMessage()
+            ], 500);
+        }
+	}
+	public function no_logout(){
+		Session::forget('user_name');
+		Session::forget('password');
+		Session::forget('home_id');
+		return response()->json(['success'=>true,'message'=>'Session Deleted']);
+	}
 	function login_staff_user($data, $user_info)
 	{
 		$current_date = date('m/d/Y');
@@ -230,11 +314,14 @@ class UserController extends Controller
 		if (Auth::attempt(['user_name' => $data['username'], 'password' => $data['password'], 'home_id' => $data['home']])) {
 			//check is user already logged in
 			$logged_in = Auth::user()->logged_in;
-			if ($logged_in == '1') {
-				$last_activity = Auth::user()->last_activity_time;
+			$last_activity = Auth::user()->last_activity_time;
+			$last_activity = Carbon::parse($last_activity);
+			$diff_mint     = $last_activity->diffInMinutes();
+			if ($logged_in == '1' && $diff_mint < 60) {
+				// $last_activity = Auth::user()->last_activity_time;
 				$current_time  = date('Y-m-d H:i:s');
-				$last_activity = Carbon::parse($last_activity);
-				$diff_mint     = $last_activity->diffInMinutes();
+				// $last_activity = Carbon::parse($last_activity);
+				// $diff_mint     = $last_activity->diffInMinutes();
 				if ($diff_mint > SESSION_TIMEOUT) {
 				} else {
 					Auth::logout();
@@ -260,6 +347,9 @@ class UserController extends Controller
 
 		if (Auth::check()) {
 			User::setUserLogInStatus(0);
+			$user = Auth::user();
+			$user->login_ip = null;
+			$user->save();
 			Auth::logout();
 			Session::forget('LAST_ACTIVITY');
 		}
@@ -339,7 +429,9 @@ class UserController extends Controller
 	public function switch_home()
 	{
 		// return "Hello";
-		return view('frontEnd.switch_home');
+		$admin_id = Admin::where('id',Auth::user()->admn_id)->where('is_deleted', 0)->value('id');
+		$homes = Home::select('id','title')->where('admin_id',$admin_id)->where('is_deleted','0')->get()->toArray();
+		return view('frontEnd.switch_home',compact('admin_id','homes'));
 	}
 
 	public function switch_home_submit(Request $request)

@@ -32,7 +32,7 @@ class HealthRecordController extends ServiceUserManagementController
 
         $today = date('Y-m-d');
         //filter
-        //    update notify
+        //update notify
         $updatenotify = array('read_notify' => 1);
         DB::table('su_health_record')->where('service_user_id', $service_user_id)->where('home_id', $home_id)->update($updatenotify);
         //    update notify
@@ -91,6 +91,8 @@ class HealthRecordController extends ServiceUserManagementController
             ->whereDate('su_health_record.created_at', '=', $today)
             ->join('service_user', 'su_health_record.service_user_id', '=', 'service_user.id')
             ->orderBy('su_health_record.created_at', 'desc')->get();
+
+            // dd($log_book_records);
            
         $log_book_records = collect($log_book_records)->map(function ($x) {
             return (array) $x;

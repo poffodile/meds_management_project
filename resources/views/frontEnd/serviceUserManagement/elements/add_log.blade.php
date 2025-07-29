@@ -81,6 +81,30 @@
                                 </div>
                             </div>
 
+                              <div class="form-group col-md-12 col-sm-12 col-xs-12 p-0">
+                                <label class="col-md-2 col-sm-1 col-xs-12 p-t-7"> Add: </label>
+                                <div class="col-md-9 col-sm-10 col-xs-12">
+                                    <div class="select-style">
+                                        <select name="dynamic_form_builder_id" class="dynamic_form_select">
+                                            <option value="0"> Select Form </option>
+                                            <?php
+                                            $this_location_id = App\DynamicFormLocation::getLocationIdByTag('top_profile_btn');
+                                            foreach ($dynamic_forms as $value) {
+                                                $location_ids_arr = explode(',', $value['location_ids']);
+                                                if (in_array($this_location_id, $location_ids_arr)) {
+                                            ?>
+                                                    <option value="{{ $value['id'] }}"> {{ ucfirst($value['title']) }} </option>
+                                            <?php }
+                                            } ?>
+                                        </select>
+                                    </div>
+                                    <p class="help-block"> Choose a user and the type of form you want to fill. </p>
+                                </div>
+                            </div>
+                              <div class="dynamic-form-fields"></div>
+
+                         
+
                             <!-- new image -->
                             <div class="form-group col-md-12 col-sm-12 col-xs-12 p-0">
                                 <label class="col-md-2 col-sm-1 col-xs-12 p-t-7"> Image: </label>
@@ -97,6 +121,7 @@
                                 <button class="btn btn-default cancel-log" type="button" data-dismiss="modal" aria-hidden="true"> Cancel </button>
                                 <input type="hidden" name="id" value="">
                                 <input type="hidden" name="service_user_id" value="{{ $service_user_id }}">
+                                <input type="hidden" name="location_id" value="9">
                                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
                                 <button class="btn btn-warning submit-log hide-field" type="button"> Submit </button>
                             </div>

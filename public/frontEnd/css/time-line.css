@@ -1,141 +1,153 @@
+.timeline-messages {
+    text-align: center;
+}
 
+.message-body.msg-in.rightmsg {
+    left: 210px;
+}
 
-    .timeline-messages {
-        text-align: center;
-    }
+.message-body.msg-in.leftmsg {
+    right: 250px;
+}
 
-    .message-body.msg-in.rightmsg {
-        left: 210px;
-    }
+.timeline-messages .msg-in .arrow {
+    border-right: 0px solid #949496 !important;
+}
 
-    .message-body.msg-in.leftmsg {
-        right: 250px;
-    }
+.timeline-messages .msg-in.rightmsg .arrow {
+    border-right: 8px solid #949496 !important;
+}
 
-    .timeline-messages .msg-in .arrow {
-        border-right: 0px solid #949496 !important;
-    }
+.timeline-messages .msg-in.leftmsg .arrow {
+    right: -3px;
+    left: inherit;
+    border-left: 8px solid #949496 !important;
+}
 
-    .timeline-messages .msg-in.rightmsg .arrow {
-        border-right: 8px solid #949496 !important;
-    }
+.timeline-messages:before,
+.msg-time-chat:before,
+.msg-time-chat .text:before {
+    content: "";
+    left: 50%;
+    position: absolute;
+    top: -2px;
+}
 
-    .timeline-messages .msg-in.leftmsg .arrow {
-        right: -3px;
-        left: inherit;
-        border-left: 8px solid #949496 !important;
-    }
+.msg-time-chat .msg-in .text .second {
+    margin-right: 6px;
+    display: flex;
+    padding: 9px 10px;
+    min-width: 480px;
+}
 
-    .timeline-messages:before,
-    .msg-time-chat:before,
-    .msg-time-chat .text:before {
-        content: "";
-        left: 50%;
-        position: absolute;
-        top: -2px;
-    }
+.msg-time-chat .msg-in .text .second p {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 24ch;
+}
 
-    .msg-time-chat .msg-in .text .second {
-        margin-right: 6px;
-        display: flex;
-        padding: 9px 10px;
-    }
-
-    .msg-time-chat .msg-in .text .second p {
-        display: -webkit-box;
-        -webkit-line-clamp: 1;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        max-width: 24ch;
-    }
-    span.timelineIcons {
+span.timelineIcons {
     border-left: 1px solid #fff;
     margin-left: 10px;
 }
-    .timelineIcons a {
-        padding: 0px 10px;
-        /* border-right: 1px solid #fff; */
-        border-radius: 0;
-        margin-right: 0;
-        color: #fff;
-    }
 
-    .timelineIcons a:last-child {
-        border-right: none;
-    }
+.timelineIcons a {
+    padding: 0px 10px;
+    /* border-right: 1px solid #fff; */
+    border-radius: 0;
+    margin-right: 0;
+    color: #fff;
+}
 
-    .timelineIcons a:hover {
-        border-radius: 0;
-        margin-right: 0;
-    }
+.timelineIcons a:last-child {
+    border-right: none;
+}
 
-    .timelineIcons a {
-        color: #fff;
-        font-size: 16px;
-        transition: .7s;
-    }
+.timelineIcons a:hover {
+    border-radius: 0;
+    margin-right: 0;
+}
 
-    .timelineIcons a:hover {
-        color: #000;
-        font-size: 16px;
-    }
-    .msg-time-chat {
-        overflow: inherit;
-    }
+.timelineIcons a {
+    color: #fff;
+    font-size: 16px;
+    transition: .7s;
+}
+
+.timelineIcons a:hover {
+    color: #000;
+    font-size: 16px;
+}
+
+.msg-time-chat {
+    overflow: inherit;
+}
+
 .leftmsg span.timelineIcons {
     border-right: 1px solid #fff;
     margin-right: 10px;
     border-left: none;
     margin-left: 0;
 }
+
 .leftmsg ul.dd-menu {
     left: -183px;
 }
+
 .leftmsg .dd-button {
     padding: 0px 10px 0px 4px;
 }
-    /* *********************** */
+
+/* *********************** */
 .timelinedropdown {
-  display: inline-block;
-  position: relative;
-  margin-bottom: 0;
+    display: inline-block;
+    position: relative;
+    margin-bottom: 0;
 }
+
 .dd-button {
-  display: inline-block;
-  padding: 0px 4px 0px 12px;
-  border-radius: 4px;
-  background-color: transparent;
-  cursor: pointer;
-  white-space: nowrap;
-  font-size: 14px;
-   font-weight: 500;
+    display: inline-block;
+    padding: 0px 4px 0px 12px;
+    border-radius: 4px;
+    background-color: transparent;
+    cursor: pointer;
+    white-space: nowrap;
+    font-size: 14px;
+    font-weight: 500;
 }
+
 .dd-input {
-  display: none;
+    display: none;
 }
+
 .dd-menu {
-  position: absolute;
-  top: -11px;
-  left: 42px;
-  border-radius: 4px;
-  padding: 10px;
-  margin: 2px 0 0 0;
-  box-shadow: 0 0 6px 0 rgba(0,0,0,0.1);
-  background-color: #ffffff;
-  list-style-type: none;
-      z-index: 999;
-          width: 172px;
+    position: absolute;
+    top: -11px;
+    left: 42px;
+    border-radius: 4px;
+    padding: 10px;
+    margin: 2px 0 0 0;
+    box-shadow: 0 0 6px 0 rgba(0, 0, 0, 0.1);
+    background-color: #ffffff;
+    list-style-type: none;
+    z-index: 999;
+    width: 172px;
 }
-.dd-input + .dd-menu {
-  display: none;
-} 
-.dd-input:checked + .dd-menu {
-  display: block;
-} 
-.dd-menu li a{
-    display:  block;
+
+.dd-input+.dd-menu {
+    display: none;
+}
+
+.dd-input:checked+.dd-menu {
+    display: block;
+}
+
+.dd-menu li a {
+    display: block;
     color: #000;
     padding: 8px 10px;
     cursor: pointer;
@@ -146,22 +158,287 @@
     transition: .7s;
     border-radius: 4px;
 }
-.dd-menu li a:hover{
+
+.dd-menu li a:hover {
     color: #333;
     background: #F1F2F7;
     font-size: 14px;
 }
-.dd-menu li a i{
+
+.dd-menu li a i {
     margin-right: 8px;
 }
-.dd-menu li a:hover i{
+
+.dd-menu li a:hover i {
     color: #1f88b5;
 }
-.actionForm{
+
+.actionForm {
     display: flow-root;
 }
 
 
+.back_opt {
+    background: #1f88b5;
+    border-radius: 100%;
+    color: #fff;
+    font-size: 20px;
+    padding: 8px 18px;
+    z-index: 999;
+    cursor: pointer;
+    height: 45px;
+    width: 45px;
+    display: inline-block;
+}
+
+.back_opt:hover i {
+    color: #fff;
+}
+
+.timeline .time-show {
+    text-align: center;
+    margin-right: 0px;
+}
+
+.timeline .time-show .btn {
+    min-width: 150px;
+}
+
+#logs_articles {
+    border-collapse: collapse;
+    border-spacing: 0;
+    display: table;
+    position: relative;
+    table-layout: fixed;
+    width: 100%;
+    min-height: 50vh;
+}
+
+.daily_log_time {
+    position: inherit !important;
+    bottom: 5px;
+    font-size: 13px;
+    color: #686868;
+    font-weight: 400;
+    margin-top: 20px;
+}
+
+.timeline-item.alt h1,
+.timeline-item.alt p {
+    text-align: left;
+}
+
+.logimg {
+    float: right;
+    margin-bottom: 38px;
+}
+
+.comment-detail-info-area {
+    width: 100%;
+}
+
+.comment-number-bnt-info {
+    position: absolute;
+    right: 20px;
+    bottom: 0px;
+}
+
+
+.logimg img {
+    width: 100px;
+    height: 60px;
+    object-fit: cover;
+}
+
+.Select_staff {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.Select_staff_inner {
+    margin: 10px 0;
+}
+
+@media (max-width:890px) {
+    .Select_staff_inner {
+        width: 100%;
+        margin: 10px 0;
+    }
+}
+
+.timelineInput {
+    display: flex;
+    justify-content: end;
+}
+
+.timelineInput a {
+    order: 1;
+    width: 50%;
+}
+
+.timelineInput a span input,
+.rightSideInput a span input {
+    color: #fff;
+    height: 40px;
+    border: none;
+}
+
+.timLineDate {
+    background-color: #777;
+    color: #fff;
+    border-radius: 4px;
+    padding: 7px 16px;
+    order: 3;
+    display: block;
+    margin-left: 6px;
+    line-height: 24px;
+    position: relative;
+}
+
+.rightSideInput {
+    margin-top: 60px;
+    display: flex;
+}
+
+.ritOrdring.one {
+    order: 2;
+}
+
+.ritOrdring.two {
+    order: 3;
+    border-top-right-radius: 4px !important;
+    border-bottom-right-radius: 4px !important;
+}
+
+.ritOrdring.three {
+    order: 1;
+}
+
+.rightSideInput a {
+    width: 50%;
+}
+
+.rightSideInput .rightdate {
+    background-color: #777;
+    color: #fff;
+    border-radius: 4px;
+    padding: 7px 6px;
+    display: block;
+    margin-right: 12px;
+    line-height: 24px;
+    position: relative;
+}
+
+.pop-notifbox.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.arrow {
+    border-bottom: 8px solid transparent;
+    border-top: 8px solid transparent;
+    border-left: 8px solid #777777 !important;
+    display: block;
+    height: 0;
+    right: -8px;
+    position: absolute;
+    top: 13px;
+    width: 0;
+}
+
+.rightArrow {
+    border-bottom: 8px solid transparent;
+    border-top: 8px solid transparent;
+    border-right: 8px solid #777777 !important;
+    display: block;
+    height: 0;
+    left: -8px;
+    position: absolute;
+    top: 13px;
+    width: 0;
+}
+
+.popovr .form-control {
+    border-radius: 0px;
+}
+
+.cog-panel .input-group {
+    position: relative;
+}
+
+.rightSideInput::after,
+.timelineInput::after {
+    content: '';
+    position: absolute;
+    bottom: 16px;
+    right: -36px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #777777;
+}
+
+.rightSideInput::after {
+    right: inherit;
+    left: -35px;
+}
+
+.ritOrdring.two:before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 10px;
+    width: 1px;
+    height: 20px;
+    background: #fff;
+}
+
+.timelineInput .input-group-addon:before {
+    content: "";
+    position: absolute;
+    right: 0;
+    top: 10px;
+    width: 1px;
+    height: 20px;
+    background: #fff;
+}
+
+input#date_range_input {
+    width: 190px;
+}
+
+.form-group.has-feedback {
+    padding: 0px 0px 10px 0px;
+}
+
+.timelineInput .pop-notifbox {
+    /* right: 54px; */
+    left: 0;
+    top: 50px;
+}
+.rightSideInput .pop-notifbox {
+    right: 0;
+    display: inline-table;
+    left: inherit;
+    top: 50px;
+}
+
+.timelineInput .pop-notification::after {
+    content: "\f0d9";
+    font-family: 'fontawesome';
+    right: -8px;
+    position: absolute;
+    top: 2px;
+    color: #fff;
+    transform: rotate(180deg);
+}
+
+
+/*  nEW CSS */
+
+  /*09 Aug 2018*/
     .back_opt {
         background: #1f88b5;
         border-radius: 100%;
@@ -179,15 +456,16 @@
         color: #fff;
     }
 
-    .timeline .time-show {
-        text-align: center;
-        margin-right: 0px;
+    i.fa.fa.fa-h-square {
+        color: #1f88b5;
+        font-size: 25px;
     }
 
-    .timeline .time-show .btn {
-        min-width: 150px;
+    .space_bottom {
+        margin-bottom: 7px !important;
     }
 
+    .timeline,
     #logs_articles {
         border-collapse: collapse;
         border-spacing: 0;
@@ -198,56 +476,18 @@
         min-height: 50vh;
     }
 
-    .daily_log_time {
-        position: inherit !important;
-        bottom: 5px;
-        font-size: 13px;
-        color: #686868;
-        font-weight: 400;
-        margin-top: 20px;
+    .timeline .time-show {
+        margin-right: 0px;
+        text-align: center;
     }
 
-    .timeline-item.alt h1,
-    .timeline-item.alt p {
-        text-align: left;
-    }
-
-    .logimg {
-        float: right;
-        margin-bottom: 38px;
-    }
-
-    .comment-detail-info-area {
-        width: 100%;
-    }
-
-    .comment-number-bnt-info {
-        position: absolute;
-        right: 20px;
-        bottom: 0px;
-    }
-
-
-    .logimg img {
-        width: 100px;
-        height: 60px;
-        object-fit: cover;
-    }
-
-    .Select_staff {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        flex-wrap: wrap;
-    }
-
-    .Select_staff_inner {
-        margin: 10px 0;
-    }
-
-    @media (max-width:890px) {
-        .Select_staff_inner {
-            width: 100%;
-            margin: 10px 0;
-        }
-    }
+   .rmpTimelineright {
+    margin-top: 72px;
+    margin-bottom: 24px;
+}
+.input-group.popovr.rmpTimeLft {
+    justify-content: end;
+}
+.rmpTimeRit{
+    
+}

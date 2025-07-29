@@ -219,14 +219,14 @@
         <div id="activeRotas" class="tab-pane active">
           <form class="active-rots-slt-from">
             <div class="row">
-              <div class="col-lg-9">
+              <div class="col-lg-12">
                 <div class="paraentBtnRota">
                   <h3>Active rotas</h3>
                   <div class="rotaBtn">
                   </div>
                 </div>
               </div>
-              <div class="col-lg-4 col-md-4">
+              <div class="col-lg-3 col-md-3">
                 <input type="date" placeholder="Select range..." id="search_date" class="form-control">
               </div>
               <div class="col-lg-3 col-md-3">
@@ -291,12 +291,12 @@
         <div id="oldRotas" class="tab-pane">
             <form class="active-rots-slt-from">
             <div class="row">
-              <div class="col-lg-9">
+              <div class="col-lg-12">
                 <h3>Old rotas</h3>
               </div>
-              <div class="col-lg-3 col-md-3">
+              <!-- <div class="col-lg-3 col-md-3">
                 <h4 class="d-none"><a href="#">Create new Rota</a></h4>
-              </div>
+              </div> -->
               <div class="col-lg-3 col-md-3">
                 <input type="date" placeholder="Select range..." class="form-control">
               </div>
@@ -306,7 +306,9 @@
               <div class="col-md-3">
                 <button type="button" class="filter_btn">Clear all filter</button>
               </div>
-              <div class="row">
+             
+            </div>
+             <div class="row">
                 <div class="col-md-3 col-lg-3">
                   <select name="" class="form-select form-control" id="">
                     <option value="">Name (A-Z)</option>
@@ -314,10 +316,10 @@
                     <option value="">Start date (Newest first)</option>
                     <option value="">Start date (Oldest first)</option>
                   </select>
+                  <p class="mt-2">Rotas which have ended are shown here.</p>
                 </div>
-                <p class="mt-2">Rotas which have ended are shown here.</p>
+                
               </div>
-            </div>
           </form>
           <div class="row">
             <div class="col-md-12 my-5 publish_rota_content">
@@ -337,7 +339,7 @@
                 </div>
               </div>
             </div>
-          </div>
+          
           <div class="col-md-12 unpublish_rota_content">
             <div class="d-flex justify-content-between">
               <div class="d-flex align-items-center">
@@ -354,6 +356,7 @@
             <div id="old_unpublish_rota">
             </div>
           </div>
+          </div>
         </div>
         <div id="createRota" class="tab-pane">
            <form action="{{ url('/add-rota-data') }}" method="POST" class="select-rota formOne" id="createRota">
@@ -362,15 +365,15 @@
               <div class="col-md-12 mt-4">
                 <h3>Create a new rota</h3>
               </div>
-              <div class="form-group col-md-12 my-3">
-                <label for="rota-name" class="mb-2">Rota name</label>
+              <div class="form-group my-3">
+                <label for="rota-name" class="col-md-2 mb-2">Rota name</label>
                 <div class="col-sm-4 col-md-4">
                   <input type="text" name="rota_name" id="rota-name" required class="form-control" placeholder="Enter a new rota name">
                 </div>
               </div>
-              <div class="form-group col-md-12 my-3">
-                <label for="select-days" class="mb-2">Rota duration</label>
-                <div class="col-sm-3 col-md-3">
+              <div class="form-group my-3">
+                <label for="select-days" class="col-md-2 mb-2">Rota duration</label>
+                <div class="col-sm-4 col-md-4">
                   <select name="rotaPeriodLength" class="form-select form-control" id="select-days">
                     <option value="7">7 days</option>
                     <option value="8">8 days</option>
@@ -387,8 +390,8 @@
                   </select>
                 </div>
               </div>
-              <div class="form-group col-md-12 my-3">
-                <label for="select-date" class="mb-2">Rota start date</label>
+              <div class="form-group my-3">
+                <label for="select-date" class="col-md-2 mb-2">Rota start date</label>
                 <div class="col-sm-4 col-md-4">
                   <input type="date" id="select-date" required name="start_date" class="form-control" placeholder="Select date">
                 </div>
@@ -428,8 +431,10 @@
                   </div>
                 </div>
               </div>
-              <div class="submit-btn my-3">
-                <button type="submit" id="rota_submit_btn" class="disable_btn">Create your rota</button>
+              <div class="col-md-12 mt-4">
+                <div class="submit-btn my-3">
+                  <button type="submit" id="rota_submit_btn" class="">Create your rota</button> <!-- disable_btn -->
+                </div>
               </div>
             </div>
           </form>
@@ -717,6 +722,9 @@
       },
       success: function(result) {
         console.log(result);
+        if (isAuthenticated(result) == false) {
+            return false;
+        }
         document.getElementById('active_publish_rota_count').innerHTML = result.active_publish_rota_count;
         document.getElementById('active_unpublish_rota_count').innerHTML = result.active_unpublish_rota_count;
         document.getElementById('old_publish_rota_count').innerHTML = result.old_publish_rota_count;
@@ -787,6 +795,9 @@
         },
         success: function(result) {
           console.log(result);
+          if (isAuthenticated(result) == false) {
+              return false;
+          }
         }
       });
       result.innerHTML = e.target.value;
@@ -810,6 +821,9 @@
         },
         success: function(result) {
           console.log(result);
+          if (isAuthenticated(result) == false) {
+              return false;
+          }
           location.reload();
         }
       });
@@ -827,6 +841,9 @@
         },
         success: function(result) {
           console.log(result);
+          if (isAuthenticated(result) == false) {
+              return false;
+          }
           location.reload();
         }
       });
@@ -844,6 +861,9 @@
         },
         success: function(result) {
           console.log(result);
+          if (isAuthenticated(result) == false) {
+              return false;
+          }
           location.reload();
         }
       });
@@ -929,6 +949,9 @@
       },
       success: function(result) {
         console.log(result);
+        if (isAuthenticated(result) == false) {
+            return false;
+        }
         location.reload();
       }
     });
@@ -947,6 +970,9 @@
       },
       success: function(result) {
         console.log(result);
+        if (isAuthenticated(result) == false) {
+            return false;
+        }
         $('#rota_starting_date').append("<option>Week 1 - " + result + "</option>");
       }
     });
@@ -962,6 +988,9 @@
       },
       success: function(result) {
         console.log(result);
+        if (isAuthenticated(result) == false) {
+            return false;
+        }
         var total_emp_hours = 0;
         var total_emp_minutes = 0;
         var total_emp_minutes_with_break = 0;

@@ -3,9 +3,116 @@
 
 <head>
   <!-- <link rel='stylesheet' href='https://cdn.form.io/formiojs/formio.full.min.css'>  -->
-  <style type="text/css">
-    /*09 Aug 2018*/
-    .chat_opt {
+ 
+  
+  <meta charset="utf-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="ThemeBucket">
+  <link rel='stylesheet' href='https://cdn.form.io/formiojs/formio.full.min.css'>
+  <!-- <link rel="shortcut icon" href="{{ asset('public/images/favicon.png') }}"> -->
+
+  <link rel="shortcut icon" type="image/x-icon" href="{{ asset('public/images/favicon.ico') }}">
+
+  <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"> -->
+
+  <link href="https://cdn.form.io/formiojs/formio.form.min.css">
+  <title>{{ PROJECT_NAME }} @yield('title','') </title>
+  <meta name="csrf-token" content="{{ csrf_token() }}" />
+
+  <!--Core CSS -->
+  <link href="{{ url('public/frontEnd/css/bs3/bootstrap.min.css') }}" rel="stylesheet">
+
+  <link href="{{ url('public/frontEnd/css/bootstrap-reset.css') }}" rel="stylesheet">
+  <link href="{{ url('public/frontEnd/css/font-awesome/css/font-awesome.css') }}" rel="stylesheet">
+
+  <!--clock css-->
+  <link href="{{ url('public/frontEnd/css/css3clock/css/style.css') }}" rel="stylesheet">
+
+  <!--<link href="{{ url('public/frontEnd/js/bootstrap-datepicker/css/datepicker.css') }}" rel="stylesheet" type="text/css" />-->
+
+  <link href=" https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/css/bootstrap-datepicker.css" rel="stylesheet">
+  <link href="{{ url('public/frontEnd/js/bootstrap-fileupload/bootstrap-fileupload.css') }}" rel="stylesheet">
+  <link href="{{ url('public/frontEnd/css/select2.min.css') }}" rel="stylesheet">
+
+  <!-- Custom styles for this template -->
+
+  <link href="{{ url('public/frontEnd/css/jquery.fileupload.css') }}" rel="stylesheet">
+  <link href="{{ url('public/frontEnd/js/fullcalendar/bootstrap-fullcalendar.css') }}" rel="stylesheet">
+
+  <link href="{{ url('public/frontEnd/css/vallenato.css') }}" rel="stylesheet">
+  <link href="{{ url('public/frontEnd/css/bootstrap-datetimepicker.css') }}" rel="stylesheet">
+
+  @if(Auth::user()->design_layout == 0)
+  <link href="{{ url('public/frontEnd/css/style.css') }}" rel="stylesheet">
+  <link href="{{ url('public/frontEnd/css/style-responsive.css') }}" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="{{ url('public/frontEnd/jobs/css/custom.css')}}" />
+  <link href="{{ url('public/frontEnd/css/developer.css') }}" rel="stylesheet">
+  @else
+  <link href="{{ url('public/frontEnd/css/dyslexia/dyslexia_style.css') }}" rel="stylesheet">
+  <link href="{{ url('public/frontEnd/css/dyslexia/dyslexia_style-responsive.css') }}" rel="stylesheet">
+  <link href="{{ url('public/frontEnd/css/dyslexia/dyslexia_developer.css') }}" rel="stylesheet">
+  @endif
+
+  <!-- Datatable css -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.min.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
+
+
+  <link href="{{ url('public/frontEnd/css/margins-min.css') }}" rel="stylesheet">
+  <!-- For stylish select box -->
+  <link href="{{ url('public/frontEnd/css/bootstrap-select.css') }}" rel="stylesheet">
+  <link href="{{ url('public/frontEnd/js/selectize/selectize.default.css') }}" rel="stylesheet">
+
+  <!-- For body Map-->
+  <!-- <link href="{{ url('public/backEnd/css/amarjeet.css')}}" rel="stylesheet" type="text/css"> -->
+  <!--Core js-->
+
+  <script src="{{ url('public/frontEnd/js/jquery.min.js') }}"></script>
+  <script src="{{ url('public/frontEnd/js/select2.min.js') }}"></script>
+
+  <script src="{{ url('public/frontEnd/js/selectize/selectize.js') }}"></script>
+
+  <script src="{{ url('public/frontEnd/js/slimscroll.js') }}"></script>
+
+  <script type="text/javascript" src="{{ url('public/frontEnd/js/fullcalendar/fullcalendar.min.js') }}"></script>
+  <script type="text/javascript" src="{{ url('public/frontEnd/js/jquery-ui-1.9.2.custom.min.js') }}"></script>
+
+  <script src="{{ url('public/frontEnd/js/bootstrap-fileupload/bootstrap-fileupload.js') }}"></script>
+  <script src="{{ url('public/frontEnd/js/vallenato.js') }}"></script>
+
+  <script src="{{ url('public/frontEnd/js/moment.js') }}"></script>
+  <script src="{{ url('public/frontEnd/js/bootstrap-datetimepicker.js') }}"></script>
+  <script src="{{ url('public/frontEnd/js/bootstrap-select.js') }}"></script>
+
+  <!-- For setting length of text descriptions i.e. clamp -->
+  <script src="{{ url('public/frontEnd/js/clamp/clamp.js') }}"></script>
+
+  <script src="{{ url('public/frontEnd/js/angularjs/angular1.4.8.min.js') }}"></script>
+
+  <!-- Datatables js -->
+  <script src="https://cdn.datatables.net/2.2.2/js/dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.colVis.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+
+  <!-- file for sticky(gritter) notifications -->
+  <link href="{{ url('public/frontEnd/js/gritter/jquery.gritter.css') }}" rel="stylesheet">
+  <script src="{{ url('public/frontEnd/js/gritter/gritter.js') }}"></script>
+  <script src="{{ url('public/frontEnd/js/gritter/jquery.gritter.min.js') }}"></script>
+  <script src="{{ url('public/frontEnd/js/autosize.js') }}"></script>
+  <!-- Date Range Picker -->
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+  <link href="{{ url('public/frontEnd/jobs/css/dashboard.css') }}" rel="stylesheet">
+
+
+    <style type="text/css">
+      .chat_opt {
       display: flex;
       background: #1f88b5;
       border-radius: 100%;
@@ -78,114 +185,6 @@
     .field-wrapper {
       display: block !important;
     }
-  </style>
-  
-  <meta charset="utf-8">
-
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="">
-  <meta name="author" content="ThemeBucket">
-  <link rel='stylesheet' href='https://cdn.form.io/formiojs/formio.full.min.css'>
-  <!-- <link rel="shortcut icon" href="{{ asset('public/images/favicon.png') }}"> -->
-
-  <link rel="shortcut icon" type="image/x-icon" href="{{ asset('public/images/favicon.ico') }}">
-
-  <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"> -->
-
-  <link href="https://cdn.form.io/formiojs/formio.form.min.css">
-  <title>{{ PROJECT_NAME }} @yield('title','') </title>
-  <meta name="csrf-token" content="{{ csrf_token() }}" />
-
-  <!--Core CSS -->
-  <link href="{{ url('public/frontEnd/css/bs3/bootstrap.min.css') }}" rel="stylesheet">
-
-  <link href="{{ url('public/frontEnd/css/bootstrap-reset.css') }}" rel="stylesheet">
-  <link href="{{ url('public/frontEnd/css/font-awesome/css/font-awesome.css') }}" rel="stylesheet">
-
-  <!--clock css-->
-  <link href="{{ url('public/frontEnd/css/css3clock/css/style.css') }}" rel="stylesheet">
-
-  <!--<link href="{{ url('public/frontEnd/js/bootstrap-datepicker/css/datepicker.css') }}" rel="stylesheet" type="text/css" />-->
-
-  <link href=" https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/css/bootstrap-datepicker.css" rel="stylesheet">
-  <link href="{{ url('public/frontEnd/js/bootstrap-fileupload/bootstrap-fileupload.css') }}" rel="stylesheet">
-  <link href="{{ url('public/frontEnd/css/select2.min.css') }}" rel="stylesheet">
-
-  <!-- Custom styles for this template -->
-
-  <link href="{{ url('public/frontEnd/css/jquery.fileupload.css') }}" rel="stylesheet">
-  <link href="{{ url('public/frontEnd/js/fullcalendar/bootstrap-fullcalendar.css') }}" rel="stylesheet">
-
-  <link href="{{ url('public/frontEnd/css/vallenato.css') }}" rel="stylesheet">
-  <link href="{{ url('public/frontEnd/css/bootstrap-datetimepicker.css') }}" rel="stylesheet">
-
-  @if(Auth::user()->design_layout == 0)
-  <link href="{{ url('public/frontEnd/css/style.css') }}" rel="stylesheet">
-  <link href="{{ url('public/frontEnd/css/style-responsive.css') }}" rel="stylesheet">
-  <link href="{{ url('public/frontEnd/css/developer.css') }}" rel="stylesheet">
-  @else
-  <link href="{{ url('public/frontEnd/css/dyslexia/dyslexia_style.css') }}" rel="stylesheet">
-  <link href="{{ url('public/frontEnd/css/dyslexia/dyslexia_style-responsive.css') }}" rel="stylesheet">
-  <link href="{{ url('public/frontEnd/css/dyslexia/dyslexia_developer.css') }}" rel="stylesheet">
-  @endif
-
-  <!-- Datatable css -->
-  <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.min.css">
-  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-  <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
-
-
-  <link href="{{ url('public/frontEnd/css/margins-min.css') }}" rel="stylesheet">
-  <!-- For stylish select box -->
-  <link href="{{ url('public/frontEnd/css/bootstrap-select.css') }}" rel="stylesheet">
-  <link href="{{ url('public/frontEnd/js/selectize/selectize.default.css') }}" rel="stylesheet">
-
-  <!-- For body Map-->
-  <!-- <link href="{{ url('public/backEnd/css/amarjeet.css')}}" rel="stylesheet" type="text/css"> -->
-  <!--Core js-->
-
-  <script src="{{ url('public/frontEnd/js/jquery.min.js') }}"></script>
-  <script src="{{ url('public/frontEnd/js/select2.min.js') }}"></script>
-
-  <script src="{{ url('public/frontEnd/js/selectize/selectize.js') }}"></script>
-
-  <script src="{{ url('public/frontEnd/js/slimscroll.js') }}"></script>
-
-  <script type="text/javascript" src="{{ url('public/frontEnd/js/fullcalendar/fullcalendar.min.js') }}"></script>
-  <script type="text/javascript" src="{{ url('public/frontEnd/js/jquery-ui-1.9.2.custom.min.js') }}"></script>
-
-  <script src="{{ url('public/frontEnd/js/bootstrap-fileupload/bootstrap-fileupload.js') }}"></script>
-  <script src="{{ url('public/frontEnd/js/vallenato.js') }}"></script>
-
-  <script src="{{ url('public/frontEnd/js/moment.js') }}"></script>
-  <script src="{{ url('public/frontEnd/js/bootstrap-datetimepicker.js') }}"></script>
-  <script src="{{ url('public/frontEnd/js/bootstrap-select.js') }}"></script>
-
-  <!-- For setting length of text descriptions i.e. clamp -->
-  <script src="{{ url('public/frontEnd/js/clamp/clamp.js') }}"></script>
-
-  <script src="{{ url('public/frontEnd/js/angularjs/angular1.4.8.min.js') }}"></script>
-
-  <!-- Datatables js -->
-  <script src="https://cdn.datatables.net/2.2.2/js/dataTables.min.js"></script>
-  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-  <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
-  <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
-  <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.colVis.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
-
-  <!-- file for sticky(gritter) notifications -->
-  <link href="{{ url('public/frontEnd/js/gritter/jquery.gritter.css') }}" rel="stylesheet">
-  <script src="{{ url('public/frontEnd/js/gritter/gritter.js') }}"></script>
-  <script src="{{ url('public/frontEnd/js/gritter/jquery.gritter.min.js') }}"></script>
-  <script src="{{ url('public/frontEnd/js/autosize.js') }}"></script>
-  <!-- Date Range Picker -->
-  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
-  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
-  <link href="{{ url('public/frontEnd/jobs/css/dashboard.css') }}" rel="stylesheet">
-
-
-    <style type="text/css">
     /*09 Aug 2018*/
     .chat_opt {
       display: flex;
@@ -256,6 +255,9 @@
       font-size: 14px;
       text-transform: capitalize;
     }
+ 
+    /*09 Aug 2018*/
+    
   </style>
 
 </head>
@@ -285,6 +287,9 @@
   <!--Core js-->
   <script src="{{ url('public/frontEnd/js/bs3/bootstrap.min.js') }}"></script>
   <script src="{{ url('public/frontEnd/js/hover-dropdown.js') }}"></script>
+    <!-- Js PaiChart graph  -->
+   <script src="https://cdn.zingchart.com/zingchart.min.js"></script>
+   
   <script src="{{ url('public/frontEnd/jobs/js/custom.js')}}"></script>
   <!--<script src="{{ url('public/frontEnd/js/bootstrap-datepicker/js/bootstrap-datepicker.js') }}" type="text/javascript"></script>-->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/js/bootstrap-datepicker.js" type="text/javascript"></script>
@@ -308,6 +313,9 @@
   <!-- Js for Clock in the sidebar -->
   <script src="{{ url('public/frontEnd/js/moment-timezone-data.js') }}"></script>
   <script src='https://cdn.form.io/formiojs/formio.full.min.js'></script>
+
+
+   
   <script>
     function PrintDivwithvalue(th) {
       var divContents = document.getElementById("formioView").innerHTML;
@@ -392,6 +400,12 @@
         printWindow.print();
       }, 300);
     }
+
+
+
+
+
+    
   </script>
 </body>
 @include('frontEnd.common.take_call')

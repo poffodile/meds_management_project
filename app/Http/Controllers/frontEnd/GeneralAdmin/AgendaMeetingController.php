@@ -9,8 +9,10 @@ class AgendaMeetingController extends GeneralAdminController
 {	
 
 	public function index() {
-		
-		$meeting_record = AgendaMeeting::where('home_id', Auth::user()->home_id)->where('is_deleted','0')->orderBy('id','desc');
+		$home_ids = Auth::user()->home_id;
+		$ex_home_ids = explode(',', $home_ids);
+		$home_id=$ex_home_ids[0];
+		$meeting_record = AgendaMeeting::where('home_id', $home_id)->where('is_deleted','0')->orderBy('id','desc');
 
 		$pagination = '';
 
@@ -53,7 +55,9 @@ class AgendaMeetingController extends GeneralAdminController
 	public function add(Request $r){
 
 		$data = $r->input();
-
+		$home_ids = Auth::user()->home_id;
+		$ex_home_ids = explode(',', $home_ids);
+		$home_id=$ex_home_ids[0];
 		$attended = "";
 		$not_attended = "";
 		if(isset($data['attended_user_ids'])){
@@ -66,7 +70,7 @@ class AgendaMeetingController extends GeneralAdminController
 		}
 		
 		$meeting 		     		= new AgendaMeeting;
-		$meeting->home_id    		= Auth::user()->home_id;  
+		$meeting->home_id    		= $home_id;  
 		$meeting->title 			= $data['title'];
 		$meeting->staff_present 	= $attended;
 		$meeting->staff_not_present = $not_attended;
@@ -103,8 +107,10 @@ class AgendaMeetingController extends GeneralAdminController
 
 		$meeting_record = AgendaMeeting::find($meeting_id); {
 			if(!empty($meeting_record)) {
-
-				$res = AgendaMeeting::where('id', $meeting_id)->where('home_id', Auth::user()->home_id)->update(['is_deleted' => '1']);
+				$home_ids = Auth::user()->home_id;
+				$ex_home_ids = explode(',', $home_ids);
+				$home_id=$ex_home_ids[0];
+				$res = AgendaMeeting::where('id', $meeting_id)->where('home_id', $home_id)->update(['is_deleted' => '1']);
                 echo $res;    
 			}
 			die;
@@ -112,9 +118,11 @@ class AgendaMeetingController extends GeneralAdminController
 	}
 
 	public function view($meeting_id) {
-
+		$home_ids = Auth::user()->home_id;
+		$ex_home_ids = explode(',', $home_ids);
+		$home_id=$ex_home_ids[0];
 		$meeting_record = AgendaMeeting::where('agenda_meeting.id', $meeting_id)
-										->where('home_id', Auth::user()->home_id)
+										->where('home_id', $home_id)
 										->where('is_deleted','0')
 										->first();
 		if(!empty($meeting_record)) {

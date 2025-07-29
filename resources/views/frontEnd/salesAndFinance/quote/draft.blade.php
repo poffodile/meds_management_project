@@ -1,10 +1,7 @@
-@include('frontEnd.salesAndFinance.jobs.layout.header')
-
-
-
+@extends('frontEnd.layouts.master')
 
 <style>
-    .maimTable.draftTable .dataTables_wrapper .dataTables_length, .maimTable.draftTable .dataTables_info, .maimTable.draftTable .paging_simple_numbers {
+.maimTable.draftTable .dataTables_wrapper .dataTables_length, .maimTable.draftTable .dataTables_info, .maimTable.draftTable .paging_simple_numbers {
     display: none;
 }
 tfoot.draftFoot tr th {
@@ -12,27 +9,32 @@ tfoot.draftFoot tr th {
 }
 </style>
 
+<section class="wrapper">
+    <div class="panel">
+       <header class="panel-heading px-5">
+            <h4>{{ $text }} Quotes</h4>
+       </header>
 
-<section class="main_section_page px-3">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-4 col-lg-4 col-xl-4 ">
-                <div class="pageTitle">
-                    <h3>{{ $text }} Quotes</h3>
-                </div>
-            </div>
+        <!-- <div class="row">
             <div class="col-md-8 col-lg-8 col-xl-8 px-3">
-                <div class="pageTitleBtn">
-                    <a href="#" class="profileDrop">Search Quotes</a>
-                </div>
+                
             </div>
-        </div>
-
-        @include('frontEnd.salesAndFinance.quote.quote_buttons')
+        </div> -->
+      
 
         <di class="row">
             <div class="col-lg-12">
                 <div class="maimTable draftTable">
+                    <div class="row">
+                         <div class="col-md-10 p-t-15 p-l-20">
+                            @include('frontEnd.salesAndFinance.quote.quote_buttons')
+                        </div>
+                        <div class="col-md-2">
+                            <div class="pageTitleBtn">
+                                <a href="#" class="profileDrop">Search Quotes</a>
+                            </div>
+                        </div>
+                    </div>
                     <div class="printExpt">
                         <div class="prntExpbtn">
                             <a href="#!" >Print</a>
@@ -449,5 +451,3 @@ tfoot.draftFoot tr th {
 
 @include('components.quote.call-back')
 @include('components.quote.quote-reject-type')
-
-@include('frontEnd.salesAndFinance.jobs.layout.footer')

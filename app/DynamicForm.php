@@ -214,17 +214,17 @@ class DynamicForm extends Model //FormBuilder
         /* Note:
             the form fields will be shown according to the latest form pattern 
         */
-
         if (Auth::check()) {
             $home_id  = Auth::user()->home_id;
         } else if (Session::has('scitsAdminSession')) {
             $home_id = Session::get('scitsAdminSession')->home_id;
         } else {
-            $result['response']     = false;
+            $result['response'] = false;
             return $result;
         }
 
         $home_idme = DB::table('dynamic_form')->where('id', $dynamic_form_id)->value('home_id');
+        // echo "<pre>";  print_r($home_idme); die;
         $admin_id  = DB::table('home')->where('id', $home_idme)->value('admin_id');
         $image_id  = DB::table('admin')->where('id', $admin_id)->value('image');
 
@@ -235,6 +235,7 @@ class DynamicForm extends Model //FormBuilder
             ->where('dynamic_form.home_id', $home_id)
             ->first();
 
+            // dd($form_info);
         $form_values  = array();
 
         if (!empty($form_info)) {
@@ -247,6 +248,9 @@ class DynamicForm extends Model //FormBuilder
             // }
 
             $form_builder_id = $form_info->form_builder_id;
+
+
+
         }
 
         //first get the form default id from tag
@@ -279,7 +283,7 @@ class DynamicForm extends Model //FormBuilder
                                 <div class="col-md-12 col-sm-12 col-xs-12 cog-panel">
                                     <div class="form-group col-md-12 col-sm-12 col-xs-12 p-0">
                                         <label class="col-md-2 col-sm-2 col-xs-12 p-t-7"> Staff Created: </label>
-                                        <div class="col-md-10 col-sm-10 col-xs-12 r-p-0">
+                                        <div class="col-md-10 col-sm-10 col-xs-12 p-r-0">
                                             <div class="input-group popovr">
                                                 <input type="text" class="form-control trans" placeholder="" name="" value="' . $form_info->name . ' (' . date('d-m-Y h:i a', strtotime($form_info->created_at)) . ')" ' . $disabled . ' readonly/>
                                             </div>
@@ -289,7 +293,7 @@ class DynamicForm extends Model //FormBuilder
                                 <div class="col-md-12 col-sm-12 col-xs-12 cog-panel">
                                      <div class="form-group col-md-12 col-sm-12 col-xs-12 p-0">
                                          <label class="col-md-2 col-sm-2 col-xs-12 p-t-7"> Title: </label>
-                                         <div class="col-md-10 col-sm-10 col-xs-12 r-p-0">
+                                         <div class="col-md-10 col-sm-10 col-xs-12 p-r-0">
                                              <div class="input-group popovr">
                                                  <input type="text" class="form-control trans static_title" placeholder="" '.$disabled.' name="title" value="'.$form_info->title.'" readonly/>
                                              </div>
@@ -300,7 +304,7 @@ class DynamicForm extends Model //FormBuilder
                                  <div class="col-md-12 col-sm-12 col-xs-12 cog-panel datepicker-sttng">      
                                      <div class="form-group col-md-12 col-sm-12 col-xs-12 p-0">
                                          <label class="col-md-2 col-sm-2 col-xs-12 p-t-7"> Date: </label>
-                                         <div class="col-md-10 col-sm-10 col-xs-12 r-p-0">
+                                         <div class="col-md-10 col-sm-10 col-xs-12 p-r-0">
                                            <div data-date-viewmode="" data-date-format="dd-mm-yyyy" data-date="" class="input-group date dpYears">
                                              <input name="date" size="16" readonly="" class="form-control trans" type="text" '.$disabled.' value="'.date('d-m-Y h:i a', strtotime($form_info->date)).'" readonly>
                                              <span class="input-group-btn add-on">
@@ -314,7 +318,7 @@ class DynamicForm extends Model //FormBuilder
                                  <div class="col-md-12 col-sm-12 col-xs-12 cog-panel">
                                      <div class="form-group col-md-12 col-sm-12 col-xs-12 p-0">
                                          <label class="col-md-2 col-sm-2 col-xs-12 p-t-7"> Time: </label>
-                                         <div class="col-md-10 col-sm-12 col-xs-12 r-p-0">
+                                         <div class="col-md-10 col-sm-12 col-xs-12 p-r-0">
                                              <div class="input-group popovr">
                                                  <input type="text" class="form-control trans static_title" placeholder="" '.$disabled.' name="time" value="'. $form_info->time .'" readonly/>
                                              </div>
@@ -324,7 +328,7 @@ class DynamicForm extends Model //FormBuilder
                                  <div class="col-md-12 col-sm-12 col-xs-12 cog-panel">
                                      <div class="form-group col-md-12 col-sm-12 col-xs-12 p-0">
                                          <label class="col-md-2 col-sm-2 col-xs-12 p-t-7"> Detail: </label>
-                                         <div class="col-md-10 col-sm-12 col-xs-12 r-p-0">
+                                         <div class="col-md-10 col-sm-12 col-xs-12 p-r-0">
                                              <div class="input-group popovr">
                                                 <textarea class="form-control trans" placeholder="" '.$disabled.' name="details" readonly>'. $form_info->details .'</textarea>
                                              </div>
@@ -357,7 +361,7 @@ class DynamicForm extends Model //FormBuilder
                                     </div>
                                 </div>';
                 } else {
-                    $formdata .= '  <div class="col-md-12 col-sm-12 col-xs-12 form-group">
+                    $formdata .= '<div class="col-md-12 col-sm-12 col-xs-12 form-group">
                         <div class="uploadimg222">
                             <input type="hidden" name="formImage" class="uploded_image" id="imageName">                           
                             <div id="previewContainer" class="formImageHide" style="overflow: hidden; margin-bottom: 20px; height: 300px; display :none;">
@@ -681,7 +685,7 @@ class DynamicForm extends Model //FormBuilder
                 $static_field = '<div class="col-md-12 col-sm-12 col-xs-12 cog-panel">
                                 <div class="form-group col-md-12 col-sm-12 col-xs-12 p-0 ">
                                     <label class="col-md-2 col-sm-2 col-xs-12 p-t-7"> Alert: </label>
-                                    <div class="col-md-10 col-sm-10 col-xs-12 r-p-0">
+                                    <div class="col-md-10 col-sm-10 col-xs-12 p-r-0">
                                         <div class="select-style" style="pointer-events:none">
                                             <select name="alert_status" ' . $disabled . '>
                                                 <option value="0">No</option>
@@ -694,7 +698,527 @@ class DynamicForm extends Model //FormBuilder
                             <div class="col-md-12 col-sm-12 col-xs-12 cog-panel datepicker-sttng">      
                                 <div class="form-group col-md-12 col-sm-12 col-xs-12 p-0">
                                     <label class="col-md-2 col-sm-2 col-xs-12 p-t-7"> Alert Date: </label>
-                                    <div class="col-md-10 col-sm-10 col-xs-12 r-p-0">
+                                    <div class="col-md-10 col-sm-10 col-xs-12 p-r-0">
+                                      <div data-date-viewmode="" data-date-format="dd-mm-yyyy" data-date="" class="input-group date custom-input-class">
+                                        <input name="alert_date" value="' . $alert_date . '" size="16" readonly="" class="form-control" type="text">
+                                        <span class="input-group-btn add-on">
+                                          <button class="btn btn-primary" type="button"><i class="fa fa-calendar"></i></button>
+                                        </span>
+                                      </div>
+                                    </div>
+                                </div>
+                            </div>
+                            ';
+
+                $formdata .= $static_field;
+            }
+
+
+
+            $result['response']         = true;
+            $formdata .= "<div class='col-md-12 col-sm-12 col-xs-12' id='formioView'></div>";
+            $result['form_builder_id']  = $form_info->form_builder_id;
+            //$result['title']            = $form_builder->title;
+            $result['service_user_id']  = $form_info->service_user_id;
+            //$result['detail']     = `->detail;
+            $result['form_data']        = $formdata;
+        } else {
+            $result['response']     = false;
+        }
+        return $result;
+    }
+
+    public static function showFormLogWithValue($dynamic_form_id = null, $enable = false)
+    { 
+        //show filled form
+
+        /* Note:
+            the form fields will be shown according to the latest form pattern 
+        */
+        if (Auth::check()) {
+            $home_id  = Auth::user()->home_id;
+        } else if (Session::has('scitsAdminSession')) {
+            $home_id = Session::get('scitsAdminSession')->home_id;
+        } else {
+            $result['response'] = false;
+            return $result;
+        }
+
+        $home_idme = DB::table('dynamic_form')->where('id', $dynamic_form_id)->value('home_id');
+        // echo "<pre>";  print_r($home_idme); die;
+        $admin_id  = DB::table('home')->where('id', $home_idme)->value('admin_id');
+        $image_id  = DB::table('admin')->where('id', $admin_id)->value('image');
+
+        $form_info    = DynamicForm::select('dynamic_form.pattern_data', 'dynamic_form.form_builder_id', 'dynamic_form.date', 'dynamic_form.created_at', 'u.name', 'dynamic_form.title', 'dynamic_form.time', 'dynamic_form.details', 'dynamic_form.alert_status', 'dynamic_form.form_builder_id', 'dynamic_form.service_user_id', 'dynamic_form.image_path')
+            ->join('user as u', 'u.id', 'dynamic_form.user_id')
+            ->join('log_book')
+            ->where('dynamic_form.id', $dynamic_form_id)
+            // ->where('su.home_id',$home_id)
+            ->where('dynamic_form.home_id', $home_id)
+            ->first();
+
+            dd($form_info);
+        $form_values  = array();
+
+        if (!empty($form_info)) {
+
+            $form_values = $form_info->pattern_data;
+            $form_values = trim($form_values);
+
+            // if(!empty($form_values)){ 
+            //     $form_values = json_decode($form_values);
+            // }
+
+            $form_builder_id = $form_info->form_builder_id;
+
+        }
+
+        //first get the form default id from tag
+        $form_builder   =   DynamicFormBuilder::where('id', $form_builder_id)->where('home_id', $home_id)->first();
+
+        if (!empty($form_builder)) {
+
+            //$form_builder->pattern = json_decode($form_builder->pattern);
+            // echo "<pre>";
+            //  print_r($form_values);
+            //  die;
+            //static fields
+            if ($enable == true) {
+                $disabled = '';
+            } else {
+                $disabled = 'disabled';
+            }
+
+            $form_date = '';
+            if (!empty($form_info->date)) {
+                $form_date = date('d-m-Y', strtotime($form_info->date));
+            }
+            // echo $form_date; die;
+            $static_fields    = '<div class="col-md-12 col-sm-12 col-xs-12">
+                                    <h3 class="m-t-0 m-b-20 clr-blue fnt-20 dynamic_form_h3">Details </h3>
+                                </div>
+                                <div class="prient-btn">
+                                        <input type="button" onclick="PrintDivwithvalue(this)" data-id="" value="download PDF" />
+                                        </div>
+                                <div class="col-md-12 col-sm-12 col-xs-12 cog-panel">
+                                    <div class="form-group col-md-12 col-sm-12 col-xs-12 p-0">
+                                        <label class="col-md-2 col-sm-2 col-xs-12 p-t-7"> Staff Created: </label>
+                                        <div class="col-md-10 col-sm-10 col-xs-12 p-r-0">
+                                            <div class="input-group popovr">
+                                                <input type="text" class="form-control trans" placeholder="" name="" value="' . $form_info->name . ' (' . date('d-m-Y h:i a', strtotime($form_info->created_at)) . ')" ' . $disabled . ' readonly/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 col-sm-12 col-xs-12 cog-panel">
+                                     <div class="form-group col-md-12 col-sm-12 col-xs-12 p-0">
+                                         <label class="col-md-2 col-sm-2 col-xs-12 p-t-7"> Title: </label>
+                                         <div class="col-md-10 col-sm-10 col-xs-12 p-r-0">
+                                             <div class="input-group popovr">
+                                                 <input type="text" class="form-control trans static_title" placeholder="" '.$disabled.' name="title" value="'.$form_info->title.'" readonly/>
+                                             </div>
+                                         </div>
+                                     </div>
+                                 </div>
+
+                                 <div class="col-md-12 col-sm-12 col-xs-12 cog-panel datepicker-sttng">      
+                                     <div class="form-group col-md-12 col-sm-12 col-xs-12 p-0">
+                                         <label class="col-md-2 col-sm-2 col-xs-12 p-t-7"> Date: </label>
+                                         <div class="col-md-10 col-sm-10 col-xs-12 p-r-0">
+                                           <div data-date-viewmode="" data-date-format="dd-mm-yyyy" data-date="" class="input-group date dpYears">
+                                             <input name="date" size="16" readonly="" class="form-control trans" type="text" '.$disabled.' value="'.date('d-m-Y h:i a', strtotime($form_info->date)).'" readonly>
+                                             <span class="input-group-btn add-on">
+                                               <button class="btn btn-primary" type="button"><i class="fa fa-calendar"></i></button>
+                                             </span>
+                                           </div>
+                                         </div>
+                                     </div>
+                                 </div>
+
+                                 <div class="col-md-12 col-sm-12 col-xs-12 cog-panel">
+                                     <div class="form-group col-md-12 col-sm-12 col-xs-12 p-0">
+                                         <label class="col-md-2 col-sm-2 col-xs-12 p-t-7"> Time: </label>
+                                         <div class="col-md-10 col-sm-12 col-xs-12 p-r-0">
+                                             <div class="input-group popovr">
+                                                 <input type="text" class="form-control trans static_title" placeholder="" '.$disabled.' name="time" value="'. $form_info->time .'" readonly/>
+                                             </div>
+                                         </div>
+                                     </div>
+                                 </div>
+                                 <div class="col-md-12 col-sm-12 col-xs-12 cog-panel">
+                                     <div class="form-group col-md-12 col-sm-12 col-xs-12 p-0">
+                                         <label class="col-md-2 col-sm-2 col-xs-12 p-t-7"> Detail: </label>
+                                         <div class="col-md-10 col-sm-12 col-xs-12 p-r-0">
+                                             <div class="input-group popovr">
+                                                <textarea class="form-control trans" placeholder="" '.$disabled.' name="details" readonly>'. $form_info->details .'</textarea>
+                                             </div>
+                                         </div>
+                                     </div>
+                                 </div>
+
+                             ';
+
+            $formdata = '';
+            $formdata .= $static_fields;
+            $total_fields = 0;
+            $formdata .= "<input type='hidden' value='" . $dynamic_form_id . "' id='dynamic_form_idformio'>";
+
+
+            if ($form_builder->is_image == "1") {
+                if ($form_info->image_path !== null) {
+                    $formdata .= '<div class="col-md-12 col-sm-12 col-xs-12 form-group">
+                                    <div class="uploadimg222"> 
+                                        <input type="hidden" name="formImage" class="uploded_image" id="imageName">                           
+                                        <input type="hidden" name="formImage2" class="" value="' . $form_info->image_path . '">                           
+                                        <div id="previewContainer2" style="overflow: hidden; margin-bottom: 20px; height: 300px;">';
+                    // Check if a previous image exists
+                    if (!empty($form_info->image_path)) {
+                        $formdata .= '<img src="' . url("/public/" . $form_info->image_path) . '" alt="Uploaded Image" id="previousImage" style=" width:100%; object-fit: contain; height: 100%;">';
+                    }
+
+                    $formdata .= '      </div>
+                                        <input type="file" multiple="false" accept="image/*" name="form_image" class="form-control finput" disabled id="finput2" onchange="uploadImageFun()">
+                                    </div>
+                                </div>';
+                } else {
+                    $formdata .= '<div class="col-md-12 col-sm-12 col-xs-12 form-group">
+                        <div class="uploadimg222">
+                            <input type="hidden" name="formImage" class="uploded_image" id="imageName">                           
+                            <div id="previewContainer" class="formImageHide" style="overflow: hidden; margin-bottom: 20px; height: 300px; display :none;">
+                                <img id="formImagePreview" style=" width:100%; object-fit: contain; height: 100%;" alt="Image Preview">  
+                            </div>
+                            <input type="file" multiple="false" accept="image/*" name="form_image" class="form-control finput" disabled id="finput" onchange="upload()">
+                        </div> 
+                    </div>';
+                }
+            }
+
+            //echo '<pre>'; print_r($static_fields); die;
+
+            $inp_col = 10;
+
+            //echo '<pre>'; print_r( $form_builder->pattern); die;
+            // foreach($form_builder->pattern as $key => $value){
+
+            //     $field_label = $value->label;
+            //     $column_name = $value->column_name;
+            //     $field_type  = $value->column_type;  
+
+            //     $match_found = 0;
+            //     foreach($form_values as $key => $value2){
+
+            //         $form_column     = $key; 
+            //         $form_column_val = $value2;
+            //         if($column_name == $form_column){
+
+            //             $field_value = $form_column_val;  
+            //             $total_fields++;
+            //             $match_found = 1;
+
+            //             if($field_type == 'Textbox'){
+            //                 $formdata .= '
+            //                             <div class="col-md-12 col-sm-12 col-xs-12 cog-panel">
+            //                                 <div class="form-group col-md-12 col-sm-12 col-xs-12 p-0 add-rcrd">
+            //                                     <label class="col-md-2 col-sm-2 col-xs-12 p-t-7"> '.$field_label.': </label>
+            //                                     <div class="col-md-'.$inp_col.' col-sm-'.$inp_col.' col-xs-12 r-p-0 ">
+            //                                         <div class="input-group popovr">
+            //                                             <input name="formdata['.$column_name.']" value="'.$field_value.'" type="text" class="form-control trans" '.$disabled.' />
+            //                                         </div>
+            //                                     </div>
+            //                                 </div>
+            //                             </div>';
+            //             //p-l-30
+            //             } else if($field_type == 'Selectbox'){
+            //                 $options = '';
+            //                 $option_name = '';
+            //                 $option_value = '';
+            //                 $opt = '';
+            //                 $j = 0;
+            //                 ///alert(option_count);
+            //                 //for($i=1; $i <= $option_count; $i++){
+            //                 foreach($value->select_options as $select_option){
+            //                     //echo '<pre>'; print_r($select_option);
+            //                     $select_option = (array)$select_option;
+            //                     //print_r($se['option_name']); die;
+
+            //                     $option_name    = $select_option['option_name'];
+            //                     $option_value   = $select_option['option_value'];
+
+            //                     $selected = '';
+            //                     if($form_column_val == $option_value){
+            //                         $selected = 'selected';
+            //                     } 
+
+            //                     //if( ($option_name !== '') && ($option_value !== '') ) {            
+            //                         $options .= '<option value="'.$option_value.'" '.$selected.'>'.$option_name.'</option>';
+
+            //                         $opt .= '<input type="hidden" name="formdata['.$key.'][select_options]['.$j.'][option_name]" value="'.$option_name.'"> <input type="hidden" name="formdata['.$key.'][select_options]['.$j.'][option_value]" value="'.$option_value.'">';
+            //                         $j++;
+            //                     //}
+            //                 }
+
+            //                 $formdata .= '
+            //                     <div class="col-md-12 col-sm-12 col-xs-12 cog-panel">
+            //                         <div class="form-group col-md-12 col-sm-12 col-xs-12 p-0 ">
+            //                             <label class="col-md-2 col-sm-2 col-xs-12 p-t-7"> '.$field_label.': </label>
+            //                             <div class="col-md-'.$inp_col.' col-sm-'.$inp_col.' col-xs-10 ">
+            //                                 <div class="select-style">
+            //                                     <select name="formdata['.$column_name.']" '.$disabled.' >
+            //                                         '.$options.'
+            //                                     </select>
+            //                                 </div>
+            //                             </div>
+            //                         </div>
+            //                     </div>'; 
+
+            //             } else if($field_type == 'Textarea'){
+            //                 $formdata .='
+            //                     <div class="col-md-12 col-sm-12 col-xs-12 cog-panel">
+            //                         <div class="form-group col-md-12 col-sm-12 col-xs-12 p-0 ">
+            //                             <label class="col-md-2 col-sm-2 col-xs-12 p-t-7"> '.$field_label.': </label>
+            //                             <div class="col-md-'.$inp_col.' col-sm-'.$inp_col.' col-xs-12 r-p-0 ">
+            //                                 <div class="input-group popovr">
+            //                                     <textarea name="formdata['.$column_name.']" class="form-control trans" '.$disabled.' >'.$field_value.'</textarea>
+            //                                 </div>
+            //                             </div>
+            //                         </div>
+            //                     </div>';
+
+            //             } else if($field_type == 'Date'){
+            //                 $formdata .='
+            //                     <div class="col-md-12 col-sm-12 col-xs-12 cog-panel datepicker-sttng">      
+            //                         <div class="form-group col-md-12 col-sm-12 col-xs-12 p-0 add-rcrd">
+            //                             <label class="col-md-2 col-sm-2 col-xs-12 p-t-7"> '.$field_label.': </label>
+            //                             <div class="col-md-'.$inp_col.' col-sm-'.$inp_col.' col-xs-12 r-p-0 ">
+            //                                 <div data-date-viewmode="" data-date-format="dd-mm-yyyy" data-date=""  class="input-group date dpYears">
+            //                                     <input name="formdata['.$column_name.']" type="text" value="'.$field_value.'" size="16" class="form-control trans" readonly="">
+            //                                     <span class="input-group-btn add-on">
+            //                                         <button class="btn btn-primary" type="button"><i class="fa fa-calendar"></i></button>
+            //                                     </span>
+            //                                 </div>
+            //                             </div>
+            //                         </div>
+            //                     </div>';
+
+            //             } else if($field_type == 'Checkbox'){
+
+            //                 //print_r($field_value); die;
+
+            //                 $checkbox       = '';
+            //                 $checkbox_name  = '';
+            //                 $checkbox_value = '';
+            //                 $chk = '';
+            //                 $j   = 0;
+
+            //                 foreach($value->select_checkboxs as $select_checkbox){
+
+            //                     //print_r($form_column_val); die;
+            //                     $select_checkbox = (array)$select_checkbox;
+
+            //                     $checkbox_name  = $select_checkbox['checkbox_name'];
+
+
+            //                     $checked = '';
+            //                     if(in_array($checkbox_name, $form_column_val)){
+            //                         $checked = 'checked';
+            //                     } 
+            //                     // echo 'checked='.$checked; die;
+
+            //                     $chk .= '<div class="col-md-6">
+            //                                 <div class="checkbox ">
+            //                                     <label>
+            //                                         <input class="trans" name="formdata['.$column_name.'][]" value="'.$checkbox_name.'" type="checkbox" '.$checked.' '.$disabled.'>'.$checkbox_name.'
+            //                                     </label>
+            //                                 </div>
+            //                             </div>';
+            //                     $j++;
+            //                 }
+
+            //                 $formdata .= '
+            //                     <div class="col-md-12 col-sm-12 col-xs-12 cog-panel">
+            //                         <div class="form-group col-md-12 col-sm-12 col-xs-12 p-0">
+            //                             <label class="col-md-2 col-sm-2 col-xs-12 p-t-7"> '.$field_label.': </label>
+            //                             <div class="col-md-'.$inp_col.' col-sm-'.$inp_col.' col-xs-12 r-p-0">
+            //                                 <div class="wrap_checks">
+            //                                     <div class="row">
+            //                                         '.$chk.'
+            //                                     </div>
+            //                                 </div>
+            //                             </div>
+            //                         </div>
+            //                     </div>'; 
+
+            //             } else{
+            //                 $formdata .='';
+            //             }                    
+            //         }
+
+            //     }
+
+            //     if($match_found == 0){
+
+            //             $field_value = '';  
+            //             $total_fields++;
+
+            //             if($field_type == 'Textbox'){
+            //                 $formdata .= '
+            //                             <div class="col-md-12 col-sm-12 col-xs-12 cog-panel">
+            //                                 <div class="form-group col-md-12 col-sm-12 col-xs-12 p-0 add-rcrd">
+            //                                     <label class="col-md-2 col-sm-2 col-xs-12 p-t-7"> '.$field_label.': </label>
+            //                                     <div class="col-md-'.$inp_col.' col-sm-'.$inp_col.' col-xs-12 r-p-0 ">
+            //                                         <div class="input-group popovr">
+            //                                             <input name="formdata['.$column_name.']" value="'.$field_value.'" type="text" class="form-control trans" '.$disabled.' />
+            //                                         </div>
+            //                                     </div>
+            //                                 </div>
+            //                             </div>';
+
+            //             } else if($field_type == 'Selectbox'){
+            //                 $options = '';
+            //                 $option_name = '';
+            //                 $option_value = '';
+            //                 $opt = '';
+            //                 $j = 0;
+            //                 ///alert(option_count);
+            //                 //for($i=1; $i <= $option_count; $i++){
+            //                 foreach($value->select_options as $select_option){
+            //                     //echo '<pre>'; print_r($select_option);
+            //                     $select_option = (array)$select_option;
+            //                     //print_r($se['option_name']); die;
+
+            //                     $option_name    = $select_option['option_name'];
+            //                     $option_value   = $select_option['option_value'];
+
+            //                     $selected = '';
+            //                     /*if($form_column_val == $option_value){
+            //                         $selected = 'selected';
+            //                     }*/ 
+            //                     $selected = '';
+
+            //                     //if( ($option_name !== '') && ($option_value !== '') ) {            
+            //                         $options .= '<option value="'.$option_value.'" '.$selected.'>'.$option_name.'</option>';
+
+            //                         $opt .= '<input type="hidden" name="formdata['.$key.'][select_options]['.$j.'][option_name]" value="'.$option_name.'"> <input type="hidden" name="formdata['.$key.'][select_options]['.$j.'][option_value]" value="'.$option_value.'">';
+            //                         $j++;
+            //                     //}
+            //                 }
+
+            //                 $formdata .= '
+            //                     <div class="col-md-12 col-sm-12 col-xs-12 cog-panel">
+            //                         <div class="form-group col-md-12 col-sm-12 col-xs-12 p-0 ">
+            //                             <label class="col-md-2 col-sm-2 col-xs-12 p-t-7"> '.$field_label.': </label>
+            //                             <div class="col-md-'.$inp_col.' col-sm-'.$inp_col.' col-xs-10 ">
+            //                                 <div class="select-style">
+            //                                     <select name="formdata['.$column_name.']" '.$disabled.' >
+            //                                         '.$options.'
+            //                                     </select>
+            //                                 </div>
+            //                             </div>
+            //                         </div>
+            //                     </div>'; 
+
+            //             } else if($field_type == 'Textarea'){
+            //                 $formdata .='
+            //                     <div class="col-md-12 col-sm-12 col-xs-12 cog-panel">
+            //                         <div class="form-group col-md-12 col-sm-12 col-xs-12 p-0 ">
+            //                             <label class="col-md-2 col-sm-2 col-xs-12 p-t-7"> '.$field_label.': </label>
+            //                             <div class="col-md-'.$inp_col.' col-sm-'.$inp_col.' col-xs-12 r-p-0 ">
+            //                                 <div class="input-group popovr">
+            //                                     <textarea name="formdata['.$column_name.']" class="form-control trans" '.$disabled.' >'.$field_value.'</textarea>
+            //                                 </div>
+            //                             </div>
+            //                         </div>
+            //                     </div>';
+
+            //             } else if($field_type == 'Date'){
+            //                 $formdata .='
+            //                     <div class="col-md-12 col-sm-12 col-xs-12 cog-panel datepicker-sttng">      
+            //                         <div class="form-group col-md-12 col-sm-12 col-xs-12 p-0 add-rcrd">
+            //                             <label class="col-md-2 col-sm-2 col-xs-12 p-t-7"> '.$field_label.': </label>
+            //                             <div class="col-md-'.$inp_col.' col-sm-'.$inp_col.' col-xs-12 r-p-0 ">
+            //                                 <div data-date-viewmode="" data-date-format="dd-mm-yyyy" data-date=""  class="input-group date dpYears">
+            //                                     <input name="formdata['.$column_name.']" type="text" value="'.$field_value.'" size="16" class="form-control trans" readonly="">
+            //                                     <span class="input-group-btn add-on">
+            //                                         <button class="btn btn-primary" type="button"><i class="fa fa-calendar"></i></button>
+            //                                     </span>
+            //                                 </div>
+            //                             </div>
+            //                         </div>
+            //                     </div>';
+
+            //             } else if($field_type == 'Checkbox') {
+
+            //                 $checkbox       = '';
+            //                 $checkbox_name  = '';
+            //                 $checkbox_value = '';
+            //                 $chk = '';
+            //                 $j   = 0;
+
+            //                 foreach ($value->select_checkboxs as $select_checkbox) {
+
+            //                     $select_checkbox = (array)$select_checkbox;
+
+            //                     $checkbox_name   = $select_checkbox['checkbox_name'];
+
+            //                     $chk .= '<div class="col-md-6">
+            //                                 <div class="checkbox ">
+            //                                     <label>
+            //                                         <input class="trans" name="formdata['.$column_name.'][]" value="'.$checkbox_name.'" type="checkbox" '.$disabled.'>'.$checkbox_name.'
+            //                                     </label>
+            //                                 </div>
+            //                             </div>';
+
+            //                     $j++;
+            //                 }   
+
+            //                 $formdata .= '<div class="col-md-12 col-sm-12 col-xs-12 cog-panel">
+            //                                     <div class="form-group col-md-12 col-sm-12 col-xs-12 p-0">
+            //                                         <label class="col-md-2 col-sm-2 col-xs-12 p-t-7"> '.$field_label.': </label>
+            //                                         <div class="col-md-'.$inp_col.' col-sm-'.$inp_col.' col-xs-12 r-p-0">
+            //                                             <div class="wrap_checks">
+            //                                                 <div class="row">
+            //                                                     '.$chk.'
+            //                                                 </div>
+            //                                             </div>
+            //                                         </div>
+            //                                     </div>
+            //                             </div>';
+            //             } 
+            //             else{
+            //                 $formdata .='';
+            //             }
+
+            //     }
+
+            // }
+
+            $selected = '';
+            if ($form_info->alert_status == '1') {
+                $selected = 'selected';
+            }
+
+            $alert_date = '';
+            if (!empty($form_info->alert_date)) {
+                $alert_date = date('d-m-Y', strtotime($form_info->alert_date));
+            }
+            if ($form_builder->alert_field == '1') {
+                $static_field = '<div class="col-md-12 col-sm-12 col-xs-12 cog-panel">
+                                <div class="form-group col-md-12 col-sm-12 col-xs-12 p-0 ">
+                                    <label class="col-md-2 col-sm-2 col-xs-12 p-t-7"> Alert: </label>
+                                    <div class="col-md-10 col-sm-10 col-xs-12 p-r-0">
+                                        <div class="select-style" style="pointer-events:none">
+                                            <select name="alert_status" ' . $disabled . '>
+                                                <option value="0">No</option>
+                                                <option value="1" ' . $selected . '>Yes</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12 col-sm-12 col-xs-12 cog-panel datepicker-sttng">      
+                                <div class="form-group col-md-12 col-sm-12 col-xs-12 p-0">
+                                    <label class="col-md-2 col-sm-2 col-xs-12 p-t-7"> Alert Date: </label>
+                                    <div class="col-md-10 col-sm-10 col-xs-12 p-r-0">
                                       <div data-date-viewmode="" data-date-format="dd-mm-yyyy" data-date="" class="input-group date custom-input-class">
                                         <input name="alert_date" value="' . $alert_date . '" size="16" readonly="" class="form-control" type="text">
                                         <span class="input-group-btn add-on">
@@ -1501,17 +2025,14 @@ class DynamicForm extends Model //FormBuilder
             $formdata = '';
         }
         // return $data['title'];
-        // //return $formdata;
-        // die;
-        //  print_r($formdata);
-        // die();
+        // return $formdata; die;
+        //  print_r($formdata); die();
         /*----- June 07,2018 (Akhil) ---*/
         if ($data['service_user_id'] != '') {
             $service_user_id = $data['service_user_id'];
         }
         // return $data['title'];
-        // //return $formdata;
-        // die;
+        // return $formdata; die;
         if (isset($data['formImage'])) {
             $formImage = $data['formImage'];
         } else {

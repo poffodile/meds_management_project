@@ -47,7 +47,7 @@ a:focus {
 
 #container {
     width: 100%;
-    height: 100%;
+    /* height: 100%; */
     -webkit-transition: all .3s ease-in-out;
     -moz-transition: all .3s ease-in-out;
     -o-transition: all .3s ease-in-out;
@@ -1500,7 +1500,7 @@ h3.timeline-title {
 }
 
 .timeline .timeline-icon {
-    /* background: #1f88b5; */
+    background: #1f88b5;
     left: -60px;
     position: absolute;
     top: 5px;
@@ -1527,7 +1527,7 @@ h3.timeline-title {
 .timeline-desk h1.blue,
 .timeline-desk span a.blue {
     color: #56C9F5;
-    margin-top: 15px;
+    /* margin-top: 15px; */
 }
 
 .timeline-desk h1.purple,
@@ -1631,6 +1631,13 @@ h3.timeline-title {
     font-size: 14px;
     margin-bottom: 0;
     color: #999;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 60ch;
 }
 
 .timeline-desk a {
@@ -1641,12 +1648,7 @@ h3.timeline-title {
     margin-bottom: 5px;
 }
 
-.timeline-desk .album {
-    margin-top: 20px;
-}
-
 .timeline-item.alt .timeline-desk .album {
-    margin-top: 20px;
     float: right;
 }
 
@@ -3860,7 +3862,7 @@ textarea:focus:invalid:focus,
 select:focus:invalid:focus,
 .cmxform .form-group input.error,
 .cmxform .form-group textarea.error {
-    border-color: #B94A48 !important;
+    /* border-color: #B94A48 !important; */
 }
 
 #signupForm label.error {
@@ -7278,7 +7280,7 @@ div.tagsinput span.tag {
 .cus-inpt-grp-addon {
     background-color: transparent;
     border: medium none;
-    font-size: 24px;
+    font-size: 20px;
     padding: 0;
     width: 35px;
 }
@@ -7536,13 +7538,22 @@ div.tagsinput span.tag {
     min-width: 246px;
 }
 
-.popovr .input-group-addon {
+.timeline .popovr .input-group-addon {
     cursor: pointer;
+    background: #e13533;
+    color: #fff;
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+    line-height: 39px;
+    font-size: 18px;
+    height: 40px;
 }
 
-.popovr .form-control {
+/* .popovr .form-control {
     border-radius: 4px !important;
-}
+} */
 
 .settings {
     position: relative;
@@ -7603,6 +7614,8 @@ ul.pop-notification>li a {
     line-height: 30px;
     padding: 7px 10px 7px 43px;
     position: relative;
+    width: 100%;
+    transition: .7s;
 }
 
 ul.pop-notification>li a:hover {
@@ -9120,10 +9133,10 @@ ul.pop-notification>li a:hover i {
 }
 
 
-.pt-0 {
+/* .pt-0 {
     text-align: center;
     width: 95px;
-}
+} */
 
 .bars {
     padding-left: 0;

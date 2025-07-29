@@ -1,4 +1,4 @@
-@include('frontEnd.salesAndFinance.jobs.layout.header')
+@extends('frontEnd.layouts.master')
 <link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/43.0.0/ckeditor5.css">
 <script src="https://cdn.ckeditor.com/ckeditor5/ckeditor.js"></script>
 <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -71,221 +71,224 @@
         margin-top: 2px;
     }
 </style>
-<section class="main_section_page px-3">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-4 col-lg-4 col-xl-4 ">
-                <div class="pageTitle">
-                    <h3>
-                        @switch($lastSegment)
-                        @case("leads") Leads @break
-                        @case("myLeads") My Leads @break
-                        @case("unassigned") Unassigned Leads @break
-                        @case("rejected") Rejected Leads @break
-                        @case("authorization") Authorization Leads @break
-                        @case("converted") Converted Leads @break
-                        @default {{-- No output if none of the cases match --}}
-                        @endswitch
-                    </h3>
-                </div>
-            </div>
-        </div>
+<!-- <section class="main_section_page px-3"> -->
+<section class="wrapper">
 
-        @include('frontEnd.salesAndFinance.lead.lead_buttons')
+    <div class=" panel">
+        <header class="panel-heading px-5">
+            <h4>                
+                @switch($lastSegment)
+                @case("leads") Leads @break
+                @case("myLeads") My Leads @break
+                @case("unassigned") Unassigned Leads @break
+                @case("actioned") Actioned @break
+                @case("rejected") Rejected Leads @break
+                @case("authorization") Authorization Leads @break
+                @case("converted") Converted Leads @break
+                @default {{-- No output if none of the cases match --}}
+                @endswitch
+            </h4>
+        </header>
+        <div class="panel-body">
+                      
+            @include('frontEnd.salesAndFinance.lead.lead_buttons')
 
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="maimTable">
-                    <div class="printExpt">
-                        <div class="prntExpbtn">
-                            <a href="#!">Print</a>
-                            <a href="#!" id="exportCsv">Export</a>
-                        </div>
-                        <div class="searchFilter">
-                            <a href="#!">Show Search Filter</a>
-                        </div>
-                    </div>
-                    <!-- Ram 15/10/2024 here code for bulk delete -->
-                    <div class="markendDelete">
-                        <div class="row">
-                            <div class="col-md-7">
-                                <div class="jobsection">
-                                    <a href="javascript:void(0)" id="deleteSelectedRows" class="profileDrop">Delete</a>
-                                    <!-- <a href="#" class="profileDrop">Mark As completed</a> -->
-                                </div>
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="maimTable">
+                        <div class="printExpt">
+                            <div class="prntExpbtn">
+                                <a href="#!">Print</a>
+                                <a href="#!" id="exportCsv">Export</a>
                             </div>
-                            <div class="col-md-5">
-                                <div class="pageTitleBtn p-0">
-                                    <!-- <a href="#" class="profileDrop"> <i class="material-symbols-outlined"> settings </i></a> -->
-                                </div>
+                            <div class="searchFilter">
+                                <a href="#!">Show Search Filter</a>
                             </div>
                         </div>
-                    </div>
-                    <!-- end here -->
-                    <div class="table-responsive" style="min-height: 350px;">
-                        <table id="exampleOne" class="display tablechange" cellspacing="0" width="100%">
-                            <thead>
-                                <tr>
-                                    <!-- Ram bulk delete -->
-                                    <th class="text-center" style=" width:30px;"><input type="checkbox" id="selectAll"> <label for="selectAll"> All Select</label></th>
-                                    <th>#</th>
-                                    <th>Lead Ref.</th>
-                                    <th>Full Name</th>
-                                    <th>Company Name</th>
-                                    <th>Email Address</th>
-                                    <th>Telephone</th>
-                                    <th>Mobile</th>
-                                    <th>Assigned User</th>
-                                    <th>Status</th>
-                                    <th>Website</th>
-                                    <th>Address</th>
-                                    <th>City </th>
-                                    <th>County </th>
-                                    <th>Postcode</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
+                        <!-- Ram 15/10/2024 here code for bulk delete -->
+                        <div class="markendDelete">
+                            <div class="row">
+                                <div class="col-md-7">
+                                    <div class="jobsection">
+                                        <a href="javascript:void(0)" id="deleteSelectedRows" class="profileDrop">Delete</a>
+                                        <!-- <a href="#" class="profileDrop">Mark As completed</a> -->
+                                    </div>
+                                </div>
+                                <div class="col-md-5">
+                                    <div class="pageTitleBtn p-0">
+                                        <!-- <a href="#" class="profileDrop"> <i class="material-symbols-outlined"> settings </i></a> -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- end here -->
+                        <div class="table-responsive" style="min-height: 50vh;">
+                            <table id="exampleOne" class="display tablechange" cellspacing="0" width="100%">
+                                <thead>
+                                    <tr>
+                                        <!-- Ram bulk delete -->
+                                        <th class="text-center" style=" width:30px;"><input type="checkbox" id="selectAll"> <label for="selectAll"> All Select</label></th>
+                                        <th>#</th>
+                                        <th>Lead Ref.</th>
+                                        <th>Full Name</th>
+                                        <th>Company Name</th>
+                                        <th>Email Address</th>
+                                        <th>Telephone</th>
+                                        <th>Mobile</th>
+                                        <th>Assigned User</th>
+                                        <th>Status</th>
+                                        <th>Website</th>
+                                        <th>Address</th>
+                                        <th>City </th>
+                                        <th>County </th>
+                                        <th>Postcode</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
 
-                            <tbody>
-                                @foreach ($customers as $customer)
-                                @php
-                                $authorizationText = '';
-                                if ($customer->status_id == 7) {
-                                if ($customer->authorization_status === 1) {
-                                $authorizationText = 'Waiting for Authorization';
-                                } elseif ($customer->authorization_status === 2) {
-                                $authorizationText = 'Authorized';
-                                } else {
-                                $authorizationText = 'none';
-                                }
-                                }
-                                @endphp
-                                <tr>
-                                    <!-- Ram bulk delete -->
-                                    <td><input type="checkbox" id="" class="delete_checkbox" value="{{$customer->id}}"></td>
-                                    <td>{{ $loop->iteration }}</td>
-                                    <td>{{ $customer->lead_ref }}</td>
-                                    <td>{{ $customer->contact_name }}</td>
-                                    <td>{{ $customer->name }}</td>
-                                    <td>{{ $customer->email }}</td>
-                                    <td>{{ $customer->telephone }}</td>
-                                    <td>{{ $customer->mobile }}</td>
-                                    <td>{{ App\User::getLeadAssignUserName($customer->assign_to) }}</td>
-                                    <td>{{ $customer->status_id == 7 ? $authorizationText : $customer->status }}</td>
-                                    <td>{{ $customer->website }}</td>
-                                    <td>{{ $customer->address }}</td>
-                                    <td>{{ $customer->city }}</td>
-                                    <td>{{ $customer->country }}</td>
-                                    <td>{{ $customer->postal_code }}</td>
-                                    <td>
-                                        <div class="d-inline-flex align-items-center ">
-                                            <div class="nav-item dropdown">
-                                                <a href="#" class="nav-link dropdown-toggle profileDrop" data-bs-toggle="dropdown">
-                                                    Action
-                                                </a>
-                                                <div class="dropdown-menu fade-up m-0">
-                                                    <a href="{{ url('/leads/edit').'/'.$customer->id }}" class="dropdown-item">Edit Details</a>
-                                                    <a href="#" class="dropdown-item">Send SMS</a>
-                                                    <hr class="dropdown-divider">
-                                                    <a href="#" class="dropdown-item set_value_on_CRM_model" data-user-id="{{ $customer->id }}" data-ref="{{ $customer->lead_ref }}" data-contact-name="{{ $customer->contact_name }}" data-email="{{ $customer->email }}" data-name="{{ $customer->name }}" data-status="{{ $customer->status }}" data-telephone="{{ $customer->telephone }}" class="dropdown-item">CRM History</a>
-                                                    <a href="#" class="dropdown-item open-modal" data-lead_ref="{{ $customer->lead_ref }}" data-bs-toggle="modal" data-bs-target="#rejectModal">Reject</a>
-                                                    <a href="{{ url('/leads/authorization').'/'.$customer->id }}" class="dropdown-item">Send for Authorization</a>
-                                                    <a href="javaScript:void(0)" onclick="openSentQuoteModal('{{ $customer->lead_ref }}', '{{ $customer->id}}', '{{ $customer->customer_id }}' ,'quote')" class="dropdown-item">Send to Quote</a>
-                                                    <a href="#" class="dropdown-item">Send to Job</a>
-                                                    <a href="#" class="dropdown-item" onclick="openSentQuoteModal('{{ $customer->lead_ref }}', '{{ $customer->id}}', '{{ $customer->customer_id }}' ,'customer')">Convert to Customer Only</a>
+                                <tbody>
+                                    @foreach ($customers as $customer)
+                                    @php
+                                    $authorizationText = '';
+                                    if ($customer->status_id == 7) {
+                                    if ($customer->authorization_status === 1) {
+                                    $authorizationText = 'Waiting for Authorization';
+                                    } elseif ($customer->authorization_status === 2) {
+                                    $authorizationText = 'Authorized';
+                                    } else {
+                                    $authorizationText = 'none';
+                                    }
+                                    }
+                                    @endphp
+                                    <tr>
+                                        <!-- Ram bulk delete -->
+                                        <td><input type="checkbox" id="" class="delete_checkbox" value="{{$customer->id}}"></td>
+                                        <td>{{ $loop->iteration }}</td>
+                                        <td>{{ $customer->lead_ref }}</td>
+                                        <td>{{ $customer->contact_name }}</td>
+                                        <td>{{ $customer->name }}</td>
+                                        <td>{{ $customer->email }}</td>
+                                        <td>{{ $customer->telephone }}</td>
+                                        <td>{{ $customer->mobile }}</td>
+                                        <td>{{ App\User::getLeadAssignUserName($customer->assign_to) }}</td>
+                                        <td>{{ $customer->status_id == 7 ? $authorizationText : $customer->status }}</td>
+                                        <td>{{ $customer->website }}</td>
+                                        <td>{{ $customer->address }}</td>
+                                        <td>{{ $customer->city }}</td>
+                                        <td>{{ $customer->country }}</td>
+                                        <td>{{ $customer->postal_code }}</td>
+                                        <td>
+                                            <div class="d-inline-flex align-items-center ">
+                                                <div class="nav-item dropdown">
+                                                    <a href="#" class="nav-link dropdown-toggle profileDrop" data-bs-toggle="dropdown">
+                                                        Action
+                                                    </a>
+                                                    <div class="dropdown-menu fade-up m-0">
+                                                        <a href="{{ url('/leads/edit').'/'.$customer->id }}" class="dropdown-item">Edit Details</a>
+                                                        <a href="#" class="dropdown-item">Send SMS</a>
+                                                        <hr class="dropdown-divider">
+                                                        <a href="#" class="dropdown-item set_value_on_CRM_model" data-user-id="{{ $customer->id }}" data-ref="{{ $customer->lead_ref }}" data-contact-name="{{ $customer->contact_name }}" data-email="{{ $customer->email }}" data-name="{{ $customer->name }}" data-status="{{ $customer->status }}" data-telephone="{{ $customer->telephone }}" class="dropdown-item">CRM History</a>
+                                                        <a href="#" class="dropdown-item open-modal" data-lead_ref="{{ $customer->lead_ref }}" data-bs-toggle="modal" data-bs-target="#rejectModal">Reject</a>
+                                                        <a href="{{ url('/leads/authorization').'/'.$customer->id }}" class="dropdown-item">Send for Authorization</a>
+                                                        <a href="javaScript:void(0)" onclick="openSentQuoteModal('{{ $customer->lead_ref }}', '{{ $customer->id}}', '{{ $customer->customer_id }}' ,'quote')" class="dropdown-item">Send to Quote</a>
+                                                        <a href="#" class="dropdown-item">Send to Job</a>
+                                                        <a href="#" class="dropdown-item" onclick="openSentQuoteModal('{{ $customer->lead_ref }}', '{{ $customer->id}}', '{{ $customer->customer_id }}' ,'customer')">Convert to Customer Only</a>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
 
-                                        <!-- **************** Reject Modal Start ****************-->
-                                        <div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                            <div class="modal-dialog">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h1 class="modal-title fs-5" id="exampleModalLabel">Reject Confirmation</h1>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <form id="lead_reject_reason_form">
-                                                            @csrf
-                                                            <div class="mb-3">
-                                                                <label for="recipient-name" class="col-form-label">Lead Ref:</label>
-                                                                <input type="text" name="lead_ref" class="form-control editInput" id="lead_ref" placeholder="Auto Generate" value="">
-                                                                <!-- <input type="text" class="form-control" id="recipient-name"> -->
-                                                            </div>
-                                                            <div class="mb-3">
-                                                                <label for="recipient-name" class="col-form-label">Reject Type:</label>
-                                                                <div class="row">
-                                                                    <div class="col-10">
-                                                                        <select name="reject_type_id" class="form-control editInput" id="">
-                                                                            @foreach($leadRejectTypes as $value)
-                                                                            <option value="{{ $value->id }}">{{ $value->title}}</option>
-                                                                            @endforeach
-                                                                        </select>
-                                                                    </div>
-                                                                    <div class="col-2 d-flex align-items-center">
-                                                                        <a href="#!"  data-bs-toggle="modal" data-bs-target="#rejectModal2">
-                                                                            <i class="fa-solid fa-square-plus fs-4"></i>
-                                                                        </a>
+                                            <!-- **************** Reject Modal Start ****************-->
+                                            <div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h1 class="modal-title fs-5" id="exampleModalLabel">Reject Confirmation</h1>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <form id="lead_reject_reason_form">
+                                                                @csrf
+                                                                <div class="mb-3">
+                                                                    <label for="recipient-name" class="col-form-label">Lead Ref:</label>
+                                                                    <input type="text" name="lead_ref" class="form-control editInput" id="lead_ref" placeholder="Auto Generate" value="">
+                                                                    <!-- <input type="text" class="form-control" id="recipient-name"> -->
+                                                                </div>
+                                                                <div class="mb-3">
+                                                                    <label for="recipient-name" class="col-form-label">Reject Type:</label>
+                                                                    <div class="row">
+                                                                        <div class="col-10">
+                                                                            <select name="reject_type_id" class="form-control editInput" id="">
+                                                                                @foreach($leadRejectTypes as $value)
+                                                                                <option value="{{ $value->id }}">{{ $value->title}}</option>
+                                                                                @endforeach
+                                                                            </select>
+                                                                        </div>
+                                                                        <div class="col-2 d-flex align-items-center">
+                                                                            <a href="#!" data-bs-toggle="modal" data-bs-target="#rejectModal2">
+                                                                                <i class="fa-solid fa-square-plus fs-4"></i>
+                                                                            </a>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
-                                                            </div>
-                                                            <div class="mb-3">
-                                                                <label for="message-text" class="col-form-label">Reject Reason:</label>
-                                                                <textarea name="reject_reason" class="form-control editInput" id=""></textarea>
-                                                            </div>
-                                                        </form>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="profileDrop" data-bs-dismiss="modal">Close</button>
-                                                        <button type="button" class="profileDrop" id="lead_reject_reason">Confirm Reject</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="modal fade" id="rejectModal2" tabindex="1" aria-labelledby="exampleModalLabel2" aria-hidden="true">
-                                            <div class="modal-dialog">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h1 class="modal-title fs-5" id="exampleModalLabel2"> Add Lead Reject Type </h1>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <form id="lead_reject_type_form_edit">
-                                                            @csrf
-                                                            <div class="mb-3">
-                                                                <label for="recipient-name" class="col-form-label">Lead Reject Type :</label>
-                                                                <input type="text" class="form-control editInput" name="title" id="recipient-name">
-                                                            </div>
-                                                            <div class="mb-3">
-                                                                <label for="message-text" class="col-form-label">Status:</label>
-                                                                <select name="status" class="form-control editInput" id="">
-                                                                    <option value="1">Active</option>
-                                                                    <option value="0">InActive</option>
-                                                                </select>
-                                                            </div>
-                                                        </form>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="profileDrop" data-bs-dismiss="modal">Close</button>
-                                                        <button type="button" id="lead_reject" class="profileDrop">Save</button>
+                                                                <div class="mb-3">
+                                                                    <label for="message-text" class="col-form-label">Reject Reason:</label>
+                                                                    <textarea name="reject_reason" class="form-control editInput" id=""></textarea>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="profileDrop" data-bs-dismiss="modal">Close</button>
+                                                            <button type="button" class="profileDrop" id="lead_reject_reason">Confirm Reject</button>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <!--  **************** Reject Model End *****************  -->
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
 
-                    </div>
-                </div> <!-- End off main Table -->
+                                            <div class="modal fade" id="rejectModal2" tabindex="1" aria-labelledby="exampleModalLabel2" aria-hidden="true">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h1 class="modal-title fs-5" id="exampleModalLabel2"> Add Lead Reject Type </h1>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <form id="lead_reject_type_form_edit">
+                                                                @csrf
+                                                                <div class="mb-3">
+                                                                    <label for="recipient-name" class="col-form-label">Lead Reject Type :</label>
+                                                                    <input type="text" class="form-control editInput" name="title" id="recipient-name">
+                                                                </div>
+                                                                <div class="mb-3">
+                                                                    <label for="message-text" class="col-form-label">Status:</label>
+                                                                    <select name="status" class="form-control editInput" id="">
+                                                                        <option value="1">Active</option>
+                                                                        <option value="0">InActive</option>
+                                                                    </select>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="profileDrop" data-bs-dismiss="modal">Close</button>
+                                                            <button type="button" id="lead_reject" class="profileDrop">Save</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!--  **************** Reject Model End *****************  -->
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div> <!-- End off main Table -->
+                </div>
             </div>
-            </di>
+
         </div>
+    </div>
+
 </section>
 <!-- ****************CRM History Modal ****************-->
 <div class="modal fade CRMFullModel" id="customerPop" tabindex="-1" aria-labelledby="customerModalLabel" aria-hidden="true">
@@ -3419,5 +3422,5 @@
     });
 </script>
 <!-- end here -->
-@include('frontEnd.salesAndFinance.jobs.layout.footer')
+
 <script type="text/javascript" src="{{ url('public/js/salesFinance/leads/customLeads.js') }}"></script>

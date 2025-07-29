@@ -106,7 +106,7 @@
 </div>
 
 <!--Edit Contacts popup -->
-<div class="modal fade" id="contact_info_model" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div class="modal fade in" id="contact_info_model" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">

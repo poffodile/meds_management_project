@@ -18,8 +18,9 @@
 </style>
 
 <?php 
-$admin_id = App\Admin::where('company','like',"Omega care group")->where('is_deleted', 0)->value('id');
-$homes = App\Home::select('id','title')->where('admin_id',$admin_id)->where('is_deleted','0')->get()->toArray();
+// Ram 17/07/2025 Replaced hardcoded company-based home fetching with dynamic fetching based on the logged-in user's company (admin_id). see on controller code
+// $admin_id = App\Admin::where('company','like',"Omega care group")->where('is_deleted', 0)->value('id');
+// $homes = App\Home::select('id','title')->where('admin_id',$admin_id)->where('is_deleted','0')->get()->toArray();
 ?>
 
 <form method="post" class="form-signin" action="{{ url('/switch_home_submit') }}" id="login_form" autocomplete="off" >

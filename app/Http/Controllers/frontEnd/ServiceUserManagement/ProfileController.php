@@ -19,7 +19,7 @@ class ProfileController extends ServiceUserManagementController
         // update notify
         $home_ids = Auth::user()->home_id;
         $ex_home_ids = explode(',', $home_ids);
-        $home_id=$ex_home_ids[0];
+        $home_id = $ex_home_ids[0];
         $updatenotify = array('read_notify' => 1);
         DB::table('su_risk')->where('service_user_id', $service_user_id)->where('home_id', $home_id)->update($updatenotify);
         $risktable = DB::table('su_risk')->where('service_user_id', $service_user_id)->where('home_id', $home_id)->get();
@@ -33,8 +33,8 @@ class ProfileController extends ServiceUserManagementController
         if (!empty($patient)) {
 
 
-            
-            if($patient->home_id != $home_id){
+
+            if ($patient->home_id != $home_id) {
                 return redirect('/')->with('error', UNAUTHORIZE_ERR);
             }
 
@@ -404,7 +404,7 @@ class ProfileController extends ServiceUserManagementController
             $su_home_id     = ServiceUser::where('id', $service_user_id)->value('home_id');
             $home_ids = Auth::user()->home_id;
             $ex_home_ids = explode(',', $home_ids);
-            $home_id=$ex_home_ids[0];
+            $home_id = $ex_home_ids[0];
             if ($su_home_id != $home_id) {
                 return redirect('/')->with('error', UNAUTHORIZE_ERR);
             }
@@ -476,7 +476,7 @@ class ProfileController extends ServiceUserManagementController
             $su_home_id     = ServiceUser::where('id', $care_history->service_user_id)->value('home_id');
             $home_ids = Auth::user()->home_id;
             $ex_home_ids = explode(',', $home_ids);
-            $home_id=$ex_home_ids[0];
+            $home_id = $ex_home_ids[0];
             if ($su_home_id != $home_id) {
                 return redirect('/')->with('error', UNAUTHORIZE_ERR);
             }
@@ -504,7 +504,7 @@ class ProfileController extends ServiceUserManagementController
             $su_home_id     = ServiceUser::where('id', $care_history->service_user_id)->value('home_id');
             $home_ids = Auth::user()->home_id;
             $ex_home_ids = explode(',', $home_ids);
-            $home_id=$ex_home_ids[0];
+            $home_id = $ex_home_ids[0];
             if ($su_home_id != $home_id) {
                 return redirect('/')->with('error', UNAUTHORIZE_ERR);
             }
@@ -532,7 +532,7 @@ class ProfileController extends ServiceUserManagementController
             unset($data['_token']);
             $home_ids = Auth::user()->home_id;
             $ex_home_ids = explode(',', $home_ids);
-            $home_id=$ex_home_ids[0];
+            $home_id = $ex_home_ids[0];
             foreach ($data as $key => $value) {
                 $updated = ServiceUser::where('id', $service_user_id)
                     ->where('home_id', $home_id)
@@ -559,7 +559,7 @@ class ProfileController extends ServiceUserManagementController
             // $current_location = str_replace("\n\r", '<br />', $data['current_location']);
             $home_ids = Auth::user()->home_id;
             $ex_home_ids = explode(',', $home_ids);
-            $home_id=$ex_home_ids[0];
+            $home_id = $ex_home_ids[0];
             $updated = ServiceUser::where('id', $data['service_user_id'])
                 ->where('home_id', $home_id)
                 ->update([
@@ -583,7 +583,7 @@ class ProfileController extends ServiceUserManagementController
             $data = $request->all();
             $home_ids = Auth::user()->home_id;
             $ex_home_ids = explode(',', $home_ids);
-            $home_id=$ex_home_ids[0];
+            $home_id = $ex_home_ids[0];
             $updated = ServiceUser::where('id', $data['service_user_id'])
                 // ->where('home_id', Auth::user()->home_id) this line is not need because we have already compare with primary id. but developer wants it then I write a new code below for the checking of home
                 ->where('home_id', $home_id)

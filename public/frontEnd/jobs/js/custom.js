@@ -166,7 +166,7 @@ var myConfig = {
 zingchart.render({
   id: 'PieChart',
   data: myConfig,
-  height: 326,
+  height: 360,
   width: "100%"
 });
 
@@ -302,7 +302,7 @@ let chartConfig = {
 zingchart.render({
   id: chartId,
   data: chartConfig,
-  height: '325px',
+  height: '360px',
   width: '100%',
 });
 

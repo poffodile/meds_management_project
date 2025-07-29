@@ -11,7 +11,10 @@ class SystemManagementController extends Controller
 {
 	  
 	public function system_management() {
-        $home_id = Auth::user()->home_id;
+        // $home_id = Auth::user()->home_id;
+        $home_ids = Auth::user()->home_id;
+        $ex_home_ids = explode(',', $home_ids);
+        $home_id=$ex_home_ids[0];
         $labels  = HomeLabel::getLabels($home_id);
         // echo '<pre>'; print_r($home_id); die;
         $earning_scheme_label = EarningSchemeLabel::where('deleted_at',null)
@@ -31,7 +34,10 @@ class SystemManagementController extends Controller
             $data = $request->all();
             // print_r($data);
             // die;
-            $home_id = Auth::user()->home_id;
+            $home_ids = Auth::user()->home_id;
+            $ex_home_ids = explode(',', $home_ids);
+            $home_id=$ex_home_ids[0];
+            // $home_id = Auth::user()->home_id;
             // echo '<pre>'; print_r($_FILES);die;
             $date_of_birth = date('Y-m-d',strtotime($data['date_of_birth']));
             $user                   = new ServiceUser;
@@ -115,7 +121,10 @@ class SystemManagementController extends Controller
             $data = $request->all();
             $date_of_joining = date('Y-m-d',strtotime($data['date_of_joining']));
             $date_of_leaving = date('Y-m-d',strtotime($data['date_of_leaving']));
-            $home_id = Auth::user()->home_id;
+            // $home_id = Auth::user()->home_id;
+            $home_ids = Auth::user()->home_id;
+            $ex_home_ids = explode(',', $home_ids);
+            $home_id=$ex_home_ids[0];
            
             $user                   = new User;
             $user->name             = $data['staff_name'];

@@ -182,6 +182,8 @@ Route::post('api/remove-device', 'App\Http\Controllers\Api\DeviceController@remo
 
 // Route::match(['get','post'], '/login', 'App\Http\Controllers\frontEnd\UserController@login');
 Route::match(['get', 'post'], '/login', 'App\Http\Controllers\frontEnd\UserController@login')->middleware('PreventBack');
+Route::get('/yes_logout', 'App\Http\Controllers\frontEnd\UserController@yes_logout');
+Route::post('/no_logout', 'App\Http\Controllers\frontEnd\UserController@no_logout');
 
 Route::get('/logout', 'App\Http\Controllers\frontEnd\UserController@logout');
 Route::post('/forgot-password', 'App\Http\Controllers\frontEnd\ForgotPasswordController@send_forgot_pass_link_mail');
@@ -206,7 +208,7 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 
 	// Rota Management
 	Route::get('/rota-dashboard', 'App\Http\Controllers\Rota\RotaController@index');
-	Route::get('/rota-management', 'App\Http\Controllers\Rota\RotaController@rota_management_dashboard');
+	Route::get('/rota_management', 'App\Http\Controllers\Rota\RotaController@rota_management_dashboard');
 	Route::get('/rota', 'App\Http\Controllers\Rota\RotaController@create');
 	Route::post('/add-rota-data', 'App\Http\Controllers\Rota\RotaController@store');
 	Route::get('/rota-planner', 'App\Http\Controllers\Rota\RotaController@rota_calender_view');
@@ -711,6 +713,7 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 			Route::post('/getLeadDataWithRecurrence', 'getLeadDataWithRecurrence')->name('lead.ajax.getLeadDataWithRecurrence');
 			Route::get('/get30DaysLead', 'get30DaysLead')->name('lead.ajax.get30DaysLead');
 			Route::post('/saveLeadConvertQuote', 'saveLeadConvertQuote')->name('lead.ajax.saveLeadConvertQuote');
+			Route::post('lead/getCRMTaskDataToday', 'getCRMTaskDataToday')->name('lead.ajax.getCRMTaskDataToday');
 
 			// Countries List
 			Route::get('/getCountriesList', 'getCountriesList')->name('ajax.getCountriesList');
@@ -729,6 +732,11 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 			Route::post('/saveLeadRejectTypes', 'saveLeadRejectType')->name('lead.ajax.saveLeadRejectTypes');
 			Route::post('/editLeadRejectTypes', 'saveLeadRejectType')->name('lead.ajax.editLeadRejectTypes');
 			Route::post('/saveLeadRejectReasons', 'saveLeadRejectReason')->name('lead.ajax.saveLeadRejectReasons');
+			Route::post('lead/getCRMComplaintData', 'getCRMComplaintData')->name('lead.ajax.getCRMComplaintData');
+			Route::post('lead/getCRMTasksData', 'getCRMTasksData')->name('lead.ajax.getCRMTasksData');
+			Route::post('lead/getCRMAllData', 'getCRMAllData')->name('lead.ajax.getCRMAllData');
+			Route::post('lead/saveCRMLeadComplaint', 'saveCRMLeadComplaint')->name('lead.ajax.saveCRMLeadComplaint');
+			Route::post('lead/saveCRMLeadTaskAndTimer', 'saveCRMLeadTaskAndTimer')->name('lead.ajax.saveCRMLeadTaskAndTimer');
 		});
 
 		Route::prefix('leads')->group(function () {
@@ -789,7 +797,7 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 			Route::post('/saveRegion', 'saveRegion')->name('quote.ajax.saveRegion');
 			Route::post('/editRegion', 'saveRegion')->name('quote.ajax.editRegion');
 			Route::get('/getRegions', 'getRegions')->name('quote.ajax.getRegions');
-			
+
 			Route::get('/getCurrencyData', 'getCurrencyData')->name('currency.ajax.getCurrencyData');
 			Route::post('/saveQuoteData', 'store');
 			Route::get('/getHomeUsers', 'getHomeUsers')->name('quote.ajax.getUsersData');
@@ -811,11 +819,11 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 			Route::get('/search', 'searchQuote');
 			Route::get('/rejected', 'index');
 		});
-		
+
 		Route::get('/quote-details/edit/{id}', 'editQuoteDetails')->name('quote.editDetails');
 		Route::get('quote-details/add_multi_attachment', 'add_multi_attachment')->name('quote.addMultiAttachment');
-		
-		
+
+
 		Route::prefix('quotes')->group(function () {
 			Route::patch('/statusChange', 'statusChange')->name('quote.ajax.statusChange');
 			Route::get('/getActiveRejectType', 'getActiveRejectType')->name('quote.ajax.getActiveRejectType');
@@ -826,7 +834,6 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 			Route::post('/getQuoteInvoiceDeposit', 'getQuoteInvoiceDeposit')->name('quote.ajax.getQuoteInvoiceDeposit');
 			Route::post('/searchQuoteData', 'searchQuoteData')->name('quote.ajax.searchQuoteData');
 		});
-
 	});
 
 	Route::controller(CataloguesController::class)->group(function () {
@@ -954,6 +961,7 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 	Route::post('/service/patterndataformio', 'App\Http\Controllers\frontEnd\ServiceUserManagement\DynamicFormController@patterndataformio');
 	Route::post('/service/patterndataformiovaule', 'App\Http\Controllers\frontEnd\ServiceUserManagement\DynamicFormController@patterndataformiovalue');
 	Route::get('/service/dynamic-form/view/data/{dynamic_form_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\DynamicFormController@view_form_data');
+	
 	Route::get('/service/dynamic-form/delete/{dynamic_form_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\DynamicFormController@delete_form');
 	Route::post('/service/dynamic-form/edit-details', 'App\Http\Controllers\frontEnd\ServiceUserManagement\DynamicFormController@edit_details');
 	Route::post('/service/dynamic-form/daily-log', 'App\Http\Controllers\frontEnd\ServiceUserManagement\DynamicFormController@su_daily_log_add');
@@ -961,7 +969,6 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 	// Route::match(['get','post'], '/system/plans/delete/{plan_id}', 'App\Http\Controllers\frontEnd\SystemManagement\PlanBuilderController@delete');
 
 	// -------- Service Management ------------------------//
-
 	Route::match(['get', 'post'], '/service-user-management', 'App\Http\Controllers\frontEnd\ServiceUserManagementController@service_users');
 	Route::match(['get', 'post'], '/service/user-profile/{service_user_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\ProfileController@index');
 
@@ -993,6 +1000,8 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 	Route::match(['get', 'post'], '/service/daily-logs3', 'App\Http\Controllers\frontEnd\ServiceUserManagement\DailyLogsController@index3');
 	Route::match(['get', 'post'], '/service/weekly-logs', 'App\Http\Controllers\frontEnd\ServiceUserManagement\DailyLogsController@weekly_log');
 	Route::match(['get', 'post'], '/service/monthly-logs', 'App\Http\Controllers\frontEnd\ServiceUserManagement\DailyLogsController@monthly_log');
+	Route::get('/service/daily-log-form/view/data/{dynamic_form_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\DailyLogsController@view_log_form_data');
+	Route::post('/service/logbook/add', 'App\Http\Controllers\frontEnd\ServiceUserManagement\LogBookController@add');
 
 	//Backend Logs Download
 	Route::get('/service/logbook/download', 'App\Http\Controllers\frontEnd\ServiceUserManagement\PDFLogsController@download');
@@ -1008,12 +1017,13 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 	Route::get('/service/risks/{su_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\RiskController@index');
 	Route::get('/service/risk/view/{risk_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\RiskController@view');
 	Route::get('/service/risk/risksfilter', 'App\Http\Controllers\frontEnd\ServiceUserManagement\RiskController@risksfilter');
+
 	//risk RMP
 	Route::post('/service/risk/rmp/add', 'App\Http\Controllers\frontEnd\ServiceUserManagement\RiskController@add_rmp_risk');
 	Route::get('/service/risk/rmp/view/{su_risk_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\RiskController@view_rmp_risk');
+
 	//edit only a single records info
 	Route::post('/service/risk/rmp/edit/{su_rmp_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\RiskController@edit_rmp_risk');
-
 	Route::get('/service/risk/inc-rec/view/{su_risk_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\RiskController@view_inc_rec_risk');
 	//edit multiple records at a time - details, review etc. 
 
@@ -1057,7 +1067,7 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 	Route::post('/service/earning/set-target', 'App\Http\Controllers\frontEnd\ServiceUserManagement\EarningSchemeController@set_su_earning_target');
 
 	//suspend incentive
-	Route::post('/service/earning-scheme/incentive/suspend', 'App\Http\Controllers\frontEnd\ServiceUserManagement\EarningSchemeController@incentive_suspend');
+	Route::post('/service/earning-scheme/incentive/suspend/save', 'App\Http\Controllers\frontEnd\ServiceUserManagement\EarningSchemeController@incentive_suspend');
 	Route::get('/service/earning-scheme/incentive/suspend/view/{suspended_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\EarningSchemeController@view_suspension');
 	/*Route::post('/service/earning-scheme/incentive/suspend/edit', 'App\Http\Controllers\frontEnd\ServiceUserManagement\EarningSchemeController@edit_suspension');*/
 	Route::get('/service/earning-scheme/incentive/suspend/delete', 'App\Http\Controllers\frontEnd\ServiceUserManagement\EarningSchemeController@remove_suspension');
@@ -1156,6 +1166,8 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 	Route::match(['get', 'post'], '/service/rmp/edit_rmp/{su_rmp_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\RmpController@edit_rmp');
 	Route::get('/service/rmp/delete/{su_rmp_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\RmpController@delete');
 	Route::match(['get', 'post'], '/service/rmp/edit', 'App\Http\Controllers\frontEnd\ServiceUserManagement\RmpController@edit');
+	Route::match(['get', 'post'], '/service/rmp/{service_user_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\RmpController@form');
+
 
 	//BMP
 	Route::match(['get', 'post'], '/service/bmp/view/{service_user_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\BmpController@index');
@@ -1164,6 +1176,9 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 	Route::get('/service/bmp/delete/{su_bmp_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\BmpController@delete');
 	Route::get('/service/bmp/view_bmp/{su_bmp_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\BmpController@view_bmp');
 	Route::post('/service/rmp/edit_bmp/{su_bmp_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\BmpController@edit_bmp');
+
+	Route::match(['get', 'post'], '/service/bmp/{service_user_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\BmpController@form');
+
 
 	//IncidentReport
 	Route::match(['get', 'post'], '/service/incident-report/views/{service_user_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\IncidentController@index');
@@ -1361,7 +1376,7 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 	Route::post('/staff/rota/add-shift', 'App\Http\Controllers\frontEnd\StaffManagement\RotaController@add_shift');
 	Route::get('/staff/rota/delete-shift/{rota_id}', 'App\Http\Controllers\frontEnd\StaffManagement\RotaController@delete');
 	Route::post('/staff/rota/add-rota', 'App\Http\Controllers\frontEnd\StaffManagement\RotaController@add_rota');
-
+	Route::match(['get','post'],'/staff/rota/rota-management','App\Http\Controllers\frontEnd\StaffManagement\RotaController@index');
 	Route::get('/staff/rota/shift/view/{rota_id}', 'App\Http\Controllers\frontEnd\StaffManagement\RotaController@view_rota');
 	Route::post('/staff/rota/shift/edit', 'App\Http\Controllers\frontEnd\StaffManagement\RotaController@edit_shift');
 

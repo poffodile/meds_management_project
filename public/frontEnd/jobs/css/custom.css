@@ -291,9 +291,9 @@ a.overdueJobsFolder i {
 /* ****************************Table ********************* */
 
 .maimTable {
-  border: 1px solid #eee;
+  /* border: 1px solid #eee;
   margin-top: 12px;
-  margin-bottom: 15px;
+  margin-bottom: 15px; */
   position: relative;
 }
 
@@ -868,15 +868,15 @@ footer.mainFooter {
 }
 
 section.main_section_page {
-  padding: 80px 20px 0 100px !important;
+  padding: 80px 0px 0 0px !important;
   min-height: 93vh;
 }
 
 .newJobForm {
-  border: 2px solid #1f88b5;
   padding: 20px 12px 12px 12px;
-  border-radius: 4px;
-  position: relative;
+    border-radius: 4px;
+    position: relative;
+    background: #f7f7f7;
 }
 
 /* form.customerForm {
@@ -896,8 +896,9 @@ section.main_section_page {
 
 .col-form-label {
   font-size: 13px;
+  color: #666;
+  font-weight: 600;
   line-height: 18px;
-  font-weight: 400;
   margin: 0;
 }
 
@@ -1306,8 +1307,8 @@ h4.card-title {
 }
 
 .slry_pakage a {
-  color: #545454;
-  font-weight: 900;
+  color: #302f2f;
+  font-weight: 600;
   text-decoration: none;
   font-size: 18px;
   display: flex;
@@ -1315,9 +1316,10 @@ h4.card-title {
 
 .up_arrow i {
   font-weight: 800;
-  line-height: 20px;
-  font-size: 24px;
+  line-height: 12px;
+  font-size: 16px;
   color: #039b1c;
+  margin-left: 10px;
 }
 
 div#PieChart-license-text {
@@ -1400,7 +1402,7 @@ div#lineChart-license-text {
 
 /* *********************************** */
 .markendDelete {
-  padding: 12px 12px 4px;
+  padding: 0px 12px 4px;
   border-bottom: 1px solid #eee;
 }
 
@@ -2687,7 +2689,7 @@ ul#supplierList {
   position: fixed;
   top: 0;
   z-index: 99;
-  left: 80px;
+  left: 0px;
   right: 0;
   height: 68px;
 }
@@ -3096,8 +3098,8 @@ ul#supplierList {
 .nav .nav-link.active,
 .nav-pills .show>.nav-link,
 .nav .show>.nav-link {
-  background: #1f88b5 !important;
-  color: #fff;
+  /* background: #1f88b5 !important; */
+  color: #000000;
 }
 
 .nav-pills .nav-link,
@@ -3447,4 +3449,15 @@ label {
   margin: 10px;
   cursor: pointer;
   z-index: 999;
+}
+.form-group {
+    display: flow-root;
+}
+.control-label {
+    font-size: 13px;
+    color: #666;
+    font-weight: 600;
+}
+.fixed-top{
+  top: 0;
 }

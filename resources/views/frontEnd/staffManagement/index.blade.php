@@ -54,7 +54,9 @@
 
                                     <li><a href="{{ $redirect_url }}"  class="staff-set-btn"> <i class="fa fa-calendar"></i> Task Allocation <!-- <span class="badge label-success pull-right r-activity">00</span> --></a></li>
                                 @endif
-                                    <li><a href="{{ url('/staff/rota/view') }}"> <i class="fa fa-sliders"></i> Manage Rota <!-- <span class="badge label-warning pull-right r-activity">02</span> --></a></li>
+                                    <!-- <li><a href="{{ url('/staff/rota/view') }}"> <i class="fa fa-sliders"></i> Manage Rota </a></li>
+                                      -->
+                                    <li><a href="{{ url('/rota-dashboard') }}"> <i class="fa fa-sliders"></i> Manage Rota <!-- <span class="badge label-warning pull-right r-activity">02</span> --></a></li>
                                 </ul>
                             </section>
                         </aside>
