@@ -19,7 +19,7 @@
                 <div class="maimTable">
                    <div class="p-t-15 p-l-15">
                         <div class="jobsection">
-                            <a href="#!" data-bs-toggle="modal" data-bs-target="#statusModel" class="profileDrop open-modal">Add</a>
+                            <a href="#!" class="profileDrop open-modal">Add</a>
                             <a href="javascript:void(0)" id="deleteSelectedRows" class="profileDrop">Delete</a>
                         </div>
                    </div>
@@ -91,7 +91,7 @@
     </div>
 </section>
 <!-- popup start -->
-<div aria-hidden="true" aria-labelledby="myModalLabel" role="dialog" tabindex="-1" id="statusModel" class="modal fade">
+<div aria-hidden="true" aria-labelledby="myModalLabel" role="dialog" tabindex="-1" id="quoteFormModel" class="modal fade">
     <div class="modal-dialog">
         <div class="modal-content add_Customer">
             <div class="modal-header terques-bg">
@@ -138,6 +138,7 @@
 <script>
     $(document).ready(function() {
         $('.open-modal').on('click', function() {
+        alert()
             var itemId = $(this).data('id');
             var itemTitle = $(this).data('title');
             var itemStatus = $(this).data('status');

@@ -55,7 +55,10 @@ class RiskController extends SystemManagementController
         if($request->isMethod('post')){
 
             $data = $request->all();
-            $home_id = Auth::user()->home_id;
+            // $home_id = Auth::user()->home_id;
+            $home_ids = Auth::user()->home_id;
+            $ex_home_ids = explode(',', $home_ids);
+            $home_id=$ex_home_ids[0];
            
             $risk  = new Risk;
             $risk->description = $data['risk_description'];

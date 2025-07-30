@@ -139,12 +139,13 @@ class ManagerController extends Controller
             }
 
             //if checkbox is checked
-            if(isset($data['assign_right_check'])) {
+            // Ram 28/07/2025 this code is hide to give all access permission for Manager 
+            // if(isset($data['assign_right_check'])) {
                 //save access rights
                 $access_rights = AccessRight::select('id')
                                             ->where('disabled','0')
-                                            ->where('submodule_name','View')
-                                            ->orWhere('submodule_name',' ')
+                                            // ->where('submodule_name','View')
+                                            // ->orWhere('submodule_name',' ')
                                             ->get()->toArray();
                 //echo "<pre>"; print_r($access_rights);
                 if(!empty($access_rights)){
@@ -152,7 +153,7 @@ class ManagerController extends Controller
                     $access_rights_ids = implode(',', $access_rights_ids);
                     $user->access_rights = $access_rights_ids;
                 }
-            }
+            // }
 
 
             if($user->save()){
@@ -279,13 +280,14 @@ class ManagerController extends Controller
                 }
                 
                 //if checkbox is checked
-                if(isset($data['assign_right_check'])) {
+                // Ram 28/07/2025 this code is hide to give all access permission for Manager 
+                // if(isset($data['assign_right_check'])) {
                     //save access rights of user 
                     
                     $access_rights = AccessRight::select('id')
                                                 ->where('disabled','0')
-                                                ->where('submodule_name','View')
-                                                ->orWhere('submodule_name',' ')
+                                                // ->where('submodule_name','View')
+                                                // ->orWhere('submodule_name',' ')
                                                 ->get()->toArray();
                     // echo "<pre>"; print_r($access_rights); die;
                     if(!empty($access_rights)){
@@ -294,7 +296,7 @@ class ManagerController extends Controller
                         $access_rights_ids = implode(',', $access_rights_ids);
                         $user->access_rights = $access_rights_ids;
                     }
-                }
+                // }
 
                 if($user->save()) {
 

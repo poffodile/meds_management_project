@@ -1,3 +1,4 @@
+@extends('frontEnd.layouts.master')
 @include('rotaStaff.components.header')
 <style>
     .disable_btn_nxt2 {
@@ -37,9 +38,12 @@
         overflow-y: auto;
     }
 </style>
-<div class="col-lg-11">
-    <div class="row">
-        <div class="container" id="timeline">
+<div class="wrapper">
+    <div class="panel">
+       <header class="panel-heading">
+        <h4> All Rota > Future rotas</h4>
+       </header>
+        <div class="" id="timeline">
             <div class="row">
                 @foreach($rota as $rota_data)
                 @if($rota_data->status == 0 || $rota_data->rota_view == 2)

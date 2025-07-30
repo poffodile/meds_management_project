@@ -246,26 +246,29 @@
               <div id="result"></div>
             </div>
           </form>
-          <div class="col-md-12 my-5 publish_rota_content">
-            <div class="d-flex justify-content-between">
-              <div class="d-flex align-items-center">
-                <h4>Published rotas</h4>
-                <span class="no_of_rota_publish" id="active_publish_rota_count"></span>
+          <div class="my-5 publish_rota_content">
+              <div class="d-flex justify-content-between">
+                <div class="d-flex align-items-center">
+                  <h4>Published rotas</h4>
+                  <span class="no_of_rota_publish" id="active_publish_rota_count"></span>
+                </div>
+                <div class="toggle_btns">
+                  <button class="view_all_btn" onclick="showRotaPublish()" id="viewPublish">View all</button>
+                  <button class="show_less_btn" onclick="lessRotaPublish()" id="lessPublish">Show less</button>
+                </div>
               </div>
-              <div class="toggle_btns">
-                <button class="view_all_btn" onclick="showRotaPublish()" id="viewPublish">View all</button>
-                <button class="show_less_btn" onclick="lessRotaPublish()" id="lessPublish">Show less</button>
+              <div class="content_about_publish" id="beforePublishRota">
+                 
+                      <h5>In progress</h5>
+                      <div id="new_publish_rota"></div>
+                  
+                  <div class="publishedRotasList p-t-20">
+                      <h5>Future rotas</h5>
+                      <p class="pb-8 radtext">Rotas that are starting in the future will appear here.</p>
+                  </div>
               </div>
-            </div>
-            <div class="content_about_publish" id="beforePublishRota">
-              <h5>In progress</h5>
-              <div id="new_publish_rota">
-              </div>
-              <h5>Future rotas</h5>
-              <p class="pb-8">Rotas that are starting in the future will appear here.</p>
-            </div>
           </div>
-          <div class="col-md-12 unpublish_rota_content">
+          <div class="unpublish_rota_content">
             <div class="d-flex justify-content-between">
               <div class="d-flex align-items-center">
                 <h4>Unpublished rotas</h4>
@@ -277,12 +280,12 @@
               </div>
             </div>
           </div>
-          <div class="col-md-12 col-lg-12" id="unpublish_rota_content_detail">
+          <div id="unpublish_rota_content_detail">
             <div id="new_unpublish_rota">
 
             </div>
           </div>
-          <div class="col-lg-12">
+          <div class="">
             <div class="no-rate-see">
               <h2>No rotas to see here yet...</h2>
             </div>
@@ -306,23 +309,23 @@
               <div class="col-md-3">
                 <button type="button" class="filter_btn">Clear all filter</button>
               </div>
-             
-            </div>
-             <div class="row">
-                <div class="col-md-3 col-lg-3">
+              <div class="col-md-3 col-lg-3">
                   <select name="" class="form-select form-control" id="">
                     <option value="">Name (A-Z)</option>
                     <option value="">Name (Z-A )</option>
                     <option value="">Start date (Newest first)</option>
                     <option value="">Start date (Oldest first)</option>
                   </select>
-                  <p class="mt-2">Rotas which have ended are shown here.</p>
                 </div>
+             
+            </div>
+             <div class="row">
+                
                 
               </div>
           </form>
           <div class="row">
-            <div class="col-md-12 my-5 publish_rota_content">
+            <div class="my-5 publish_rota_content">
               <div class="d-flex justify-content-between">
                 <div class="d-flex align-items-center">
                   <h4>Published rotas</h4>
@@ -340,7 +343,7 @@
               </div>
             </div>
           
-          <div class="col-md-12 unpublish_rota_content">
+          <div class="unpublish_rota_content">
             <div class="d-flex justify-content-between">
               <div class="d-flex align-items-center">
                 <h4>Unpublished rotas</h4>

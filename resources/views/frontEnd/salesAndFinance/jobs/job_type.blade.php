@@ -1,41 +1,37 @@
-@include('frontEnd.salesAndFinance.jobs.layout.header')
+@extends('frontEnd.layouts.master')
 <style>
     .addError {
         border: 1px solid red;
     }
 </style>
-<section class="main_section_page px-3">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-4 col-lg-4 col-xl-4 ">
-                <div class="pageTitle">
-                    <h3>Jobs Type</h3>
-                </div>
-            </div>
-            <div class="col-md-8 col-lg-8 col-xl-8 px-3">
-                <div class="pageTitleBtn">
-                </div>
-            </div>
-        </div>
 
+<section class="wrapper">
+    <div class="panel">
+        <header class="panel-heading px-5">
+            <h4>Jobs Type</h4>
+        </header>
+<!-- 
         <div class="row">
-
             <div class="col-md-8 col-lg-8 col-xl-8 px-3">
-                <?php if (array_key_exists(315, $access_rights)) { ?>
-                    <div class="jobsection">
-                        <a href="#!" data-bs-toggle="modal" data-bs-target="#customerPop" class="profileDrop">Add</a>
-                    </div>
-                <?php } ?>
+               
             </div>
             <div class="col-md-4 col-lg-4 col-xl-4 ">
             </div>
-        </div>
+        </div> -->
         <div class="alert alert-success text-center" id="msg" style="display:none;height:50px">
             <p id="status_meesage"></p>
         </div>
         <di class="row">
             <div class="col-lg-12">
                 <div class="maimTable">
+                    <div class="p-t-15">
+                        <?php if (array_key_exists(315, $access_rights)) { ?>
+                            <div class="jobsection ">
+                                <a href="#!" data-bs-toggle="modal" data-bs-target="#customerPop" class="profileDrop">Add</a>
+                                <a href="javascript:void(0)" id="deleteSelectedRows" class="profileDrop">Delete</a>
+                            </div>
+                        <?php } ?>
+                    </div>
                     <div class="printExpt">
                         <div class="prntExpbtn">
                             <a href="#!">Print</a>
@@ -49,7 +45,7 @@
                         <div class="row">
                             <div class="col-md-7">
                                 <div class="jobsection">
-                                    <a href="javascript:void(0)" id="deleteSelectedRows" class="profileDrop">Delete</a>
+                                    
                                     <!-- <a href="#" class="profileDrop">Mark As completed</a> -->
                                 </div>
                             </div>
@@ -126,8 +122,7 @@
 
                 </div> <!-- End off main Table -->
                 <!-- Job type Modal start here -->
-                <div class="modal fade" id="customerPop" tabindex="-1" aria-labelledby="customerModalLabel"
-                    aria-hidden="true">
+                <div class="modal fade" id="customerPop" tabindex="-1" aria-labelledby="customerModalLabel" aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content add_Customer">
                             <div class="modal-header">
@@ -152,7 +147,6 @@
                                                     </div>
                                                 </div>
 
-
                                                 <div class="mb-2 row">
                                                     <label for="inputName" class="col-sm-3 col-form-label">Number of days <span class="radStar">*</span></label>
                                                     <div class="col-sm-9">
@@ -172,7 +166,6 @@
                                                         </div>
                                                     </div>
                                                 </div>
-
 
                                                 <div class="mb-2 row">
                                                     <label for="inputProject"

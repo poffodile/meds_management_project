@@ -300,14 +300,14 @@ if (isset($user_info)) {
                                 </div>
                                 @endif
 
-                                <div class="form-group">
+                                {{--<div class="form-group">
                                     <label class="col-lg-3 control-label"></label>
                                     <div class="col-lg-9">
                                         <div class="checkbox">
                                             <label class="assign-access"><input type="checkbox" value="yes" name="assign_right_check" {{ (isset($user_info->access_rights)) ? 'checked' : '' }}>Assign access rights according to the access level</label>
                                         </div>
                                     </div>
-                                </div>
+                                </div>--}}
 
                                 <div class="form-actions">
                                     <div class="row">

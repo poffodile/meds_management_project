@@ -178,9 +178,9 @@
                 mid = 'pm';
             }
 
-            // if(hours < 10){
-            //     hours = '0'+hours;
-            // }
+            if(hours < 10){
+                hours = '0'+hours;
+            }
             if(mins < 10){
                 mins = '0'+mins;
             }

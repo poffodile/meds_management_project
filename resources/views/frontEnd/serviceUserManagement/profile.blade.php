@@ -75,7 +75,8 @@
 
     .contact h3 .currentAdd {
         color: #767676;
-        background: #f1f2f7;
+        /* background: #f1f2f7; */
+        background: #ffffff;
         font-family: 'Open Sans', sans-serif;
         font-size: 13px;
         font-weight: 500;
@@ -90,7 +91,7 @@
 
     .location-info .previousAdd {
         color: #767676;
-        /* background: #f1f2f7; */
+        background: #f1f2f7;
         font-family: 'Open Sans', sans-serif;
         font-size: 13px;
         font-weight: 500;
@@ -137,11 +138,44 @@
     .fa.fa-pencil.profile {
     color: #1fb5ad;
     font-size: 13px;
-  
+
 }
 span.ps10 {
     padding-right: 5px;
 }
+</style>
+<style>
+    .dropdown {
+        position: relative;
+        display: inline-block;
+    }
+
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: white;
+        min-width: 150px;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        border-radius: 5px;
+        padding: 10px;
+        z-index: 10;
+    }
+
+    .dropdown-content a {
+        display: block;
+        padding: 8px;
+        text-decoration: none;
+        color: black;
+        font-size: 17px;
+    }
+
+    .dropdown-content a:hover {
+        background-color: #f1f1f1;
+    }
+
+    .show {
+        display: block;
+    }
 </style>
 
 <!--main content start-->
@@ -193,7 +227,7 @@ span.ps10 {
                                         <h1>{{ ucfirst($patient->name) }}</h1>
                                         <span class="text-muted">{{ date('d/m/Y',strtotime($patient->date_of_birth)) }}</span>
                                         <div class="location-info contact">
-                                            <h2> <span><i class="fa fa-phone"></i></span> Contacts <a href="javascript:void(0)" class="contact-edit-btn" phone_no="{{ $patient->phone_no }}" mobile="{{ $patient->mobile }}" email="{{ $patient->email }}">&nbsp &nbsp<i class="fa fa-pencil profile"></i></a> </h2> 
+                                            <h2> <span><i class="fa fa-phone"></i></span> Contacts <a href="javascript:void(0)" class="contact-edit-btn" phone_no="{{ $patient->phone_no }}" mobile="{{ $patient->mobile }}" email="{{ $patient->email }}">&nbsp &nbsp<i class="fa fa-pencil profile"></i></a> </h2>
                                             <span> <strong style="color:#3399CC; display:inline-block; margin-bottom: 10px;">Phone</strong> <span class="ps10">: {!! $patient->phone_no !!}</span> &nbsp &nbsp &nbsp
                                                 <strong style="color:#3399CC; display:inline-block; margin-bottom: 10px;">Mobile</strong> <span class="ps10"> : {!! $patient->mobile !!}</span>&nbsp &nbsp &nbsp
                                                 <strong style="color:#3399CC; display:inline-block; margin-bottom: 10px;">Email</strong> <span class="ps10"> : {!! $patient->email !!}</span>
@@ -244,8 +278,8 @@ span.ps10 {
                                         <h2> <span><i class="fa fa-map-marker"></i></span> Current location <a href="javascript:void(0)" class="location-edit-btn" clmn-name="current_location"><i class="fa fa-pencil profile"></i> </a> </h2>
                                         <div class="location-info current_location"><p>{!! $patient->current_location !!}</p></div>
 
-                                    </div> 
-                                    <div class="location-info ">    
+                                    </div>
+                                    <div class="location-info ">
                                         <strong style="color:#3399CC;">Previous Location</strong><br>
                                         <div class="previous_location"><p>{!! $patient->previous_location !!}</p></div>
                                     </div>
@@ -259,7 +293,7 @@ span.ps10 {
                                <h1>{{ $age }}</h1>
                                <p>Years Old</p>
                                <h1>{{ $patient->admission_number }}</h1>
-                               <p>Admission Number</p>  
+                               <p>Admission Number</p>
                                <h1>{{ $patient->section }}</h1>
                                <p>Section</p>
                                 <?php $risk_status = App\Risk::overallRiskStatus($service_user_id);
@@ -275,13 +309,13 @@ span.ps10 {
                                 }
                                 ?>
                                <h1 id="su_risk_status" class="{{ $color }}">{{ $risk_status }}</h1>
-                               <p>Risk</p> 
+                               <p>Risk</p>
                                 <?php
                                 if (isset($noti_data['back_path'])) { ?>
                                    <div class="cus-back-btn">
                                        <a href="{{ $noti_data['back_path'] }}" class="btn cus-btn btn-warning">Continue</a>
                                    </div>
-                                <?php } ?>                            
+                                <?php } ?>
                            </div> -->
                                 <!--<a href="#" class="btn btn-primary">Read Full Profile</a>-->
                             </div>
@@ -289,7 +323,7 @@ span.ps10 {
                         <div>
                             <span class="profile-bigico">
                                 <a href="{{ url('/service/calendar/'.$service_user_id) }}" title="Calendar"><i class="fa fa-calendar"></i></a>
-                                <!-- <a href="" title="{{ $labels['mfc']['label'] }}" class="mfc"><i class="fa fa-user-times"></i></a> 
+                                <!-- <a href="" title="{{ $labels['mfc']['label'] }}" class="mfc"><i class="fa fa-user-times"></i></a>
                                 <a href="" title="{{ $labels['living_skill']['label'] }}" class="living-skill-list"><i class="fa fa-child"></i></a>  -->
                                 <a data-toggle="modal" href="#filemngrModal" title="File Manager"><i class="fa fa-folder-open-o" aria-hidden="true"></i></a>
                                 <!-- <a data-toggle="modal" href="#filemngrModal" title="YP Log Book"><i class="fa fa-address-book-o"></i></a> -->
@@ -298,6 +332,17 @@ span.ps10 {
                                 <!-- <a href="javascript:void(0)" class="eventreq" title="Event Date Change Request"><i class="fa fa-calendar-times-o"></i></a> -->
                                 <!-- <a href="{{ url('/service/location-history/'.$service_user_id) }}" title="Location History"><i class="fa fa-map-marker"></i></a> -->
                                 <a href="{{url('/select/report?key='.base64_encode($service_user_id))}}" class="" title="Report" srvcUserId="{{ $service_user_id }}"><i class="fa fa-file-o"></i></a>
+                                {{-- <a href="#!" onclick="toggleDropdown()" class="" title="Logs" srvcUserId="{{ $service_user_id }}"><i class="fa fa-address-book-o"></i></a> --}}
+                                <div class="dropdown">
+                                    <a href="#!" onclick="toggleDropdown(event)" class="" title="Logs">
+                                        <i class="fa fa-address-book-o"></i>
+                                    </a>
+                                    <div id="myDropdown" class="dropdown-content">
+                                        <a href="{{ url('/service/daily-logs?key='.$service_user_id) }}">Daily Log</a>
+                                        <a href="{{ url('/service/weekly-logs?key='.$service_user_id) }}">Weekly Log</a>
+                                        <a href="{{ url('/service/monthly-logs?key='.$service_user_id) }}">Monthly Log</a>
+                                    </div>
+                                </div>
                             </span>
                         </div>
                     </div>
@@ -342,7 +387,7 @@ span.ps10 {
                                                             </div>
                                                         </div> -->
 
-                                                    <div class="col-md-2 col-sm-4 col-xs-12 ">
+                                                    {{-- <div class="col-md-2 col-sm-4 col-xs-12 ">
                                                         <div class="profile-nav alt">
                                                             <!-- <a data-toggle="modal" href="#logBookModal"> -->
                                                             <a href="{{ url('/service/daily-logs?key='.$service_user_id) }}">
@@ -356,7 +401,7 @@ span.ps10 {
                                                                 </section>
                                                             </a>
                                                         </div>
-                                                    </div>
+                                                    </div> --}}
 
                                                     <div class="col-md-2 col-sm-4 col-xs-12">
                                                         <div class="profile-nav alt">
@@ -435,6 +480,24 @@ span.ps10 {
                                                             </section>
                                                         </div>
                                                     </div>
+                                                    <!-- Pre Invoice -->
+                                                    <div class="col-md-2 col-sm-4 col-xs-12">
+                                                        <div class="profile-nav alt">
+                                                            <a href="{{ url('/service/invoice/'.$service_user_id) }}">
+                                                                <section class="panel text-center profile-square">
+                                                                    <div class="user-heading alt wdgt-row label-inverse">
+                                                                        <i class="fa fa-file"></i>
+                                                                        <!-- <i class="fa fa-heartbeat"></i> -->
+                                                                    </div>
+                                                                    <div class="panel-body">
+                                                                        <div class="wdgt-value">Pre-Invoice</div>
+                                                                    </div>
+                                                                </section>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                    <!-- end here -->
+
                                                 </div>
                                             </div>
 
@@ -480,15 +543,13 @@ span.ps10 {
 
                                         <!-- notification start -->
                                         <section class="panel m-0">
-
-                                            <header class="panel-heading"> Notification</header>
                                             <header class="panel-heading"> Notification
-                                                <!-- <span class="tools pull-right"> 
-                                                <a href="javascript:;" class="fa fa-chevron-down"></a> 
-                                                <a href="javascript:;" class="fa fa-cog"></a> <a href="javascript:;" class="fa fa-times"></a> 
+                                                <!-- <span class="tools pull-right">
+                                                <a href="javascript:;" class="fa fa-chevron-down"></a>
+                                                <a href="javascript:;" class="fa fa-cog"></a> <a href="javascript:;" class="fa fa-times"></a>
                                             </span> -->
+
                                             </header>
-                                            
                                             <div class="panel-body  min-ht-0 srvc_usr_ntf">
                                                 @include('frontEnd.serviceUserManagement.elements.su_profile_notification')
                                             </div>
@@ -510,7 +571,6 @@ span.ps10 {
     </section>
 </section>
 <!--main content end-->
-
 
 @include('frontEnd.serviceUserManagement.elements.daily_record')
 @include('frontEnd.serviceUserManagement.elements.health_record')
@@ -615,8 +675,8 @@ span.ps10 {
         $("#add_care_team").validate({
             rules: {
                 // job_title: {
-                //     required: true,  
-                //     regex: /^[a-zA-Z'.\s]{1,40}$/          
+                //     required: true,
+                //     regex: /^[a-zA-Z'.\s]{1,40}$/
                 // },
                 name: {
                     required: true,
@@ -772,11 +832,11 @@ span.ps10 {
         //     $.ajax({
         //         type   : 'get',
         //         url    : "{{ url('/service/user-profile/status/') }}"+'/'+service_user_id,
-        //         success:function(resp){ 
+        //         success:function(resp){
         //             if(isAuthenticated(resp) == false){
         //                 return false;
-        //             } 
-        //             if(resp == '1') {                       
+        //             }
+        //             if(resp == '1') {
         //                 if($('.profile_active_status').hasClass('profile_active')) {
         //                     $('.profile_active_status').removeClass('profile_active');
         //                     $('.profile_active_status').addClass('profile_inactive');
@@ -784,8 +844,8 @@ span.ps10 {
         //                     $('.profile_active_status').removeClass('profile_inactive')
         //                      $('.profile_active_status').addClass('profile_active');
         //                 }
-        //             } else { 
-        //             } 
+        //             } else {
+        //             }
         //             $('.profile_active_status').removeClass('profile_active_status');
         //             $('.loader').hide();
         //             $('body').removeClass('body-overflow');
@@ -799,7 +859,7 @@ span.ps10 {
         //     window.location.href = "{{ url('/service/user-profile') }}"+'/'+su_id;
         // });
 
-        //yp photo right click functionality 
+        //yp photo right click functionality
         $(function () {
             $('.profile_click').bind('contextmenu', function (e) {
                 var service_user_id = "{{ $service_user_id }}";
@@ -809,11 +869,11 @@ span.ps10 {
             $.ajax({
                 type   : 'get',
                 url    : "{{ url('/service/user-profile/afc-status/update') }}"+'/'+service_user_id,
-                success:function(resp){ 
+                success:function(resp){
                     if(isAuthenticated(resp) == false){
                         return false;
-                    } 
-                    if(resp == 'true') {                       
+                    }
+                    if(resp == 'true') {
                         if($('.profile_active_status').hasClass('profile_active')) {
                             $('.profile_active_status').removeClass('profile_active');
                             $('.profile_active_status').addClass('profile_inactive');
@@ -829,11 +889,11 @@ span.ps10 {
                         $('.ajax-alert-err').find('.msg').text("{{ UNAUTHORIZE_ERR }}");
                         $('.ajax-alert-err').show();
                         setTimeout(function(){$(".ajax-alert-err").fadeOut()}, 5000);
-                    } else { 
+                    } else {
                         $('.ajax-alert-err').find('.msg').text('Some Error Occured. Status can not be updated.');
                         $('.ajax-alert-err').show();
                         setTimeout(function(){$(".ajax-alert-err").fadeOut()}, 5000);
-                    } 
+                    }
                     $('.profile_active_status').removeClass('profile_active_status');
                     $('.loader').hide();
                     $('body').removeClass('body-overflow');
@@ -864,6 +924,21 @@ span.ps10 {
         $('input[name=srvcc_usrr_id]').val(srvc_user_id);
         $('#ChooseReportModal').modal('show');
     });
+</script>
+<script>
+    function toggleDropdown(event) {
+        event.preventDefault(); // Prevent link from navigating
+        event.stopPropagation(); // Stop click from reaching window.onclick
+        document.getElementById("myDropdown").classList.toggle("show");
+    }
+
+    // Close the dropdown when clicking outside
+    window.onclick = function(event) {
+        var dropdown = document.getElementById("myDropdown");
+        if (!event.target.closest(".dropdown")) {
+            dropdown.classList.remove("show");
+        }
+    };
 </script>
 
 @endsection

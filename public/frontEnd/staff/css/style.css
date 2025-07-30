@@ -951,7 +951,8 @@ p.next {
 }
 
 .parent_div .date_of_shift_rota {
-    border-right: 2px solid #999;
+   background: #1f88b5;
+    color: #fff;
 }
 
 .publish_rota_content .content_about_publish .pb-8 {
@@ -3829,6 +3830,7 @@ margin: 0px 10px 0px 10px;
 
 #timeline .accordion .accordion-button {
     box-shadow: none;
+    font-size: 16px;
 }
 
 #timeline .accordion .accordion-button:after {
@@ -4289,3 +4291,18 @@ margin: 0px 10px 0px 10px;
     left: 0px;
 }
 /* add lateness css end */
+
+.radtext{
+    font-size: 13px;
+    color: #f00;
+}
+.content_about_publish h5 {
+    font-weight: 600;
+    color: #1f88b5;
+}
+
+.accordion-body .d-flex {
+    border-bottom: 1px solid #e3e1e1;
+    padding-top: 10px;
+    background: #f1f2f7;
+}

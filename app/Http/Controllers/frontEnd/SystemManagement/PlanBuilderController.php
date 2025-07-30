@@ -51,7 +51,9 @@ class PlanBuilderController extends SystemManagementController
 
 		if($request->isMethod('post'))	{
 			$data = $request->input();
-
+			$home_ids = Auth::user()->home_id;
+            $ex_home_ids = explode(',', $home_ids);
+            $home_id=$ex_home_ids[0];
 			if(isset($data['formdata']))	{
 				$data['formdata'] = array_values($data['formdata']);
 			} else  {
@@ -59,7 +61,7 @@ class PlanBuilderController extends SystemManagementController
 			}
 			//echo '<pre>'; print_r($data['formdata']); die;
 			$plan 			= new PlanBuilder;
-			$plan->home_id 	= Auth::user()->home_id;
+			$plan->home_id 	= $home_id;
 			$plan->title 	= $data['plan_title'];
 			$plan->pattern 	= json_encode($data['formdata']);
 			$plan->icon 	= $data['plan_icon'];

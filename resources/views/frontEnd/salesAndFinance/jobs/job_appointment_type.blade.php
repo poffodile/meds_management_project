@@ -1,28 +1,18 @@
-@include('frontEnd.salesAndFinance.jobs.layout.header')
+@extends('frontEnd.layouts.master')
 <style>
     .addError {
         border: 1px solid red;
     }
 </style>
-<section class="main_section_page px-3">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-4 col-lg-4 col-xl-4 ">
-                <div class="pageTitle">
-                    <h3>Jobs Appointment Type</h3>
-                </div>
-            </div>
-            <div class="col-md-8 col-lg-8 col-xl-8 px-3">
-                <div class="pageTitleBtn">
-                </div>
-            </div>
-        </div>
+<section class="wrapper">
+    <div class="panel">
+        <header class="panel-heading px-5">
+             <h4>Jobs Appointment Type</h4>
+        </header>
 
         <div class="row">
             <div class="col-md-8 col-lg-8 col-xl-8 px-3">
-                <div class="jobsection">
-                    <a href="#!" data-bs-toggle="modal" data-bs-target="#customerPop" class="profileDrop">Add</a>
-                </div>
+               
             </div>
             <div class="col-md-4 col-lg-4 col-xl-4 ">
             </div>
@@ -33,6 +23,13 @@
         <di class="row">
             <div class="col-lg-12">
                 <div class="maimTable">
+                    <div class="p-t-15">                   
+                        <div class="jobsection">
+                            <a href="#!" data-bs-toggle="modal" data-bs-target="#customerPop" class="profileDrop">Add</a>
+                            <a href="javascript:void(0)" id="deleteSelectedRows" class="profileDrop">Delete</a>
+                        </div>
+                    </div>
+                    
                     <div class="printExpt">
                         <div class="prntExpbtn">
                             <a href="#!">Print</a>
@@ -41,21 +38,7 @@
                             <a href="#!">Show Search Filter</a>
                         </div>
                     </div>
-                    <div class="markendDelete">
-                        <div class="row">
-                            <div class="col-md-7">
-                                <div class="jobsection">
-                                    <a href="javascript:void(0)" id="deleteSelectedRows" class="profileDrop">Delete</a>
-                                    <!-- <a href="#" class="profileDrop">Mark As completed</a> -->
-                                </div>
-                            </div>
-                            <div class="col-md-5">
-                                <div class="pageTitleBtn p-0">
-                                    <!-- <a href="#" class="profileDrop"> <i class="material-symbols-outlined"> settings </i></a> -->
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+          
 
                     <table id="exampleOne" class="display tablechange" cellspacing="0" width="100%">
                         <thead>
