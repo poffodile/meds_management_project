@@ -9,9 +9,9 @@ body {
   font-family: "Roboto", sans-serif;
 }
 
-a {
+/* a {
   color: #1f88b5;
-}
+} */
 
 .main_wrapper {
   position: relative;
@@ -3207,7 +3207,7 @@ section.main_section_page_petty {
 } */
 
 .Additional_Hours .heading {
-  text-align: center;
+  text-align: start;
   font-weight: 700;
   font-size: 14px;
 }

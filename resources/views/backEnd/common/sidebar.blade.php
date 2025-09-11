@@ -118,8 +118,8 @@
                         <li class="{{ ($page == 'agents') ? 'active' : '' }}"><a href="{{ url('admin/agents') }}">Agent</a></li>
                         <!-- <li class="{{ ($page == 'daily_records') ? 'active' : '' }}"><a href="{{ url('admin/daily-record') }}">Daily Log</a></li> -->
                         <!-- <li class="{{ ($page == 'daily-record-scores') ? 'active' : '' }}"><a href="{{ url('admin/daily-record-scores') }}">Daily Log Scores</a></li> -->
-                        <li class="{{ ($page == 'education-training') ? 'active' : '' }}"><a href="{{ url('admin/education-trainings') }}">Education Records</a></li>
-                        <li class="{{ ($page == 'living_skill') ? 'active' : '' }}"><a href="{{ url('admin/living-skill') }}"> Independent Living Skills </a></li>
+                        {{-- <li class="{{ ($page == 'education-training') ? 'active' : '' }}"><a href="{{ url('admin/education-trainings') }}">Education Records</a></li>
+                        <li class="{{ ($page == 'living_skill') ? 'active' : '' }}"><a href="{{ url('admin/living-skill') }}"> Independent Living Skills </a></li> --}}
                         <!-- <li class="{{ ($page == 'mfc') ? 'active' : '' }}"><a href="{{ url('admin/mfc-records') }}">MFC</a></li> -->
                         <li class="{{ ($page == 'risks') ? 'active' : '' }}"><a href="{{ url('admin/risk') }}">Risks</a></li>
                         <li class="{{ ($page == 'earning_scheme') || ($page == 'incentive_earning_scheme') ? 'active' : '' }}"><a href="{{ url('admin/earning-scheme') }}">Earning Scheme </a></li>

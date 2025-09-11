@@ -222,7 +222,7 @@
                     }
                     // $('.su-skill').html(resp2);
                     $('#livingSkillModal').modal('show');
-                    $('.add-new-btn').click();
+                    // $('.add-new-btn').click();
                     $('.loader').hide();
                     $('body').removeClass('body-overflow');
                 }

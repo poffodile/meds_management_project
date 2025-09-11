@@ -603,7 +603,6 @@ class DynamicFormController extends Controller
     public function su_daily_log_add(Request $request)
     {
         // dd($request);
-
         // echo "<pre>"; print_r($request->input()); die;
 
         if ($request->isMethod('post')) {
@@ -644,11 +643,13 @@ class DynamicFormController extends Controller
             $s_category_id = $data['s_category_id'] ?? null;
             $category_data = $s_category_id ? CategoryFrontEnd::where('id', $s_category_id)->first() : null;
 
+            $form = DynamicForm::find($data['dyn_form_id']);
+            // dd($form);
 
-            $form = DynamicForm::showForm($data);
+            $form_insert_id = DynamicForm::saveForm($form);
 
             $log_book                  = new LogBook;
-            $log_book->dynamic_form_id = $data['dyn_form_id'] ?? null;
+            $log_book->dynamic_form_id = $form_insert_id ?? null;
             $log_book->home_id         = $home_id;
             $log_book->user_id         = Auth::user()->id;
             $log_book->title           = $dyn_form->title ?? $title_detail->title;
@@ -663,13 +664,11 @@ class DynamicFormController extends Controller
                 : null;
                 
             $log_book->details         = $dyn_form->details ?? $title_detail->detail;
-            $log_book->category_id     = $s_category_id;
-            $log_book->category_name   = $category_data ? $category_data->name : null;
-            $log_book->category_icon   = $category_data ? $category_data->icon : null;
-            // $log_book->formdata        = $dyn_form->pattern_data;
+            $log_book->category_id     = $s_category_id ?? 3;
+            $log_book->category_name   = $category_data ? $category_data->name : 'Visitor';
+            $log_book->category_icon   = $category_data ? $category_data->icon : 'fa fa-users';
             $log_book->logType         = $data['logtype'] ?? null;
             $log_book->save();
-
 
             $su_log_record                  = new ServiceUserLogBook;
             $su_log_record->user_id         = Auth::user()->id;
@@ -687,7 +686,6 @@ class DynamicFormController extends Controller
             }
             die;
             // echo $response; die;
-
         }
     }
     /*public function edit_details(Request $request) {

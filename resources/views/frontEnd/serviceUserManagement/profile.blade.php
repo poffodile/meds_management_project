@@ -139,7 +139,6 @@
         .fa.fa-pencil.profile {
             color: #1fb5ad;
             font-size: 13px;
-
         }
 
         span.ps10 {
@@ -185,7 +184,6 @@
         <section class="wrapper">
             <!-- page start-->
 
-
             <div class="row">
                 <div class="col-md-12">
                     <div class="backIcon"> <a href="{{ url('/service-user-management') }}"><i class="fa fa-arrow-left"
@@ -211,15 +209,13 @@
                                 ?>
 
                                 <div class="profile-pic text-center">
-                                    <img src="{{ env('ASSETS_URL') }}/{{ serviceUserProfileImagePath . '/' . $user_image }}"
-                                        alt="" class="profile_click {{ $profile_color }}" />
+                                    <img src="{{ url(serviceUserProfileImagePath . '/' . $user_image) }}" alt="" class="profile_click {{ $profile_color }}" />
                                 </div>
                                 <div class="contact">
                                     <h3><span><i class="fa fa-map-marker"></i></span> Current location <a
                                             href="javascript:void(0)" class="location-edit-btn"
                                             clmn-name="current_location"><i class="fa fa-pencil profile"></i> </a> <span
                                             class="currentAdd">{!! $patient->current_location !!} </span></h3>
-
                                 </div>
                                 <div class="location-info">
                                     <strong>Previous Location</strong> <span
@@ -528,7 +524,7 @@
                                                             </a>
                                                         </div>
                                                         <!-- Pre Invoice -->
-                                                        <div class="col-md-2 col-sm-4 col-xs-12">
+                                                        {{-- <div class="col-md-2 col-sm-4 col-xs-12">
                                                             <div class="profile-nav alt">
                                                                 <a href="{{ url('/service/invoice/' . $service_user_id) }}">
                                                                     <section class="panel text-center profile-square">
@@ -543,7 +539,7 @@
                                                                     </section>
                                                                 </a>
                                                             </div>
-                                                        </div>
+                                                        </div> --}}
                                                         <!-- end here -->
 
                                                     </div>

@@ -105,8 +105,6 @@
                             ?>
                             <!-- <img alt="" src="{{ userProfileImagePath.'/'.$user_image }}"> -->
                             <img alt="" src="{{ url('public/images/userProfileImages'.'/'.$user_image) }}">
-                            <!-- Komal -->
-                            <!-- <img alt="" src="{{ env('APP_URL') }}/{{ userProfileImagePath.'/'.$user_image }}"> -->
                             <span class="username">{{ ucfirst(Auth::user()->name) }}</span>
                             <b class="caret"></b>
                         </a>

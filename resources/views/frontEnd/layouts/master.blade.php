@@ -4,7 +4,6 @@
 <head>
     <!-- <link rel='stylesheet' href='https://cdn.form.io/formiojs/formio.full.min.css'>  -->
 
-
     <meta charset="utf-8">
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,8 +11,6 @@
     <meta name="author" content="ThemeBucket">
     <link rel='stylesheet' href='https://cdn.form.io/formiojs/formio.full.min.css'>
     <!-- <link rel="shortcut icon" href="{{ asset('public/images/favicon.png') }}"> -->
-
-
 
     <link rel="shortcut icon" type="image/x-icon" href="{{ asset('public/images/favicon.ico') }}">
 
@@ -322,10 +319,9 @@
     <script src="{{ url('public/frontEnd/js/moment-timezone-data.js') }}"></script>
     <script src='https://cdn.form.io/formiojs/formio.full.min.js'></script>
 
-
-
     <script>
         function PrintDivwithvalue(th) {
+
             var divContents = document.getElementById("formioView").innerHTML;
             var imagelocalpath;
             if ($(th).data('id')) {
@@ -343,31 +339,22 @@
             }
             var printWindow = window.open('', '', 'height=600,width=600');
             printWindow.document.write('<html><head><title>Print DIV Content</title>');
-            printWindow.document.write(
-                '<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">'
-                );
-            printWindow.document.write(
-                '<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">'
-                );
+            printWindow.document.write('<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">');
+            printWindow.document.write('<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">');
             printWindow.document.write('<link rel="stylesheet" href="https://cdn.form.io/formiojs/formio.full.min.css">');
-            printWindow.document.write(
-                '<link href="{{ url(' public / backEnd / css / amarjeet.css ') }}" rel="stylesheet" type="text/css" >');
-            printWindow.document.write(
-                '<link href="{{ url(' public / backEnd / css / pdfstyle.css ') }}" rel="stylesheet" type="text/css" >');
+            printWindow.document.write('<link href="{{ url('public/backEnd/css/amarjeet.css') }}" rel="stylesheet" type="text/css" >');
+            printWindow.document.write('<link href="{{ url(' public/backEnd/css/pdfstyle.css') }}" rel="stylesheet" type="text/css" >');
             printWindow.document.write('</head><body > <div class="masterprintmainarea">');
             printWindow.document.write('<div class="header">');
             printWindow.document.write('<img src="' + finalpath + '" style="height:80px;">');
-            printWindow.document.write(
-                "<img src='{{ url('/public/images/scits.png') }}' style='float:right;height:80px;'>");
+            printWindow.document.write("<img src='{{ url('/public/images/scits.png') }}' style='float:right;height:80px;'>");
             printWindow.document.write('</div>');
             printWindow.document.write(divContentImage);
             printWindow.document.write(divContents);
             printWindow.document.write('</div>');
             printWindow.document.write('<div class="footer">');
             printWindow.document.write('<div class="footer-section-area">');
-            printWindow.document.write(
-                '© {{ date(' Y ') }} Omega Care Group (SCITS). All Rights Reserved | www.socialcareitsolutions.co.uk '
-                );
+            printWindow.document.write('© {{ date(' Y ') }} Omega Care Group (SCITS). All Rights Reserved | www.socialcareitsolutions.co.uk ');
             printWindow.document.write('</div>');
             printWindow.document.write('</div>');
             printWindow.document.write('</div> </body></html>');
@@ -380,12 +367,14 @@
 
         function PrintDiv(th) {
 
-            var imagelocalpath = "<?php echo adminImgPath; ?>";
+            if ($(th).data('id')) {
+                var finalpath = $(th).data('id');
+            } else {
+                var finalpath = "default_user.jpg";
+            }
+            var adminImgPath = "{{ url(constant('adminImgPath')) }}";
+            var imageUrl = adminImgPath + '/' + finalpath;
 
-            // console.log(imagelocalpath);
-            var finalpath = imagelocalpath + '/' + $(th).data('id');
-            //console.log(finalpath);
-            // let imagepathdata="public/images/admin/"+"$(th).data('id')";
             var divContents = document.getElementById("formiotest").innerHTML;
             var divContentImage = document.getElementById("previewContainer");
             console.log(divContentImage);
@@ -396,31 +385,22 @@
             }
             var printWindow = window.open('', '', 'height=600,width=600');
             printWindow.document.write('<html><head><title>Print DIV Content</title>');
-            printWindow.document.write(
-                '<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">'
-                );
-            printWindow.document.write(
-                '<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">'
-                );
+            printWindow.document.write('<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">');
+            printWindow.document.write('<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">');
             printWindow.document.write('<link rel="stylesheet" href="https://cdn.form.io/formiojs/formio.full.min.css">');
-            printWindow.document.write(
-                '<link href="{{ url(' public / backEnd / css / amarjeet.css ') }}" rel="stylesheet" type="text/css" >');
-            printWindow.document.write(
-                '<link href="{{ url(' public / backEnd / css / pdfstyle.css ') }}" rel="stylesheet" type="text/css" >');
+            printWindow.document.write('<link href="{{ url('public/backEnd/css/amarjeet.css') }}" rel="stylesheet" type="text/css" >');
+            printWindow.document.write('<link href="{{ url('public/backEnd/css/pdfstyle.css') }}" rel="stylesheet" type="text/css" >');
             printWindow.document.write('</head><body ><div class="masterprintmainarea">');
             printWindow.document.write('<div class="header">');
-            printWindow.document.write('<img src="' + finalpath + '" style="height:80px;">');
-            printWindow.document.write(
-                '<img src="{{ url('public / images / scits.png ') }}" style="float:right;height:80px;">');
+            printWindow.document.write('<img src="' + imageUrl + '" style="height:80px;">');
+            printWindow.document.write('<img src="{{ url('public/images/scits.png') }}" style="float:right;height:80px;">');
             printWindow.document.write('</div>');
             printWindow.document.write(divContentImage);
             printWindow.document.write(divContents);
             printWindow.document.write('</div>');
             printWindow.document.write('<div class="footer">');
             printWindow.document.write('<div class="footer-section-area">');
-            printWindow.document.write(
-                '© {{ date(' Y ') }} Omega Care Group (SCITS). All Rights Reserved | www.socialcareitsolutions.co.uk '
-                );
+            printWindow.document.write('© {{ date(' Y ') }} Omega Care Group (SCITS). All Rights Reserved | www.socialcareitsolutions.co.uk ');
             printWindow.document.write('</div>');
             printWindow.document.write('</div>');
             printWindow.document.write('</div></body></html>');
@@ -434,10 +414,17 @@
 
         function PrintDivwithvalueLog(th) {
             var divContents = document.getElementById("formioView1").innerHTML;
-            var imagelocalpath = "<?php echo adminImgPath; ?>";
-            var finalpath = imagelocalpath + '/' + $(th).data('id');
+
+            if ($(th).data('id')) {
+                var finalpath = $(th).data('id');
+            } else {
+                var finalpath = "default_user.jpg";
+            }
+            var adminImgPath = "{{ url(constant('adminImgPath')) }}";
+            var imageUrl = adminImgPath + '/' + finalpath;
+
             var divContentImage = document.getElementById("previewContainer2");
-            console.log(divContentImage);
+
             if (divContentImage !== "" && divContentImage !== null) {
                 var divContentImage = document.getElementById('previewContainer2').innerHTML;
             } else {
@@ -445,31 +432,22 @@
             }
             var printWindow = window.open('', '', 'height=600,width=600');
             printWindow.document.write('<html><head><title>Print DIV Content</title>');
-            printWindow.document.write(
-                '<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">'
-                );
-            printWindow.document.write(
-                '<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">'
-                );
+            printWindow.document.write('<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">');
+            printWindow.document.write('<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">');
             printWindow.document.write('<link rel="stylesheet" href="https://cdn.form.io/formiojs/formio.full.min.css">');
-            printWindow.document.write(
-                '<link href="{{ url('public / backEnd / css / amarjeet.css ') }}" rel="stylesheet" type="text/css" >');
-            printWindow.document.write(
-                '<link href="{{ url('public / backEnd / css / pdfstyle.css ') }}" rel="stylesheet" type="text/css" >');
+            printWindow.document.write('<link href="{{ url('public/backEnd/css/amarjeet.css') }}" rel="stylesheet" type="text/css" >');
+            printWindow.document.write('<link href="{{ url('public/backEnd/css/pdfstyle.css') }}" rel="stylesheet" type="text/css" >');
             printWindow.document.write('</head><body > <div class="masterprintmainarea">');
             printWindow.document.write('<div class="header">');
-            printWindow.document.write('<img src="' + finalpath + '" style="height:80px;">');
-            printWindow.document.write(
-                '<img src="{{ url('public / images / scits.png ') }}" style="float:right;height:80px;">');
+            printWindow.document.write('<img src="' + imageUrl + '" style="height:80px;">');
+            printWindow.document.write('<img src="{{ url('public/images/scits.png') }}" style="float:right;height:80px;">');
             printWindow.document.write('</div>');
             printWindow.document.write(divContentImage);
             printWindow.document.write(divContents);
             printWindow.document.write('</div>');
             printWindow.document.write('<div class="footer">');
             printWindow.document.write('<div class="footer-section-area">');
-            printWindow.document.write(
-                '© {{ date(' Y ') }} Omega Care Group (SCITS). All Rights Reserved | www.socialcareitsolutions.co.uk '
-                );
+            printWindow.document.write('© {{ date(' Y ') }} Omega Care Group (SCITS). All Rights Reserved | www.socialcareitsolutions.co.uk ');
             printWindow.document.write('</div>');
             printWindow.document.write('</div>');
             printWindow.document.write('</div> </body></html>');
@@ -482,8 +460,12 @@
 
         function PrintDivLog(th) {
 
-            var finalpath = $(th).data('id');
-            var adminImgPath = "{{ url('adminImgPath') }}";
+            if ($(th).data('id')) {
+                var finalpath = $(th).data('id');
+            } else {
+                var finalpath = "default_user.jpg";
+            }
+            var adminImgPath = "{{ url(constant('adminImgPath')) }}";
 
             // Assume finalpath is your JS variable (e.g., "logo.png")
             var imageUrl = adminImgPath + '/' + finalpath;
@@ -498,31 +480,22 @@
             }
             var printWindow = window.open('', '', 'height=600,width=600');
             printWindow.document.write('<html><head><title>Print DIV Content</title>');
-            printWindow.document.write(
-                '<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">'
-                );
-            printWindow.document.write(
-                '<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">'
-                );
+            printWindow.document.write('<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">');
+            printWindow.document.write('<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">');
             printWindow.document.write('<link rel="stylesheet" href="https://cdn.form.io/formiojs/formio.full.min.css">');
-            printWindow.document.write(
-                '<link href="{{ url('public/backEnd/css/amarjeet.css') }}" rel="stylesheet" type="text/css" >');
-            printWindow.document.write(
-                '<link href="{{ url('public/backEnd/css/pdfstyle.css') }}" rel="stylesheet" type="text/css" >');
+            printWindow.document.write('<link href="{{ url('public/backEnd/css/amarjeet.css') }}" rel="stylesheet" type="text/css" >');
+            printWindow.document.write('<link href="{{ url('public/backEnd/css/pdfstyle.css') }}" rel="stylesheet" type="text/css" >');
             printWindow.document.write('</head><body ><div class="masterprintmainarea">');
             printWindow.document.write('<div class="header">');
             printWindow.document.write('<img src="' + imageUrl + '" style="height:80px;">');
-            printWindow.document.write(
-            '<img src="{{ url('public/images/scits.png') }}" style="float:right;height:80px;">');
+            printWindow.document.write('<img src="{{ url('public/images/scits.png') }}" style="float:right;height:80px;">');
             printWindow.document.write('</div>');
             printWindow.document.write(divContentImage);
             printWindow.document.write(divContents);
             printWindow.document.write('</div>');
             printWindow.document.write('<div class="footer">');
             printWindow.document.write('<div class="footer-section-area">');
-            printWindow.document.write(
-                '© {{ date(' Y ') }} Omega Care Group (SCITS). All Rights Reserved | www.socialcareitsolutions.co.uk '
-                );
+            printWindow.document.write('© {{ date(' Y ') }} Omega Care Group (SCITS). All Rights Reserved | www.socialcareitsolutions.co.uk ');
             printWindow.document.write('</div>');
             printWindow.document.write('</div>');
             printWindow.document.write('</div></body></html>');

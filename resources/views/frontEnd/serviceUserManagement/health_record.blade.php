@@ -153,6 +153,7 @@
                                     $colors = ['#8fd6d6', '#f57775', '#bda4ec', '#fed65a', '#81b56b'];
                                     shuffle($colors); // Randomizes the order
                                 @endphp
+                                @if (count($log_book_records) > 0)
 
                                 @foreach ($log_book_records as $index => $key)
                                     @php
@@ -228,6 +229,12 @@
                                         </div>
                                     @endif
                                 @endforeach
+
+                                @else
+                                <div class="no-record text-center p-3">
+                                    <p>No records found</p>
+                                </div>
+                            @endif
                             </div>
 
                         </div>

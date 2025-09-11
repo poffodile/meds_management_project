@@ -466,7 +466,7 @@ class LogBookController extends ServiceUserManagementController
                 $dynamic_form_log = DynamicForm::find($data['log_dynamic_form_id']);
                 if ($dynamic_form_log) {
                     $dynamic_form_log->title = $data['title'];
-                    $dynamic_form_log->date = \Carbon\Carbon::createFromFormat('d-m-Y h:i a', $data['date'])->format('Y-m-d H:i:s'); 
+                    $dynamic_form_log->date = \Carbon\Carbon::createFromFormat('d-m-Y', $data['date'])->format('Y-m-d'); 
                     $dynamic_form_log->time = $data['time'];
                     $dynamic_form_log->details = $data['details'];
                     $dynamic_form_log->pattern_data = $data['formDataLogs'];

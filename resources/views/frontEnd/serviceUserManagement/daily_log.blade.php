@@ -25,13 +25,8 @@
             margin-right: 0px;
         }
 
-        .timeline .time-show .btn {
-            min-width: 150px;
-            cursor: auto;
-        }
-
         /* .timeline .time-show.first a.btn {
-                        } */
+                            } */
 
         #logs_articles {
             border-collapse: collapse;
@@ -110,7 +105,7 @@
 
         .timeline-desk .badge.red-bg {
             position: absolute;
-            right: 56px;
+            right: 56px !important;
             top: 16px;
         }
 
@@ -120,12 +115,15 @@
         }
 
         .comment-list {
-
             width: 100%;
         }
+
+     div#formiotestForm label {
+        text-align: start;
+    }
     </style>
 
-    @php
+    {{-- @php
         if (!function_exists('time_diff_string')) {
             function time_diff_string($from, $to, $full = false)
             {
@@ -159,7 +157,43 @@
                 return $string ? implode(', ', $string) . ' ago' : 'just now';
             }
         }
-    @endphp
+    @endphp --}}
+
+
+    @php
+if (!function_exists('time_diff_string')) {
+    function time_diff_string($from, $to = 'now')
+    {
+        $from = new DateTime($from);
+        $to = new DateTime($to);
+        $diff = $to->diff($from);
+
+        // total days
+        $days = (int)$diff->days;
+
+        if ($days > 0 && $days <= 30) {
+            return $days . ' ' . ($days === 1 ? 'day' : 'days') . ' ago';
+        }
+
+        if ($days > 30) {
+            $months = floor($days / 30);
+            if ($months < 12) {
+                return $months . ' ' . ($months === 1 ? 'month' : 'months') . ' ago';
+            } else {
+                $years = floor($months / 12);
+                return $years . ' ' . ($years === 1 ? 'year' : 'years') . ' ago';
+            }
+        }
+
+        if ($diff->h) return $diff->h . ' ' . ($diff->h === 1 ? 'hour' : 'hours') . ' ago';
+        if ($diff->i) return $diff->i . ' ' . ($diff->i === 1 ? 'minute' : 'minutes') . ' ago';
+        if ($diff->s) return $diff->s . ' ' . ($diff->s === 1 ? 'second' : 'seconds') . ' ago';
+
+        return 'just now';
+    }
+}
+@endphp
+
 
     <!--Core CSS -->
     {{-- <link href="{{ url('public/frontEnd/daily_logs/bs3/css/bootstrap.min.css') }}" rel="stylesheet" type="text/css"> --}}
@@ -277,9 +311,15 @@
                     <!-- sourabh -->
                     <!-- <div class="col-md-4 filter_buttons" style="text-align:right;padding-right:150px;display:inline-block;">
 
-                                                                                                                                                <a data-toggle="modal" href="#addLogModal" class="btn btn-primary  col-6" id='add_new_log'>Add New</a>
-                                                                                                                                                <a onclick="pdf()" id="pdf" target="_blank" class="btn col-6" id='add_new_log' style="background-color:#d9534f;color:white;">PDF Export</a>
-                                                                                                                                            </div> -->
+                            <a data-toggle="modal" href="#addLogModal" class="btn btn-primary  col-6" id='add_new_log'>Add New</a>
+                            <a onclick="pdf()" id="pdf" target="_blank" class="btn col-6" id='add_new_log' style="background-color:#d9534f;color:white;">PDF Export</a>
+                        </div> -->
+
+
+                                                                                                                                                    <a data-toggle="modal" href="#addLogModal" class="btn btn-primary  col-6" id='add_new_log'>Add New</a>
+                                                                                                                                                    <a onclick="pdf()" id="pdf" target="_blank" class="btn col-6" id='add_new_log' style="background-color:#d9534f;color:white;">PDF Export</a>
+                                                                                                                                                </div> -->
+
 
                 </div>
 
@@ -505,7 +545,7 @@
                 $("#addLogModal form")[0].reset();
                 $(".dynamic-form-log-fields").empty();
                 // document.getElementById('dynamic_form_builder_log').disabled = false;
-
+                $("#image-preview").css("display", "none");
                 $("#addLogModal").find("select[name='dynamic_form_builder_id']").prop("disabled", false);
 
                 let formEl = document.getElementById("addLogModal");
@@ -1084,61 +1124,108 @@
 
     <!-- Comment Created Duration -->
     <script>
-        function time_ago(time) {
-            switch (typeof time) {
-                case 'number':
-                    break;
-                case 'string':
-                    time = +new Date(time);
-                    break;
-                case 'object':
-                    if (time.constructor === Date) time = time.getTime();
-                    break;
-                default:
-                    time = +new Date();
-            }
-            var time_formats = [
-                [60, 'seconds', 1], // 60
-                [120, '1 minute ago', '1 minute from now'], // 60*2
-                [3600, 'minutes', 60], // 60*60, 60
-                [7200, '1 hour ago', '1 hour from now'], // 60*60*2
-                [86400, 'hours', 3600], // 60*60*24, 60*60
-                [172800, 'Yesterday', 'Tomorrow'], // 60*60*24*2
-                [604800, 'days', 86400], // 60*60*24*7, 60*60*24
-                [1209600, 'Last week', 'Next week'], // 60*60*24*7*4*2
-                [2419200, 'weeks', 604800], // 60*60*24*7*4, 60*60*24*7
-                [4838400, 'Last month', 'Next month'], // 60*60*24*7*4*2
-                [29030400, 'months', 2419200], // 60*60*24*7*4*12, 60*60*24*7*4
-                [58060800, 'Last year', 'Next year'], // 60*60*24*7*4*12*2
-                [2903040000, 'years', 29030400], // 60*60*24*7*4*12*100, 60*60*24*7*4*12
-                [5806080000, 'Last century', 'Next century'], // 60*60*24*7*4*12*100*2
-                [58060800000, 'centuries', 2903040000] // 60*60*24*7*4*12*100*20, 60*60*24*7*4*12*100
-            ];
-            var seconds = (+new Date() - time) / 1000,
-                token = 'ago',
-                list_choice = 1;
+        // function time_ago(time) {
+        //     switch (typeof time) {
+        //         case 'number':
+        //             break;
+        //         case 'string':
+        //             time = +new Date(time);
+        //             break;
+        //         case 'object':
+        //             if (time.constructor === Date) time = time.getTime();
+        //             break;
+        //         default:
+        //             time = +new Date();
+        //     }
+        //     var time_formats = [
+        //         [60, 'seconds', 1], // 60
+        //         [120, '1 minute ago', '1 minute from now'], // 60*2
+        //         [3600, 'minutes', 60], // 60*60, 60
+        //         [7200, '1 hour ago', '1 hour from now'], // 60*60*2
+        //         [86400, 'hours', 3600], // 60*60*24, 60*60
+        //         [172800, 'Yesterday', 'Tomorrow'], // 60*60*24*2
+        //         [604800, 'days', 86400], // 60*60*24*7, 60*60*24
+        //         [1209600, 'Last week', 'Next week'], // 60*60*24*7*4*2
+        //         [2419200, 'weeks', 604800], // 60*60*24*7*4, 60*60*24*7
+        //         [4838400, 'Last month', 'Next month'], // 60*60*24*7*4*2
+        //         [29030400, 'months', 2419200], // 60*60*24*7*4*12, 60*60*24*7*4
+        //         [58060800, 'Last year', 'Next year'], // 60*60*24*7*4*12*2
+        //         [2903040000, 'years', 29030400], // 60*60*24*7*4*12*100, 60*60*24*7*4*12
+        //         [5806080000, 'Last century', 'Next century'], // 60*60*24*7*4*12*100*2
+        //         [58060800000, 'centuries', 2903040000] // 60*60*24*7*4*12*100*20, 60*60*24*7*4*12*100
+        //     ];
+        //     var seconds = (+new Date() - time) / 1000,
+        //         token = 'ago',
+        //         list_choice = 1;
 
-            if (seconds == 0) {
-                return 'Just now'
-            }
-            if (seconds < 0) {
-                seconds = Math.abs(seconds);
-                token = 'from now';
-                list_choice = 2;
-            }
-            var i = 0,
-                format;
-            while (format = time_formats[i++])
-                if (seconds < format[0]) {
-                    if (typeof format[2] == 'string') {
-                        return format[list_choice];
-                    } else {
-                        return Math.floor(seconds / format[2]) + ' ' + format[1] + ' ' + token;
-                    }
+        //     if (seconds == 0) {
+        //         return 'Just now'
+        //     }
+        //     if (seconds < 0) {
+        //         seconds = Math.abs(seconds);
+        //         token = 'from now';
+        //         list_choice = 2;
+        //     }
+        //     var i = 0,
+        //         format;
+        //     while (format = time_formats[i++])
+        //         if (seconds < format[0]) {
+        //             if (typeof format[2] == 'string') {
+        //                 return format[list_choice];
+        //             } else {
+        //                 return Math.floor(seconds / format[2]) + ' ' + format[1] + ' ' + token;
+        //             }
 
-                }
-            return time;
+        //         }
+        //     return time;
+        // }
+        function timeAgo(time) {
+    switch (typeof time) {
+        case 'number':
+            break;
+        case 'string':
+            time = +new Date(time);
+            break;
+        case 'object':
+            if (time.constructor === Date) time = time.getTime();
+            break;
+        default:
+            time = +new Date();
+    }
+
+    var seconds = (+new Date() - time) / 1000;
+    var token = 'ago';
+
+    if (seconds === 0) return 'Just now';
+    if (seconds < 0) {
+        seconds = Math.abs(seconds);
+        token = 'from now';
+    }
+
+    var days = Math.floor(seconds / 86400); // 1 day = 86400 seconds
+
+    if (days > 0 && days <= 30) {
+        return days + (days === 1 ? ' day ' : ' days ') + token;
+    }
+
+    if (days > 30) {
+        var months = Math.floor(days / 30);
+        if (months < 12) {
+            return months + (months === 1 ? ' month ' : ' months ') + token;
+        } else {
+            var years = Math.floor(months / 12);
+            return years + (years === 1 ? ' year ' : ' years ') + token;
         }
+    }
+
+    // For <1 day, show hours/minutes/seconds
+    if (seconds < 60) return Math.floor(seconds) + ' seconds ' + token;
+    if (seconds < 3600) return Math.floor(seconds / 60) + ' minutes ' + token;
+    if (seconds < 86400) return Math.floor(seconds / 3600) + ' hours ' + token;
+
+    return 'Just now';
+}
+
     </script>
 
     <!-- Category Filter -->

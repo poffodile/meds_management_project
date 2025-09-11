@@ -234,6 +234,15 @@ class DailyLogsController extends ServiceUserManagementController
                         ->whereIn('log_book.id', $su_logss)
                         ->orderBy('date', 'desc');
 
+                    // Staff Member
+                    // if (isset($request->staff_member) && $request->staff_member != 'null') {
+                    //     $log_book_records = $log_book_records->where('log_book.user_id', $request->staff_member);
+                    // }
+
+                    //    // Staff Member
+                    // if (isset($request->service_user) && $request->service_user != 'null') {
+                    //     $log_book_records = $log_book_records->where('dynamic_form.service_user_id', $request->service_user);
+                    // }
 
                     // ✅ Log Type Filter
                     // log type filter

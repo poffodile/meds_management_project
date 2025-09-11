@@ -9304,6 +9304,16 @@ ul.pop-notification>li a:hover i {
 
 .close {
     top: 8px;
+    font-size: 30px;
+    font-weight: 100;
+    color: #ffffff;
+    opacity: .8;
+}
+
+a.close.edit_dyn_form {
+    font-size: 20px;
+    margin-top: 8px;
+    margin-right: 14px;
 }
 
 .modal-backdrop.in {
@@ -9320,3 +9330,16 @@ ul.pop-notification>li a:hover i {
     background-color: #1f88b5;
     color: #fff;
 }
+.modal-body form .input-group.date input {
+    width: 100%;
+}
+.form-group.datepicker-sttng.date-sttng {
+    width: 190px;
+}
+.input-group.date input {
+    width: 190px;
+}
+
+
+
+

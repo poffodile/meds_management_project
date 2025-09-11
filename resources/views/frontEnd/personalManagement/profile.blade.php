@@ -197,7 +197,7 @@
                     <a href="#!" class="profileDrop"><i class="fa fa-handshake-o"></i> Partners </a>
                 </div>
             </div> -->
-            @include('frontEnd.salesAndFinance.jobs.layout.secondheader')
+            {{-- @include('frontEnd.salesAndFinance.jobs.layout.secondheader') --}}
         </div>
         <div class="row">
             <div class="col-md-12">
