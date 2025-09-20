@@ -110,7 +110,7 @@
                                 <div class="col-md-9 col-sm-10 col-xs-12">
                                     <div class="select-style">
                                         <select name="dynamic_form_builder_id" class="dynamic_form_select"
-                                            id="dynamic_form_builder_log">
+                                            id="">
                                             <option value="0"> Select Form </option>
                                             <?php
                                             $this_location_id = App\DynamicFormLocation::getLocationIdByTag('daily_log');
@@ -209,7 +209,7 @@
                                 <label class="col-md-2 col-sm-1 col-xs-12 p-t-7"> Category: </label>
                                 <div class="col-md-9 col-sm-10 col-xs-12">
                                     <div class="select-style">
-                                        <select name="category" class='su_name' required>
+                                        <select name="category" class='su_name' required id="edit_category">
                                             <option disabled selected value> -- Select an option -- </option>
                                             @foreach ($categorys as $key)
                                                 <option value="{{ $key['id'] }}">{{ $key['name'] }}</option>
@@ -262,11 +262,12 @@
                                     style="max-width:200px; border:1px solid #ddd; padding:5px;">
                             </div>
                             <!-- new image -->
-                            <input type="hidden" class="dynamic_form_log_select">
+                            <input type="hidden" name="dynamic_form_log_select" class="dynamic_form_log_select" id="dynamic_form_log_select">
                             <div class="form-group col-md-12 col-sm-12 col-xs-12 p-0">
                                 <label class="col-md-2 col-sm-1 col-xs-12 p-t-7"> Add: </label>
                                 <div class="col-md-9 col-sm-10 col-xs-12">
                                     <div class="select-style">
+
                                         <select name="dynamic_form_builder_id" class="dynamic_form_select"
                                             id="dynamic_form_builder_log">
                                             <option value="0"> Select Form </option>
@@ -322,9 +323,7 @@
         var today = new Date;
         $('#log-book-datetimepicker').datetimepicker({
             format: 'dd-mm-yyyy',
-            todayHighlight: true,
-            startDate: today,
-            // endDate: today,
+            endDate: today,
             // minView : 2
 
         }).on("change.dp", function(e) {
@@ -349,82 +348,78 @@
             $('#log-book-datetimepicker').datetimepicker('hide');
         });
 
-        // $('.dynamic_form_select').on('change', function() {
-        //     var form_select = $(this);
-        //     var model_id = form_select.closest('.modal').attr('id');
+        $('.dynamic_form_select').on('change', function() {
+            var form_select = $(this);
+            var model_id = form_select.closest('.modal').attr('id');
 
-        //     var form_builder_id = form_select.val();
-        //     var service_user_id = $('#' + model_id + ' .su_n_id').val();
+            var form_builder_id = form_select.val();
+            var service_user_id = $('#' + model_id + ' .su_n_id').val();
 
-        //     var form_title = $('#' + model_id + ' .dynamic_form_select option:selected').text();
+            var form_title = $('#' + model_id + ' .dynamic_form_select option:selected').text();
 
-        //     if (form_builder_id > 0) {
+            if (form_builder_id > 0) {
 
-        //         // $('.loader').show();
-        //         // $('body').addClass('body-overflow');
+                // $('.loader').show();
+                // $('body').addClass('body-overflow');
 
-        //         $.ajax({
-        //             type: 'post',
-        //             //url : "{{ url('/service/dynamic-form/view/pattern') }}"+'/'+form_builder_id+'/'+su_id,
-        //             url: "{{ url('/service/dynamic-form/view/pattern_log') }}",
-        //             data: {
-        //                 'form_builder_id': form_builder_id,
-        //                 'service_user_id': service_user_id
-        //             },
-        //             dataType: "json",
-        //             success: function(resp) {
-        //                 console.log(resp);
+                $.ajax({
+                    type: 'post',
+                    //url : "{{ url('/service/dynamic-form/view/pattern') }}"+'/'+form_builder_id+'/'+su_id,
+                    url: "{{ url('/service/dynamic-form/view/pattern_log') }}",
+                    data: {
+                        'form_builder_id': form_builder_id,
+                        'service_user_id': service_user_id
+                    },
+                    dataType: "json",
+                    success: function(resp) {
+                        console.log(resp);
 
-        //                 if (isAuthenticated(resp) == false) {
-        //                     return false;
-        //                 }
+                        if (isAuthenticated(resp) == false) {
+                            return false;
+                        }
 
-        //                 var response = resp['response'];
-        //                 if (response == true) {
+                        var response = resp['response'];
+                        if (response == true) {
 
-        //                     var pattern = resp['pattern'];
-        //                     $('#' + model_id + ' .dynamic-form-log-fields').html(pattern);
-        //                     $('#' + model_id + ' .dynamic_form_h3').html(form_title +
-        //                         ' Details');
+                            var pattern = resp['pattern'];
+                            $('#' + model_id + ' .dynamic-form-log-fields').html(pattern);
+                            $('#' + model_id + ' .dynamic_form_h3').html(form_title +
+                                ' Details');
 
-        //                     $('.dpYears').datepicker({
-        //                         //format: 'dd/mm/yyyy',
-        //                     }).on('changeDate', function(e) {
-        //                         $(this).datepicker('hide');
-        //                     });
+                            $('.dpYears').datepicker({
+                                //format: 'dd/mm/yyyy',
+                            }).on('changeDate', function(e) {
+                                $(this).datepicker('hide');
+                            });
 
-        //                     //alert(1);
-        //                     $('.send_to').selectize({
-        //                         delimiter: ',',
-        //                         persist: false,
-        //                         create: function(input) {
-        //                             return {
-        //                                 value: input,
-        //                                 text: input
-        //                             }
-        //                         }
-        //                     });
-        //                 }
+                            //alert(1);
+                            $('.send_to').selectize({
+                                delimiter: ',',
+                                persist: false,
+                                create: function(input) {
+                                    return {
+                                        value: input,
+                                        text: input
+                                    }
+                                }
+                            });
+                        }
 
-        //                 $('.loader').hide();
-        //                 $('body').removeClass('body-overflow');
+                        $('.loader').hide();
+                        $('body').removeClass('body-overflow');
 
-        //                 let formE2 = document.getElementById("addLogModal");
-        //                 let mode = formE2.getAttribute("data-mode");
+                        let formE2 = document.getElementById("editLogModal");
+                        let mode = formE2.getAttribute("data-mode");
 
-
-        //                 if (mode === "add") {
-        //                     // 🔹 Add mode logic
-        //                     console.log("Form is in ADD mode");
-        //                     loaddataontableLog()
-        //                 }
-        //             }
-        //         });
-        //     } else {
-        //         //$('.dynamic-form-fields').
-        //         //$('.entry-default-fields').hide();
-        //     }
-        // });
+                        loaddataontableLog()
+                      
+                     
+                    }
+                });
+            } else {
+                $('.dynamic-form-log-fields').hide();
+            }
+        });
 
     });
 
@@ -609,7 +604,7 @@
 
     $('.submit-log-edit').click(function() {
 
-        var category = $('select[name=\'category\']').val();
+        var category = $('#edit_category').val();
         var log_title = $('input[name=\'log_title\']').val();
         var log_date = $('input[name=\'log_date\']').val();
         var log_image = $('input[name=\'log_image\']').val();
@@ -620,10 +615,10 @@
         var error = 0;
 
         if (category == null) {
-            $('select[name=\'category\']').addClass('red_border');
+            $('#edit_category').addClass('red_border');
             error = 1;
         } else {
-            $('select[name=\'category\']').removeClass('red_border');
+            $('#edit_category').removeClass('red_border');
         }
 
         if (log_date == '') {

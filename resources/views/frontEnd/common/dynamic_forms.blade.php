@@ -412,26 +412,6 @@ $service_user_id = isset($service_user_id) ? $service_user_id : 0;
                                     }
                                 }
                             });
-
-                            // setTimeout(function () {
-                            //     autosize($("textarea"));
-                            // },200);
-
-                            // $('#alert-datetimepicker').datetimepicker({
-                            //     format: 'dd-mm-yyyy',
-                            //     // endDate: today,
-                            //     // minView : 2
-
-                            // }).on("change.dp",function (e) {
-                            //     var currentdate = $(this).data("datetimepicker").getDate();
-                            //     var newFormat = currentdate.getDate()+"-" +(currentdate.getMonth() + 1)+"-"+currentdate.getFullYear()+" "+currentdate.getHours()+":"+currentdate.getMinutes();
-                            //     $('.alert-datetime').val(newFormat);
-                            // });
-                            // $('#alert-datetimepicker').on('change', function(){
-                            //     $('#alert-datetimepicker').datetimepicker('hide');
-                            // });
-
-                            //form_select.parent().removeClass('red_border');
                         }
 
                         $('.loader').hide();
@@ -440,8 +420,9 @@ $service_user_id = isset($service_user_id) ? $service_user_id : 0;
                     }
                 });
             } else {
-                //$('.dynamic-form-fields').
-                //$('.entry-default-fields').hide();
+                // $('.dynamic-form-fields').
+                // $('.entry-default-fields').hide();
+                $('.dynamic-form-fields').hide();
             }
         });
 

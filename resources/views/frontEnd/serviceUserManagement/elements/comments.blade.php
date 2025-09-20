@@ -1,7 +1,7 @@
 <style>
     .container {
         background-color: #eef2f5;
-        width: 400px
+        width: 400px;
     }
 
     .addtxt {
@@ -15,7 +15,7 @@
     }
 
     .form-control: focus {
-        color: #000
+        color: #000;
     }
 
 
@@ -54,21 +54,21 @@
     }
 
     .text3o {
-        color: #00a5f4
+        color: #00a5f4;
     }
 
     .text4 {
         font-size: 13px;
         font-weight: 500;
-        color: #828386
+        color: #828386;
     }
 
     .text4i {
-        color: #00a5f4
+        color: #00a5f4;
     }
 
     .text4o {
-        color: white
+        color: white;
     }
 
     .thumbup {
@@ -78,7 +78,12 @@
     }
 
     .thumbupo {
-        color: #17a2b8
+        color: #17a2b8;
+    }
+    .comment-staff-name{
+        font-weight: 600;
+        white-space: nowrap;
+        margin-right: 12px;
     }
 </style>
 
@@ -172,7 +177,6 @@
                 if (isAuthenticated(resp) == false) {
                     return false;
                 }
-
                 if (resp == false) {
                     $('span.popup_error_txt').text('Error Occured', 'Try after sometime');
                     $('.popup_error').show();
@@ -194,17 +198,20 @@
                     setTimeout(function() {
                         $(".popup_success").fadeOut()
                     }, 3000);
+                    console.log("comments", resp);
 
                     // var d = new Date(resp.created_at);
                     // var d_format = ("0" + d.getDate()).slice(-2) + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" +
                     //     d.getFullYear() + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
-
+                    console.log("resp.staff_name", resp.staff_name);
                     var d_format = moment.utc(resp.created_at).format('DD-MM-YYYY HH:mm');
 
                     $("#daily_log_comments_list").append(
                         `
                         <div class="d-flex justify-content-center py-2" style="margin-top:10px;">
-                                <div class="second py-2 px-2"> <span class="text1">${resp.comment}</span>
+                                <div class="second py-2 px-2 comment-list"> 
+                                    <div class="comment-staff-name">${resp.staff_name} </div>
+                                    <span class="text1">${resp.comment}</span>
                                     <div class="d-flex justify-content-between py-1 pt-2" style="text-align:right;">
                                         <div><span class="text3">${d_format}</span></div>
                                     </div>

@@ -2,10 +2,8 @@
 @section('title', 'Daily Logs')
 @section('content')
     <style type="text/css">
-
-
         /* .timeline .time-show.first a.btn {
-                                        } */
+                                                        } */
 
         #logs_articles {
             border-collapse: collapse;
@@ -96,6 +94,7 @@
         .comment-list {
             width: 100%;
         }
+
         div#formiotestForm label {
             text-align: start;
         }
@@ -105,7 +104,6 @@
             font-weight: 700;
             color: #1f88b5;
         }
-
     </style>
 
     {{-- @php
@@ -270,11 +268,11 @@
                             <div>
                                 <select class="form-control" style="min-width:200px;" id="select_category"
                                     name="category_timeline" required>
-                                <!-- <option disabled value> -- select an option -- </option> -->
-                                <option selected value="all">All</option>
-                                @foreach ($categorys as $key)
-                                    <option value="{{ $key['id'] }}">{{ $key['name'] }}</option>
-                                @endforeach
+                                    <!-- <option disabled value> -- select an option -- </option> -->
+                                    <option selected value="all">All</option>
+                                    @foreach ($categorys as $key)
+                                        <option value="{{ $key['id'] }}">{{ $key['name'] }}</option>
+                                    @endforeach
                                 </select>
                             </div>
                         </div>
@@ -301,9 +299,9 @@
                     </div>
                     <!-- sourabh -->
                     <!-- <div class="col-md-4 filter_buttons" style="text-align:right;padding-right:150px;display:inline-block;">
-                                        <a data-toggle="modal" href="#addLogModal" class="btn btn-primary  col-6" id='add_new_log'>Add New</a>
-                                        <a onclick="pdf()" id="pdf" target="_blank" class="btn col-6" id='add_new_log' style="background-color:#d9534f;color:white;">PDF Export</a>
-                                    </div> -->
+                                                        <a data-toggle="modal" href="#addLogModal" class="btn btn-primary  col-6" id='add_new_log'>Add New</a>
+                                                        <a onclick="pdf()" id="pdf" target="_blank" class="btn col-6" id='add_new_log' style="background-color:#d9534f;color:white;">PDF Export</a>
+                                                    </div> -->
 
                     {{-- <a data-toggle="modal" href="#addLogModal" class="btn btn-primary  col-6" id='add_new_log'>Add New</a>
 
@@ -396,7 +394,6 @@
                                                         ?>
                                                         <p class="daily_log_time">
                                                             {{ date('d-m-Y H:i', strtotime($key['date'])) }} | <span
-
                                                                 class="log_title log-type-text">{{ $logType }}
                                                             </span>
 
@@ -404,14 +401,13 @@
                                                                 @if ($key['late_time_text'])
                                                                     | {{ $key['late_date_text'] }} <span
                                                                         style="color:red;">{{ $key['late_time_text'] }}</span>
-                                                                    | <span
-                                                                        class="log_title log-type-text">{{ $logType }}</span>
+                                                                    {{-- | <span
+                                                                        class="log_title log-type-text">{{ $logType }}</span> --}}
                                                                 @else
                                                                     | <span
                                                                         style="color:red;">{{ date('d-m-Y H:i', strtotime($key['created_at'])) }}</span>
-                                                                    | <span
-                                                                        class="log_title log-type-text">{{ $logType }}</span>
-
+                                                                    {{-- | <span
+                                                                        class="log_title log-type-text">{{ $logType }}</span> --}}
                                                                 @endif
                                                             @endif
                                                         </p>
@@ -629,7 +625,6 @@
             $.ajax({
                 type: 'get',
                 url: "{{ url('/service/logbook/comments?log_book_id=') }}" + logId,
-
                 dataType: 'json',
 
                 success: function(resp) {
@@ -646,7 +641,9 @@
                         $("#daily_log_comments_list").append(
                             `
                         <div class="d-flex justify-content-center py-2" style="margin-top:10px;">
-                                <div class="second py-2 px-2 comment-list"> <span class="text1">${comment.comment}</span>
+                                <div class="second py-2 px-2 comment-list">     
+                                    <div class="comment-staff-name">${resp.data[0].staff_name} </div>
+                                    <span class="text1">${comment.comment}</span>
                                     <div class="d-flex justify-content-between py-1 pt-2" style="text-align:right;">
                                         <div><span class="text3">${d_format}</span></div>
                                     </div>
@@ -1411,7 +1408,7 @@
 
             $(document).on('click', '.dyn-form-view-data-log-book', function(e) {
                 e.preventDefault();
-                $(".dynamic-form-log-fields").empty();
+
                 var id = $(this).attr('id');
                 var dynamic_form_id = $(this).attr('dynamic_form_id');
                 var getFormUrl = "{{ route('get.dynamic.form.daily.log', ['id' => ':id']) }}";
@@ -1422,23 +1419,28 @@
                     success: function(response) {
 
                         console.log(response);
-                        $(".su_name").val(response.dynamicForm.service_user_id).trigger(
-                            "change");
+                        $("#editLogModal form")[0].reset();
                         $('input[name="log_title"]').val(response.log_book_records.title);
                         $('#log_dynamic_form_id').val(response.log_book_records
-                        .dynamic_form_id);
+                            .dynamic_form_id);
                         $('#dynamic_form_log_book_id').val(response.log_book_records.id);
-                        $('select[name="category"]').val(response.log_book_records.category_id);
+                        // $('select[name="category"]').val(response.log_book_records.category_id);
+                        // Set new selected option
+                        $("select[name='category'] option[value='" + response.log_book_records
+                                .category_id + "']")
+                            .prop("selected", true);
+
+
                         // $('input[name="log_date"]').val(response.log_book_records.date);
-                        if (response.log_book_records.date) { 
-                            let formattedDate = moment(response.log_book_records.date, "YYYY-MM-DD HH:mm:ss") .format("DD-MM-YYYY HH:mm"); 
-                            $('input[name="log_date"]').val(formattedDate); 
+                        if (response.log_book_records.date) {
+                            let formattedDate = moment(response.log_book_records.date,
+                                "YYYY-MM-DD HH:mm:ss").format("DD-MM-YYYY HH:mm");
+                            $('input[name="log_date"]').val(formattedDate);
                         }
 
 
                         $('textarea[name="log_detail"]').val(response.log_book_records.details);
-                        $('select[name="dynamic_form_builder_id"]').val(response.dynamicForm
-                            .form_builder_id).trigger('change');
+
                         if (response.log_book_records.image_name && response.log_book_records
                             .image_name !== "") {
                             var url = "{{ url('upload/events/') }}";
@@ -1452,39 +1454,60 @@
                         let formE = document.getElementById("addLogModal");
                         formE.setAttribute("data-mode", "edit");
 
-                        var schema = JSON.parse(response.pattern); // form structure
-                        var savedData = response.pattern_data ? JSON.parse(response
-                            .pattern_data) : {}; // user entered values
-                        setTimeout(function() {
+                        $(".dynamic-form-log-fields").empty();
+                        if (response.log_book_records.dynamic_form_id) {
+                            //  $('select[name="dynamic_form_builder_id"]').val(response.dynamicForm
+                            //     .form_builder_id).trigger('change');
+                            $('select[name="dynamic_form_builder_id"]')
+                                .val(response.dynamicForm.form_builder_id) // set value
+                                .prop('selected', true);
+                            document.getElementById("dynamic_form_log_select").value = response
+                                .log_book_records.dynamic_form_id;
+                            document.getElementById("dynamic_form_builder_log").disabled = true;
 
-                            $(".dynamic-form-log-fields").html(
-                                '<div class="below-divider"></div>' + response
-                                .dynamicForm
-                                .form_data);
 
-                            Formio.createForm(document.getElementById('formioView1'), {
-                                components: schema
 
-                            }).then(function(form) {
-                                // Pass values into the form
-                                form.submission = {
-                                    data: savedData
-                                };
+                            var schema = JSON.parse(response.pattern); // form structure
+                            var savedData = response.pattern_data ? JSON.parse(response
+                                .pattern_data) : {}; // user entered values
+                            $(".su_name").val(response.dynamicForm.service_user_id).trigger(
+                                "change");
+                            setTimeout(function() {
+                                $(".dynamic-form-log-fields").html(
+                                    '<div class="below-divider"></div>' + response
+                                    .dynamicForm
+                                    .form_data);
 
-                                // Capture changes if you want to save
-                                form.on('change', function(submission) {
-                                    $("#formDataLogs").val(JSON
-                                        .stringify(submission.data));
+                                Formio.createForm(document.getElementById(
+                                    'formioView1'), {
+                                    components: schema
+
+                                }).then(function(form) {
+                                    // Pass values into the form
+                                    form.submission = {
+                                        data: savedData
+                                    };
+
+                                    // Capture changes if you want to save
+                                    form.on('change', function(submission) {
+                                        $("#formDataLogs").val(JSON
+                                            .stringify(submission
+                                                .data));
+                                    });
                                 });
-                            });
-                        }, 1000);
+                            }, 1000);
+                        } else {
+                            document.getElementById("dynamic_form_builder_log").disabled =
+                                false;
+                        }
+
                     },
                     error: function() {
                         $('.dynamic-form-log-fields').html(
                             '<p class="text-danger">Error loading data.</p>');
                     }
                 });
-                document.getElementById('dynamic_form_builder_log').disabled = true;
+                // document.getElementById('dynamic_form_builder_log').disabled = true;
                 $("#addLogModal").find("select[name='dynamic_form_builder_id']").prop("disabled", true);
 
                 $("#editLogModal").modal({

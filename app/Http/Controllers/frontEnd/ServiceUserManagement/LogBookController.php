@@ -17,7 +17,7 @@ use App\DynamicForm;
 
 class LogBookController extends ServiceUserManagementController
 {
-    
+
     public function index($service_user_id)
     {
 
@@ -431,6 +431,7 @@ class LogBookController extends ServiceUserManagementController
             $data = $request->all();
 
             if (!empty($data['dynamic_form_log_book_id'])) {
+
                 /*sourabh image upload*/
                 if ($request->hasFile('log_image')) {
                     //echo "string";
@@ -441,55 +442,50 @@ class LogBookController extends ServiceUserManagementController
                     $log_image = '';
                 }
 
+                 $dynamic_form_log = null;
+                
+                if(isset($data['log_dynamic_form_id'])) {
+                    $dynamic_form_log = DynamicForm::find($data['log_dynamic_form_id']);
+                    if ($dynamic_form_log) {
+                        $dynamic_form_log->title = $data['title'];
+                        $dynamic_form_log->date = \Carbon\Carbon::createFromFormat('d-m-Y', $data['date'])->format('Y-m-d');
+                        $dynamic_form_log->time = $data['time'];
+                        $dynamic_form_log->details = $data['details'];
+                        $dynamic_form_log->pattern_data = $data['formDataLogs'];
+                        $dynamic_form_log->save();
+                    }
+                } else {
+                    if ($data['dynamic_form_builder_id'] != 0) {
+                        $form_insert_id = DynamicForm::saveForm($data);
+                    }
+                }
+
+
                 // Find existing record
                 $log_book_record = LogBook::find($data['dynamic_form_log_book_id']); // <-- $id should be passed from request
 
                 $category_icon = CategoryFrontEnd::where('id', $data['category'])->value('icon');
                 $category_name = CategoryFrontEnd::where('id', $data['category'])->value('name');
 
-                $latest_date  = LogBook::select('log_book.*')->orderBy('date', 'desc')->take(1)->value('date');
-                $latest_date  = date('Y-m-d H:i:s', strtotime($latest_date));
-                $given_date   = date('Y-m-d H:i:s', strtotime($data['log_date']));
-                // $given_date    = date('d-m-Y H:i:s');
-                $latest_date_without_time    = date('Y-m-d', strtotime($latest_date));
-                $given_date_without_time    = date('Y-m-d', strtotime($given_date));
-                $current_date_without_time    = date('Y-m-d');
-
-
                 if ($log_book_record) {
                     // update fields
                     $log_book_record->title          = $data['log_title'];
                     $log_book_record->category_id    = $data['category'];
                     $log_book_record->start_date     = date('Y-m-d');
-                    $log_book_record->date           = $given_date;
                     $log_book_record->category_name  = $category_name;
                     $log_book_record->category_icon  = $category_icon;
+                    $log_book_record->dynamic_form_id = $form_insert_id ?? null;
                     $log_book_record->details        = $data['log_detail'];
                     $log_book_record->image_name     = $log_image;
                     $log_book_record->latitude       = $latitude;
                     $log_book_record->longitude      = $longitude;
-
-                    if ($given_date < $latest_date) {
-                        $log_book_record->is_late = true;
-                    } else if ($current_date_without_time > $latest_date_without_time && $given_date_without_time < $current_date_without_time) {
-                        $log_book_record->is_late = true;
-                    }
-
                     // save changes
-                    $log_book_record->save();
+                    // $log_book_record->save();
+
                 }
 
-                $dynamic_form_log = DynamicForm::find($data['log_dynamic_form_id']);
-                if ($dynamic_form_log) {
-                    $dynamic_form_log->title = $data['title'];
-                    $dynamic_form_log->date = \Carbon\Carbon::createFromFormat('d-m-Y', $data['date'])->format('Y-m-d'); 
-                    $dynamic_form_log->time = $data['time'];
-                    $dynamic_form_log->details = $data['details'];
-                    $dynamic_form_log->pattern_data = $data['formDataLogs'];
-                }
-
-
-                if ($dynamic_form_log->save()) {
+               
+                if (($dynamic_form_log && $dynamic_form_log->wasChanged()) || $log_book_record->save()) {
                     $result['response'] = true;
                     echo "3";
                 }
@@ -498,7 +494,7 @@ class LogBookController extends ServiceUserManagementController
                     //echo "string";
                     $log_image = time() . '.' . request()->log_image->getClientOriginalExtension();
                     request()->log_image->move('upload/events/', $log_image);
-                } else { 
+                } else {
                     //echo "false";
                     $log_image = '';
                 }
@@ -526,8 +522,9 @@ class LogBookController extends ServiceUserManagementController
                 echo '0'; die; 
             }*/
 
-
-                $form_insert_id = DynamicForm::saveForm($data);
+                if ($data['dynamic_form_builder_id'] != 0) {
+                    $form_insert_id = DynamicForm::saveForm($data);
+                }
 
                 $latest_date  = LogBook::select('log_book.*')->orderBy('date', 'desc')->take(1)->value('date');
                 $latest_date  = date('Y-m-d H:i:s', strtotime($latest_date));
@@ -546,14 +543,14 @@ class LogBookController extends ServiceUserManagementController
                 $category_icon = CategoryFrontEnd::where('id', $data['category'])->value('icon');
                 $category_name = CategoryFrontEnd::where('id', $data['category'])->value('name');
 
-                $log_book_record->title   = $data['title'];
+                $log_book_record->title   = $data['log_title'];
                 $log_book_record->category_id = $data['category'];
                 $log_book_record->start_date =  date('Y-m-d');
-                $log_book_record->dynamic_form_id = $form_insert_id;
+                $log_book_record->dynamic_form_id = $form_insert_id ?? null;
                 $log_book_record->category_name   = $category_name;
                 $log_book_record->category_icon   = $category_icon;
                 $log_book_record->date    = $given_date;
-                $log_book_record->details = $data['details'];
+                $log_book_record->details = $data['log_detail'];
                 $log_book_record->home_id = $login_home_id;
                 $log_book_record->user_id = Auth::user()->id;
                 $log_book_record->image_name = $log_image;
