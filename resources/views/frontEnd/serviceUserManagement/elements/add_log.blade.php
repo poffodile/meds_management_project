@@ -229,7 +229,7 @@
                                             class="form-control daily-log-book-datetime">
                                         <span class="input-group-btn add-on datetime-picker2">
                                             <input type="text" value="" name=""
-                                                id="log-book-datetimepicker" autocomplete="off"
+                                                id="" autocomplete="off"
                                                 class="form-control date-btn2">
                                             <button class="btn btn-primary" type="button"><span
                                                     class="glyphicon glyphicon-calendar"></span></button>
