@@ -204,7 +204,8 @@
                     // var d_format = ("0" + d.getDate()).slice(-2) + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" +
                     //     d.getFullYear() + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
                     console.log("resp.staff_name", resp.staff_name);
-                    var d_format = moment.utc(resp.created_at).format('DD-MM-YYYY HH:mm');
+                    // var d_format = moment.utc(resp.created_at).format('DD-MM-YYYY HH:mm');
+                    var d_format = moment.utc(resp.created_at).local().format('DD-MM-YYYY HH:mm');
 
                     $("#daily_log_comments_list").append(
                         `

@@ -274,7 +274,7 @@ if ($del_status == '0') { //regular users
                     console.log(result);
                     document.getElementById('qrcode') .innerHTML = ""; 
                     document.getElementById('download') .innerHTML = ""; 
-                    console.log(blkstr.join(", "));
+                    // console.log(blkstr.join(", "));
                     var qrcode = new QRCode(document.getElementById("qrcode"), {
                         text: `${result.qr_code_id}`,
                         width: 180, //default 128

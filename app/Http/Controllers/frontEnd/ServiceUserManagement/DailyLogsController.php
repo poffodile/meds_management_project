@@ -182,7 +182,7 @@ class DailyLogsController extends ServiceUserManagementController
             //         }
             //     }
             // }
-                foreach ($log_book_records as &$key) {
+            foreach ($log_book_records as &$key) {
                 $key['created_at'] = date("d-m-Y H:i", strtotime($key['created_at']));
                 $comments = LogBookComment::where('log_book_id', $key['id'])->get();
                 $key = Arr::add($key, 'comments', $comments->count());
@@ -245,25 +245,16 @@ class DailyLogsController extends ServiceUserManagementController
                     $log_book_records = DB::table('log_book')
                         ->join('user', 'log_book.user_id', '=', 'user.id')
                         ->join('category', 'log_book.category_id', '=', 'category.id')
-                        ->join('dynamic_form', 'log_book.dynamic_form_id', '=', 'dynamic_form.id')
-                        ->join('service_user', 'service_user.id', '=', 'dynamic_form.service_user_id')
-                        ->select('log_book.*', 'user.name as staff_name', 'category.color as category_color', 'service_user.name as child_name')
+                        ->join('su_log_book', 'su_log_book.log_book_id', '=', 'log_book.id')
+                        ->leftJoin('dynamic_form', 'log_book.dynamic_form_id', '=', 'dynamic_form.id')
+                        ->leftJoin('service_user', 'service_user.id', '=', 'su_log_book.service_user_id')
+                        ->select('log_book.*', 'user.name as staff_name', 'category.color as category_color', 'service_user.name as child_name', 'su_log_book.service_user_id')
                         ->where('log_book.home_id', $home_id)
                         ->whereIn('log_book.id', $su_logss)
                         ->orderBy('date', 'desc');
 
-                    // Staff Member
-                    // if (isset($request->staff_member) && $request->staff_member != 'null') {
-                    //     $log_book_records = $log_book_records->where('log_book.user_id', $request->staff_member);
-                    // }
-
-                    //    // Staff Member
-                    // if (isset($request->service_user) && $request->service_user != 'null') {
-                    //     $log_book_records = $log_book_records->where('dynamic_form.service_user_id', $request->service_user);
-                    // }
 
                     // ✅ Log Type Filter
-                    // log type filter
                     if ($request->has('log_type')) {
                         if ($request->log_type != 'all') {
                             // Apply specific log type filter
@@ -295,7 +286,6 @@ class DailyLogsController extends ServiceUserManagementController
                         $log_book_records = $log_book_records->whereBetween('log_book.date', [$startDate, $endDate]);
                     }
 
-                    // dd($log_book_records->get());
 
 
                     //keyword filter
@@ -323,24 +313,34 @@ class DailyLogsController extends ServiceUserManagementController
                     //     }
                     // }
 
+                    //    use Carbon\Carbon;
+
                     foreach ($log_book_records as &$key) {
-                        $key['created_at'] = date("d-m-Y H:i", strtotime($key['created_at']));
-                        $comments = LogBookComment::where('log_book_id', $key['id'])->get();
-                        $key = Arr::add($key, 'comments', $comments->count());
+                        // Format created_at
+                        $key['created_at'] = Carbon::parse($key['created_at'])->format('d-m-Y H:i');
+
+                        // Comments count
+                        $comments = LogBookComment::where('log_book_id', $key['id'])->count();
+                        $key = Arr::add($key, 'comments', $comments);
 
                         // Always define defaults
                         $key['late_time_text'] = null;
                         $key['late_date_text'] = null;
 
                         if ($key['is_late']) {
-                            $given_date_without_time = date('Y-m-d', strtotime($key['date']));
-                            $created_at_without_time = date('Y-m-d', strtotime($key['created_at']));
-                            if ($given_date_without_time == $created_at_without_time) {
-                                $key['late_time_text'] = date('H:i', strtotime($key['created_at']));
-                                $key['late_date_text'] = date('d-m-Y', strtotime($key['created_at']));
+                            $given_date_without_time   = Carbon::parse($key['date'])->toDateString();       // Y-m-d
+                            $created_at_without_time   = Carbon::parse($key['created_at'])->toDateString(); // Y-m-d
+
+                            if ($given_date_without_time === $created_at_without_time) {
+                                $key['late_time_text'] = Carbon::parse($key['created_at'])->format('H:i');
+                                $key['late_date_text'] = Carbon::parse($key['created_at'])->format('d-m-Y');
                             }
                         }
                     }
+
+
+                    // dd($log_book_records);
+
 
                     $categorys = CategoryFrontEnd::select('category.*')->orderBy('name', 'asc')->get()->toArray();
                     return compact('log_book_records', 'categorys');
@@ -373,7 +373,7 @@ class DailyLogsController extends ServiceUserManagementController
                     DB::raw('MIN(log_book.title) as title'),
                     DB::raw('MIN(log_book.image_name) as image_name'),
                     DB::raw('MIN(user.name) as staff_name'),
-                    DB::raw('MIN(dynamic_form.service_user_id) as service_user_id'),
+                    DB::raw('MIN(su_log_book.service_user_id) as service_user_id'),
                     DB::raw('MIN(service_user.name) as child_name'),
                     DB::raw('MIN(log_book.is_late) as is_late'),
                     DB::raw('MIN(log_book.logType) as logType'),
@@ -384,8 +384,9 @@ class DailyLogsController extends ServiceUserManagementController
                 )
                 ->join('user', 'log_book.user_id', '=', 'user.id')
                 ->join('category', 'log_book.category_id', '=', 'category.id')
+                ->join('su_log_book', 'su_log_book.log_book_id', '=', 'log_book.id')
                 ->leftJoin('dynamic_form', 'log_book.dynamic_form_id', '=', 'dynamic_form.id')
-                ->leftJoin('service_user', 'service_user.id', '=', 'dynamic_form.service_user_id')
+                ->leftJoin('service_user', 'service_user.id', '=', 'su_log_book.service_user_id')
                 ->whereIn('log_book.id', $su_logs)
                 ->where('log_book.home_id', $home_id)
                 ->where(function ($query) use ($today) {
@@ -437,21 +438,45 @@ class DailyLogsController extends ServiceUserManagementController
             //     }
             // }
 
+            // foreach ($log_book_records as &$key) {
+            //     $key['created_at'] = date("d-m-Y H:i", strtotime($key['created_at']));
+            //     $comments = LogBookComment::where('log_book_id', $key['id'])->get();
+            //     $key = Arr::add($key, 'comments', $comments->count());
+
+            //     // Always define defaults
+            //     $key['late_time_text'] = null;
+            //     $key['late_date_text'] = null;
+
+            //     if ($key['is_late']) {
+            //         $given_date_without_time = date('Y-m-d', strtotime($key['date']));
+            //         $created_at_without_time = date('Y-m-d', strtotime($key['created_at']));
+            //         if ($given_date_without_time == $created_at_without_time) {
+            //             $key['late_time_text'] = date('H:i', strtotime($key['created_at']));
+            //             $key['late_date_text'] = date('d-m-Y', strtotime($key['created_at']));
+            //         }
+            //     }
+            // }
+
             foreach ($log_book_records as &$key) {
-                $key['created_at'] = date("d-m-Y H:i", strtotime($key['created_at']));
-                $comments = LogBookComment::where('log_book_id', $key['id'])->get();
-                $key = Arr::add($key, 'comments', $comments->count());
+                // Format created_at
+                $createdAt = Carbon::parse($key['created_at']); // parse once
+                $key['created_at'] = $createdAt->format('d-m-Y H:i');
+
+                // Count comments
+                $commentsCount = LogBookComment::where('log_book_id', $key['id'])->count();
+                $key = Arr::add($key, 'comments', $commentsCount);
 
                 // Always define defaults
                 $key['late_time_text'] = null;
                 $key['late_date_text'] = null;
 
                 if ($key['is_late']) {
-                    $given_date_without_time = date('Y-m-d', strtotime($key['date']));
-                    $created_at_without_time = date('Y-m-d', strtotime($key['created_at']));
-                    if ($given_date_without_time == $created_at_without_time) {
-                        $key['late_time_text'] = date('H:i', strtotime($key['created_at']));
-                        $key['late_date_text'] = date('d-m-Y', strtotime($key['created_at']));
+                    $givenDate = Carbon::parse($key['date']);
+                    $createdAtDate = $createdAt->copy()->startOfDay(); // just date for comparison
+
+                    if ($givenDate->isSameDay($createdAtDate)) {
+                        $key['late_time_text'] = $createdAt->format('H:i');
+                        $key['late_date_text'] = $createdAt->format('d-m-Y');
                     }
                 }
             }
@@ -1689,7 +1714,7 @@ class DailyLogsController extends ServiceUserManagementController
             ->where('log_book.id', $id)
             ->first();
 
-        if($data['log_book_records']->dynamic_form_id){
+        if ($data['log_book_records']->dynamic_form_id) {
             $data['dynamicForm'] = DynamicForm::showFormLogWithValue($data['log_book_records']->dynamic_form_id, true);
             $data['pattern_data'] = DynamicForm::where('id', $data['log_book_records']->dynamic_form_id)->value('pattern_data');
             $data['pattern'] = DynamicFormBuilder::where('id', $data['dynamicForm']['form_builder_id'])->value('pattern');

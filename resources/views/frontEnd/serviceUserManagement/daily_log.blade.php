@@ -3,7 +3,7 @@
 @section('content')
     <style type="text/css">
         /* .timeline .time-show.first a.btn {
-                                                        } */
+                                                                                } */
 
         #logs_articles {
             border-collapse: collapse;
@@ -299,9 +299,9 @@
                     </div>
                     <!-- sourabh -->
                     <!-- <div class="col-md-4 filter_buttons" style="text-align:right;padding-right:150px;display:inline-block;">
-                                                        <a data-toggle="modal" href="#addLogModal" class="btn btn-primary  col-6" id='add_new_log'>Add New</a>
-                                                        <a onclick="pdf()" id="pdf" target="_blank" class="btn col-6" id='add_new_log' style="background-color:#d9534f;color:white;">PDF Export</a>
-                                                    </div> -->
+                                                                                <a data-toggle="modal" href="#addLogModal" class="btn btn-primary  col-6" id='add_new_log'>Add New</a>
+                                                                                <a onclick="pdf()" id="pdf" target="_blank" class="btn col-6" id='add_new_log' style="background-color:#d9534f;color:white;">PDF Export</a>
+                                                                            </div> -->
 
                     {{-- <a data-toggle="modal" href="#addLogModal" class="btn btn-primary  col-6" id='add_new_log'>Add New</a>
 
@@ -634,7 +634,10 @@
                     let ul_list_items = '';
                     resp.data.forEach((comment) => {
                         // ul_list_items += '<li>'+ comment + '</li>';
-                        var d_format = moment.utc(comment.created_at).format('DD-MM-YYYY HH:mm');
+                        // var d_format = moment.utc(comment.created_at).format('DD-MM-YYYY HH:mm');
+                        // Convert UTC to local time
+                        var d_format = moment.utc(comment.created_at).local().format('DD-MM-YYYY HH:mm');
+
                         // var d = new Date(comment.created_at);
                         // var d_format = ("0" + d.getDate()).slice(-2) + "-" + ("0"+(d.getMonth()+1)).slice(-2) + "-" +
                         // d.getFullYear() + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
@@ -747,17 +750,39 @@
                                 created_at.setAttribute("class", "time_abbre");
                                 created_at.setAttribute("data-toggle", "tooltip");
                                 created_at.setAttribute("data-placement", "top");
-                                created_at.setAttribute("title", moment.utc(resp.log_book_records[i][
-                                    'created_at'
-                                ]).format('DD-MM-YYYY HH:mm'));
 
-                                var created_at_text = document.createTextNode(moment.utc(resp
-                                    .log_book_records[i]['created_at']).fromNow());
+
+
+
+                                //   created_at.setAttribute("title", moment.utc(resp.log_book_records[i][
+                                //         'created_at'
+                                //     ]).format('DD-MM-YYYY HH:mm'));
+
+                                //     var created_at_text = document.createTextNode(moment.utc(resp
+                                //         .log_book_records[i]['created_at']).fromNow());
+                                //     created_at.append(created_at_text);
+
+                                // parse with explicit format
+                                var parsedDate = moment.utc(createdAtValue, "DD-MM-YYYY HH:mm");
+
+                                // add formatted date in title
+                                created_at.setAttribute("title", parsedDate.format("DD-MM-YYYY HH:mm"));
+
+                                // show "5 minutes ago"
+                                var created_at_text = document.createTextNode(parsedDate.local().fromNow());
+
+                                // created_at.appendChild(created_at_text);
+
+                                // created_at.setAttribute("title", resp.log_book_records[i]['created_at']);
+                                // createdAt = resp.log_book_records[i]['created_at'];
+                                // var created_at_text = document.createTextNode(createdAt);
+
                                 created_at.append(created_at_text);
                                 $(created_at).append($(
                                     `<span style="color:black;font-weight:400;font-size:14px;"> by ${resp.log_book_records[i]['staff_name']}</span> | <span style="color:black;font-weight:400;font-size:14px;"> ${resp.log_book_records[i]['child_name']}</span>`
                                 ));
                                 pannel_body.append(created_at);
+
 
                                 var viewEditIcon = document.createElement("span");
 
@@ -845,11 +870,11 @@
                                         date_field.append(span_date_field);
                                     }
                                 }
+                                // date_field.setAttribute("class", "daily_log_time");
                                 date_field.setAttribute("data-logtype", logType);
-                                logTypeText = logType;
-                                date_field.textContent = moment(resp.log_book_records[i]['date'],
-                                    'YYYY-MM-DD HH:mm:ss').format('DD-MM-YYYY HH:mm') + " | " + logTypeText;
-                                // date_field.prepend(date_text);
+                                date_field.innerHTML = moment(resp.log_book_records[i]['date'],
+                                        'YYYY-MM-DD HH:mm:ss').format('DD-MM-YYYY HH:mm') + " | " +
+                                    `<span class="log_title log-type-text">${logType}</span>`;
                                 // image sourabh
                                 if (resp.log_book_records[i]['image_name'] != '') {
                                     $(pannel_body).append($(`
@@ -914,17 +939,40 @@
                                 created_at.setAttribute("class", "time_abbre");
                                 created_at.setAttribute("data-toggle", "tooltip");
                                 created_at.setAttribute("data-placement", "top");
-                                created_at.setAttribute("title", moment.utc(resp.log_book_records[i][
-                                    'created_at'
-                                ]).format('DD-MM-YYYY HH:mm'));
+                                var createdAtValue = resp.log_book_records[i]['created_at'];
 
-                                var created_at_text = document.createTextNode(moment.utc(resp
-                                    .log_book_records[i]['created_at']).fromNow());
+
+                                // parse with explicit format
+                                var parsedDate = moment.utc(createdAtValue, "DD-MM-YYYY HH:mm");
+
+                                // add formatted date in title
+                                created_at.setAttribute("title", parsedDate.format("DD-MM-YYYY HH:mm"));
+
+                                // show "5 minutes ago"
+                                var created_at_text = document.createTextNode(parsedDate.local().fromNow());
+
+                                created_at.appendChild(created_at_text);
+
+                                // created_at.setAttribute("title", moment.utc(resp.log_book_records[i][
+                                //     'created_at'
+                                // ]).format('DD-MM-YYYY HH:mm'));
+
+                                // var created_at_text = document.createTextNode(moment.utc(resp
+                                //     .log_book_records[i]['created_at']).fromNow());
+                                // created_at.append(created_at_text);
+
+                                // Assuming your created_at from API is already in Asia/Kolkata
+                                // created_at.setAttribute("title", resp.log_book_records[i]['created_at']);
+
+                                // var created_at_text = document.createTextNode(resp.log_book_records[i][
+                                //     'created_at'
+                                // ]);
+
                                 created_at.append(created_at_text);
-                                $(created_at).append($(
-                                    `<span style="color:black;font-weight:400;font-size:14px;"> by ${resp.log_book_records[i]['staff_name']}</span> | <span style="color:black;font-weight:400;font-size:14px;"> ${resp.log_book_records[i]['child_name']}</span> `
-                                ));
 
+                                $(created_at).append($(
+                                    `<span style="color:black;font-weight:400;font-size:14px;"> by ${resp.log_book_records[i]['staff_name']}</span> | <span style="color:black;font-weight:400;font-size:14px;"> ${resp.log_book_records[i]['child_name']}</span>`
+                                ));
                                 pannel_body.append(created_at);
 
                                 var viewEditIcon = document.createElement("span");
@@ -1006,9 +1054,9 @@
                                     }
                                 }
                                 date_field.setAttribute("data-logtype", logType);
-                                logTypeText = logType;
-                                date_field.textContent = moment(resp.log_book_records[i]['date'],
-                                    'YYYY-MM-DD HH:mm:ss').format('DD-MM-YYYY HH:mm') + " | " + logTypeText;
+                                date_field.innerHTML = moment(resp.log_book_records[i]['date'],
+                                        'YYYY-MM-DD HH:mm:ss').format('DD-MM-YYYY HH:mm') + " | " +
+                                    `<span class="log_title log-type-text">${logType}</span>`;
                                 // date_field.prepend(date_text);
                                 // image sourabh
                                 if (resp.log_book_records[i]['image_name'] != '') {
@@ -1048,62 +1096,7 @@
 
     <!-- Comment Created Duration -->
     <script>
-        // function time_ago(time) {
-        //     switch (typeof time) {
-        //         case 'number':
-        //             break;
-        //         case 'string':
-        //             time = +new Date(time);
-        //             break;
-        //         case 'object':
-        //             if (time.constructor === Date) time = time.getTime();
-        //             break;
-        //         default:
-        //             time = +new Date();
-        //     }
-        //     var time_formats = [
-        //         [60, 'seconds', 1], // 60
-        //         [120, '1 minute ago', '1 minute from now'], // 60*2
-        //         [3600, 'minutes', 60], // 60*60, 60
-        //         [7200, '1 hour ago', '1 hour from now'], // 60*60*2
-        //         [86400, 'hours', 3600], // 60*60*24, 60*60
-        //         [172800, 'Yesterday', 'Tomorrow'], // 60*60*24*2
-        //         [604800, 'days', 86400], // 60*60*24*7, 60*60*24
-        //         [1209600, 'Last week', 'Next week'], // 60*60*24*7*4*2
-        //         [2419200, 'weeks', 604800], // 60*60*24*7*4, 60*60*24*7
-        //         [4838400, 'Last month', 'Next month'], // 60*60*24*7*4*2
-        //         [29030400, 'months', 2419200], // 60*60*24*7*4*12, 60*60*24*7*4
-        //         [58060800, 'Last year', 'Next year'], // 60*60*24*7*4*12*2
-        //         [2903040000, 'years', 29030400], // 60*60*24*7*4*12*100, 60*60*24*7*4*12
-        //         [5806080000, 'Last century', 'Next century'], // 60*60*24*7*4*12*100*2
-        //         [58060800000, 'centuries', 2903040000] // 60*60*24*7*4*12*100*20, 60*60*24*7*4*12*100
-        //     ];
-        //     var seconds = (+new Date() - time) / 1000,
-        //         token = 'ago',
-        //         list_choice = 1;
-
-        //     if (seconds == 0) {
-        //         return 'Just now'
-        //     }
-        //     if (seconds < 0) {
-        //         seconds = Math.abs(seconds);
-        //         token = 'from now';
-        //         list_choice = 2;
-        //     }
-        //     var i = 0,
-        //         format;
-        //     while (format = time_formats[i++])
-        //         if (seconds < format[0]) {
-        //             if (typeof format[2] == 'string') {
-        //                 return format[list_choice];
-        //             } else {
-        //                 return Math.floor(seconds / format[2]) + ' ' + format[1] + ' ' + token;
-        //             }
-
-        //         }
-        //     return time;
-        // }
-        function timeAgo(time) {
+        function time_ago(time) {
             switch (typeof time) {
                 case 'number':
                     break;
@@ -1116,39 +1109,94 @@
                 default:
                     time = +new Date();
             }
+            var time_formats = [
+                [60, 'seconds', 1], // 60
+                [120, '1 minute ago', '1 minute from now'], // 60*2
+                [3600, 'minutes', 60], // 60*60, 60
+                [7200, '1 hour ago', '1 hour from now'], // 60*60*2
+                [86400, 'hours', 3600], // 60*60*24, 60*60
+                [172800, 'Yesterday', 'Tomorrow'], // 60*60*24*2
+                [604800, 'days', 86400], // 60*60*24*7, 60*60*24
+                [1209600, 'Last week', 'Next week'], // 60*60*24*7*4*2
+                [2419200, 'weeks', 604800], // 60*60*24*7*4, 60*60*24*7
+                [4838400, 'Last month', 'Next month'], // 60*60*24*7*4*2
+                [29030400, 'months', 2419200], // 60*60*24*7*4*12, 60*60*24*7*4
+                [58060800, 'Last year', 'Next year'], // 60*60*24*7*4*12*2
+                [2903040000, 'years', 29030400], // 60*60*24*7*4*12*100, 60*60*24*7*4*12
+                [5806080000, 'Last century', 'Next century'], // 60*60*24*7*4*12*100*2
+                [58060800000, 'centuries', 2903040000] // 60*60*24*7*4*12*100*20, 60*60*24*7*4*12*100
+            ];
+            var seconds = (+new Date() - time) / 1000,
+                token = 'ago',
+                list_choice = 1;
 
-            var seconds = (+new Date() - time) / 1000;
-            var token = 'ago';
-
-            if (seconds === 0) return 'Just now';
+            if (seconds == 0) {
+                return 'Just now'
+            }
             if (seconds < 0) {
                 seconds = Math.abs(seconds);
                 token = 'from now';
+                list_choice = 2;
             }
+            var i = 0,
+                format;
+            while (format = time_formats[i++])
+                if (seconds < format[0]) {
+                    if (typeof format[2] == 'string') {
+                        return format[list_choice];
+                    } else {
+                        return Math.floor(seconds / format[2]) + ' ' + format[1] + ' ' + token;
+                    }
 
-            var days = Math.floor(seconds / 86400); // 1 day = 86400 seconds
-
-            if (days > 0 && days <= 30) {
-                return days + (days === 1 ? ' day ' : ' days ') + token;
-            }
-
-            if (days > 30) {
-                var months = Math.floor(days / 30);
-                if (months < 12) {
-                    return months + (months === 1 ? ' month ' : ' months ') + token;
-                } else {
-                    var years = Math.floor(months / 12);
-                    return years + (years === 1 ? ' year ' : ' years ') + token;
                 }
-            }
-
-            // For <1 day, show hours/minutes/seconds
-            if (seconds < 60) return Math.floor(seconds) + ' seconds ' + token;
-            if (seconds < 3600) return Math.floor(seconds / 60) + ' minutes ' + token;
-            if (seconds < 86400) return Math.floor(seconds / 3600) + ' hours ' + token;
-
-            return 'Just now';
+            return time;
         }
+        // function timeAgo(time) {
+        //     switch (typeof time) {
+        //         case 'number':
+        //             break;
+        //         case 'string':
+        //             time = +new Date(time);
+        //             break;
+        //         case 'object':
+        //             if (time.constructor === Date) time = time.getTime();
+        //             break;
+        //         default:
+        //             time = +new Date();
+        //     }
+
+        //     var seconds = (+new Date() - time) / 1000;
+        //     var token = 'ago';
+
+        //     if (seconds === 0) return 'Just now';
+        //     if (seconds < 0) {
+        //         seconds = Math.abs(seconds);
+        //         token = 'from now';
+        //     }
+
+        //     var days = Math.floor(seconds / 86400); // 1 day = 86400 seconds
+
+        //     if (days > 0 && days <= 30) {
+        //         return days + (days === 1 ? ' day ' : ' days ') + token;
+        //     }
+
+        //     if (days > 30) {
+        //         var months = Math.floor(days / 30);
+        //         if (months < 12) {
+        //             return months + (months === 1 ? ' month ' : ' months ') + token;
+        //         } else {
+        //             var years = Math.floor(months / 12);
+        //             return years + (years === 1 ? ' year ' : ' years ') + token;
+        //         }
+        //     }
+
+        //     // For <1 day, show hours/minutes/seconds
+        //     if (seconds < 60) return Math.floor(seconds) + ' seconds ' + token;
+        //     if (seconds < 3600) return Math.floor(seconds / 60) + ' minutes ' + token;
+        //     if (seconds < 86400) return Math.floor(seconds / 3600) + ' hours ' + token;
+
+        //     return 'Just now';
+        // }
     </script>
 
     <!-- Category Filter -->
@@ -1420,17 +1468,19 @@
 
                         console.log(response);
                         $("#editLogModal form")[0].reset();
+                        console.log("Category ID:", response.log_book_records.category_id);
+
                         $('input[name="log_title"]').val(response.log_book_records.title);
                         $('#log_dynamic_form_id').val(response.log_book_records
                             .dynamic_form_id);
                         $('#dynamic_form_log_book_id').val(response.log_book_records.id);
-                        // $('select[name="category"]').val(response.log_book_records.category_id);
-                        // Set new selected option
-                        $("select[name='category'] option[value='" + response.log_book_records
-                                .category_id + "']")
-                            .prop("selected", true);
-
-
+                        $('select[name="category"]').val('');
+                        setTimeout(function() {
+                            $('select[name="category"]').val(String(response.log_book_records
+                            .category_id)).trigger('change');
+                        }, 100);
+                        
+                        
                         // $('input[name="log_date"]').val(response.log_book_records.date);
                         if (response.log_book_records.date) {
                             let formattedDate = moment(response.log_book_records.date,
@@ -1438,17 +1488,16 @@
                             $('input[name="log_date"]').val(formattedDate);
                         }
 
-
                         $('textarea[name="log_detail"]').val(response.log_book_records.details);
 
                         if (response.log_book_records.image_name && response.log_book_records
                             .image_name !== "") {
                             var url = "{{ url('upload/events/') }}";
-                            $('#image-preview img').attr('src', "{{ url('upload/events/') }}" +
+                            $('#image-preview-edit img').attr('src', "{{ url('upload/events/') }}" +
                                 "/" + response.log_book_records.image_name);
-                            $('#image-preview').show();
+                            $('#image-preview-edit').show();
                         } else {
-                            $('#image-preview').hide();
+                            $('#image-preview-edit').hide();
                         }
 
                         let formE = document.getElementById("addLogModal");
@@ -1509,6 +1558,16 @@
                 });
                 // document.getElementById('dynamic_form_builder_log').disabled = true;
                 $("#addLogModal").find("select[name='dynamic_form_builder_id']").prop("disabled", true);
+                $('.dpYears').datepicker({
+                    format: 'dd/mm/yyyy',
+                    autoclose: true,
+                    showTodayButton: true
+                }).on('changeDate', function(e) {
+                    $(this).datepicker('hide');
+                });
+                $('#editLogModal').on('scroll', function() {
+                    $('.dpYears').datepicker('place')
+                });
 
                 $("#editLogModal").modal({
                     backdrop: 'static',
