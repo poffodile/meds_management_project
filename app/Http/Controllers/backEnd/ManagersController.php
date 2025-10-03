@@ -172,7 +172,7 @@ class ManagersController extends Controller
             }
 
             //if checkbox is checked
-            if(isset($data['assign_right_check'])) {
+            // if(isset($data['assign_right_check'])) {
                 //save access rights
                 $access_rights = AccessRight::select('id')
                                             ->where('disabled','0')
@@ -185,7 +185,7 @@ class ManagersController extends Controller
                     $access_rights_ids = implode(',', $access_rights_ids);
                     $user->access_rights = $access_rights_ids;
                 }
-            }
+            // }
 
             if($user->save()){
                 User::saveQualification($data,$user->id);
@@ -360,7 +360,7 @@ class ManagersController extends Controller
                 }
 
                 //if checkbox is checked
-                if(isset($data['assign_right_check'])) {
+                // if(isset($data['assign_right_check'])) {
                     //save access rights of user 
 
                     $access_rights = AccessRight::select('id')
@@ -375,7 +375,7 @@ class ManagersController extends Controller
                         $access_rights_ids = implode(',', $access_rights_ids);
                         $user->access_rights = $access_rights_ids;
                     }
-                }
+                // }
 
                 if($user->save()) {
 
