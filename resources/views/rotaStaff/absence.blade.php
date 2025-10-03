@@ -2,6 +2,15 @@
 <meta name="csrf-token" content="{{ csrf_token() }}">
 @section('title','Staff Timesheet')
 <link rel="stylesheet" type="text/css" href="{{ url('public/frontEnd/jobs/css/custom.css')}}" />
+<style>
+    .approve {
+        border-radius: 17px !important;
+        width: 100px;
+        height: 25px;
+        margin-top: 10px;
+        line-height: 10px !important;
+    }
+</style>
 @section('content')
 
 
@@ -19,6 +28,17 @@
     $data=['hours'=>$hours,'min'=>$minutes];
     return $data;
   }
+  function checkLeavType($leave_type){
+    if($leave_type == 1){
+        return $leave_type = 'Annual leave';
+    }else if($leave_type == 2){
+        return $leave_type = 'Sickness';
+    }else if($leave_type == 3){
+        return $leave_type = 'Lateness';
+    }else{
+        return $leave_type = 'Other';
+    }
+  }
 ?>
 <section class="wrapper">
     <div class="container-fluid">
@@ -34,12 +54,12 @@
                                 <label>Filter absences</label>
                                 <div>
                                     <select id="absenceFilter" class="form-select form-control">
-                                        <option value="allAbsences">All absences</option>
-                                        <option value="annualLeave">Annual leave</option>
-                                        <option value="lateness">Lateness</option>
-                                        <option value="sickness">Sickness</option>
-                                        <option value="furloughs">Furloughs</option>
-                                        <option value="otherAbsences">Other absences</option>
+                                        <option value="1">All absences</option>
+                                        <option value="2">Annual leave</option>
+                                        <option value="3">Lateness</option>
+                                        <option value="4">Sickness</option>
+                                        <!-- <option value="furloughs">Furloughs</option> -->
+                                        <option value="5">Other absences</option>
                                     </select>
                                 </div>
                             </div>
@@ -142,7 +162,10 @@
                                                     <div id="collapseOne" class="panel-collapse collapse">
                                                         <div class="panel-body">
                                                             <div class="col-md-12">
-                                                                <?php foreach($current_future as $cfVal){?>
+                                                                <?php 
+                                                                foreach($current_future as $cfVal){
+                                                                    $leave_typeAll_cfVal=checkLeavType($cfVal->leave_type);
+                                                                ?>
                                                                 <div class="row publicHoliday">
                                                                     <div class="col-md-2">
                                                                         <div class="sunIcon">
@@ -151,9 +174,9 @@
                                                                     </div>
                                                                     <div class="col-md-8">
                                                                         <div class="holidayTitle">
-                                                                            <h4>Public Holiday</h4>
-                                                                            <p><strong>Mon 01 Jan 2018</strong> (7 hrs)</p>
-                                                                            <p>New Year's Day</p>
+                                                                            <h4>{{$leave_typeAll_cfVal}}</h4>
+                                                                            <p><strong><?php echo date('D d M', strtotime($cfVal->start_date)) . ' - ' . date('D d M Y',strtotime($cfVal->end_date));?></strong> (0 hrs)</p>
+                                                                            <p><b>logged</b> on <?php echo date('D d M Y', strtotime($cfVal->created_at));?> by <?php echo Auth::user()->name; ?></p>
                                                                         </div>
                                                                     </div>
                                                                     <div class="col-md-2">
@@ -201,6 +224,26 @@
                                                                     Shank fatback pastrami turkey ham hock. Pastrami ball tip brisket pig salami kevin tri-tip sausage venison jowl spare ribs short loin pork chop. Shank pork chop burgdoggen shankle flank. Turducken cow salami venison, biltong ham ball tip meatloaf drumstick bacon jowl kielbasa.
                                                                 </div>
                                                             </div> -->
+                                                            <?php 
+                                                            $annual_cf=0;
+                                                            $annual_ah=0;
+                                                            $lateness_h=0;
+                                                            $sickness_h=0;
+                                                            $other_cf=0;
+                                                            foreach($history as $all_histroy){
+                                                                $leave_typeAll_histroy=checkLeavType($all_histroy->leave_type);
+                                                                if($all_histroy->leave_type == 1){
+                                                                    $annual_cf=$annual_cf+1;
+                                                                }else if($all_histroy->leave_type == 2){
+                                                                    $annual_ah=$annual_ah+1;
+                                                                }else if($all_histroy->leave_type == 3){
+                                                                    $sickness_h=$sickness_h+1;
+                                                                }else if($all_histroy->leave_type == 4){
+                                                                    $lateness_h=$lateness_h+1;
+                                                                }else{
+                                                                    $other_cf=$other_cf+1;
+                                                                }
+                                                                ?>
                                                             <div class="row publicHoliday m-t-15">
                                                                 <div class="col-md-2">
                                                                     <div class="sunIcon">
@@ -209,9 +252,14 @@
                                                                 </div>
                                                                 <div class="col-md-8">
                                                                     <div class="holidayTitle">
-                                                                        <h4>Public Holiday</h4>
-                                                                        <p><strong>Mon 01 Jan 2018</strong> (7 hrs)</p>
-                                                                        <p>New Year's Day</p>
+                                                                        <!-- <h4>Public Holiday</h4> -->
+                                                                            <h4>{{$leave_typeAll_histroy}}</h4>
+                                                                        <?php if($all_histroy->leave_type == 4){?>
+                                                                            <p>Other Leave</p>
+                                                                        <?php }?>
+                                                                            <p><strong><?php echo date('D d M', strtotime($all_histroy->start_date)) . ' - ' . date('D d M Y',strtotime($all_histroy->end_date));?></strong> (0 hrs)</p>
+                                                                            <!-- <p>New Year's Day</p> -->
+                                                                            <p><button type="button" class="btn btn-warning approve">APPROVED</button> on <?php echo date('D d M Y', strtotime($all_histroy->created_at));?> by <?php echo Auth::user()->name; ?></p>
                                                                     </div>
                                                                 </div>
                                                                 <!-- <div class="col-md-2">
@@ -221,7 +269,7 @@
                                                                     </div>
                                                                 </div> -->
                                                             </div>
-
+                                                            <?php } ?>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -244,11 +292,11 @@
                                         <label>Remaining</label>
                                         <div class="timeHrsMinuts m-t-20 m-b-20">
                                             <div class="timelist">
-                                                <strong>234</strong>
+                                                <strong><?php echo $hrsmin['hours'];?></strong>
                                                 <span>hrs</span>
                                             </div>
                                             <div class="timelist">
-                                                <strong>234</strong>
+                                                <strong><?php echo $hrsmin['min'];?></strong>
                                                 <span>mins</span>
                                             </div>
                                         </div>
@@ -259,18 +307,18 @@
                                         <label>Allowance</label>
                                         <div class="timeHrsMinuts m-t-20 m-b-20">
                                             <div class="timelist">
-                                                <strong>234</strong>
+                                                <strong><?php echo $allowhrsmin['hours'];?></strong>
                                                 <span>hrs</span>
                                             </div>
                                             <div class="timelist">
-                                                <strong>234</strong>
+                                                <strong><?php echo $allowhrsmin['min'];?></strong>
                                                 <span>mins</span>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-12 m-t-20 text-center">
-                                    <label>Craig has taken 56 hrs of annual leave.</label>
+                                    <label>Craig has taken {{$hrsmin['hours']-$allowhrsmin['hours']}} hrs of annual leave.</label>
                                     <a href="#!" type="button" class="btn btn-warning m-t-20">Add annual leave</a>
                                 </div>
                             </div>
@@ -289,7 +337,7 @@
                                                     <div id="collapseThree" class="panel-collapse collapse">
                                                         <div class="panel-body">
                                                             <div class="col-md-12">
-                                                                <div class="row publicHoliday">
+                                                                <div class="row publicHoliday m-t-15">
                                                                     <div class="col-md-2">
                                                                         <div class="sunIcon">
                                                                             <i class="fa fa-certificate"></i>
@@ -298,7 +346,7 @@
                                                                     <div class="col-md-8">
                                                                         <div class="holidayTitle">
                                                                             <h4>Public Holiday</h4>
-                                                                            <p><strong>Mon 01 Jan 2018</strong> (7 hrs)</p>
+                                                                            <p><strong>Mon 01 Jan 2018</strong> (0 hrs)</p>
                                                                             <p>New Year's Day</p>
                                                                         </div>
                                                                     </div>
@@ -741,24 +789,37 @@
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         const selectBox = document.getElementById("absenceFilter");
-        const sections = document.querySelectorAll(
-            ".allAbsences, .annualLeave, .lateness, .sickness, .furloughs, .otherAbsences"
-        );
+        const sections={1:'.allAbsences',2:'.annualLeave',3:'.lateness',4:'.sickness',5:'.otherAbsences',6:'.furloughs'};
+        // console.log(sections[1]);
+        // const sections = document.querySelectorAll(
+        //     ".allAbsences, .annualLeave, .lateness, .sickness, .furloughs, .otherAbsences"
+        // );
 
         // Default: sirf allAbsences dikhana
-        sections.forEach(div => div.style.display = "none");
+        default_display(sections);
+        // sections.forEach(div => div.style.display = "none");
         document.querySelector(".allAbsences").style.display = "block";
 
         selectBox.addEventListener("change", function() {
             const value = this.value;
-            // sab hide
-            sections.forEach(div => div.style.display = "none");
-            // sirf selected show
-            const selectedDiv = document.querySelector("." + value);
+            console.log(sections);
+            // sections.forEach(div => div.style.display = "none");
+            default_display(sections);
+            // const selectedDiv = document.querySelector("." + value);
+            const selectedDiv = document.querySelector(sections[value]);
             if (selectedDiv) {
                 selectedDiv.style.display = "block";
             }
         });
     });
+    function default_display(sections){
+        for (let key in sections) {
+            console.log(`Key: ${key}, Value: ${sections[key]}`);
+             const div = document.querySelector(sections[key]);
+            if (div) {
+                div.style.display = "none";
+            }
+        }
+    }
 </script>
 @endsection

@@ -1616,7 +1616,8 @@ class RotaController extends Controller
       return "{$hours}h {$minutes}min";
     }
     public function rota_absence(Request $request){
-      $user_id=base64_decode($request->manager);
+      $user_id=base64_decode($request->manager) ? base64_decode($request->manager) : base64_decode($request->key);
+      // echo $user_id;die;
       $absence_data=$this->absence_data($user_id,date('Y'),request());
       // echo "<pre>";print_r($absence_data);die;
       $currentYear = date('Y');
@@ -1629,6 +1630,7 @@ class RotaController extends Controller
       $absence['lateness']=$absence_data['lateness'];
       $absence['current_future']=$absence_data['current_future'];
       $absence['history']=$absence_data['history'];
+      // echo "<pre>";print_r($absence['history']);die;
       return view('rotaStaff.absence',$absence);
     }
     public function absence_data($user_id,$year,Request $request){
@@ -1644,7 +1646,7 @@ class RotaController extends Controller
       } else {
           $renaming_hour = (int)$renaming_hour;
       }
-      $staff_leave =  $staff_leave_query->where('leave_type', 1)->get();
+      $staff_leave =  $staff_leave_query->get();
         
       $allowance_hour=0;
       if(count($staff_leave) > 0){
