@@ -87,7 +87,8 @@
                     <div class="p-4">
                         <div class="col-md-12">
                             <p class="mb-3">Thanks {{ $username }},</p>
-                            <p class="mb-5">You have added this lateness. You were late by <strong>{{ $last_leave->late_by }}2 hrs</strong> on <strong>{{ \Carbon\Carbon::parse($last_leave->start_date)->format('D j M') }}.</strong></p>
+                            <?php $exp=explode('::',$last_leave->late_by);?>
+                            <p class="mb-5">You have added this lateness. You were late by <strong>{{ $exp[0] ?? 0 }} hrs {{$exp[1] ?? 0}} mins</strong> on <strong>{{ \Carbon\Carbon::parse($last_leave->start_date)->format('D j M') }}.</strong></p>
                             <p class="mb-1"> <strong> Description </strong></p>
                             <p class="mb-2">{{ $last_leave->notes }}</p>
                             <div class="mt-5">

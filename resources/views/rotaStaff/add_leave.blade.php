@@ -154,7 +154,16 @@
                                     <div class="mb-3 row">
                                         <label for="name" class="col-sm-2 col-form-label">Late by</label>
                                         <div class="col-sm-3 col-md-3">
-                                            <input type="time" name="late_time" placeholder="Pattern Name" class="form-control" id="staticEmail" value="">
+                                            <div class="row">
+                                                <div class="col-sm-6">
+                                                    <input type="text" name="late_hrs" id="late_hrs" placeholder="hrs" class="form-control" id="staticEmail" value="0">
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <input type="text" name="late_min" id="late_min" placeholder="mins" class="form-control" id="staticEmail" value="0">
+                                                </div>
+                                                
+                                            </div>
+                                            
                                         </div>
                                     </div>
                                 </div>
@@ -375,4 +384,28 @@
             el.classList.remove("show_select");
         }
     }
+</script>
+<script>
+    $(document).on('input','#late_min', function(){
+    this.value = this.value.replace(/[^0-9.]/g, '');
+    var late_hrs=document.getElementById('late_hrs');
+    if ((this.value.match(/\./g) || []).length > 1) {
+        this.value = this.value.slice(0, -1);
+    }
+    
+    let parts = this.value;
+    if(parts == '' || parts == 0){
+        late_hrs.value='0';
+    }
+    if(parts && parts > 9 && parts < 60){
+        const ex=this.value.split('0');
+        parts= ex[1];
+        this.value=ex[1];
+    }
+    if(parts && Number(parts) > Number(59)){
+        this.value=0;
+        let update=late_hrs.value;
+        late_hrs.value = Number(update)+Number(1);
+    }
+});
 </script>

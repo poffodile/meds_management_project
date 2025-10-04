@@ -44,7 +44,8 @@ class AccessRightController extends Controller
         // print_r($access_rights);
         // die();
         //$access_rights='';
-        $page = 'agents';
+        // $page = 'agents';
+        $page = 'users';
 
        	return view('backEnd/access_rights', compact('page','user_id','dashboard_rights','access_rights','available_rights'));
     }
