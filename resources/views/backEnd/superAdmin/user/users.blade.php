@@ -29,7 +29,7 @@
                             <div class="btn-group">
                                 <a href="{{ url('super-admin/user/add') }}">
                                     <button id="editable-sample_new" class="btn btn-primary">
-                                        Add Sub Admin User <i class="fa fa-plus"></i>
+                                        Add Sub Admin <i class="fa fa-plus"></i>  
                                     </button>
                                 </a>    
                             </div>

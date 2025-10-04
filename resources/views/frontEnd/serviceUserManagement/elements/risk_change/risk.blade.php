@@ -1,18 +1,26 @@
 <?php //show su profile risk tiles
 foreach ($risks as $risk) {
-    $status = App\Risk::checkRiskStatus($service_user_id, $risk->id);
-    $color_class = 'bg-darkgreen';
+    // $status = App\Risk::checkRiskStatus($service_user_id, $risk->id);
+    // // dd($status);
+    // $color_class = 'bg-darkgreen';
+    // $risk_id = $status->id ?? '';
+    // if (!empty($status->status)) {
 
-    if (!empty($status)) {
+    //     if ($status->status == 1) {
+    //         $color_class = 'orange-bg';
+    //     } elseif ($status->status == 2) {
+    //         $color_class = 'bg-red';
+    //     }
+    // } else {
+    //     $status = 0;
+    // }
 
-        if ($status == 1) {
-            $color_class = 'orange-bg';
-        } elseif ($status == 2) {
-            $color_class = 'bg-red';
-        }
-    } else {
-        $status = 0;
-    }
+     $color_class = match ($risk->user_status) {
+        1 => 'orange-bg',
+        2 => 'bg-red',
+        default => 'bg-darkgreen',
+    };
+
 ?>
     <style>
         .input-date {
@@ -65,11 +73,11 @@ foreach ($risks as $risk) {
                 </div>
             </section>
             <ul class="m-0 p-0 overviw-dropdown risk_change_btns" type="none">
-                <li><a href="#" class="risk_change_btn " risk-id="{{ $risk->id }}" status="2"> <i class="<?php echo ($status == '2') ? 'fa fa-check-circle' : 'fa fa-times-circle'; ?>"></i> Live Risk </a> </li>
-                <li><a href="#" class="risk_change_btn" risk-id="{{ $risk->id }}" status="1"> <i class="<?php echo ($status == '1') ? 'fa fa-check-circle' : 'fa fa-times-circle'; ?>"></i> Historic Risk </a> </li>
-                <li><a href="#" class="risk_change_btn" risk-id="{{ $risk->id }}" status="0"> <i class="<?php echo ($status == '0') ? 'fa fa-check-circle' : 'fa fa-times-circle'; ?>"></i> No Risk </a> </li>
-                <!-- <li><a href="#" class="risk_change_btn" risk-id="{{ $risk->id }}" status=""><i class="fa fa-times-circle"></i> View Log </a> </li>-->
-                <li><a href="{{url('service/risks/'.$service_user_id)}}" class="risk_change_btns" risk-id="{{ $risk->id }}" status=""><i class="fa fa-eye risk-view"></i> View Log </a> </li>
+                <li><a href="#" class="risk_change_btn " risk-id="{{ $risk->risk_id }}" status="2"> <i class="<?php echo ($risk->user_status == '2') ? 'fa fa-check-circle' : 'fa fa-times-circle'; ?>"></i> Live Risk </a> </li>
+                <li><a href="#" class="risk_change_btn" risk-id="{{ $risk->risk_id }}" status="1"> <i class="<?php echo ($risk->user_status == '1') ? 'fa fa-check-circle' : 'fa fa-times-circle'; ?>"></i> Historic Risk </a> </li>
+                <li><a href="#" class="risk_change_btn" risk-id="{{ $risk->risk_id }}" status="0"> <i class="<?php echo ($risk->user_status == '0') ? 'fa fa-check-circle' : 'fa fa-times-circle'; ?>"></i> No Risk </a> </li>
+                <!-- <li><a href="#" class="risk_change_btn" risk-id="{{ $risk->risk_id }}" status=""><i class="fa fa-times-circle"></i> View Log </a> </li>-->
+                <li><a href="{{url('service/risks/'.$service_user_id)}}" class="risk_change_btns" risk-id="{{ $risk->risk_id }}" status=""><i class="fa fa-eye risk-view"></i> View Log </a> </li>
 
             </ul>
         </div>
