@@ -26,6 +26,7 @@
     $hours = floor($decimalHours);
     $minutes = round(($decimalHours - $hours) * 60);
     $data=['hours'=>$hours,'min'=>$minutes];
+    // echo "<pre>";print_r($data);die;
     return $data;
   }
   function checkLeavType($leave_type){
@@ -166,6 +167,7 @@
                                                                 $annual_cf=0;
                                                                 $seekness_occurrences=0;
                                                                 $lateness_occurrences=0;
+                                                                $other_cf=0;
                                                                 foreach($current_future as $cfVal){
                                                                     $leave_typeAll_cfVal=checkLeavType($cfVal->leave_type);
                                                                     if($cfVal->leave_type == 1){
@@ -174,6 +176,8 @@
                                                                         $seekness_occurrences=$seekness_occurrences+1;
                                                                     }if($cfVal->leave_type == 3){
                                                                         $lateness_occurrences=$lateness_occurrences+1;
+                                                                    }if($cfVal->leave_type == 4){
+                                                                        $other_cf=$other_cf+1;
                                                                     }
                                                                 ?>
                                                                 <div class="row publicHoliday">
@@ -458,11 +462,11 @@
                                         <label>Total</label>
                                         <div class="timeHrsMinuts m-t-20 m-b-20">
                                             <div class="timelist">
-                                                <strong><?php echo $latenesshrsmin['hours'];?></strong>
+                                                <strong><?php echo $latenesshrsmin['hours'] ?? 0;?></strong>
                                                 <span>hrs</span>
                                             </div>
                                             <div class="timelist">
-                                                <strong><?php echo $latenesshrsmin['min'];?></strong>
+                                                <strong><?php echo $latenesshrsmin['min'] ?? 0;?></strong>
                                                 <span>mins</span>
                                             </div>
                                         </div>
@@ -535,7 +539,7 @@
                                         <label>Logged</label>
                                         <div class="timeHrsMinuts m-t-20 m-b-20">
                                             <div class="timelist">
-                                                <strong>2</strong>
+                                                <strong>{{count($sickness)}}</strong>
                                                 <span>occurrences</span>
                                             </div>
                                         </div>
@@ -544,9 +548,14 @@
                                 <div class="col-md-6">
                                     <div class="absenceAdd m-t-20">
                                         <label>Total</label>
+                                        <?php 
+                                        $sickCount=0;
+                                        foreach($sickness as $sickVal){
+                                            $sickCount=$sickCount+$sickVal->days ?? 1;
+                                        }?>
                                         <div class="timeHrsMinuts m-t-20 m-b-20">
                                             <div class="timelist">
-                                                <strong>0</strong>
+                                                <strong>{{$sickCount}}</strong>
                                                 <span>days</span>
                                             </div>
                                         </div>
@@ -707,7 +716,11 @@
                                         <div class="timeHrsMinuts m-t-20 m-b-20">
                                             <div class="timelist">
                                                 <strong>0</strong>
-                                                <span>days</span>
+                                                <span>hrs</span>
+                                            </div>
+                                            <div class="timelist">
+                                                <strong>0</strong>
+                                                <span>min</span>
                                             </div>
                                         </div>
                                     </div>
@@ -725,7 +738,46 @@
                                                 <div class="panel panel-default">
                                                     <div class="panel-heading">
                                                         <h4 class="panel-title">
-                                                            <a data-toggle="collapse" data-parent="#accordionOther" href="#collapseOther">Other absence current & future ({{$other_ah}})</a>
+                                                            <a data-toggle="collapse" data-parent="#accordionOther" href="#collapseOthercf">Other absence current & future ({{$other_cf}})</a>
+                                                        </h4>
+                                                    </div>
+                                                    <div id="collapseOthercf" class="panel-collapse collapse">
+                                                        <div class="panel-body">
+                                                            <div class="col-md-12">
+                                                                <?php 
+                                                                foreach($current_future as $cfVal){
+                                                                if($all_histroy->leave_type == 4){
+                                                                    $leave_typeAll_cfVal=checkLeavType($cfVal->leave_type);
+                                                                ?>
+                                                                <div class="row publicHoliday">
+                                                                    <div class="col-md-2">
+                                                                        <div class="sunIcon">
+                                                                            <i class="fa fa-certificate"></i>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-8">
+                                                                        <div class="holidayTitle">
+                                                                            <h4>{{$leave_typeAll_cfVal}}</h4>
+                                                                            <p><strong><?php echo date('D d M', strtotime($cfVal->start_date)) . ' - ' . date('D d M Y',strtotime($cfVal->end_date));?></strong> (0 hrs)</p>
+                                                                            <p><b>logged</b> on <?php echo date('D d M Y', strtotime($cfVal->created_at));?> by <?php echo Auth::user()->name; ?></p>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-2">
+                                                                        <div class="sunIcon">
+                                                                            <a href="#!"><i class="fa fa-pencil-square-o"></i></a>
+                                                                            <a href="#!"><i class="fa fa-trash-o"></i></a>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <?php }}?>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="panel panel-default">
+                                                    <div class="panel-heading">
+                                                        <h4 class="panel-title">
+                                                            <a data-toggle="collapse" data-parent="#accordionOther" href="#collapseOther">Other absence history ({{$other_ah}})</a>
                                                         </h4>
                                                     </div>
                                                     <div id="collapseOther" class="panel-collapse collapse">

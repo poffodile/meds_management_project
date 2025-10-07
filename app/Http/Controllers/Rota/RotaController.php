@@ -1631,6 +1631,8 @@ class RotaController extends Controller
       $absence['lateness']=$absence_data['lateness'];
       $absence['current_future']=$absence_data['current_future'];
       $absence['history']=$absence_data['history'];
+      $absence['annual']=$absence_data['annual'];
+      $absence['other']=$absence_data['other'];
       // echo "<pre>";print_r($absence['history']);die;
       return view('rotaStaff.absence',$absence);
     }
@@ -1668,8 +1670,10 @@ class RotaController extends Controller
       $data['renaming_hour']=$renaming_hour - $allowance_hour;
       $data['allowance_hour']=$allowance_hour;
 
+      $annual = (clone $staff_leave_query)->where('leave_type', 1)->get();
       $sickness = (clone $staff_leave_query)->where('leave_type', 2)->get();
       $lateness = (clone $staff_leave_query)->where('leave_type', 3)->get();
+      $other = (clone $staff_leave_query)->where('leave_type', 4)->get();
 
       $current_future = (clone $staff_leave_query)
           ->whereDate('start_date','>=',date('Y-m-d'))
@@ -1679,8 +1683,10 @@ class RotaController extends Controller
           ->whereDate('start_date','<',date('Y-m-d'))
           ->get();
 
+      $data['annual']=$annual;
       $data['sickness']=$sickness;
       $data['lateness']=$lateness;
+      $data['other']=$other;
       $data['current_future']=$current_future;
       $data['history']=$history;
       if($request->ajax()){

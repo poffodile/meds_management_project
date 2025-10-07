@@ -171,9 +171,19 @@
                                 <div id="section4">
                                     <div class="mb-3 row">
                                         <label for="name" class="col-sm-2 col-form-label">Start</label>
-                                        <div class="col-sm-3 col-md-3">
-                                            <input type="date" id="start_date_validate" name="start_date" placeholder="Pattern Name" class="form-control"
-                                                id="staticEmail" value="" onchange="dateValidate()">
+                                            <div class="col-sm-3 col-md-3" id="endDateDiveFirst" style="display:none">
+                                                <input type="date" id="start_date_validate" name="start_date" placeholder="Pattern Name" class="form-control" id="staticEmail" value="" onchange="dateValidate()">
+                                            </div>
+                                        <div class="col-sm-3 col-md-3" id="" style="display:none">
+                                            <div class="row">
+                                                <div class="col-sm-6 col-md-6">
+                                                    <input type="date" id="start_date_validate" name="start_date" placeholder="Pattern Name" class="form-control" id="staticEmail" value="" onchange="dateValidate()">
+                                                </div>
+                                                <div class="col-sm-6 col-md-6">
+                                                    <input type="time" id="" name="start_time" class="form-control" id="" value="">
+                                                </div>
+                                                
+                                            </div>
                                         </div>
                                         <div class="col-md-2" id="section5">
                                             <select class="form-select form-control" name="start_date_full_half" aria-label="Default select example">
@@ -205,9 +215,19 @@
 
                                     <div class="mb-3 row">
                                         <label for="name" class="col-sm-2 col-form-label">End</label>
-                                        <div class="col-sm-3 col-md-3">
-                                            <input type="date" name="end_date" placeholder="Select date" class="form-control"
-                                                id="staticEmail" value="">
+                                        
+                                        <div class="col-sm-3 col-md-3" id="endDateDiveFirst" style="display:none">
+                                            <input type="date" name="end_date" placeholder="Select date" class="form-control" id="staticEmail" value="">
+                                        </div>
+                                        <div class="col-sm-3 col-md-3" id="endDateDiveSecond" style="display:none">
+                                            <div class="row">
+                                                <div class="col-sm-6">
+                                                    <input type="date" name="end_date" placeholder="Select date" class="form-control" id="staticEmail" value="">
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <input type="time" name="end_time" placeholder="Select tiem" class="form-control" id="" value="">
+                                                </div>
+                                            </div>
                                         </div>
                                         <div class="col-md-2" id="section6">
                                             <select class="form-select form-control" name="end_date_full_half" aria-label="Default select example">
