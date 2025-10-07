@@ -632,19 +632,19 @@ class RotaController extends Controller
     }
 
     function add_leave(Request $request){
-      echo "<pre>";print_r($request->all());die;
+      // echo "<pre>";print_r($request->all());die;
         if($request->ongoingLeave == "yes"){
             $ongoingLeave = 1;
         }else {
             $ongoingLeave = 0;
         }
 
-        if(empty($request->start_date)){
+        if(empty($request->start_date_validate_first) && empty($request->start_date_validate_second)){
             $date = $request->late_date;
             $request->end_date = null;
             $date = $request->late_date;
         } else {
-            $date = $request->start_date;
+            $date = $request->start_date_validate_first ?? $request->start_date_validate_second;
         }
         // dd($date);
         // $data = $request->validate([
@@ -681,6 +681,8 @@ class RotaController extends Controller
             'late_by' => $late_time,
             'notes' => $request->notes,
             'days' => $missed_working_days,
+            'start_time' => $request->start_time ?? '',
+            'end_time' => $request->end_time ?? '',
             'leave_status' => 0,
             'is_deleted' => 1,
             'created_at'=>date("Y-m-d H:i:s"),
@@ -1626,14 +1628,14 @@ class RotaController extends Controller
       $endYear = $startYear - 10;
       $absence['years'] = range($endYear, $startYear);
       $absence['renaming_hour']=$absence_data['renaming_hour'];
-      $absence['allowance_hour']=$absence_data['allowance_hour'];
       $absence['sickness']=$absence_data['sickness'];
       $absence['lateness']=$absence_data['lateness'];
       $absence['current_future']=$absence_data['current_future'];
       $absence['history']=$absence_data['history'];
       $absence['annual']=$absence_data['annual'];
       $absence['other']=$absence_data['other'];
-      // echo "<pre>";print_r($absence['history']);die;
+      $absence['totalSeconds']=$absence_data['totalSeconds'];
+      // echo "<pre>";print_r($absence['totalSeconds']);die;
       return view('rotaStaff.absence',$absence);
     }
     public function absence_data($user_id,$year,Request $request){
@@ -1652,8 +1654,8 @@ class RotaController extends Controller
       $staff_leave =  $staff_leave_query->get();
         
       $allowance_hour=0;
+      $leave_count=0;
       if(count($staff_leave) > 0){
-        $leave_count=0;
         foreach ($staff_leave as $val) {
             $start = new \DateTime($val->start_date);
             if (!empty($val->end_date)) {
@@ -1664,11 +1666,9 @@ class RotaController extends Controller
             $diff = $start->diff($end);
             $leave_count += $diff->days + 1;
         }
-        $total_hours=RotaAssignEmployee::where('emp_id',$user_id)->whereYear('created_at',date('Y'))->sum('total_hours');
-        $allowance_hour = $total_hours * $leave_count;
+        // $total_hours=RotaAssignEmployee::where('emp_id',$user_id)->whereYear('created_at',date('Y'))->sum('total_hours');
+        // $totalSeconds = RotaAssignEmployee::where('emp_id', $user_id)->whereYear('created_at', date('Y'))->selectRaw('SUM(TIME_TO_SEC(total_hours)) as total_seconds')->value('total_seconds');
       }
-      $data['renaming_hour']=$renaming_hour - $allowance_hour;
-      $data['allowance_hour']=$allowance_hour;
 
       $annual = (clone $staff_leave_query)->where('leave_type', 1)->get();
       $sickness = (clone $staff_leave_query)->where('leave_type', 2)->get();
@@ -1683,6 +1683,9 @@ class RotaController extends Controller
           ->whereDate('start_date','<',date('Y-m-d'))
           ->get();
 
+      $data['leave_count']=$leave_count;
+      $data['renaming_hour']=$renaming_hour;
+      $data['totalSeconds']=$totalSeconds;
       $data['annual']=$annual;
       $data['sickness']=$sickness;
       $data['lateness']=$lateness;

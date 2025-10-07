@@ -26,7 +26,7 @@
                     </header>
                     <div class="tab-content">
 
-                        <form action="{{ url('/add-leave') }}" method="POST">
+                        <form action="{{ url('/add-leave') }}" method="POST" id="addLeaveForm">
                             <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">
                             <input type="hidden" name="staff_id" id="staff_id" value="<?php echo $staff_id;?>">
                             <input type="hidden" name="manager_id" id="manager_id" value="<?php echo $manager_id;?>">
@@ -148,7 +148,7 @@
                                     <div class="mb-3 row">
                                         <label for="name" class="col-sm-2 col-form-label">Date</label>
                                         <div class="col-sm-3 col-md-3">
-                                            <input type="date" name="late_date" placeholder="Pattern Name" class="form-control" id="staticEmail" max="<?php echo date("Y-m-d"); ?>">
+                                            <input type="date" name="late_date" placeholder="Pattern Name" class="form-control" id="late_date" max="<?php echo date("Y-m-d"); ?>">
                                         </div>
                                     </div>
                                     <div class="mb-3 row">
@@ -172,21 +172,21 @@
                                     <div class="mb-3 row">
                                         <label for="name" class="col-sm-2 col-form-label">Start</label>
                                             <div class="col-sm-3 col-md-3" id="startDateDiveFirst" style="display:none">
-                                                <input type="date" id="start_date_validate" name="start_date" placeholder="Pattern Name" class="form-control" id="staticEmail" value="" onchange="dateValidate()">
+                                                <input type="date" id="start_date_validate_first" name="start_date_validate_first" placeholder="Pattern Name" class="form-control checkValidationSecond" id="staticEmail" value="" onchange="dateValidate()">
                                             </div>
                                         <div class="col-sm-3 col-md-3" id="startDateDiveSecond" style="display:none">
                                             <div class="row">
                                                 <div class="col-sm-6 col-md-6">
-                                                    <input type="date" id="start_date_validate" name="start_date" placeholder="Pattern Name" class="form-control" id="staticEmail" value="" onchange="dateValidate()">
+                                                    <input type="date" id="start_date_validate_second" name="start_date_validate_second" placeholder="Pattern Name" class="form-control checkValidationFirst" id="staticEmail" value="" onchange="dateValidate()">
                                                 </div>
                                                 <div class="col-sm-6 col-md-6">
-                                                    <input type="time" id="start_time" name="start_time" class="form-control" id="" value="">
+                                                    <input type="time" id="start_time" name="start_time" class="form-control checkValidationFirst" id="" value="">
                                                 </div>
                                                 
                                             </div>
                                         </div>
                                         <div class="col-md-2" id="section5">
-                                            <select class="form-select form-control" name="start_date_full_half" aria-label="Default select example">
+                                            <select class="form-select form-control checkValidationSecond" name="start_date_full_half" aria-label="Default select example">
                                                 <option selected="" value="1">Full Day</option>
                                                 <option value="2">Second Half</option>
                                             </select>
@@ -217,20 +217,20 @@
                                         <label for="name" class="col-sm-2 col-form-label">End</label>
                                         
                                         <div class="col-sm-3 col-md-3" id="endDateDiveFirst" style="display:none">
-                                            <input type="date" name="end_date" placeholder="Select date" class="form-control" id="end_date" value="">
+                                            <input type="date" name="end_date" placeholder="Select date" class="form-control checkValidationSecond" id="end_date_first" value="">
                                         </div>
                                         <div class="col-sm-3 col-md-3" id="endDateDiveSecond" style="display:none">
                                             <div class="row">
                                                 <div class="col-sm-6">
-                                                    <input type="date" name="end_date" placeholder="Select date" class="form-control" id="end_date" value="">
+                                                    <input type="date" name="end_date" placeholder="Select date" class="form-control checkValidationFirst" id="end_date_second" value="">
                                                 </div>
                                                 <div class="col-sm-6">
-                                                    <input type="time" name="end_time" placeholder="Select tiem" class="form-control" id="end_time" value="">
+                                                    <input type="time" name="end_time" placeholder="Select tiem" class="form-control checkValidationFirst" id="end_time" value="">
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="col-md-2" id="section6">
-                                            <select class="form-select form-control" name="end_date_full_half" aria-label="Default select example">
+                                            <select class="form-select form-control checkValidationSecond" name="end_date_full_half" aria-label="Default select example">
                                                 <option selected="" value="1">Full Day</option>
                                                 <option value="2">Second Half</option>
                                             </select>
@@ -241,7 +241,7 @@
                                 <div class="mb-3 row" id="section7">
                                     <label for="name" class="col-sm-2 col-form-label">Working days missed</label>
                                     <div class="col-sm-2 col-md-2">
-                                        <input type="number" name="missed_days" placeholder="days" class="form-control" id="staticEmail" value="">
+                                        <input type="number" name="missed_days" placeholder="days" class="form-control checkValidationSecond" id="missed_days" value="">
                                     </div>
                                 </div>
                                 <!-- <div class="mb-3 row" id="section8">
@@ -254,7 +254,7 @@
                                                     </div>
                                                 </div> -->
                                 <div class="mb-3 row">
-                                    <label for="select" id="textarea" class="col-sm-2 col-form-label">Notes</label>
+                                    <label for="select" class="col-sm-2 col-form-label">Notes</label>
                                     <div class="col-sm-3 col-md-3">
                                         <textarea name="notes" placeholder="Notes regarding the absence" id="textarea" cols="10" class="form-control" rows="3"></textarea>
                                     </div>
@@ -295,7 +295,10 @@
     }
 
     function dateValidate() {
-        var start_date_input = document.getElementById('start_date_validate').value;
+        var start_date_input = document.getElementById('start_date_validate_first').value;
+        if(start_date_input == ''){
+            start_date_input=document.getElementById('start_date_validate_second').value;
+        }
         var user_id = $('#user_id').val()
         // alert(user_id);
         var token = "<?= csrf_token() ?>";
@@ -341,10 +344,10 @@
             $('#section5').show();
             $('#section6').show();
             $('#section7').show();
-            $('#startDateDiveFirst').show();
-            $('#endDateDiveFirst').show();
-            $('#startDateDiveSecond').hide();
-            $('#endDateDiveSecond').hide();
+            $('#startDateDiveFirst').hide();
+            $('#endDateDiveFirst').hide();
+            $('#startDateDiveSecond').show();
+            $('#endDateDiveSecond').show();
         } else {
             $('#section2').hide();
             $('#section5').hide();
@@ -383,10 +386,10 @@
             if (leaveTypes_id == 2) {
                 $('#section2').show();
                 $('#section7').show();
-                $('#startDateDiveFirst').show();
-                $('#endDateDiveFirst').show();
-                $('#startDateDiveSecond').hide();
-                $('#endDateDiveSecond').hide();
+                $('#startDateDiveFirst').hide();
+                $('#endDateDiveFirst').hide();
+                $('#startDateDiveSecond').show();
+                $('#endDateDiveSecond').show();
             } else {
                 $('#section2').hide();
                 $('#section7').hide();
@@ -447,11 +450,64 @@
 $('.absance-btn').on('click', function(event) {
     event.preventDefault();
     var leaveTypes_id = document.getElementById('leaveTypes_id').value;
-    var user_id=$("#user_id").val();
-    var start_date_validate=$("#start_date_validate").val();
-    if(leaveTypes_id == 1){
-
+    var textarea=$("#textarea").val();
+    var emptyError=0;
+    if(leaveTypes_id == 1 || leaveTypes_id == 4){
+        $('.checkValidationFirst').each(function(){
+            if($(this).val() == '' || $(this).val() == undefined){
+                emptyError=1;
+                $(this).css('border','1px solid red');
+                $(this).focus();
+                return false;
+            }else{
+                $(this).css('border','');
+            }
+        });
+    }else if(leaveTypes_id == 2){
+        $('.checkValidationSecond').each(function(){
+            if($(this).val() == '' || $(this).val() == undefined){
+                emptyError=1;
+                $(this).css('border','1px solid red');
+                $(this).focus();
+                return false;
+            }else{
+                $(this).css('border','');
+            }
+        });
+    }else if(leaveTypes_id == 3){
+        var late_date=$("#late_date").val();
+        var late_hrs=$("#late_hrs").val();
+        var late_min=$("#late_min").val();
+        if(late_date == ''){
+            $("#late_date").css('border','1px solid red').focus();
+            return false;
+        }else if(late_hrs == ''){
+            $("#late_date").css('border','');
+            $("#late_hrs").css('border','1px solid red').focus();
+            return false;
+        }else if(late_min == ''){
+            $("#late_hrs").css('border','');
+            $("#late_min").css('border','1px solid red').focus();
+            return false;
+        }else if(late_min == 0 && late_hrs == 0){
+            $("#late_hrs").css('border','1px solid red').focus();
+            $("#late_min").css('border','');
+            return false;
+        }
+    }else{
+        alert("Something went wrong! Please try after some time");
+        return false;
     }
-    alert(leaveTypes_id);return false;
+    if(emptyError == 1){
+        return false;
+    }
+    if(textarea == ''){
+        $("#textarea").css('border','1px solid red');
+        return false;
+    }else{
+        $("#textarea").css('border','');
+    }
+    alert("ready to submit")
+    $('#addLeaveForm').submit();
 });
 </script>

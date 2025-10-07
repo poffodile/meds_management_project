@@ -16,17 +16,17 @@
 
 <!--main content start-->
 <?php 
-  function formatHours($decimalHours) {
+  function formatHours($totalSeconds) {
     
-    if ($decimalHours == 0 || $decimalHours == null) {
+    if ($totalSeconds == 0 || $totalSeconds == null) {
         $data=['hours'=>0,'min'=>0];
         return $data;
     }
-
-    $hours = floor($decimalHours);
-    $minutes = round(($decimalHours - $hours) * 60);
+    // $totalSeconds = 3700;
+    $hours = floor($totalSeconds / 3600);
+    $minutes = floor(($totalSeconds % 3600) / 60);
     $data=['hours'=>$hours,'min'=>$minutes];
-    // echo "<pre>";print_r($data);die;
+    echo "<pre>";print_r($data);die;
     return $data;
   }
   function checkLeavType($leave_type){
@@ -87,7 +87,7 @@
                                     <div class="absenceAdd m-t-20">
                                         <label>Annual leave to take</label>
                                         <div class="timeHrsMinuts m-t-20 m-b-20">
-                                            <?php $hrsmin=formatHours($renaming_hour);?>
+                                            <?php $hrsmin=formatHours($totalSeconds);?>
                                             <div class="timelist">
                                                 <strong><?php echo $hrsmin['hours'];?></strong>
                                                 <span>hrs</span>
