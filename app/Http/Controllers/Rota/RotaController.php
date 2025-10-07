@@ -632,7 +632,7 @@ class RotaController extends Controller
     }
 
     function add_leave(Request $request){
-      // echo "<pre>";print_r($request->all());die;
+      echo "<pre>";print_r($request->all());die;
         if($request->ongoingLeave == "yes"){
             $ongoingLeave = 1;
         }else {

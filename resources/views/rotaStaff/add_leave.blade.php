@@ -171,16 +171,16 @@
                                 <div id="section4">
                                     <div class="mb-3 row">
                                         <label for="name" class="col-sm-2 col-form-label">Start</label>
-                                            <div class="col-sm-3 col-md-3" id="endDateDiveFirst" style="display:none">
+                                            <div class="col-sm-3 col-md-3" id="startDateDiveFirst" style="display:none">
                                                 <input type="date" id="start_date_validate" name="start_date" placeholder="Pattern Name" class="form-control" id="staticEmail" value="" onchange="dateValidate()">
                                             </div>
-                                        <div class="col-sm-3 col-md-3" id="" style="display:none">
+                                        <div class="col-sm-3 col-md-3" id="startDateDiveSecond" style="display:none">
                                             <div class="row">
                                                 <div class="col-sm-6 col-md-6">
                                                     <input type="date" id="start_date_validate" name="start_date" placeholder="Pattern Name" class="form-control" id="staticEmail" value="" onchange="dateValidate()">
                                                 </div>
                                                 <div class="col-sm-6 col-md-6">
-                                                    <input type="time" id="" name="start_time" class="form-control" id="" value="">
+                                                    <input type="time" id="start_time" name="start_time" class="form-control" id="" value="">
                                                 </div>
                                                 
                                             </div>
@@ -217,15 +217,15 @@
                                         <label for="name" class="col-sm-2 col-form-label">End</label>
                                         
                                         <div class="col-sm-3 col-md-3" id="endDateDiveFirst" style="display:none">
-                                            <input type="date" name="end_date" placeholder="Select date" class="form-control" id="staticEmail" value="">
+                                            <input type="date" name="end_date" placeholder="Select date" class="form-control" id="end_date" value="">
                                         </div>
                                         <div class="col-sm-3 col-md-3" id="endDateDiveSecond" style="display:none">
                                             <div class="row">
                                                 <div class="col-sm-6">
-                                                    <input type="date" name="end_date" placeholder="Select date" class="form-control" id="staticEmail" value="">
+                                                    <input type="date" name="end_date" placeholder="Select date" class="form-control" id="end_date" value="">
                                                 </div>
                                                 <div class="col-sm-6">
-                                                    <input type="time" name="end_time" placeholder="Select tiem" class="form-control" id="" value="">
+                                                    <input type="time" name="end_time" placeholder="Select tiem" class="form-control" id="end_time" value="">
                                                 </div>
                                             </div>
                                         </div>
@@ -341,11 +341,19 @@
             $('#section5').show();
             $('#section6').show();
             $('#section7').show();
+            $('#startDateDiveFirst').show();
+            $('#endDateDiveFirst').show();
+            $('#startDateDiveSecond').hide();
+            $('#endDateDiveSecond').hide();
         } else {
             $('#section2').hide();
             $('#section5').hide();
             $('#section6').hide();
             $('#section7').hide();
+            $('#startDateDiveFirst').hide();
+            $('#endDateDiveFirst').hide();
+            $('#startDateDiveSecond').show();
+            $('#endDateDiveSecond').show();
         }
         if (leaveTypes_id == 3) {
             $('#section3').show();
@@ -375,9 +383,17 @@
             if (leaveTypes_id == 2) {
                 $('#section2').show();
                 $('#section7').show();
+                $('#startDateDiveFirst').show();
+                $('#endDateDiveFirst').show();
+                $('#startDateDiveSecond').hide();
+                $('#endDateDiveSecond').hide();
             } else {
                 $('#section2').hide();
                 $('#section7').hide();
+                $('#startDateDiveFirst').hide();
+                $('#endDateDiveFirst').hide();
+                $('#startDateDiveSecond').show();
+                $('#endDateDiveSecond').show();
             }
             if (leaveTypes_id == 3) {
                 $('#section3').show();
@@ -427,5 +443,15 @@
         let update=late_hrs.value;
         late_hrs.value = Number(update)+Number(1);
     }
+});
+$('.absance-btn').on('click', function(event) {
+    event.preventDefault();
+    var leaveTypes_id = document.getElementById('leaveTypes_id').value;
+    var user_id=$("#user_id").val();
+    var start_date_validate=$("#start_date_validate").val();
+    if(leaveTypes_id == 1){
+
+    }
+    alert(leaveTypes_id);return false;
 });
 </script>
