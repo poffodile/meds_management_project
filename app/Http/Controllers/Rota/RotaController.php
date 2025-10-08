@@ -716,18 +716,24 @@ class RotaController extends Controller
     }
 
     function date_validation_for_user(Request $request){
+      // echo json_encode($request->start_id);die;
         $request->start_date_input;
         $staff_leaves = Staffleaves::where('is_deleted', 1)->where('user_id', $request->start_id)->get();
+        // echo json_encode($staff_leaves);die;
         $arr = array();
         foreach($staff_leaves as $staff_leave ){
-            $period = \Carbon\CarbonPeriod::create($staff_leave->start_date, $staff_leave->end_date);
+          $start = $staff_leave->start_date;
+          $end = $staff_leave->end_date ?? $staff_leave->start_date;
+          if (!empty($start) && !empty($end)) {
+            $period = \Carbon\CarbonPeriod::create($start, $end);
             foreach ($period as $date) {
                 // echo $date->format('Y-m-d');
                 if($request->start_date_input == $date->format('Y-m-d')){
                     $arr[] =  \Carbon\Carbon::parse($staff_leave->start_date)->format('D, jS M');
-                    $arr[] =  \Carbon\Carbon::parse($staff_leave->end_date)->format('D, jS M');
+                    $arr[] =  \Carbon\Carbon::parse($staff_leave->end_date ?? $staff_leave->start_date)->format('D, jS M');
                 }
             }
+          }
             $dates = $period->toArray(); 
         }
         echo json_encode($arr);
@@ -1619,85 +1625,153 @@ class RotaController extends Controller
       return "{$hours}h {$minutes}min";
     }
     public function rota_absence(Request $request){
-      $user_id=base64_decode($request->manager) ? base64_decode($request->manager) : base64_decode($request->key);
-      // echo $user_id;die;
-      $absence_data=$this->absence_data($user_id,date('Y'),request());
+      // echo "<pre>";print_r($request->all());die;
+      $user_id=base64_decode($request->manager);
+      $user_id_key='manager';
+      if($request->staff){
+        $user_id=base64_decode($request->staff);
+        $user_id_key='staff';
+      }
+      $reqyear=date('Y');
+      if($request->year){
+        $reqyear=$request->year;
+      }
+      // $user_id=base64_decode($request->manager) ? base64_decode($request->manager) : base64_decode($request->key);
+      $absence_data=$this->absence_data($user_id,$reqyear,request());
       // echo "<pre>";print_r($absence_data);die;
       $currentYear = date('Y');
       $startYear = $currentYear + 1;
       $endYear = $startYear - 10;
       $absence['years'] = range($endYear, $startYear);
-      $absence['renaming_hour']=$absence_data['renaming_hour'];
       $absence['sickness']=$absence_data['sickness'];
       $absence['lateness']=$absence_data['lateness'];
       $absence['current_future']=$absence_data['current_future'];
       $absence['history']=$absence_data['history'];
       $absence['annual']=$absence_data['annual'];
       $absence['other']=$absence_data['other'];
-      $absence['totalSeconds']=$absence_data['totalSeconds'];
-      // echo "<pre>";print_r($absence['totalSeconds']);die;
+      $absence['allowance_hour']=$absence_data['allowance_hour'];
+      $absence['allowance_min']=$absence_data['allowance_min'];
+      $absence['renaming_hour']=$absence_data['renaming_hour'];
+      $absence['renaming_min']=$absence_data['renaming_min'];
+      $absence['allowance_Otherhour']=$absence_data['allowance_Otherhour'];
+      $absence['allowanceOther_min']=$absence_data['allowanceOther_min'];
+      $absence['user_id']=$user_id;
+      $absence['user_id_key']=$user_id_key;
+      $absence['reqyear']=$reqyear;
+      // echo "<pre>";print_r($absence['allowance_Otherhour']);die;
       return view('rotaStaff.absence',$absence);
     }
     public function absence_data($user_id,$year,Request $request){
       $staff_leave_query =  Staffleaves::where('user_id',$user_id)->whereYear('start_date', $year)->where('is_deleted', 1)->where('leave_status', 1);
-        
+          
       $userDetails=User::find($user_id)->holiday_entitlement;
       $renaming_hour=$userDetails ?? 0;
 
       if ($renaming_hour === null || trim($renaming_hour) === '') {
-          $renaming_hour = 0;
+        $renaming_hour = 0;
       } elseif (!is_numeric($renaming_hour)) {
-          $renaming_hour = 0;
+        $renaming_hour = 0;
       } else {
-          $renaming_hour = (int)$renaming_hour;
+        $renaming_hour = (int)$renaming_hour;
       }
       $staff_leave =  $staff_leave_query->get();
-        
-      $allowance_hour=0;
       $leave_count=0;
-      if(count($staff_leave) > 0){
+      $allowance_hour = 0;
+      $allowance_min = 0;
+      $allowance_Otherhour = 0;
+      $allowanceOther_min = 0;
+      if ($staff_leave->count() > 0) {
         foreach ($staff_leave as $val) {
-            $start = new \DateTime($val->start_date);
-            if (!empty($val->end_date)) {
-                $end = new \DateTime($val->end_date);
-            } else {
-                $end = $start;
-            }
-            $diff = $start->diff($end);
-            $leave_count += $diff->days + 1;
+          if ($val->leave_type == 1) {
+            $startDate = new \DateTime($val->start_date);
+            $endDate = !empty($val->end_date) ? new \DateTime($val->end_date) : $startDate;
+            $diff = $startDate->diff($endDate);
+            $totalDays = $diff->days + 1;
+            $leave_count=$leave_count+$totalDays;
+
+            $startTime = strtotime($val->start_time);
+            $endTime = strtotime($val->end_time);
+            $diffSeconds = $endTime - $startTime;
+
+            $hoursPerDay = floor($diffSeconds / 3600);
+            $minutesPerDay = floor(($diffSeconds % 3600) / 60);
+
+            $allowance_hour += $hoursPerDay * $totalDays;
+            $allowance_min += $minutesPerDay * $totalDays;
+
+          }elseif($val->leave_type == 4){
+            $startOtherDate = new \DateTime($val->start_date);
+            $endOtherDate = !empty($val->end_date) ? new \DateTime($val->end_date) : $startOtherDate;
+            $diffOther = $startOtherDate->diff($endOtherDate);
+            $totalOtherDays = $diffOther->days + 1;
+
+            $startOtherTime = strtotime($val->start_time);
+            $endOtherTime = strtotime($val->end_time);
+            $diffOtherSeconds = $endOtherTime - $startOtherTime;
+
+            $hoursPerOtherDay = floor($diffOtherSeconds / 3600);
+            $minutesPerOtherDay = floor(($diffOtherSeconds % 3600) / 60);
+
+            $allowance_Otherhour += $hoursPerOtherDay * $totalOtherDays;
+            $allowanceOther_min += $minutesPerOtherDay * $totalOtherDays;
+          }
         }
-        // $total_hours=RotaAssignEmployee::where('emp_id',$user_id)->whereYear('created_at',date('Y'))->sum('total_hours');
+
+        // Convert minutes to hours
+        $extraHours = floor($allowance_min / 60);
+        $allowance_hour += $extraHours;
+        $allowance_min = $allowance_min % 60;
+        // Other
+        $extraOtherHours = floor($allowanceOther_min / 60);
+        $allowance_Otherhour += $extraOtherHours;
+        $allowanceOther_min = $allowanceOther_min % 60;
+      }
+
+
+      //  Remaining calculation
+      $totalEntitlementSeconds = $renaming_hour * 3600;
+      $totalUsedSeconds = ($allowance_hour * 3600) + ($allowance_min * 60);
+      $remainingSeconds = $totalEntitlementSeconds - $totalUsedSeconds;
+
+      if ($remainingSeconds < 0) {
+          $remainingSeconds = 0;
+      }
+
+      $remainingHour = floor($remainingSeconds / 3600);
+      $remainingMin = floor(($remainingSeconds % 3600) / 60);
         // $totalSeconds = RotaAssignEmployee::where('emp_id', $user_id)->whereYear('created_at', date('Y'))->selectRaw('SUM(TIME_TO_SEC(total_hours)) as total_seconds')->value('total_seconds');
-      }
 
-      $annual = (clone $staff_leave_query)->where('leave_type', 1)->get();
-      $sickness = (clone $staff_leave_query)->where('leave_type', 2)->get();
-      $lateness = (clone $staff_leave_query)->where('leave_type', 3)->get();
-      $other = (clone $staff_leave_query)->where('leave_type', 4)->get();
+        $annual = (clone $staff_leave_query)->where('leave_type', 1)->get();
+        $sickness = (clone $staff_leave_query)->where('leave_type', 2)->get();
+        $lateness = (clone $staff_leave_query)->where('leave_type', 3)->get();
+        $other = (clone $staff_leave_query)->where('leave_type', 4)->get();
 
-      $current_future = (clone $staff_leave_query)
-          ->whereDate('start_date','>=',date('Y-m-d'))
-          ->get();
+        $current_future = (clone $staff_leave_query)
+            ->whereDate('start_date','>=',date('Y-m-d'))
+            ->get();
 
-      $history = (clone $staff_leave_query)
-          ->whereDate('start_date','<',date('Y-m-d'))
-          ->get();
+        $history = (clone $staff_leave_query)
+            ->whereDate('start_date','<',date('Y-m-d'))
+            ->get();
 
-      $data['leave_count']=$leave_count;
-      $data['renaming_hour']=$renaming_hour;
-      $data['totalSeconds']=$totalSeconds;
-      $data['annual']=$annual;
-      $data['sickness']=$sickness;
-      $data['lateness']=$lateness;
-      $data['other']=$other;
-      $data['current_future']=$current_future;
-      $data['history']=$history;
-      if($request->ajax()){
-        return json_encode($data);   
-      }else{
-        return $data;
-      }
-      
+        $data['leave_count']=$leave_count;
+        $data['allowance_hour']=$allowance_hour;
+        $data['allowance_min']=$allowance_min;
+        $data['renaming_hour']=$remainingHour;
+        $data['renaming_min']=$remainingMin;
+        $data['allowance_Otherhour']=$allowance_Otherhour;
+        $data['allowanceOther_min']=$allowanceOther_min;
+        $data['annual']=$annual;
+        $data['sickness']=$sickness;
+        $data['lateness']=$lateness;
+        $data['other']=$other;
+        $data['current_future']=$current_future;
+        $data['history']=$history;
+        if($request->ajax()){
+          return json_encode($data);   
+        }else{
+          return $data;
+        }
     }
 
 }

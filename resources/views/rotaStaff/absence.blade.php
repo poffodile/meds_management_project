@@ -16,19 +16,10 @@
 
 <!--main content start-->
 <?php 
-  function formatHours($totalSeconds) {
-    
-    if ($totalSeconds == 0 || $totalSeconds == null) {
-        $data=['hours'=>0,'min'=>0];
-        return $data;
-    }
-    // $totalSeconds = 3700;
-    $hours = floor($totalSeconds / 3600);
-    $minutes = floor(($totalSeconds % 3600) / 60);
-    $data=['hours'=>$hours,'min'=>$minutes];
-    echo "<pre>";print_r($data);die;
-    return $data;
-  }
+$action_url=url('rota-absence?manager='.base64_encode($user_id));
+if($user_id_key == 'staff'){
+    $action_url=url('rota-absence?staff='.base64_encode($user_id));
+}
   function checkLeavType($leave_type){
     if($leave_type == 1){
         return $leave_type = 'Annual leave';
@@ -66,13 +57,16 @@
                             </div>
                             <div>
                                 <label>Leave year</label>
-                                <div>
-                                    <select class="form-select form-control">
-                                        <?php foreach($years as $yearVal){ $current_year=date('Y');?>
-                                            <option value="{{$yearVal}}" <?php if($current_year == $yearVal){echo 'selected';}?>>01 Jan {{$yearVal}} - 31 Dec {{$yearVal}}</option>
-                                        <?php }?>
-                                    </select>
-                                </div>
+                                <form action="{{$action_url}}" method="post" id="yearForm">
+                                    @csrf
+                                    <div>
+                                        <select class="form-select form-control" id="year" onchange="year_select()" name="year">
+                                            <?php foreach($years as $yearVal){?>
+                                                <option value="{{$yearVal}}" <?php if($reqyear == $yearVal){echo 'selected';}?>>01 Jan {{$yearVal}} - 31 Dec {{$yearVal}}</option>
+                                            <?php }?>
+                                        </select>
+                                    </div>
+                                </form>
                             </div>
 
                         </div>
@@ -87,31 +81,30 @@
                                     <div class="absenceAdd m-t-20">
                                         <label>Annual leave to take</label>
                                         <div class="timeHrsMinuts m-t-20 m-b-20">
-                                            <?php $hrsmin=formatHours($totalSeconds);?>
                                             <div class="timelist">
-                                                <strong><?php echo $hrsmin['hours'];?></strong>
+                                                <strong><?php echo $renaming_hour;?></strong>
                                                 <span>hrs</span>
                                             </div>
                                             <div class="timelist">
-                                                <strong><?php echo $hrsmin['min'];?></strong>
+                                                <strong><?php echo $renaming_min;?></strong>
                                                 <span>mins</span>
                                             </div>
                                             <div class="timelist">
                                                 <strong>/</strong>
                                             </div>
-                                            <?php $allowhrsmin=formatHours($allowance_hour);?>
+                                           
                                             <div class="timelist">
-                                                <strong><?php echo $allowhrsmin['hours'];?></strong>
+                                                <strong>{{$allowance_hour}}</strong>
                                                 <span>hrs</span>
                                             </div>
                                             <div class="timelist">
-                                                <strong><?php echo $allowhrsmin['min'];?></strong>
+                                                <strong>{{$allowance_min}}</strong>
                                                 <span>mins</span>
                                             </div>
                                         </div>
                                         <!-- <p>(Approx 24 / 32 days) <a href="#!"><i class="fa fa-info-o"></i> </a> </p> -->
                                         <div class="m-t-20">
-                                            <a href="#!" type="button" class="btn btn-warning">Add annual leave</a>
+                                            <a href="{{url('absence/type=1?'.$user_id_key.'='.$user_id)}}" type="button" class="btn btn-warning">Add annual leave</a>
                                         </div>
                                     </div>
                                 </div>
@@ -127,7 +120,7 @@
                                         </div>
                                         <!-- <p>(....?) <a href="#!"><i class="fa fa-info-o"></i> </a> </p> -->
                                         <div class="m-t-20">
-                                            <a href="#!" type="button" class="btn btn-warning">Add</a>
+                                            <a href="{{url('absence/type=2?'.$user_id_key.'='.$user_id)}}" type="button" class="btn btn-warning">Add</a>
                                         </div>
                                     </div>
                                 </div>
@@ -143,7 +136,7 @@
                                         </div>
                                         <!-- <p>(....?) <a href="#!"><i class="fa fa-info-o"></i> </a> </p> -->
                                         <div class="m-t-20">
-                                            <a href="#!" type="button" class="btn btn-warning">Add</a>
+                                            <a href="{{url('absence/type=3?'.$user_id_key.'='.$user_id)}}" type="button" class="btn btn-warning">Add</a>
                                         </div>
                                     </div>
                                 </div>
@@ -305,11 +298,11 @@
                                         <label>Remaining</label>
                                         <div class="timeHrsMinuts m-t-20 m-b-20">
                                             <div class="timelist">
-                                                <strong><?php echo $hrsmin['hours'];?></strong>
+                                                <strong><?php echo $renaming_hour;?></strong>
                                                 <span>hrs</span>
                                             </div>
                                             <div class="timelist">
-                                                <strong><?php echo $hrsmin['min'];?></strong>
+                                                <strong><?php echo $renaming_min;?></strong>
                                                 <span>mins</span>
                                             </div>
                                         </div>
@@ -320,19 +313,19 @@
                                         <label>Allowance</label>
                                         <div class="timeHrsMinuts m-t-20 m-b-20">
                                             <div class="timelist">
-                                                <strong><?php echo $allowhrsmin['hours'];?></strong>
+                                                <strong>{{$allowance_hour}}</strong>
                                                 <span>hrs</span>
                                             </div>
                                             <div class="timelist">
-                                                <strong><?php echo $allowhrsmin['min'];?></strong>
+                                                <strong>{{$allowance_min}}</strong>
                                                 <span>mins</span>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-12 m-t-20 text-center">
-                                    <label>Craig has taken {{$hrsmin['hours']-$allowhrsmin['hours']}} hrs of annual leave.</label>
-                                    <a href="#!" type="button" class="btn btn-warning m-t-20">Add annual leave</a>
+                                    <label>Craig has taken {{$allowance_hour}} hrs of annual leave.</label>
+                                    <a href="{{url('absence/type=1?'.$user_id_key.'='.$user_id)}}" type="button" class="btn btn-warning m-t-20">Add annual leave</a>
                                 </div>
                             </div>
                             <div class="absenceHistory m-t-40">
@@ -450,30 +443,41 @@
                                         </div>
                                     </div>
                                 </div>
-                                <?php foreach($lateness as $lateVal){
-                                    $exp=explode('::',$lateVal->late_by);
-                                    $expHour=$exp[0] ?? 0;
-                                    $expMin=$exp[1] ?? 0;
-                                    $latehours=$expHour+$expMin;
-                                    $latenesshrsmin=formatHours($latehours);
-                                }?>
+                                <?php 
+                                $lateness_hour=0;
+                                $lateness_min=0;
+                                foreach($lateness as $lateVal){
+                                    if (!empty($lateVal->late_by)) {
+                                        $lateParts = explode('::', $lateVal->late_by);
+                                        $lateHour = isset($lateParts[0]) ? (int)$lateParts[0] : 0;
+                                        $lateMin = isset($lateParts[1]) ? (int)$lateParts[1] : 0;
+
+                                        $lateness_hour += $lateHour;
+                                        $lateness_min += $lateMin;
+                                    }
+                                }
+
+                                $extraHoursLate = floor($lateness_min / 60);
+                                $allowanceLate_hour = $lateness_hour+$extraHoursLate;
+                                $allowanceLate_min = $lateness_min % 60;
+                                ?>
                                 <div class="col-md-6">
                                     <div class="absenceAdd m-t-20">
                                         <label>Total</label>
                                         <div class="timeHrsMinuts m-t-20 m-b-20">
                                             <div class="timelist">
-                                                <strong><?php echo $latenesshrsmin['hours'] ?? 0;?></strong>
+                                                <strong>{{$allowanceLate_hour}}</strong>
                                                 <span>hrs</span>
                                             </div>
                                             <div class="timelist">
-                                                <strong><?php echo $latenesshrsmin['min'] ?? 0;?></strong>
+                                                <strong>{{$allowanceLate_min}}</strong>
                                                 <span>mins</span>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-12 m-t-20 text-center">
-                                    <a href="#!" type="button" class="btn btn-warning">Add lateness</a>
+                                    <a href="{{url('absence/type=3?'.$user_id_key.'='.$user_id)}}" type="button" class="btn btn-warning">Add lateness</a>
                                 </div>
                             </div>
                             <div class="absenceHistory m-t-40">
@@ -562,7 +566,7 @@
                                     </div>
                                 </div>
                                 <div class="col-md-12 m-t-20 text-center">
-                                    <a href="#!" type="button" class="btn btn-warning">Add Sickness</a>
+                                    <a href="{{url('absence/type=2?'.$user_id_key.'='.$user_id)}}" type="button" class="btn btn-warning">Add Sickness</a>
                                 </div>
                             </div>
                             <div class="absenceHistory m-t-40">
@@ -715,18 +719,18 @@
                                         <label>Total</label>
                                         <div class="timeHrsMinuts m-t-20 m-b-20">
                                             <div class="timelist">
-                                                <strong>0</strong>
+                                                <strong>{{$allowance_Otherhour}}</strong>
                                                 <span>hrs</span>
                                             </div>
                                             <div class="timelist">
-                                                <strong>0</strong>
+                                                <strong>{{$allowanceOther_min}}</strong>
                                                 <span>min</span>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-12 m-t-20 text-center">
-                                    <a href="#!" type="button" class="btn btn-warning">Request other absence</a>
+                                    <a href="{{url('absence/type=4?'.$user_id_key.'='.$user_id)}}" type="button" class="btn btn-warning">Request other absence</a>
                                 </div>
                             </div>
                             <div class="absenceHistory m-t-40">
@@ -746,9 +750,9 @@
                                                             <div class="col-md-12">
                                                                 <?php 
                                                                 foreach($current_future as $cfVal){
-                                                                if($all_histroy->leave_type == 4){
+                                                                if($cfVal->leave_type == 4){
                                                                     $leave_typeAll_cfVal=checkLeavType($cfVal->leave_type);
-                                                                ?>
+                                                                    ?>
                                                                 <div class="row publicHoliday">
                                                                     <div class="col-md-2">
                                                                         <div class="sunIcon">
@@ -859,6 +863,12 @@
             if (div) {
                 div.style.display = "none";
             }
+        }
+    }
+    function year_select(){
+        var yearVal=$('#year').val();
+        if(yearVal){
+            $("#yearForm").submit();
         }
     }
 </script>

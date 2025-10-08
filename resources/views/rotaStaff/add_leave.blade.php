@@ -172,15 +172,15 @@
                                     <div class="mb-3 row">
                                         <label for="name" class="col-sm-2 col-form-label">Start</label>
                                             <div class="col-sm-3 col-md-3" id="startDateDiveFirst" style="display:none">
-                                                <input type="date" id="start_date_validate_first" name="start_date_validate_first" placeholder="Pattern Name" class="form-control checkValidationSecond" id="staticEmail" value="" onchange="dateValidate()">
+                                                <input type="date" id="start_date_validate_first" name="start_date_validate_first" placeholder="Pattern Name" class="form-control" id="staticEmail" value="" onchange="dateValidate()">
                                             </div>
                                         <div class="col-sm-3 col-md-3" id="startDateDiveSecond" style="display:none">
                                             <div class="row">
                                                 <div class="col-sm-6 col-md-6">
-                                                    <input type="date" id="start_date_validate_second" name="start_date_validate_second" placeholder="Pattern Name" class="form-control checkValidationFirst" id="staticEmail" value="" onchange="dateValidate()">
+                                                    <input type="date" id="start_date_validate_second" name="start_date_validate_second" placeholder="Pattern Name" class="form-control checkValidationFirst checkValidationSecond" id="staticEmail" value="" onchange="dateValidate()">
                                                 </div>
                                                 <div class="col-sm-6 col-md-6">
-                                                    <input type="time" id="start_time" name="start_time" class="form-control checkValidationFirst" id="" value="">
+                                                    <input type="time" id="start_time" name="start_time" class="form-control checkValidationFirst checkValidationSecond" id="" value="">
                                                 </div>
                                                 
                                             </div>
@@ -217,15 +217,15 @@
                                         <label for="name" class="col-sm-2 col-form-label">End</label>
                                         
                                         <div class="col-sm-3 col-md-3" id="endDateDiveFirst" style="display:none">
-                                            <input type="date" name="end_date" placeholder="Select date" class="form-control checkValidationSecond" id="end_date_first" value="">
+                                            <input type="date" name="end_date" placeholder="Select date" class="form-control" id="end_date_first" value="">
                                         </div>
                                         <div class="col-sm-3 col-md-3" id="endDateDiveSecond" style="display:none">
                                             <div class="row">
                                                 <div class="col-sm-6">
-                                                    <input type="date" name="end_date" placeholder="Select date" class="form-control checkValidationFirst" id="end_date_second" value="">
+                                                    <input type="date" name="end_date" placeholder="Select date" class="form-control checkValidationFirst checkValidationSecond" id="end_date_second" value="">
                                                 </div>
                                                 <div class="col-sm-6">
-                                                    <input type="time" name="end_time" placeholder="Select tiem" class="form-control checkValidationFirst" id="end_time" value="">
+                                                    <input type="time" name="end_time" placeholder="Select tiem" class="form-control checkValidationFirst checkValidationSecond" id="end_time" value="">
                                                 </div>
                                             </div>
                                         </div>
@@ -299,7 +299,7 @@
         if(start_date_input == ''){
             start_date_input=document.getElementById('start_date_validate_second').value;
         }
-        var user_id = $('#user_id').val()
+        var user_id = $('#user_id').val();
         // alert(user_id);
         var token = "<?= csrf_token() ?>";
         $.ajax({
@@ -425,8 +425,15 @@
     }
 </script>
 <script>
+    $(document).on('input','#late_hrs',function(){
+        this.value = this.value.replace(/[^0-9]/g, '');
+        if ((this.value.match(/\./g) || []).length > 1) {
+            this.value = this.value.slice(0, -1);
+        }
+    });
     $(document).on('input','#late_min', function(){
-    this.value = this.value.replace(/[^0-9.]/g, '');
+    // this.value = this.value.replace(/[^0-9.]/g, '');
+    this.value = this.value.replace(/[^0-9]/g, '');
     var late_hrs=document.getElementById('late_hrs');
     if ((this.value.match(/\./g) || []).length > 1) {
         this.value = this.value.slice(0, -1);
@@ -438,8 +445,13 @@
     }
     if(parts && parts > 9 && parts < 60){
         const ex=this.value.split('0');
-        parts= ex[1];
-        this.value=ex[1];
+        if(ex[0]){
+            parts= ex[0];
+        }else{
+            parts= ex[1];
+        }
+        
+        this.value=parts;
     }
     if(parts && Number(parts) > Number(59)){
         this.value=0;
@@ -507,7 +519,6 @@ $('.absance-btn').on('click', function(event) {
     }else{
         $("#textarea").css('border','');
     }
-    alert("ready to submit")
     $('#addLeaveForm').submit();
 });
 </script>
