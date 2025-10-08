@@ -154,7 +154,7 @@
 
                                                 <a href="{{ url('admin/user/task-allocations/'.$value->id) }}" class="right"s><span style= "color: #000"><i data-toggle="tooltip" title="Task Allocation" class="fa fa-calendar fa-lg"></i></span></a>
 
-                                                <a href="{{ url('admin/user/annual-leaves/'.$value->id) }}" class="right"s><span style= "color: #000"><i data-toggle="tooltip" title="Annual Leave" class="fa fa-files-o fa-lg"></i></span></a>
+                                                <a href="{{ url('admin/user/annual-leaves/'.$value->id) }}" class="right"s><span style= "color: #000"><i data-toggle="tooltip" title="Leave" class="fa fa-files-o fa-lg"></i></span></a>
 
                                                 <a href="{{ url('admin/user/sick-leaves/'.$value->id) }}" class="right"s><span style= "color: #000"><i data-toggle="tooltip" title="Sick Leave" class="fa fa-bed fa-lg"></i></span></a>
 

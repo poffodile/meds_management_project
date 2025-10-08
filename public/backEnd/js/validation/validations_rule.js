@@ -6121,16 +6121,16 @@ $('#add_company_manager_form').formValidation({
                 }
             }
         },
-        "date_of_leaving":
-        {
-            validators:
-            {
-                notEmpty:
-                {
-                    message: 'This field is required'
-                }
-            }
-        },
+        // "date_of_leaving":
+        // {
+        //     validators:
+        //     {
+        //         notEmpty:
+        //         {
+        //             message: 'This field is required'
+        //         }
+        //     }
+        // },
         "current_location":
         {
             validators:

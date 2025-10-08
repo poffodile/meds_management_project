@@ -1,6 +1,7 @@
 @extends('backEnd.layouts.master')
 
-@section('title',' User Annual Leaves')
+{{-- @section('title',' User Annual Leaves') --}}
+@section('title',' User Leaves')
 
 @section('content')
 
