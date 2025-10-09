@@ -1717,6 +1717,10 @@ Route::group(['prefix' => 'admin', 'middleware' => 'CheckAdminAuth'], function (
 
 	//backEnd ServiceUserController
 	Route::match(['get', 'post'], '/service-users', 'App\Http\Controllers\backEnd\serviceUser\ServiceUserController@index');
+	Route::match(['get', 'post'], '/child-sections', 'App\Http\Controllers\backEnd\serviceUser\ServiceUserController@child_sections');
+	Route::post('/childsection_status_change', 'App\Http\Controllers\backEnd\serviceUser\ServiceUserController@childsection_status_change');
+	Route::get('/child-section/delete/{id}', 'App\Http\Controllers\backEnd\serviceUser\ServiceUserController@child_section_delete');
+	Route::post('/child-section-save', 'App\Http\Controllers\backEnd\serviceUser\ServiceUserController@child_section_save');
 	Route::match(['get', 'post'], '/service-users/add', 'App\Http\Controllers\backEnd\serviceUser\ServiceUserController@add');
 	Route::match(['get', 'post'], '/service-users/edit/{su_id}', 'App\Http\Controllers\backEnd\serviceUser\ServiceUserController@edit');
 	Route::match(['get', 'post'], '/service-users/delete/{su_id}', 'App\Http\Controllers\backEnd\serviceUser\ServiceUserController@delete');

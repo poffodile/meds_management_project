@@ -188,8 +188,8 @@ if($user_id_key == 'staff'){
                                                                     </div>
                                                                     <div class="col-md-2">
                                                                         <div class="sunIcon">
-                                                                            <a href="#!"><i class="fa fa-pencil-square-o"></i></a>
-                                                                            <a href="#!"><i class="fa fa-trash-o"></i></a>
+                                                                            <a href="{{url('absence/type='.$cfVal->leave_type.'?'.$user_id_key.'='.$user_id.'&leave_id='.$cfVal->id)}}"><i class="fa fa-pencil-square-o"></i></a>
+                                                                            <a href="{{url('absence/type='.$cfVal->leave_type.'?'.$user_id_key.'='.$user_id.'&leave_id='.$cfVal->id)}}"><i class="fa fa-trash-o"></i></a>
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -708,7 +708,7 @@ if($user_id_key == 'staff'){
                                         <label>Logged</label>
                                         <div class="timeHrsMinuts m-t-20 m-b-20">
                                             <div class="timelist">
-                                                <strong>2</strong>
+                                                <strong>{{count($other)}}</strong>
                                                 <span>occurrences</span>
                                             </div>
                                         </div>

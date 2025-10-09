@@ -97,7 +97,7 @@ class checkUserAuth
                 //,'/general/petty_cash/check-balance'
                 //if requested path is not one of them that don't need permission. then check it for permission 
                 // Ram 10/06/2025 new array create to temprary for Rota Management by Abhishek sir when testing task done then we have to remove it.
-                array_push($allowed_path,'rota/staff','rota/staff-add','/rota/staff-delete/{id}','get_leave_record_for_1_week','get_leave_record_for__week','staff/logs','staff/log/view','satff/log/view/filter','satff/log/view/is_valid','staff/timesheet','staff/timesheet_filter','pending-request-data','approve_leave');
+                array_push($allowed_path,'rota/staff','rota/staff-add','/rota/staff-delete/{id}','get_leave_record_for_1_week','get_leave_record_for__week','staff/logs','staff/log/view','satff/log/view/filter','satff/log/view/is_valid','staff/timesheet','staff/timesheet_filter','pending-request-data','approve_leave','date_validation_for_user');
                 // echo "<pre>";print_r($allowed_path);die;
                 // end here
                 if(!in_array($path, $allowed_path)) {

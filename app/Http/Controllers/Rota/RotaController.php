@@ -530,6 +530,7 @@ class RotaController extends Controller
     }
 
     function annual_leave_view($id,Request $request){
+      // echo "<pre>";print_r($request->all());die;
         $home_ids = Auth::user()->home_id;
         $ex_home_ids = explode(',', $home_ids);
         $home_id=$ex_home_ids[0];
@@ -540,6 +541,11 @@ class RotaController extends Controller
         $data['leavetype'] = LeaveType::where('status', 1)->get();
         // $data['users'] = ServiceUser::where('home_id', $home_id)->where('is_deleted',0)->get();
         $data['users'] = User::where('home_id', $home_id)->where('is_deleted', 0)->get();
+        $staffleave='';
+        if($request->leave_id){
+          $staffleave=Staffleaves::find($request->leave_id);
+        }
+        $data['staffleave']=$staffleave;
         // dd($data);
         return view('rotaStaff.add_leave', $data);
     }
@@ -632,7 +638,7 @@ class RotaController extends Controller
     }
 
     function add_leave(Request $request){
-      // echo "<pre>";print_r($request->all());die;
+      echo "<pre>";print_r($request->all());die;
         if($request->ongoingLeave == "yes"){
             $ongoingLeave = 1;
         }else {

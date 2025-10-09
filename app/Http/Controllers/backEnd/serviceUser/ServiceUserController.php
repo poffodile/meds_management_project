@@ -8,6 +8,9 @@ use Illuminate\Http\Request;
 
 use App\ServiceUser, App\Home, App\SocialApp, App\ServiceUserSocialApp, App\Ethnicity;
 use Hash, DB, Session;
+use App\Models\ChildSection;
+use Carbon\Carbon;
+use Validator;
 
 class ServiceUserController extends Controller
 {
@@ -403,4 +406,80 @@ class ServiceUserController extends Controller
             //echo json_encode(true);  //  for jquery validations
         }    
     }*/
+    public function child_sections(Request $request){
+        $home_id = Session::get('scitsAdminSession')->home_id;
+        if (!empty($home_id)) {
+            $section_query = ChildSection::select('id', 'home_id', 'section','status')
+                ->whereNull('deleted_at')
+                ->where('home_id', $home_id);
+            $search = '';
+
+            if (isset($request->limit)) {
+                $limit = $request->limit;
+                Session::put('page_record_limit', $limit);
+            } else {
+                if (Session::has('page_record_limit')) {
+                    $limit = Session::get('page_record_limit');
+                } else {
+                    $limit = 25;
+                }
+            }
+
+            if (isset($request->search)) {
+                $search = trim($request->search);
+                $section_query = $section_query->where('section', 'like', '%' . $search . '%');
+            }
+
+            $section_query = $section_query->paginate($limit);
+        } else {
+            return redirect('admin/')->with('error', UNAUTHORIZE_ERR);
+        }
+
+        //$users = DB::table('user')->select('id','name','user_name', 'email', 'access_level')->paginate(25);
+        $page = 'child_section';
+        return view('backEnd.serviceUser.child_sections', compact('page', 'limit', 'section_query', 'search'));
+    }
+    public function childsection_status_change(Request $request){
+        $table=ChildSection::find($request->id);
+        $table->status=$request->status;
+        if($table->save()){
+            echo "done";
+        }else{
+            echo "error";
+        }
+    }
+    public function child_section_delete($id){
+        $table=ChildSection::find($id);
+        $table->deleted_at = Carbon::now();
+        if($table->save()){
+            return redirect()->back()->with('success','Section is deleted');
+        }else{
+            return redirect()->back()->with('error','Somthing went wrong');
+        }
+    }
+    public function child_section_save(Request $request){
+        // echo "<pre>";print_r($request->all());die;
+        $validator = Validator::make($request->all(), [
+            'section' => 'required',
+            'status' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return redirect()->back()->with('error',$validator->errors()->first());
+            // return response()->json(['error' => $validator->errors()->first()]);
+        }
+        $table=new ChildSection;
+        $message='Save Successfully done';
+        if($request->id){
+            $message='Update Successfully done';
+            $table=ChildSection::find($request->id);
+        }
+        $table->home_id=Session::get('scitsAdminSession')->home_id;
+        $table->section=$request->section;
+        $table->status=$request->status;
+        if($table->save()){
+            return redirect()->back()->with('success',$message);
+        }else{
+            return redirect()->back()->with('error','Something went wrong!');
+        }
+    }
 }
