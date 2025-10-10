@@ -209,7 +209,8 @@
                                 ?>
 
                                 <div class="profile-pic text-center">
-                                    <img src="{{ url(serviceUserProfileImagePath . '/' . $user_image) }}" alt="" class="profile_click {{ $profile_color }}" />
+                                    <img src="{{ url(serviceUserProfileImagePath . '/' . $user_image) }}" alt=""
+                                        class="profile_click {{ $profile_color }}" />
                                 </div>
                                 <div class="contact">
                                     <h3><span><i class="fa fa-map-marker"></i></span> Current location <a
@@ -284,63 +285,78 @@
                                                         ?>
                                                         <strong style="color:#3399CC;"> &nbsp &nbsp Risk</strong> :
                                                         {{ $risk_status }}
-                                                    </p>
                                                     <p class="info">
                                                         <strong style="color:#3399CC;">Height</strong> :
-                                                        {{ $patient->height }}
-                                                        <strong style="color:#3399CC; "> &nbsp &nbsp Weight</strong> :
-                                                        {{ $patient->weight }}
-                                                        <strong style="color:#3399CC;"> &nbsp &nbsp Hair & Eyes</strong> :
-                                                        {{ $patient->hair_and_eyes }}
-                                                        <strong style="color:#3399CC;"> &nbsp &nbsp Markings</strong> :
-                                                        {{ $patient->markings }}
+                                                        @switch($patient->height_unit)
+                                                            @case('ft_in')
+                                                                {{ $patient->height_ft }} ft {{ $patient->height_in }} in
+                                                            @break
+
+                                                            @case('cm')
+                                                                {{ $patient->height_ft }} cm
+                                                            @break
+
+                                                            @default
+                                                                N/A
+                                                        @endswitch
+
+                                                        <strong style="color:#3399CC;"> &nbsp;&nbsp; Weight</strong> :
+                                                        {{ $patient->weight ?? 'N/A' }}
+                                                        {{ $patient->weight_unit === 'kg' ? 'kg' : ($patient->weight_unit === 'lbs' ? 'lbs' : '') }}
+
+                                                        <strong style="color:#3399CC;"> &nbsp;&nbsp; Hair & Eyes</strong> :
+                                                        {{ $patient->hair_and_eyes ?? 'N/A' }}
+
+                                                        <strong style="color:#3399CC;"> &nbsp;&nbsp; Markings</strong> :
+                                                        {{ $patient->markings ?? 'N/A' }}
                                                     </p>
+
                                             </div>
                                         </div>
                                         <!-- <div class="col-md-6">
-                                        <div class="contact">
-                                            <h2> <span><i class="fa fa-map-marker"></i></span> Current location <a href="javascript:void(0)" class="location-edit-btn" clmn-name="current_location"><i class="fa fa-pencil profile"></i> </a> </h2>
-                                            <div class="location-info current_location"><p>{!! $patient->current_location !!}</p></div>
+                                            <div class="contact">
+                                                <h2> <span><i class="fa fa-map-marker"></i></span> Current location <a href="javascript:void(0)" class="location-edit-btn" clmn-name="current_location"><i class="fa fa-pencil profile"></i> </a> </h2>
+                                                <div class="location-info current_location"><p>{!! $patient->current_location !!}</p></div>
 
-                                        </div>
-                                        <div class="location-info ">
-                                            <strong style="color:#3399CC;">Previous Location</strong><br>
-                                            <div class="previous_location"><p>{!! $patient->previous_location !!}</p></div>
-                                        </div>
-                                    </div> -->
+                                            </div>
+                                            <div class="location-info ">
+                                                <strong style="color:#3399CC;">Previous Location</strong><br>
+                                                <div class="previous_location"><p>{!! $patient->previous_location !!}</p></div>
+                                            </div>
+                                        </div> -->
                                     </div>
                                     <!-- <div class="profile-statistics back-res">
-                                   <?php
-                                   $dob = Carbon\Carbon::parse($patient->date_of_birth);
-                                   $age = $dob->diffInYears();
-                                   ?>
-                                   <h1>{{ $age }}</h1>
-                                   <p>Years Old</p>
-                                   <h1>{{ $patient->admission_number }}</h1>
-                                   <p>Admission Number</p>
-                                   <h1>{{ $patient->section }}</h1>
-                                   <p>Section</p>
-                                    <?php $risk_status = App\Risk::overallRiskStatus($service_user_id);
-                                    if ($risk_status == 1) {
-                                        $color = 'orange-clr';
-                                        $risk_status = 'Historic';
-                                    } elseif ($risk_status == 2) {
-                                        $color = 'red-clr';
-                                        $risk_status = 'High';
-                                    } else {
-                                        $color = 'darkgreen-clr';
-                                        $risk_status = 'No';
-                                    }
-                                    ?>
-                                   <h1 id="su_risk_status" class="{{ $color }}">{{ $risk_status }}</h1>
-                                   <p>Risk</p>
-                                    <?php
+                                       <?php
+                                       $dob = Carbon\Carbon::parse($patient->date_of_birth);
+                                       $age = $dob->diffInYears();
+                                       ?>
+                                       <h1>{{ $age }}</h1>
+                                       <p>Years Old</p>
+                                       <h1>{{ $patient->admission_number }}</h1>
+                                       <p>Admission Number</p>
+                                       <h1>{{ $patient->section }}</h1>
+                                       <p>Section</p>
+                                        <?php $risk_status = App\Risk::overallRiskStatus($service_user_id);
+                                        if ($risk_status == 1) {
+                                            $color = 'orange-clr';
+                                            $risk_status = 'Historic';
+                                        } elseif ($risk_status == 2) {
+                                            $color = 'red-clr';
+                                            $risk_status = 'High';
+                                        } else {
+                                            $color = 'darkgreen-clr';
+                                            $risk_status = 'No';
+                                        }
+                                        ?>
+                                       <h1 id="su_risk_status" class="{{ $color }}">{{ $risk_status }}</h1>
+                                       <p>Risk</p>
+                                        <?php
                                 if (isset($noti_data['back_path'])) { ?>
-                                       <div class="cus-back-btn">
-                                           <a href="{{ $noti_data['back_path'] }}" class="btn cus-btn btn-warning">Continue</a>
-                                       </div>
-                                    <?php } ?>
-                               </div> -->
+                                           <div class="cus-back-btn">
+                                               <a href="{{ $noti_data['back_path'] }}" class="btn cus-btn btn-warning">Continue</a>
+                                           </div>
+                                        <?php } ?>
+                                   </div> -->
                                     <!--<a href="#" class="btn btn-primary">Read Full Profile</a>-->
                                 </div>
                             </div>
@@ -349,7 +365,7 @@
                                     <a href="{{ url('/service/calendar/' . $service_user_id) }}" title="Calendar"><i
                                             class="fa fa-calendar"></i></a>
                                     <!-- <a href="" title="{{ $labels['mfc']['label'] }}" class="mfc"><i class="fa fa-user-times"></i></a>
-                                    <a href="" title="{{ $labels['living_skill']['label'] }}" class="living-skill-list"><i class="fa fa-child"></i></a>  -->
+                                        <a href="" title="{{ $labels['living_skill']['label'] }}" class="living-skill-list"><i class="fa fa-child"></i></a>  -->
                                     <a data-toggle="modal" href="#filemngrModal" title="File Manager"><i
                                             class="fa fa-folder-open-o" aria-hidden="true"></i></a>
                                     <!-- <a data-toggle="modal" href="#filemngrModal" title="YP Log Book"><i class="fa fa-address-book-o"></i></a> -->
@@ -403,21 +419,21 @@
                                                 <div class="foor-box-wrap">
                                                     <div class="col-lg-12 p-r-0 resp-padd-right">
                                                         <!-- <div class="col-md-3 col-sm-4 col-xs-12 ">
-                                                                <div class="profile-nav alt">
-                                                                    <a href="{{ url('/service/earning-scheme/' . $service_user_id) }}">
-                                                                        <section class="panel text-center profile-square" style="">
-                                                                            <div class="user-heading alt wdgt-row purple-bg">
-                                                                                <i class="{{ $labels['earning_scheme']['icon'] }}"></i> <!-- fa fa-star-half-o --
-                                                                            </div>
-                                                                            <div class="panel-body">
-                                                                                <div class="wdgt-value">
-                                                                                    {{ $labels['earning_scheme']['label'] }}
+                                                                    <div class="profile-nav alt">
+                                                                        <a href="{{ url('/service/earning-scheme/' . $service_user_id) }}">
+                                                                            <section class="panel text-center profile-square" style="">
+                                                                                <div class="user-heading alt wdgt-row purple-bg">
+                                                                                    <i class="{{ $labels['earning_scheme']['icon'] }}"></i> <!-- fa fa-star-half-o --
                                                                                 </div>
-                                                                            </div>
-                                                                        </section>
-                                                                    </a>
-                                                                </div>
-                                                            </div> -->
+                                                                                <div class="panel-body">
+                                                                                    <div class="wdgt-value">
+                                                                                        {{ $labels['earning_scheme']['label'] }}
+                                                                                    </div>
+                                                                                </div>
+                                                                            </section>
+                                                                        </a>
+                                                                    </div>
+                                                                </div> -->
 
                                                         {{-- <div class="col-md-2 col-sm-4 col-xs-12 ">
                                                         <div class="profile-nav alt">
@@ -472,7 +488,8 @@
                                                         <!-- </div> -->
 
                                                         <div class="col-md-2 col-sm-4 col-xs-12 ">
-                                                            <a href="{{ url('/service/missing-care-form-records/' . $service_user_id) }}">
+                                                            <a
+                                                                href="{{ url('/service/missing-care-form-records/' . $service_user_id) }}">
                                                                 <div class="profile-nav alt">
                                                                     <section class="panel text-center profile-square">
                                                                         <div
@@ -506,21 +523,23 @@
                                                             </div>
                                                         </div>
 
-                                                            <div class="col-md-2 col-sm-4 col-xs-12 ">     {{-- incident_plan_modal --}}
-                                                            <a href="{{ url('service/incident-report/'.$service_user_id) }}">
-                                                            <div class="profile-nav alt">
-                                                                <section class="panel text-center profile-square">
-                                                                    <div class="user-heading alt wdgt-row label-warning">
-                                                                        <i
-                                                                            class="{{ $labels['incident_report']['icon'] }}"></i>
-                                                                    </div>
-                                                                    <div class="panel-body">
-                                                                        <div class="wdgt-value">
-                                                                            {{ $labels['incident_report']['label'] }}
+                                                        <div class="col-md-2 col-sm-4 col-xs-12 "> {{-- incident_plan_modal --}}
+                                                            <a
+                                                                href="{{ url('service/incident-report/' . $service_user_id) }}">
+                                                                <div class="profile-nav alt">
+                                                                    <section class="panel text-center profile-square">
+                                                                        <div
+                                                                            class="user-heading alt wdgt-row label-warning">
+                                                                            <i
+                                                                                class="{{ $labels['incident_report']['icon'] }}"></i>
                                                                         </div>
-                                                                    </div>
-                                                                </section>
-                                                            </div>
+                                                                        <div class="panel-body">
+                                                                            <div class="wdgt-value">
+                                                                                {{ $labels['incident_report']['label'] }}
+                                                                            </div>
+                                                                        </div>
+                                                                    </section>
+                                                                </div>
                                                             </a>
                                                         </div>
                                                         <!-- Pre Invoice -->
@@ -549,20 +568,20 @@
                                                     <div class="col-lg-6 p-l-0 resp-padd-left">
 
                                                         <!-- <div class="col-md-3 col-sm-4 col-xs-12 mood-chart">
-                                                                <div class="profile-nav alt">
-                                                                    <section class="panel text-center profile-square">
-                                                                        <div class="user-heading alt wdgt-row label-danger">
-                                                                            <i class="fa fa-thermometer-3"></i>
-                                                                        </div>
-                                                                        <div class="panel-body">
-                                                                            <div class="wdgt-value">
-                                                                                Emotional Health and Well Being / Mood Chart --
-                                                                                Emotional Thermometer
+                                                                    <div class="profile-nav alt">
+                                                                        <section class="panel text-center profile-square">
+                                                                            <div class="user-heading alt wdgt-row label-danger">
+                                                                                <i class="fa fa-thermometer-3"></i>
                                                                             </div>
-                                                                        </div>
-                                                                    </section>
-                                                                </div>
-                                                            </div> -->
+                                                                            <div class="panel-body">
+                                                                                <div class="wdgt-value">
+                                                                                    Emotional Health and Well Being / Mood Chart --
+                                                                                    Emotional Thermometer
+                                                                                </div>
+                                                                            </div>
+                                                                        </section>
+                                                                    </div>
+                                                                </div> -->
 
                                                     </div>
                                                 </div>
@@ -590,9 +609,9 @@
                                             <section class="panel m-0">
                                                 <header class="panel-heading"> Notification
                                                     <!-- <span class="tools pull-right">
-                                                    <a href="javascript:;" class="fa fa-chevron-down"></a>
-                                                    <a href="javascript:;" class="fa fa-cog"></a> <a href="javascript:;" class="fa fa-times"></a>
-                                                </span> -->
+                                                        <a href="javascript:;" class="fa fa-chevron-down"></a>
+                                                        <a href="javascript:;" class="fa fa-cog"></a> <a href="javascript:;" class="fa fa-times"></a>
+                                                    </span> -->
 
                                                 </header>
                                                 <div class="panel-body  min-ht-0 srvc_usr_ntf">
@@ -865,90 +884,90 @@
 
     <script>
         /*
-        // profile status change
-        $(document).ready(function(){
-            // $('.sum_profile_click').dblclick(function(){
-            //      // alert(1); return false;
-            //     $(this).addClass('profile_active_status');
-            //     var service_user_id = $(this).attr('id');
-            //     //var service_user_id = "{{ $patient->id }}";
-            //     $('.loader').show();
-            //     $('body').addClass('body-overflow');
-            //     $.ajax({
-            //         type   : 'get',
-            //         url    : "{{ url('/service/user-profile/status/') }}"+'/'+service_user_id,
-            //         success:function(resp){
-            //             if(isAuthenticated(resp) == false){
-            //                 return false;
-            //             }
-            //             if(resp == '1') {
-            //                 if($('.profile_active_status').hasClass('profile_active')) {
-            //                     $('.profile_active_status').removeClass('profile_active');
-            //                     $('.profile_active_status').addClass('profile_inactive');
-            //                 } else {
-            //                     $('.profile_active_status').removeClass('profile_inactive')
-            //                      $('.profile_active_status').addClass('profile_active');
-            //                 }
-            //             } else {
-            //             }
-            //             $('.profile_active_status').removeClass('profile_active_status');
-            //             $('.loader').hide();
-            //             $('body').removeClass('body-overflow');
-            //         }
-            //     });
-            //     return false;
-            // });
+            // profile status change
+            $(document).ready(function(){
+                // $('.sum_profile_click').dblclick(function(){
+                //      // alert(1); return false;
+                //     $(this).addClass('profile_active_status');
+                //     var service_user_id = $(this).attr('id');
+                //     //var service_user_id = "{{ $patient->id }}";
+                //     $('.loader').show();
+                //     $('body').addClass('body-overflow');
+                //     $.ajax({
+                //         type   : 'get',
+                //         url    : "{{ url('/service/user-profile/status/') }}"+'/'+service_user_id,
+                //         success:function(resp){
+                //             if(isAuthenticated(resp) == false){
+                //                 return false;
+                //             }
+                //             if(resp == '1') {
+                //                 if($('.profile_active_status').hasClass('profile_active')) {
+                //                     $('.profile_active_status').removeClass('profile_active');
+                //                     $('.profile_active_status').addClass('profile_inactive');
+                //                 } else {
+                //                     $('.profile_active_status').removeClass('profile_inactive')
+                //                      $('.profile_active_status').addClass('profile_active');
+                //                 }
+                //             } else {
+                //             }
+                //             $('.profile_active_status').removeClass('profile_active_status');
+                //             $('.loader').hide();
+                //             $('body').removeClass('body-overflow');
+                //         }
+                //     });
+                //     return false;
+                // });
 
-            // $('.sum_profile_click').click(function(){
-            //     var su_id = $(this).attr('id');
-            //     window.location.href = "{{ url('/service/user-profile') }}"+'/'+su_id;
-            // });
+                // $('.sum_profile_click').click(function(){
+                //     var su_id = $(this).attr('id');
+                //     window.location.href = "{{ url('/service/user-profile') }}"+'/'+su_id;
+                // });
 
-            //yp photo right click functionality
-            $(function () {
-                $('.profile_click').bind('contextmenu', function (e) {
-                    var service_user_id = "{{ $service_user_id }}";
-                    $(this).addClass('profile_active_status');
-                    $('.loader').show();
-                    $('body').addClass('body-overflow');
-                $.ajax({
-                    type   : 'get',
-                    url    : "{{ url('/service/user-profile/afc-status/update') }}"+'/'+service_user_id,
-                    success:function(resp){
-                        if(isAuthenticated(resp) == false){
-                            return false;
-                        }
-                        if(resp == 'true') {
-                            if($('.profile_active_status').hasClass('profile_active')) {
-                                $('.profile_active_status').removeClass('profile_active');
-                                $('.profile_active_status').addClass('profile_inactive');
-                            } else {
-                                $('.profile_active_status').removeClass('profile_inactive')
-                                 $('.profile_active_status').addClass('profile_active');
+                //yp photo right click functionality
+                $(function () {
+                    $('.profile_click').bind('contextmenu', function (e) {
+                        var service_user_id = "{{ $service_user_id }}";
+                        $(this).addClass('profile_active_status');
+                        $('.loader').show();
+                        $('body').addClass('body-overflow');
+                    $.ajax({
+                        type   : 'get',
+                        url    : "{{ url('/service/user-profile/afc-status/update') }}"+'/'+service_user_id,
+                        success:function(resp){
+                            if(isAuthenticated(resp) == false){
+                                return false;
                             }
-                            //show success message
-                            $('.ajax-alert-suc').find('.msg').text('MFC/AFC status has been changed successfully.');
-                            $('.ajax-alert-suc').show();
-                            setTimeout(function(){$(".ajax-alert-suc").fadeOut()}, 5000);
-                        } else if(resp == 'AUTH_ERR') {
-                            $('.ajax-alert-err').find('.msg').text("{{ UNAUTHORIZE_ERR }}");
-                            $('.ajax-alert-err').show();
-                            setTimeout(function(){$(".ajax-alert-err").fadeOut()}, 5000);
-                        } else {
-                            $('.ajax-alert-err').find('.msg').text('Some Error Occured. Status can not be updated.');
-                            $('.ajax-alert-err').show();
-                            setTimeout(function(){$(".ajax-alert-err").fadeOut()}, 5000);
+                            if(resp == 'true') {
+                                if($('.profile_active_status').hasClass('profile_active')) {
+                                    $('.profile_active_status').removeClass('profile_active');
+                                    $('.profile_active_status').addClass('profile_inactive');
+                                } else {
+                                    $('.profile_active_status').removeClass('profile_inactive')
+                                     $('.profile_active_status').addClass('profile_active');
+                                }
+                                //show success message
+                                $('.ajax-alert-suc').find('.msg').text('MFC/AFC status has been changed successfully.');
+                                $('.ajax-alert-suc').show();
+                                setTimeout(function(){$(".ajax-alert-suc").fadeOut()}, 5000);
+                            } else if(resp == 'AUTH_ERR') {
+                                $('.ajax-alert-err').find('.msg').text("{{ UNAUTHORIZE_ERR }}");
+                                $('.ajax-alert-err').show();
+                                setTimeout(function(){$(".ajax-alert-err").fadeOut()}, 5000);
+                            } else {
+                                $('.ajax-alert-err').find('.msg').text('Some Error Occured. Status can not be updated.');
+                                $('.ajax-alert-err').show();
+                                setTimeout(function(){$(".ajax-alert-err").fadeOut()}, 5000);
+                            }
+                            $('.profile_active_status').removeClass('profile_active_status');
+                            $('.loader').hide();
+                            $('body').removeClass('body-overflow');
                         }
-                        $('.profile_active_status').removeClass('profile_active_status');
-                        $('.loader').hide();
-                        $('body').removeClass('body-overflow');
-                    }
+                    });
+                    return false;
+                    e.preventDefault();
+                    });
                 });
-                return false;
-                e.preventDefault();
-                });
-            });
-        }); */
+            }); */
     </script>
 
     <!-- commom scripts -->
