@@ -189,6 +189,8 @@ class LogBookController extends GeneralAdminController
                     $su_log_record                  = new ServiceUserLogBook;
                     $su_log_record->log_book_id     = $log_book_record['id'];
                     $su_log_record->service_user_id = $data['select_usr_id'];
+                    $su_log_record->logType = 1;
+                    
                     $su_log_record->user_id         = Auth::user()->id;
                     if($su_log_record->save())  {
                         if($data['add_calender'] == 'on'){

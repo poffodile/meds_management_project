@@ -32,16 +32,48 @@ class ProfileController extends ServiceUserManagementController
 
         if (!empty($patient)) {
 
-
-
             if ($patient->home_id != $home_id) {
                 return redirect('/')->with('error', UNAUTHORIZE_ERR);
             }
 
-            $risks = DB::table('risk')->select('id', 'description', 'icon', 'status')
-                ->where('home_id', $home_id)
-                ->where('is_deleted', '0')
+            // $risks = DB::table('risk')->select('id', 'description', 'icon', 'status')
+            //     ->where('home_id', $home_id)
+            //     ->where('is_deleted', '0')
+            //     ->get();
+
+            // subquery that returns latest su_risk.id per risk_id for the given service_user
+            $latest = DB::table('su_risk as s')
+                ->select('s.risk_id', DB::raw('MAX(s.id) as max_id'))
+                ->where('s.service_user_id', $service_user_id)
+                ->groupBy('s.risk_id');
+
+            $risks = DB::table('risk')
+                ->leftJoinSub($latest, 'latest', function ($join) {
+                    $join->on('risk.id', '=', 'latest.risk_id');
+                })
+                ->leftJoin('su_risk as su', function ($join) {
+                    $join->on('su.id', '=', 'latest.max_id');
+                })
+                ->select(
+                    'risk.id as risk_id',
+                    'risk.description',
+                    'risk.icon',
+                    'risk.status as risk_status',        // risk table status (if needed)
+                    'su.id as user_risk_id',             // latest su_risk id for this risk & user (or null)
+                    'su.status as user_status'           // latest su_risk status for this risk & user (or null)
+                )
+                ->where('risk.home_id', $home_id)
+                ->where('risk.is_deleted', '0')
+                                ->orderByRaw("
+                        CASE 
+                        WHEN su.status = 2 THEN 0
+                        WHEN su.status = 1 THEN 1
+                        WHEN su.status = 0 THEN 2
+                        ELSE 3
+                        END
+                    ")
                 ->get();
+
             $daily_score   = DB::table('daily_record_score')->get();
             $care_team = DB::table('su_care_team')->select('id', 'job_title_id', 'name', 'email', 'phone_no', 'image', 'address')->where('service_user_id', $service_user_id)->where('is_deleted', '0')->orderBy('id', 'desc')->get();
 

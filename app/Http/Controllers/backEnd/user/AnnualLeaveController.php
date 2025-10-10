@@ -18,6 +18,13 @@ class AnnualLeaveController extends Controller
 
             // $u_annual = StaffAnnualLeave::where('staff_member_id', $user_id)->where('is_deleted','0')->select('id','title', 'leave_date','staff_member_id');
             $u_annual = Staffleaves::where(['user_id'=> $user_id,'leave_type'=>1])->where('is_deleted','1')->select('id','home_id', 'user_id','leave_type','start_date','end_date','notes','leave_status');
+
+            //    $u_annual = Staffleaves::where(['staff_leaves.user_id'=> $user_id, 'staff_leaves.is_deleted' => '1'])
+            //             ->join('leave_type', 'leave_type.id', '=', 'staff_leaves.leave_type')
+            //             ->select('staff_leaves.*', 'leave_type.leave_name')
+            //             ->orderBy('staff_leaves.created_at', 'desc');
+
+            
             $search = '';
 
             if(isset($request->limit))

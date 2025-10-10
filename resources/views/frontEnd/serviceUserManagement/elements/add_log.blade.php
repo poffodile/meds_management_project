@@ -66,7 +66,7 @@
                                 <div class="col-md-9 col-sm-10 col-xs-12">
                                     <div data-date-viewmode="years" data-date-format="dd-mm-yyyy" data-date=""
                                         class="input-group date"> <!--  dpYears  -->
-                                        <input name="log_date" id="daily_log_date" value="{{ date('d-m-Y H:i') }}"
+                                        <input name="log_date" id="daily_log_date" value="{{ \Carbon\Carbon::now()->format('d-m-Y H:i') }}"
                                             type="text" readonly="" size="16"
                                             class="form-control daily-log-book-datetime">
                                         <span class="input-group-btn add-on datetime-picker2">
@@ -110,7 +110,7 @@
                                 <div class="col-md-9 col-sm-10 col-xs-12">
                                     <div class="select-style">
                                         <select name="dynamic_form_builder_id" class="dynamic_form_select"
-                                            id="dynamic_form_builder_log">
+                                            id="">
                                             <option value="0"> Select Form </option>
                                             <?php
                                             $this_location_id = App\DynamicFormLocation::getLocationIdByTag('daily_log');
@@ -209,7 +209,7 @@
                                 <label class="col-md-2 col-sm-1 col-xs-12 p-t-7"> Category: </label>
                                 <div class="col-md-9 col-sm-10 col-xs-12">
                                     <div class="select-style">
-                                        <select name="category" class='su_name' required>
+                                        <select name="category" class='su_name' required id="edit_category">
                                             <option disabled selected value> -- Select an option -- </option>
                                             @foreach ($categorys as $key)
                                                 <option value="{{ $key['id'] }}">{{ $key['name'] }}</option>
@@ -228,9 +228,8 @@
                                             type="text" readonly="" size="16"
                                             class="form-control daily-log-book-datetime">
                                         <span class="input-group-btn add-on datetime-picker2">
-                                            <input type="text" value="" name=""
-                                                id="log-book-datetimepicker" autocomplete="off"
-                                                class="form-control date-btn2">
+                                            <input type="text" value="" name="" id=""
+                                                autocomplete="off" class="form-control date-btn2">
                                             <button class="btn btn-primary" type="button"><span
                                                     class="glyphicon glyphicon-calendar"></span></button>
                                         </span>
@@ -257,16 +256,18 @@
                                     </div>
                                 </div>
                             </div>
-                            <div id="image-preview" style="margin-top:10px; display:none;">
+                            <div id="image-preview-edit" style="margin-top:10px; display:none;">
                                 <img src="" alt="Preview"
                                     style="max-width:200px; border:1px solid #ddd; padding:5px;">
                             </div>
                             <!-- new image -->
-                            <input type="hidden" class="dynamic_form_log_select">
+                            <input type="hidden" name="dynamic_form_log_select" class="dynamic_form_log_select"
+                                id="dynamic_form_log_select">
                             <div class="form-group col-md-12 col-sm-12 col-xs-12 p-0">
                                 <label class="col-md-2 col-sm-1 col-xs-12 p-t-7"> Add: </label>
                                 <div class="col-md-9 col-sm-10 col-xs-12">
                                     <div class="select-style">
+
                                         <select name="dynamic_form_builder_id" class="dynamic_form_select"
                                             id="dynamic_form_builder_log">
                                             <option value="0"> Select Form </option>
@@ -313,18 +314,18 @@
 <script>
     $(document).ready(function() {
 
+        //When add daily log model open then default date and time selected shows
         $('#addLogModal').on('shown.bs.modal', function(e) {
             let currentDateTime = moment().format('DD-MM-YYYY HH:mm');
             $('#daily_log_date').val(currentDateTime);
         });
 
-     
+
+        // Date time picker option shows start
         var today = new Date;
         $('#log-book-datetimepicker').datetimepicker({
             format: 'dd-mm-yyyy',
-            todayHighlight: true,
-            startDate: today,
-            // endDate: today,
+            endDate: today,
             // minView : 2
 
         }).on("change.dp", function(e) {
@@ -349,85 +350,113 @@
             $('#log-book-datetimepicker').datetimepicker('hide');
         });
 
-        // $('.dynamic_form_select').on('change', function() {
-        //     var form_select = $(this);
-        //     var model_id = form_select.closest('.modal').attr('id');
+        $('.dynamic_form_select').on('change', function() {
+            var form_select = $(this);
+            var model_id = form_select.closest('.modal').attr('id');
 
-        //     var form_builder_id = form_select.val();
-        //     var service_user_id = $('#' + model_id + ' .su_n_id').val();
+            var form_builder_id = form_select.val();
+            var service_user_id = $('#' + model_id + ' .su_n_id').val();
 
-        //     var form_title = $('#' + model_id + ' .dynamic_form_select option:selected').text();
+            var form_title = $('#' + model_id + ' .dynamic_form_select option:selected').text();
 
-        //     if (form_builder_id > 0) {
+            if (form_builder_id > 0) {
 
-        //         // $('.loader').show();
-        //         // $('body').addClass('body-overflow');
+                // $('.loader').show();
+                // $('body').addClass('body-overflow');
 
-        //         $.ajax({
-        //             type: 'post',
-        //             //url : "{{ url('/service/dynamic-form/view/pattern') }}"+'/'+form_builder_id+'/'+su_id,
-        //             url: "{{ url('/service/dynamic-form/view/pattern_log') }}",
-        //             data: {
-        //                 'form_builder_id': form_builder_id,
-        //                 'service_user_id': service_user_id
-        //             },
-        //             dataType: "json",
-        //             success: function(resp) {
-        //                 console.log(resp);
+                $.ajax({
+                    type: 'post',
+                    //url : "{{ url('/service/dynamic-form/view/pattern') }}"+'/'+form_builder_id+'/'+su_id,
+                    url: "{{ url('/service/dynamic-form/view/pattern_log') }}",
+                    data: {
+                        'form_builder_id': form_builder_id,
+                        'service_user_id': service_user_id
+                    },
+                    dataType: "json",
+                    success: function(resp) {
+                        console.log(resp);
 
-        //                 if (isAuthenticated(resp) == false) {
-        //                     return false;
-        //                 }
+                        if (isAuthenticated(resp) == false) {
+                            return false;
+                        }
 
-        //                 var response = resp['response'];
-        //                 if (response == true) {
+                        var response = resp['response'];
+                        if (response == true) {
 
-        //                     var pattern = resp['pattern'];
-        //                     $('#' + model_id + ' .dynamic-form-log-fields').html(pattern);
-        //                     $('#' + model_id + ' .dynamic_form_h3').html(form_title +
-        //                         ' Details');
+                            var pattern = resp['pattern'];
+                            $('#' + model_id + ' .dynamic-form-log-fields').html(pattern);
+                            $('#' + model_id + ' .dynamic_form_h3').html(form_title +
+                                ' Details');
 
-        //                     $('.dpYears').datepicker({
-        //                         //format: 'dd/mm/yyyy',
-        //                     }).on('changeDate', function(e) {
-        //                         $(this).datepicker('hide');
-        //                     });
+                            $('.dpYears').datepicker({
+                                //format: 'dd/mm/yyyy',
+                            }).on('changeDate', function(e) {
+                                $(this).datepicker('hide');
+                            });
 
-        //                     //alert(1);
-        //                     $('.send_to').selectize({
-        //                         delimiter: ',',
-        //                         persist: false,
-        //                         create: function(input) {
-        //                             return {
-        //                                 value: input,
-        //                                 text: input
-        //                             }
-        //                         }
-        //                     });
-        //                 }
+                            //alert(1);
+                            $('.send_to').selectize({
+                                delimiter: ',',
+                                persist: false,
+                                create: function(input) {
+                                    return {
+                                        value: input,
+                                        text: input
+                                    }
+                                }
+                            });
+                        }
 
-        //                 $('.loader').hide();
-        //                 $('body').removeClass('body-overflow');
+                        $('.loader').hide();
+                        $('body').removeClass('body-overflow');
 
-        //                 let formE2 = document.getElementById("addLogModal");
-        //                 let mode = formE2.getAttribute("data-mode");
+                        let formE2 = document.getElementById("editLogModal");
+                        let mode = formE2.getAttribute("data-mode");
+
+                        loaddataontableLog()
 
 
-        //                 if (mode === "add") {
-        //                     // 🔹 Add mode logic
-        //                     console.log("Form is in ADD mode");
-        //                     loaddataontableLog()
-        //                 }
-        //             }
-        //         });
-        //     } else {
-        //         //$('.dynamic-form-fields').
-        //         //$('.entry-default-fields').hide();
-        //     }
+                    }
+                });
+            } else {
+                $('.dynamic-form-log-fields').hide();
+            }
+        });
+        var today = new Date();
+
+        // $('#log-book-datetimepicker').datetimepicker({
+        //     format: 'dd-mm-yyyy hh:ii', // include time if needed
+        //     autoclose: true, // auto close on select
+        //     todayHighlight: true, // highlight today
+        //     endDate: today
+        // }).on("changeDate", function(e) {
+        //     if (!e.date) return;
+
+        //     var currentdate = e.date;
+        //     var newFormat = ("0" + currentdate.getDate()).slice(-2) + "-" +  
+        //         ("0" + (currentdate.getMonth() + 1)).slice(-2) + "-" +
+        //         currentdate.getFullYear() + " " +
+        //         ("0" + currentdate.getHours()).slice(-2) + ":" +
+        //         ("0" + currentdate.getMinutes()).slice(-2);
+
+        //     $('.daily-log-book-datetime').val(newFormat);
         // });
+
+        // // open on button click
+        // $('.datetime-picker2 button').on('click', function() {
+        //     $('#log-book-datetimepicker').datetimepicker('show');
+        // });
+
+        // // reposition on modal scroll
+        // $("#logBookModal").on("scroll", function() {
+        //     $('#log-book-datetimepicker').datetimepicker('place');
+        // });
+
+        // Date time picker option shows end
 
     });
 
+    // Image preview on daily log page 
     $('input[name="log_image"]').on('change', function(e) {
         var file = e.target.files[0];
         if (file) {
@@ -441,6 +470,23 @@
             $('#image-preview').hide();
         }
     });
+    // Image preview on daily log page
+
+        // Image preview on daily log page 
+    $('input[name="log_image"]').on('change', function(e) {
+        var file = e.target.files[0];
+        if (file) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                $('#image-preview-edit img').attr('src', e.target.result);
+                $('#image-preview-edit').show();
+            }
+            reader.readAsDataURL(file);
+        } else {
+            $('#image-preview-edit').hide();
+        }
+    });
+    // Image preview on daily log page
 
     let loaddataontableLog = () => {
         let formid = $("#formid").val();
@@ -479,8 +525,8 @@
         $('textarea[name=\'log_detail\']').val('');
     });
 
+    //Add Daily log 
     $('.submit-log').click(function() {
-
         var category = $('select[name=\'category\']').val();
         var log_title = $('input[name=\'log_title\']').val();
         var log_date = $('input[name=\'log_date\']').val();
@@ -562,54 +608,85 @@
                     return false;
                 }
 
-                if (resp == false) {
-                    $('span.popup_error_txt').text('Error Occured', 'Try after sometime');
+                if (resp == "2" || resp == false) {
+                    // error (either backend sent "2" or returned false)
+                    $('span.popup_error_txt').text('Error Occurred, Try after sometime');
                     $('.popup_error').show();
                     setTimeout(function() {
-                        $(".popup_error").fadeOut()
+                        $(".popup_error").fadeOut();
                     }, 5000);
-                } else {
-                    if (resp == 3) {
-                        $('.loader').show();
-                        $('body').addClass('body-overflow');
-                        $('span.popup_success_txt').text('Daily log eddied successfully');
-                        $('.popup_success').show();
-                        setTimeout(function() {
-                            $(".popup_success").fadeOut();
-                            $('.loader').hide();
-                            $('body').removeClass('body-overflow');
-                            location.reload();
-                        }, 2000);
-                    } else {
-                        $('select[name=\'category\']').val('');
-                        $('input[name=\'log_title\']').val('');
-                        $('input[name=\'log_date\']').val('');
-                        $('textarea[name=\'log_detail\']').val('');
 
-                        //show success message
+                } else if (resp == "3") {
+                    // late entry
+                    $('span.popup_error_txt').text('Late entry added (not on time)');
+                    $('.popup_error').show();
+                    setTimeout(function() {
+                        $(".popup_error").fadeOut();
+                    }, 5000);
+
+                } else {
+                    // success (normal add or edit)
+                    if (resp == "edit") { // 👈 if your backend ever returns "edit" instead of number
                         $('span.popup_success_txt').text('Daily log added successfully');
-                        $('.popup_success').show();
-                        setTimeout(function() {
-                            $(".popup_success").fadeOut();
-                            $('.loader').hide();
-                            $('body').removeClass('body-overflow');
-                            location.reload();
-                        }, 2000);
+                    } else {
+                        $('span.popup_success_txt').text('Daily log added successfully');
                     }
 
+                    $('.popup_success').show();
+                    setTimeout(function() {
+                        $(".popup_success").fadeOut();
+                        $('.loader').hide();
+                        $('body').removeClass('body-overflow');
+                        location.reload();
+                    }, 2000);
                 }
 
+
+                // if (resp == false) {
+                //     $('span.popup_error_txt').text('Error Occured', 'Try after sometime');
+                //     $('.popup_error').show();
+                //     setTimeout(function() {
+                //         $(".popup_error").fadeOut()
+                //     }, 5000);
+                // } else {
+                //     if (resp == 3) {
+                //         $('.loader').show();
+                //         $('body').addClass('body-overflow');
+                //         $('span.popup_success_txt').text('Daily log eddied successfully');
+                //         $('.popup_success').show();
+                //         setTimeout(function() {
+                //             $(".popup_success").fadeOut();
+                //             $('.loader').hide();
+                //             $('body').removeClass('body-overflow');
+                //             location.reload();
+                //         }, 2000);
+                //     } else {
+                //         $('select[name=\'category\']').val('');
+                //         $('input[name=\'log_title\']').val('');
+                //         $('input[name=\'log_date\']').val('');
+                //         $('textarea[name=\'log_detail\']').val('');
+
+                //         //show success message
+                //         $('span.popup_success_txt').text('Daily log added successfully');
+                //         $('.popup_success').show();
+                //         setTimeout(function() {
+                //             $(".popup_success").fadeOut();
+                //             $('.loader').hide();
+                //             $('body').removeClass('body-overflow');
+                //             location.reload();
+                //         }, 2000);
+                //     }
+                // }
                 return false;
             }
         });
         return false;
     });
+    //Add Daily log
 
-
-
+    //Edit daily log 
     $('.submit-log-edit').click(function() {
-
-        var category = $('select[name=\'category\']').val();
+        var category = $('#edit_category').val();
         var log_title = $('input[name=\'log_title\']').val();
         var log_date = $('input[name=\'log_date\']').val();
         var log_image = $('input[name=\'log_image\']').val();
@@ -620,10 +697,10 @@
         var error = 0;
 
         if (category == null) {
-            $('select[name=\'category\']').addClass('red_border');
+            $('#edit_category').addClass('red_border');
             error = 1;
         } else {
-            $('select[name=\'category\']').removeClass('red_border');
+            $('#edit_category').removeClass('red_border');
         }
 
         if (log_date == '') {
@@ -648,13 +725,6 @@
         } else {
             $('textarea[name=\'log_detail\']').removeClass('red_border');
         }
-
-        // if(log_image == ''){ 
-        //     $('input[name=\'log_image\']').addClass('red_border');
-        //     error = 1;
-        // }else{ 
-        //     $('input[name=\'log_image\']').removeClass('red_border');
-        // }
 
         if (error == 1) {
             return false;
@@ -702,7 +772,7 @@
                     if (resp == 3) {
                         $('.loader').show();
                         $('body').addClass('body-overflow');
-                        $('span.popup_success_txt').text('Daily log eddied successfully');
+                        $('span.popup_success_txt').text('Daily log edited successfully');
                         $('.popup_success').show();
                         setTimeout(function() {
                             $(".popup_success").fadeOut();
@@ -717,7 +787,7 @@
                         $('textarea[name=\'log_detail\']').val('');
 
                         //show success message
-                        $('span.popup_success_txt').text('Daily log added successfully');
+                        $('span.popup_success_txt').text('Daily log edited successfully');
                         $('.popup_success').show();
                         setTimeout(function() {
                             $(".popup_success").fadeOut();
@@ -734,6 +804,7 @@
         });
         return false;
     });
+    //Edit daily log
 </script>
 
 @include('frontEnd.serviceUserManagement.elements.handover_to_staff')

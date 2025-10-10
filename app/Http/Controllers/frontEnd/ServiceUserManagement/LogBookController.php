@@ -12,12 +12,12 @@ use App\Notification;
 use Exception;
 use DB, Auth;
 // use PDF;
-// use Carbon\Carbon;
+use Carbon\Carbon;
 use App\DynamicForm;
 
 class LogBookController extends ServiceUserManagementController
 {
-    
+
     public function index($service_user_id)
     {
 
@@ -394,7 +394,6 @@ class LogBookController extends ServiceUserManagementController
 
     public function add(Request $request)
     {
-        // dd($request);
         // echo "<pre>"; print_r($request->all()); die;
         if ($request->isMethod('post')) {
             //sourabh geo location
@@ -426,11 +425,14 @@ class LogBookController extends ServiceUserManagementController
                 }
             }
 
-            // $current_location = \Location::get($ip);
             //sourabh geo location
+            // $current_location = \Location::get($ip);
+
             $data = $request->all();
+            // echo "<pre>"; print_r($data); die;
 
             if (!empty($data['dynamic_form_log_book_id'])) {
+
                 /*sourabh image upload*/
                 if ($request->hasFile('log_image')) {
                     //echo "string";
@@ -441,65 +443,59 @@ class LogBookController extends ServiceUserManagementController
                     $log_image = '';
                 }
 
+                $dynamic_form_log = null;
+
+                if (isset($data['log_dynamic_form_id'])) {
+                    $dynamic_form_log = DynamicForm::find($data['log_dynamic_form_id']);
+                    if ($dynamic_form_log) {
+                        $dynamic_form_log->title = $data['title'];
+                        $dynamic_form_log->date = \Carbon\Carbon::createFromFormat('d-m-Y', $data['date'])->format('Y-m-d');
+                        $dynamic_form_log->time = $data['time'];
+                        $dynamic_form_log->details = $data['details'];
+                        $dynamic_form_log->pattern_data = $data['formDataLogs'];
+                        $dynamic_form_log->save();
+                    }
+                } else {
+                    if ($data['dynamic_form_builder_id'] != 0) {
+                        $form_insert_id = DynamicForm::saveForm($data);
+                    }
+                }
+
+
                 // Find existing record
                 $log_book_record = LogBook::find($data['dynamic_form_log_book_id']); // <-- $id should be passed from request
 
                 $category_icon = CategoryFrontEnd::where('id', $data['category'])->value('icon');
                 $category_name = CategoryFrontEnd::where('id', $data['category'])->value('name');
 
-                $latest_date  = LogBook::select('log_book.*')->orderBy('date', 'desc')->take(1)->value('date');
-                $latest_date  = date('Y-m-d H:i:s', strtotime($latest_date));
-                $given_date   = date('Y-m-d H:i:s', strtotime($data['log_date']));
-                // $given_date    = date('d-m-Y H:i:s');
-                $latest_date_without_time    = date('Y-m-d', strtotime($latest_date));
-                $given_date_without_time    = date('Y-m-d', strtotime($given_date));
-                $current_date_without_time    = date('Y-m-d');
-
-
                 if ($log_book_record) {
                     // update fields
                     $log_book_record->title          = $data['log_title'];
                     $log_book_record->category_id    = $data['category'];
                     $log_book_record->start_date     = date('Y-m-d');
-                    $log_book_record->date           = $given_date;
                     $log_book_record->category_name  = $category_name;
                     $log_book_record->category_icon  = $category_icon;
+                    $log_book_record->dynamic_form_id = $form_insert_id ?? null;
                     $log_book_record->details        = $data['log_detail'];
                     $log_book_record->image_name     = $log_image;
                     $log_book_record->latitude       = $latitude;
                     $log_book_record->longitude      = $longitude;
-
-                    if ($given_date < $latest_date) {
-                        $log_book_record->is_late = true;
-                    } else if ($current_date_without_time > $latest_date_without_time && $given_date_without_time < $current_date_without_time) {
-                        $log_book_record->is_late = true;
-                    }
-
                     // save changes
-                    $log_book_record->save();
-                }
+                    // $log_book_record->save();
 
-                $dynamic_form_log = DynamicForm::find($data['log_dynamic_form_id']);
-                if ($dynamic_form_log) {
-                    $dynamic_form_log->title = $data['title'];
-                    $dynamic_form_log->date = \Carbon\Carbon::createFromFormat('d-m-Y', $data['date'])->format('Y-m-d'); 
-                    $dynamic_form_log->time = $data['time'];
-                    $dynamic_form_log->details = $data['details'];
-                    $dynamic_form_log->pattern_data = $data['formDataLogs'];
                 }
 
 
-                if ($dynamic_form_log->save()) {
+                if (($dynamic_form_log && $dynamic_form_log->wasChanged()) || $log_book_record->save()) {
                     $result['response'] = true;
                     echo "3";
                 }
             } else {
+                /*sourabh image upload*/
                 if ($request->hasFile('log_image')) {
-                    //echo "string";
                     $log_image = time() . '.' . request()->log_image->getClientOriginalExtension();
                     request()->log_image->move('upload/events/', $log_image);
-                } else { 
-                    //echo "false";
+                } else {
                     $log_image = '';
                 }
 
@@ -513,47 +509,51 @@ class LogBookController extends ServiceUserManagementController
                     $login_home_id = @$home_ids;
                 }
 
-                //print_r($data['log_image']);
-                /*sourabh image upload*/
 
-                // echo $data['service_user_id']; die;
                 /*sourabh*/
-
-                // echo "<pre>"; print_r($data); die;
-
                 /*$su_home_id = ServiceUser::where('id',$data['service_user_id'])->value('home_id');
-            if(Auth::user()->home_id != $su_home_id){
-                echo '0'; die; 
-            }*/
+                if(Auth::user()->home_id != $su_home_id){
+                    echo '0'; die; 
+                }*/
+
+                if ($data['dynamic_form_builder_id'] != 0) {
+                    $form_insert_id = DynamicForm::saveForm($data);
+                }
 
 
-                $form_insert_id = DynamicForm::saveForm($data);
+                // $latest_date  = LogBook::select('log_book.*')->orderBy('date', 'desc')->take(1)->value('date');
+                // $latest_date  = date('Y-m-d H:i:s', strtotime($latest_date));
+                // $latest_date_without_time    = date('Y-m-d', strtotime($latest_date));
+                // // Log date
+                // $given_date   = date('Y-m-d H:i:s', strtotime($data['log_date']));
+                // $given_date_without_time    = date('Y-m-d', strtotime($given_date));
+                // // current Date
+                // $current_date_without_time    = date('Y-m-d');
 
-                $latest_date  = LogBook::select('log_book.*')->orderBy('date', 'desc')->take(1)->value('date');
-                $latest_date  = date('Y-m-d H:i:s', strtotime($latest_date));
-                $given_date   = date('Y-m-d H:i:s', strtotime($data['log_date']));
-                // $given_date    = date('d-m-Y H:i:s');
-                $latest_date_without_time    = date('Y-m-d', strtotime($latest_date));
-                $given_date_without_time    = date('Y-m-d', strtotime($given_date));
-                $current_date_without_time    = date('Y-m-d');
+                $latest_date = LogBook::orderBy('date', 'desc')->value('date'); // returns datetime
+                $latest_date = Carbon::parse($latest_date);                     // Carbon object
+                $latest_date_without_time = $latest_date->toDateString();       // Y-m-d
 
+                // Log date from input
+                $given_date = Carbon::parse($data['log_date']);                // Carbon object
+                $given_date_without_time = $given_date->toDateString();         // Y-m-d
 
-                // $latest_date_value = $latest_date->value('date');
+                // Current date
+                $current_date_without_time = Carbon::now()->toDateString();     // Y-m-d
 
-                $log_book_record          = new LogBook;
-                // echo "<pre>"; print_r($log_book_record); die;
 
                 $category_icon = CategoryFrontEnd::where('id', $data['category'])->value('icon');
                 $category_name = CategoryFrontEnd::where('id', $data['category'])->value('name');
 
-                $log_book_record->title   = $data['title'];
+                $log_book_record          = new LogBook;
+                $log_book_record->title   = $data['log_title'];
                 $log_book_record->category_id = $data['category'];
-                $log_book_record->start_date =  date('Y-m-d');
-                $log_book_record->dynamic_form_id = $form_insert_id;
+                $log_book_record->start_date =  Carbon::parse($data['log_date'] ?? Carbon::now())->format('Y-m-d');
+                $log_book_record->dynamic_form_id = $form_insert_id ?? null;
                 $log_book_record->category_name   = $category_name;
                 $log_book_record->category_icon   = $category_icon;
                 $log_book_record->date    = $given_date;
-                $log_book_record->details = $data['details'];
+                $log_book_record->details = $data['log_detail'];
                 $log_book_record->home_id = $login_home_id;
                 $log_book_record->user_id = Auth::user()->id;
                 $log_book_record->image_name = $log_image;
@@ -580,25 +580,44 @@ class LogBookController extends ServiceUserManagementController
                     $su_log_book_record->service_user_id    =   $data['service_user_id'];
                     $su_log_book_record->log_book_id        =   $log_book_record->id;
                     $su_log_book_record->user_id            =   Auth::user()->id;
-                    //$su_log_book_record->category_id        =   $data['category_id'];
                     $su_log_book_record->logType = '1';
+
+                    // if ($given_date < $latest_date) {
+                    //     $su_log_book_record->is_late = true;
+                    //     Log::info("Send notification for late entry ");
+                    //     $this->sendNotification($log_book_record, $su_log_book_record);
+                    //     if ($su_log_book_record->save()) {
+                    //         $result['response'] = true;
+                    //         echo "1";
+                    //     } else {
+                    //         $result['response'] = false;
+                    //         echo "2";
+                    //     }
+                    // } else {
+                    //     if ($su_log_book_record->save()) {
+                    //         $result['response'] = true;
+                    //         echo "1";
+                    //     } else {
+                    //         $result['response'] = false;
+                    //         echo "2";
+                    //     }
+                    // }
 
                     if ($given_date < $latest_date) {
                         $su_log_book_record->is_late = true;
                         Log::info("Send notification for late entry ");
                         $this->sendNotification($log_book_record, $su_log_book_record);
+
                         if ($su_log_book_record->save()) {
-                            $result['response'] = true;
+                            return response()->json(['status' => 'late']);
                         } else {
-                            $result['response'] = false;
+                            return response()->json(['status' => 'error']);
                         }
                     } else {
                         if ($su_log_book_record->save()) {
-                            $result['response'] = true;
-                            echo "1";
+                            return response()->json(['status' => 'added']);
                         } else {
-                            $result['response'] = false;
-                            echo "2";
+                            return response()->json(['status' => 'error']);
                         }
                     }
                     // if($su_log_book_record->save()) {

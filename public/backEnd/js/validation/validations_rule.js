@@ -768,26 +768,26 @@ $('#add_agent_form').formValidation({
                 }*/
             }
         },
-        "date_of_leaving":
-        {
-            validators:
-            {
-                notEmpty:
-                {
-                    message: 'This field is required'
-                },
-                stringLength: 
-                {
-                    min: 10,
-                    max: 10,
-                    message: 'Please enter valid input'
-                },
-                regexp: {
-                    regexp: /^[0-9-]+$/,
-                    message: 'Name can only consist of digits'   
-                }
-            }
-        },
+        // "date_of_leaving":
+        // {
+        //     validators:
+        //     {
+        //         notEmpty:
+        //         {
+        //             message: 'This field is required'
+        //         },
+        //         stringLength: 
+        //         {
+        //             min: 10,
+        //             max: 10,
+        //             message: 'Please enter valid input'
+        //         },
+        //         regexp: {
+        //             regexp: /^[0-9-]+$/,
+        //             message: 'Name can only consist of digits'   
+        //         }
+        //     }
+        // },
         "current_location":
         {
             validators:
@@ -6121,16 +6121,16 @@ $('#add_company_manager_form').formValidation({
                 }
             }
         },
-        "date_of_leaving":
-        {
-            validators:
-            {
-                notEmpty:
-                {
-                    message: 'This field is required'
-                }
-            }
-        },
+        // "date_of_leaving":
+        // {
+        //     validators:
+        //     {
+        //         notEmpty:
+        //         {
+        //             message: 'This field is required'
+        //         }
+        //     }
+        // },
         "current_location":
         {
             validators:

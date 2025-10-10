@@ -33,6 +33,7 @@ class LogBookCommentsController extends ServiceUserManagementController
             $query->where('log_book.id', $log_book_id);
         }
 
+        // dd($query);
         return $query->where('log_book.is_deleted','0')
         ->orderBy('log_book_comments.id','asc')
         ->paginate($per_page);
@@ -42,6 +43,7 @@ class LogBookCommentsController extends ServiceUserManagementController
         $log_book_id = $request->get('log_book_id');
         $service_user_id = $request->get('service_user_id');
         $su_log_book_records = $this->getData($per_page, $service_user_id, $log_book_id);
+        // dd($su_log_book_records);
         return response()->json($su_log_book_records);
     }
     public function store(Request $request) {
@@ -70,6 +72,7 @@ class LogBookCommentsController extends ServiceUserManagementController
         $logBookComment->log_book_id = $log_book_id;
         $logBookComment->user_id = Auth::user()->id;
         $return = $logBookComment->save();
+        $logBookComment->staff_name = User::where('id', Auth::user()->id)->value('name');
         return response()->json($logBookComment);
     }
 }

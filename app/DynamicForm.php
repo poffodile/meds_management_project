@@ -1012,10 +1012,10 @@ class DynamicForm extends Model //FormBuilder
 
                                  <div class="col-md-12 col-sm-12 col-xs-12 cog-panel datepicker-sttng">      
                                      <div class="form-group col-md-12 col-sm-12 col-xs-12 p-0">
-                                         <label class="col-md-2 col-sm-2 col-xs-12 p-t-7"> Date: </label>
+                                         <label for="date" class="col-md-2 col-sm-2 col-xs-12 p-t-7"> Date: </label>
                                          <div class="col-md-10 col-sm-10 col-xs-12 p-r-0">
                                            <div data-date-viewmode="" data-date-format="dd-mm-yyyy" data-date="" class="input-group date dpYears">
-                                             <input name="date" size="16" class="form-control trans" type="text" '.$disabled.' value="'.date('d-m-Y', strtotime($form_info->date)).'" readonly>
+                                             <input name="date" size="16" class="form-control trans " id="date" type="text" '.$disabled.' value="'.(!empty($form_info->date) ? date('d-m-Y', strtotime($form_info->date)) : date('d-m-Y')).'">
                                              <span class="input-group-btn add-on">
                                                <button class="btn btn-primary" type="button"><i class="fa fa-calendar"></i></button>
                                              </span>
@@ -1029,7 +1029,7 @@ class DynamicForm extends Model //FormBuilder
                                          <label class="col-md-2 col-sm-2 col-xs-12 p-t-7"> Time: </label>
                                          <div class="col-md-10 col-sm-12 col-xs-12 p-r-0">
                                              <div class="input-group popovr">
-                                                 <input type="time" class="form-control trans static_title" placeholder="" '.$disabled.' name="time" value="'. date('H:i', strtotime($form_info->time)) .'" />
+                                                 <input type="time" class="form-control trans static_title" placeholder="" '.$disabled.' name="time" value="'. (!empty($form_info->time) ? date('H:i', strtotime($form_info->time)) : '') .'" />
                                              </div>
                                          </div>
                                      </div>

@@ -54,7 +54,7 @@ class SocialAppController extends Controller
 
     	    $social_app          = new SocialApp;
             $social_app->name  = $request->name;
-            $social_app->icon  = $request->icon;
+            $social_app->icon  = $request->icon ?? '';
                 
     		if($social_app->save()) {
     			return redirect('super-admin/social-apps')->with('success', 'Socail App added successfully.');

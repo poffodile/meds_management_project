@@ -45,7 +45,7 @@
                             <div class="form-group">
                                 <label class="col-lg-2 control-label">Icon</label>
                                 <div class="col-lg-10">
-                                    <input type="text" name="icon" class="form-control" placeholder="name" value="{{ (isset($social_app->icon)) ? $social_app->icon : '' }}" maxlength="255">
+                                    <input type="text" name="icon" class="form-control" placeholder="icon" value="{{ (isset($social_app->icon)) ? $social_app->icon : '' }}" maxlength="255">
                                 </div>
                             </div>
                             

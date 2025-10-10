@@ -193,7 +193,8 @@ if ($del_status == '0') { //regular users
                                             foreach ($system_admins as $key => $value) {
                                             ?>
                                                 <tr class="">
-                                                    <td>{{ $value->company }}</td>
+                                                    {{-- <td>{{ $value->company }}</td> --}}
+                                                    <td><a href="{{ url('admin/system-admin/edit/'.$value->id) }}" class="edit">{{ $value->company }}</a></td>
                                                     <td>{{ $value->name }}</td>
                                                     <td class="transform-none">{{ $value->email }}</td>
                                                     <td style="width: 25%;">@if($value->qr_code_id == NULL) <button class="re-generateQR" onclick="generateQR(<?= $value->id ?>);"><span>Generate QR</span></button> <button><i class="fa fa-qrcode" aria-hidden="true"></i></button> @else <button class="re-generateQR" onclick="generateQR(<?= $value->id ?>);"><span>Re-Generate QR</span></button> <button class="re-generateQR" onclick="ViewQR(<?= $value->id ?>);"><span>View</span></button> @endif </td>
@@ -274,7 +275,7 @@ if ($del_status == '0') { //regular users
                     console.log(result);
                     document.getElementById('qrcode') .innerHTML = ""; 
                     document.getElementById('download') .innerHTML = ""; 
-                    console.log(blkstr.join(", "));
+                    // console.log(blkstr.join(", "));
                     var qrcode = new QRCode(document.getElementById("qrcode"), {
                         text: `${result.qr_code_id}`,
                         width: 180, //default 128

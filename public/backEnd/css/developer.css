@@ -35,6 +35,9 @@ body.modal-open.fontawesome-open {
   position: fixed;
   right: 0;
   width: 100%;
+  background: #fff;
+  z-index: 99999;
+  top:0;
 }
 .font-awesome {
   float: none;

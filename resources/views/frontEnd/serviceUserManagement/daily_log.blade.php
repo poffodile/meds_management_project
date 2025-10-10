@@ -2,10 +2,8 @@
 @section('title', 'Daily Logs')
 @section('content')
     <style type="text/css">
-
-
         /* .timeline .time-show.first a.btn {
-                                        } */
+                                                                                } */
 
         #logs_articles {
             border-collapse: collapse;
@@ -96,6 +94,7 @@
         .comment-list {
             width: 100%;
         }
+
         div#formiotestForm label {
             text-align: start;
         }
@@ -105,7 +104,6 @@
             font-weight: 700;
             color: #1f88b5;
         }
-
     </style>
 
     {{-- @php
@@ -270,11 +268,11 @@
                             <div>
                                 <select class="form-control" style="min-width:200px;" id="select_category"
                                     name="category_timeline" required>
-                                <!-- <option disabled value> -- select an option -- </option> -->
-                                <option selected value="all">All</option>
-                                @foreach ($categorys as $key)
-                                    <option value="{{ $key['id'] }}">{{ $key['name'] }}</option>
-                                @endforeach
+                                    <!-- <option disabled value> -- select an option -- </option> -->
+                                    <option selected value="all">All</option>
+                                    @foreach ($categorys as $key)
+                                        <option value="{{ $key['id'] }}">{{ $key['name'] }}</option>
+                                    @endforeach
                                 </select>
                             </div>
                         </div>
@@ -301,9 +299,9 @@
                     </div>
                     <!-- sourabh -->
                     <!-- <div class="col-md-4 filter_buttons" style="text-align:right;padding-right:150px;display:inline-block;">
-                                        <a data-toggle="modal" href="#addLogModal" class="btn btn-primary  col-6" id='add_new_log'>Add New</a>
-                                        <a onclick="pdf()" id="pdf" target="_blank" class="btn col-6" id='add_new_log' style="background-color:#d9534f;color:white;">PDF Export</a>
-                                    </div> -->
+                                                                                <a data-toggle="modal" href="#addLogModal" class="btn btn-primary  col-6" id='add_new_log'>Add New</a>
+                                                                                <a onclick="pdf()" id="pdf" target="_blank" class="btn col-6" id='add_new_log' style="background-color:#d9534f;color:white;">PDF Export</a>
+                                                                            </div> -->
 
                     {{-- <a data-toggle="modal" href="#addLogModal" class="btn btn-primary  col-6" id='add_new_log'>Add New</a>
 
@@ -396,7 +394,6 @@
                                                         ?>
                                                         <p class="daily_log_time">
                                                             {{ date('d-m-Y H:i', strtotime($key['date'])) }} | <span
-
                                                                 class="log_title log-type-text">{{ $logType }}
                                                             </span>
 
@@ -404,14 +401,13 @@
                                                                 @if ($key['late_time_text'])
                                                                     | {{ $key['late_date_text'] }} <span
                                                                         style="color:red;">{{ $key['late_time_text'] }}</span>
-                                                                    | <span
-                                                                        class="log_title log-type-text">{{ $logType }}</span>
+                                                                    {{-- | <span
+                                                                        class="log_title log-type-text">{{ $logType }}</span> --}}
                                                                 @else
                                                                     | <span
                                                                         style="color:red;">{{ date('d-m-Y H:i', strtotime($key['created_at'])) }}</span>
-                                                                    | <span
-                                                                        class="log_title log-type-text">{{ $logType }}</span>
-
+                                                                    {{-- | <span
+                                                                        class="log_title log-type-text">{{ $logType }}</span> --}}
                                                                 @endif
                                                             @endif
                                                         </p>
@@ -629,7 +625,6 @@
             $.ajax({
                 type: 'get',
                 url: "{{ url('/service/logbook/comments?log_book_id=') }}" + logId,
-
                 dataType: 'json',
 
                 success: function(resp) {
@@ -639,14 +634,19 @@
                     let ul_list_items = '';
                     resp.data.forEach((comment) => {
                         // ul_list_items += '<li>'+ comment + '</li>';
-                        var d_format = moment.utc(comment.created_at).format('DD-MM-YYYY HH:mm');
+                        // var d_format = moment.utc(comment.created_at).format('DD-MM-YYYY HH:mm');
+                        // Convert UTC to local time
+                        var d_format = moment.utc(comment.created_at).local().format('DD-MM-YYYY HH:mm');
+
                         // var d = new Date(comment.created_at);
                         // var d_format = ("0" + d.getDate()).slice(-2) + "-" + ("0"+(d.getMonth()+1)).slice(-2) + "-" +
                         // d.getFullYear() + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
                         $("#daily_log_comments_list").append(
                             `
                         <div class="d-flex justify-content-center py-2" style="margin-top:10px;">
-                                <div class="second py-2 px-2 comment-list"> <span class="text1">${comment.comment}</span>
+                                <div class="second py-2 px-2 comment-list">     
+                                    <div class="comment-staff-name">${resp.data[0].staff_name} </div>
+                                    <span class="text1">${comment.comment}</span>
                                     <div class="d-flex justify-content-between py-1 pt-2" style="text-align:right;">
                                         <div><span class="text3">${d_format}</span></div>
                                     </div>
@@ -750,17 +750,39 @@
                                 created_at.setAttribute("class", "time_abbre");
                                 created_at.setAttribute("data-toggle", "tooltip");
                                 created_at.setAttribute("data-placement", "top");
-                                created_at.setAttribute("title", moment.utc(resp.log_book_records[i][
-                                    'created_at'
-                                ]).format('DD-MM-YYYY HH:mm'));
 
-                                var created_at_text = document.createTextNode(moment.utc(resp
-                                    .log_book_records[i]['created_at']).fromNow());
+
+
+
+                                //   created_at.setAttribute("title", moment.utc(resp.log_book_records[i][
+                                //         'created_at'
+                                //     ]).format('DD-MM-YYYY HH:mm'));
+
+                                //     var created_at_text = document.createTextNode(moment.utc(resp
+                                //         .log_book_records[i]['created_at']).fromNow());
+                                //     created_at.append(created_at_text);
+
+                                // parse with explicit format
+                                var parsedDate = moment.utc(createdAtValue, "DD-MM-YYYY HH:mm");
+
+                                // add formatted date in title
+                                created_at.setAttribute("title", parsedDate.format("DD-MM-YYYY HH:mm"));
+
+                                // show "5 minutes ago"
+                                var created_at_text = document.createTextNode(parsedDate.local().fromNow());
+
+                                // created_at.appendChild(created_at_text);
+
+                                // created_at.setAttribute("title", resp.log_book_records[i]['created_at']);
+                                // createdAt = resp.log_book_records[i]['created_at'];
+                                // var created_at_text = document.createTextNode(createdAt);
+
                                 created_at.append(created_at_text);
                                 $(created_at).append($(
                                     `<span style="color:black;font-weight:400;font-size:14px;"> by ${resp.log_book_records[i]['staff_name']}</span> | <span style="color:black;font-weight:400;font-size:14px;"> ${resp.log_book_records[i]['child_name']}</span>`
                                 ));
                                 pannel_body.append(created_at);
+
 
                                 var viewEditIcon = document.createElement("span");
 
@@ -848,11 +870,11 @@
                                         date_field.append(span_date_field);
                                     }
                                 }
+                                // date_field.setAttribute("class", "daily_log_time");
                                 date_field.setAttribute("data-logtype", logType);
-                                logTypeText = logType;
-                                date_field.textContent = moment(resp.log_book_records[i]['date'],
-                                    'YYYY-MM-DD HH:mm:ss').format('DD-MM-YYYY HH:mm') + " | " + logTypeText;
-                                // date_field.prepend(date_text);
+                                date_field.innerHTML = moment(resp.log_book_records[i]['date'],
+                                        'YYYY-MM-DD HH:mm:ss').format('DD-MM-YYYY HH:mm') + " | " +
+                                    `<span class="log_title log-type-text">${logType}</span>`;
                                 // image sourabh
                                 if (resp.log_book_records[i]['image_name'] != '') {
                                     $(pannel_body).append($(`
@@ -917,17 +939,40 @@
                                 created_at.setAttribute("class", "time_abbre");
                                 created_at.setAttribute("data-toggle", "tooltip");
                                 created_at.setAttribute("data-placement", "top");
-                                created_at.setAttribute("title", moment.utc(resp.log_book_records[i][
-                                    'created_at'
-                                ]).format('DD-MM-YYYY HH:mm'));
+                                var createdAtValue = resp.log_book_records[i]['created_at'];
 
-                                var created_at_text = document.createTextNode(moment.utc(resp
-                                    .log_book_records[i]['created_at']).fromNow());
+
+                                // parse with explicit format
+                                var parsedDate = moment.utc(createdAtValue, "DD-MM-YYYY HH:mm");
+
+                                // add formatted date in title
+                                created_at.setAttribute("title", parsedDate.format("DD-MM-YYYY HH:mm"));
+
+                                // show "5 minutes ago"
+                                var created_at_text = document.createTextNode(parsedDate.local().fromNow());
+
+                                created_at.appendChild(created_at_text);
+
+                                // created_at.setAttribute("title", moment.utc(resp.log_book_records[i][
+                                //     'created_at'
+                                // ]).format('DD-MM-YYYY HH:mm'));
+
+                                // var created_at_text = document.createTextNode(moment.utc(resp
+                                //     .log_book_records[i]['created_at']).fromNow());
+                                // created_at.append(created_at_text);
+
+                                // Assuming your created_at from API is already in Asia/Kolkata
+                                // created_at.setAttribute("title", resp.log_book_records[i]['created_at']);
+
+                                // var created_at_text = document.createTextNode(resp.log_book_records[i][
+                                //     'created_at'
+                                // ]);
+
                                 created_at.append(created_at_text);
-                                $(created_at).append($(
-                                    `<span style="color:black;font-weight:400;font-size:14px;"> by ${resp.log_book_records[i]['staff_name']}</span> | <span style="color:black;font-weight:400;font-size:14px;"> ${resp.log_book_records[i]['child_name']}</span> `
-                                ));
 
+                                $(created_at).append($(
+                                    `<span style="color:black;font-weight:400;font-size:14px;"> by ${resp.log_book_records[i]['staff_name']}</span> | <span style="color:black;font-weight:400;font-size:14px;"> ${resp.log_book_records[i]['child_name']}</span>`
+                                ));
                                 pannel_body.append(created_at);
 
                                 var viewEditIcon = document.createElement("span");
@@ -1009,9 +1054,9 @@
                                     }
                                 }
                                 date_field.setAttribute("data-logtype", logType);
-                                logTypeText = logType;
-                                date_field.textContent = moment(resp.log_book_records[i]['date'],
-                                    'YYYY-MM-DD HH:mm:ss').format('DD-MM-YYYY HH:mm') + " | " + logTypeText;
+                                date_field.innerHTML = moment(resp.log_book_records[i]['date'],
+                                        'YYYY-MM-DD HH:mm:ss').format('DD-MM-YYYY HH:mm') + " | " +
+                                    `<span class="log_title log-type-text">${logType}</span>`;
                                 // date_field.prepend(date_text);
                                 // image sourabh
                                 if (resp.log_book_records[i]['image_name'] != '') {
@@ -1051,62 +1096,7 @@
 
     <!-- Comment Created Duration -->
     <script>
-        // function time_ago(time) {
-        //     switch (typeof time) {
-        //         case 'number':
-        //             break;
-        //         case 'string':
-        //             time = +new Date(time);
-        //             break;
-        //         case 'object':
-        //             if (time.constructor === Date) time = time.getTime();
-        //             break;
-        //         default:
-        //             time = +new Date();
-        //     }
-        //     var time_formats = [
-        //         [60, 'seconds', 1], // 60
-        //         [120, '1 minute ago', '1 minute from now'], // 60*2
-        //         [3600, 'minutes', 60], // 60*60, 60
-        //         [7200, '1 hour ago', '1 hour from now'], // 60*60*2
-        //         [86400, 'hours', 3600], // 60*60*24, 60*60
-        //         [172800, 'Yesterday', 'Tomorrow'], // 60*60*24*2
-        //         [604800, 'days', 86400], // 60*60*24*7, 60*60*24
-        //         [1209600, 'Last week', 'Next week'], // 60*60*24*7*4*2
-        //         [2419200, 'weeks', 604800], // 60*60*24*7*4, 60*60*24*7
-        //         [4838400, 'Last month', 'Next month'], // 60*60*24*7*4*2
-        //         [29030400, 'months', 2419200], // 60*60*24*7*4*12, 60*60*24*7*4
-        //         [58060800, 'Last year', 'Next year'], // 60*60*24*7*4*12*2
-        //         [2903040000, 'years', 29030400], // 60*60*24*7*4*12*100, 60*60*24*7*4*12
-        //         [5806080000, 'Last century', 'Next century'], // 60*60*24*7*4*12*100*2
-        //         [58060800000, 'centuries', 2903040000] // 60*60*24*7*4*12*100*20, 60*60*24*7*4*12*100
-        //     ];
-        //     var seconds = (+new Date() - time) / 1000,
-        //         token = 'ago',
-        //         list_choice = 1;
-
-        //     if (seconds == 0) {
-        //         return 'Just now'
-        //     }
-        //     if (seconds < 0) {
-        //         seconds = Math.abs(seconds);
-        //         token = 'from now';
-        //         list_choice = 2;
-        //     }
-        //     var i = 0,
-        //         format;
-        //     while (format = time_formats[i++])
-        //         if (seconds < format[0]) {
-        //             if (typeof format[2] == 'string') {
-        //                 return format[list_choice];
-        //             } else {
-        //                 return Math.floor(seconds / format[2]) + ' ' + format[1] + ' ' + token;
-        //             }
-
-        //         }
-        //     return time;
-        // }
-        function timeAgo(time) {
+        function time_ago(time) {
             switch (typeof time) {
                 case 'number':
                     break;
@@ -1119,39 +1109,94 @@
                 default:
                     time = +new Date();
             }
+            var time_formats = [
+                [60, 'seconds', 1], // 60
+                [120, '1 minute ago', '1 minute from now'], // 60*2
+                [3600, 'minutes', 60], // 60*60, 60
+                [7200, '1 hour ago', '1 hour from now'], // 60*60*2
+                [86400, 'hours', 3600], // 60*60*24, 60*60
+                [172800, 'Yesterday', 'Tomorrow'], // 60*60*24*2
+                [604800, 'days', 86400], // 60*60*24*7, 60*60*24
+                [1209600, 'Last week', 'Next week'], // 60*60*24*7*4*2
+                [2419200, 'weeks', 604800], // 60*60*24*7*4, 60*60*24*7
+                [4838400, 'Last month', 'Next month'], // 60*60*24*7*4*2
+                [29030400, 'months', 2419200], // 60*60*24*7*4*12, 60*60*24*7*4
+                [58060800, 'Last year', 'Next year'], // 60*60*24*7*4*12*2
+                [2903040000, 'years', 29030400], // 60*60*24*7*4*12*100, 60*60*24*7*4*12
+                [5806080000, 'Last century', 'Next century'], // 60*60*24*7*4*12*100*2
+                [58060800000, 'centuries', 2903040000] // 60*60*24*7*4*12*100*20, 60*60*24*7*4*12*100
+            ];
+            var seconds = (+new Date() - time) / 1000,
+                token = 'ago',
+                list_choice = 1;
 
-            var seconds = (+new Date() - time) / 1000;
-            var token = 'ago';
-
-            if (seconds === 0) return 'Just now';
+            if (seconds == 0) {
+                return 'Just now'
+            }
             if (seconds < 0) {
                 seconds = Math.abs(seconds);
                 token = 'from now';
+                list_choice = 2;
             }
+            var i = 0,
+                format;
+            while (format = time_formats[i++])
+                if (seconds < format[0]) {
+                    if (typeof format[2] == 'string') {
+                        return format[list_choice];
+                    } else {
+                        return Math.floor(seconds / format[2]) + ' ' + format[1] + ' ' + token;
+                    }
 
-            var days = Math.floor(seconds / 86400); // 1 day = 86400 seconds
-
-            if (days > 0 && days <= 30) {
-                return days + (days === 1 ? ' day ' : ' days ') + token;
-            }
-
-            if (days > 30) {
-                var months = Math.floor(days / 30);
-                if (months < 12) {
-                    return months + (months === 1 ? ' month ' : ' months ') + token;
-                } else {
-                    var years = Math.floor(months / 12);
-                    return years + (years === 1 ? ' year ' : ' years ') + token;
                 }
-            }
-
-            // For <1 day, show hours/minutes/seconds
-            if (seconds < 60) return Math.floor(seconds) + ' seconds ' + token;
-            if (seconds < 3600) return Math.floor(seconds / 60) + ' minutes ' + token;
-            if (seconds < 86400) return Math.floor(seconds / 3600) + ' hours ' + token;
-
-            return 'Just now';
+            return time;
         }
+        // function timeAgo(time) {
+        //     switch (typeof time) {
+        //         case 'number':
+        //             break;
+        //         case 'string':
+        //             time = +new Date(time);
+        //             break;
+        //         case 'object':
+        //             if (time.constructor === Date) time = time.getTime();
+        //             break;
+        //         default:
+        //             time = +new Date();
+        //     }
+
+        //     var seconds = (+new Date() - time) / 1000;
+        //     var token = 'ago';
+
+        //     if (seconds === 0) return 'Just now';
+        //     if (seconds < 0) {
+        //         seconds = Math.abs(seconds);
+        //         token = 'from now';
+        //     }
+
+        //     var days = Math.floor(seconds / 86400); // 1 day = 86400 seconds
+
+        //     if (days > 0 && days <= 30) {
+        //         return days + (days === 1 ? ' day ' : ' days ') + token;
+        //     }
+
+        //     if (days > 30) {
+        //         var months = Math.floor(days / 30);
+        //         if (months < 12) {
+        //             return months + (months === 1 ? ' month ' : ' months ') + token;
+        //         } else {
+        //             var years = Math.floor(months / 12);
+        //             return years + (years === 1 ? ' year ' : ' years ') + token;
+        //         }
+        //     }
+
+        //     // For <1 day, show hours/minutes/seconds
+        //     if (seconds < 60) return Math.floor(seconds) + ' seconds ' + token;
+        //     if (seconds < 3600) return Math.floor(seconds / 60) + ' minutes ' + token;
+        //     if (seconds < 86400) return Math.floor(seconds / 3600) + ' hours ' + token;
+
+        //     return 'Just now';
+        // }
     </script>
 
     <!-- Category Filter -->
@@ -1411,7 +1456,7 @@
 
             $(document).on('click', '.dyn-form-view-data-log-book', function(e) {
                 e.preventDefault();
-                $(".dynamic-form-log-fields").empty();
+
                 var id = $(this).attr('id');
                 var dynamic_form_id = $(this).attr('dynamic_form_id');
                 var getFormUrl = "{{ route('get.dynamic.form.daily.log', ['id' => ':id']) }}";
@@ -1422,70 +1467,107 @@
                     success: function(response) {
 
                         console.log(response);
-                        $(".su_name").val(response.dynamicForm.service_user_id).trigger(
-                            "change");
+                        $("#editLogModal form")[0].reset();
+                        console.log("Category ID:", response.log_book_records.category_id);
+
                         $('input[name="log_title"]').val(response.log_book_records.title);
                         $('#log_dynamic_form_id').val(response.log_book_records
-                        .dynamic_form_id);
+                            .dynamic_form_id);
                         $('#dynamic_form_log_book_id').val(response.log_book_records.id);
-                        $('select[name="category"]').val(response.log_book_records.category_id);
+                        $('select[name="category"]').val('');
+                        setTimeout(function() {
+                            $('select[name="category"]').val(String(response.log_book_records
+                            .category_id)).trigger('change');
+                        }, 100);
+                        
+                        
                         // $('input[name="log_date"]').val(response.log_book_records.date);
-                        if (response.log_book_records.date) { 
-                            let formattedDate = moment(response.log_book_records.date, "YYYY-MM-DD HH:mm:ss") .format("DD-MM-YYYY HH:mm"); 
-                            $('input[name="log_date"]').val(formattedDate); 
+                        if (response.log_book_records.date) {
+                            let formattedDate = moment(response.log_book_records.date,
+                                "YYYY-MM-DD HH:mm:ss").format("DD-MM-YYYY HH:mm");
+                            $('input[name="log_date"]').val(formattedDate);
                         }
 
-
                         $('textarea[name="log_detail"]').val(response.log_book_records.details);
-                        $('select[name="dynamic_form_builder_id"]').val(response.dynamicForm
-                            .form_builder_id).trigger('change');
+
                         if (response.log_book_records.image_name && response.log_book_records
                             .image_name !== "") {
                             var url = "{{ url('upload/events/') }}";
-                            $('#image-preview img').attr('src', "{{ url('upload/events/') }}" +
+                            $('#image-preview-edit img').attr('src', "{{ url('upload/events/') }}" +
                                 "/" + response.log_book_records.image_name);
-                            $('#image-preview').show();
+                            $('#image-preview-edit').show();
                         } else {
-                            $('#image-preview').hide();
+                            $('#image-preview-edit').hide();
                         }
 
                         let formE = document.getElementById("addLogModal");
                         formE.setAttribute("data-mode", "edit");
 
-                        var schema = JSON.parse(response.pattern); // form structure
-                        var savedData = response.pattern_data ? JSON.parse(response
-                            .pattern_data) : {}; // user entered values
-                        setTimeout(function() {
+                        $(".dynamic-form-log-fields").empty();
+                        if (response.log_book_records.dynamic_form_id) {
+                            //  $('select[name="dynamic_form_builder_id"]').val(response.dynamicForm
+                            //     .form_builder_id).trigger('change');
+                            $('select[name="dynamic_form_builder_id"]')
+                                .val(response.dynamicForm.form_builder_id) // set value
+                                .prop('selected', true);
+                            document.getElementById("dynamic_form_log_select").value = response
+                                .log_book_records.dynamic_form_id;
+                            document.getElementById("dynamic_form_builder_log").disabled = true;
 
-                            $(".dynamic-form-log-fields").html(
-                                '<div class="below-divider"></div>' + response
-                                .dynamicForm
-                                .form_data);
 
-                            Formio.createForm(document.getElementById('formioView1'), {
-                                components: schema
 
-                            }).then(function(form) {
-                                // Pass values into the form
-                                form.submission = {
-                                    data: savedData
-                                };
+                            var schema = JSON.parse(response.pattern); // form structure
+                            var savedData = response.pattern_data ? JSON.parse(response
+                                .pattern_data) : {}; // user entered values
+                            $(".su_name").val(response.dynamicForm.service_user_id).trigger(
+                                "change");
+                            setTimeout(function() {
+                                $(".dynamic-form-log-fields").html(
+                                    '<div class="below-divider"></div>' + response
+                                    .dynamicForm
+                                    .form_data);
 
-                                // Capture changes if you want to save
-                                form.on('change', function(submission) {
-                                    $("#formDataLogs").val(JSON
-                                        .stringify(submission.data));
+                                Formio.createForm(document.getElementById(
+                                    'formioView1'), {
+                                    components: schema
+
+                                }).then(function(form) {
+                                    // Pass values into the form
+                                    form.submission = {
+                                        data: savedData
+                                    };
+
+                                    // Capture changes if you want to save
+                                    form.on('change', function(submission) {
+                                        $("#formDataLogs").val(JSON
+                                            .stringify(submission
+                                                .data));
+                                    });
                                 });
-                            });
-                        }, 1000);
+                            }, 1000);
+                        } else {
+                            document.getElementById("dynamic_form_builder_log").disabled =
+                                false;
+                        }
+
                     },
                     error: function() {
                         $('.dynamic-form-log-fields').html(
                             '<p class="text-danger">Error loading data.</p>');
                     }
                 });
-                document.getElementById('dynamic_form_builder_log').disabled = true;
+                // document.getElementById('dynamic_form_builder_log').disabled = true;
                 $("#addLogModal").find("select[name='dynamic_form_builder_id']").prop("disabled", true);
+                $('.dpYears').datepicker({
+                    format: 'dd/mm/yyyy',
+                    autoclose: true,
+                    showTodayButton: true
+                }).on('changeDate', function(e) {
+                    $(this).datepicker('hide');
+                });
+                $('#editLogModal').on('scroll', function() {
+                    $('.dpYears').datepicker('place')
+                });
 
                 $("#editLogModal").modal({
                     backdrop: 'static',

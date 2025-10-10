@@ -10,9 +10,9 @@
 <?php
 
 if (isset($user_info)) {
-    $action   = url('admin/company-manager/edit/' . $user_info->id);
+    $action   = url('admin/managers/edit/' . $user_info->id);
     $task     = "Edit";
-    $form_id  = 'edit_company_manager_form';
+    $form_id  = 'edit_managers_form';
     $readonly = '';
 
     if (isset($del_status)) {
@@ -24,9 +24,9 @@ if (isset($user_info)) {
         }
     }
 } else {
-    $action  = url('admin/company-manager/add');
+    $action  = url('admin/managers/add');
     $task    = "Add";
-    $form_id = 'add_company_manager_form';
+    $form_id = 'add_managers_form';
 }
 ?>
 
@@ -68,7 +68,7 @@ if (isset($user_info)) {
             <div class="col-lg-12">
                 <section class="panel">
                     <header class="panel-heading">
-                        {{ $task }} Company Manager
+                        {{ $task }} Manager
 
                     </header>
                     <div class="panel-body">
@@ -123,7 +123,7 @@ if (isset($user_info)) {
                                     </div>
                                 </div>
 
-                                <input type="hidden" id="selectedHomes" value="{{ (isset($user_info->home_id)) ? $user_info->home_id : '' }}">
+                                <!-- <input type="hidden" id="selectedHomes" value="{{ (isset($user_info->home_id)) ? $user_info->home_id : '' }}">
                                 <div class="form-group">
                                     <label for="homes" class=" col-lg-3 control-label">Select Homes:</label>
                                     <div class="col-lg-3">
@@ -131,7 +131,7 @@ if (isset($user_info)) {
                                     </div>
                                     <div class="col-lg-3" id="homesCheckboxList">
                                     </div>
-                                </div>
+                                </div> -->
 
 
                                 <div class="form-group">
@@ -300,14 +300,14 @@ if (isset($user_info)) {
                                 </div>
                                 @endif
 
-                                {{--<div class="form-group">
+                                <div class="form-group">
                                     <label class="col-lg-3 control-label"></label>
                                     <div class="col-lg-9">
                                         <div class="checkbox">
                                             <label class="assign-access"><input type="checkbox" value="yes" name="assign_right_check" {{ (isset($user_info->access_rights)) ? 'checked' : '' }}>Assign access rights according to the access level</label>
                                         </div>
                                     </div>
-                                </div>--}}
+                                </div>
 
                                 <div class="form-actions">
                                     <div class="row">
@@ -354,9 +354,9 @@ if (isset($user_info)) {
                 return date.valueOf();
             }
         }).on('changeDate', function(ev) {
-            // var newDate = new Date(ev.date);
-            // newDate.setDate(newDate.getDate() + 1);
-            // leaving_date.setValue(newDate);
+            var newDate = new Date(ev.date);
+            newDate.setDate(newDate.getDate() + 1);
+            leaving_date.setValue(newDate);
 
             joining_date.hide();
 
@@ -372,9 +372,9 @@ if (isset($user_info)) {
         //console.log(joining_date);
         var leaving_date = $('#leaving-date').datepicker({
             format: 'dd-mm-yyyy',
-            // onRender: function(date) {
-            //     return date.valueOf() <= joining_date.date.valueOf() ? 'disabled' : '';
-            // }
+            onRender: function(date) {
+                return date.valueOf() <= joining_date.date.valueOf() ? 'disabled' : '';
+            }
         }).on('changeDate', function(ev) {
             leaving_date.hide();
         }).data('datepicker');
