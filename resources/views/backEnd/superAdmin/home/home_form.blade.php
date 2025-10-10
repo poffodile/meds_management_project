@@ -53,13 +53,13 @@ if (isset($system_admin_home)) {
 									</div>
 								</div>
 
-								<div class="form-group">
+								<!-- <div class="form-group">
 									<label class="col-lg-3 control-label">Location History Duration</label>
 									<div class="col-lg-9">
 										<input type="text" name="location_history_duration" class="form-control" placeholder="Location history duration" value="{{ (isset($system_admin_home->location_history_duration)) ? $system_admin_home->location_history_duration : '' }}" maxlength="255">
 										<p>Days for which location history will be saved</p>
 									</div>
-								</div>
+								</div> -->
 								
 								<div class="form-group yes_no_btn">
 									<label class="col-lg-3 control-label">Registered with Ofsted or CIW</label>
@@ -71,7 +71,7 @@ if (isset($system_admin_home)) {
 									</div>
 								</div>
 								<?php $rota_time_format = (isset($system_admin_home->rota_time_format)) ? $system_admin_home->rota_time_format : ''; ?>
-								<div class="form-group has-feedback">
+								<!-- <div class="form-group has-feedback">
 									<label class="col-lg-3 control-label">Rota Time Format</label>
 									<div class="col-lg-9">
 										<select name="rota_time_format" class="form-control" data-fv-field="status">
@@ -79,7 +79,7 @@ if (isset($system_admin_home)) {
 											<option value="24" {{ $rota_time_format == '24' ? 'selected' : '' }}>24 Hours</option>
 										</select>
 									</div>
-								</div>
+								</div> -->
 
 
 								<!--<div class="form-group">
