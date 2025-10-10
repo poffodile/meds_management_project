@@ -95,9 +95,9 @@ class HomeController extends Controller
             $system_admin_home->admin_id                    = $system_admin_id;
             $system_admin_home->title                       = $data['title'];
             $system_admin_home->address                     = $data['address'];
-            $system_admin_home->location_history_duration   = $data['location_history_duration'];
-            $system_admin_home->is_registered               = $data['is_registered'] ?? 0 ;
-            $system_admin_home->rota_time_format            = $data['rota_time_format'];
+            // $system_admin_home->location_history_duration   = $data['location_history_duration'];
+            $system_admin_home->is_registered               = $data['is_registered'];
+            // $system_admin_home->rota_time_format            = $data['rota_time_format'];
             
             if(!empty($_FILES['image']['name'])) {
                 $tmp_image  =   $_FILES['image']['tmp_name'];

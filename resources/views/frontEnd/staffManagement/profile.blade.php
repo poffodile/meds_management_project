@@ -149,7 +149,7 @@
                                                 </div> -->
                                                 <div class="col-md-3 col-sm-4 col-xs-12 ">
                                                     <div class="profile-nav alt" >
-                                                        <a href="{{url('/rota-absence?key='.base64_encode($staff_id))}}">
+                                                        <a href="{{url('/rota-absence?staff='.base64_encode($staff_id))}}">
                                                             <section class="panel text-center" style="border-style:solid; border-color:#cccccc;">
                                                                 <div class="user-heading alt wdgt-row terques-bg">
                                                                     <i class="fa fa-frown-o"></i>
@@ -166,7 +166,7 @@
                                                 </div>
                                                 <div class="col-md-3 col-sm-4 col-xs-12 ">
                                                     <div class="profile-nav alt" >
-                                                        <a href="{{url('/overtime?key='.base64_encode($staff_id))}}">
+                                                        <a href="{{url('/overtime?staff='.base64_encode($staff_id))}}">
                                                             <section class="panel text-center" style="border-style:solid; border-color:#cccccc;">
                                                                 <div class="user-heading alt wdgt-row terques-bg">
                                                                     <i class="fa fa-clock-o"></i>
