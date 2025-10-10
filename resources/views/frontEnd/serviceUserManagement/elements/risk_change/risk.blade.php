@@ -22,66 +22,71 @@ foreach ($risks as $risk) {
     };
 
 ?>
-    <style>
-        .input-date {
-            display: inline-block;
-            height: 34px;
-            width: 167px;
-        }
+<style>
+    .input-date {
+        display: inline-block;
+        height: 34px;
+        width: 167px;
+    }
 
-        .input-area {
-            display: inline-block;
-            height: 34px;
-            width: 167px;
-            margin-left: 5px;
-        }
+    .input-area {
+        display: inline-block;
+        height: 34px;
+        width: 167px;
+        margin-left: 5px;
+    }
 
-        .input-area:focus {
-            border: 1px solid #57c8f1;
-        }
+    .input-area:focus {
+        border: 1px solid #57c8f1;
+    }
 
-        .select-control {
-            display: inline-block;
-            height: 34px;
-            width: 167px;
-            border: 1px solid #33333336;
-            border-radius: 4px;
-            margin-left: -5px;
-        }
+    .select-control {
+        display: inline-block;
+        height: 34px;
+        width: 167px;
+        border: 1px solid #33333336;
+        border-radius: 4px;
+        margin-left: -5px;
+    }
 
-        .select-control:focus {
-            border: 1px solid #57c8f1;
-        }
+    .select-control:focus {
+        border: 1px solid #57c8f1;
+    }
 
-        .riskfilter {
-            margin-bottom: 25px;
-            margin-right: 20px;
-        }
-    </style>
-    <div class="col-md-3 col-sm-4 col-xs-12">
-        <div class="profile-nav alt">
-            <section class="panel text-center" style="border-style:solid; border-color:#cccccc;">
-                <div class="user-heading alt wdgt-row {{ $color_class }} risk-clr">
-                    <i class="{{ $risk->icon }}"></i>
+    .riskfilter {
+        margin-bottom: 25px;
+        margin-right: 20px;
+    }
+</style>
+<div class="col-md-3 col-sm-4 col-xs-12">
+    <div class="profile-nav alt">
+        <section class="panel text-center" style="border-style:solid; border-color:#cccccc;">
+            <div class="user-heading alt wdgt-row {{ $color_class }} risk-clr">
+                <i class="{{ $risk->icon }}"></i>
+            </div>
+
+            <div class="panel-body">
+                <div class="wdgt-value">
+                    <h4 class="count risk-desc">{{ $risk->description }}</h4>
+                    <p></p>
                 </div>
+            </div>
+        </section>
+        <ul class="m-0 p-0 overviw-dropdown risk_change_btns" type="none">
+            <li><a href="#" class="risk_change_btn " risk-id="{{ $risk->risk_id }}" status="2"> <i
+                        class="<?php echo $risk->user_status == '2' ? 'fa fa-check-circle' : 'fa fa-times-circle'; ?>"></i> Live Risk </a> </li>
+            <li><a href="#" class="risk_change_btn" risk-id="{{ $risk->risk_id }}" status="1"> <i
+                        class="<?php echo $risk->user_status == '1' ? 'fa fa-check-circle' : 'fa fa-times-circle'; ?>"></i> Historic Risk </a> </li>
+            <li><a href="#" class="risk_change_btn" risk-id="{{ $risk->risk_id }}" status="0"> <i
+                        class="<?php echo $risk->user_status == '0' ? 'fa fa-check-circle' : 'fa fa-times-circle'; ?>"></i> No Risk </a> </li>
+            <!-- <li><a href="#" class="risk_change_btn" risk-id="{{ $risk->risk_id }}" status=""><i class="fa fa-times-circle"></i> View Log </a> </li>-->
+            <li><a href="{{ url('service/risks/' . $service_user_id) }}" class="risk_change_btns"
+                    risk-id="{{ $risk->risk_id }}" status=""><i class="fa fa-eye risk-view"></i> View Log </a>
+            </li>
 
-                <div class="panel-body">
-                    <div class="wdgt-value">
-                        <h4 class="count risk-desc">{{ $risk->description }}</h4>
-                        <p></p>
-                    </div>
-                </div>
-            </section>
-            <ul class="m-0 p-0 overviw-dropdown risk_change_btns" type="none">
-                <li><a href="#" class="risk_change_btn " risk-id="{{ $risk->risk_id }}" status="2"> <i class="<?php echo ($risk->user_status == '2') ? 'fa fa-check-circle' : 'fa fa-times-circle'; ?>"></i> Live Risk </a> </li>
-                <li><a href="#" class="risk_change_btn" risk-id="{{ $risk->risk_id }}" status="1"> <i class="<?php echo ($risk->user_status == '1') ? 'fa fa-check-circle' : 'fa fa-times-circle'; ?>"></i> Historic Risk </a> </li>
-                <li><a href="#" class="risk_change_btn" risk-id="{{ $risk->risk_id }}" status="0"> <i class="<?php echo ($risk->user_status == '0') ? 'fa fa-check-circle' : 'fa fa-times-circle'; ?>"></i> No Risk </a> </li>
-                <!-- <li><a href="#" class="risk_change_btn" risk-id="{{ $risk->risk_id }}" status=""><i class="fa fa-times-circle"></i> View Log </a> </li>-->
-                <li><a href="{{url('service/risks/'.$service_user_id)}}" class="risk_change_btns" risk-id="{{ $risk->risk_id }}" status=""><i class="fa fa-eye risk-view"></i> View Log </a> </li>
-
-            </ul>
-        </div>
+        </ul>
     </div>
+</div>
 
 <?php  } ?>
 
@@ -90,7 +95,8 @@ foreach ($risks as $risk) {
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
                 <h4 class="modal-title risk-desc-modal">Risk</h4>
             </div>
             <div class="modal-body p-b-0">
@@ -109,9 +115,9 @@ foreach ($risks as $risk) {
                                     <div class="select-style">
                                         <select name="service_user_id" class="su_n_id" disabled="">
                                             <option value="0"> Select Child </option>
-                                            @foreach($service_users as $value)
-                                                <option value="{{ $value['id'] }}" {{ ($service_user_id == $value['id']) ? 'selected' : '' }}>{{ ucfirst($value['name']) }}</option>
-                                            @endforeach
+                                            @foreach ($service_users as $value)
+<option value="{{ $value['id'] }}" {{ $service_user_id == $value['id'] ? 'selected' : '' }}>{{ ucfirst($value['name']) }}</option>
+@endforeach
                                         </select>
                                     </div>
                                 </div>
@@ -120,7 +126,8 @@ foreach ($risks as $risk) {
                             <div class="form-group col-md-12 col-sm-12 col-xs-12 p-0">
                                 <label class="col-md-1 col-sm-1 col-xs-12 p-t-7 text-right">Risk: </label>
                                 <div class="col-md-11 col-sm-11 col-xs-12 p-l-20">
-                                    <input type="text" disabled="" class="form-control trans" name="risk_name" maxlength="255" />
+                                    <input type="text" disabled="" class="form-control trans" name="risk_name"
+                                        maxlength="255" />
                                 </div>
                             </div>
 
@@ -154,7 +161,8 @@ foreach ($risks as $risk) {
 
                                                 if (in_array($this_location_id, $location_ids_arr)) {
                                             ?>
-                                                    <option value="{{ $value['id'] }}"> {{ ucfirst($value['title']) }} </option>
+                                            <option value="{{ $value['id'] }}"> {{ ucfirst($value['title']) }}
+                                            </option>
                                             <?php }
                                             } ?>
                                         </select>
@@ -179,8 +187,10 @@ foreach ($risks as $risk) {
                                 <input type="hidden" name="service_user_id" value="{{ $service_user_id }}">
                                 <input type="hidden" name="location_id" value="{{ $this_location_id }}">
                                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                                <button class="btn btn-default" type="button" data-dismiss="modal" aria-hidden="true"> Cancel </button>
-                                <button class="btn btn-warning change_risk_submit_btn" type="submit"> Confirm </button>
+                                <button class="btn btn-default" type="button" data-dismiss="modal"
+                                    aria-hidden="true"> Cancel </button>
+                                <button class="btn btn-warning change_risk_submit_btn" type="submit"> Confirm
+                                </button>
                                 <!-- sbt-bmp-btn  -->
                             </div>
                         </form>
@@ -243,10 +253,16 @@ foreach ($risks as $risk) {
 
                                 <div class="form-group datepicker-sttng date-sttng">
                                     <div class="col-md-4 col-sm-10 col-xs-12 col-lg-5">
-                                        <div data-date-viewmode="years" data-date-format="dd-mm-yyyy" data-date="" class="input-group date">
-                                            <input id="date_range_input" style="cursor: pointer;" name="daterange" value="{{ date('d-m-Y') }} - {{ date('d-m-Y') }}" type="text" value="" readonly="" size="16" class="form-control log-book-datetime">
+                                        <div data-date-viewmode="years" data-date-format="dd-mm-yyyy" data-date=""
+                                            class="input-group date">
+                                            <input id="date_range_input" style="cursor: pointer;" name="daterange"
+                                                value="{{ date('d-m-Y') }} - {{ date('d-m-Y') }}" type="text"
+                                                value="" readonly="" size="16"
+                                                class="form-control log-book-datetime">
                                             <span class="input-group-btn add-on datetime-picker2">
-                                                <button onclick="showDate()" class="btn btn-primary" type="button"><span class="glyphicon glyphicon-calendar"></span></button>
+                                                <button onclick="showDate()" class="btn btn-primary"
+                                                    type="button"><span
+                                                        class="glyphicon glyphicon-calendar"></span></button>
                                             </span>
                                         </div>
                                     </div>
@@ -259,7 +275,8 @@ foreach ($risks as $risk) {
                                     <option value="1">Historic </option>
                                     <option value="2">Live Risk </option>
                                 </select>
-                                <input type="text" id="keyword" class="input-area" onKeyPress="myFunctionkey()" onKeyUp="myFunctionkey()" placeholder="keyword">
+                                <input type="text" id="keyword" class="input-area" onKeyPress="myFunctionkey()"
+                                    onKeyUp="myFunctionkey()" placeholder="keyword">
                             </form>
                         </div>
                         <!-- sourabh -->
@@ -275,7 +292,8 @@ foreach ($risks as $risk) {
                             <div class="form-group col-md-12 col-sm-12 col-xs-12 p-0 add-rcrd">
                                 <label class="col-md-2 col-sm-2 col-xs-12 p-t-7"> Risk Title: </label>
                                 <div class="col-md-10 col-sm-10 col-xs-12 p-l-0 m-b-15">
-                                    <input type="text" name="search_risk_keyword" class="form-control" maxlength="255">
+                                    <input type="text" name="search_risk_keyword" class="form-control"
+                                        maxlength="255">
                                 </div>
                                 <div class="searched-risks p-t-10 text-center">
                                     <!--searched Risk List using ajax -->
@@ -284,7 +302,8 @@ foreach ($risks as $risk) {
                             <div class="modal-space"></div>
                             <div class="modal-footer m-t-0 recent-task-sec">
                                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                                <button class="btn btn-default" type="button" data-dismiss="modal" aria-hidden="true"> Cancel </button>
+                                <button class="btn btn-default" type="button" data-dismiss="modal"
+                                    aria-hidden="true"> Cancel </button>
                                 <button class="btn btn-warning search_su_risk_btn" type="button"> Confirm</button>
                             </div>
                         </form>
@@ -303,8 +322,10 @@ foreach ($risks as $risk) {
             <div class="modal-header">
                 <!--<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                      <a href="#" data-toggle="modal" data-dismiss="modal" data-target="#riskDesc" class="close p-r-10" > <i class="fa fa-arrow-left"></i></a> -->
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <a class="close view-logged" href="" data-toggle="modal" data-dismiss="modal" data-target="" style="font-size:18px; padding-right:8px;">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <a class="close view-logged" href="" data-toggle="modal" data-dismiss="modal" data-target=""
+                    style="font-size:18px; padding-right:8px;">
                     <i class="fa fa-arrow-left" title=""></i>
                 </a>
 
@@ -319,7 +340,8 @@ foreach ($risks as $risk) {
                             <div class="form-group col-md-12 col-sm-12 col-xs-12 p-0">
                                 <label class="col-md-1 col-sm-1 col-xs-12 p-t-7 text-right">Risk: </label>
                                 <div class="col-md-11 col-sm-11 col-xs-12 p-l-20">
-                                    <input type="text" disabled="" class="form-control trans" name="v-risk_name" maxlength="255" />
+                                    <input type="text" disabled="" class="form-control trans"
+                                        name="v-risk_name" maxlength="255" />
                                 </div>
                             </div>
 
@@ -327,7 +349,8 @@ foreach ($risks as $risk) {
                                 <label class="col-md-1 col-sm-1 col-xs-12 p-t-7 text-right">Changed to: </label>
                                 <div class="col-md-11 col-sm-11 col-xs-12 p-l-20">
                                     <div class="select-style">
-                                        <select class="form-control new_risk_status trans" name="v-risk_new_status" disabled="">
+                                        <select class="form-control new_risk_status trans" name="v-risk_new_status"
+                                            disabled="">
                                             <option value="">Select Risk </option>
                                             <option value="0">No Risk </option>
                                             <option value="1">Historic </option>
@@ -341,7 +364,8 @@ foreach ($risks as $risk) {
                                 <label class="col-md-1 col-sm-1 col-xs-12 p-t-7 text-right"> Form: </label>
                                 <div class="col-md-11 col-sm-12 col-xs-12 p-l-20">
                                     <div class="select-style">
-                                        <select name="dynamic_form_builder_id" class="dynamic_form_select form-control" disabled="">
+                                        <select name="dynamic_form_builder_id"
+                                            class="dynamic_form_select form-control" disabled="">
                                             <option value="0"> Select Form </option>
                                             <?php
 
@@ -352,7 +376,8 @@ foreach ($risks as $risk) {
 
                                                 if (in_array($this_location_id, $location_ids_arr)) {
                                             ?>
-                                                    <option value="{{ $value['id'] }}"> {{ ucfirst($value['title']) }} </option>
+                                            <option value="{{ $value['id'] }}"> {{ ucfirst($value['title']) }}
+                                            </option>
                                             <?php }
                                             } ?>
                                         </select>
@@ -362,9 +387,12 @@ foreach ($risks as $risk) {
 
                             <div class="col-md-12 col-sm-12 col-xs-12">
                                 <div class="icon-div-icons pull-right p-r-15">
-                                    <button class="btn btn-risk group-ico view-risk-rmp w-75" su_rmp_id="" name="View RMP"><i class=""></i>RMP</button>
-                                    <button class="btn btn-risk group-ico ve-risk-inc-rep w-75" su_risk_id="" name="View Incident Report"><i class=""></i>Report</button>
-                                    <a href="" title="Body Map" class="btn btn-risk group-ico body-map"><i class="fa fa-male"></i></a>
+                                    <button class="btn btn-risk group-ico view-risk-rmp w-75" su_rmp_id=""
+                                        name="View RMP"><i class=""></i>RMP</button>
+                                    <button class="btn btn-risk group-ico ve-risk-inc-rep w-75" su_risk_id=""
+                                        name="View Incident Report"><i class=""></i>Report</button>
+                                    <a href="" title="Body Map" class="btn btn-risk group-ico body-map"><i
+                                            class="fa fa-male"></i></a>
                                 </div>
                             </div>
 
@@ -436,8 +464,10 @@ foreach ($risks as $risk) {
                                         <input type="hidden" name="_token" value="{{ csrf_token() }}">-->
 
                                 <input type="hidden" name="su_risk_id" value="">
-                                <button class="btn btn-default" type="button" data-dismiss="modal" aria-hidden="true"> Cancel </button><!--  -->
-                                <button class="btn btn-warning" data-toggle="modal" data-target="#riskDesc" type="button" data-dismiss="modal"> Confirm </button>
+                                <button class="btn btn-default" type="button" data-dismiss="modal"
+                                    aria-hidden="true"> Cancel </button><!--  -->
+                                <button class="btn btn-warning" data-toggle="modal" data-target="#riskDesc"
+                                    type="button" data-dismiss="modal"> Confirm </button>
                             </div>
                         </form>
                     </div>
@@ -457,7 +487,8 @@ foreach ($risks as $risk) {
                 format: 'DD/MM/YYYY'
             }
         }, function(start, end, label) {
-            console.log("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+            console.log("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end
+                .format('YYYY-MM-DD'));
         });
     });
 
@@ -476,7 +507,8 @@ foreach ($risks as $risk) {
             }
 
 
-            var risk_name = $(this).closest('.risk_change_btns').siblings('.panel').find('.risk-desc').text();
+            var risk_name = $(this).closest('.risk_change_btns').siblings('.panel').find('.risk-desc')
+                .text();
             var risk_id = $(this).attr('risk-id');
             var status = $(this).attr('status');
 
@@ -591,24 +623,34 @@ foreach ($risks as $risk) {
 
                         if (status == '1') { //historic
                             //changing icon bg color
-                            $('.active_change_risk').closest('.risk_change_btns').siblings('.panel').find('.risk-clr').addClass('orange-bg');
-                            $('.active_change_risk').closest('.risk_change_btns').siblings('.panel').find('.risk-clr').removeClass('bg-red');
-                            $('.active_change_risk').closest('.risk_change_btns').siblings('.panel').find('.risk-clr').removeClass('bg-darkgreen');
+                            $('.active_change_risk').closest('.risk_change_btns').siblings(
+                                '.panel').find('.risk-clr').addClass('orange-bg');
+                            $('.active_change_risk').closest('.risk_change_btns').siblings(
+                                '.panel').find('.risk-clr').removeClass('bg-red');
+                            $('.active_change_risk').closest('.risk_change_btns').siblings(
+                                '.panel').find('.risk-clr').removeClass('bg-darkgreen');
                             //changing tick mark with selected option
-                            $('.active_change_risk').closest('.risk_change_btns').find('i').attr('class', 'fa fa-times-circle');
-                            $('.active_change_risk').children('i').attr('class', 'fa fa-check-circle');
+                            $('.active_change_risk').closest('.risk_change_btns').find('i')
+                                .attr('class', 'fa fa-times-circle');
+                            $('.active_change_risk').children('i').attr('class',
+                                'fa fa-check-circle');
 
                             //view log btn functionality
                             // $('.active_change_risk').closest('.risk_change_btns').find('i').attr('class','fa fa-eye');
                             // $('.active_change_risk').children('i').attr('class','fa fa-eye risk-view');
 
                         } else if (status == '2') { //live risk
-                            $('.active_change_risk').closest('.risk_change_btns').siblings('.panel').find('.risk-clr').addClass('bg-red');
-                            $('.active_change_risk').closest('.risk_change_btns').siblings('.panel').find('.risk-clr').removeClass('orange-bg');
-                            $('.active_change_risk').closest('.risk_change_btns').siblings('.panel').find('.risk-clr').removeClass('bg-darkgreen');
+                            $('.active_change_risk').closest('.risk_change_btns').siblings(
+                                '.panel').find('.risk-clr').addClass('bg-red');
+                            $('.active_change_risk').closest('.risk_change_btns').siblings(
+                                '.panel').find('.risk-clr').removeClass('orange-bg');
+                            $('.active_change_risk').closest('.risk_change_btns').siblings(
+                                '.panel').find('.risk-clr').removeClass('bg-darkgreen');
                             //changing tick mark with selected option
-                            $('.active_change_risk').closest('.risk_change_btns').find('i').attr('class', 'fa fa-times-circle');
-                            $('.active_change_risk').children('i').attr('class', 'fa fa-check-circle');
+                            $('.active_change_risk').closest('.risk_change_btns').find('i')
+                                .attr('class', 'fa fa-times-circle');
+                            $('.active_change_risk').children('i').attr('class',
+                                'fa fa-check-circle');
 
                             //view log btn functionality
                             // $('.active_change_risk').closest('.risk_change_btns').find('i').attr('class','fa fa-eye');
@@ -616,12 +658,17 @@ foreach ($risks as $risk) {
 
 
                         } else { //no risk
-                            $('.active_change_risk').closest('.risk_change_btns').siblings('.panel').find('.risk-clr').addClass('bg-darkgreen');
-                            $('.active_change_risk').closest('.risk_change_btns').siblings('.panel').find('.risk-clr').removeClass('bg-red');
-                            $('.active_change_risk').closest('.risk_change_btns').siblings('.panel').find('.risk-clr').removeClass('orange-bg');
+                            $('.active_change_risk').closest('.risk_change_btns').siblings(
+                                '.panel').find('.risk-clr').addClass('bg-darkgreen');
+                            $('.active_change_risk').closest('.risk_change_btns').siblings(
+                                '.panel').find('.risk-clr').removeClass('bg-red');
+                            $('.active_change_risk').closest('.risk_change_btns').siblings(
+                                '.panel').find('.risk-clr').removeClass('orange-bg');
                             //changing tick mark with selected option
-                            $('.active_change_risk').closest('.risk_change_btns').find('i').attr('class', 'fa fa-times-circle');
-                            $('.active_change_risk').children('i').attr('class', 'fa fa-check-circle');
+                            $('.active_change_risk').closest('.risk_change_btns').find('i')
+                                .attr('class', 'fa fa-times-circle');
+                            $('.active_change_risk').children('i').attr('class',
+                                'fa fa-check-circle');
 
                             //view log btn functionality
                             // $('.active_change_risk').closest('.risk_change_btns').find('i').attr('class','fa fa-eye');
@@ -640,11 +687,14 @@ foreach ($risks as $risk) {
                         } else {}
 
                         //show success message
-                        $('span.popup_success_txt').text('Risk Details Added Successfully.');
+                        $('span.popup_success_txt').text(
+                        'Risk Details Added Successfully.');
                         $('.popup_success').show();
                         setTimeout(function() {
                             $(".popup_success").fadeOut(function() {
-                                window.location.href = "{{url('/service/risks/')}}" + '/' + service_user_id
+                                window.location.href =
+                                    "{{ url('/service/risks/') }}" + '/' +
+                                    service_user_id
                             })
                         }, 3000);
 
@@ -674,7 +724,8 @@ foreach ($risks as $risk) {
 
                     } else {
 
-                        $('span.popup_error_txt').text('Some Error Occurred. Please try again later.');
+                        $('span.popup_error_txt').text(
+                            'Some Error Occurred. Please try again later.');
                         $('.popup_error').show();
                         setTimeout(function() {
                             $(".popup_error").fadeOut()
@@ -711,7 +762,9 @@ foreach ($risks as $risk) {
                         return false;
                     }
                     if (resp == '') {
-                        $('.logged-risk-list').html('<div class="text-center p-b-20" style="width:100%">No Records found.</div>');
+                        $('.logged-risk-list').html(
+                            '<div class="text-center p-b-20" style="width:100%">No Records found.</div>'
+                            );
                     } else {
                         $('.logged-risk-list').html(resp);
                     }
@@ -741,9 +794,9 @@ foreach ($risks as $risk) {
         if (!empty($noti_data)) {
             if ($noti_data['event_type'] == 'RISK') {
         ?>
-                var risk_id = "{{ $noti_data['event_id'] }}";
-                view_risk(risk_id);
-                $('#riskViewModal').modal('show');
+        var risk_id = "{{ $noti_data['event_id'] }}";
+        view_risk(risk_id);
+        $('#riskViewModal').modal('show');
         <?php }
         } ?>
         // View Risk from logged Records
@@ -831,7 +884,8 @@ foreach ($risks as $risk) {
 
                     } else {
 
-                        $('span.popup_error_txt').text('Some Error Occurred. Please try again later.');
+                        $('span.popup_error_txt').text(
+                            'Some Error Occurred. Please try again later.');
                         $('.popup_error').show();
                         setTimeout(function() {
                             $(".popup_error").fadeOut()
@@ -1047,7 +1101,9 @@ foreach ($risks as $risk) {
                         $(inc_modal + ' .dynamic_form_select').attr('disabled', false);
                         //$(inc_modal+' input[name=\'su_risk_id\']').val(su_risk_id);
 
-                        $(inc_modal + ' span.popup_error_txt').text('Incident Report is Not Added. You can add this by selecting form');
+                        $(inc_modal + ' span.popup_error_txt').text(
+                            'Incident Report is Not Added. You can add this by selecting form'
+                            );
                         $(inc_modal + ' .popup_error').show();
                         setTimeout(function() {
                             $(".popup_error").fadeOut()
@@ -1138,7 +1194,8 @@ foreach ($risks as $risk) {
                         // $('input[name=\'edit_rmp_title\']').val('');
                         // $('#incdntRprtModal').modal('show');
                         //show success message
-                        $('span.popup_success_txt').text('RMP Details Edited Successfully.');
+                        $('span.popup_success_txt').text(
+                        'RMP Details Edited Successfully.');
                         $('.popup_success').show();
                         setTimeout(function() {
                             $(".popup_success").fadeOut()
@@ -1230,7 +1287,8 @@ foreach ($risks as $risk) {
                         // $('#veIncdntRprtModal').modal('hide');
 
                         //show success message
-                        $('span.popup_success_txt').text('Incident Report Edited Successfully.');
+                        $('span.popup_success_txt').text(
+                            'Incident Report Edited Successfully.');
                         $('.popup_success').show();
                         setTimeout(function() {
                             $(".popup_success").fadeOut()
@@ -1318,7 +1376,8 @@ foreach ($risks as $risk) {
 
             $.ajax({
                 type: 'get',
-                url: "{{ url('/service/risks') }}" + '/' + service_user_id + '?search=' + search,
+                url: "{{ url('/service/risks') }}" + '/' + service_user_id + '?search=' +
+                    search,
                 success: function(resp) {
                     if (isAuthenticated(resp) == false) {
                         return false;
@@ -1378,7 +1437,9 @@ foreach ($risks as $risk) {
         $.ajax({
             type: 'get',
 
-            url: "{{ url('/service/risks') }}" + '/' + service_user_id + '?start_date=' + start_date.format('YYYY-MM-DD') + '&end_date=' + end_date.format('YYYY-MM-DD') + '&category_id=' + category_id + '&filter=1&keyword=' + keyword,
+            url: "{{ url('/service/risks') }}" + '/' + service_user_id + '?start_date=' + start_date
+                .format('YYYY-MM-DD') + '&end_date=' + end_date.format('YYYY-MM-DD') + '&category_id=' +
+                category_id + '&filter=1&keyword=' + keyword,
 
             success: function(resp) {
                 //console.log(resp)
@@ -1427,7 +1488,9 @@ foreach ($risks as $risk) {
         //alert("hdsgf")
         $.ajax({
             type: 'get',
-            url: "{{ url('/service/risks') }}" + '/' + service_user_id + '?start_date=' + start_date + '&end_date=' + end_date + '&category_id=' + category_id + '&filter=1&keyword=' + keyword,
+            url: "{{ url('/service/risks') }}" + '/' + service_user_id + '?start_date=' + start_date +
+                '&end_date=' + end_date + '&category_id=' + category_id + '&filter=1&keyword=' +
+                keyword,
             success: function(resp) {
                 if (isAuthenticated(resp) == false) {
                     return false;
@@ -1454,7 +1517,9 @@ foreach ($risks as $risk) {
         $.ajax({
             type: 'get',
 
-            url: "{{ url('/service/risks') }}" + '/' + service_user_id + '?start_date=' + start_date.format('YYYY-MM-DD') + '&end_date=' + end_date.format('YYYY-MM-DD') + '&category_id=' + category_id + '&filter=1&keyword=' + keyword,
+            url: "{{ url('/service/risks') }}" + '/' + service_user_id + '?start_date=' + start_date.format(
+                    'YYYY-MM-DD') + '&end_date=' + end_date.format('YYYY-MM-DD') + '&category_id=' +
+                category_id + '&filter=1&keyword=' + keyword,
 
             success: function(resp) {
 
