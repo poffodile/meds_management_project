@@ -46,6 +46,7 @@ class PlacementPlanController extends ServiceUserManagementController
                                 ->where('service_user_id',$service_user_id)
                                 ->whereDate('date', '<=', $today)
                                 ->where('status','0')
+                                ->orderBy('created_at', 'desc')
                                 ->paginate(100);
 
         $service_user = ServiceUser::select('id', 'name')
@@ -440,8 +441,8 @@ class PlacementPlanController extends ServiceUserManagementController
             $today = date('Y-m-d');
             $data = $request->input();
             // echo "<pre>"; print_r($data); die;
-            // $date = date('Y-m-d', strtotime($data['target_date']));
-            $date = null ;
+            $date = date('Y-m-d', strtotime($data['target_date']));
+            // $date = null ;
 
             // if(isset($data['formdata'])){
             //     $formdata = json_encode($data['formdata']);
@@ -551,7 +552,7 @@ class PlacementPlanController extends ServiceUserManagementController
                 return redirect()->back()->with('error', UNAUTHORIZE_ERR);
             }
 
-
+            
             $su_home_id = ServiceUser::where('id',$placement_plan->service_user_id)->value('home_id');
             // if(Auth::user()->home_id != $su_home_id){
             //     return redirect('/')->with('error',UNAUTHORIZE_ERR); 

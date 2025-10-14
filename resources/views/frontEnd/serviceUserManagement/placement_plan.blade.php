@@ -222,6 +222,7 @@
                                                     <div class="form-group col-md-12 col-sm-12 col-xs-12 settingFlex">
                                                         <div>
                                                             {{ \Carbon\Carbon::parse($value->created_at)->format('d-m-Y H:i:s') }}
+                                                            {{-- <input type="text" class="form-control trans" value="{{ $value->task }}" disabled="" maxlength="255"> --}}
 
                                                         </div>
                                                         <div>
