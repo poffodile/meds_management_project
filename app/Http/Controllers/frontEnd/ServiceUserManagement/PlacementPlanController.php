@@ -365,9 +365,6 @@ class PlacementPlanController extends ServiceUserManagementController
         }   
     }
 
-
-
-
     public function view_target(Request $request, $active_target_id=null) {
 
         $active_target = ServiceUserPlacementPlan::select('su_placement_plan.id as su_placement_plan_id','su_placement_plan.task','su_placement_plan.service_user_id','su_placement_plan.description','su_placement_plan.date','d.title as d_title','d.date as d_date', 'd.time as d_time','d.details as d_details', 'd.pattern_data as d_pattern','su_placement_plan.dynamic_form_id','d.location_id','d.alert_date as d_alert_date','d.alert_status as d_alert_status')
@@ -469,9 +466,9 @@ class PlacementPlanController extends ServiceUserManagementController
                 // if($placement_plan->dynamic_form_id != 'Null') {
                     $dynamic_form_id = $placement_plan->dynamic_form_id;
                     // echo $dynamic_form_id; die;
-                    if($data['title'] || $data['time'] || $data['details'] === "" ){
-                        $data['details'] = $data['time'] = $data['title'] = null;
-                    }
+                    // if($data['title'] || $data['time'] || $data['details'] === "" ){
+                    //     $data['details'] = $data['time'] = $data['title'] = null;
+                    // }
                     if(!empty($dynamic_form_id)) {
                         $dynamic_form       = DynamicForm::find($dynamic_form_id);
                         if(!empty($dynamic_form)) {
@@ -479,7 +476,8 @@ class PlacementPlanController extends ServiceUserManagementController
                             $dynamic_form->title            = $data['title'];
                             $dynamic_form->time             = $data['time']; 
                             $dynamic_form->details          = $data['details']; 
-                            $dynamic_form->dynamic_form_id  = $data['dynamic_form_builder_id'];
+                            // $dynamic_form->dynamic_form_id  = $data['dynamic_form_builder_id'] ;
+                            $dynamic_form->form_builder_id  = $dynamic_form_id;
                             $dynamic_form->pattern_data     = $formdata; 
                             if(!empty($data['date'])){
                                 $dynamic_form->date         = date('Y-m-d',strtotime($data['date']));   
