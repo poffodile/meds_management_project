@@ -1726,6 +1726,11 @@ Route::group(['prefix' => 'admin', 'middleware' => 'CheckAdminAuth'], function (
 	Route::match(['get', 'post'], '/service-users/delete/{su_id}', 'App\Http\Controllers\backEnd\serviceUser\ServiceUserController@delete');
 	Route::get('/service-users/send-set-pass-link/{su_id}', 'App\Http\Controllers\backEnd\serviceUser\ServiceUserController@send_set_pass_link_mail');
 
+	Route::match(['get', 'post'], '/child-sections', 'App\Http\Controllers\backEnd\serviceUser\ServiceUserController@child_sections');
+    Route::post('/childsection_status_change', 'App\Http\Controllers\backEnd\serviceUser\ServiceUserController@childsection_status_change');
+    Route::get('/child-section/delete/{id}', 'App\Http\Controllers\backEnd\serviceUser\ServiceUserController@child_section_delete');
+    Route::post('/child-section-save', 'App\Http\Controllers\backEnd\serviceUser\ServiceUserController@child_section_save');
+
 	//backEnd Childs Care History
 	Route::match(['get', 'post'], '/service-users/care-history/{su_id}', 'App\Http\Controllers\backEnd\serviceUser\CareHistoryController@index');
 	Route::match(['get', 'post'], '/service-users/care-history/add/{su_id}', 'App\Http\Controllers\backEnd\serviceUser\CareHistoryController@add');
