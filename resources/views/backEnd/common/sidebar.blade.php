@@ -107,8 +107,9 @@
                         <i class="fa fa-laptop"></i>
                         <span>System Management</span>
                     </a>
+                    {{-- {{ $page }} --}}
                     <ul class="sub">
-                        <li class="<?php if (($page == 'users') || ($page == 'user-task') || ($page == 'user-sick-leave') || ($page == 'user-annual-leave')) {
+                        <li class="<?php if (($page == 'users') || ($page == 'user-task') || ($page == 'user-sick-leave') || ($page == 'user-annual-leave') || ($page == 'user-late-leave')) {
                                         echo 'active';
                                     } ?>"><a href="{{ url('admin/users') }}">Users</a></li>
                         <li class="<?php if (($page == 'service-users') || ($page == 'service-users-care-history') || ($page == 'care_team') || ($page == 'moods') || ($page == 'su_migration_form') || ($page == 'incident-report') || ($page == 'external-service') || ($page == 'su-dynamic-form') || ($page == 'file_manager')  || ($page == 'service-user-my-money-history') || ($page == 'service-user-my-money-request') || ($page == 'service-users-log-book') || ($page == 'service-users-living-skill') || ($page == 'service-users-rmp') || ($page == 'service-users-risk') || ($page == 'service-users-earn-schm') || ($page == 'service-users-bmp')) {

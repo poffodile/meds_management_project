@@ -1,5 +1,8 @@
 @extends('backEnd.layouts.master')
-@section('title',' User Annual Leaves')
+
+@section('title',' User Lateness Leaves')
+{{-- @section('title',' User Leaves') --}}
+
 @section('content')
 
 <!--main content start-->
@@ -22,7 +25,7 @@
                         <div class="adv-table editable-table ">
                             <div class="clearfix">
                                 <div class="btn-group">
-                                    <h3>Annual Leave</h3>
+                                    <h3>Lateness Leave</h3>
                                     {{-- <a href="{{ url('admin/user/annual-leave/add/'.$user_id) }}">
                                         <button id="editable-sample_new" class="btn btn-primary">
                                             Add Annual Leave <i class="fa fa-plus"></i>
@@ -72,7 +75,7 @@
 
                                     <tbody>
                                         <?php
-                                        if($u_annual_leave->isEmpty()){ ?>
+                                        if($u_late_leave->isEmpty()){ ?>
                                             <?php
                                                 echo '<tr style="text-align:center">
                                                       <td colspan="4">No records found.</td>
@@ -82,7 +85,7 @@
                                         } 
     									else
                                         {
-                                            foreach($u_annual_leave as $key => $value) {
+                                            foreach($u_late_leave as $key => $value) {
 
                                             $leave_date = date('d M Y', strtotime($value->start_date));
 
@@ -111,8 +114,8 @@
                             </div>
                             
                             <!-- <div class="row"><div class="col-lg-6"><div class="dataTables_info" id="editable-sample_info">Showing 1 to 28 of 28 entries</div></div><div class="col-lg-6"><div class="dataTables_paginate paging_bootstrap pagination"><ul><li class="prev disabled"><a href="#">← Prev</a></li><li class="next"><a href="#">Next → </a></li></ul></div></div></div> -->
-                            @if($u_annual_leave->links() !== null) 
-                            {{ $u_annual_leave->links() }}
+                            @if($u_late_leave->links() !== null) 
+                            {{ $u_late_leave->links() }}
                             @endif
 
                         </div>

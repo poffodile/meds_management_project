@@ -24,11 +24,12 @@
                         <div class="adv-table editable-table ">
                             <div class="clearfix">
                                 <div class="btn-group">
-                                    <a href="{{ url('admin/user/sick-leave/add/'.$user_id) }}">
+                                    <h3>Sick Leave</h3>
+                                    {{-- <a href="{{ url('admin/user/sick-leave/add/'.$user_id) }}">
                                         <button id="editable-sample_new" class="btn btn-primary">
                                             Add Sick Leave <i class="fa fa-plus"></i>
                                         </button>
-                                    </a>
+                                    </a> --}}
                                 </div>
                                 @include('backEnd.common.alert_messages')
                             </div>
@@ -96,7 +97,7 @@
                                                 
                                                 <a href="{{ url('admin/user/sick-leave/edit/'.$value->id) }}" class="edit"><i data-toggle="tooltip" title="Edit" class="fa fa-edit"></i></a>
                                                 <a href="{{ url('admin/user/sick-leave/delete/'.$value->id) }}" class="delete"><i data-toggle="tooltip" title="Delete" class="fa fa-trash-o"></i></a>
-                                                <a href="{{ url('admin/user/sick-leave/sanction/'.$value->id)}}"><i data-toggle="tooltip" title="Sanction Leave" class="fa fa-check-circle"></i></a>
+                                                {{-- <a href="{{ url('admin/user/sick-leave/sanction/'.$value->id)}}"><i data-toggle="tooltip" title="Sanction Leave" class="fa fa-check-circle"></i></a> --}}
 
                                                 <?php //$user_id = base64_encode(convert_uuencode($value->id)); ?>
                                                 

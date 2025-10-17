@@ -27,6 +27,7 @@ use App\Http\Controllers\Rota\StaffController;
 use App\Http\Controllers\Rota\AnnualLeaveController;
 use App\Http\Controllers\frontEnd\salesFinance\leave_tracker\LeaveTrackerController;
 use App\Http\Controllers\frontEnd\ServiceUserManagement\DailyLogsController;
+use App\Http\Controllers\backEnd\user\LatnessLeaveController;
 
 // Backend Controllers
 use App\Http\Controllers\backEnd\superAdmin\HomeController;
@@ -49,6 +50,7 @@ use App\Http\Controllers\backEnd\generalAdmin\DepartmentBackendController;
 use App\Http\Controllers\backEnd\systemManage\PlanBuilderAdminController;
 use App\Http\Controllers\backEnd\salesfinance\TimeSheetBackendController;
 use App\Http\Controllers\Rota\RotaController;
+
 
 
 Route::get('clear', function () {
@@ -1714,6 +1716,12 @@ Route::group(['prefix' => 'admin', 'middleware' => 'CheckAdminAuth'], function (
 	Route::match(['get', 'post'], '/user/annual-leave/add/{staff_member_id}', 'App\Http\Controllers\backEnd\user\AnnualLeaveController@add');
 	Route::match(['get', 'post'], '/user/annual-leave/edit/{u_annual_leave_id}', 'App\Http\Controllers\backEnd\user\AnnualLeaveController@edit');
 	Route::get('/user/annual-leave/delete/{u_sick_leave_id}', 'App\Http\Controllers\backEnd\user\AnnualLeaveController@delete');
+
+
+	// User Latness Leave
+	Route::match(['get', 'post'], '/user/late-leaves/{staff_member}', [LatnessLeaveController::class, 'index'])
+    ->name('user.latness-leaves');
+	// User Other Leave
 
 	//backEnd ServiceUserController
 	Route::match(['get', 'post'], '/service-users', 'App\Http\Controllers\backEnd\serviceUser\ServiceUserController@index');

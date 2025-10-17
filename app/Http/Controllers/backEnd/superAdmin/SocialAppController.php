@@ -63,7 +63,7 @@ class SocialAppController extends Controller
     		}
     	}
         $page = 'social-app';
-        return view('backEnd/superAdmin/social_app/social_app_form', compact('page'));
+        return view('backEnd/superAdmin/social_app/social_app_form', compact('page'));  
     }
    			
    	public function edit(Request $request, $social_app_id) { 
