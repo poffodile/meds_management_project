@@ -210,7 +210,7 @@
                                             foreach ($period as $date) {
                                                 $date->format('D j M') . "<br>";
                                             ?>
-                                                <div class="d-flex">
+                                                <div class="addSoftBtmBorder">
                                                     <div class="date-of-shift">
                                                         <strong>{{$date->format('D j M')}}</strong>
                                                     </div>
@@ -266,7 +266,7 @@
                                                                         <div class="name_of_person">{{ $user_data->name }}</div>
                                                                         <div class="shift_timeing_duration">{{ \Carbon\Carbon::parse($shift_start)->format('h:i') }} - {{ \Carbon\Carbon::parse($shift_end) ->format('h:i') }}</div>
                                                                     </div>
-                                                                    <div class="">{{ $description }}</div>
+                                                                    <div class="addDiscriptest">{{ $description }}</div>
                                                                 </div>
                                                             </div>
                                                         </button>
@@ -383,7 +383,7 @@
                                             <div class="row">
                                                 <div class="col-md-12">
                                                     <h4>Assign Childs to <span id="assign_emp_date"></span>, <span id="shift_time_show"></span></h4>
-                                                    <span class="date-of-weak-shift">Find a Child or a team</span>
+                                                    <span class="date-of-weak-shift">Find a User or a team</span>
                                                 </div>
                                                 <div class="col-sm-3 col-md-4">
                                                     <select class="form-select form-control" aria-label="Default select example">
@@ -1281,7 +1281,7 @@
             next2.disabled = true;
             next2.classList.add("disable_btn_nxt2");
         } else {
-            hour_emp.innerHTML = `<p>This shift has <strong>${countE} Childs </strong>working <strong>${Math.abs(show_hour*countE)} hrs</strong></p>`;
+            hour_emp.innerHTML = `<p>This shift has <strong>${countE} users </strong>working <strong>${Math.abs(show_hour*countE)} hrs</strong></p>`;
 
             next2.removeAttribute("disabled");
             next2.classList.remove("disable_btn_nxt2");
