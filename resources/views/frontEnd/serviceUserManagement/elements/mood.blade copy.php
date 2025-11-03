@@ -1,19 +1,3 @@
-@extends('frontEnd.layouts.master')
-@section('title', 'Child Profile')
-@section('content')
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 <!-- Child Emotional Health/Mood Modal -->
 <div class="modal fade" id="moodModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -175,4 +159,3 @@
         return false;
     });
 </script>
-@endsection

@@ -181,13 +181,13 @@ class ViewReportController extends Controller
 	}
 
     // public function get_user($user_type_id = null) {
-	public function get_user(Request $request) {
+	public function get_user(Request $request, $user_type_id) {
 
 		// $home_id      = Auth::user()->home_id;
 		$home_ids = Auth::user()->home_id;
 		$ex_home_ids = explode(',', $home_ids);
 		$home_id=$ex_home_ids[0];
-		$user_type_id = $request->user_type_id;
+		// $user_type_id = $request->user_type_id;
 		
 		if($user_type_id == 'STAFF') {
 			$user_query = User::where('home_id', $home_id)
@@ -212,7 +212,7 @@ class ViewReportController extends Controller
 
 
 	public function record(Request $request) {
-		
+		dd($request);
 		$page = 'index';
 		$guide_tag = 'sys_mngmt';
 

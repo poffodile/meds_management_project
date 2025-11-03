@@ -992,6 +992,9 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 	// status change of su_profile pic
 	Route::match(['get', 'post'], '/service/user-profile/afc-status/update/{service_user_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\ProfileController@update_afc_status');
 
+	// Save child rating (AJAX)
+	Route::post('/service/user-profile/rating/{service_user_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\ProfileController@saveRating');
+
 	//notifications
 	Route::match(['get', 'post'], '/service/notifications/', 'App\Http\Controllers\frontEnd\ServiceUserManagement\ProfileController@show_notifications');
 
@@ -1124,7 +1127,6 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 	/*Route::match(['get','post'], '/service/daily-records-bmp-rmp/{service_user_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\BmpRmpController@service_users_list');*/
 
 	//Body Map
-
 	Route::match(['get', 'post'], '/service/body-map/{risk_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\BodyMapController@index');
 	Route::match(['get', 'post'], '/service/body-map/injury/add', 'App\Http\Controllers\frontEnd\ServiceUserManagement\BodyMapController@addInjury');
 	Route::match(['get', 'post'], '/service/body-map/injury/remove/{service_user_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\BodyMapController@removeInjury');
@@ -1152,6 +1154,16 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 	Route::match(['get', 'post'], '/service/calendar/event/view', 'App\Http\Controllers\frontEnd\CalendarEventController@index');
 	Route::match(['get', 'post'], '/service/calendar/event/edit', 'App\Http\Controllers\frontEnd\CalendarEventController@edit');
 	Route::match(['get', 'post'], '/service/calendar/event/remove/{calendar_id}', 'App\Http\Controllers\frontEnd\CalendarEventController@delete');
+
+	// Task Management from Child
+	Route::match(['get', 'post'], '/service/task-management/{service_user_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\TaskManagementController@index');
+	Route::match(['get', 'post'], '/service/save-task-management/{service_user_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\TaskManagementController@store');
+	Route::match(['get', 'post'], '/service/task-management/update/{service_user_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\TaskManagementController@update');
+	Route::match(['get', 'post'], '/service/task-management/edit/{service_user_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\TaskManagementController@edit');
+	
+	// Service User Task Management - Delete Task
+	Route::delete('/service/task-management/delete/{id}', [\App\Http\Controllers\frontEnd\ServiceUserManagement\TaskManagementController::class, 'destroy'])->name('service.task-management.destroy');
+
 
 	//Weekly and Monthly Report
 	Route::match(['get', 'post'], '/select/report', 'App\Http\Controllers\frontEnd\ServiceUserManagement\ReportController@index');
@@ -1206,6 +1218,11 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 	Route::post('/service/incident-report/edit_incident/{su_incident_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\IncidentController@edit_incident');
 	Route::get('/service/incident-report/delete/{su_incident_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\IncidentController@delete');
 	Route::match(['get', 'post'], '/service/incident-report/{service_user_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\IncidentController@form');
+	
+	// Mood
+	Route::match(['get', 'post'], '/service/mood/{service_user_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\MoodController@mood_view');
+
+
 
 
 	//ServiceUser LogBook
@@ -1454,9 +1471,10 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 
 	//------------- View Reports ---------------//
 	Route::match(['get', 'post'], '/view-reports', 'App\Http\Controllers\frontEnd\ViewReportController@index');
-	// 	Route::get('/users/{user_type_id}', 'App\Http\Controllers\frontEnd\ViewReportController@get_user');
-	Route::get('/users', 'App\Http\Controllers\frontEnd\ViewReportController@get_user');
+	Route::get('/users/{user_type_id}', 'App\Http\Controllers\frontEnd\ViewReportController@get_user');
+	// Route::get('/users', 'App\Http\Controllers\frontEnd\ViewReportController@get_user');
 	Route::match(['get', 'post'], '/user/record', 'App\Http\Controllers\frontEnd\ViewReportController@record');
+	// Route::post('/user/record', 'App\Http\Controllers\frontEnd\ViewReportController@record');
 });
 
 // System guide 

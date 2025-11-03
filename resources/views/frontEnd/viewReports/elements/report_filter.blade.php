@@ -1,6 +1,6 @@
 
 <div class="col-md-12 col-sm-12 col-xs-12 metro-main">
-    <form class="form-horizontal" method="get" action="{{ url('/user/record') }}">
+    <form class="form-horizontal" method="POST" action="{{ url('/user/record') }}">
         <div class="form-group col-md-6 col-sm-4 col-xs-12 p-0 metro-design">
             <label class="col-md-3 col-sm-3 col-xs-12 control-label"> Report type: </label>
             <div class="col-md-9 col-sm-9 col-xs-12">

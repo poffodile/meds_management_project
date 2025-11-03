@@ -215,7 +215,7 @@
         var report_type = $('#report_type_select').val();
         if(report_type == 'ALL') {
             $('select[name=\'user_type\']').html("<option value='SERVICE_USER'> Child </option>"+"<option value='STAFF' > Staff </option>");
-            $('select[name=\'select_user_id\']').attr('disabled', true);
+            // $('select[name=\'select_user_id\']').attr('disabled', true);
             // $('#confirm_btn').hide();
         }
 
@@ -224,7 +224,7 @@
             if(report_type == 'ALL') { 
                 $('select[name=\'user_type\']').html("<option value='SERVICE_USER'> Child </option>"+"<option value='STAFF' > Staff </option>");
                 $('select[name=\'select_user_id\']').html("<option value=''> Select </option>");
-                $('select[name=\'select_user_id\']').attr('disabled', true);
+                // $('select[name=\'select_user_id\']').attr('disabled', true);
                 // $('#confirm_btn').hide();
             } else {
                 $('select[name=\'user_type\']').html("<option value=''>Select</option>"+"<option value='SERVICE_USER'> Child </option>"+"<option value='STAFF'> Staff </option>");
@@ -235,7 +235,7 @@
 
         $('#user_type').change(function(){
             var user_type_id = $(this).val();
-            
+            console.log("user_type_id", user_type_id);
             if(user_type_id == '') {
                 $('select[name=\'select_user_id\']').html("<option value=''>Select</option>");
                 return false;
@@ -250,9 +250,10 @@
 
             $.ajax({
                 type : 'get',
-                 // url  : "{{ url('/users') }}"+'/'+user_type_id,
-                url  : "{{ url('/users') }}"+'?user_type_id='+user_type_id,
+                 url  : "{{ url('/users') }}"+'/'+ user_type_id,
+                // url  : "{{ url('/users') }}"+'?user_type_id='+user_type_id,
                 success : function(resp) {
+                    console.log("child List", resp);
                     if(isAuthenticated(resp) == false){
                         return false;
                     }

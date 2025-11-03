@@ -23,7 +23,7 @@ class MoodController extends ServiceUserManagementController
             $image = MoodImgPath.'/dummy.jpg';
             if(!empty($value->image)) {
                 
-                $image = MoodImgPath.'/'.$value->image;
+                $image = url(MoodImgPath.'/'.$value->image);
             }
 
             $check = (!empty($value->suggestions)) ? '<i class="fa fa-check"></i>' : '';
@@ -106,4 +106,8 @@ class MoodController extends ServiceUserManagementController
     	}
     }
 
+    public function mood_view($service_user_id)
+    {
+        return view('frontEnd.serviceUserManagement.elements.mood', compact('service_user_id'));
+    }
 }
