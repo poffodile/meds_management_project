@@ -309,10 +309,16 @@
                                                     <br>
                                                     <span
                                                         class="text-muted">{{ date('d/m/Y', strtotime($patient->date_of_birth)) }}</span>
+                                                    @if (isset($current_moods))
+                                                        <p><strong>Today's Mood <img
+                                                                    src="{{ url(MoodImgPath . '/' . $current_moods->image) }}"
+                                                                    style="width: 30px;"></strong></p>
+                                                    @endif
                                                 </div>
+
                                             </div>
 
-                                            <div class="location-info contact">
+                                            <div class="location-info contact pt-0">
                                                 <h2> <span><i class="fa fa-phone"></i></span> Contacts <a
                                                         href="javascript:void(0)" class="contact-edit-btn"
                                                         phone_no="{{ $patient->phone_no }}" mobile="{{ $patient->mobile }}"
@@ -394,49 +400,49 @@
                                             </div>
                                         </div>
                                         <!-- <div class="col-md-6">
-                                                        <div class="contact">
-                                                            <h2> <span><i class="fa fa-map-marker"></i></span> Current location <a href="javascript:void(0)" class="location-edit-btn" clmn-name="current_location"><i class="fa fa-pencil profile"></i> </a> </h2>
-                                                            <div class="location-info current_location"><p>{!! $patient->current_location !!}</p></div>
+                                                                <div class="contact">
+                                                                    <h2> <span><i class="fa fa-map-marker"></i></span> Current location <a href="javascript:void(0)" class="location-edit-btn" clmn-name="current_location"><i class="fa fa-pencil profile"></i> </a> </h2>
+                                                                    <div class="location-info current_location"><p>{!! $patient->current_location !!}</p></div>
 
-                                                        </div>
-                                                        <div class="location-info ">
-                                                            <strong style="color:#3399CC;">Previous Location</strong><br>
-                                                            <div class="previous_location"><p>{!! $patient->previous_location !!}</p></div>
-                                                        </div>
-                                                    </div> -->
+                                                                </div>
+                                                                <div class="location-info ">
+                                                                    <strong style="color:#3399CC;">Previous Location</strong><br>
+                                                                    <div class="previous_location"><p>{!! $patient->previous_location !!}</p></div>
+                                                                </div>
+                                                            </div> -->
                                     </div>
                                     <!-- <div class="profile-statistics back-res">
-                                                   <?php
-                                                   $dob = Carbon\Carbon::parse($patient->date_of_birth);
-                                                   $age = $dob->diffInYears();
-                                                   ?>
-                                                   <h1>{{ $age }}</h1>
-                                                   <p>Years Old</p>
-                                                   <h1>{{ $patient->admission_number }}</h1>
-                                                   <p>Admission Number</p>
-                                                   <h1>{{ $patient->section }}</h1>
-                                                   <p>Section</p>
-                                                    <?php $risk_status = App\Risk::overallRiskStatus($service_user_id);
-                                                    if ($risk_status == 1) {
-                                                        $color = 'orange-clr';
-                                                        $risk_status = 'Historic';
-                                                    } elseif ($risk_status == 2) {
-                                                        $color = 'red-clr';
-                                                        $risk_status = 'High';
-                                                    } else {
-                                                        $color = 'darkgreen-clr';
-                                                        $risk_status = 'No';
-                                                    }
-                                                    ?>
-                                                   <h1 id="su_risk_status" class="{{ $color }}">{{ $risk_status }}</h1>
-                                                   <p>Risk</p>
-                                                    <?php
+                                                           <?php
+                                                           $dob = Carbon\Carbon::parse($patient->date_of_birth);
+                                                           $age = $dob->diffInYears();
+                                                           ?>
+                                                           <h1>{{ $age }}</h1>
+                                                           <p>Years Old</p>
+                                                           <h1>{{ $patient->admission_number }}</h1>
+                                                           <p>Admission Number</p>
+                                                           <h1>{{ $patient->section }}</h1>
+                                                           <p>Section</p>
+                                                            <?php $risk_status = App\Risk::overallRiskStatus($service_user_id);
+                                                            if ($risk_status == 1) {
+                                                                $color = 'orange-clr';
+                                                                $risk_status = 'Historic';
+                                                            } elseif ($risk_status == 2) {
+                                                                $color = 'red-clr';
+                                                                $risk_status = 'High';
+                                                            } else {
+                                                                $color = 'darkgreen-clr';
+                                                                $risk_status = 'No';
+                                                            }
+                                                            ?>
+                                                           <h1 id="su_risk_status" class="{{ $color }}">{{ $risk_status }}</h1>
+                                                           <p>Risk</p>
+                                                            <?php
                                 if (isset($noti_data['back_path'])) { ?>
-                                                       <div class="cus-back-btn">
-                                                           <a href="{{ $noti_data['back_path'] }}" class="btn cus-btn btn-warning">Continue</a>
-                                                       </div>
-                                                    <?php } ?>
-                                               </div> -->
+                                                               <div class="cus-back-btn">
+                                                                   <a href="{{ $noti_data['back_path'] }}" class="btn cus-btn btn-warning">Continue</a>
+                                                               </div>
+                                                            <?php } ?>
+                                                       </div> -->
                                     <!--<a href="#" class="btn btn-primary">Read Full Profile</a>-->
                                 </div>
                             </div>
@@ -447,7 +453,7 @@
                                     <a data-toggle="modal" href="#filemngrModal" title="File Manager"><i
                                             class="fa fa-folder-open-o" aria-hidden="true"></i></a>
                                     <!-- <a href="" title="{{ $labels['mfc']['label'] }}" class="mfc"><i class="fa fa-user-times"></i></a>
-                                                    <a href="" title="{{ $labels['living_skill']['label'] }}" class="living-skill-list"><i class="fa fa-child"></i></a>  -->
+                                                            <a href="" title="{{ $labels['living_skill']['label'] }}" class="living-skill-list"><i class="fa fa-child"></i></a>  -->
                                     <!-- <a data-toggle="modal" href="#filemngrModal" title="YP Log Book"><i class="fa fa-address-book-o"></i></a> -->
                                     <!-- <a href="javascript:void(0)" class="moneylist" rel="{{ $service_user_id }}" title="Money Requests"><i class="fa fa-credit-card"></i></a> -->
                                     <!-- <a data-toggle="modal" href="#careCenterModel" title="Care Center"><i class="fa fa-building-o "></i></a> -->
@@ -655,7 +661,8 @@
                                                                                     name="service_user_id"
                                                                                     value="{{ $service_user_id }}">
                                                                                 @php
-                                                                                    $rating = $patient->behavior_rate ?? 0; // or wherever your rating value comes from
+                                                                                    $rating =
+                                                                                        $patient->behavior_rate ?? 0; // or wherever your rating value comes from
                                                                                 @endphp
 
                                                                                 <div class="star-rating">
@@ -764,9 +771,9 @@
                                             <section class="panel m-0">
                                                 <header class="panel-heading"> Notification
                                                     <!-- <span class="tools pull-right">
-                                                                    <a href="javascript:;" class="fa fa-chevron-down"></a>
-                                                                    <a href="javascript:;" class="fa fa-cog"></a> <a href="javascript:;" class="fa fa-times"></a>
-                                                                </span> -->
+                                                                            <a href="javascript:;" class="fa fa-chevron-down"></a>
+                                                                            <a href="javascript:;" class="fa fa-cog"></a> <a href="javascript:;" class="fa fa-times"></a>
+                                                                        </span> -->
                                                 </header>
                                                 <div class="panel-body  min-ht-0 srvc_usr_ntf">
                                                     @include('frontEnd.serviceUserManagement.elements.su_profile_notification')
@@ -1036,90 +1043,90 @@
 
     <script>
         /*
-                        // profile status change
-                        $(document).ready(function(){
-                            // $('.sum_profile_click').dblclick(function(){
-                            //      // alert(1); return false;
-                            //     $(this).addClass('profile_active_status');
-                            //     var service_user_id = $(this).attr('id');
-                            //     //var service_user_id = "{{ $patient->id }}";
-                            //     $('.loader').show();
-                            //     $('body').addClass('body-overflow');
-                            //     $.ajax({
-                            //         type   : 'get',
-                            //         url    : "{{ url('/service/user-profile/status/') }}"+'/'+service_user_id,
-                            //         success:function(resp){
-                            //             if(isAuthenticated(resp) == false){
-                            //                 return false;
-                            //             }
-                            //             if(resp == '1') {
-                            //                 if($('.profile_active_status').hasClass('profile_active')) {
-                            //                     $('.profile_active_status').removeClass('profile_active');
-                            //                     $('.profile_active_status').addClass('profile_inactive');
-                            //                 } else {
-                            //                     $('.profile_active_status').removeClass('profile_inactive')
-                            //                      $('.profile_active_status').addClass('profile_active');
-                            //                 }
-                            //             } else {
-                            //             }
-                            //             $('.profile_active_status').removeClass('profile_active_status');
-                            //             $('.loader').hide();
-                            //             $('body').removeClass('body-overflow');
-                            //         }
-                            //     });
-                            //     return false;
-                            // });
+                                // profile status change
+                                $(document).ready(function(){
+                                    // $('.sum_profile_click').dblclick(function(){
+                                    //      // alert(1); return false;
+                                    //     $(this).addClass('profile_active_status');
+                                    //     var service_user_id = $(this).attr('id');
+                                    //     //var service_user_id = "{{ $patient->id }}";
+                                    //     $('.loader').show();
+                                    //     $('body').addClass('body-overflow');
+                                    //     $.ajax({
+                                    //         type   : 'get',
+                                    //         url    : "{{ url('/service/user-profile/status/') }}"+'/'+service_user_id,
+                                    //         success:function(resp){
+                                    //             if(isAuthenticated(resp) == false){
+                                    //                 return false;
+                                    //             }
+                                    //             if(resp == '1') {
+                                    //                 if($('.profile_active_status').hasClass('profile_active')) {
+                                    //                     $('.profile_active_status').removeClass('profile_active');
+                                    //                     $('.profile_active_status').addClass('profile_inactive');
+                                    //                 } else {
+                                    //                     $('.profile_active_status').removeClass('profile_inactive')
+                                    //                      $('.profile_active_status').addClass('profile_active');
+                                    //                 }
+                                    //             } else {
+                                    //             }
+                                    //             $('.profile_active_status').removeClass('profile_active_status');
+                                    //             $('.loader').hide();
+                                    //             $('body').removeClass('body-overflow');
+                                    //         }
+                                    //     });
+                                    //     return false;
+                                    // });
 
-                            // $('.sum_profile_click').click(function(){
-                            //     var su_id = $(this).attr('id');
-                            //     window.location.href = "{{ url('/service/user-profile') }}"+'/'+su_id;
-                            // });
+                                    // $('.sum_profile_click').click(function(){
+                                    //     var su_id = $(this).attr('id');
+                                    //     window.location.href = "{{ url('/service/user-profile') }}"+'/'+su_id;
+                                    // });
 
-                            //yp photo right click functionality
-                            $(function () {
-                                $('.profile_click').bind('contextmenu', function (e) {
-                                    var service_user_id = "{{ $service_user_id }}";
-                                    $(this).addClass('profile_active_status');
-                                    $('.loader').show();
-                                    $('body').addClass('body-overflow');
-                                $.ajax({
-                                    type   : 'get',
-                                    url    : "{{ url('/service/user-profile/afc-status/update') }}"+'/'+service_user_id,
-                                    success:function(resp){
-                                        if(isAuthenticated(resp) == false){
-                                            return false;
-                                        }
-                                        if(resp == 'true') {
-                                            if($('.profile_active_status').hasClass('profile_active')) {
-                                                $('.profile_active_status').removeClass('profile_active');
-                                                $('.profile_active_status').addClass('profile_inactive');
-                                            } else {
-                                                $('.profile_active_status').removeClass('profile_inactive')
-                                                 $('.profile_active_status').addClass('profile_active');
+                                    //yp photo right click functionality
+                                    $(function () {
+                                        $('.profile_click').bind('contextmenu', function (e) {
+                                            var service_user_id = "{{ $service_user_id }}";
+                                            $(this).addClass('profile_active_status');
+                                            $('.loader').show();
+                                            $('body').addClass('body-overflow');
+                                        $.ajax({
+                                            type   : 'get',
+                                            url    : "{{ url('/service/user-profile/afc-status/update') }}"+'/'+service_user_id,
+                                            success:function(resp){
+                                                if(isAuthenticated(resp) == false){
+                                                    return false;
+                                                }
+                                                if(resp == 'true') {
+                                                    if($('.profile_active_status').hasClass('profile_active')) {
+                                                        $('.profile_active_status').removeClass('profile_active');
+                                                        $('.profile_active_status').addClass('profile_inactive');
+                                                    } else {
+                                                        $('.profile_active_status').removeClass('profile_inactive')
+                                                         $('.profile_active_status').addClass('profile_active');
+                                                    }
+                                                    //show success message
+                                                    $('.ajax-alert-suc').find('.msg').text('MFC/AFC status has been changed successfully.');
+                                                    $('.ajax-alert-suc').show();
+                                                    setTimeout(function(){$(".ajax-alert-suc").fadeOut()}, 5000);
+                                                } else if(resp == 'AUTH_ERR') {
+                                                    $('.ajax-alert-err').find('.msg').text("{{ UNAUTHORIZE_ERR }}");
+                                                    $('.ajax-alert-err').show();
+                                                    setTimeout(function(){$(".ajax-alert-err").fadeOut()}, 5000);
+                                                } else {
+                                                    $('.ajax-alert-err').find('.msg').text('Some Error Occured. Status can not be updated.');
+                                                    $('.ajax-alert-err').show();
+                                                    setTimeout(function(){$(".ajax-alert-err").fadeOut()}, 5000);
+                                                }
+                                                $('.profile_active_status').removeClass('profile_active_status');
+                                                $('.loader').hide();
+                                                $('body').removeClass('body-overflow');
                                             }
-                                            //show success message
-                                            $('.ajax-alert-suc').find('.msg').text('MFC/AFC status has been changed successfully.');
-                                            $('.ajax-alert-suc').show();
-                                            setTimeout(function(){$(".ajax-alert-suc").fadeOut()}, 5000);
-                                        } else if(resp == 'AUTH_ERR') {
-                                            $('.ajax-alert-err').find('.msg').text("{{ UNAUTHORIZE_ERR }}");
-                                            $('.ajax-alert-err').show();
-                                            setTimeout(function(){$(".ajax-alert-err").fadeOut()}, 5000);
-                                        } else {
-                                            $('.ajax-alert-err').find('.msg').text('Some Error Occured. Status can not be updated.');
-                                            $('.ajax-alert-err').show();
-                                            setTimeout(function(){$(".ajax-alert-err").fadeOut()}, 5000);
-                                        }
-                                        $('.profile_active_status').removeClass('profile_active_status');
-                                        $('.loader').hide();
-                                        $('body').removeClass('body-overflow');
-                                    }
-                                });
-                                return false;
-                                e.preventDefault();
-                                });
-                            });
-                        }); */
+                                        });
+                                        return false;
+                                        e.preventDefault();
+                                        });
+                                    });
+                                }); */
     </script>
 
     <!-- commom scripts -->

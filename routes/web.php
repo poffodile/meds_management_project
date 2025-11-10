@@ -53,6 +53,7 @@ use App\Http\Controllers\Rota\RotaController;
 
 
 
+
 Route::get('clear', function () {
 	Artisan::call('cache:clear');
 	return "Cleared!";
@@ -209,6 +210,10 @@ Route::match(['get', 'post'], '/switch_home_submit', 'App\Http\Controllers\front
 
 
 Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
+
+	Route::post('/service/mood/add', 'App\Http\Controllers\frontEnd\ServiceUserManagement\MoodController@saveMood')->name('mood.add');
+	Route::post('/service/mood/edit/{id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\MoodController@edit')->name('mood.edit');
+	Route::post('/service/mood/delete/{id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\MoodController@delete')->name('mood.delete');
 
 	// Rota Management
 	Route::get('/rota-dashboard', 'App\Http\Controllers\Rota\RotaController@index');
@@ -1254,6 +1259,7 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 	// su Moods listing
 	Route::get('/service/moods/{service_user_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\MoodController@index');
 	Route::post('/service/mood/suggestion/add', 'App\Http\Controllers\frontEnd\ServiceUserManagement\MoodController@add');
+
 
 	// my money requests of user
 	Route::get('service/money-requests/{service_user_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\MoneyController@index');

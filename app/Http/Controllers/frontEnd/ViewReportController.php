@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use illuminate\Http\Request;
 use App\User, App\ServiceUser, App\ServiceUserCareCenter, App\OfficeMessage, App\ServiceUserNeedAssistance, App\ServiceUserEarningStar, App\PettyCash, App\EarningScheme, App\HomeLabel, App\ServiceUserMFC, App\ServiceUserRisk, App\Risk, App\Mood, App\AgendaMeeting, App\Training, App\StaffTraining,App\ServiceUserMood, App\ServiceUserMoney, App\StaffSickLeave, App\StaffAnnualLeave, App\DynamicForm;
 use Auth, DB;
+use Illuminate\Support\Facades\Log;
 
 class ViewReportController extends Controller
 {
@@ -212,7 +213,28 @@ class ViewReportController extends Controller
 
 
 	public function record(Request $request) {
-		dd($request);
+		// return $request->all();
+		
+	$reportType = $request->query('report_type');
+    $fromDate   = $request->query('from_date');
+    $toDate     = $request->query('to_date');
+    $userType   = $request->query('user_type');
+    $userId     = $request->query('select_user_id');
+
+    // OR get all query params
+    // $data = $request->query();
+
+    return response()->json([
+        'report_type' => $reportType,
+        'from_date'   => $fromDate,
+        'to_date'     => $toDate,
+        'user_type'   => $userType,
+        'user_id'     => $userId,
+    ]);
+		  $data = $request->all();
+    dd($data); 
+
+
 		$page = 'index';
 		$guide_tag = 'sys_mngmt';
 

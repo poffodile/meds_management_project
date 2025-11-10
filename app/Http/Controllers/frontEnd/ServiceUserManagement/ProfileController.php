@@ -270,9 +270,17 @@ class ProfileController extends ServiceUserManagementController
             $avg_rating = $ratingStats && $ratingStats->avg_rating ? round($ratingStats->avg_rating, 1) : 0;
             $rating_count = $ratingStats ? intval($ratingStats->rating_count) : 0;
 
+            $current_moods = DB::table('su_mood')->select('su_mood.*', 'mood.id as mood_id', 'mood.name', 'mood.image')
+            ->where('su_mood.is_deleted', '0')
+            ->where('mood.home_id', $home_id)
+            ->where('su_mood.service_user_id', $service_user_id)
+            ->join('mood', 'mood.id', 'su_mood.mood_id')
+            ->orderBy('su_mood.id', 'desc')
+            ->first();
+
             //echo "<pre>"; print_r($noti_data); die;
             //print_r($patient); die;
-            return view('frontEnd.serviceUserManagement.profile', compact('patient', 'risks', 'file_category', 'service_user_id', 'care_team', 'care_history', 'daily_score', 'latitude', 'longitude', 'form_pattern', 'notifications', 'afc_status', 'labels', 'care_team_job_title', 'su_in_danger', 'su_req_cb', 'su_contact', 'service_users', 'dynamic_forms', 'social_app', 'social_app_val', 'my_money', 'noti_data', 'users', 'avg_rating', 'rating_count'));
+            return view('frontEnd.serviceUserManagement.profile', compact('patient', 'risks', 'file_category', 'service_user_id', 'care_team', 'care_history', 'daily_score', 'latitude', 'longitude', 'form_pattern', 'notifications', 'afc_status', 'labels', 'care_team_job_title', 'su_in_danger', 'su_req_cb', 'su_contact', 'service_users', 'dynamic_forms', 'social_app', 'social_app_val', 'my_money', 'noti_data', 'users', 'avg_rating', 'rating_count','current_moods'));
         } else {
             return view('frontEnd.error_404');
         }

@@ -1,6 +1,8 @@
 
 <div class="col-md-12 col-sm-12 col-xs-12 metro-main">
-    <form class="form-horizontal" method="POST" action="{{ url('/user/record') }}">
+    {{-- <form class="form-horizontal" method="POST" action="{{ url('/user/record') }}"> --}}
+        <form id="filterFormDatas" class="form-horizontal">
+     
         <div class="form-group col-md-6 col-sm-4 col-xs-12 p-0 metro-design">
             <label class="col-md-3 col-sm-3 col-xs-12 control-label"> Report type: </label>
             <div class="col-md-9 col-sm-9 col-xs-12">
@@ -94,9 +96,9 @@
             </div>
         </div>
 
-        <div class="form-group col-md-2 col-sm-2 col-xs-12 text-center" id="confirm_btn">
-            {{ csrf_field() }}
-            <button type="submit" class="btn btn-warning">Confirm</button>
+        <div class="form-group col-md-2 col-sm-2 col-xs-12 text-center" id="">
+            {{-- {{ csrf_field() }} --}}
+            <button type="button" class="btn btn-warning" id="filterDataFormBtn">Confirm</button>
         </div>
     </form>
 </div>
@@ -105,6 +107,51 @@
 
 
 <script>
+
+ $(document).on('click', '#filterDataFormBtn', function (e) {
+    e.preventDefault(); // prevent normal form submission
+    
+    // Get the form data
+    var formData = $('#filterFormDatas').serialize();
+    console.log(formData);
+
+    $.ajax({
+        // url: "{{ url('/user/record') }}",
+         url: "{{ url('/user/record') }}?" + formData, // append query string
+        type: "GET",
+        // data: formData,
+        // processData:false,
+        // contentType:false,
+        // Remove the redundant CSRF header since it's already in the form data
+        success: function (response) {
+            console.log('✅ Success:', response);
+        },
+        error: function (xhr) {
+            console.log('❌ Error:', xhr.responseText);
+        }
+    });
+});
+
+//  $('#filterFormData').on('submit', function (e) {
+//     e.preventDefault();
+    
+//     var formData = $(this).serialize();
+//     console.log(formData);
+
+//     $.ajax({
+//         url: "{{ url('/user/record') }}",
+//         type: "POST",
+//         data: formData,
+//         success: function (response) {
+//             console.log('✅ Success:', response);
+//         },
+//         error: function (xhr) {
+//             console.log('❌ Error:', xhr.responseText);
+//         }
+//     });
+// });
+
+
     $(document).ready(function() {
         today  = new Date; 
         $('#datetime-picker2').datetimepicker({
