@@ -307,13 +307,14 @@
                                                             style="margin-left:6px; color:#666;">({{ $displayAvg }})</small>
                                                     </span>
                                                     <br>
-                                                    <span
-                                                        class="text-muted">{{ date('d/m/Y', strtotime($patient->date_of_birth)) }}</span>
-                                                    @if (isset($current_moods))
-                                                        <p><strong>Today's Mood <img
-                                                                    src="{{ url(MoodImgPath . '/' . $current_moods->image) }}"
-                                                                    style="width: 30px;"></strong></p>
-                                                    @endif
+                                                    <span class="text-muted">{{ date('d/m/Y', strtotime($patient->date_of_birth)) }}</span>
+                                                    <p>
+                                                        <strong>Today's Mood 
+                                                        @if (isset($current_moods))
+                                                            <img src="{{ url(MoodImgPath . '/' . $current_moods->image) }}" style="width: 30px;">
+                                                        @endif
+                                                        </strong>
+                                                    </p>
                                                 </div>
 
                                             </div>

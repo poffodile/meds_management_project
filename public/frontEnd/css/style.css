@@ -9341,5 +9341,28 @@ a.close.edit_dyn_form {
 }
  */
 
+.cus-calendar .panel-body{
+    padding: 34px 0;
+}
 
-
+.pop-notifbox.activeTargets{
+    right: 0;
+    top: 40px;
+    left: auto;
+}
+.help-block.enterthedescription{
+    font-size: 12px;
+}
+.placement_plan .cus-label label {
+    padding: 6px 0;
+}
+.allAddComments{
+    
+}
+.recurringTaskCheck input[type=checkbox]{
+  margin: 10px 0 0;
+}
+.commentsSave {
+     font-size: 13px;
+     margin-top: 20px
+}

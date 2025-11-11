@@ -1192,8 +1192,9 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 
 	Route::match(['get', 'post'], '/service/placement-plan/target/view/{act_tar_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\PlacementPlanController@view_target');
 	Route::post('/service/placement-plan/edit', 'App\Http\Controllers\frontEnd\ServiceUserManagement\PlacementPlanController@edit');
-
 	Route::post('/service/placement-plan/add-qqa-review', 'App\Http\Controllers\frontEnd\ServiceUserManagement\PlacementPlanController@add_qqa_review');
+	Route::post('/service/placement-plan/save-comment', 'App\Http\Controllers\frontEnd\ServiceUserManagement\PlacementPlanComments\PlacementPlanCommentsController@add_comments');
+	Route::get('/service/placement-plan/get-comments/{id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\PlacementPlanComments\PlacementPlanCommentsController@get_comments');	
 
 	//RMP
 	Route::match(['get', 'post'], '/service/rmp/view/{service_user_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\RmpController@index');
