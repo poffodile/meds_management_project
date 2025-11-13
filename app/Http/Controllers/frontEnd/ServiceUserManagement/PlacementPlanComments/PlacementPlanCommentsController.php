@@ -5,6 +5,7 @@ namespace App\Http\Controllers\frontend\ServiceUserManagement\PlacementPlanComme
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\ServiceUserManagement\PlacementPlanComment;
+use App\User;
 use Auth;
 
 class PlacementPlanCommentsController extends Controller
@@ -38,7 +39,12 @@ class PlacementPlanCommentsController extends Controller
 
     public function get_comments($plan_id){
 
-        $commentData = PlacementPlanComment::where('su_placement_plan_id', $plan_id)->where('is_deleted', 0)->orderBy('created_at', 'desc')->get();
+        $commentData = PlacementPlanComment::select('user.name','placement_plan_comments.created_at','placement_plan_comments.comments', 'placement_plan_comments.id')
+                        ->join('user', 'user.id', 'placement_plan_comments.user_id')
+                        ->where('su_placement_plan_id', $plan_id)
+                        ->where('placement_plan_comments.is_deleted', 0)
+                        ->orderBy('placement_plan_comments.created_at', 'desc')
+                        ->get();
 
         if(empty($commentData)){
             return response()->json(['status' => 'success', 'message' => 'No Record Found.']);

@@ -93,6 +93,8 @@
                                 </div>
                                 <?php //echo '<pre>'; print_r($labels); die; ?>
                                 <ul class="nav nav-pills nav-stacked">
+                                    <li ><a href="{{ url('/service/dashboard/' . $patient->id) }}"> <i class="fa fa-tachometer"></i> Dashboard <span class="badge label-success pull-right {{ $notifi_count_personal_clr }}">{{ (strlen($notifi_count_personal) < 2) ? '0':'' }}{{ $notifi_count_personal }}</span></a></li>
+                                    
                                     <li ><a href="{{ url('/service/user-profile/'.$patient->id) }}"> <i class="fa fa-pencil"></i> Personal Details <span class="badge label-success pull-right {{ $notifi_count_personal_clr }}">{{ (strlen($notifi_count_personal) < 2) ? '0':'' }}{{ $notifi_count_personal }}</span></a></li>
 
                                     <li><a href="{{ url('/service/earning-scheme/'.$patient->id) }}"> <i class="{{ $labels['earning_scheme']['icon'] }}"></i> {{$labels['earning_scheme']['label']}} <span class="badge pull-right r-activity {{ $ern_schme_count['color'] }}">{{ (strlen($ern_schme_count['count']) < 2) ? '0':'' }}{{ $ern_schme_count['count'] }}</span></a></li>

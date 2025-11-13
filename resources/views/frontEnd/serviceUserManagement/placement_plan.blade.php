@@ -67,6 +67,33 @@
             min-height: 380px;
             overflow-x: hidden;
         }
+
+        .second {
+            /* width: 100%; */
+            background-color: whitesmoke;
+            border-radius: 4px;
+            border: 1px solid #ebebeb;
+            padding: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .comment-list {
+            width: 100%;
+        }
+
+        .comment-staff-name {
+            font-weight: 600;
+            white-space: nowrap;
+            margin-right: 12px;
+        }
+
+        .text1 {
+            font-size: 15px;
+            font-weight: 500;
+            color: #56575b;
+            text-align: justify;
+        }
     </style>
 
     <section id="main-content">
@@ -345,16 +372,15 @@
                             <div class="formDtail">
 
                                 <div class="form-group">
-                                    <div class="col-sm-12">
-                                        <input type="hidden" name="plan_id" id="plan_id" value="">
-                                        <textarea class="form-control" name="task_comments" id="task_comments" rows="5"
-                                            placeholder="Type comments..."></textarea>
-                                    </div>
+
+                                    <input type="hidden" name="plan_id" id="plan_id" value="">
+                                    <textarea class="form-control" name="task_comments" id="task_comments" rows="5"
+                                        placeholder="Type comments..."></textarea>
                                 </div>
 
                                 <div class="form-group allAddComments">
-                                    <div class="col-sm-12" id="addedCommentsList">
-                                
+                                    <div id="addedCommentsList" style="width: 100%; height: 200px; overflow: auto;">
+
                                     </div>
                                 </div>
 
@@ -440,12 +466,24 @@
                 success: function(response) {
                     if (response.status === 'success') {
                         $('#addedCommentsList').empty();
-                         $('#task_comments').val('');
+                        $('#task_comments').val('');
                         if (response.comments.length === 0) {
-                            $('#addedCommentsList').html('<p>No comments yet.</p>');
+                            $('#addedCommentsList').html();
                         } else {
                             $.each(response.comments, function(i, comment) {
-                                $('#addedCommentsList').append(`<textarea class="form-control commentsSave" name="comments" rows="3" readonly>${comment.comments}</textarea>`);
+                                var d_format = moment.utc(comment.created_at).local().format(
+                                    'DD-MM-YYYY HH:mm');
+                                $('#addedCommentsList').append(
+                                    `<div class="d-flex justify-content-center py-2" style="margin-top:10px;">
+                                        <div class="second py-2 px-2 comment-list"> 
+                                            <div class="comment-staff-name">${comment.name} </div>
+                                            <span class="text1">${comment.comments}</span>
+                                            <div class="d-flex justify-content-between py-1 pt-2" style="text-align:right;">
+                                                <div><span class="text3">${d_format}</span></div>
+                                            </div>
+                                        </div>
+                                    </div>`
+                                );
                             });
                         }
                     }

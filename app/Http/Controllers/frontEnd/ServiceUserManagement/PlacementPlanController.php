@@ -402,7 +402,7 @@ class PlacementPlanController extends ServiceUserManagementController
             }
 
             // ✅ If single (non-recurring) task
-            if ($data['recurringTask'] == null) {
+            if (!isset($data['recurringTask']) || $data['recurringTask'] === null) {
 
                 $date = date('Y-m-d', strtotime($data['date']));
                 if ($date < $today) {

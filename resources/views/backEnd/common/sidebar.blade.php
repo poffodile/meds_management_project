@@ -166,6 +166,9 @@
                         <li class="{{ ($page == 'mood_title') ? 'active' : '' }}">
                             <a href="{{ url('admin/moods') }}">Moods</a>
                         </li>
+                         <li class="{{ ($page == 'pay_rates') ? 'active' : '' }}">
+                            <a href="{{ url('admin/user/pay-rates') }}">Pay rates</a>
+                        </li>
                         <li class="{{ ($page == 'access_levels') ? 'active' : '' }}">
                             <a href="{{ url('admin/home/access-levels') }}">Access Levels</a>
                         </li>

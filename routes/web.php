@@ -211,9 +211,23 @@ Route::match(['get', 'post'], '/switch_home_submit', 'App\Http\Controllers\front
 
 Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 
+
+	// Report Section
+	Route::post('user/record', 'App\Http\Controllers\frontEnd\StaffManagementController@record')->name('staff.record');
+	// Route::get('/staff/record', 'App\Http\Controllers\frontEnd\ViewReportController@recordGet')->name('staff.record.get');
+
+	// Service User Mood Management
 	Route::post('/service/mood/add', 'App\Http\Controllers\frontEnd\ServiceUserManagement\MoodController@saveMood')->name('mood.add');
 	Route::post('/service/mood/edit/{id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\MoodController@edit')->name('mood.edit');
 	Route::post('/service/mood/delete/{id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\MoodController@delete')->name('mood.delete');
+
+
+	// Service User Dashboard
+	Route::get('service/dashboard/{id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\DashboardController@index');
+
+	
+
+	
 
 	// Rota Management
 	Route::get('/rota-dashboard', 'App\Http\Controllers\Rota\RotaController@index');
@@ -1479,9 +1493,8 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 	//------------- View Reports ---------------//
 	Route::match(['get', 'post'], '/view-reports', 'App\Http\Controllers\frontEnd\ViewReportController@index');
 	Route::get('/users/{user_type_id}', 'App\Http\Controllers\frontEnd\ViewReportController@get_user');
-	// Route::get('/users', 'App\Http\Controllers\frontEnd\ViewReportController@get_user');
-	Route::match(['get', 'post'], '/user/record', 'App\Http\Controllers\frontEnd\ViewReportController@record');
-	// Route::post('/user/record', 'App\Http\Controllers\frontEnd\ViewReportController@record');
+
+	
 });
 
 // System guide 
@@ -1742,7 +1755,9 @@ Route::group(['prefix' => 'admin', 'middleware' => 'CheckAdminAuth'], function (
 	Route::match(['get', 'post'], '/user/annual-leave/edit/{u_annual_leave_id}', 'App\Http\Controllers\backEnd\user\AnnualLeaveController@edit');
 	Route::get('/user/annual-leave/delete/{u_sick_leave_id}', 'App\Http\Controllers\backEnd\user\AnnualLeaveController@delete');
 
-
+	// Backend User Pay Rates
+	Route::match(['get', 'post'], '/user/pay-rates', 'App\Http\Controllers\backEnd\user\PayRatesController@index');
+	Route::match(['get', 'post'], '/user/pay-rates/add', 'App\Http\Controllers\backEnd\user\PayRatesController@create');
 	// User Latness Leave
 	Route::match(['get', 'post'], '/user/late-leaves/{staff_member}', [LatnessLeaveController::class, 'index'])
     ->name('user.latness-leaves');
@@ -1788,6 +1803,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'CheckAdminAuth'], function (
 	Route::match(['get', 'post'], '/service-user/mood/add/{su_id}', 'App\Http\Controllers\backEnd\serviceUser\MoodController@add');
 	Route::match(['get', 'post'], '/service-user/mood/edit/{su_mood_id}', 'App\Http\Controllers\backEnd\serviceUser\MoodController@edit');
 	Route::match(['get', 'post'], '/service-user/mood/delete/{su_mood_id}', 'App\Http\Controllers\backEnd\serviceUser\MoodController@delete');
+
 
 	//backEnd ServiceUser External Service
 	Route::match(['get', 'post'], '/service-user/external-service/{su_id}', 'App\Http\Controllers\backEnd\serviceUser\ExternalServiceController@index');

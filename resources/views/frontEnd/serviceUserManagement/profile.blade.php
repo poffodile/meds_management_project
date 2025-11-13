@@ -313,6 +313,7 @@
                                                         @if (isset($current_moods))
                                                             <img src="{{ url(MoodImgPath . '/' . $current_moods->image) }}" style="width: 30px;">
                                                         @endif
+                                                            <a href="javascript:void(0)" class="openMoodModel" data-action="add"><i class="fa fa-pencil profile"></i></a>
                                                         </strong>
                                                     </p>
                                                 </div>
@@ -503,23 +504,25 @@
                                                 <!-- new 8  -->
                                                 <div class="foor-box-wrap">
                                                     <div class="col-lg-12 p-r-0 resp-padd-right">
+                                                        {{-- Earning Scehma Section start --}}
                                                         {{-- <div class="col-md-3 col-sm-4 col-xs-12 ">
-                                                                        <div class="profile-nav alt">
-                                                                            <a href="{{ url('/service/earning-scheme/' . $service_user_id) }}">
-                                                                                <section class="panel text-center profile-square" style="">
-                                                                                    <div class="user-heading alt wdgt-row purple-bg">
-                                                                                        <i class="{{ $labels['earning_scheme']['icon'] }}"></i>
-                                                                                    </div>
-                                                                                    <div class="panel-body">
-                                                                                        <div class="wdgt-value">
-                                                                                            {{ $labels['earning_scheme']['label'] }}
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </section>
-                                                                            </a>
+                                                            <div class="profile-nav alt">
+                                                                <a href="{{ url('/service/earning-scheme/' . $service_user_id) }}">
+                                                                    <section class="panel text-center profile-square" style="">
+                                                                        <div class="user-heading alt wdgt-row purple-bg">
+                                                                            <i class="{{ $labels['earning_scheme']['icon'] }}"></i>
                                                                         </div>
-                                                                    </div>  --}}
-
+                                                                        <div class="panel-body">
+                                                                            <div class="wdgt-value">
+                                                                                {{ $labels['earning_scheme']['label'] }}
+                                                                            </div>
+                                                                        </div>
+                                                                    </section>
+                                                                </a>
+                                                            </div>
+                                                        </div>  --}}
+                                                        {{-- Earning Scehma Section End --}}
+                                                        {{-- Daily Log Section Start --}}
                                                         {{-- <div class="col-md-2 col-sm-4 col-xs-12 ">
                                                         <div class="profile-nav alt">
                                                             <!-- <a data-toggle="modal" href="#logBookModal"> -->
@@ -535,15 +538,14 @@
                                                             </a>
                                                         </div>
                                                     </div> --}}
-
+                                                    {{-- Daily Log Section Start --}}
+                                                    {{-- Health Record Section Start --}}
                                                         <div class="col-md-2 col-sm-4 col-xs-12">
                                                             <div class="profile-nav alt">
-                                                                <a
-                                                                    href="{{ url('/service/health-records/' . $service_user_id) }}">
+                                                                <a href="{{ url('/service/health-records/' . $service_user_id) }}">
                                                                     <section class="panel text-center profile-square">
                                                                         <div class="user-heading alt wdgt-row terques-bg">
-                                                                            <i
-                                                                                class="{{ $labels['health_record']['icon'] }}"></i>
+                                                                            <i class="{{ $labels['health_record']['icon'] }}"></i>
                                                                             <!-- <i class="fa fa-heartbeat"></i> -->
                                                                         </div>
                                                                         <div class="panel-body">
@@ -555,7 +557,8 @@
                                                                 </a>
                                                             </div>
                                                         </div>
-
+                                                        {{-- Health Record Section End --}}
+                                                        {{-- Plans Section Start --}}
                                                         <div class="col-md-2 col-sm-4 col-xs-12">
                                                             <div class="profile-nav alt">
                                                                 <a data-toggle="modal" href="#planModal">
@@ -570,15 +573,14 @@
                                                                 </a>
                                                             </div>
                                                         </div>
+                                                        {{-- Plans Section End --}}
                                                         <!-- </div> -->
 
                                                         <div class="col-md-2 col-sm-4 col-xs-12 ">
-                                                            <a
-                                                                href="{{ url('/service/missing-care-form-records/' . $service_user_id) }}">
+                                                            <a href="{{ url('/service/missing-care-form-records/' . $service_user_id) }}">
                                                                 <div class="profile-nav alt">
                                                                     <section class="panel text-center profile-square">
-                                                                        <div
-                                                                            class="user-heading alt wdgt-row label-inverse">
+                                                                        <div class="user-heading alt wdgt-row label-inverse">
                                                                             <i class="{{ $labels['mfc']['icon'] }}"></i>
                                                                             <!-- <i class="fa fa-user-times"></i> -->
                                                                         </div>
@@ -609,14 +611,11 @@
                                                         </div>
 
                                                         <div class="col-md-2 col-sm-4 col-xs-12 "> {{-- incident_plan_modal --}}
-                                                            <a
-                                                                href="{{ url('service/incident-report/' . $service_user_id) }}">
+                                                            <a href="{{ url('service/incident-report/' . $service_user_id) }}">
                                                                 <div class="profile-nav alt">
                                                                     <section class="panel text-center profile-square">
-                                                                        <div
-                                                                            class="user-heading alt wdgt-row label-warning">
-                                                                            <i
-                                                                                class="{{ $labels['incident_report']['icon'] }}"></i>
+                                                                        <div class="user-heading alt wdgt-row label-warning">
+                                                                            <i class="{{ $labels['incident_report']['icon'] }}"></i>
                                                                         </div>
                                                                         <div class="panel-body">
                                                                             <div class="wdgt-value">
@@ -805,6 +804,7 @@
     {{-- @include('frontEnd.serviceUserManagement.elements.rmp') --}}
     {{-- @include('frontEnd.serviceUserManagement.elements.bmp') --}}
     {{-- @include('frontEnd.serviceUserManagement.elements.mood') --}}
+    @include('frontEnd.serviceUserManagement.elements.add_mood')
     {{-- @include('frontEnd.serviceUserManagement.elements.incident_report') --}}
     @include('frontEnd.serviceUserManagement.elements.living_skill')
     @include('frontEnd.serviceUserManagement.elements.education_record')

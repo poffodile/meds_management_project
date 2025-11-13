@@ -150,7 +150,7 @@
         var report_type = $('#report_type_select').val();
         if(report_type == 'ALL') {
             $('select[name=\'user_type\']').html("<option value='STAFF'> Staff </option>"+"<option value='SERVICE_USER' > Child </option>");
-            $('select[name=\'select_user_id\']').attr('disabled', true);
+            // $('select[name=\'select_user_id\']').attr('disabled', true);
             // $('#confirm_btn').hide();
         }
 
@@ -159,11 +159,11 @@
             if(report_type == 'ALL') { 
                 $('select[name=\'user_type\']').html("<option value='STAFF'> Staff </option>"+"<option value='SERVICE_USER' > Child </option>");
                 $('select[name=\'select_user_id\']').html("<option value=''> Select </option>");
-                $('select[name=\'select_user_id\']').attr('disabled', true);
+                // $('select[name=\'select_user_id\']').attr('disabled', true);
                 // $('#confirm_btn').hide();
             } else {
                 $('select[name=\'user_type\']').html("<option value=''>Select</option>"+"<option value='SERVICE_USER'> Child </option>"+"<option value='STAFF'> Staff </option>");
-                $('select[name=\'select_user_id\']').attr('disabled', false);
+                // $('select[name=\'select_user_id\']').attr('disabled', false);
                 // $('#confirm_btn').show();
             }
         });
@@ -185,8 +185,8 @@
 
             $.ajax({
                 type : 'get',
-                 // url  : "{{ url('/users') }}"+'/'+user_type_id,
-                url  : "{{ url('/users') }}"+'?user_type_id='+user_type_id,
+                 url  : "{{ url('/users') }}"+'/'+ user_type_id,
+                // url  : "{{ url('/users') }}"+'?user_type_id='+user_type_id,
                 success : function(resp) {
                     if(isAuthenticated(resp) == false){
                         return false;
