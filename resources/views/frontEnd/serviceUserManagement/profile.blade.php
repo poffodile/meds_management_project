@@ -202,34 +202,7 @@
             font-size: 22px;
         }
 
-        .star-rating {
-            display: flex;
-            flex-direction: row-reverse;
-            font-size: 4em;
-            justify-content: space-around;
-            padding: 0 .2em;
-            text-align: center;
-            width: 6em;
-            margin-bottom: 20px;
-        }
-
-        .star-rating input {
-            display: none;
-        }
-
-        .star-rating label {
-            color: #ccc;
-            cursor: pointer;
-        }
-
-        .star-rating :checked~label {
-            color: #f90;
-        }
-
-        .star-rating label:hover,
-        .star-rating label:hover~label {
-            color: #fc0;
-        }
+   
     </style>
 
     <!--main content start-->
@@ -628,7 +601,7 @@
                                                         </div>
                                                         <div class="col-md-2 col-sm-4 col-xs-12">
                                                             <div class="profile-nav alt">
-                                                                <a data-toggle="modal" href="#BehaviorModal">
+                                                                <a href="{{ url('service/behavior/'. $service_user_id) }}">   
                                                                     <section class="panel text-center profile-square">
                                                                         <div class="user-heading alt wdgt-row red-bg">
                                                                             <i class="fa fa-handshake-o"></i>
@@ -641,53 +614,6 @@
                                                             </div>
                                                         </div>
 
-
-                                                        <!-- Modal -->
-                                                        <div class="modal fade" id="BehaviorModal" tabindex="-1"
-                                                            role="dialog" aria-labelledby="BehaviorModalLabel">
-                                                            <div class="modal-dialog widthmodelRatting" role="document">
-                                                                <div class="modal-content">
-                                                                    <div class="modal-header">
-                                                                        <button type="button" class="close"
-                                                                            data-dismiss="modal"
-                                                                            aria-hidden="true">×</button>
-                                                                        <h4 class="modal-title"> Child Behavior </h4>
-                                                                    </div>
-                                                                    <div class="modal-body">
-                                                                        <div class="starmodelRatting">
-                                                                            <form id="ratingForm" method="POST">
-                                                                                @csrf
-                                                                                <input type="hidden"
-                                                                                    name="service_user_id"
-                                                                                    value="{{ $service_user_id }}">
-                                                                                @php
-                                                                                    $rating =
-                                                                                        $patient->behavior_rate ?? 0; // or wherever your rating value comes from
-                                                                                @endphp
-
-                                                                                <div class="star-rating">
-                                                                                    @for ($i = 5; $i >= 1; $i--)
-                                                                                        <input type="radio"
-                                                                                            id="{{ $i }}-stars"
-                                                                                            name="rating"
-                                                                                            value="{{ $i }}"
-                                                                                            {{ $rating == $i ? 'checked' : '' }}>
-                                                                                        <label
-                                                                                            for="{{ $i }}-stars"
-                                                                                            class="star">&#9733;</label>
-                                                                                    @endfor
-                                                                                </div>
-                                                                            </form>
-                                                                        </div>
-                                                                        <div class="form-group modal-footer m-t-0 ">
-                                                                            <button class="btn btn-warning"
-                                                                                id="saveChildRating" type="submit">
-                                                                                Submit </button>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
                                                         <!-- Pre Invoice -->
                                                         {{-- <div class="col-md-2 col-sm-4 col-xs-12">
                                                             <div class="profile-nav alt">
@@ -1164,43 +1090,4 @@
             }
         };
     </script>
-
-    <script>
-        // Submit child rating via AJAX
-        $(document).on('click', '#saveChildRating', function(e) {
-            e.preventDefault();
-            var $form = $('#ratingForm');
-            var rating = $form.find('input[name="rating"]:checked').val();
-
-            var serviceUserId = "{{ $service_user_id }}";
-            $.ajax({
-                url: "{{ url('/service/user-profile/rating/') }}" + "/" + serviceUserId,
-                method: 'POST',
-                data: $form.serialize(),
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                success: function(res) {
-                    if (res && res.status) {
-                        alert(res.message || 'Rating saved');
-                        $('#BehaviorModal').modal('hide');
-                        location.reload();
-                    } else {
-                        alert(res.message || 'Failed to save rating');
-                    }
-                },
-                error: function(xhr) {
-                    if (xhr.status === 422 && xhr.responseJSON && xhr.responseJSON.errors) {
-                        var first = Object.keys(xhr.responseJSON.errors)[0];
-                        alert(xhr.responseJSON.errors[first][0]);
-                    } else if (xhr.responseJSON && xhr.responseJSON.message) {
-                        alert(xhr.responseJSON.message);
-                    } else {
-                        alert('An unexpected error occurred');
-                    }
-                }
-            });
-        });
-    </script>
-
 @endsection

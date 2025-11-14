@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use App\ServiceUserCareHistory, App\CareTeam, App\ServiceUser, App\FormBuilder, App\Notification, App\ServiceUserAFC, App\HomeLabel, App\LogBook, App\ServiceUserLogBook, App\CareTeamJobTitle, App\ServiceUserCareCenter, App\ServiceUserContacts, App\DynamicFormBuilder, App\DynamicForm, App\SocialApp, App\ServiceUserSocialApp, App\ServiceUserMoney, App\ServiceUserMoneyRequest, App\ServiceUserCareHistoryFile, App\User, App\Mood;
 use DB, Auth, Session;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Validator;
+
 use Carbon\Carbon;
 
 
@@ -263,9 +263,9 @@ class ProfileController extends ServiceUserManagementController
                 ->toArray();
 
             // Get average rating and count for this service user
-            $ratingStats = DB::table('service_user')
-                ->where('id', $service_user_id)
-                ->select(DB::raw('AVG(behavior_rate) as avg_rating'), DB::raw('COUNT(*) as rating_count'))
+            $ratingStats = DB::table('su_behavior')
+                ->where('service_user_id', $service_user_id)
+                ->select(DB::raw('AVG(rate) as avg_rating'), DB::raw('COUNT(*) as rating_count'))
                 ->first();
 
             $avg_rating = $ratingStats && $ratingStats->avg_rating ? round($ratingStats->avg_rating, 1) : 0;
@@ -950,49 +950,9 @@ class ProfileController extends ServiceUserManagementController
         }
     }
 
-    /**
-     * Save child behavior rating (AJAX)
-     */
-    public function saveRating(Request $request, $service_user_id)
-    {
-        $data = $request->all();
-
-        $rules = [
-            'rating' => 'required|integer|min:1|max:5',
-        ];
-
-        $validator = Validator::make($data, $rules);
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
-        // verify service user belongs to current user's home
-        $home_ids = Auth::user()->home_id;
-        $ex_home_ids = explode(',', $home_ids);
-        $home_id = $ex_home_ids[0];
-        $su_home_id = ServiceUser::where('id', $service_user_id)->value('home_id');
-        if (empty($su_home_id) || $su_home_id != $home_id) {
-            return response()->json(['message' => 'Unauthorized or service user not found'], 403);
-        }
-
-        try {
-            // Attempt to insert into su_rating table. If table doesn't exist, this will throw and return error.
-            DB::table('service_user')->updateOrInsert(
-                ['id' => $service_user_id], // condition
-                [
-                    'behavior_rate' => $data['rating'],
-                ]
-            );
-
-            return response()->json(['status' => true, 'message' => 'Rating saved successfully']);
-        } catch (\Exception $e) {
-            Log::error('Failed to save child rating: ' . $e->getMessage(), ['data' => $data, 'user' => Auth::user()->id]);
-            return response()->json(['status' => false, 'message' => 'Failed to save rating'], 500);
-        }
-    }
-
     public function submit_form()
     {
         echo "Hiiiii";
     }
 }
+

@@ -1,5 +1,5 @@
 @extends('frontEnd.layouts.master')
-@section('title', 'Child Profile')
+@section('title', 'Child Mood')
 @section('content')
     <style>
         .todaysMood {
@@ -42,6 +42,8 @@
                                                     <th>Date</th>
                                                     <th>Mood</th>
                                                     <th>image</th>
+                                                    <th>Description</th>
+                                                    <th>Suggestions</th>
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
@@ -60,12 +62,12 @@
                                                         <td>
                                                             <img src="{{ $image }}" alt="{{ $su_mood->name }}" height="50" width="50" class="mood-img" data-id="{{ $su_mood->id }}" style="border-radius:10px;">
                                                         </td>
+                                                        <td>{{ $su_mood->description }}</td>
+                                                        <td>{{ $su_mood->suggestions }}</td>
                                                         <td>
                                                             <div class="childMoodAction">
-                                                            {{-- <a href="{{ url('service/mood/edit/' . $su_mood->id) }}" class="editMoodBtn"><i class="fa fa-edit"></i></a> | 
-                                                                    <a href="{{ url('service/mood/delete' . $su_mood->id) }}" class="deleteMoodBtn"><i class="fa fa-trash"></i></a> --}}
-                                                                    <a href="javascript:void(0)" class="openMoodModel" data-action="edit" data-id="{{ $su_mood->id }}" data-mood_id="{{ $su_mood->mood_id }}"><i class="fa fa-edit"></i></a> | 
-                                                                    <a href="javascript:void(0)" class="deleteMoodBtn" data-id="{{ $su_mood->id }}"><i class="fa fa-trash"></i></a>
+                                                                <a href="javascript:void(0)" class="openMoodModel" data-action="edit" data-id="{{ $su_mood->id }}" data-mood_id="{{ $su_mood->mood_id }}" data-description="{{ $su_mood->description }}" data-suggestions="{{ $su_mood->suggestions }}"><i class="fa fa-edit"></i></a> | 
+                                                                <a href="javascript:void(0)" class="deleteMoodBtn" data-id="{{ $su_mood->id }}"><i class="fa fa-trash"></i></a>
                                                             </div>
                                                         </td>
                                                     </tr>
@@ -212,8 +214,4 @@
         //     return false;
         // });
     </script>
-
-
-
-
 @endsection

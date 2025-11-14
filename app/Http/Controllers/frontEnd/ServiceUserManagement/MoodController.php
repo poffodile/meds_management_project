@@ -134,6 +134,24 @@ class MoodController extends ServiceUserManagementController
         // If ID comes → Edit, else Add
         $moodId = $request->edit_mood_id ?? null;
 
+        // -------------------------------------------------------
+        // 1. Check if mood already exists for today (for add only)
+        // -------------------------------------------------------
+        if (!$moodId) { // Only check when adding a new mood
+            $existsToday = DB::table('su_mood')
+                ->where('service_user_id', $request->service_user_id)
+                ->whereDate('created_at', today())
+                ->where('is_deleted', 0)
+                ->exists();
+
+            if ($existsToday) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "Today's mood is already added. Please edit the existing record if you want to change anything."
+                ]);
+            }
+        }
+
         DB::table('su_mood')->updateOrInsert(
             ['id' => $moodId],  // Match ID (if null → insert)
             [

@@ -221,14 +221,14 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 	Route::post('/service/mood/edit/{id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\MoodController@edit')->name('mood.edit');
 	Route::post('/service/mood/delete/{id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\MoodController@delete')->name('mood.delete');
 
+	// Service User behavior
+	Route::get('/service/behavior/{id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\BehaviorController@index')->name('service.behavior');
+	Route::post('/service/behavior/{service_user_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\BehaviorController@saveRating');
 
 	// Service User Dashboard
 	Route::get('service/dashboard/{id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\DashboardController@index');
 
 	
-
-	
-
 	// Rota Management
 	Route::get('/rota-dashboard', 'App\Http\Controllers\Rota\RotaController@index');
 	Route::get('/rota_management', 'App\Http\Controllers\Rota\RotaController@rota_management_dashboard');
@@ -1011,8 +1011,6 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 	// status change of su_profile pic
 	Route::match(['get', 'post'], '/service/user-profile/afc-status/update/{service_user_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\ProfileController@update_afc_status');
 
-	// Save child rating (AJAX)
-	Route::post('/service/user-profile/rating/{service_user_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\ProfileController@saveRating');
 
 	//notifications
 	Route::match(['get', 'post'], '/service/notifications/', 'App\Http\Controllers\frontEnd\ServiceUserManagement\ProfileController@show_notifications');
