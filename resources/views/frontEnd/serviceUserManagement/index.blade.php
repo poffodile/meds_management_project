@@ -93,7 +93,7 @@
                                 </div>
                                 <?php //echo '<pre>'; print_r($labels); die; ?>
                                 <ul class="nav nav-pills nav-stacked">
-                                    <li ><a href="{{ url('/service/dashboard/' . $patient->id) }}"> <i class="fa fa-tachometer"></i> Dashboard <span class="badge label-success pull-right {{ $notifi_count_personal_clr }}">{{ (strlen($notifi_count_personal) < 2) ? '0':'' }}{{ $notifi_count_personal }}</span></a></li>
+                                    <li ><a href="{{ url('/select/report?key=' . base64_encode($patient->id)) }}"> <i class="fa fa-tachometer"></i> Dashboard <span class="badge label-success pull-right {{ $notifi_count_personal_clr }}">{{ (strlen($notifi_count_personal) < 2) ? '0':'' }}{{ $notifi_count_personal }}</span></a></li>
                                     
                                     <li ><a href="{{ url('/service/user-profile/'.$patient->id) }}"> <i class="fa fa-pencil"></i> Personal Details <span class="badge label-success pull-right {{ $notifi_count_personal_clr }}">{{ (strlen($notifi_count_personal) < 2) ? '0':'' }}{{ $notifi_count_personal }}</span></a></li>
 

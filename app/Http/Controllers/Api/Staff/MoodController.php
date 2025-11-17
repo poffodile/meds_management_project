@@ -1,9 +1,9 @@
 <?php 
 namespace App\Http\Controllers\Api\Staff;
 use App\Http\Controllers\frontEnd\StaffManagementController;
-
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
-use Validator, DB;
+use DB;
 use App\ServiceUserMood, App\User, App\ServiceUser;
 
 class MoodController extends StaffManagementController

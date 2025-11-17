@@ -110,7 +110,7 @@ class MoodController extends ServiceUserManagementController
     public function mood_view($service_user_id)
     {
         $home_id = Auth::user()->home_id;
-        $moods = Mood::where('home_id', $home_id)->where('is_deleted', '0')->get();
+        $moods = Mood::where('home_id', $home_id)->where('status', 1)->where('is_deleted', '0')->get();
         $su_moods = DB::table('su_mood')->select('su_mood.*', 'mood.id as mood_id', 'mood.name', 'mood.image')
             ->where('su_mood.is_deleted', '0')
             ->where('mood.home_id', $home_id)
