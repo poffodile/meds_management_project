@@ -139,12 +139,12 @@
                                 </div>
                                 <ul class="list-inline two-part d-flex align-items-center mb-0">
                                     <!-- <li>
-                                                                                        <div id="sparklinedash">
-                                                                                            <p class="mb-0 text-muted"><span class="badge bg-light text-success mb-0">
-                                                                                                <i class="fa fa-arrow-up"></i> 16.24 %
-                                                                                            </span> vs. previous month</p>
-                                                                                        </div>
-                                                                                    </li> -->
+                                                                                                                <div id="sparklinedash">
+                                                                                                                    <p class="mb-0 text-muted"><span class="badge bg-light text-success mb-0">
+                                                                                                                        <i class="fa fa-arrow-up"></i> 16.24 %
+                                                                                                                    </span> vs. previous month</p>
+                                                                                                                </div>
+                                                                                                            </li> -->
                                     <li class="ms-auto"><span
                                             class="counter text-success counter-value"><?= $totaleventsadded ?></span></li>
                                 </ul>
@@ -186,12 +186,12 @@
                                 </div>
                                 <ul class="list-inline two-part d-flex align-items-center mb-0">
                                     <!-- <li>
-                                                                                        <div id="sparklinedash3">
-                                                                                            <p class="mb-0 text-muted"><span class="badge bg-light text-success mb-0">
-                                                                                                <i class="fa fa-arrow-up"></i> 16.24 %
-                                                                                            </span> vs. previous month</p>
-                                                                                        </div>
-                                                                                    </li> -->
+                                                                                                                <div id="sparklinedash3">
+                                                                                                                    <p class="mb-0 text-muted"><span class="badge bg-light text-success mb-0">
+                                                                                                                        <i class="fa fa-arrow-up"></i> 16.24 %
+                                                                                                                    </span> vs. previous month</p>
+                                                                                                                </div>
+                                                                                                            </li> -->
                                     <li class="ms-auto"><span
                                             class="counter text-info counter-value"><?= $totalpolicecall ?></span> </li>
                                 </ul>
@@ -209,12 +209,12 @@
                                 </div>
                                 <ul class="list-inline two-part d-flex align-items-center mb-0">
                                     <!-- <li>
-                                                                                        <div id="sparklinedash4">
-                                                                                            <p class="mb-0 text-muted"><span class="badge bg-light text-success mb-0">
-                                                                                                <i class="fa fa-arrow-up"></i> 16.24 %
-                                                                                            </span> vs. previous month</p>
-                                                                                        </div>
-                                                                                    </li> -->
+                                                                                                                <div id="sparklinedash4">
+                                                                                                                    <p class="mb-0 text-muted"><span class="badge bg-light text-success mb-0">
+                                                                                                                        <i class="fa fa-arrow-up"></i> 16.24 %
+                                                                                                                    </span> vs. previous month</p>
+                                                                                                                </div>
+                                                                                                            </li> -->
                                     <li class="ms-auto"><span
                                             class="counter text-purple counter-value"><?= $totalappointments ?></span></li>
                                 </ul>
@@ -222,7 +222,7 @@
                         </a>
                     </div>
                 </div>
-                <div class="row">
+                {{-- <div class="row">
                     <div class="row justify-content-center owl-carousel owl-theme">
                         <a class="col-lg-3 round_box col-md-4 col-sm-1 item">
                             <div class="white-box analytics-info box_white counter">
@@ -235,13 +235,7 @@
                                     </div>
                                 </div>
                                 <ul class="list-inline two-part d-flex align-items-center mb-0">
-                                    <!-- <li>
-                                                                                        <div id="sparklinedash">
-                                                                                            <p class="mb-0 text-muted"><span class="badge bg-light text-success mb-0">
-                                                                                                <i class="fa fa-arrow-up"></i> 16.24 %
-                                                                                            </span> vs. previous month</p>
-                                                                                        </div>
-                                                                                    </li> -->
+
                                     <li class="ms-auto"><span
                                             class="counter text-success counter-value"><?= $totaleventsadded ?></span></li>
                                 </ul>
@@ -259,20 +253,14 @@
                                     </div>
                                 </div>
                                 <ul class="list-inline two-part d-flex align-items-center mb-0">
-                                    {{-- <li>
-                                    <div id="sparklinedash2">
-                                        <p class="mb-0 text-muted"><span class="badge bg-light text-danger mb-0">
-                                            <i class="fa fa-arrow-down"></i> 3.96 %
-                                        </span> vs. previous month</p>
-                                    </div>
-                                </li> --}}
+
                                     <li class="ms-auto"><span
                                             class="counter text-purple counter-value"><?= $missingserviceuser ?></span></li>
                                 </ul>
                             </div>
                         </a>
                     </div>
-                </div>
+                </div> --}}
                 <div class="row">
                     <div class="col-sm-12">
                         <section class="panel">
@@ -318,7 +306,7 @@
                         <div class="chart-row2">
                             <div class="chart">
                                 <h2>Child Behavior</h2>
-                                <canvas id="childRatingChart" height="250" width="800"></canvas>
+                                <canvas id="behaviorChart" height="150" width="800"></canvas>
                             </div>
                         </div>
                     </div>
@@ -327,7 +315,14 @@
                         <div class="chart-row2">
                             <div class="chart">
                                 <h2>Child Mood</h2>
-                                <canvas id="moodChart" height="250" width="800"></canvas>
+                                <canvas id="moodChart" height="150" width="800"></canvas>
+                                <div id="moodLegend" style="margin-top: 20px; display: flex; gap: 20px; flex-wrap: wrap;">
+                                    @foreach ($mood as $moodItem)
+                                        <div style="display: flex; align-items: center;">
+                                            <span>{{ $moodItem->value }}</span> - <span>{{ $moodItem->name }}</span>
+                                        </div>
+                                    @endforeach
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -369,56 +364,88 @@
 
     {{-- Mood Graph start --}}
     <script>
-        var mood_date = [
-            @foreach ($mood_graph as $value)
-                "{{ $value['date'] }}",
+        var moodDates = [
+            @foreach ($mood_graph as $item)
+                "{{ $item['date'] }}",
             @endforeach
         ];
 
-        var mood_list = [
-            @foreach ($mood_graph as $value)
-                "{{ $value['name'] }}",
+        var moodValues = [
+            @foreach ($mood_graph as $item)
+                {{ $item['mood_id'] }},
             @endforeach
         ];
 
-        var moodCtx = document.getElementById("moodChart").getContext("2d");
+        var moodNames = {
+            @foreach ($mood as $m)
+                {{ $m->id }}: "{{ $m->name }}",
+            @endforeach
+        };
 
-        var moodChart = new Chart(moodCtx, {
-            type: 'line',
+        // Manual formatter (NO UTC issue)
+        function formatDate(d) {
+            let year = d.getFullYear();
+            let month = ('0' + (d.getMonth() + 1)).slice(-2);
+            let day = ('0' + d.getDate()).slice(-2);
+            return `${year}-${month}-${day}`;
+        }
+
+        var fullMoodDates = [];
+        var finalMoodValues = [];
+
+        var startDate = new Date();
+        startDate.setDate(startDate.getDate() - 29);
+
+        for (let i = 0; i < 30; i++) {
+
+            let d = new Date(startDate);
+            d.setDate(startDate.getDate() + i);
+
+            let formatted = formatDate(d);
+
+            fullMoodDates.push(formatted);
+
+            let index = moodDates.indexOf(formatted);
+
+            finalMoodValues.push(
+                index !== -1 ? Number(moodValues[index]) : 0 // MAKE SURE VALUE IS NUMBER
+            );
+        }
+
+
+        var ctx = document.getElementById('moodChart').getContext('2d');
+
+        var moodChart = new Chart(ctx, {
+            type: 'bar',
             data: {
-                labels: mood_date,
+                labels: fullMoodDates, // X-axis (30 days)
                 datasets: [{
-                    label: "Mood Level",
-                    data: mood_list,
-                    borderColor: "#2196F3",
-                    backgroundColor: "rgba(33, 150, 243, 0.2)",
+                    label: "Child Mood (Last 30 Days)",
+                    data: finalMoodValues, // FIXED — processed value
                     borderWidth: 2,
-                    pointRadius: 4,
-                    pointBackgroundColor: "#2196F3",
-                    lineTension: 0
+                    borderColor: "#3e95cd",
+                    backgroundColor: "#3e95cd55",
+                    fill: true,
+                    pointRadius: 5
                 }]
             },
             options: {
-                responsive: true,
                 scales: {
                     yAxes: [{
                         ticks: {
                             min: 1,
-                            max: 5,
+                            max: {{ count($mood) }},
                             stepSize: 1,
                             callback: function(value) {
-                                return value;
+                                return moodNames[value]; // mood name
                             }
-                        },
-                        scaleLabel: {
-                            display: true,
-                            labelString: "Mood (1–5)"
                         }
                     }],
                     xAxes: [{
-                        scaleLabel: {
-                            display: true,
-                            labelString: "Date"
+                        ticks: {
+                            autoSkip: true,
+                            maxRotation: 0,
+                            minRotation: 0
                         }
                     }]
                 }
@@ -430,33 +457,51 @@
 
     {{-- Behaviour Chart Start --}}
     <script>
-        var rating_date = [
-            @foreach ($rating_graph as $value)
-                "{{ $value['date'] }}",
-            @endforeach
-        ];
+        var behaviorData = @json($behavior_graph);
 
-        var rating_list = [
-            @foreach ($rating_graph as $value)
-                {{ $value['rating'] }},
-            @endforeach
-        ];
+        var behaviorDates = [];
+        var behaviorValues = [];
 
-        var ratingCtx = document.getElementById("childRatingChart").getContext("2d");
+        behaviorData.forEach(item => {
+            behaviorDates.push(item.date);
+            behaviorValues.push(item.rate); // rating column (1–5)
+        });
 
-        var childRatingChart = new Chart(ratingCtx, {
-            type: 'line',
+
+        // Generate last 30 days
+        var fullDates = [];
+        var finalValues = [];
+
+        var startDate = new Date();
+        startDate.setDate(startDate.getDate() - 29);
+
+        for (let i = 0; i < 30; i++) {
+            let d = new Date(startDate);
+            d.setDate(startDate.getDate() + i);
+
+            let formatted = d.toISOString().slice(0, 10);
+
+            fullDates.push(formatted);
+
+            let index = behaviorDates.indexOf(formatted);
+            finalValues.push(index !== -1 ? behaviorValues[index] : 0);
+        }
+
+        var ctx = document.getElementById('behaviorChart').getContext('2d');
+
+        new Chart(ctx, {
+            type: 'bar',
             data: {
-                labels: rating_date,
+                labels: fullDates,
                 datasets: [{
-                    label: "Child Rating",
-                    data: rating_list,
-                    borderColor: "#4CAF50",
-                    backgroundColor: "rgba(76, 175, 80, 0.2)",
+                    label: "Behavior Rating",
+                    data: finalValues,
+                    borderColor: "#3b82f6",
                     borderWidth: 2,
+                    fill: false,
+                    lineTension: 0.3,
                     pointRadius: 4,
-                    pointBackgroundColor: "#4CAF50",
-                    lineTension: 0
+                    pointHoverRadius: 6
                 }]
             },
             options: {
@@ -467,16 +512,13 @@
                             min: 1,
                             max: 5,
                             stepSize: 1
-                        },
-                        scaleLabel: {
-                            display: true,
-                            labelString: "Rating (1–5)"
+
                         }
                     }],
                     xAxes: [{
-                        scaleLabel: {
-                            display: true,
-                            labelString: "Date"
+                        ticks: {
+                            autoSkip: true,
+                            maxTicksLimit: 10
                         }
                     }]
                 }
@@ -618,7 +660,7 @@
                 var myLineChart = new Chart(document.getElementById("line-chart-js").getContext("2d")).Line(Linedata);
 
 
-                
+
 
 
                 var pieData = [{

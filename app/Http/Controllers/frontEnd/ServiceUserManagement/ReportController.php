@@ -223,29 +223,33 @@ class ReportController extends ServiceUserManagementController
             array_push($appointmentpermonth, $totalappointmentmonth);
         }
 
-        //Mood Graph Data
-         $mood_graph = ServiceUserMood::where('su_mood.service_user_id', $service_user_id)
-            ->whereMonth('su_mood.created_at', now()->month)
-            ->whereYear('su_mood.created_at', now()->year)
-            ->join('mood', 'mood.id', '=', 'su_mood.mood_id')
-            ->selectRaw('DATE(su_mood.created_at) as date, mood.name as name')
-            ->orderBy('date', 'ASC')
-            ->get()
-            ->toArray();
+        $mood = Mood::where('home_id', Auth::user()->home_id)
+            ->where('is_deleted', '0')
+            ->where('status', '1')
+            ->get();
 
+        $lastMonth = now()->subDays(30);
 
-        $rating_graph  = SuBehavior::where('service_user_id', $service_user_id)
-                      ->whereBetween('created_at', [now()->subDays(30), now()])
-                    ->orderBy('created_at', 'ASC')
-                    ->where('is_deleted', 0)
-                    ->get();
+        $mood_graph = ServiceUserMood::where('service_user_id', $service_user_id)
+        ->whereDate('su_mood.created_at', '>=', $lastMonth)
+        ->join('mood', 'mood.id', '=', 'su_mood.mood_id')
+        ->selectRaw('DATE(su_mood.created_at) AS date, su_mood.mood_id AS mood_id')
+        ->orderBy('date', 'ASC')
+        ->get()
+        ->toArray();
 
+        $behavior_graph = SuBehavior::where('service_user_id', $service_user_id)
+                    ->whereDate('created_at', '>=', $lastMonth)
+                    ->selectRaw('DATE(created_at) as date, rate')
+                    ->orderBy('date', 'ASC')
+                    ->get()
+                    ->toArray();
 
         // dd($rating_graph);
         //print_r(implode(",",$policecallpermonth));
         //die;
         $appointmentpermonths = implode(",", $appointmentpermonth);
-        return view('frontEnd.serviceUserManagement.report', compact('service_user_id', 'totaleventsadded', 'totalappointments', 'totalpolicecall', 'missingserviceuser', 'policecallpermonths', 'appointmentpermonths', 'mood_graph','rating_graph'));
+        return view('frontEnd.serviceUserManagement.report', compact('service_user_id', 'totaleventsadded', 'totalappointments', 'totalpolicecall', 'missingserviceuser', 'policecallpermonths', 'appointmentpermonths', 'mood_graph','behavior_graph', 'mood'));
     }
 
     public function monthly_report_detail($log_book_id)
