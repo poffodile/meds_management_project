@@ -36,11 +36,11 @@
                                  @endforeach
                              </div>
                          </div>
-                         <div class="">
+                         <div class="col-md-12 col-sm-12 col-xs-12">
                              <label for="rate_description">Description</label>
                              <textarea class="form-control" name="description" id="rate_description" rows="5" placeholder="Type comments..."></textarea>
                          </div>
-                         <div class="m-t-10">
+                         <div class="col-md-12 col-sm-12 col-xs-12 m-t-10 m-b-10">
                             <label for="suggestions">Suggestions</label>
                              <textarea class="form-control" name="suggestions" id="suggestions" rows="5" placeholder="Type comments..."></textarea>
                          </div>

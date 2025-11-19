@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\frontEnd;
+namespace App\Http\Controllers\Api\Staff;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Validator;
 use Auth, DB;
 use App\User, App\ServiceUser, App\Admin, App\Home, App\LogBook;
 use Hash, Session;
@@ -429,4 +429,133 @@ class UserController extends Controller
             echo json_encode(true);      //  for jquery validations
         }  
     }*/ 
+
+
+	public function addStaffUser(Request $request)
+    {
+        // ---------------------------
+        // VALIDATION
+        // ---------------------------
+        $validator = Validator::make($request->all(), [
+            'home_id'			  => 'required|string|max:255',
+            'name'                => 'required|string|max:255',
+            'user_name'           => 'required|string|max:255|unique:user,user_name',
+            'email'               => 'required|email|max:255|unique:user,email',
+            'job_title'           => 'nullable|string|max:255',
+            'user_name'           => 'required|string|max:255',
+            'phone_no'            => 'required|string|max:20',
+            'description'         => 'nullable|string|max:500',
+            'payroll'             => 'nullable|string|max:255',
+            'date_of_joining'     => 'required|date',
+            'date_of_leaving'     => 'nullable|date|after_or_equal:date_of_joining',
+            'holiday_entitlement' => 'nullable|numeric|min:0|max:365',
+            'image'               => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'send_credentials'    => 'nullable|boolean',
+			'password'			  => 'required|string|min:6',
+			'job_title'           => 'required|string|max:255',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status'  => false,
+                'errors'  => $validator->errors()
+            ], 422);
+        }
+
+        $data = $request->all();
+        // ---------------------------
+        // SECURITY CODE DECODING
+        // ---------------------------
+		if(isset($data['security_code'])){
+			$security_code = convert_uudecode(base64_decode($data['security_code']));
+		} 
+
+        // ---------------------------
+        // HASH PASSWORD
+        // ---------------------------
+        $password =	Hash::make($data['password']);
+
+        // ---------------------------
+        // CREATE NEW USER
+        // ---------------------------
+        $user = new User();
+        $user->name                = $data['name'];
+        $user->user_name           = $data['user_name'];
+        $user->email               = $data['email'];
+        $user->job_title           = $data['job_title'] ?? null;
+        $user->access_level        = $data['access_level'] ?? null;
+        $user->department          = $data['department'] ?? null;
+        $user->description         = $data['description'] ?? '';
+        $user->payroll             = $data['payroll'] ?? '';
+        $user->holiday_entitlement = $data['holiday_entitlement'] ?? 0;
+		$user->access_rights       = $data['access_rights'] ?? null;
+        $user->status              = 1;
+		$user->security_code       = $security_code ?? null;
+		$user->is_deleted 		   = 0;
+        $user->phone_no            = $data['phone_no'];
+        $user->current_location    = $data['current_location'] ?? null;
+        $user->date_of_joining     = date('Y-m-d', strtotime($data['date_of_joining']));
+        $user->date_of_leaving     = !empty($data['date_of_leaving']) ? date('Y-m-d', strtotime($data['date_of_leaving'])) : null;
+        $user->personal_info       = $data['personal_info'] ?? null;
+        $user->banking_info        = $data['banking_info'] ?? null;
+        $user->qualification_info  = $data['qualification_info'] ?? null;
+		$user->last_activity_time = null;
+		$user->logged_in		   = 0;
+		$user->login_ip		       = null;
+		$user->design_layout	   = 0;
+		$user->company_id	       = null;
+		$user->user_type 	       = 'N';
+		$user->login_home_id       = null;
+        $user->password            = $password ?? null;  
+        $user->home_id             = $request->home_id;
+
+        // ---------------------------
+        // UPLOAD IMAGE
+        // ---------------------------
+        if (!empty($_FILES['image']['name'])) {
+            $tmp_image  =   $_FILES['image']['tmp_name'];
+            $image_info =   pathinfo($_FILES['image']['name']);
+            $ext        =   strtolower($image_info['extension']);
+            $new_name   =   time() . '.' . $ext;
+
+            if ($ext == 'jpg' || $ext == 'jpeg' || $ext == 'png') {
+                $destination = base_path() . userProfileImageBasePath;
+                if (move_uploaded_file($tmp_image, $destination . '/' . $new_name)) {
+                    $user->image = $new_name;
+                }
+            }
+        }
+
+        if (!isset($user->image)) {
+            $user->image = '';
+        }
+
+        // ---------------------------
+        // SAVE USER
+        // ---------------------------
+        if ($user->save()) {
+
+            // OPTIONAL: Save qualification
+            User::saveQualification($data, $user->id);
+
+            if (!empty($data['send_credentials'])) {
+                User::sendCredentials($user->id);
+            }
+
+            return response()->json([
+                'status'  => true,
+                'message' => 'Staff user added successfully.',
+                'data'    => $user
+            ], 201);
+        }
+
+        return response()->json([
+            'status' => false,
+            'message' => 'Something went wrong. Please try again.'
+        ], 500);
+    }
+
+	public function setPassword(){
+		
+	}
 }

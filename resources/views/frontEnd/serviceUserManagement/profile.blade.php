@@ -440,8 +440,8 @@
                                             class="fa fa-file-o"></i></a>
                                     <a href="{{ url('/service/daily-logs?key=' . $service_user_id) }}" title="Logs"><i
                                             class="fa fa-address-book-o"></i></a>
-                                    {{-- <a href="{{ url('/service/task-management/' . $service_user_id) }}"
-                                        title="Calendar"><i class="fa fa-tasks"></i></a> --}}
+                                    <a href="{{ url('/service/task-management/' . $service_user_id) }}"
+                                        title="Calendar"><i class="fa fa-tasks"></i></a>
                                     {{-- <div class="dropdown">
                                         <a href="#!" onclick="toggleDropdown(event)" class="" title="Logs"> <i class="fa fa-address-book-o"></i> </a>
                                         <div id="myDropdown" class="dropdown-content">

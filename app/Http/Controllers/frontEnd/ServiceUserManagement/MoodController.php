@@ -90,14 +90,15 @@ class MoodController extends ServiceUserManagementController
             if ($su_mood->save()) {
 
                 //saving notification start
-                /*$notification                  = new Notification;
-                $notification->service_user_id = $data['service_user_id'];
-                $notification->event_id        = $health_record->id;
-                $notification->event_type      = 'SU_HR';
-                $notification->event_action    = 'ADD';    
-                $notification->home_id         = Auth::user()->home_id;
-                $notification->user_id         = Auth::user()->id;                  
-                $notification->save();*/
+                // $notification                  = new Notification;
+                // $notification->home_id         = Auth::user()->home_id;
+                // $notification->user_id         = Auth::user()->id;                  
+                // $notification->service_user_id = $data['service_user_id'];
+                // $notification->event_id        = $su_mood->id;
+                // $notification->notification_event_type_id = $data['service_user_id'];
+                // $notification->event_action    = 'ADD';    
+                // $notification->event_type      = 'SU_HR';
+                // $notification->save();
                 //saving notification end
                 $result = $this->index($data['service_user_id']);
                 echo $result;
@@ -187,3 +188,5 @@ class MoodController extends ServiceUserManagementController
         return response()->json(['success' => true, 'message' => 'Mood deleted successfully.']);
     }
 }
+
+

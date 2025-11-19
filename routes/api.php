@@ -142,5 +142,9 @@ Route::group(['prefix' => '/staff'], function () {
 	Route::get('/care-center/request-callbacks/{staff_id}', 'App\Http\Controllers\Api\Staff\CareCenterController@request_callbacks');
 	Route::post('/device/add', 'App\Http\Controllers\Api\DeviceController@add_user_device');
 	Route::post('/behavior/add', 'App\Http\Controllers\Api\Staff\BehaviorController@addBehavior');
+
+	// Staff Register
+	Route::post('/add-staff', 'App\Http\Controllers\Api\Staff\UserController@addStaffUser');
+	Route::post('/set-password', 'App\Http\Controllers\Api\Staff\UserController@setPassword');
 });
 

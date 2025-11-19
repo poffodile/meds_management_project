@@ -42,7 +42,6 @@
                             </a>
                         </div>
                         <div class="col-md-6 col-sm-6 col-xs-12 m-t-10">
-
                             <a href="{{ url('/service/bmp/' . $service_user_id) }}">
                                 <div class="profile-nav alt profile-plan-div">
                                     <section class="panel text-center profile-square" style="height: 191px">
@@ -58,20 +57,21 @@
                                 </div>
                             </a>
                         </div>
-                        <div class="col-md-6 col-sm-6 col-xs-12 m-t-10 education-record-list"
-                            data-dismiss="modal" aria-hidden="true">
-                            <div class="profile-nav alt profile-plan-div">
-                                <section class="panel text-center profile-square" style="height: 191px">
-                                    <div class="plan-user-heading alt wdgt-row label-inverse">
-                                        <i class="{{ $labels['education_record']['icon'] }}"></i>
-                                    </div>
-                                    <div class="panel-body">
-                                        <div class="wdgt-text">
-                                            {{ $labels['education_record']['label'] }}
+                        <div class="col-md-6 col-sm-6 col-xs-12 m-t-10">
+                            <a href="http://66.116.198.68:8099/Learner/Learner-Login/" target="_blank">
+                                <div class="profile-nav alt profile-plan-div">
+                                    <section class="panel text-center profile-square" style="height: 191px">
+                                        <div class="plan-user-heading alt wdgt-row label-inverse">
+                                            <i class="{{ $labels['education_record']['icon'] }}"></i>
                                         </div>
-                                    </div>
-                                </section>
-                            </div>
+                                        <div class="panel-body">
+                                            <div class="wdgt-text">
+                                                {{ $labels['education_record']['label'] }}
+                                            </div>
+                                        </div>
+                                    </section>
+                                </div>
+                            </a>
                         </div>
                     </div>
                 </div>

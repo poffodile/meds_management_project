@@ -15,6 +15,19 @@
             border: 3px solid #f0ad4e !important;
             border-radius: 10px;
         }
+
+
+.moodDescription {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;        /* 3 lines only */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 232px;
+    line-height: 1.4;
+    max-height: calc(1.4em * 3);
+    white-space: normal;  
+}
     </style>
 
     <section id="main-content">
@@ -62,8 +75,8 @@
                                                         <td>
                                                             <img src="{{ $image }}" alt="{{ $su_mood->name }}" height="50" width="50" class="mood-img" data-id="{{ $su_mood->id }}" style="border-radius:10px;">
                                                         </td>
-                                                        <td>{{ $su_mood->description }}</td>
-                                                        <td>{{ $su_mood->suggestions }}</td>
+                                                        <td style="width: 240px;"><div class="moodDescription"> {{ $su_mood->description }} </div> </td>
+                                                        <td style="width: 240px;"><div class="moodDescription"> {{ $su_mood->suggestions }} </div> </td>
                                                         <td>
                                                             <div class="childMoodAction">
                                                                 <a href="javascript:void(0)" class="openMoodModel" data-action="edit" data-id="{{ $su_mood->id }}" data-mood_id="{{ $su_mood->mood_id }}" data-description="{{ $su_mood->description }}" data-suggestions="{{ $su_mood->suggestions }}"><i class="fa fa-edit"></i></a> | 
