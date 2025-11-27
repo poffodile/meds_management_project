@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\ServiceUserReport, App\ServiceUserCareTeam, App\CareTeam, App\ServiceUser, App\ServiceUserLivingSkill, App\DynamicForm, App\DynamicFormBuilder, App\ServiceUserEducationRecord, App\ServiceUserDailyRecord, App\ServiceUserHealthRecord, App\Mood, App\ServiceUserMood;
 use Response;
 use App\Models\SuBehavior;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -223,10 +224,17 @@ class ReportController extends ServiceUserManagementController
             array_push($appointmentpermonth, $totalappointmentmonth);
         }
 
-        $mood = Mood::where('home_id', Auth::user()->home_id)
+        $home_ids = Auth::user()->home_id;
+        $ex_home_ids = explode(',', $home_ids);
+        $home_id = $ex_home_ids[0];
+
+        $mood = Mood::where('home_id', $home_id)
             ->where('is_deleted', '0')
-            ->where('status', '1')
+            ->where('status', 1)
             ->get();
+
+        // dd($mood);
+            
 
         $lastMonth = now()->subDays(30);
 
@@ -245,11 +253,57 @@ class ReportController extends ServiceUserManagementController
                     ->get()
                     ->toArray();
 
-        // dd($rating_graph);
-        //print_r(implode(",",$policecallpermonth));
-        //die;
+        $incidentCount =  DynamicForm::where('service_user_id', $service_user_id) 
+                        ->where('location_id', 4)
+                        ->where('is_deleted', 0)
+                        ->count();
+
+
+         // Get average rating and count for this service user
+        $ratingStats = DB::table('su_behavior')
+            ->where('service_user_id', $service_user_id)
+            ->select(DB::raw('AVG(rate) as avg_rating'), DB::raw('COUNT(*) as rating_count'))
+            ->where('home_id', $home_id)
+            ->first();
+
+        $avg_rating = $ratingStats && $ratingStats->avg_rating ? round($ratingStats->avg_rating, 1) : 0;
+        $rating_count = $ratingStats ? intval($ratingStats->rating_count) : 0;
+
+        $current_moods = DB::table('su_mood')->select('su_mood.*', 'mood.id as mood_id', 'mood.name', 'mood.image')
+            ->where('su_mood.is_deleted', '0')
+            ->where('mood.home_id', $home_id)
+            ->where('su_mood.service_user_id', $service_user_id)
+            ->join('mood', 'mood.id', 'su_mood.mood_id')
+            ->whereDate('su_mood.created_at', \Carbon\Carbon::today())
+            ->orderBy('su_mood.id', 'desc')
+            ->first();
+
+
+        $today = date('Y-m-d');
+
+        $task_count['completed_targets'] = DB::table('su_placement_plan')
+            ->where('service_user_id', $service_user_id)
+            ->where('status', '1')
+            ->count();
+
+        $task_count['active_targets'] = DB::table('su_placement_plan')
+            ->where('service_user_id', $service_user_id)
+            ->whereDate('date', '>=', $today)
+            ->orderBy('date', 'asc')
+            ->where('status', '0')
+            ->count();
+
+        $task_count['pending_targets'] = DB::table('su_placement_plan')
+            ->where('service_user_id', $service_user_id)
+            ->whereDate('date', '<=', $today)
+            ->where('status', '0')
+            ->orderBy('created_at', 'desc')
+            ->count();
+
+        // dd($task_count);
+
         $appointmentpermonths = implode(",", $appointmentpermonth);
-        return view('frontEnd.serviceUserManagement.report', compact('service_user_id', 'totaleventsadded', 'totalappointments', 'totalpolicecall', 'missingserviceuser', 'policecallpermonths', 'appointmentpermonths', 'mood_graph','behavior_graph', 'mood'));
+        return view('frontEnd.serviceUserManagement.report', compact('service_user_id', 'totaleventsadded', 'totalappointments', 'totalpolicecall', 'missingserviceuser', 'policecallpermonths', 'appointmentpermonths', 'mood_graph','behavior_graph', 'mood', 'incidentCount', 'avg_rating', 'rating_count', 'current_moods','task_count'));
     }
 
     public function monthly_report_detail($log_book_id)

@@ -139,12 +139,12 @@
                                 </div>
                                 <ul class="list-inline two-part d-flex align-items-center mb-0">
                                     <!-- <li>
-                                                                                                                <div id="sparklinedash">
-                                                                                                                    <p class="mb-0 text-muted"><span class="badge bg-light text-success mb-0">
-                                                                                                                        <i class="fa fa-arrow-up"></i> 16.24 %
-                                                                                                                    </span> vs. previous month</p>
-                                                                                                                </div>
-                                                                                                            </li> -->
+                                            <div id="sparklinedash">
+                                                <p class="mb-0 text-muted"><span class="badge bg-light text-success mb-0">
+                                                    <i class="fa fa-arrow-up"></i> 16.24 %
+                                                </span> vs. previous month</p>
+                                            </div>
+                                        </li> -->
                                     <li class="ms-auto"><span
                                             class="counter text-success counter-value"><?= $totaleventsadded ?></span></li>
                                 </ul>
@@ -186,12 +186,12 @@
                                 </div>
                                 <ul class="list-inline two-part d-flex align-items-center mb-0">
                                     <!-- <li>
-                                                                                                                <div id="sparklinedash3">
-                                                                                                                    <p class="mb-0 text-muted"><span class="badge bg-light text-success mb-0">
-                                                                                                                        <i class="fa fa-arrow-up"></i> 16.24 %
-                                                                                                                    </span> vs. previous month</p>
-                                                                                                                </div>
-                                                                                                            </li> -->
+                                                <div id="sparklinedash3">
+                                                    <p class="mb-0 text-muted"><span class="badge bg-light text-success mb-0">
+                                                        <i class="fa fa-arrow-up"></i> 16.24 %
+                                                    </span> vs. previous month</p>
+                                                </div>
+                                            </li> -->
                                     <li class="ms-auto"><span
                                             class="counter text-info counter-value"><?= $totalpolicecall ?></span> </li>
                                 </ul>
@@ -209,12 +209,12 @@
                                 </div>
                                 <ul class="list-inline two-part d-flex align-items-center mb-0">
                                     <!-- <li>
-                                                                                                                <div id="sparklinedash4">
-                                                                                                                    <p class="mb-0 text-muted"><span class="badge bg-light text-success mb-0">
-                                                                                                                        <i class="fa fa-arrow-up"></i> 16.24 %
-                                                                                                                    </span> vs. previous month</p>
-                                                                                                                </div>
-                                                                                                            </li> -->
+                                                <div id="sparklinedash4">
+                                                    <p class="mb-0 text-muted"><span class="badge bg-light text-success mb-0">
+                                                        <i class="fa fa-arrow-up"></i> 16.24 %
+                                                    </span> vs. previous month</p>
+                                                </div>
+                                            </li> -->
                                     <li class="ms-auto"><span
                                             class="counter text-purple counter-value"><?= $totalappointments ?></span></li>
                                 </ul>
@@ -222,45 +222,81 @@
                         </a>
                     </div>
                 </div>
-                {{-- <div class="row">
+                <div class="row">
                     <div class="row justify-content-center owl-carousel owl-theme">
-                        <a class="col-lg-3 round_box col-md-4 col-sm-1 item">
+                        <a href="{{ url('service/incident-report/' . base64_decode($_GET['key'])) }}"
+                            class="col-lg-3 round_box col-md-4 col-sm-1 item">
                             <div class="white-box analytics-info box_white counter">
                                 <div class="d-flex">
                                     <div class="heading">
-                                        <h3 class="box-title">Child Mood</h3>
+                                        <h3 class="box-title">Incident Reports</h3>
                                     </div>
                                     <div class="icon-1 icon">
-                                        <span class="icon_name"><i class="fa fa-calendar" aria-hidden="true"></i></span>
+                                        <span class="icon_name"><i class="fa fa-shield" aria-hidden="true"></i></span>
                                     </div>
                                 </div>
                                 <ul class="list-inline two-part d-flex align-items-center mb-0">
 
                                     <li class="ms-auto"><span
-                                            class="counter text-success counter-value"><?= $totaleventsadded ?></span></li>
+                                            class="counter text-success counter-value"><?= $incidentCount ?></span></li>
                                 </ul>
                             </div>
                         </a>
-                        <a class="col-lg-3 round_box col-md-4 col-sm-1 item">
+                        <a href="{{ url('service/behavior/' . base64_decode($_GET['key'])) }}"
+                            class="col-lg-3 round_box col-md-4 col-sm-1 item">
                             <div class="white-box analytics-info box_white counter">
                                 <div class="d-flex">
                                     <div class="heading">
                                         <h3 class="box-title">Child Behavior</h3>
                                     </div>
                                     <div class="icon-2 icon">
-                                        <span class="icon_name"><i class="fa fa-user-circle-o"
-                                                aria-hidden="true"></i></span>
+                                        <span class="icon_name"><i class="fa fa-star" aria-hidden="true"></i></span>
                                     </div>
                                 </div>
                                 <ul class="list-inline two-part d-flex align-items-center mb-0">
 
-                                    <li class="ms-auto"><span
-                                            class="counter text-purple counter-value"><?= $missingserviceuser ?></span></li>
+                                    <li class="ms-auto"> @php
+                                        $displayAvg = isset($avg_rating) ? (float) $avg_rating : 0;
+                                        $fullStars = floor($displayAvg);
+                                        $hasHalf = $displayAvg - $fullStars >= 0.5 ? true : false;
+                                    @endphp
+                                        <span class="profile-rating" title="{{ $rating_count ?? 0 }} rating(s)"
+                                            style="vertical-align:middle; font-size: 22px;">
+                                            @for ($i = 1; $i <= 5; $i++)
+                                                @if ($i <= $fullStars)
+                                                    <i class="fa fa-star" style="color:#f90"></i>
+                                                @elseif ($i == $fullStars + 1 && $hasHalf)
+                                                    <i class="fa fa-star-half-o" style="color:#f90"></i>
+                                                @else
+                                                    <i class="fa fa-star-o" style="color:#ccc"></i>
+                                                @endif
+                                            @endfor
+                                            <small style="margin-left:6px; color:#666;">({{ $displayAvg }})</small>
+                                        </span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </a>
+                        <a href="{{ url('service/mood/' . base64_decode($_GET['key'])) }}"
+                            class="col-lg-3 round_box col-md-4 col-sm-1 item">
+                            <div class="white-box analytics-info box_white counter">
+                                <div class="d-flex">
+                                    <div class="heading">
+                                        <h3 class="box-title">Child Mood</h3>
+                                    </div>
+                                    <div class="icon-2 icon">
+                                        <span class="icon_name" style="font-size:30px;">😊</span>
+                                    </div>
+                                </div>
+                                <ul class="list-inline two-part d-flex align-items-center mb-0">
+                                    <li class="ms-auto"><span class="counter text-purple" style="font-size: 16px"> Today's Mood @if (isset($current_moods))
+                                                            <img src="{{ url(MoodImgPath . '/' . $current_moods->image) }}" style="width: 30px;">
+                                                        @endif</span></li>
                                 </ul>
                             </div>
                         </a>
                     </div>
-                </div> --}}
+                </div>
                 <div class="row">
                     <div class="col-sm-12">
                         <section class="panel">
@@ -303,28 +339,63 @@
                 </div>
                 <div class="row">
                     <div class="col-sm-12">
-                        <div class="chart-row2">
-                            <div class="chart">
-                                <h2>Child Behavior</h2>
-                                <canvas id="behaviorChart" height="150" width="800"></canvas>
+                        <section class="panel">
+                            <header class="panel-heading">
+                                Child Behavior
+                                <span class="tools pull-right">
+                                    <a href="javascript:;" class="fa fa-chevron-down"></a>
+                                    <a href="javascript:;" class="fa fa-times"></a>
+                                </span>
+                            </header>
+                            <div class="panel-body">
+                                <div class="chartJS">
+                                    <canvas id="behaviorChart" height="150" width="800"></canvas>
+                                </div>
                             </div>
-                        </div>
+                        </section>
                     </div>
 
                     <div class="col-sm-12">
-                        <div class="chart-row2">
-                            <div class="chart">
-                                <h2>Child Mood</h2>
-                                <canvas id="moodChart" height="150" width="800"></canvas>
-                                <div id="moodLegend" style="margin-top: 20px; display: flex; gap: 20px; flex-wrap: wrap;">
-                                    @foreach ($mood as $moodItem)
-                                        <div style="display: flex; align-items: center;">
-                                            <span>{{ $moodItem->value }}</span> - <span>{{ $moodItem->name }}</span>
-                                        </div>
-                                    @endforeach
+                        <section class="panel">
+                            <header class="panel-heading">
+                                Child Mood
+                                <span class="tools pull-right">
+                                    <a href="javascript:;" class="fa fa-chevron-down"></a>
+                                    <a href="javascript:;" class="fa fa-times"></a>
+                                </span>
+                            </header>
+                            <div class="panel-body">
+                                <div class="chartJS">
+                                    <canvas id="moodChart" height="150" width="800"></canvas>
+                                    <div id="moodLegend"
+                                        style=" display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;">
+                                        @foreach ($mood as $moodItem)
+                                            <div style="display: flex; align-items: center;">
+                                                <span>{{ $moodItem->id }}</span> - <span>{{ $moodItem->name }}</span>
+                                            </div>
+                                        @endforeach
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </section>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4">
+                        <section class="panel">
+                            <header class="panel-heading">
+                                Task
+                                <span class="tools pull-right">
+                                    <a href="javascript:;" class="fa fa-chevron-down"></a>
+                                    <a href="javascript:;" class="fa fa-times"></a>
+                                </span>
+                            </header>
+                            <div class="panel-body pie-rel">
+                                <div class="chartJS">
+                                    <canvas id="pie-chart-js" height="330" width="530"></canvas>
+                                </div>
+                            </div>
+                        </section>
                     </div>
                 </div>
 
@@ -346,6 +417,9 @@
     </section>
     <script src="{{ url('public/frontEnd/js/Chart2.js') }}"></script>
 
+    <!--Easy Pie Chart-->
+    {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js"></script> --}}
+
     <script>
         $(document).ready(function() {
             $('.counter-value').each(function() {
@@ -361,6 +435,40 @@
             });
         });
     </script>
+
+    <?php //print_r($task_count); ?>
+
+    {{-- Pie Chart Start --}}
+    <script>
+        var ctx = document.getElementById("pie-chart-js").getContext("2d");
+
+        var myPie = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ["Completed Targets", "Active Targets", "Pending Targets"],
+                datasets: [{
+                    data: [
+                        {{ $task_count['completed_targets'] }},
+                        {{ $task_count['active_targets'] }},
+                        {{ $task_count['pending_targets'] }}
+                    ],
+                    backgroundColor: [
+                        "#4ab661", // Completed - Green
+                        "#e13533", // Active - Red
+                        "#ed6a22"  // Pending - Orange
+                    ]
+                }]
+            },
+            options: {
+                responsive: false,
+                animation: {
+                    animateScale: true
+                }
+            }
+        });
+    </script>
+    {{-- Pie Chart End --}}
+
 
     {{-- Mood Graph start --}}
     <script>
@@ -381,6 +489,8 @@
                 {{ $m->id }}: "{{ $m->name }}",
             @endforeach
         };
+
+
 
         // Manual formatter (NO UTC issue)
         function formatDate(d) {
@@ -422,9 +532,11 @@
                 datasets: [{
                     label: "Child Mood (Last 30 Days)",
                     data: finalMoodValues, // FIXED — processed value
-                    borderWidth: 2,
-                    borderColor: "#3e95cd",
-                    backgroundColor: "#3e95cd55",
+                    // borderWidth: 2,
+                    fillColor: "#79D1CF",
+                    strokeColor: "#79D1CF",
+                    // borderColor: "#3e95cd",
+                    // backgroundColor: "#3e95cd55",
                     fill: true,
                     pointRadius: 5
                 }]
@@ -496,8 +608,10 @@
                 datasets: [{
                     label: "Behavior Rating",
                     data: finalValues,
-                    borderColor: "#3b82f6",
-                    borderWidth: 2,
+                    // borderColor: "#3b82f6",
+                    fillColor: "#79D1CF",
+                    strokeColor: "#79D1CF",
+                    // borderWidth: 2,
                     fill: false,
                     lineTension: 0.3,
                     pointRadius: 4,
@@ -658,28 +772,6 @@
                     ]
                 }
                 var myLineChart = new Chart(document.getElementById("line-chart-js").getContext("2d")).Line(Linedata);
-
-
-
-
-
-                var pieData = [{
-                        value: 30,
-                        color: "#E67A77"
-                    },
-                    {
-                        value: 50,
-                        color: "#D9DD81"
-                    },
-                    {
-                        value: 100,
-                        color: "#79D1CF"
-                    }
-
-                ];
-
-                var myPie = new Chart(document.getElementById("pie-chart-js").getContext("2d")).Pie(pieData);
-
 
 
                 var donutData = [{

@@ -13,6 +13,7 @@ class SuBehavior extends Model
     protected $table = 'su_behavior'; // your table name
 
     protected $fillable = [
+        'home_id',
         'user_id',
         'service_user_id',
         'rate',

@@ -109,6 +109,7 @@ class UserController extends Controller
             //$user->password           = Hash::make($request->password);
             $user->job_title            = $request->job_title;
             $user->access_level         = $request->access_level;
+            $user->department           = $request->department;
             $user->description          = $request->description;
             $user->payroll              = $request->payroll;
             $user->holiday_entitlement  = $request->holiday_entitlement;

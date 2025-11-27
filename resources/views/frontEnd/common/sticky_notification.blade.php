@@ -240,7 +240,7 @@
 </form>
 
 <script type="text/javascript">
-    // $(document).ready(function(){
+     $(document).ready(function(){
         $('.sticky_noti_title').on('click', function(){
             var noti    = $(this);
             var noti_id = noti.attr('id');
@@ -257,7 +257,7 @@
                 return false;                
             }
         })
-    // })
+     })
 </script>
 <script>
     $('.sticky_noti_title').on('click', function(e){

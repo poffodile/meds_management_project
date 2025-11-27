@@ -1,16 +1,16 @@
 @extends('backEnd.layouts.master')
-@section('title', 'Pay Rates')
+@section('title', ' Rates Type')
 @section('content')
 
     <?php
-    if (isset($payrate)) {
-        $action = url('admin/user/pay-rates/edit/' . $payrate->id);
+    if (isset($rateType)) {
+        $action = url('admin/user/pay-rate-type/update/' . $rateType->id);
         $task = 'Edit';
-        $form_id = 'EditUserPayRates';
+        $form_id = 'EditUserPayRateType';
     } else {
-        $action = url('admin/user/pay-rates/save');
+        $action = url('admin/user/pay-rate-type/save');
         $task = 'Add';
-        $form_id = 'AddUserPayRates';
+        $form_id = 'AddUserPayRateType';
     }
     ?>
 
@@ -31,7 +31,7 @@
                 <div class="col-lg-12">
                     <section class="panel">
                         <header class="panel-heading">
-                            {{ $task }} Pay Rates
+                            {{ $task }} Rates Type
                         </header>
                         <div class="panel-body">
                             <div class="position-center">
@@ -47,36 +47,28 @@
                                 @include('backEnd.common.alert_messages')
                                 <form class="form-horizontal" role="form" method="post" action="{{ $action }}"
                                     id="{{ $form_id }}">
-                                    <div class="form-group">
-                                        <label class="col-lg-2 control-label">Access levels</label>
-                                        <div class="col-lg-10">
-                                            <select name="access_level_id" class="form-control" id="">
-                                                @foreach ($accesslevel as $key => $value)
-                                                    <option value="{{ $key }}">{{ $value }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
+
                                     <div class="form-group">
                                         <label class="col-lg-2 control-label">Rate Type</label>
                                         <div class="col-lg-10">
-                                            <select name="rate_type_id" class="form-control" id="">
-                                                @foreach ($rateType as $type)
-                                                    <option value="{{ $type->id }}">{{ $type->type_name }}</option>
-                                                @endforeach
-                                            </select>
+                                            <input type="text" name="type_name" class="form-control"
+                                                placeholder="Rate Type"
+                                                value="{{ $rateType->type_name ?? old('type_name') }}"
+                                                maxlength="255">
                                         </div>
                                     </div>
 
                                     <div class="form-group">
-                                        <label class="col-lg-2 control-label">Pay Rate</label>
+                                        <label class="col-lg-2 control-label">Status</label>
                                         <div class="col-lg-10">
-                                            <input type="text" name="pay_rate" class="form-control"
-                                                placeholder="Pay Rates"
-                                                value="{{ isset($u_sick_leave->title) ? $u_sick_leave->title : '' }}"
-                                                maxlength="255">
+                                           <select name="status" class="form-control">
+                                            <option value="1" {{ isset($rateType) && $rateType->status == 1 ? 'selected' : '' }}>Active</option>
+                                            <option value="0" {{ isset($rateType) && $rateType->status == 0 ? 'selected' : '' }}>Inactive</option>
+                                        </select>
+
                                         </div>
                                     </div>
+
                                     <div class="form-actions">
                                         <div class="row">
                                             <div class="col-lg-offset-2 col-lg-10">

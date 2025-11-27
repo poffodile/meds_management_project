@@ -4,7 +4,7 @@ namespace App\Http\Controllers\frontEnd;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\ServiceUser, App\User, App\HomeLabel, App\UserQualification, App\Ethnicity, App\EarningSchemeLabel;
+use App\ServiceUser, App\User, App\HomeLabel, App\UserQualification, App\Ethnicity, App\EarningSchemeLabel, App\Models\CompanyDepartment;
 use DB;
 use Auth;
 
@@ -25,8 +25,10 @@ class SystemManagementController extends Controller
             ->toArray();
         // echo "<pre>"; print_r($earning_scheme_label); die;
         $su_ethnicity = Ethnicity::select('id', 'name')->where('is_deleted', '0')->get()->toArray();
+
+        $department = CompanyDepartment::getActiveCompanyDepartment();
         // echo "<pre>"; print_r($su_ethnicity); die;
-        return view('frontEnd.systemManagement.index', compact('labels', 'su_ethnicity', 'earning_scheme_label'));
+        return view('frontEnd.systemManagement.index', compact('labels', 'su_ethnicity', 'earning_scheme_label', 'department'));
     }
 
     public function add_service_user(Request $request)
@@ -132,6 +134,7 @@ class SystemManagementController extends Controller
             $user->phone_no         = $data['staff_phone_no'];
             $user->email            = $data['staff_email'];
             $user->job_title        = $data['job_title'];
+            $user->department      = $data['department'];
             $user->description      = $data['description'];
             $user->payroll          = $data['payroll'];
 

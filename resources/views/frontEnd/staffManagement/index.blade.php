@@ -57,6 +57,10 @@
                                     <!-- <li><a href="{{ url('/staff/rota/view') }}"> <i class="fa fa-sliders"></i> Manage Rota </a></li>
                                       -->
                                     <li><a href="{{ url('/rota-dashboard') }}"> <i class="fa fa-sliders"></i> Manage Rota <!-- <span class="badge label-warning pull-right r-activity">02</span> --></a></li>
+                                    <?php $encodedUser = base64_encode(Auth::user()->user_name);
+                                        $url = "http://66.116.198.68:8055/Learner/Learner-Dashboard/?key=" . $encodedUser;
+                                    ?>
+                                    <li><a href="{{ $url }}" target="_blank"> <i class="fa fa-book"></i> Traning/Education </a></li>
                                 </ul>
                             </section>
                         </aside>

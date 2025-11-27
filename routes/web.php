@@ -50,6 +50,7 @@ use App\Http\Controllers\backEnd\generalAdmin\DepartmentBackendController;
 use App\Http\Controllers\backEnd\systemManage\PlanBuilderAdminController;
 use App\Http\Controllers\backEnd\salesfinance\TimeSheetBackendController;
 use App\Http\Controllers\Rota\RotaController;
+use App\Http\Controllers\backEnd\user\PayRatesTypeController;
 
 
 
@@ -1640,9 +1641,25 @@ Route::group(['prefix' => 'admin', 'middleware' => 'CheckAdminAuth'], function (
 	Route::match(['get', 'post'], '/user/annual-leave/edit/{u_annual_leave_id}', 'App\Http\Controllers\backEnd\user\AnnualLeaveController@edit');
 	Route::get('/user/annual-leave/delete/{u_sick_leave_id}', 'App\Http\Controllers\backEnd\user\AnnualLeaveController@delete');
 
+	
+	// Backend User Pay Rates Type
+	Route::prefix('user')->group(function () {
+		Route::get('pay-rates-type', [PayRatesTypeController::class, 'index'])->name('payrates.types.index');
+		Route::get('pay-rate-type/add', [PayRatesTypeController::class, 'create'])->name('payrates.types.create');
+		Route::post('pay-rate-type/save', [PayRatesTypeController::class, 'store'])->name('payrates.types.store');
+		Route::get('pay-rate-type/edit/{id}', [PayRatesTypeController::class, 'edit'])->name('payrates.types.edit');
+		Route::post('pay-rate-type/update/{id}', [PayRatesTypeController::class, 'update'])->name('payrates.types.update');
+		Route::get('pay-rate-type/delete/{id}', [PayRatesTypeController::class, 'destroy'])->name('payrates.types.destroy');
+	});
+	
+
+	
+
 	// Backend User Pay Rates
 	Route::match(['get', 'post'], '/user/pay-rates', 'App\Http\Controllers\backEnd\user\PayRatesController@index');
 	Route::match(['get', 'post'], '/user/pay-rates/add', 'App\Http\Controllers\backEnd\user\PayRatesController@create');
+	Route::match(['get', 'post'], '/user/pay-rates/save', 'App\Http\Controllers\backEnd\user\PayRatesController@store');
+
 	// User Latness Leave
 	Route::match(['get', 'post'], '/user/late-leaves/{staff_member}', [LatnessLeaveController::class, 'index'])
     ->name('user.latness-leaves');

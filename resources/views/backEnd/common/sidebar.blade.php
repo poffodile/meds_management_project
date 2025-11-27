@@ -148,7 +148,7 @@
 
                 <li class="sub-menu">
                     <a href="javascript:;"
-                        class="<?php if (($page == 'care_team_job_title') || ($page == 'mood_title')  || ($page == 'access_levels')  || ($page == 'rota_shift') || ($page == 'homelist') || ($page == 'policies')) {
+                        class="<?php if (($page == 'care_team_job_title') || ($page == 'mood_title')  || ($page == 'access_levels')  || ($page == 'rota_shift')|| ($page == "pay_rates_type") || ($page == "pay_rates") || ($page == 'homelist') || ($page == 'policies')) {
                                     echo 'active';
                                 } ?>">
                         <i class="fa fa-home"></i>
@@ -166,8 +166,11 @@
                         <li class="{{ ($page == 'mood_title') ? 'active' : '' }}">
                             <a href="{{ url('admin/moods') }}">Moods</a>
                         </li>
-                         <li class="{{ ($page == 'pay_rates') ? 'active' : '' }}">
-                            <a href="{{ url('admin/user/pay-rates') }}">Pay rates</a>
+                        <li class="{{ ($page == 'pay_rates_type') ? 'active' : '' }}">
+                            <a href="{{ url('admin/user/pay-rates-type') }}">Rates Type</a>
+                        </li>
+                        <li class="{{ ($page == 'pay_rates') ? 'active' : '' }}">
+                            <a href="{{ url('admin/user/pay-rates') }}">Pay Rates</a>
                         </li>
                         <li class="{{ ($page == 'access_levels') ? 'active' : '' }}">
                             <a href="{{ url('admin/home/access-levels') }}">Access Levels</a>

@@ -19,6 +19,8 @@ class ProfileController extends ServiceUserManagementController
         //$d = DynamicForm::countIncidentReport(1,'29-08-2017','30-08-2017');
         //echo '<prE>'; print_r($d); die;
         // update notify
+
+        $userName = Auth::user()->user_name;
         $home_ids = Auth::user()->home_id;
         $ex_home_ids = explode(',', $home_ids);
         $home_id = $ex_home_ids[0];
@@ -284,7 +286,7 @@ class ProfileController extends ServiceUserManagementController
 
             //echo "<pre>"; print_r($noti_data); die;
             //print_r($patient); die;
-            return view('frontEnd.serviceUserManagement.profile', compact('patient', 'risks', 'file_category', 'service_user_id', 'care_team', 'care_history', 'daily_score', 'latitude', 'longitude', 'form_pattern', 'notifications', 'afc_status', 'labels', 'care_team_job_title', 'su_in_danger', 'su_req_cb', 'su_contact', 'service_users', 'dynamic_forms', 'social_app', 'social_app_val', 'my_money', 'noti_data', 'users', 'avg_rating', 'rating_count','current_moods', 'moods'));
+            return view('frontEnd.serviceUserManagement.profile', compact('patient', 'risks', 'file_category', 'service_user_id', 'care_team', 'care_history', 'daily_score', 'latitude', 'longitude', 'form_pattern', 'notifications', 'afc_status', 'labels', 'care_team_job_title', 'su_in_danger', 'su_req_cb', 'su_contact', 'service_users', 'dynamic_forms', 'social_app', 'social_app_val', 'my_money', 'noti_data', 'users', 'avg_rating', 'rating_count','current_moods', 'moods', 'userName'));
         } else {
             return view('frontEnd.error_404');
         }

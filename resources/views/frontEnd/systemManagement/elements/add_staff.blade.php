@@ -33,6 +33,15 @@
                         </div>
 
                         <div class="form-group col-md-12 col-sm-12 col-xs-12">
+                            <label>Department</label>
+                            <select class="form-control" name="department" id="">
+                                @foreach($department as $dept)
+                                    <option value="{{ $dept['id'] }}">{{ $dept['name'] }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="form-group col-md-12 col-sm-12 col-xs-12">
                             <label>Description</label>
                             <textarea name="description" class="form-control" rows="3" cols="20" placeholder="Short Descriptiion" maxlength="1000"></textarea>
                         </div>

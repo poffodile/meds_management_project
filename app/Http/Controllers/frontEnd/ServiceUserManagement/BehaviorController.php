@@ -18,12 +18,20 @@ class BehaviorController extends Controller
      */
     public function index($service_user_id)
     {
+
+        // Verify service user belongs to current user's home
+        $home_ids = Auth::user()->home_id;
+        $ex_home_ids = explode(',', $home_ids);
+        $home_id = $ex_home_ids[0];
+
+
         $data['service_user_id'] = $service_user_id;
         $data['su_behaviors'] = SuBehavior::join('user', 'user.id', '=', 'su_behavior.user_id')
             ->select('su_behavior.*', 'user.name')
             ->where('service_user_id', $service_user_id)
             ->where('su_behavior.is_deleted', 0)
             ->orderBy('su_behavior.id', 'desc')
+            ->where('su_behavior.home_id', $home_id)
             ->get();
         return view('frontEnd.serviceUserManagement.elements.behavior', $data);
     }
@@ -65,6 +73,7 @@ class BehaviorController extends Controller
                 $alreadyExists = SuBehavior::where('service_user_id', $service_user_id)
                     ->whereDate('created_at', today())
                     ->where('is_deleted', 0)
+                    ->where('home_id', $home_id)
                     ->exists();
 
                 if ($alreadyExists) {
@@ -99,6 +108,7 @@ class BehaviorController extends Controller
             } else {
                 // Create new record
                 SuBehavior::create([
+                    'home_id'         => $home_id,
                     'user_id'         => Auth::id(),
                     'service_user_id' => $service_user_id,
                     'rate'            => $data['rating'],

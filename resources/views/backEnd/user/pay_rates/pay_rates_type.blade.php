@@ -1,5 +1,5 @@
 @extends('backEnd.layouts.master')
-@section('title','Pay Rates')
+@section('title',' Rate Type')
 @section('content')
 
 <!--main content start-->
@@ -9,16 +9,15 @@
 
         <div class="row">
             <div class="col-sm-12">
-                <section class="panel">
-                   
+                <section class="panel">                   
                     <div class="panel-body">
                         <div class="adv-table editable-table ">
                             <div class="clearfix">
                                 <div class="btn-group">
-                                    <h3>Pay Rates</h3>
-                                      <a href="{{ url('admin/user/pay-rates/add') }}">
+                                    <h3>Pay Rate Type</h3>
+                                      <a href="{{ url('admin/user/pay-rate-type/add') }}">
                                         <button id="editable-sample_new" class="btn btn-primary">
-                                            Add Pay Rates <i class="fa fa-plus"></i>
+                                            Add Pay Rate Type <i class="fa fa-plus"></i>
                                         </button>
                                     </a>
                                 </div>
@@ -56,40 +55,33 @@
                                     <thead>
                                     <tr>
                                         <th>Date</th>
-                                        <th>User Type</th>
-                                        <th>Rate Type</th>
-                                        <th>Pay Rate</th>
+                                        <th>Name</th>
                                         <th>Status</th>
                                         <th width="20%">Actions</th>
                                     </tr>
                                     </thead>
-
                                     <tbody>
-                                        @foreach ($payRates as $payRate)
-                                            <tr class="">
-                                                <td>{{ date('d-m-Y', strtotime($payRate->created_at)) }}</td>
-                                                <td>{{ $payRate->access_level_name }}</td>
-                                                <td>{{ $payRate->rate_type_name  }}</td>
-                                                <td>{{ $payRate->pay_rate }}</td>
-                                                <td>
-                                                    @if($payRate->status == 1)
-                                                        Active
-                                                    @elseif( $payRate->status == 0 )
-                                                        Inactive
-                                                    @endif
-                                                </td>
-                                                <td>
-                                                    <a href="{{ url('admin/user/pay-rates/edit/' . $payRate->id) }}" class=""><i class="fa fa-pencil"></i></a>
-                                                    <a href="{{ url('admin/user/pay-rates/delete/' . $payRate->id) }}" class="" onclick="return confirm('Are you sure you want to delete this pay rate?');"><i class="fa fa-trash"></i></a>
-                                                </td>
-                                            </tr>
-                                         @endforeach
+                                      @foreach($rateTypes as $type)
+                                        <tr class="">
+                                            <td>{{ date('d-m-Y', strtotime($type->created_at)) }}</td>
+                                            <td>{{ $type->type_name }}</td>
+                                            <td>
+                                                @if($type->status == 1)
+                                                    Active
+                                                @else
+                                                    Inactive
+                                                @endif
+                                            </td>
+                                            <td>
+                                                <a href="{{ url('admin/user/pay-rate-type/edit/'.$type->id) }}" class="btn btn-primary btn-xs"><i class="fa fa-pencil"></i></a>
+                                                <a href="{{ url('admin/user/pay-rate-type/delete/'.$type->id) }}" class="btn btn-danger btn-xs" onclick="return confirm('Are you sure you want to delete this item?');"><i class="fa fa-trash-o "></i></a>
+                                            </td>
+                                        </tr>
+                                        @endforeach
                                   
                                     </tbody>
                                 </table>
                             </div>
-                          
-
                         </div>
                     </div>
                 </section>
