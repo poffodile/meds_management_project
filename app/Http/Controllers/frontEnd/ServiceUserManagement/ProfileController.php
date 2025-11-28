@@ -5,9 +5,9 @@ namespace App\Http\Controllers\frontEnd\ServiceUserManagement;
 use App\Http\Controllers\frontEnd\ServiceUserManagementController;
 use Illuminate\Http\Request;
 use App\ServiceUserCareHistory, App\CareTeam, App\ServiceUser, App\FormBuilder, App\Notification, App\ServiceUserAFC, App\HomeLabel, App\LogBook, App\ServiceUserLogBook, App\CareTeamJobTitle, App\ServiceUserCareCenter, App\ServiceUserContacts, App\DynamicFormBuilder, App\DynamicForm, App\SocialApp, App\ServiceUserSocialApp, App\ServiceUserMoney, App\ServiceUserMoneyRequest, App\ServiceUserCareHistoryFile, App\User, App\Mood;
-use DB, Auth, Session;
+use DB, Session;
 use Illuminate\Support\Facades\Log;
-
+use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
 
@@ -286,7 +286,7 @@ class ProfileController extends ServiceUserManagementController
 
             //echo "<pre>"; print_r($noti_data); die;
             //print_r($patient); die;
-            return view('frontEnd.serviceUserManagement.profile', compact('patient', 'risks', 'file_category', 'service_user_id', 'care_team', 'care_history', 'daily_score', 'latitude', 'longitude', 'form_pattern', 'notifications', 'afc_status', 'labels', 'care_team_job_title', 'su_in_danger', 'su_req_cb', 'su_contact', 'service_users', 'dynamic_forms', 'social_app', 'social_app_val', 'my_money', 'noti_data', 'users', 'avg_rating', 'rating_count','current_moods', 'moods', 'userName'));
+            return view('frontEnd.serviceUserManagement.profile', compact('patient', 'risks', 'file_category', 'service_user_id', 'care_team', 'care_history', 'daily_score', 'latitude', 'longitude', 'form_pattern', 'notifications', 'afc_status', 'labels', 'care_team_job_title', 'su_in_danger', 'su_req_cb', 'su_contact', 'service_users', 'dynamic_forms', 'social_app', 'social_app_val', 'my_money', 'noti_data', 'users', 'avg_rating', 'rating_count','current_moods', 'moods'));
         } else {
             return view('frontEnd.error_404');
         }

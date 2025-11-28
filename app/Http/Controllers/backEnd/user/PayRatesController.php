@@ -47,14 +47,26 @@ class PayRatesController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request->all());
         $request->validate([
             'access_level_id' => 'required',
             'pay_rate'        => 'required|numeric',
             'rate_type_id'    => 'required',
         ]);
 
+        // Check if already exists for same home, access level, and rate type
+        $exists = PayRate::where('home_id', $this->home_id)
+            ->where('access_level_id', $request->access_level_id)
+            ->where('rate_type_id', $request->rate_type_id)
+            ->where('id', '!=', $request->id)  // allow editing same record
+            ->where('is_deleted', 0)
+            ->exists();
+
+        if ($exists) {
+            return redirect()->back()->with('error', 'Pay Rate already exists for this Access Level and Rate Type.');
+        }
+
         try {
+
             $data = PayRate::updateOrCreate(
                 ['id' => $request->id],
                 [
@@ -67,10 +79,10 @@ class PayRatesController extends Controller
                 ]
             );
 
-            // return redirect()->back()->with('success', 'Pay Rate saved successfully');
-            $data['page'] = 'pay_rates';
-            $data['payRates'] = PayRate::getAllPayRates($this->home_id);
-            return view('backEnd.user.pay_rates.pay_rates', $data);
+            // $data['page'] = 'pay_rates';
+             return redirect()
+                ->route('payrates.index')
+                ->with('success', 'Pay rate added successfully.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Something went wrong: ' . $e->getMessage());
         }

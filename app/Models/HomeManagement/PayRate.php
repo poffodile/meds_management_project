@@ -27,6 +27,7 @@ class PayRate extends Model
         return self::select(
             'pay_rates.id',
             'pay_rates.home_id',
+            'pay_rates.status',
             'pay_rates.access_level_id',
             'pay_rates.rate_type_id',
             'pay_rates.pay_rate',

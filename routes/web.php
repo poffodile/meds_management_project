@@ -1653,10 +1653,8 @@ Route::group(['prefix' => 'admin', 'middleware' => 'CheckAdminAuth'], function (
 	});
 	
 
-	
-
 	// Backend User Pay Rates
-	Route::match(['get', 'post'], '/user/pay-rates', 'App\Http\Controllers\backEnd\user\PayRatesController@index');
+	Route::match(['get', 'post'], '/user/pay-rates', 'App\Http\Controllers\backEnd\user\PayRatesController@index')->name('payrates.index');
 	Route::match(['get', 'post'], '/user/pay-rates/add', 'App\Http\Controllers\backEnd\user\PayRatesController@create');
 	Route::match(['get', 'post'], '/user/pay-rates/save', 'App\Http\Controllers\backEnd\user\PayRatesController@store');
 
