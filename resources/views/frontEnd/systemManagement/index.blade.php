@@ -21,14 +21,14 @@
                             <div class="sys-mngmnt-box" >
                                 <!-- data-toggle="modal" data-target="#addServiceUserModal" -->
                                 <div class="sys-mngmnticon"> <i class="fa fa-user"></i> </div>
-                                <p>Add user</p>
+                                <p>Add Child</p>
                             </div>
                         </div>
                         <div class="col-md-6 col-sm-6 col-xs-6 add_staff">
                             <div class="sys-mngmnt-box" >
                                 <!-- data-toggle="modal" data-target="#addStaffModal" -->
                                 <div class="sys-mngmnticon"> <i class="fa fa-users"></i> </div>
-                                <p>Add staff</p>
+                                <p>Add Staff</p>
                             </div>
                         </div>
                         <div class="col-md-6 col-sm-6 col-xs-6 risk-record">

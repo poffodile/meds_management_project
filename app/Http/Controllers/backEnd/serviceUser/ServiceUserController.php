@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\ServiceUser, App\Home, App\SocialApp, App\ServiceUserSocialApp, App\Ethnicity;
 use Hash, DB, Session;
 use App\Models\ChildSection;
+use App\Models\CompanyDepartment;
 use Carbon\Carbon;
 use Validator;
 
@@ -60,13 +61,13 @@ class ServiceUserController extends Controller
 
     public function add(Request $request)
     {
+        $home_id = Session::get('scitsAdminSession')->home_id;
         if ($request->isMethod('post')) {
             $data = $request->input();
             // echo "<pre>"; print_r($data); die;
             // $social_apps = $data['social_app_name'];
             // echo "<pre>"; print_r($social_apps); die;
 
-            $home_id = Session::get('scitsAdminSession')->home_id;
             // echo $home_id; 
             // dd(Session::get('scitsAdminSession'));
             $date_of_birth = date('Y-m-d', strtotime($data['date_of_birth']));
@@ -84,8 +85,9 @@ class ServiceUserController extends Controller
             $user->password              =  '';
             $user->phone_no              =  $data['phone_no'];
             $user->date_of_birth         =  $date_of_birth;
-            $user->child_type            =  $data['child_type'];
-            $user->room_type             =  $data['room_type'];
+            $user->department            =  $data['department'];   
+            $user->child_type            =  $data['child_type'] ?? null;
+            $user->room_type             =  $data['room_type'] ?? null;
             $user->weekly_rate           =  $data['weekly_rate'];
             $user->subs                  =  $data['subs'];
             $user->extra                 =  $data['extra'];
@@ -160,8 +162,11 @@ class ServiceUserController extends Controller
 
         $ethnicity = Ethnicity::select('id', 'name')->where('is_deleted', '0')->get();
         // echo "<pre>"; print_r($ethnicity); die;
+        $childSection = ChildSection::where(['home_id'=>$home_id,'status'=>1])->whereNull('deleted_at')->get();
 
-        return view('backEnd.serviceUser.service_user_form', compact('page', 'social_app', 'ethnicity'));
+        $company_departments = CompanyDepartment::getActiveCompanyDepartment();
+
+        return view('backEnd.serviceUser.service_user_form', compact('page', 'social_app', 'ethnicity', 'company_departments', 'childSection'));
     }
 
     public function edit(Request $request, $service_id)
@@ -199,16 +204,17 @@ class ServiceUserController extends Controller
                 $user_old_image         = $user->image;
                 $date_of_birth = date('Y-m-d', strtotime($data['date_of_birth']));
 
-                $user->name             =  $data['name'];
-                $user->user_name        =  $data['user_name'];
-                $user->email            =  $data['email'];
-                $user->phone_no         =  $data['phone_no'];
-                $user->date_of_birth    =  $date_of_birth;
-                $user->section          =  $data['section'];
-                $user->admission_number =  $data['admission_number'];
+                $user->name              =  $data['name'];
+                $user->user_name         =  $data['user_name'];
+                $user->email             =  $data['email']; 
+                $user->phone_no          =  $data['phone_no'];
+                $user->date_of_birth     =  $date_of_birth;
+                $user->department        =  $data['department'];   
+                $user->section           =  $data['section'];
+                $user->admission_number  =  $data['admission_number'];
                 $user->short_description =  $data['short_description'];
-                $user->child_type        =  $data['child_type'];
-                $user->room_type         =  $data['room_type'];
+                $user->child_type        =  $data['child_type'] ?? null;
+                $user->room_type         =  $data['room_type'] ?? null;
                 $user->weekly_rate       =  $data['weekly_rate'];
                 $user->subs              =  $data['subs'];
                 $user->extra             =  $data['extra'];
@@ -217,19 +223,18 @@ class ServiceUserController extends Controller
                 $user->end_date          =  date('Y-m-d', strtotime($data['end_date']));
                 // $user->height           =  $data['height'];
                 // $user->weight           =  $data['weight'];
-                $user->height_unit           =  $data['height_unit'];
-                $user->height_ft             =  $data['height_ft'];
-                $user->height_in             =  $data['height_in'];
-                $user->weight_unit           =  $data['weight_unit'];
-                $user->weight                =  $data['weight'];
-                $user->hair_and_eyes    =  $data['hair_and_eyes'];
-                $user->markings         =  $data['markings'];
-                $user->status           =  $data['status'];
-                $user->ethnicity_id     =  $ethnicity_id;
-
-                $user->current_location =  nl2br($data['current_location']);
+                $user->height_unit       =  $data['height_unit'];
+                $user->height_ft         =  $data['height_ft'];
+                $user->height_in         =  $data['height_in'];
+                $user->weight_unit       =  $data['weight_unit'];
+                $user->weight            =  $data['weight'];
+                $user->hair_and_eyes     =  $data['hair_and_eyes'];
+                $user->markings          =  $data['markings'];
+                $user->status            =  $data['status'];
+                $user->ethnicity_id      =  $ethnicity_id;
+                $user->current_location  =  nl2br($data['current_location']);
                 $user->previous_location =  nl2br($data['previous_location']);
-                $user->mobile           =  $data['mobile'];
+                $user->mobile            =  $data['mobile'];
                 /* $user->skype            =  $data['skype'];
                 $user->facebook         =  $data['facebook'];
                 $user->twitter          =  $data['twitter'];   */
@@ -319,7 +324,11 @@ class ServiceUserController extends Controller
 
         $page = 'service-users';
 
-        return view('backEnd/serviceUser/service_user_form', compact('page', 'user_info', 'social_app', 'social_app', 'social_app_val', 'ethnicity', 'del_status')); //name of view file*/
+        $childSection=ChildSection::where(['home_id'=>$home_id,'status'=>1])->whereNull('deleted_at')->get();
+
+        $company_departments = CompanyDepartment::getActiveCompanyDepartment();
+
+        return view('backEnd/serviceUser/service_user_form', compact('page', 'user_info', 'social_app', 'social_app', 'social_app_val', 'ethnicity', 'del_status', 'company_departments', 'childSection')); //name of view file*/
     }
 
     public function check_username_exist(Request $request)

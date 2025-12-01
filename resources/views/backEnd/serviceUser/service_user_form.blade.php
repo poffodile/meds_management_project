@@ -90,9 +90,14 @@
                                     <div class="form-group">
                                         <label class="col-lg-3 control-label">Section</label>
                                         <div class="col-lg-9">
-                                            <input type="text" name="section" class="form-control" placeholder="Section"
+                                            {{-- <input type="text" name="section" class="form-control" placeholder="Section"
                                                 value="{{ isset($user_info->section) ? $user_info->section : '' }}"
-                                                maxlength="255" {{ isset($del_status) ? $disabled : '' }}>
+                                                maxlength="255" {{ isset($del_status) ? $disabled : '' }}> --}}
+                                            <select name="section" id="" class="form-control" {{ isset($del_status) ? $disabled : '' }}>
+                                                @foreach($childSection as $sectionVal)
+                                                    <option value="{{$sectionVal->id}}" <?php if(isset($user_info->section) && $sectionVal->id == $user_info->section){echo 'selected';}?>>{{$sectionVal->section}}</option>
+                                                @endforeach
+                                            </select>
                                         </div>
                                     </div>
                                     <div class="form-group">
@@ -107,8 +112,22 @@
                                             <!-- <input class="form-control default-date-picker" type="text" value="{{ isset($user_info->date_of_birth) ? date('d-m-Y', strtotime($user_info->date_of_birth)) : '' }}" placeholder="DD-MM-YYYY" name="date_of_birth" value="" maxlength="10" /> -->
                                         </div>
                                     </div>
-                                    <!-- Child type -->
+                                    <!-- Department -->
                                     <div class="form-group">
+                                        <label class="col-lg-3 control-label">Department</label>
+                                        <div class="col-lg-9">
+                                            <select class="form-control" name="department" id="">
+                                                @foreach ($company_departments as $department)
+                                                    <option value="{{ $department->id }}"
+                                                        {{ isset($user_info->department) && $user_info->department == $department->id ? 'selected' : '' }}>
+                                                        {{ $department->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <!-- Department -->
+                                    <!-- Child type -->
+                                    {{-- <div class="form-group">
                                         <label class="col-lg-3 control-label">Child Type</label>
                                         <div class="col-lg-9">
                                             <select class="form-control" name="child_type" id="home_type">
@@ -124,9 +143,9 @@
                                                     Leavers</option>
                                             </select>
                                         </div>
-                                    </div>
+                                    </div> --}}
                                     <!-- Residential rooms -->
-                                    <div class="form-group" id="residential_rooms" style="display: none;">
+                                    {{-- <div class="form-group" id="residential_rooms" style="display: none;">
                                         <label class="col-lg-3 control-label">Residential Rooms Type</label>
                                         <div class="col-lg-9">
                                             <select class="form-control" name="room_type">
@@ -145,9 +164,9 @@
                                                     4 Bed Placement </option>
                                             </select>
                                         </div>
-                                    </div>
+                                    </div> --}}
                                     <!-- Supported Accommodation rooms -->
-                                    <div class="form-group" id="accommodation_rooms" style="display: none;">
+                                    {{-- <div class="form-group" id="accommodation_rooms" style="display: none;">
                                         <label class="col-lg-3 control-label">Supported Accomodation Rooms Type</label>
                                         <div class="col-lg-9">
                                             <select class="form-control" name="room_type">
@@ -160,7 +179,8 @@
                                                     Seperate Flats </option>
                                             </select>
                                         </div>
-                                    </div>
+                                    </div> --}}
+                                    <!-- Supported Accommodation rooms -->
                                     <div class="form-group">
                                         <label class="col-lg-3 control-label">Weekly Rate</label>
                                         <div class="col-lg-9">
@@ -409,35 +429,35 @@
                                                                 </div>
                                                             </div>
                                                             <!--  <div class="form-group">
-                                                                                                                                <label class="col-lg-2 control-label">Facebook</label>
-                                                                                                                                <div class="col-lg-10">
-                                                                                                                                    <input type="text" name="facebook" class="form-control" placeholder="Facebook" value=" maxlength="255">
-                                                                                                                                </div>
-                                                                                                                            </div>
-                                                                                                                            <div class="form-group">
-                                                                                                                                <label class="col-lg-2 control-label">Twitter</label>
-                                                                                                                                <div class="col-lg-10">
-                                                                                                                                    <input type="text" name="twitter" class="form-control" placeholder="Twitter" value="" maxlength="255">
-                                                                                                                                </div>
-                                                                                                                            </div>
-                                                                                                                            <div class="form-group">
-                                                                                                                                <label class="col-lg-2 control-label">Skype</label>
-                                                                                                                                <div class="col-lg-10">
-                                                                                                                                    <input name="skype" type="text" class="form-control" placeholder="Skype" value="" maxlength="255">
-                                                                                                                                </div>
-                                                                                                                            </div> -->
+                                                                    <label class="col-lg-2 control-label">Facebook</label>
+                                                                    <div class="col-lg-10">
+                                                                        <input type="text" name="facebook" class="form-control" placeholder="Facebook" value=" maxlength="255">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-lg-2 control-label">Twitter</label>
+                                                                    <div class="col-lg-10">
+                                                                        <input type="text" name="twitter" class="form-control" placeholder="Twitter" value="" maxlength="255">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-lg-2 control-label">Skype</label>
+                                                                    <div class="col-lg-10">
+                                                                        <input name="skype" type="text" class="form-control" placeholder="Skype" value="" maxlength="255">
+                                                                    </div>
+                                                                </div> -->
                                                             <?php if (empty($social_app)) { ?>
                                                             <?php } else {  ?><label class="form-heading-size">Social
                                                                 App's</label>
                                                             <?php    }
 
-                                foreach ($social_app as $key => $value) {
-                                    $app_name      = $value['name'];
-                                    $social_app_id = $value['id'];
+                                                                foreach ($social_app as $key => $value) {
+                                                                    $app_name      = $value['name'];
+                                                                    $social_app_id = $value['id'];
 
-                                    $field_id    = (isset($social_app_val[$social_app_id]['id'])) ? $social_app_val[$social_app_id]['id'] : '';
-                                    $field_value = (isset($social_app_val[$social_app_id]['value'])) ? $social_app_val[$social_app_id]['value'] : '';
-                                ?>
+                                                                    $field_id    = (isset($social_app_val[$social_app_id]['id'])) ? $social_app_val[$social_app_id]['id'] : '';
+                                                                    $field_value = (isset($social_app_val[$social_app_id]['value'])) ? $social_app_val[$social_app_id]['value'] : '';
+                                                                ?>
 
                                                             <div class="form-group">
                                                                 <label
@@ -549,7 +569,7 @@
     <script>
         $(document).ready(function() {
 
-            document.getElementById('cm_div').style.display = "none";
+            // document.getElementById('cm_div').style.display = "none";
 
             function readURL(input) {
                 if (input.files && input.files[0]) {
@@ -590,24 +610,24 @@
     </script>
 
     <script>
-        $(document).ready(function() {
-            $('#home_type').change(function() {
-                var selectedType = $(this).val();
-                if (selectedType === 'residential') {
-                    $('#residential_rooms').show().find('select').prop('disabled', false);
-                    $('#accommodation_rooms').hide().find('select').prop('disabled', true);
-                } else if (selectedType === 'accommodation') {
-                    $('#accommodation_rooms').show().find('select').prop('disabled', false);
-                    $('#residential_rooms').hide().find('select').prop('disabled', true);
-                } else {
-                    $('#residential_rooms, #accommodation_rooms').hide().find('select').prop('disabled',
-                        true);
-                }
-            });
+        // $(document).ready(function() {
+        //     $('#home_type').change(function() {
+        //         var selectedType = $(this).val();
+        //         if (selectedType === 'residential') {
+        //             $('#residential_rooms').show().find('select').prop('disabled', false);
+        //             $('#accommodation_rooms').hide().find('select').prop('disabled', true);
+        //         } else if (selectedType === 'accommodation') {
+        //             $('#accommodation_rooms').show().find('select').prop('disabled', false);
+        //             $('#residential_rooms').hide().find('select').prop('disabled', true);
+        //         } else {
+        //             $('#residential_rooms, #accommodation_rooms').hide().find('select').prop('disabled',
+        //                 true);
+        //         }
+        //     });
 
-            // ✅ Trigger change once on page load to apply correct state
-            $('#home_type').trigger('change');
-        });
+        //     // ✅ Trigger change once on page load to apply correct state
+        //     $('#home_type').trigger('change');
+        // });
 
         // before set room type we have to check child type check child type if residential then 1 bed 2 bed shows
 
@@ -633,42 +653,40 @@
 
     <script>
         /*$(document).ready(function() {
-                                                                                                    var date = new Date();
-                                                                                                    var currentMonth = date.getMonth();
-                                                                                                    var currentDate = date.getDate();
-                                                                                                    var currentYear = date.getFullYear();
-                                                                                                    //console.log(date);
-                                                                                                    $('.default-date-picker').datepicker({
-                                                                                                            format : 'dd-mm-yyyy',
-                                                                                                            //maxDate: '01-01-2017'
-                                                                                                            //maxDate : date
-                                                                                                            //maxDate: new Date(currentYear, currentMonth, currentDate)
-                                                                                                            //endDate : date
-                                                                                                            //maxDate: 'now'
-                                                                                                            //maxDate:'+1d'
-                                                                                                            //maxDate:'2017/04/04'
-                                                                                                            maxDate:'0'
-                                                                                                        });
-                                                                                                    });*/
+                var date = new Date();
+                var currentMonth = date.getMonth();
+                var currentDate = date.getDate();
+                var currentYear = date.getFullYear();
+                //console.log(date);
+                $('.default-date-picker').datepicker({
+                        format : 'dd-mm-yyyy',
+                        //maxDate: '01-01-2017'
+                        //maxDate : date
+                        //maxDate: new Date(currentYear, currentMonth, currentDate)
+                        //endDate : date
+                        //maxDate: 'now'
+                        //maxDate:'+1d'
+                        //maxDate:'2017/04/04'
+                        maxDate:'0'
+                    });
+                });*/
     </script>
 
     <!-- setDate: new Date(2006, 11, 24)
-                                                                                                'maxDate':'13-02-2017',
-                                                                                                            'setDate':'13-02-2018'
-                                                                                                format: 'yyyy-mm-dd'
-                                                                                                            format : 'dd-mm-yyyy',
+            'maxDate':'13-02-2017',
+                        'setDate':'13-02-2018'
+            format: 'yyyy-mm-dd'
+                        format : 'dd-mm-yyyy',
 
-                                                                                                            var date = new Date();
-                                                                                                            var currentMonth = date.getMonth();
-                                                                                                            var currentDate = date.getDate();
-                                                                                                            var currentYear = date.getFullYear();
-                                                                                                            $('#datetimepicker,#datetimepicker1').datetimepicker({
-                                                                                                                                    pickTime: false,
-                                                                                                                format: "DD-MM-YYYY",
-                                                                                                                maxDate: new Date(currentYear, currentMonth, currentDate)
-                                                                                                            });
-
-                                                                                                 -->
+            var date = new Date();
+            var currentMonth = date.getMonth();
+            var currentDate = date.getDate();
+            var currentYear = date.getFullYear();
+            $('#datetimepicker,#datetimepicker1').datetimepicker({
+                                    pickTime: false,
+                format: "DD-MM-YYYY",
+                maxDate: new Date(currentYear, currentMonth, currentDate)
+            });  -->
 
     <script>
         const unitSelect = document.getElementById('height_unit');

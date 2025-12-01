@@ -35,7 +35,7 @@ class SystemManagementController extends Controller
     {
 
         if ($request->isMethod('post')) {
-            $data = $request->all();
+            $data = $request->all();    
             // print_r($data);
             // die;
             $home_ids = Auth::user()->home_id;
@@ -52,8 +52,9 @@ class SystemManagementController extends Controller
             $user->admission_number = $data['admission_number'];
             $user->phone_no         = $data['phone_no'];
             $user->date_of_birth    = $date_of_birth;
-            $user->child_type       =  $data['child_type'];
-            $user->room_type        =  $data['room_type'];
+            $user->department       = $data['department'];
+            $user->child_type       =  $data['child_type'] ?? null;
+            $user->room_type        =  $data['room_type'] ?? null;
             $user->weekly_rate      =  $data['weekly_rate'];
             $user->subs             =  $data['subs'];
             $user->extra            =  $data['extra'];

@@ -1,3 +1,9 @@
+<?php
+    $department = App\Models\CompanyDepartment::getActiveCompanyDepartment();
+
+    $childSection = App\Models\ChildSection::where(['home_id' => Auth::user()->home_id,'status' => 1])->whereNull('deleted_at')->get();
+?>
+
 <div class="modal fade" id="addServiceUserModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
     aria-hidden="true">
     <div class="modal-dialog">
@@ -22,6 +28,16 @@
                                 class="form-control">
                         </div>
                         <div class="form-group col-md-12 col-sm-12 col-xs-12">
+                            <label>Department</label>
+                            <div class="select-style">
+                                <select name="department" id="" class="form-control">
+                                    @foreach($department as $department)
+                                        <option value="{{ $department->id }}">{{ $department->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        {{-- <div class="form-group col-md-12 col-sm-12 col-xs-12">
                             <label>Child Type</label>
                             <div class="select-style">
                                 <select name="child_type" id="home_type" class="form-control">
@@ -57,7 +73,7 @@
                                     <option value="2">Seperate Flats </option>
                                 </select>
                             </div>
-                        </div>
+                        </div> --}}
                         <div class="form-group col-md-6 col-sm-6 col-xs-12">
                             <label>Weekly Rate</label>
                             <input type="text" name="weekly_rate" placeholder="Weekly Rate" class="form-control">
@@ -120,8 +136,13 @@
 
                         <div class="form-group col-md-12 col-sm-12 col-xs-12">
                             <label>Section</label>
-                            <input type="text" name="section" required placeholder="section"
-                                class="form-control">
+                            {{-- <input type="text" name="section" required placeholder="section"
+                                class="form-control"> --}}
+                                <select class="form-control" name="section">
+                                    @foreach($childSection as $sectionVal)
+                                        <option value="{{$sectionVal->id}}">{{$sectionVal->section}}</option>
+                                    @endforeach
+                                </select>
                         </div>
                         <div class="form-group col-md-12 col-sm-12 col-xs-12">
                             <label>Admission Number</label>
