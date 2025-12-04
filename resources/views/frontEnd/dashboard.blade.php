@@ -95,7 +95,8 @@
                 </a>
             @endif
                 <?php if($accessRight === true) { ?>
-                <a href="{{ url('/rota_management') }}">
+                {{-- <a href="{{ url('/rota_management') }}"> --}}
+                <a href="{{ url('/roster') }}">
                     <div class="col-md-6">
                         <div class="profile-nav alt">
                             <section class="panel text-center">

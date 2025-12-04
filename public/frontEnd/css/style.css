@@ -9356,13 +9356,68 @@ a.close.edit_dyn_form {
 .placement_plan .cus-label label {
     padding: 6px 0;
 }
-.allAddComments{
-    
-}
+.allAddComments{}
+
 .recurringTaskCheck input[type=checkbox]{
   margin: 10px 0 0;
 }
 .commentsSave {
      font-size: 13px;
      margin-top: 20px
+}
+.childMoodAction {
+    display: flex;
+}
+.childMoodAction a{
+    font-size: 20px;
+    line-height: 20px;
+    margin: 0 5px;
+}
+.childMoodAction a.openMoodModel .fa.fa-edit{
+    margin-left: 0;
+}
+
+/* ********************Start Roster Css********************** */
+ .rosterBox a{
+    background-color: #f1f2f7;
+    display: flex;
+    border-radius: 3px;
+    border-bottom: 6px solid #1f88b5;
+    transition: .7s;
+}
+.rosterBox a:hover {
+    box-shadow: 0px 4px 7px #0000004f;
+}
+.rosterBox > div {
+    margin-bottom: 26px;
+}
+.rosterBox .sys-mngmnt-box {
+    /* float: left; */
+    margin: 26px;
+    text-align: start;
+    cursor: pointer;
+    /* width: 100%; */
+    display: flex;
+}
+.rosterBox .sys-mngmnt-box .sys-mngmnticon{
+    color: #ffffff;
+    font-size: 20px;
+    background: #1f88b5;
+    width: 48px;
+    height: 48px;
+    border-radius: 6px;
+    line-height: 48px;
+    margin-right: 20px;
+    text-align: center;
+}
+.rosterBox .rotsBoxRightCont h4 {
+    font-size: 16px;
+    margin: 0;
+    font-weight: 600;
+}
+.rosterBox .rotsBoxRightCont  p {
+    color: #424242;
+    font-size: 13px;
+    line-height: 18px;
+    margin: 3px 0;
 }

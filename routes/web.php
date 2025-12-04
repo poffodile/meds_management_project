@@ -27,9 +27,10 @@ use App\Http\Controllers\Rota\StaffController;
 use App\Http\Controllers\Rota\AnnualLeaveController;
 use App\Http\Controllers\frontEnd\salesFinance\leave_tracker\LeaveTrackerController;
 use App\Http\Controllers\frontEnd\ServiceUserManagement\DailyLogsController;
-use App\Http\Controllers\backEnd\user\LatnessLeaveController;
+use App\Http\Controllers\frontEnd\Roster\RosterController;
 
 // Backend Controllers
+use App\Http\Controllers\backEnd\user\LatnessLeaveController;
 use App\Http\Controllers\backEnd\superAdmin\HomeController;
 use App\Http\Controllers\backEnd\salesfinance\LeadController as BackendLeadController;
 use App\Http\Controllers\backEnd\CustomerController as BackendCustomerController;
@@ -99,6 +100,10 @@ Route::match(['get', 'post'], '/switch_home_submit', 'App\Http\Controllers\front
 
 Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 
+	Route::prefix('roster')->group(function () {
+		Route::get('/', [RosterController::class, 'index'])->name('roster.index');
+		Route::get('/dashboard', [RosterController::class, 'dashboard'])->name('roster.dashboard');
+	});
 
 	// Report Section
 	Route::post('user/record', 'App\Http\Controllers\frontEnd\StaffManagementController@record')->name('staff.record');
@@ -115,7 +120,6 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 
 	// Service User Dashboard
 	Route::get('service/dashboard/{id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\DashboardController@index');
-
 	
 	// Rota Management
 	Route::get('/rota-dashboard', 'App\Http\Controllers\Rota\RotaController@index');
