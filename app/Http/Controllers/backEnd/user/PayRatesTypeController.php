@@ -36,7 +36,6 @@ class PayRatesTypeController extends Controller
     public function store(Request $request)
     {
         $data['page'] = 'pay_rates_type';
-
         $request->validate([
             'type_name' => 'required|max:255'
         ]);
@@ -67,7 +66,7 @@ class PayRatesTypeController extends Controller
 
     public function edit($id)
     {
-        $data['page'] = 'pay_rate_types';
+        $data['page'] = 'pay_rates_type';
         $data['rateType'] = PayRateType::findOrFail($id);
 
         return view('backEnd.user.pay_rates.pay_rate_type_form', $data);
@@ -75,6 +74,7 @@ class PayRatesTypeController extends Controller
 
     public function update(Request $request, $id)
     {
+        $data['page'] = 'pay_rates_type';
         try {
             $request->validate([
                 'type_name' => 'required|max:255'
@@ -84,6 +84,7 @@ class PayRatesTypeController extends Controller
 
             $type->update([
                 'type_name' => $request->type_name,
+                'status'    => $request->status,
             ]);
 
             return redirect()->route('payrates.types.index')
@@ -95,6 +96,7 @@ class PayRatesTypeController extends Controller
 
     public function destroy($id)
     {
+        $data['page'] = 'pay_rates_type';
         $type = PayRateType::findOrFail($id);
 
         $type->update([

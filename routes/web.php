@@ -52,8 +52,7 @@ use App\Http\Controllers\backEnd\systemManage\PlanBuilderAdminController;
 use App\Http\Controllers\backEnd\salesfinance\TimeSheetBackendController;
 use App\Http\Controllers\Rota\RotaController;
 use App\Http\Controllers\backEnd\user\PayRatesTypeController;
-
-
+use App\Http\Controllers\backEnd\user\PayRatesController;
 
 
 Route::get('clear', function () {
@@ -120,7 +119,7 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 
 	// Service User Dashboard
 	Route::get('service/dashboard/{id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\DashboardController@index');
-	
+
 	// Rota Management
 	Route::get('/rota-dashboard', 'App\Http\Controllers\Rota\RotaController@index');
 	Route::get('/rota_management', 'App\Http\Controllers\Rota\RotaController@rota_management_dashboard');
@@ -129,13 +128,13 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 	Route::get('/rota-planner', 'App\Http\Controllers\Rota\RotaController@rota_calender_view');
 
 	// Staff logs
-	Route::get('staff/logs','App\Http\Controllers\Rota\RotaController@staff_logs');
-	Route::get('staff/log/view','App\Http\Controllers\Rota\RotaController@staff_log_view');
-	Route::post('satff/log/view/filter','App\Http\Controllers\Rota\RotaController@satff_log_view_filter');
-	Route::post('satff/log/view/is_valid','App\Http\Controllers\Rota\RotaController@satff_log_view_is_valid');
-	Route::get('staff/timesheet','App\Http\Controllers\Rota\RotaController@staff_timesheet');
-	Route::get('staff/timesheet/add','App\Http\Controllers\Rota\RotaController@staff_timesheet_add');
-	Route::post('staff/timesheet_filter','App\Http\Controllers\Rota\RotaController@timesheet_filter');
+	Route::get('staff/logs', 'App\Http\Controllers\Rota\RotaController@staff_logs');
+	Route::get('staff/log/view', 'App\Http\Controllers\Rota\RotaController@staff_log_view');
+	Route::post('satff/log/view/filter', 'App\Http\Controllers\Rota\RotaController@satff_log_view_filter');
+	Route::post('satff/log/view/is_valid', 'App\Http\Controllers\Rota\RotaController@satff_log_view_is_valid');
+	Route::get('staff/timesheet', 'App\Http\Controllers\Rota\RotaController@staff_timesheet');
+	Route::get('staff/timesheet/add', 'App\Http\Controllers\Rota\RotaController@staff_timesheet_add');
+	Route::post('staff/timesheet_filter', 'App\Http\Controllers\Rota\RotaController@timesheet_filter');
 
 	Route::post('/add-shift-data', 'App\Http\Controllers\Rota\RotaController@add_shift_data');
 	Route::post('/get-all-users', 'App\Http\Controllers\Rota\RotaController@get_all_users');
@@ -151,7 +150,7 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 	Route::post('/delete_rota_employee', 'App\Http\Controllers\Rota\RotaController@delete_rota_employee');
 	Route::get('/edit_rota/{id}', 'App\Http\Controllers\Rota\RotaController@edit_rota');
 	Route::post('/publish_unpublish_rota', 'App\Http\Controllers\Rota\RotaController@publish_unpublish_rota');
-	Route::match(['get', 'post'],'/rota-absence',[RotaController::class,'rota_absence']);
+	Route::match(['get', 'post'], '/rota-absence', [RotaController::class, 'rota_absence']);
 
 	Route::post('/add-leave', 'App\Http\Controllers\Rota\RotaController@add_leave');
 	Route::post('/date_validation_for_user', 'App\Http\Controllers\Rota\RotaController@date_validation_for_user');
@@ -887,7 +886,7 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 	Route::post('/service/patterndataformio', 'App\Http\Controllers\frontEnd\ServiceUserManagement\DynamicFormController@patterndataformio');
 	Route::post('/service/patterndataformiovaule', 'App\Http\Controllers\frontEnd\ServiceUserManagement\DynamicFormController@patterndataformiovalue');
 	Route::get('/service/dynamic-form/view/data/{dynamic_form_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\DynamicFormController@view_form_data');
-	
+
 	Route::get('/service/dynamic-form/delete/{dynamic_form_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\DynamicFormController@delete_form');
 	Route::post('/service/dynamic-form/edit-details', 'App\Http\Controllers\frontEnd\ServiceUserManagement\DynamicFormController@edit_details');
 	Route::post('/service/dynamic-form/daily-log', 'App\Http\Controllers\frontEnd\ServiceUserManagement\DynamicFormController@su_daily_log_add');
@@ -1069,7 +1068,7 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 	Route::match(['get', 'post'], '/service/save-task-management/{service_user_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\TaskManagementController@store');
 	Route::match(['get', 'post'], '/service/task-management/update/{service_user_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\TaskManagementController@update');
 	Route::match(['get', 'post'], '/service/task-management/edit/{service_user_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\TaskManagementController@edit');
-	
+
 	// Service User Task Management - Delete Task
 	Route::delete('/service/task-management/delete/{id}', [\App\Http\Controllers\frontEnd\ServiceUserManagement\TaskManagementController::class, 'destroy'])->name('service.task-management.destroy');
 
@@ -1098,7 +1097,7 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 	Route::post('/service/placement-plan/edit', 'App\Http\Controllers\frontEnd\ServiceUserManagement\PlacementPlanController@edit');
 	Route::post('/service/placement-plan/add-qqa-review', 'App\Http\Controllers\frontEnd\ServiceUserManagement\PlacementPlanController@add_qqa_review');
 	Route::post('/service/placement-plan/save-comment', 'App\Http\Controllers\frontEnd\ServiceUserManagement\PlacementPlanComments\PlacementPlanCommentsController@add_comments');
-	Route::get('/service/placement-plan/get-comments/{id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\PlacementPlanComments\PlacementPlanCommentsController@get_comments');	
+	Route::get('/service/placement-plan/get-comments/{id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\PlacementPlanComments\PlacementPlanCommentsController@get_comments');
 
 	//RMP
 	Route::match(['get', 'post'], '/service/rmp/view/{service_user_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\RmpController@index');
@@ -1128,7 +1127,7 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 	Route::post('/service/incident-report/edit_incident/{su_incident_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\IncidentController@edit_incident');
 	Route::get('/service/incident-report/delete/{su_incident_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\IncidentController@delete');
 	Route::match(['get', 'post'], '/service/incident-report/{service_user_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\IncidentController@form');
-	
+
 	// Mood
 	Route::match(['get', 'post'], '/service/mood/{service_user_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\MoodController@mood_view');
 
@@ -1325,7 +1324,7 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 	Route::post('/staff/rota/add-shift', 'App\Http\Controllers\frontEnd\StaffManagement\RotaController@add_shift');
 	Route::get('/staff/rota/delete-shift/{rota_id}', 'App\Http\Controllers\frontEnd\StaffManagement\RotaController@delete');
 	Route::post('/staff/rota/add-rota', 'App\Http\Controllers\frontEnd\StaffManagement\RotaController@add_rota');
-	Route::match(['get','post'],'/staff/rota/rota-management','App\Http\Controllers\frontEnd\StaffManagement\RotaController@index');
+	Route::match(['get', 'post'], '/staff/rota/rota-management', 'App\Http\Controllers\frontEnd\StaffManagement\RotaController@index');
 	Route::get('/staff/rota/shift/view/{rota_id}', 'App\Http\Controllers\frontEnd\StaffManagement\RotaController@view_rota');
 	Route::post('/staff/rota/shift/edit', 'App\Http\Controllers\frontEnd\StaffManagement\RotaController@edit_shift');
 
@@ -1383,8 +1382,6 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 	//------------- View Reports ---------------//
 	Route::match(['get', 'post'], '/view-reports', 'App\Http\Controllers\frontEnd\ViewReportController@index');
 	Route::get('/users/{user_type_id}', 'App\Http\Controllers\frontEnd\ViewReportController@get_user');
-
-	
 });
 
 // System guide 
@@ -1520,7 +1517,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'CheckAdminAuth'], function (
 	Route::post('/user/is_valid/', 'App\Http\Controllers\backEnd\UserController@is_valid');
 	Route::get('/user/logs/delete/{id}', 'App\Http\Controllers\backEnd\UserController@logs_delete');
 	Route::match(['get', 'post'], '/user/timesheet/{user_id}', 'App\Http\Controllers\backEnd\UserController@user_timesheet');
-	Route::match(['get', 'post'],'/user/timesheet/edit/{user_id}', 'App\Http\Controllers\backEnd\UserController@user_timesheet_edit');
+	Route::match(['get', 'post'], '/user/timesheet/edit/{user_id}', 'App\Http\Controllers\backEnd\UserController@user_timesheet_edit');
 	Route::get('/user/timesheet/delete/{user_id}', 'App\Http\Controllers\backEnd\UserController@user_timesheet_delete');
 
 	// Ram 04/07/2024 here paths for Job Manageent
@@ -1645,7 +1642,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'CheckAdminAuth'], function (
 	Route::match(['get', 'post'], '/user/annual-leave/edit/{u_annual_leave_id}', 'App\Http\Controllers\backEnd\user\AnnualLeaveController@edit');
 	Route::get('/user/annual-leave/delete/{u_sick_leave_id}', 'App\Http\Controllers\backEnd\user\AnnualLeaveController@delete');
 
-	
+
 	// Backend User Pay Rates Type
 	Route::prefix('user')->group(function () {
 		Route::get('pay-rates-type', [PayRatesTypeController::class, 'index'])->name('payrates.types.index');
@@ -1655,16 +1652,23 @@ Route::group(['prefix' => 'admin', 'middleware' => 'CheckAdminAuth'], function (
 		Route::post('pay-rate-type/update/{id}', [PayRatesTypeController::class, 'update'])->name('payrates.types.update');
 		Route::get('pay-rate-type/delete/{id}', [PayRatesTypeController::class, 'destroy'])->name('payrates.types.destroy');
 	});
-	
+
 
 	// Backend User Pay Rates
-	Route::match(['get', 'post'], '/user/pay-rates', 'App\Http\Controllers\backEnd\user\PayRatesController@index')->name('payrates.index');
-	Route::match(['get', 'post'], '/user/pay-rates/add', 'App\Http\Controllers\backEnd\user\PayRatesController@create');
-	Route::match(['get', 'post'], '/user/pay-rates/save', 'App\Http\Controllers\backEnd\user\PayRatesController@store');
+	Route::prefix('user/pay-rates')->name('payrates.')->group(function () {
+		Route::get('/', [PayRatesController::class, 'index'])->name('index');
+		Route::get('/add', [PayRatesController::class, 'create'])->name('create');
+		Route::post('/save', [PayRatesController::class, 'store'])->name('store');
+		Route::get('/edit/{id}', [PayRatesController::class, 'edit'])->name('edit');
+		Route::post('/update/{id}', [PayRatesController::class, 'update'])->name('update');
+		Route::get('/delete/{id}', [PayRatesController::class, 'destroy'])->name('destroy');
+	});
+
+
 
 	// User Latness Leave
 	Route::match(['get', 'post'], '/user/late-leaves/{staff_member}', [LatnessLeaveController::class, 'index'])
-    ->name('user.latness-leaves');
+		->name('user.latness-leaves');
 	// User Other Leave
 
 	//backEnd ServiceUserController
@@ -1679,9 +1683,9 @@ Route::group(['prefix' => 'admin', 'middleware' => 'CheckAdminAuth'], function (
 	Route::get('/service-users/send-set-pass-link/{su_id}', 'App\Http\Controllers\backEnd\serviceUser\ServiceUserController@send_set_pass_link_mail');
 
 	Route::match(['get', 'post'], '/child-sections', 'App\Http\Controllers\backEnd\serviceUser\ServiceUserController@child_sections');
-    Route::post('/childsection_status_change', 'App\Http\Controllers\backEnd\serviceUser\ServiceUserController@childsection_status_change');
-    Route::get('/child-section/delete/{id}', 'App\Http\Controllers\backEnd\serviceUser\ServiceUserController@child_section_delete');
-    Route::post('/child-section-save', 'App\Http\Controllers\backEnd\serviceUser\ServiceUserController@child_section_save');
+	Route::post('/childsection_status_change', 'App\Http\Controllers\backEnd\serviceUser\ServiceUserController@childsection_status_change');
+	Route::get('/child-section/delete/{id}', 'App\Http\Controllers\backEnd\serviceUser\ServiceUserController@child_section_delete');
+	Route::post('/child-section-save', 'App\Http\Controllers\backEnd\serviceUser\ServiceUserController@child_section_save');
 
 	//backEnd Childs Care History
 	Route::match(['get', 'post'], '/service-users/care-history/{su_id}', 'App\Http\Controllers\backEnd\serviceUser\CareHistoryController@index');

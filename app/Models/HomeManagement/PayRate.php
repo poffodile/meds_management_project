@@ -39,6 +39,8 @@ class PayRate extends Model
         ->join('access_level', 'pay_rates.access_level_id', '=', 'access_level.id')
         ->join('pay_rate_types', 'pay_rates.rate_type_id', '=', 'pay_rate_types.id')
         ->where('pay_rates.home_id', $home_id)
+        ->where('pay_rates.is_deleted', 0)
+        ->orderBy('pay_rates.id', 'DESC')
         ->get();
     }
 

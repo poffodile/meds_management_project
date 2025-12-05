@@ -45,7 +45,7 @@ class PayRatesController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request, $id = null)
     {
         $request->validate([
             'access_level_id' => 'required',
@@ -68,7 +68,7 @@ class PayRatesController extends Controller
         try {
 
             $data = PayRate::updateOrCreate(
-                ['id' => $request->id],
+                ['id' => $id],
                 [
                     'home_id'         => $this->home_id,
                     'access_level_id' => $request->access_level_id,
@@ -79,7 +79,7 @@ class PayRatesController extends Controller
                 ]
             );
 
-            // $data['page'] = 'pay_rates';
+            $data['page'] = 'pay_rates';
              return redirect()
                 ->route('payrates.index')
                 ->with('success', 'Pay rate added successfully.');
@@ -101,23 +101,54 @@ class PayRatesController extends Controller
      */
     public function edit(string $id)
     {
-        $payrate = PayRate::findOrFail($id);
-        return view('backEnd.user.pay_rates.pay_rates_form', compact('payrate'));
+        $data['page'] = 'pay_rates';
+        $data['payrate'] = PayRate::findOrFail($id);
+        $data['accesslevel'] = AccessLevel::getAccessLevelList();
+        $data['rateType'] = PayRateType::getActiveTypes($this->home_id);
+        return view('backEnd.user.pay_rates.pay_rates_form', $data);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, $id)
     {
-        //
+        try {
+            $request->validate([
+                'access_level_id' => 'required',
+                'pay_rate'        => 'required|numeric',
+                'rate_type_id'    => 'required',
+            ]);
+
+            $type = PayRate::findOrFail($id);
+
+            $type->update([
+                'access_level_id' => $request->access_level_id,
+                'pay_rate'        => $request->pay_rate,
+                'rate_type_id'    => $request->rate_type_id,
+                'status'          => $request->status,
+            ]);
+            $data['page'] = 'pay_rates';
+            return redirect()->route('payrates.index')
+                ->with('success', 'Pay rate updated successfully.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Something went wrong. Please try again.');
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy($id)
     {
-        //
+        $type = PayRate::findOrFail($id);
+
+        $type->update([
+            'is_deleted' => 1,
+            'status'     => 0
+        ]);
+        $data['page'] = 'pay_rates';
+        return redirect()->route('payrates.index')
+            ->with('success', 'Pay rate deleted successfully.');
     }
 }
