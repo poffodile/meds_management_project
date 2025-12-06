@@ -65,7 +65,6 @@
                                             <option value="1" {{ isset($rateType) && $rateType->status == 1 ? 'selected' : '' }}>Active</option>
                                             <option value="0" {{ isset($rateType) && $rateType->status == 0 ? 'selected' : '' }}>Inactive</option>
                                         </select>
-
                                         </div>
                                     </div>
 

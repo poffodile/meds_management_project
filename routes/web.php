@@ -28,6 +28,7 @@ use App\Http\Controllers\Rota\AnnualLeaveController;
 use App\Http\Controllers\frontEnd\salesFinance\leave_tracker\LeaveTrackerController;
 use App\Http\Controllers\frontEnd\ServiceUserManagement\DailyLogsController;
 use App\Http\Controllers\frontEnd\Roster\RosterController;
+use App\Http\Controllers\frontEnd\Roster\ManageDashboardController;
 
 // Backend Controllers
 use App\Http\Controllers\backEnd\user\LatnessLeaveController;
@@ -102,6 +103,7 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 	Route::prefix('roster')->group(function () {
 		Route::get('/', [RosterController::class, 'index'])->name('roster.index');
 		Route::get('/dashboard', [RosterController::class, 'dashboard'])->name('roster.dashboard');
+		Route::get('/manage-dashboard', [ManageDashboardController::class, 'index'])->name('roster.manage.dashboard');
 	});
 
 	// Report Section
