@@ -29,6 +29,12 @@ use App\Http\Controllers\frontEnd\salesFinance\leave_tracker\LeaveTrackerControl
 use App\Http\Controllers\frontEnd\ServiceUserManagement\DailyLogsController;
 use App\Http\Controllers\frontEnd\Roster\RosterController;
 use App\Http\Controllers\frontEnd\Roster\ManageDashboardController;
+use App\Http\Controllers\frontEnd\Roster\ScheduleShiftController;
+use App\Http\Controllers\frontEnd\Roster\Staff\CarerAvailabilityController;
+use App\Http\Controllers\frontEnd\Roster\Staff\StaffTaskController;
+use App\Http\Controllers\frontEnd\Roster\MessagingCenterController;
+use App\Http\Controllers\frontEnd\Roster\LeaveRequestController;
+
 
 // Backend Controllers
 use App\Http\Controllers\backEnd\user\LatnessLeaveController;
@@ -104,6 +110,13 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 		Route::get('/', [RosterController::class, 'index'])->name('roster.index');
 		Route::get('/dashboard', [RosterController::class, 'dashboard'])->name('roster.dashboard');
 		Route::get('/manage-dashboard', [ManageDashboardController::class, 'index'])->name('roster.manage.dashboard');
+		Route::get('/schedule-shift', [ScheduleShiftController::class, 'index'])->name('roster.schedule.dashboard');
+		Route::get('/carer-availability', [CarerAvailabilityController::class, 'index'])->name('roster.carer.availability');
+		Route::get('/messaging-center', [MessagingCenterController::class, 'index'])->name('roster.carer.availability');
+		Route::get('/staff-task', [StaffTaskController::class, 'index'])->name('roster.staff.task');
+		Route::get('/leave-request', [LeaveRequestController::class, 'index'])->name('roster.leave.request');
+		
+		
 	});
 
 	// Report Section

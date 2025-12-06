@@ -5,33 +5,7 @@
 <section id="main-content">
     <div class="wrapper ps-0 pe-0 ">
         <div class="container-fluid">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="wrappermenu">
-                        <nav>
-                            <input type="checkbox" id="show-search">
-                            <input type="checkbox" id="show-menu">
-                            <label for="show-menu" class="menu-icon"><i class="fas fa-bars"></i></label>
-                            <div class="content">
-                                <ul class="links">
-                                    <li><a href="#"> <i class="fa fa-tachometer"></i> Dashboard</a></li>
-                                    <li><a href="{{ url('/roster/manage-dashboard') }}"> <i class="fa fa-tachometer"></i> Manager Dashboard</a></li>
-                                    <li><a href="#"> <i class="fa fa-tachometer"></i> Schedule</a></li>
-                                    <li><a href="#"> <i class="fa fa-tachometer"></i> Carer Availability</a></li>
-                                    <li><a href="#"> <i class="fa fa-tachometer"></i> Messaging Center</a></li>
-                                    <li><a href="#"> <i class="fa fa-tachometer"></i> Staff Tasks</a></li>
-                                    <li><a href="#"> <i class="fa fa-tachometer"></i> Carers</a></li>
-                                    <li><a href="#"> <i class="fa fa-tachometer"></i> Clients</a></li>
-                                    <li><a href="#"> <i class="fa fa-tachometer"></i> Care Documents</a></li>
-                                    <li><a href="#"> <i class="fa fa-tachometer"></i> Reports</a></li>
-                                    <li><a href="#"> <i class="fa fa-tachometer"></i> Leave Requests</a></li>
-                                    <li><a href="#"> <i class="fa fa-tachometer"></i> Daily Log</a></li>
-                                </ul>
-                            </div>
-                        </nav>
-                    </div>
-                </div>
-            </div>
+            @include('frontEnd.roster.common.roster_header')
             <div class="row">
                 <div class="col-md-9">
                     <div class="m-t-30">
@@ -48,7 +22,7 @@
                                                 </div>
                                             </div>
                                             <div class="rotsBoxRightCont">
-                                                <h4>53 </h4>
+                                                <h4>{{ $serviceUserCount }} </h4>
                                                 <p> Active Clients </p>
                                             </div>
                                         </div>
@@ -64,7 +38,7 @@
                                                 </div>
                                             </div>
                                             <div class="rotsBoxRightCont">
-                                                <h4>12 </h4>
+                                                <h4>{{ $userCount }} </h4>
                                                 <p>Active Carers</p>
                                             </div>
                                         </div>
@@ -209,7 +183,7 @@
                                 <div class="panel-body">
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <a href="#!">
+                                            <a href="{{ url('roster/schedule-shift') }}">
                                                 <div class="quickActions">   
                                                     <div class="activityCalendar"> <i class="fa fa-calendar-o"></i></div>
                                                     <div class="rotsBoxRightCont">
@@ -334,11 +308,15 @@
                         </div>
                     </div>
                 </div>
+                   
+                
                 <div class="col-md-3">
+
                     <div class="rotawhitebgColor m-t-30">
                         <div class="panel">
-                            <header class="panel-heading">Notifications</header>
-                            <div class="panel-body">
+                            @include('frontEnd.common.notification_bar')
+                            {{-- <header class="panel-heading">Notifications</header> --}}
+                            {{-- <div class="panel-body">
                                 <div class="alert alert-placement clearfix">
                                     <span class="alert-icon"><i class="fa fa-map-marker"></i></span>
                                     <div class="notification-info">
@@ -410,7 +388,7 @@
                                     </div>
                                 </div>
 
-                            </div>
+                            </div> --}}
                         </div>
                     </div>
                 </div>

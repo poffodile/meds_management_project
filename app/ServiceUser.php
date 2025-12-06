@@ -88,6 +88,9 @@ class ServiceUser extends Model
         return $location_get_interval;
     }
 
-
+    public static function getServiceUserByResidentialId($department)
+    {
+        return self::where('home_id', Auth::user()->home_id)->where('department', $department)->where('status', 1)->where('is_deleted', 0)->count();
+    }
 
 }
