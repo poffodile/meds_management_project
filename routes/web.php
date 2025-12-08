@@ -32,6 +32,8 @@ use App\Http\Controllers\frontEnd\Roster\ManageDashboardController;
 use App\Http\Controllers\frontEnd\Roster\ScheduleShiftController;
 use App\Http\Controllers\frontEnd\Roster\Staff\CarerAvailabilityController;
 use App\Http\Controllers\frontEnd\Roster\Staff\StaffTaskController;
+use App\Http\Controllers\frontEnd\Roster\CareDocumentController;
+use App\Http\Controllers\frontEnd\Roster\ReportController;
 use App\Http\Controllers\frontEnd\Roster\MessagingCenterController;
 use App\Http\Controllers\frontEnd\Roster\LeaveRequestController;
 
@@ -114,8 +116,9 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 		Route::get('/carer-availability', [CarerAvailabilityController::class, 'index'])->name('roster.carer.availability');
 		Route::get('/messaging-center', [MessagingCenterController::class, 'index'])->name('roster.carer.availability');
 		Route::get('/staff-task', [StaffTaskController::class, 'index'])->name('roster.staff.task');
+		Route::get('/care-document', [CareDocumentController::class, 'index'])->name('roster.care.document');
+		Route::get('/reports', [ReportController::class, 'index'])->name('roster.report');
 		Route::get('/leave-request', [LeaveRequestController::class, 'index'])->name('roster.leave.request');
-		
 		
 	});
 
