@@ -9625,3 +9625,303 @@ header.panel-heading.headingCapitilize {
     display: flex;
 }
 
+.staffShifts {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  padding: 20px 10px;
+}
+
+.staffShifts div p {
+  margin: 0;
+  font-size: 14px;
+  color: #666;
+}
+
+.staffShifts div h3 {
+  margin-top: 5px;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.text-green{
+  color: #32bb05;
+}
+.text-orange{
+  color: rgb(234 88 12);
+}
+
+.occupancyBox {
+  width: 100%;
+  padding: 10px 0;
+   border-bottom: 1px solid #eee;
+}
+.topRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.topRow .value {
+  font-weight: 700;
+  color: #32bb05; /* Blue color same as design */
+}
+
+.progressBar {
+  width: 100%;
+  height: 10px;
+  background: #e4e6eb; /* light grey */
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: #32bb05;
+  border-radius: 10px;
+}
+
+.topFilters {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.topFilters .filterBtn {
+  background: #ffffff;
+  border: 1px solid #e2e2e2;
+  padding: 4px 14px;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: 0.2s;
+}
+
+.topFilters .filterBtn:hover {
+  background: #f5f7ff;
+  border-color: #cdd5ff;
+}
+
+/* Active Dot Button */
+.topFilters .activeDot {
+  border-color: #cfcfcf;
+}
+
+.topFilters .activeDot .dot {
+  width: 10px;
+  height: 10px;
+  background: #14c216;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+/* Highlight Blue Outline */
+.topFilters .highlight {
+  border-color: #a8c6ff;
+  color: #0038ff;
+  background: #eef3ff;
+}
+
+/* Light Green Box */
+.topFilters .lightGreen {
+  background: #eefcf1;
+  border-color: #d6efd9;
+}
+/* Advance Filtter Css*/
+
+.advancedFiltersBox {
+  width: 100%;
+}
+.advancedFiltersBox .advBtn {
+  padding: 8px 14px;
+  border: 1px solid #d8dce6;
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+/* MAIN CARD */
+.advancedFiltersBox .filterPanel {
+  background: #f5f9ff;
+  border: 1px solid #cfe0ff;
+  margin-top: 12px;
+  padding: 18px;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.advancedFiltersBox .filterPanel h4 {
+  font-size: 13px;
+  color: #6c7c96;
+  margin-bottom: 12px;
+  margin-top: 0;
+}
+.advancedFiltersBox hr {
+  border: none;
+  border-top: 1px solid #e3e7ef;
+  margin: 16px 0;
+}
+/* QUICK PRESETS */
+.advancedFiltersBox .quickPresets {
+  display: flex;
+  gap: 10px;
+}
+.advancedFiltersBox .preset {
+  background: #fff;
+  border: 1px solid #e2e2e2;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.advancedFiltersBox .preset:hover {
+  background: #eef3ff;
+}
+/* Dot Button */
+.advancedFiltersBox .activeDot .dot {
+  width: 10px;
+  height: 10px;
+  background: #00c62a;
+  border-radius: 50%;
+}
+.advancedFiltersBox .orange {
+  border-color: #f4c28e;
+}
+.advancedFiltersBox .yellow {
+  border-color: #ffd966;
+}
+/* SEARCH BOX */
+.advancedFiltersBox .searchBox {
+  background: #ffffff;
+  border: 1px solid #dde3ee;
+  padding: 8px 12px;
+  border-radius: 4px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.advancedFiltersBox .searchBox input {
+  border: none;
+  outline: none;
+  flex: 1;
+  font-size: 14px;
+}
+/* FILTER FIELD BUTTONS */
+.advancedFiltersBox .filterFields {
+  /* display: flex;
+  flex-wrap: wrap; */
+    gap: 12px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+}
+.advancedFiltersBox .fieldBtn {
+  background: #fff;
+  border: 1px solid #dadee8;
+  padding: 10px 14px;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+}
+.advancedFiltersBox .fieldBtn:hover {
+  background: #eef3ff;
+  border-color: #c8d7ff;
+}
+
+/* **************************Calender tabs Css***************** */
+.calendarTabs .tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.calendarTabs .tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+.calendarTabs .tab:hover {
+  background: #f5f5f5;
+}
+
+.calendarTabs .tab.active {
+  background: #000;
+  color: #fff;
+  border-color: #000;
+}
+
+/* CONTENT */
+.calendarTabs .tab-content .content {
+  display: none;
+  padding: 15px;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  background: #fafafa;
+}
+
+.calendarTabs .tab-content .content.active {
+  display: block;
+}
+
+.filter-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+}
+
+.filter-item {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius:4px;
+  background: #fafafa;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.filter-item.small {
+  width: 80px;
+}
+
+.filter-input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  background: #fff;
+}
+
+.close-btn {
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px;
+  color: #666;
+}
+
+.close-btn:hover {
+  color: #000;
+}
