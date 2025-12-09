@@ -503,14 +503,7 @@ class RotaController extends Controller
             $arr['end'] = $value->end_date;
             array_push($recordArray,$arr);
         }
-        // $data['pending_leave'] = DB::table('staff_leaves')
-        //                     ->join('service_user', 'staff_leaves.user_id', '=', 'service_user.id')
-        //                     ->join('leave_type', 'leave_type.id', '=', 'staff_leaves.leave_type')
-        //                     ->select('leave_type.leave_name','leave_type.color','leave_type.id as leavetype_id','service_user.name','service_user.id as user_id','staff_leaves.start_date', 'staff_leaves.end_date','staff_leaves.id as staffleave_id', 'staff_leaves.days', 'staff_leaves.notes')
-        //                     ->where('staff_leaves.is_deleted', 1 )
-        //                     ->where('staff_leaves.leave_status', 0)
-        //                     ->where('staff_leaves.home_id', $home_id)
-        //                     ->get();
+ 
         $data['pending_leave'] = DB::table('staff_leaves')
                             ->join('user', 'staff_leaves.user_id', '=', 'user.id')
                             ->join('leave_type', 'leave_type.id', '=', 'staff_leaves.leave_type')

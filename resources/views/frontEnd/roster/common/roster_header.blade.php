@@ -16,6 +16,7 @@
                         <li><a href="{{ url('/roster/care-document') }}"> <i class="fa fa-tachometer"></i> Care Documents</a></li>
                         <li><a href="{{ url('/roster/reports') }}"> <i class="fa fa-tachometer"></i> Reports</a></li>
                         <li><a href="{{ url('/roster/leave-request') }}"> <i class="fa fa-tachometer"></i> Leave Requests</a></li>
+                        <li><a href="{{ url('/calendar') }}"> <i class="fa fa-tachometer"></i> Leaves</a></li>
                     </ul>
                 </div>
             </nav>

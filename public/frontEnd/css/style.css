@@ -9862,9 +9862,9 @@ header.panel-heading.headingCapitilize {
 }
 
 .calendarTabs .tab.active {
-  background: #000;
+  background: #474751;
   color: #fff;
-  border-color: #000;
+  border-color: #474751;
 }
 
 /* CONTENT */
@@ -9924,4 +9924,153 @@ header.panel-heading.headingCapitilize {
 
 .close-btn:hover {
   color: #000;
+}
+
+
+
+
+.tabs {
+    display: flex;
+    gap: 10px;
+    /* padding: 10px; */
+}
+
+.leaveTab {
+    padding: 8px 20px;
+    border: 1px solid #ddd;
+    background: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: 0.3s;
+}
+
+.leaveTab.active {
+    background: #474751;
+    color: #fff;
+}
+
+.leaveBox {
+    display: none;
+    /* padding: 20px;
+    border: 1px solid #eee;
+    margin-top: 10px; */
+    border-radius: 10px;
+}
+
+.leaveBox.active {
+    display: block;
+}
+
+/* ********************************************* */
+
+
+.leave-card {
+    width: 100%;
+    background: #fff;
+    border-radius: 15px;
+    padding: 20px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    margin-top: 20px;
+}
+.leave-card .leave-left {
+    display: flex;
+    gap: 15px;
+    align-items: flex-start;
+}
+.leave-card .user-icon {
+    width: 55px;
+    height: 55px;
+    background: #4b7aff;
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.leave-card .user-info h3 {
+    margin: 0 0 5px 0;
+}
+
+.leave-card .tags {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.leave-card .tag {
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.leave-card .blue {
+    background: #e3efff;
+    color: #2970ff;
+}
+
+.leave-card .yellow {
+    background: #ffe7c2;
+    color: #cd8500;
+}
+
+.leave-card .date-row p {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin: 3px 0;
+}
+
+.leave-card .requested {
+    display: block;
+    margin-top: 5px;
+    color: #555;
+}
+
+.leave-card .leave-actions {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: end;
+}
+
+.leave-card .approve-btn {
+    background: #16a34a;
+    color: #fff;
+    padding: 8px 20px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+}
+
+.leave-card .reject-btn {
+    width: 100%;
+    background: #fff;
+    border: 1px solid #f44336;
+    color: #f44336;
+    padding: 7px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.leave-card .reason-box {
+    background: #f8f9fb;
+    padding: 15px;
+    border-radius: 4px;
+    margin-top: 20px;
+}
+
+.leave-card .reason-title {
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+.unknownCarer{
+    display: flex;
+    justify-content: space-between;
 }

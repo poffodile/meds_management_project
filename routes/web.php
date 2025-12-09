@@ -62,6 +62,7 @@ use App\Http\Controllers\backEnd\salesfinance\TimeSheetBackendController;
 use App\Http\Controllers\Rota\RotaController;
 use App\Http\Controllers\backEnd\user\PayRatesTypeController;
 use App\Http\Controllers\backEnd\user\PayRatesController;
+use App\Http\Controllers\backEnd\homeManage\LeaveTypeController;
 
 
 Route::get('clear', function () {
@@ -1451,7 +1452,7 @@ Route::get('user/payments', 'App\Http\Controllers\CronController@recurring_home_
 //Route::get('cron-jobs','CronController@index');
 
 
-//___________________________________________BACKEND_ROUTES_START___________________________________________________//
+//______________________________________________________________________________BACKEND_ROUTES_START___________________________________________________________________________//
 
 Route::match(['get', 'post'], 'admin/login', 'App\Http\Controllers\backEnd\AdminController@login');
 Route::match(['get', 'post'], 'admin/logout', 'App\Http\Controllers\backEnd\AdminController@logout');
@@ -1499,6 +1500,17 @@ Route::group(['prefix' => 'admin', 'middleware' => 'CheckAdminAuth'], function (
 	Route::match(['get', 'post'], '/company-manager/send-set-pass-link/{user_id}', 'App\Http\Controllers\backEnd\superAdmin\companyManager\ManagerController@send_user_set_pass_link_mail');
 	Route::match(['get', 'post'], '/company-manager/check_username_unique', 'App\Http\Controllers\backEnd\UserController@check_username_exist');
 	Route::post('/companyManager/change-status', [ManagerController::class, 'manager_change_status']);
+
+
+	// Backend Leave Type
+	Route::prefix('leave-type')->name('admin.leaveType.')->group(function () {
+		Route::get('/', [LeaveTypeController::class, 'index'])->name('index');
+		Route::get('/add', [LeaveTypeController::class, 'create'])->name('create');
+		Route::post('/save', [LeaveTypeController::class, 'store'])->name('store');
+		Route::get('/edit/{id}', [LeaveTypeController::class, 'edit'])->name('edit');
+		Route::post('/update/{id}', [LeaveTypeController::class, 'update'])->name('update');
+		Route::get('/delete/{id}', [LeaveTypeController::class, 'destroy'])->name('destroy');
+	});
 
 
 	//backEnd SystemAdmin in SuperAdmin 

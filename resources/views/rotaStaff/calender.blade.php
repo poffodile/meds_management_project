@@ -77,11 +77,9 @@
                     <span class="toil leave"></span>TOIL
                     <span class="other_leave leave"></span>Other absence
                   </div>
-                  <!-- <div id='calendar'></div> -->
                   <div id="calendar" class="has-toolbar"></div>
                 </div>
                 <div id="about" class="tab-pane content-info-title">
-
                   <select id="leave_order">
                     <option value="1">Date raised (Newest first)</option>
                     <option value="2">Date raised (Oldest first)</option>

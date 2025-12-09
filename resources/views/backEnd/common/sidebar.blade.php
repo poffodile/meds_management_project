@@ -148,7 +148,7 @@
 
                 <li class="sub-menu">
                     <a href="javascript:;"
-                        class="<?php if (($page == 'care_team_job_title') || ($page == 'mood_title')  || ($page == 'access_levels')  || ($page == 'rota_shift')|| ($page == "pay_rates_type") || ($page == "pay_rates") || ($page == 'homelist') || ($page == 'policies')) {
+                        class="<?php if (($page == 'care_team_job_title') || ($page == 'mood_title')  || ($page == 'access_levels')  || ($page == 'rota_shift')|| ($page == "pay_rates_type") || ($page == "pay_rates") || ($page == 'homelist') || ($page == 'policies') || ($page == 'leaves')) {
                                     echo 'active';
                                 } ?>">
                         <i class="fa fa-home"></i>
@@ -181,11 +181,15 @@
                         <li class="{{ ($page == 'policies') ? 'active' : '' }}">
                             <a href="{{ url('admin/home/policies') }}">Policies & Procedure</a>
                         </li>
+                        
+                        <li class="{{ ($page == 'leaves') ? 'active' : '' }}">
+                            <a href="{{ url('admin/leave-type') }}">Leaves </a>
+                        </li>
                     </ul>
                 </li>
 
                 <li class="sub-menu">
-                    <a href="javascript:;" class="<?php if (($page == 'agenda_meeting') || ($page == 'petty_cash') || ($page == 'log_book') || ($page == 'weekly_allowance') || ($page == 'staff_training') || ($page == 'home_costing') || ($page == 'department')) {
+                    <a href="javascript:;" class="<?php if (($page == 'agenda_meeting') || ($page == 'petty_cash') || ($page == 'log_book') || ($page == 'weekly_allowance') || ($page == 'staff_training') || ($page == 'home_costing') || ($page == 'department') ) {
                                                         echo 'active';
                                                     } ?>">
                         <i class="fa fa-cogs"></i>
@@ -211,7 +215,7 @@
                         <li class="{{ ($page == 'home_costing') ? 'active' : '' }}">
                             <a href="{{ url('admin/general-admin/home-costing') }}">Home Costing </a>
                         </li>
-                         <li class="{{ ($page == 'department') ? 'active' : '' }}">
+                        <li class="{{ ($page == 'department') ? 'active' : '' }}">
                             <a href="{{ url('admin/general-admin/department') }}">Department </a>
                         </li>
                     </ul>
