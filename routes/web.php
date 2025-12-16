@@ -119,7 +119,10 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 		Route::get('/staff-task', [StaffTaskController::class, 'index'])->name('roster.staff.task');
 		Route::get('/care-document', [CareDocumentController::class, 'index'])->name('roster.care.document');
 		Route::get('/reports', [ReportController::class, 'index'])->name('roster.report');
+
+		// Frontend Leave Request
 		Route::get('/leave-request', [LeaveRequestController::class, 'index'])->name('roster.leave.request');
+		Route::post('/leave/update', [LeaveRequestController::class, 'update'])->name('roster.leave.update');
 		
 	});
 

@@ -942,10 +942,10 @@ class RotaController extends Controller
         echo json_encode($data);
     }
 
-    function approve_leave(Request $request){
-        $result = Staffleaves::where('id',$request->id)->update(['leave_status'=> 1]);
-        echo json_encode($result);
-    }
+    // function approve_leave(Request $request){
+    //     $result = Staffleaves::where('id',$request->id)->update(['leave_status'=> 1]);
+    //     echo json_encode($result);
+    // }
 
     function get_leave_record_for_1_week(Request $request){
 
