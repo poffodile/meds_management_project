@@ -145,9 +145,9 @@ class AndroidApiController extends Controller
         {
             return response()->json(['success'=> false, 'message'=>'Please provide valid password..!'], 200);
         }
-        if($request->home_id == null){
-            return response()->json(['success'=> false, 'message'=>'Please provide home id..!'], 200);
-        }
+        // if($request->home_id == null){
+        //     return response()->json(['success'=> false, 'message'=>'Please provide home id..!'], 200);
+        // }
 
         $recordArray = array();
         // $check_username = ServiceUser::where('user_name', $request->user_name)->first();
@@ -161,8 +161,8 @@ class AndroidApiController extends Controller
 
         }else{
             $data['id'] = $check_username->id;
-            // $data['home_id'] = $check_username->home_id;
-            $data['home_id'] = $request->home_id;
+            $data['home_id'] = $check_username->home_id;
+            // $data['home_id'] = $request->home_id;
             $data['name'] = $check_username->name;
             $data['user_name'] = $check_username->user_name;
             $data['phone_no'] = $check_username->phone_no;
@@ -174,7 +174,7 @@ class AndroidApiController extends Controller
             $data['weight'] = $check_username->weight ?? "";
             $data['hair_and_eyes'] = $check_username->hair_and_eyes ?? "";
             $data['markings'] = $check_username->markings ?? "";
-            $data['image'] = $check_username->image;
+            $data['image'] = url('public/images/userProfileImages/').'/'.$check_username->image;
             $data['email'] = $check_username->email;
             $data['personal_info'] = $check_username->personal_info;
             $data['education_history'] = $check_username->education_history ?? "";
@@ -339,6 +339,7 @@ class AndroidApiController extends Controller
                 $activity = new LoginInActivity();
                 $activity->user_id = $request->user_id;
                 $activity->login_date = date('Y-m-d');
+                $activity->check_in_time=date("Y-m-d H:i:s");
                 $activity->latitude_in = $request->latitude_in;
                 $activity->longitude_in = $request->longitude_in;
                 $activity->home_id = $request->home_id;
@@ -384,7 +385,7 @@ class AndroidApiController extends Controller
             $response = LoginInActivity::where('id', $request->activity_id)->where('user_id', $request->user_id)->update(['check_out_time'=>date("Y-m-d H:i:s"), 'latitude_out'=> $request->latitude_out, 'longitude_out'=>$request->longitude_out,'reason'=>$request->reason]);
 
             if($response){
-                return response()->json(['success'=>true,'message'=>'Checked out successfully..! ','Data'=>$response], 200);
+                return response()->json(['success'=>true,'message'=>'Checked out successfully..! ','Data'=>$response,'time'=>date("Y-m-d H:i:s")], 200);
             }
             return response()->json(['success'=>false,'message'=>'Error in record update'], 200);
         } else {
@@ -408,10 +409,15 @@ class AndroidApiController extends Controller
             $data['longitude_in'] = $activities[$i]['longitude_in'];
             if(is_null($activities[$i]['check_out_time'])){
                 $check_out = "";
+                $logged_time = "";
             } else {
                 $check_out = $activities[$i]['check_out_time'];
+                $checkIn  = \Carbon\Carbon::parse($activities[$i]['check_in_time']);
+                $checkOut = \Carbon\Carbon::parse($activities[$i]['check_out_time']);
+                $logged_time = $checkIn->diff($checkOut)->format('%H:%I:%S');
             }
             $data['check_out_time'] = $check_out;
+            $data['logged_time'] = $logged_time;
             if(is_null($activities[$i]['latitude_out']) || is_null($activities[$i]['longitude_out']) ){
                 $latitude_out = "";
                 $longitude_out = "";

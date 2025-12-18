@@ -27,10 +27,10 @@ class MoodController extends Controller
         return $array;
     }*/
     
-     public function moods($service_user_id=null)
+    public function moods($service_user_id=null)
     {
         $home_id = DB::table('service_user')->where('id',$service_user_id)->value('home_id');
-        $moods = DB::table('mood')->select('id','name','image')->where('home_id',$home_id)->get();
+        $moods = DB::table('mood')->select('id','name','image')->where('home_id',$home_id)->where(['status'=>1,'is_deleted'=>0])->get();
         $moods = json_decode(json_encode($moods),true);
         if(!empty($moods))
         {
@@ -61,12 +61,22 @@ class MoodController extends Controller
             die;*/
             if(!empty($su_info))
             {   
+                $existsToday = DB::table('su_mood')
+                    ->where('service_user_id', $data['service_user_id'])
+                    ->whereDate('created_at', today())
+                    ->where('is_deleted', 0)
+                    ->exists();
 
+                if ($existsToday) {
+                    return response()->json([
+                        'success' => 'false',
+                        'message' => "Today's mood is already added."
+                    ]);
+                }
                 $su_feeling = new ServiceUserMood;
                 $su_feeling->service_user_id = $data['service_user_id'];
                 $su_feeling->mood_id = $data['mood_id'];
                 $su_feeling->description = $data['description'];
-                $su_feeling->suggestions = $data['suggestions'] ?? null;
                 $su_feeling->home_id = $su_info['home_id'];
                 $su_feeling->save();
                 

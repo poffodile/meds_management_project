@@ -111,6 +111,24 @@
                         </div>
                     </div>
                 </a> <?php } ?>
+
+                   <?php if($accessRight === true) { ?>
+                <a href="{{ url('/rota_management') }}">
+                {{-- <a href="{{ url('/roster') }}"> --}}
+                    <div class="col-md-6">
+                        <div class="profile-nav alt">
+                            <section class="panel text-center">
+                                <div class="user-heading alt wdgt-row grayish_green"> <i class="fa fa-group"></i> </div>
+                                <div class="panel-body">
+                                    <div class="wdgt-value">
+                                        <h1 class="count">Rota Management 2</h1>
+                                        <p></p>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+                </a> <?php } ?>
                  <div class="col-md-6">
                     <div class="profile-nav alt">
                     <!-- #PoliProcModal  -->

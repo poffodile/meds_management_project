@@ -14,7 +14,13 @@
 <section id="main-content">
     <div class="wrapper">
         <div class="row working-time-pattern annual-leave">
+               <div class="row">
+                    <div class="col-md-12">
+                        @include('frontEnd.roster.common.roster_header')
+                    </div>
+                </div>
             <div class="col-md-12">
+                
                 <div class="panel">
                     <header class="panel-heading">
                         <h4 class="head">Add <span id="employee_name_head"></span> for <span id="emp_name_leave"></span>
@@ -244,15 +250,7 @@
                                         <input type="number" name="missed_days" placeholder="days" class="form-control checkValidationSecond" id="missed_days" value="">
                                     </div>
                                 </div>
-                                <!-- <div class="mb-3 row" id="section8">
-                                                    <label for="name" class="col-sm-2 col-form-label">Hours deducted</label>
-                                                    <div class="col-md-6">
-                                                        <div class="col-sm-3 col-md-3">
-                                                            <input type="time" name="late_time" placeholder="Pattern Name" class="form-control" id="staticEmail" value="">
-                                                        </div>
-                                                        <p class="mt-3" id="hours_error">michael's allowance is -12 hours with an average day of 0 hours. We have estimated that 0 hours need to be deducted from the allowance but you can amend this.</p>
-                                                    </div>
-                                                </div> -->
+                               
                                 <div class="mb-3 row">
                                     <label for="select" class="col-sm-2 col-form-label">Notes</label>
                                     <div class="col-sm-3 col-md-3">
@@ -262,7 +260,7 @@
                                 <div class="addAnnualBtn">
                                     <input type="submit" class="absance-btn" value="Add absence">
                                     <?php if($staff_id=='' && $manager_id == ''){?>
-                                    <a href="{{ url('/rota') }}" class="dash-btn">Back to dashboard</a>
+                                    <a href="{{ url('/roster/leave-request') }}" class="dash-btn">Back to dashboard</a>
                                     <?php }else if($manager_id !=''){?>
                                         <a href="{{ url('/my-profile/').'/'.$manager_id }}" class="dash-btn">Back to dashboard</a>
                                     <?php }else{?>

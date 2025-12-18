@@ -10,6 +10,8 @@ class RosterController extends Controller
 {
     public function index(){
         $data['departments'] = CompanyDepartment::getActiveCompanyDepartment();
+        $data['serviceUserCount'] = ServiceUser::getServiceUserByResidentialId(1);
+        $data['userCount'] = User::getstaffByResidentialId(1);
         return view('frontEnd.roster.index', $data);
     }
 

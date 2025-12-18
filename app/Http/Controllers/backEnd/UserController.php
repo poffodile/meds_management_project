@@ -76,7 +76,9 @@ class UserController extends Controller
     public function add(Request $request) { 
 
         $admin = Session::get('scitsAdminSession');
+      
         $home_id = $admin->home_id; 
+        $company_id = Home::where('id', $home_id)->where('is_deleted', 0)->value('admin_id');
 
         if($request->isMethod('post')) {
             
@@ -122,7 +124,7 @@ class UserController extends Controller
             $user->personal_info        = nl2br(trim($request->personal_info));
             $user->banking_info         = nl2br(trim($request->banking_info));
             $user->qualification_info   = nl2br(trim($request->qualification_info));
-
+            $user->company_id = $company_id;
             if(!empty($_FILES['image']['name']))
             {
                 $tmp_image  =   $_FILES['image']['tmp_name'];
