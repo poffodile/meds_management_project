@@ -356,6 +356,7 @@ class UserController extends Controller
         $data['social_apps'] = SocialApp::select(
             'social_app.id',
             'social_app.name',
+            'social_app.icon',
             DB::raw('IFNULL(ssa.value, "") as value')
         )
             ->where('social_app.is_deleted', 0)
@@ -390,11 +391,11 @@ class UserController extends Controller
             ->where('is_deleted', 0)
             ->avg('rate');
 
-        $data['avg_rating'] = $rating ? round($rating, 1) : 0.0;
+        $data['avg_rating'] = $rating ? (string)round($rating, 1) : '0.0';
 
          /* ================= MOOD ================= */
         $data['mood'] = [
-            'id' => '',
+            'id' => null,
             'mood_image' => '',
             'mood_name' => ''
         ];

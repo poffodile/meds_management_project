@@ -31,6 +31,7 @@ class LeaveRequestController extends Controller
         $data['calender'] = json_encode($recordArray);
 
         $query = Staffleaves::join('user', 'user.id', '=', 'staff_leaves.user_id')
+                ->leftJoin('user as actioned', 'actioned.id', '=', 'staff_leaves.actioned_by')
             ->join('leave_type', 'leave_type.id', '=', 'staff_leaves.leave_type')
             ->where('staff_leaves.is_deleted', 1)
             ->where('staff_leaves.home_id', Auth::user()->home_id)
@@ -38,10 +39,13 @@ class LeaveRequestController extends Controller
             ->select(
                 'staff_leaves.*',
                 'user.name as staff_name',
-                'leave_type.leave_name as leave_type_name'
+                'leave_type.leave_name as leave_type_name',
+                'actioned.name as actioned_by_name' 
             );
 
         $data['leaves'] = $query->get();
+
+        // dd($data['leaves']);
 
         $data['pending_leave'] = (clone $query)
             ->where('leave_status', 0)
@@ -65,7 +69,6 @@ class LeaveRequestController extends Controller
 
     public function update(Request $request)
     {
-
         $leave = Staffleaves::find($request->id);
 
         if (!$leave) {
@@ -73,6 +76,9 @@ class LeaveRequestController extends Controller
         }
 
         $leave->leave_status = $request->status;
+        $leave->actioned_by = Auth::user()->id;
+        $leave->actioned_at = now();
+        $leave->description = $request->description;
         $leave->save();
 
         return response()->json(['success' => true]);
