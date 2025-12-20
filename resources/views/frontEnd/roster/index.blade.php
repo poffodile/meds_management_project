@@ -1,5 +1,5 @@
 @extends('frontEnd.layouts.master')
-@section('title','Roaster Management')
+@section('title','Roster Management')
 @section('content')
 
 

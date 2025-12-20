@@ -284,7 +284,7 @@
 }
 
 .page-wrapper .page-content > div {
-  padding: 20px;
+  padding: 20px 6rem;
 }
 
 .page-wrapper .page-content {
@@ -446,8 +446,8 @@
           <li> <a href="{{ url('/roster/manage-dashboard') }}"><i class="fa fa-shopping-cart"></i><span>Manager Dashboard</span> </a></li>        
           <li> <a href="{{ url('/roster/schedule-shift') }}"><i class="fa fa-user"></i> <span>Schedule</span> </a> </li> 
           <li> <a href="{{ url('/roster/carer-availability') }}"><i class="fa fa-globe"></i> <span>Carer Availability</span> </a> </li>
-          <li> <a href="#"><i class="fa fa-globe"></i> <span>Carers</span> </a> </li>
-          <li> <a href="#"><i class="fa fa-globe"></i> <span>Clients</span> </a> </li>
+          <li> <a href="{{ url('/roster/carer') }}"><i class="fa fa-globe"></i> <span>Carers</span> </a> </li>
+          <li> <a href="{{ url('/roster/client') }}"><i class="fa fa-globe"></i> <span>Clients</span> </a> </li>
           <li> <a href="#"><i class="fa fa-globe"></i> <span>Daily Log</span> </a> </li>
           <li> <a href="{{ url('/roster/reports') }}"><i class="fa fa-globe"></i> <span> Reports </span> </a> </li>
           
@@ -456,14 +456,26 @@
           <li> <a href="#"><i class="fa fa-calendar"></i> <span>Calendar</span> </a></li>
           <li> <a href="#"> <i class="fa fa-folder"></i> <span>Examples</span> </a></li>
           
-          <li class="header-menu"> <span>General</span> </li>
+          <!-- <li class="header-menu"> <span>General</span> </li>
           <li> <a href="{{ url('/roster/staff-task') }}"><i class="fa fa-globe"></i> <span> Staff Tasks</span> </a> </li>
           <li> <a href="{{ url('/roster/messaging-center') }}"><i class="fa fa-globe"></i> <span> Messaging Center</span> </a> </li>
           <li> <a href="{{ url('/roster/leave-request') }}"><i class="fa fa-globe"></i> <span> Leave Requests </span> </a> </li>
           <li> <a href="{{ url('/roster/care-document') }}"><i class="fa fa-globe"></i> <span> Care Documents</span> </a> </li>
           <li> <a href="#"><i class="fa fa-book"></i> <span>Documentation</span></a></li>
           <li> <a href="#"><i class="fa fa-calendar"></i> <span>Calendar</span> </a></li>
+          <li> <a href="#"> <i class="fa fa-folder"></i> <span>Examples</span> </a></li> -->
+
+          <li class="header-menu"> <span>General</span> </li>
+          <li> <a href="{{ url('/roster/messaging-center') }}"><i class="fa fa-globe"></i> <span> Messaging Center</span> </a> </li>
+          <li> <a href="{{ url('/roster/staff-task') }}"><i class="fa fa-globe"></i> <span> Staff Tasks</span> </a> </li>
+          <li> <a href="{{ url('/roster/care-document') }}"><i class="fa fa-globe"></i> <span> Care Documents</span> </a> </li>
+          <li> <a href="{{ url('/roster/leave-request') }}"><i class="fa fa-globe"></i> <span> Leave Requests </span> </a> </li>
+          <li> <a href="{{ url('/roster/payroll-finance') }}"><i class="fa fa-globe"></i> <span> Payroll & Finance </span> </a> </li>
+          <li> <a href="#"><i class="fa fa-book"></i> <span>Documentation</span></a></li>
+          <li> <a href="{{ url('/roster/incident-management') }}"><i class="fa fa-book"></i> <span>Incident Management</span></a></li>
+          <li> <a href="#"><i class="fa fa-calendar"></i> <span>Calendar</span> </a></li>
           <li> <a href="#"> <i class="fa fa-folder"></i> <span>Examples</span> </a></li>
+
 
         </ul>
       </div>

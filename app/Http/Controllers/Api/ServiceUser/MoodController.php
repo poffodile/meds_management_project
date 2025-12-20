@@ -78,6 +78,9 @@ class MoodController extends Controller
                 $su_feeling->mood_id = $data['mood_id'];
                 $su_feeling->description = $data['description'];
                 $su_feeling->home_id = $su_info['home_id'];
+                $su_feeling->suggestions = $data['suggestions'] ?? null;
+                $su_feeling->suggestion_provider_id = $su_info['suggestion_provider_id'] ?? null;
+                
                 $su_feeling->save();
                 
                 //saving notification start

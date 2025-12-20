@@ -4,6 +4,57 @@
 
     @include('frontEnd.roster.common.roster_header')
     <style>
+    .mainCalendar{
+        background-color: #fff;
+    }
+    .fc-button {
+        top: -10px;
+    }
+    .fc-header-title {
+    margin-top: -5px;
+}
+.external-event{
+    border: 1px dashed #ea580c;
+    background: #fef9ef;
+}
+.dotEndText span i{
+   font-size: 8px;
+   color: #09db9cff;
+}
+.dotEndText span{
+    font-size: 13px;
+    font-weight: 700;
+    color: #146a50;
+}
+.leaveTime{
+    font-size: 10px;
+    margin-top: 5px;
+    color: #146a50;
+}
+.table tbody > tr > td{
+    padding: 6px;
+    background: #fef9ef;
+}
+.openShifts{
+    width: 167px;
+    color: #cf4b06;
+    font-weight: 600;
+    font-size: 13px;
+    padding-top: 17px;
+}
+.fc-grid th {
+    background: #f7f7f7 !important;
+}
+/* .fc-widget-header{
+    height: 50px;
+    line-height: 50px;
+    text-align: center;
+    background: #e4e4e4 !important;
+} */
+
+
+
+
 
     </style>
     <script type="text/javascript" src="{{ url('/public/frontEnd/js/external-dragging-calendar.js') }}"></script>
@@ -97,7 +148,6 @@
                     </div>
                 </div>
             </div>
-
 
             <!-- advancedFiltersBox -->
 
@@ -254,67 +304,234 @@
                                 <input type="text" placeholder="Search..." />
                             </div>
 
-                            <!-- Calendar -->
-                            <div class="sr-calendar">
-
-                                <!-- Header Row -->
-                                <!-- <div class="sr-row sr-head">
-                                                                            </div> -->
-
-                                <!-- Staff Row -->
-                                <!-- <div class="sr-row">
-                                                                            </div> -->
-
-                            </div>
-
-
-
-
+                     
                             <!--main content start-->
-                            <section id="main-content">
-                                <section class="wrapper">
+                         
                                     <!-- page start-->
-                                    <section class="panel">
-                                        <header class="panel-heading">
-                                            Draggable Calendar
-                                            <span class="tools pull-right">
-                                                <a href="javascript:;" class="fa fa-chevron-down"></a>
-                                                <a href="javascript:;" class="fa fa-cog"></a>
-                                                <a href="javascript:;" class="fa fa-times"></a>
-                                            </span>
-                                        </header>
+                                    <section class="mainCalendar">
                                         <div class="panel-body">
                                             <!-- page start-->
-                                            <div class="row">
+                                            <div class="row">                                               
+                                                <aside class="col-lg-12">
+                                                    <div id='external-events'>
+                                                        <table class="table table-bordered m-b-0">
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td><div class="openShifts"><i class="fa fa-exclamation-circle"></i> Open Shifts</div></td>
+                                                                    <td>
+                                                                        <div class='external-event label fc-event'>
+                                                                            <div class="dotEndText">
+                                                                                <span><i class="fa fa-circle"></i> </span>
+                                                                                <span>East Wing</span>
+                                                                            </div>
+                                                                            <div class="leaveTime">09:00 - 17:00</div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>
+                                                                        <div class='external-event label fc-event'>
+                                                                            <div class="dotEndText">
+                                                                                <span><i class="fa fa-circle"></i> </span>
+                                                                                <span>East Wing</span>
+                                                                            </div>
+                                                                            <div class="leaveTime">09:00 - 17:00</div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>
+                                                                        <div class='external-event label fc-event'>
+                                                                            <div class="dotEndText">
+                                                                                <span><i class="fa fa-circle"></i> </span>
+                                                                                <span>East Wing</span>
+                                                                            </div>
+                                                                            <div class="leaveTime">09:00 - 17:00</div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>
+                                                                        <div class='external-event label fc-event'>
+                                                                            <div class="dotEndText">
+                                                                                <span><i class="fa fa-circle"></i> </span>
+                                                                                <span>East Wing</span>
+                                                                            </div>
+                                                                            <div class="leaveTime">09:00 - 17:00</div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>
+                                                                        <div class='external-event label fc-event'>
+                                                                            <div class="dotEndText">
+                                                                                <span><i class="fa fa-circle"></i> </span>
+                                                                                <span>East Wing</span>
+                                                                            </div>
+                                                                            <div class="leaveTime">09:00 - 17:00</div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>
+                                                                        <div class='external-event label fc-event'>
+                                                                            <div class="dotEndText">
+                                                                                <span><i class="fa fa-circle"></i> </span>
+                                                                                <span>East Wing</span>
+                                                                            </div>
+                                                                            <div class="leaveTime">09:00 - 17:00</div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>
+                                                                        <div class='external-event label fc-event'>
+                                                                            <div class="dotEndText">
+                                                                                <span><i class="fa fa-circle"></i> </span>
+                                                                                <span>East Wing</span>
+                                                                            </div>
+                                                                            <div class="leaveTime">09:00 - 17:00</div>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                     
+                                                    </div>
+                                                </aside>
+                                                <aside class="col-lg-3">
+                                                     <div class="staff-wrapper">
+                                                        <div class="staff-panel">
+
+                                                            <div class="panel-header">
+                                                            <i class="fa fa-user"></i>
+                                                            <span>Staff</span>
+                                                            </div>
+
+                                                            <div class="staff-list">
+
+                                                            <div class="staff-item">
+                                                                <div class="avatar">AS</div>
+                                                                <div class="staff-info">
+                                                                <div class="name">Alex Sheffield</div>
+                                                                <div class="hours">
+                                                                    <span>8.0h / 40h</span>
+                                                                    <div class="progress"><div class="bar" style="width:20%"></div></div>
+                                                                </div>
+                                                                </div>
+                                                                <span class="badge">FT</span>
+                                                            </div>
+
+                                                            <div class="staff-item">
+                                                                <div class="avatar">BH</div>
+                                                                <div class="staff-info">
+                                                                <div class="name">Becky Harrison</div>
+                                                                <div class="hours">
+                                                                    <span>8.0h / 40h</span>
+                                                                    <div class="progress"><div class="bar" style="width:20%"></div></div>
+                                                                </div>
+                                                                </div>
+                                                                <span class="badge">FT</span>
+                                                            </div>
+
+                                                            <div class="staff-item">
+                                                                <div class="avatar">ER</div>
+                                                                <div class="staff-info">
+                                                                <div class="name">Ellese Rothwell</div>
+                                                                <div class="hours">
+                                                                    <span>8.0h / 48h</span>
+                                                                    <div class="progress"><div class="bar" style="width:17%"></div></div>
+                                                                </div>
+                                                                </div>
+                                                                <span class="badge">FT</span>
+                                                            </div>
+
+                                                            <div class="staff-item">
+                                                                <div class="avatar">EW</div>
+                                                                <div class="staff-info">
+                                                                <div class="name">Emma Wilson</div>
+                                                                <div class="hours">
+                                                                    <span>0.0h / 40h</span>
+                                                                    <div class="progress"><div class="bar" style="width:0%"></div></div>
+                                                                </div>
+                                                                </div>
+                                                                <span class="badge">FT</span>
+                                                            </div>
+
+                                                            <div class="staff-item">
+                                                                <div class="avatar">GA</div>
+                                                                <div class="staff-info">
+                                                                <div class="name">George Ashmore</div>
+                                                                <div class="hours">
+                                                                    <span>4.0h / 20h</span>
+                                                                    <div class="progress"><div class="bar" style="width:20%"></div></div>
+                                                                </div>
+                                                                </div>
+                                                                <span class="badge pt">PT</span>
+                                                            </div>
+
+                                                            <div class="staff-item">
+                                                                <div class="avatar">GA</div>
+                                                                <div class="staff-info">
+                                                                <div class="name">George Ashmore</div>
+                                                                <div class="hours">
+                                                                    <span>4.0h / 20h</span>
+                                                                    <div class="progress"><div class="bar" style="width:20%"></div></div>
+                                                                </div>
+                                                                </div>
+                                                                <span class="badge pt">PT</span>
+                                                            </div>
+                                                            <div class="staff-item">
+                                                                <div class="avatar">ER</div>
+                                                                <div class="staff-info">
+                                                                <div class="name">Ellese Rothwell</div>
+                                                                <div class="hours">
+                                                                    <span>8.0h / 48h</span>
+                                                                    <div class="progress"><div class="bar" style="width:17%"></div></div>
+                                                                </div>
+                                                                </div>
+                                                                <span class="badge">FT</span>
+                                                            </div>
+
+                                                            <div class="staff-item">
+                                                                <div class="avatar">EW</div>
+                                                                <div class="staff-info">
+                                                                <div class="name">Emma Wilson</div>
+                                                                <div class="hours">
+                                                                    <span>0.0h / 40h</span>
+                                                                    <div class="progress"><div class="bar" style="width:0%"></div></div>
+                                                                </div>
+                                                                </div>
+                                                                <span class="badge">FT</span>
+                                                            </div>
+
+                                                            <div class="staff-item">
+                                                                <div class="avatar">GA</div>
+                                                                <div class="staff-info">
+                                                                <div class="name">George Ashmore</div>
+                                                                <div class="hours">
+                                                                    <span>4.0h / 20h</span>
+                                                                    <div class="progress"><div class="bar" style="width:20%"></div></div>
+                                                                </div>
+                                                                </div>
+                                                                <span class="badge pt">PT</span>
+                                                            </div>
+
+                                                            <div class="staff-item">
+                                                                <div class="avatar">GA</div>
+                                                                <div class="staff-info">
+                                                                <div class="name">George Ashmore</div>
+                                                                <div class="hours">
+                                                                    <span>4.0h / 20h</span>
+                                                                    <div class="progress"><div class="bar" style="width:20%"></div></div>
+                                                                </div>
+                                                                </div>
+                                                                <span class="badge pt">PT</span>
+                                                            </div>
+
+                                                            </div>
+                                                        </div>
+                                                        </div>
+
+                                                </aside>
                                                 <aside class="col-lg-9">
                                                     <div id="calendar" class="has-toolbar"></div>
                                                 </aside>
-                                                <aside class="col-lg-3">
-                                                    <h4 class="drg-event-title"> Draggable Events</h4>
-                                                    <div id='external-events'>
-                                                        <div class='external-event label label-primary fc-event'>My Event 1</div>
-                                                        <div class='external-event label label-success fc-event'>My Event 2</div>
-                                                        <div class='external-event label label-info fc-event'>My Event 3</div>
-                                                        <div class='external-event label label-inverse fc-event'>My Event 4</div>
-                                                        <div class='external-event label label-warning fc-event'>My Event 5</div>
-                                                        <div class='external-event label label-danger fc-event'>My Event 6</div>
-                                                        <div class='external-event label label-default fc-event'>My Event 7</div>
-                                                        <div class='external-event label label-primary fc-event'>My Event 8</div>
-                                                        <div class='external-event label label-info fc-event'>My Event 9</div>
-                                                        <div class='external-event label label-success fc-event'>My Event 10</div>
-                                                        <p class="border-top drp-rmv">
-                                                            <input type='checkbox' id='drop-remove' />
-                                                            remove after drop
-                                                        </p>
-                                                    </div>
-                                                </aside>
+                                                
                                             </div>
                                             <!-- page end-->
                                         </div>
                                     </section>
                                     <!-- page end-->
-                                </section>
-                            </section>
+                               
                             <!--main content end-->
                             <!--right sidebar start-->
                             <div class="right-sidebar">
@@ -618,10 +835,6 @@
                     </div>
                 </div>
             </div>
-
-
-
-
 
         </div>
 

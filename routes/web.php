@@ -32,10 +32,14 @@ use App\Http\Controllers\frontEnd\Roster\ManageDashboardController;
 use App\Http\Controllers\frontEnd\Roster\ScheduleShiftController;
 use App\Http\Controllers\frontEnd\Roster\Staff\CarerAvailabilityController;
 use App\Http\Controllers\frontEnd\Roster\Staff\StaffTaskController;
+use App\Http\Controllers\frontEnd\Roster\Client\ClientController;
+use App\Http\Controllers\frontEnd\Roster\Staff\CarerController;
 use App\Http\Controllers\frontEnd\Roster\CareDocumentController;
 use App\Http\Controllers\frontEnd\Roster\ReportController;
 use App\Http\Controllers\frontEnd\Roster\MessagingCenterController;
 use App\Http\Controllers\frontEnd\Roster\LeaveRequestController;
+use App\Http\Controllers\frontEnd\Roster\IncidentManagementController;
+use App\Http\Controllers\frontEnd\Roster\PayrollFinance\PayrollFinanceController;
 
 
 // Backend Controllers
@@ -123,6 +127,16 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 		// Frontend Leave Request
 		Route::get('/leave-request', [LeaveRequestController::class, 'index'])->name('roster.leave.request');
 		Route::post('/leave/update', [LeaveRequestController::class, 'update'])->name('roster.leave.update');
+
+		Route::get('/carer', [CarerController::class, 'index'])->name('roster.staff.carer');
+		Route::get('/client', [ClientController::class, 'index'])->name('roster.client');
+		
+		Route::get('/incident-management', [IncidentManagementController::class, 'index'])->name('roster.incident.management');
+
+
+		Route::get('/payroll-finance', [PayrollFinanceController::class, 'index'])->name('roster.payroll.finance');
+
+		
 		
 	});
 

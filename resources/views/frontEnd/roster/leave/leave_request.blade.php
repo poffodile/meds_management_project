@@ -13,8 +13,8 @@
                     <p class="header-subtitle">Operational overview and key metrics</p>
                 </div>
                 <!-- <div class="header-actions">
-                        <button class="btn" data-toggle="modal" data-target="#addLeaveModal"><i class="fa fa-plus"></i> Add Leaves</button>
-                    </div>  -->
+                                        <button class="btn" data-toggle="modal" data-target="#addLeaveModal"><i class="fa fa-plus"></i> Add Leaves</button>
+                                    </div>  -->
             </div>
 
             <div class="rota_dashboard-cards simpleCard">
@@ -106,7 +106,9 @@
                             <div class="leave-card">
                                 <div class="unknownCarer">
                                     <div class="leave-left">
-                                        <div class="user-icon">?</div>
+                                        <div class="user-icon">
+                                            {{ strtoupper(substr($leave->staff_name, 0, 1)) }}
+                                        </div>
                                         <div class="user-info">
                                             <h3>{{ $leave->staff_name }}</h3>
                                             <div class="tags">
@@ -164,7 +166,7 @@
                                         </div>
                                     </div>
                                 @endif
-                                @if($leave->leave_status === 1)
+                                @if ($leave->leave_status === 1)
                                     <div class="rota_alerts ">
                                         <div class="rota_alert leaveGreenbg p-10">
                                             <div class="rota_alert-icon"><i class="fa fa-exclamation-circle"></i></div>
@@ -196,7 +198,9 @@
                             <div class="leave-card">
                                 <div class="unknownCarer">
                                     <div class="leave-left">
-                                        <div class="user-icon">?</div>
+                                        <div class="user-icon">
+                                            {{ strtoupper(substr($leave->staff_name, 0, 1)) }}
+                                        </div>
                                         <div class="user-info">
                                             <h3>{{ $leave->staff_name }}</h3>
                                             <div class="tags">
@@ -280,7 +284,9 @@
                             <div class="leave-card">
                                 <div class="unknownCarer">
                                     <div class="leave-left">
-                                        <div class="user-icon">?</div>
+                                        <div class="user-icon">
+                                            {{ strtoupper(substr($leave->staff_name, 0, 1)) }}
+                                        </div>
                                         <div class="user-info">
                                             <h3>{{ $leave->staff_name }}</h3>
                                             <div class="tags">
@@ -362,7 +368,9 @@
                             <div class="leave-card">
                                 <div class="unknownCarer">
                                     <div class="leave-left">
-                                        <div class="user-icon">?</div>
+                                        <div class="user-icon">
+                                            {{ strtoupper(substr($leave->staff_name, 0, 1)) }}
+                                        </div>
                                         <div class="user-info">
                                             <h3>{{ $leave->staff_name }}</h3>
                                             <div class="tags">
@@ -660,29 +668,35 @@
             });
 
             $(document).on('click', '.leave-approve-btn', function() {
-                let approve_leave_id = document.getElementById('approve_leave_id').value; // ✅ FIX
-                let approve_note = document.getElementById('approve_note').value; // ✅ FIX
+                let approve_leave_id = $('#approve_leave_id').val();
+                let approve_note = $('#approve_note').val();
 
-                // console.log(id);
                 $.ajax({
                     url: "{{ url('/roster/leave/update') }}",
                     type: "POST",
                     data: {
                         id: approve_leave_id,
                         description: approve_note,
-                        status: 1, // approved
+                        status: 1,
                         _token: $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function(response) {
-                        alert("Leave approved!");
-                        location.reload(); // reload page or update UI dynamically
+                        console.log(response);
+                        alert(response.message); // ✅ FROM CONTROLLER
+                        location.reload();
+                    },
+                    error: function(xhr) {
+                        console.log(xhr);
+                        alert(xhr.responseJSON?.message || 'Something went wrong.');
+                        $('#approveLeaveModal').modal('hide');
                     }
                 });
             });
 
+
             $(document).on('click', '.leave-reject-btn', function() {
-                let reject_leave_id = document.getElementById('reject_leave_id').value;
-                let reject_note = document.getElementById('reject_note').value;
+                let reject_leave_id = $('#reject_leave_id').val();
+                let reject_note = $('#reject_note').val();
 
                 $.ajax({
                     url: "{{ url('/roster/leave/update') }}",
@@ -690,12 +704,18 @@
                     data: {
                         id: reject_leave_id,
                         description: reject_note,
-                        status: 2, // rejected
+                        status: 2,
                         _token: $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function(response) {
-                        alert("Leave rejected!");
+                        console.log(response);
+                        alert(response.message); // ✅ FROM CONTROLLER
                         location.reload();
+                    },
+                    error: function(xhr) {
+                        console.log(xhr);
+                        alert(xhr.responseJSON?.message || 'Something went wrong.');
+                        $('#rejectLeaveModal').modal('hide');
                     }
                 });
             });

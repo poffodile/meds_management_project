@@ -31,7 +31,7 @@ class LeaveRequestController extends Controller
         $data['calender'] = json_encode($recordArray);
 
         $query = Staffleaves::join('user', 'user.id', '=', 'staff_leaves.user_id')
-                ->leftJoin('user as actioned', 'actioned.id', '=', 'staff_leaves.actioned_by')
+            ->leftJoin('user as actioned', 'actioned.id', '=', 'staff_leaves.actioned_by')
             ->join('leave_type', 'leave_type.id', '=', 'staff_leaves.leave_type')
             ->where('staff_leaves.is_deleted', 1)
             ->where('staff_leaves.home_id', Auth::user()->home_id)
@@ -40,7 +40,7 @@ class LeaveRequestController extends Controller
                 'staff_leaves.*',
                 'user.name as staff_name',
                 'leave_type.leave_name as leave_type_name',
-                'actioned.name as actioned_by_name' 
+                'actioned.name as actioned_by_name'
             );
 
         $data['leaves'] = $query->get();
@@ -72,15 +72,31 @@ class LeaveRequestController extends Controller
         $leave = Staffleaves::find($request->id);
 
         if (!$leave) {
-            return response()->json(['error' => 'Leave not found'], 404);
+            return response()->json([
+                'success' => false,
+                'message' => 'Leave not found.'
+            ], 404);
+        }
+
+        // Prevent self approval/rejection
+        if ($leave->user_id == auth()->id()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You cannot approve or reject your own leave.'
+            ], 403);
         }
 
         $leave->leave_status = $request->status;
-        $leave->actioned_by = Auth::user()->id;
+        $leave->actioned_by = auth()->id();
         $leave->actioned_at = now();
         $leave->description = $request->description;
         $leave->save();
 
-        return response()->json(['success' => true]);
+        return response()->json([
+            'success' => true,
+            'message' => $request->status == 1
+                ? 'Leave approved successfully.'
+                : 'Leave rejected successfully.'
+        ], 200);
     }
 }

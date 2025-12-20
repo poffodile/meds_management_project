@@ -32,6 +32,9 @@ a:focus {
     background: #1F88B5;
     color: #fff;
 }
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+    color: #272727;
+}
 #container {
     width: 100%;
     /* height: 100%; */
@@ -9549,6 +9552,7 @@ a.close.edit_dyn_form {
 .redClr:before { background: #ff0000;}
 .redClr .rota_dash-icon { background: #ff0000;}
 
+
 /* Left side */
 .rota_dash-left { position: relative;  z-index: 2;}
 .rota_dash-left .rota_title {
@@ -9560,7 +9564,6 @@ a.close.edit_dyn_form {
 .rota_dash-left .rota_count {
     font-size: 24px;
     font-weight: 700;
-    color: #000;
 }
 /* Icon box */
 .rota_dash-icon {
@@ -10175,8 +10178,9 @@ header.panel-heading.headingCapitilize {
 
 .shift-roster .sr-title h2 {
   margin: 0;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 600;
+  color: #fff;
 }
 .shift-roster .sr-title span {
   font-size: 13px;
@@ -10406,13 +10410,13 @@ header.panel-heading.headingCapitilize {
 .simpleCard .rota_dash-left .rota_title{
     font-weight: 400;
 }
-.simpleCard .blue, .simpleCard .orangeClr, .simpleCard .green, .simpleCard .redClr {
+.simpleCard .blue, .simpleCard .orangeClr, .simpleCard .green, .simpleCard .redClr, .simpleCard .purple {
     border: none;
 }
-.simpleCard .blue:before, .simpleCard .orangeClr:before, .simpleCard .green:before, .simpleCard .redClr:before {
+.simpleCard .blue:before, .simpleCard .orangeClr:before, .simpleCard .green:before, .simpleCard .redClr:before, .simpleCard .purple:before {
     background: transparent;
 }
-.simpleCard .blue .rota_dash-icon, .simpleCard .orangeClr .rota_dash-icon, .simpleCard .green .rota_dash-icon, .simpleCard .redClr .rota_dash-icon{
+.simpleCard .blue .rota_dash-icon, .simpleCard .orangeClr .rota_dash-icon, .simpleCard .green .rota_dash-icon, .simpleCard .redClr .rota_dash-icon, .simpleCard .purple .rota_dash-icon{
     background: transparent;
 }
 .simpleCard .blue .rota_dash-icon i {
@@ -10426,6 +10430,9 @@ header.panel-heading.headingCapitilize {
 }
 .simpleCard .redClr .rota_dash-icon i {
     color: #ff0000;
+}
+.simpleCard .purple .rota_dash-icon i {
+    color: #9C27B0;
 }
 
 .leavebanktabCont{
@@ -10550,4 +10557,313 @@ header.panel-heading.headingCapitilize {
 .radShowbtn{
     background: #ff000026;
     color: #ff0000b3;
+}
+
+/* **********************Shift Schedule******************************* */
+.staff-wrapper {
+    margin-top: 64px;
+}
+.staff-wrapper .staff-panel {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid #e3e6ea;
+  overflow: hidden;
+}
+.staff-wrapper .panel-header {
+  padding: 14px 16px;
+  font-weight: 600;
+  border-bottom: 1px solid #e3e6ea;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.staff-wrapper .open-shifts {
+  padding: 10px 16px;
+  background: #fff7f1;
+  color: #e55300;
+  font-weight: 600;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid #f0e1d6;
+}
+.staff-wrapper .staff-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  gap: 12px;
+}
+
+.staff-wrapper .staff-item:not(:last-child) {
+  border-bottom: 1px solid #f0f1f3;
+}
+
+.staff-wrapper .avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #3b82f6;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.staff-wrapper .staff-info {
+  flex: 1;
+}
+
+.staff-wrapper .name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 4px;
+}
+
+.staff-wrapper .hours {
+  font-size: 12px;
+  color: #2563eb;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.staff-wrapper .progress {
+  flex: 1;
+  height: 6px;
+  background: #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.staff-wrapper .bar {
+  height: 100%;
+  background: #3b82f6;
+}
+
+.staff-wrapper .badge {
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  color: #374151;
+  font-weight: 600;
+}
+
+.staff-wrapper .badge.pt {
+  color: #2563eb;
+  border-color: #93c5fd;
+}
+
+/* **********Start Carer Css**************** */
+
+.searchWithtabs{
+    width: 70%;
+}
+.searchWithtabs span {
+    background: #f1f2f7;
+    color: #333;
+    border: 1px solid #e2e2e4;
+}
+.tab-content.carertabcontent .content {
+    background-color: transparent;
+    padding: 0;
+}
+.carertabcontent .profile-card {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  padding: 16px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.05);
+  margin-bottom: 20px;
+  min-height: 430px;
+}
+.carertabcontent .card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.carertabcontent .user {
+  display: flex;
+  gap: 12px;
+}
+.carertabcontent .avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #3b82f6;
+  color: #fff;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.carertabcontent .name {
+    font-weight: 700;
+    font-size: 16px;
+    color: #272727;
+}
+.carertabcontent .role {
+  font-size: 13px;
+  color: #6b7280;
+  margin-top: 2px;
+}
+.carertabcontent .status {
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 14px;
+  font-weight: 600;
+}
+.carertabcontent .status.inactive {
+  background: #f3f4f6;
+  color: #374151;
+}
+.carertabcontent .details {
+  margin-top: 14px;
+}
+.carertabcontent .item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: #374151;
+  margin-bottom: 8px;
+}
+.carertabcontent .item i {
+  color: #6b7280;
+  width: 16px;
+}
+.carertabcontent .sectionCarer {
+  margin-top: 14px;
+}
+.carertabcontent .label {
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 0px;
+    color: #4a4a4a;
+    display: inline-block;
+    padding-left: 0;
+}
+.carertabcontent .tags span {
+  display: inline-block;
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 14px;
+  border: 1px solid #e5e7eb;
+  margin-right: 6px;
+  margin-bottom: 6px;
+  background: #ffffff;
+  color: #333;
+}
+.carertabcontent .rate {
+  margin-top: 14px;
+  background: #f9fafb;
+  padding: 10px 12px;
+  border-radius: 8px;
+}
+.carertabcontent .rate .label {
+  font-size: 12px;
+  color: #6b7280;
+  margin-bottom: 4px;
+}
+.carertabcontent .amount {
+  font-size: 16px;
+  font-weight: 700;
+  color: #15803d;
+}
+.carertabcontent .supervision {
+  margin-top: 12px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #374151;
+  background: #f9fafb;
+  padding: 6px 10px;
+  border-radius: 8px;
+}
+.carertabcontent .actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+.carertabcontent .actions button {
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+}
+.carertabcontent .actions .edit {
+  flex: 1;
+}
+.carertabcontent .actions .delete {
+  color: #dc2626;
+  border-color: #fecaca;
+}
+
+.orangeText{
+    color: #ff7417;
+}
+.greenText{
+    color: #16a34a;
+}
+
+
+
+
+
+/* Care Needs */
+.carertabcontent .care-needs .label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.carertabcontent .care-list {
+  margin-top: 8px;
+  height: 186px;
+    overflow: auto;
+}
+
+.carertabcontent .care-item {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 13px;
+  margin-bottom: 8px;
+  background: #ffffff;
+  line-height: 1.4;
+  color: #272727;
+}
+
+.carertabcontent .care-more {
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 14px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+/* Actions override */
+.carertabcontent .actions .view {
+  flex: 1;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  font-weight: 600;
+}
+
+.carertabcontent .actions .edit {
+  width: 42px;
+}
+
+.carertabcontent .actions .delete {
+  width: 42px;
 }
