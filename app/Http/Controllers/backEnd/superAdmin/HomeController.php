@@ -53,7 +53,7 @@ class HomeController extends Controller
         }
         // echo "<pre>"; print_r($disable_btn); die;
         $current_date   = Carbon::now();
-        $sa_home_query  = DB::table('home')->where('admin_id',$system_admin_id)->select('id','admin_id','title','image')->where('is_deleted','0');
+        $sa_home_query  = DB::table('home')->where('admin_id',$system_admin_id)->select('id','admin_id','title','image', 'qr_code_id')->where('is_deleted','0');
         $search = '';
         
         if(isset($request->limit)) {
@@ -89,12 +89,27 @@ class HomeController extends Controller
     public function add(Request $request, $system_admin_id) { 
       	
         if($request->isMethod('post')) {
+
+            $address = $request->address;
+            $apiKey = 'AIzaSyBxoFiKEhpV_lzf-i17vjFb9hZZwHSkZGI'; // Google maps now requires an API key.
+            // Get JSON results from this request
+            $geo = file_get_contents('https://maps.googleapis.com/maps/api/geocode/json?address=' . urlencode($address) . '&sensor=false&key=' . $apiKey);
+
+            $geo = json_decode($geo, true); // Convert the JSON to an array
+
+            if (isset($geo['status']) && ($geo['status'] == 'OK')) {
+                $latitude = $geo['results'][0]['geometry']['location']['lat']; // Latitude
+                $longitude = $geo['results'][0]['geometry']['location']['lng']; // Longitude
+            }
+
             $admin  = Session::get('scitsAdminSession');
             $data   = $request->input();
     	    $system_admin_home                              = new Home;
             $system_admin_home->admin_id                    = $system_admin_id;
             $system_admin_home->title                       = $data['title'];
             $system_admin_home->address                     = $data['address'];
+            $system_admin_home->latitude                    = $latitude;
+            $system_admin_home->longitude                   = $longitude;
             // $system_admin_home->location_history_duration   = $data['location_history_duration'];
             $system_admin_home->is_registered               = $data['is_registered'];
             // $system_admin_home->rota_time_format            = $data['rota_time_format'];
@@ -149,12 +164,27 @@ class HomeController extends Controller
             $system_admin_id = $system_admin_home->admin_id;
             if($request->isMethod('post'))
             {
+                $address = $request->address;
+                $apiKey = 'AIzaSyBxoFiKEhpV_lzf-i17vjFb9hZZwHSkZGI'; // Google maps now requires an API key.
+                // Get JSON results from this request
+                $geo = file_get_contents('https://maps.googleapis.com/maps/api/geocode/json?address=' . urlencode($address) . '&sensor=false&key=' . $apiKey);
+
+                $geo = json_decode($geo, true); // Convert the JSON to an array
+
+                if (isset($geo['status']) && ($geo['status'] == 'OK')) {
+                    $latitude = $geo['results'][0]['geometry']['location']['lat']; // Latitude
+                    $longitude = $geo['results'][0]['geometry']['location']['lng']; // Longitude
+                }
+
                 $home_old_image                               = $system_admin_home->image;
                 //$home_old_policy                              = $system_admin_home->security_policy;
                 $system_admin_home->title                     = $request->title;
                 $system_admin_home->address                   = $request->address;
                 $system_admin_home->location_history_duration = $request->location_history_duration;
                 $system_admin_home->rota_time_format          = $request->rota_time_format;
+                $system_admin_home->is_registered             = $request->is_registered;
+                $system_admin_home->latitude                  = $latitude;
+                $system_admin_home->longitude                 = $longitude;
                 //$system_admin_home->image            = $request->image;
                 
                 /*if(!empty($request->password))
@@ -513,4 +543,13 @@ class HomeController extends Controller
         }
     }
 
+    public function qr_code(Request $request){
+         if ($request->val == 1) {
+            $qr_id = uniqid('qr');
+            $home = Home::where('id', $request->id)->update(['qr_code_id' => $qr_id]);
+        }
+        $details['qr_code_id'] = Home::where('id', $request->id)->value('qr_code_id');
+
+        echo json_encode($details);
+    }
 }

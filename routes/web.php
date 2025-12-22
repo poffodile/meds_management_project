@@ -1552,6 +1552,8 @@ Route::group(['prefix' => 'admin', 'middleware' => 'CheckAdminAuth'], function (
 	Route::match(['get', 'post'], '/system-admin/home/undo-delete/{home_id}', 'App\Http\Controllers\backEnd\superAdmin\HomeController@undo_delete');
 	Route::match(['get', 'post'], '/system-admin/home/company-package-type', 'App\Http\Controllers\backEnd\superAdmin\HomeController@company_package_type');
 	Route::match(['get', 'post'], '/system-admin/home/card-detail', 'App\Http\Controllers\backEnd\superAdmin\HomeController@card_detail_save');
+	Route::match(['get', 'post'], '/system-admin/home/qr-code', 'App\Http\Controllers\backEnd\superAdmin\HomeController@qr_code');
+	
 
 
 	Route::match(['get', 'post'], '/users', 'App\Http\Controllers\backEnd\UserController@users');

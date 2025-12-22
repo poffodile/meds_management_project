@@ -65,7 +65,7 @@ class AdminController extends Controller
             $admin = Session::get('scitsAdminSession');
             // $home_id = $admin->home_id; 
             $address = $request->address;
-            $apiKey = 'AIzaSyAMCKKwljh4nvmKVhFHngldmyw7At9rndg'; // Google maps now requires an API key.
+            $apiKey = 'AIzaSyBxoFiKEhpV_lzf-i17vjFb9hZZwHSkZGI'; // Google maps now requires an API key.
             // Get JSON results from this request
             $geo = file_get_contents('https://maps.googleapis.com/maps/api/geocode/json?address=' . urlencode($address) . '&sensor=false&key=' . $apiKey);
 
@@ -85,10 +85,10 @@ class AdminController extends Controller
             $system_admin->company      = $request->company;
             $system_admin->address      = $request->address;
             $system_admin->post_code    = $request->post_code;
-            // $system_admin->latitude     = $latitude; 
-            $system_admin->latitude     = "53.4084°";
-            // $system_admin->longitude    = $longitude; 
-            $system_admin->longitude    =   "2.9916°";
+            $system_admin->latitude     = $latitude; 
+            // $system_admin->latitude     = "53.4084°";
+            $system_admin->longitude    = $longitude; 
+            // $system_admin->longitude    =   "2.9916°";
             $system_admin->access_type  = 'O';
             $system_admin->password     = '';
             //$system_admin->password     = md5($request->password);

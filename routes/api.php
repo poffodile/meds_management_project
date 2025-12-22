@@ -28,6 +28,7 @@ Route::post('/check-out-activity', 'App\Http\Controllers\Android\AndroidApiContr
 Route::post('/get-user-activity', 'App\Http\Controllers\Android\AndroidApiController@get_user_activity');
 // Route::post('/qrcode', 'Android\AndroidApiController@QRCode');
 Route::post('/get-company-data', 'App\Http\Controllers\Android\AndroidApiController@get_company_data');
+Route::post('/get-home-data', 'App\Http\Controllers\Android\AndroidApiController@get_home_data');
 
 
 // Ram 19/08/2025

@@ -464,7 +464,49 @@ class AndroidApiController extends Controller
         echo json_encode($details);
     }
 
-    public function get_company_data(Request $request)
+    // public function get_company_data(Request $request)
+    // {
+    //     if (empty($request->qr_id)) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Please provide qr_id.'
+    //         ], 200);
+    //     }
+
+    //     $details = Admin::where('qr_code_id', $request->qr_id)->first();
+
+    //     // ❌ QR code not found
+    //     if (!$details) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'QR code not found.'
+    //         ], 404);
+    //     }
+
+    //     $data = [
+    //         'company_id'    => $details->id,
+    //         'name'          => $details->name,
+    //         'user_name'     => $details->user_name,
+    //         'email'         => $details->email,
+    //         'company'       => $details->company,
+    //         'access_type'   => $details->access_type,
+    //         'home_id'       => $details->home_id,
+    //         'image'         => $details->image,
+    //         'security_code' => $details->security_code,
+    //         'qr_code_id'    => $details->qr_code_id,
+    //         'address'       => $details->address,
+    //         'latitude'      => $details->latitude,
+    //         'longitude'     => $details->longitude,
+    //     ];
+
+    //     return response()->json([
+    //         'success' => true,
+    //         'message' => 'Company data fetched successfully.',
+    //         'data'    => $data
+    //     ], 200);
+    // }
+
+    public function get_home_data(Request $request)
     {
         if (empty($request->qr_id)) {
             return response()->json([
@@ -473,7 +515,7 @@ class AndroidApiController extends Controller
             ], 200);
         }
 
-        $details = Admin::where('qr_code_id', $request->qr_id)->first();
+        $details = Home::where('qr_code_id', $request->qr_id)->first();
 
         // ❌ QR code not found
         if (!$details) {
@@ -484,15 +526,10 @@ class AndroidApiController extends Controller
         }
 
         $data = [
-            'company_id'    => $details->id,
-            'name'          => $details->name,
-            'user_name'     => $details->user_name,
-            'email'         => $details->email,
-            'company'       => $details->company,
-            'access_type'   => $details->access_type,
-            'home_id'       => $details->home_id,
-            'image'         => $details->image,
-            'security_code' => $details->security_code,
+            'home_id'       => $details->id,
+            'company_id'    => $details->admin_id,
+            'name'          => $details->title,
+            'address'       => $details->address,
             'qr_code_id'    => $details->qr_code_id,
             'address'       => $details->address,
             'latitude'      => $details->latitude,
@@ -501,7 +538,7 @@ class AndroidApiController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Company data fetched successfully.',
+            'message' => 'Home data fetched successfully.',
             'data'    => $data
         ], 200);
     }

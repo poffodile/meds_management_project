@@ -27,6 +27,94 @@
         color: red;
     }
 </style>
+<style>
+    #qrcode {
+        padding: 0px 15px;
+    }
+
+    #qrcode img{
+        padding: 5px;
+        border: 1px solid #ddd;
+        border-radius: 3px;
+    }
+
+    .re-generateQR {
+        border: 1px solid #1fb5ad;
+        box-shadow: none;
+        color: #fff;
+        background: #1fb5ad;
+        padding: 6px 12px;
+        text-align: center;
+        border-radius: 3px;
+        margin-right: 11px;
+        transition: all 0.5s;
+        cursor: pointer;
+    }
+
+    .re-generateQR span {
+        cursor: pointer;
+        display: inline-block;
+        position: relative;
+        transition: 0.5s;
+    }
+
+    .re-generateQR span:after {
+        content: '\00bb';
+        position: absolute;
+        opacity: 0;
+        top: 0;
+        right: -10px;
+        transition: 0.5s;
+    }
+
+    .re-generateQR:hover span {
+        padding-right: 20px;
+    }
+
+    .re-generateQR:hover span:after {
+        opacity: 1;
+        right: 0;
+    }
+
+    .download-btn {
+        border: 1px solid #1fb5ad;
+        box-shadow: none;
+        color: #fff;
+        background: #1fb5ad;
+        padding: 6px 12px;
+        text-align: center;
+        border-radius: 3px;
+        margin: 15px;
+        margin-right: 11px;
+        transition: all 0.5s;
+        cursor: pointer;
+    }
+
+    .download-btn span {
+        cursor: pointer;
+        display: inline-block;
+        position: relative;
+        transition: 0.5s;
+    }
+
+    .download-btn span:after {
+        content: '\00bb';
+        position: absolute;
+        opacity: 0;
+        top: 0;
+        right: -10px;
+        transition: 0.5s;
+    }
+
+    .download-btn:hover span {
+        padding-right: 20px;
+    }
+
+    .download-btn:hover span:after {
+        opacity: 1;
+        right: 0;
+    }
+</style>
 <?php
     if($company_package != ''){
         if($company_package->free_trial_done){
@@ -105,6 +193,7 @@
                                     <tr>
                                         <th>Title</th>
                                         <th>image</th>
+                                        <th>QR Code</th>
                                         <th>Actions</th>
                                     </tr>
                                     </thead>
@@ -128,6 +217,7 @@
                                         <tr class="">
                                             <td>{{ $value->title }}</td>
                                             <td><img src = "{{ $image }}" height="50px" width="auto"></td>
+                                             <td style="width: 25%;">@if($value->qr_code_id == NULL) <button class="re-generateQR" onclick="generateQR(<?= $value->id ?>);"><span>Generate QR</span></button> <button><i class="fa fa-qrcode" aria-hidden="true"></i></button> @else <button class="re-generateQR" onclick="generateQR(<?= $value->id ?>);"><span>Re-Generate QR</span></button> <button class="re-generateQR" onclick="ViewQR(<?= $value->id ?>);"><span>View</span></button> @endif </td>
                                             <td class="action-icn">
                                                 <a href="{{ url('super-admin/home-admin/'.$value->id) }}" class="user"><i data-toggle="tooltip" title="Add Home admins" class="fa fa-user-o "></i></a>
                                                 <a href="{{ url('admin/system-admin/home/edit/'.$value->id) }}" class="edit"><i data-toggle="tooltip" title="Edit" class="fa fa-edit"></i></a>
@@ -143,12 +233,16 @@
                             @endif
                         </div>
                     </div>
+                    <div id="qrcode"></div>
+                    <div id='download'></div>
                 </section>
             </div>
         </div>
         <!-- page end-->
         </section>
     </section>
+
+
     <!--main content end-->
 <div aria-hidden="true" aria-labelledby="myModalLabel" role="dialog" tabindex="-1" id="PackageModal" class="modal fade">
     <div class="modal-dialog modal-lg">
@@ -375,6 +469,7 @@
     </div><!--/.modal-dialog -->
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
 <!--script for this page only-->
 <script>
@@ -594,5 +689,69 @@
     //         }
     //     });
     // });
+
+        function generateQR(id){
+        if (confirm("Are you sure you want to generate or re-generate QR code") == true) {
+            var token = "<?=csrf_token()?>";  
+            $.ajax({
+                url:"{{ url('/admin/system-admin/home/qr-code') }}",    
+                type: "post",    
+                dataType: 'json',
+                data: {id: id, val: 1, _token: token},
+                success:function(result){
+                    console.log(result);
+                    document.getElementById('qrcode') .innerHTML = ""; 
+                    document.getElementById('download') .innerHTML = ""; 
+                    // console.log(blkstr.join(", "));
+                    var qrcode = new QRCode(document.getElementById("qrcode"), {
+                        text: `${result.qr_code_id}`,
+                        width: 180, //default 128
+                        height: 180,
+                        colorDark : "#000000",
+                        colorLight : "#ffffff",
+                        correctLevel : QRCode.CorrectLevel.H
+                    });
+                    document.getElementById('download').innerHTML = '<button class="download-btn" onclick="myFunction()"><span>Download</span></button>';
+
+                }
+            });
+        } 
+    }
+
+    function ViewQR(id) {
+        var token = "<?=csrf_token()?>";  
+            $.ajax({
+                url:"{{ url('/admin/system-admin/home/qr-code') }}",    
+                type: "post",    
+                dataType: 'json',
+                data: {id: id, val: 0, _token: token},
+                success:function(result){
+                    console.log(result);
+                    document.getElementById('qrcode') .innerHTML = ""; 
+                    document.getElementById('download') .innerHTML = ""; 
+                    var qrcode = new QRCode(document.getElementById("qrcode"), {
+                        text: `${result.qr_code_id}`,
+                        width: 180, //default 128
+                        height: 180,
+                        colorDark : "#000000",
+                        colorLight : "#ffffff",
+                        correctLevel : QRCode.CorrectLevel.H
+                    });
+                    document.getElementById('download').innerHTML = '<button class="download-btn" onclick="myFunction()"><span>Download</span></button>';
+                }
+            });
+    }  
+
+    function myFunction(){
+        let a = document.getElementById('qrcode')
+        img = a.getElementsByTagName('img')[0]
+        var element = document.createElement('a');
+        element.setAttribute('href', img.src);
+        element.setAttribute('download', 'qr.png');
+        element.style.display = 'none';
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
+    }
 </script>
 @endsection
