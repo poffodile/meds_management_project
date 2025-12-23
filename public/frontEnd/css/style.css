@@ -10239,7 +10239,7 @@ header.panel-heading.headingCapitilize {
     background: #fff;
     padding: 15px;
     border: 1px solid #dddddd;
-    border-radius: 8px;
+    border-radius: 4px;
 }
 .calendarTabs.leaveRequesttabs .tab{
     flex-grow: inherit;
@@ -10816,10 +10816,6 @@ header.panel-heading.headingCapitilize {
 }
 
 
-
-
-
-/* Care Needs */
 .carertabcontent .care-needs .label {
   display: flex;
   align-items: center;
@@ -10866,4 +10862,240 @@ header.panel-heading.headingCapitilize {
 
 .carertabcontent .actions .delete {
   width: 42px;
+}
+
+/* carer Popup  csss*/
+.carer-form form{
+    padding-bottom: 16px;
+}
+.carer-form label {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #111827;
+}
+
+.carer-form input,
+.carer-form select {
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid #dcdcdc;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.carer-form input:focus,
+.carer-form select:focus {
+  outline: none;
+  border-color: #2563eb;
+}
+
+.carer-form .overtime {
+  background: #f1f7ff;
+  padding: 4px 14px;
+  border-radius: 8px;
+  margin: 14px 0;
+}
+
+.carer-form .overtime label {
+  font-weight: 600;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.carer-form .qualifications {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 4px 16px;
+  margin-bottom: 20px;
+  background: #f7f7f7;
+}
+
+.carer-form .qualifications h4 {
+  margin-bottom: 12px;
+  font-size: 14px;
+      color: #333;
+    font-weight: 700;
+
+}
+
+.carer-form .checkbox-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  /* gap: 10px 20px; */
+}
+
+.carer-form .checkbox-grid label {
+  font-weight: 600;
+  font-size: 13px;
+  display: flex;
+  gap: 8px;
+  color: #111827;
+}
+.carer-form .checkbox-grid label input{
+  height: auto;
+}
+
+.carer-form .address label,
+.carer-form .emergency label {
+  font-weight: 700;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.carer-form .address .row,
+.carer-form .emergency .row {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.carer-form .actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.carer-form .actions button {
+  height: 40px;
+  padding: 0 18px;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.carer-form .actions .cancel {
+  background: #fff;
+  border: 1px solid #d1d5db;
+}
+
+.carer-form .actions .submit {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+}
+
+.attached-documents {   
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px;
+  border: 1px solid #e2e2e4;
+}
+
+.attached-documents .header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.attached-documents .title {
+  font-size: 15px;
+  font-weight: 600;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.attached-documents .close-btn {
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+}
+
+.attached-documents .upload-box {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.attached-documents .upload-actions {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.attached-documents .upload-actions button {
+  flex: 1;
+  height: 40px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.attached-documents .secondary {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+}
+
+.attached-documents .primary {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+}
+
+/* .attached-documents .row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.attached-documents .field {
+  display: flex;
+  flex-direction: column;
+} */
+
+.attached-documents label {
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.attached-documents input,
+.attached-documents select {
+  height: 38px;
+  padding: 0 10px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  font-size: 13px;
+}
+/* 
+.attached-documents .checkbox {
+  margin: 12px 0;
+} */
+
+.attached-documents .checkbox label {
+  font-size: 13px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.attached-documents .upload-btn {
+  width: 100%;
+  height: 42px;
+  border-radius: 10px;
+  background: #111;
+  color: #fff;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.attached-documents .empty-state {
+  text-align: center;
+  margin-top: 28px;
+  color: #6b7280;
+}
+
+.attached-documents .empty-state .icon {
+  font-size: 26px;
+  margin-bottom: 8px;
+}
+
+.attached-documents .empty-state .hint {
+  font-size: 12px;
 }

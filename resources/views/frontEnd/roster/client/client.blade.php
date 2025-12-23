@@ -16,7 +16,7 @@
                     <p class="header-subtitle">Manage client information and care plans</p>
                 </div>
                 <div class="header-actions">
-                    <button class="btn" data-toggle="modal" data-target="#addLeaveModal"><i class="fa fa-plus"></i> Add Client</button>
+                    <button class="btn" data-toggle="modal" data-target="#addClientsModal"><i class="fa fa-plus"></i> Add Client</button>
                 </div> 
             </div>
 
@@ -460,6 +460,125 @@
                 </div>
             </div>
 
+        </div>
+
+
+
+
+
+        <!-- add Clients Modal -->
+        <div class="modal fade leaveCommunStyle" id="addClientsModal" tabindex="1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title">Add New Client</h4>
+                    </div>
+                    <div class="modal-body approveLeaveModal">
+                    <div class="carer-form">
+                        <form>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label>Full Name *</label>
+                                    <input type="text" class="form-control">
+                                </div>
+                                <div class="col-md-6">
+                                    <label>Date of Birth *</label>
+                                    <input type="date" class="form-control">
+                                </div>
+                                <div class="col-md-6 m-t-10">
+                                    <label>Phone *</label>
+                                    <input type="text" class="form-control">
+                                </div>
+                                <div class="col-md-6 m-t-10">
+                                    <label>Email *</label>
+                                    <input type="email" class="form-control">
+                                </div>     
+                                <div class="col-md-6  m-t-10">
+                                    <label>Status</label>
+                                    <select class="form-control">
+                                        <option>Active</option>
+                                        <option>Inactive</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6  m-t-10">
+                                    <label>Funding Type</label>
+                                    <select class="form-control">
+                                        <option>Full Time</option>
+                                        <option>Part Time</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6  m-t-10">
+                                    <label>Mobility</label>
+                                    <select class="form-control">
+                                        <option>Full Time</option>
+                                        <option>Part Time</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-12 m-t-10">
+                                     <label>Hourly Rate (£)</label>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <input type="text" placeholder="Street" class="form-control">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <input type="text" placeholder="City" class="form-control">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <input type="text" placeholder="Postcode" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12  m-t-10">
+                                    <label>Notes (Optional)</label>
+                                    <textarea  class="form-control" rows="3" placeholder="Add any notes for the staff member..." name="approve_note"></textarea>
+                                </div>
+                            </div>
+                            <div class="qualifications m-t-10">
+                                <h4>Qualifications</h4>
+                                <div class="checkbox-grid">
+                                    <label><input type="checkbox"> NVQ Level 2 Health & Social Care</label>
+                                    <label><input type="checkbox"> NVQ Level 3 Health & Social Care</label>
+                                    <label><input type="checkbox"> First Aid Certificate</label>
+                                    <label><input type="checkbox"> Dementia Care Specialist</label>
+                                    <label><input type="checkbox"> Medication Administration</label>
+                                    <label><input type="checkbox"> Care Certificate</label>
+                                    <label><input type="checkbox"> Dementia Care</label>
+                                    <label><input type="checkbox"> First Aid</label>
+                                </div>
+                            </div>
+                            <div class="row">
+                            <div class="col-md-12">
+                                <label>Medical Notes</label>
+                                <textarea  class="form-control" rows="4" placeholder="Important Medical information" name="approve_note"></textarea>
+                            </div>
+                            <div class="col-md-12 m-t-10">
+                                    <label>Emergency Contact</label>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <input type="text" placeholder="Name" class="form-control">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <input type="text" placeholder="Phone" class="form-control">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <input type="text" placeholder="Relationship" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                            </div>
+
+                          
+                            <div class="actions">
+                                <button type="button" class="cancel">Cancel</button>
+                                <button type="submit" class="submit">Create Carer</button>
+                            </div>
+
+                        </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
 

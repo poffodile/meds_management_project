@@ -86,20 +86,20 @@ class StaffService
     /**
      * On Leave Staff
      */
-    // public function onLeaveStaff($homeId)
-    // {
-    //     $today = Carbon::today()->toDateString();
+    public function onLeaveStaff($homeId)
+    {
+        $today = Carbon::today()->toDateString();
 
-    //     return User::join('staff_leaves', 'staff_leaves.user_id', '=', 'user.id')
-    //         ->where('user.home_id', $homeId)
-    //         ->where('user.is_deleted', 0)
-    //         ->where('staff_leaves.status', 1)
-    //         ->whereDate('staff_leaves.start_date', '<=', $today)
-    //         ->whereDate('staff_leaves.end_date', '>=', $today)
-    //         ->select('user.*')
-    //         ->distinct()
-    //         ->get();
-    // }
+        return User::join('staff_leaves', 'staff_leaves.user_id', '=', 'user.id')
+            ->where('user.home_id', $homeId)
+            ->where('user.is_deleted', 0)
+            ->where('staff_leaves.leave_status', 1)
+            ->whereDate('staff_leaves.start_date', '<=', $today)
+            ->whereDate('staff_leaves.end_date', '>=', $today)
+            ->select('user.*')
+            ->distinct()
+            ->get();
+    }
 
     /**
      * Staff counts
@@ -110,7 +110,7 @@ class StaffService
             'all'       => $this->allStaff($homeId)->count(),
             'active'    => $this->activeStaff($homeId)->count(),
             'inactive'  => $this->inactiveStaff($homeId)->count(),
-            // 'on_leave'  => $this->onLeaveStaff($homeId)->count(),
+            'on_leave'  => $this->onLeaveStaff($homeId)->count(),
         ];
     }
 }

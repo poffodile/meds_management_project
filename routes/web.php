@@ -129,6 +129,7 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 		Route::post('/leave/update', [LeaveRequestController::class, 'update'])->name('roster.leave.update');
 
 		Route::get('/carer', [CarerController::class, 'index'])->name('roster.staff.carer');
+		
 		Route::get('/client', [ClientController::class, 'index'])->name('roster.client');
 		
 		Route::get('/incident-management', [IncidentManagementController::class, 'index'])->name('roster.incident.management');

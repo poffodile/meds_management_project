@@ -3,59 +3,68 @@
 @section('content')
 
     @include('frontEnd.roster.common.roster_header')
+    <!-- FullCalendar Scheduler CSS -->
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/fullcalendar-scheduler@6.1.11/index.global.min.css">
+
     <style>
-    .mainCalendar{
-        background-color: #fff;
-    }
-    .fc-button {
-        top: -10px;
-    }
-    .fc-header-title {
-    margin-top: -5px;
-}
-.external-event{
-    border: 1px dashed #ea580c;
-    background: #fef9ef;
-}
-.dotEndText span i{
-   font-size: 8px;
-   color: #09db9cff;
-}
-.dotEndText span{
-    font-size: 13px;
-    font-weight: 700;
-    color: #146a50;
-}
-.leaveTime{
-    font-size: 10px;
-    margin-top: 5px;
-    color: #146a50;
-}
-.table tbody > tr > td{
-    padding: 6px;
-    background: #fef9ef;
-}
-.openShifts{
-    width: 167px;
-    color: #cf4b06;
-    font-weight: 600;
-    font-size: 13px;
-    padding-top: 17px;
-}
-.fc-grid th {
-    background: #f7f7f7 !important;
-}
-/* .fc-widget-header{
-    height: 50px;
-    line-height: 50px;
-    text-align: center;
-    background: #e4e4e4 !important;
-} */
+        .mainCalendar {
+            background-color: #fff;
+        }
 
+        .fc-button {
+            top: -10px;
+        }
 
+        .fc-header-title {
+            margin-top: -5px;
+        }
 
+        .external-event {
+            border: 1px dashed #ea580c;
+            background: #fef9ef;
+        }
 
+        .dotEndText span i {
+            font-size: 8px;
+            color: #09db9cff;
+        }
 
+        .dotEndText span {
+            font-size: 13px;
+            font-weight: 700;
+            color: #146a50;
+        }
+
+        .leaveTime {
+            font-size: 10px;
+            margin-top: 5px;
+            color: #146a50;
+        }
+
+        .table tbody>tr>td {
+            padding: 6px;
+            background: #fef9ef;
+        }
+
+        .openShifts {
+            width: 167px;
+            color: #cf4b06;
+            font-weight: 600;
+            font-size: 13px;
+            padding-top: 17px;
+        }
+
+        .fc-grid th {
+            background: #f7f7f7 !important;
+        }
+
+        /* .fc-widget-header{
+                        height: 50px;
+                        line-height: 50px;
+                        text-align: center;
+                        background: #e4e4e4 !important;
+                    } */
     </style>
     <script type="text/javascript" src="{{ url('/public/frontEnd/js/external-dragging-calendar.js') }}"></script>
     <main class="page-content">
@@ -92,8 +101,7 @@
                     <button class="filterBtn lightGreen">
                         🔁 Recurring
                     </button>
-                    <button class="profileDrop">+ Add Shift</button>
-
+                    <button class="profileDrop" data-toggle="modal" data-target="#addShiftModal">+ Add Shift</button>
                 </div>
 
             </div>
@@ -243,7 +251,7 @@
                 </div>
 
                 <!-- TAB CONTENT -->
-                <div class="tab-content">
+                {{-- <div class="tab-content">
 
                     <div class="content active" id="roster">
 
@@ -304,234 +312,256 @@
                                 <input type="text" placeholder="Search..." />
                             </div>
 
-                     
+
                             <!--main content start-->
-                         
+
+                            <!-- page start-->
+                            <section class="mainCalendar">
+                                <div class="panel-body">
                                     <!-- page start-->
-                                    <section class="mainCalendar">
-                                        <div class="panel-body">
-                                            <!-- page start-->
-                                            <div class="row">                                               
-                                                <aside class="col-lg-12">
-                                                    <div id='external-events'>
-                                                        <table class="table table-bordered m-b-0">
-                                                            <tbody>
-                                                                <tr>
-                                                                    <td><div class="openShifts"><i class="fa fa-exclamation-circle"></i> Open Shifts</div></td>
-                                                                    <td>
-                                                                        <div class='external-event label fc-event'>
-                                                                            <div class="dotEndText">
-                                                                                <span><i class="fa fa-circle"></i> </span>
-                                                                                <span>East Wing</span>
-                                                                            </div>
-                                                                            <div class="leaveTime">09:00 - 17:00</div>
-                                                                        </div>
-                                                                    </td>
-                                                                    <td>
-                                                                        <div class='external-event label fc-event'>
-                                                                            <div class="dotEndText">
-                                                                                <span><i class="fa fa-circle"></i> </span>
-                                                                                <span>East Wing</span>
-                                                                            </div>
-                                                                            <div class="leaveTime">09:00 - 17:00</div>
-                                                                        </div>
-                                                                    </td>
-                                                                    <td>
-                                                                        <div class='external-event label fc-event'>
-                                                                            <div class="dotEndText">
-                                                                                <span><i class="fa fa-circle"></i> </span>
-                                                                                <span>East Wing</span>
-                                                                            </div>
-                                                                            <div class="leaveTime">09:00 - 17:00</div>
-                                                                        </div>
-                                                                    </td>
-                                                                    <td>
-                                                                        <div class='external-event label fc-event'>
-                                                                            <div class="dotEndText">
-                                                                                <span><i class="fa fa-circle"></i> </span>
-                                                                                <span>East Wing</span>
-                                                                            </div>
-                                                                            <div class="leaveTime">09:00 - 17:00</div>
-                                                                        </div>
-                                                                    </td>
-                                                                    <td>
-                                                                        <div class='external-event label fc-event'>
-                                                                            <div class="dotEndText">
-                                                                                <span><i class="fa fa-circle"></i> </span>
-                                                                                <span>East Wing</span>
-                                                                            </div>
-                                                                            <div class="leaveTime">09:00 - 17:00</div>
-                                                                        </div>
-                                                                    </td>
-                                                                    <td>
-                                                                        <div class='external-event label fc-event'>
-                                                                            <div class="dotEndText">
-                                                                                <span><i class="fa fa-circle"></i> </span>
-                                                                                <span>East Wing</span>
-                                                                            </div>
-                                                                            <div class="leaveTime">09:00 - 17:00</div>
-                                                                        </div>
-                                                                    </td>
-                                                                    <td>
-                                                                        <div class='external-event label fc-event'>
-                                                                            <div class="dotEndText">
-                                                                                <span><i class="fa fa-circle"></i> </span>
-                                                                                <span>East Wing</span>
-                                                                            </div>
-                                                                            <div class="leaveTime">09:00 - 17:00</div>
-                                                                        </div>
-                                                                    </td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
-                                                     
+                                    <div class="row">
+                                        <aside class="col-lg-12">
+                                            <div id='external-events'>
+                                                <table class="table table-bordered m-b-0">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>
+                                                                <div class="openShifts"><i class="fa fa-exclamation-circle"></i> Open Shifts</div>
+                                                            </td>
+                                                            <td>
+                                                                <div class='external-event label fc-event'>
+                                                                    <div class="dotEndText">
+                                                                        <span><i class="fa fa-circle"></i> </span>
+                                                                        <span>East Wing</span>
+                                                                    </div>
+                                                                    <div class="leaveTime">09:00 - 17:00</div>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class='external-event label fc-event'>
+                                                                    <div class="dotEndText">
+                                                                        <span><i class="fa fa-circle"></i> </span>
+                                                                        <span>East Wing</span>
+                                                                    </div>
+                                                                    <div class="leaveTime">09:00 - 17:00</div>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class='external-event label fc-event'>
+                                                                    <div class="dotEndText">
+                                                                        <span><i class="fa fa-circle"></i> </span>
+                                                                        <span>East Wing</span>
+                                                                    </div>
+                                                                    <div class="leaveTime">09:00 - 17:00</div>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class='external-event label fc-event'>
+                                                                    <div class="dotEndText">
+                                                                        <span><i class="fa fa-circle"></i> </span>
+                                                                        <span>East Wing</span>
+                                                                    </div>
+                                                                    <div class="leaveTime">09:00 - 17:00</div>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class='external-event label fc-event'>
+                                                                    <div class="dotEndText">
+                                                                        <span><i class="fa fa-circle"></i> </span>
+                                                                        <span>East Wing</span>
+                                                                    </div>
+                                                                    <div class="leaveTime">09:00 - 17:00</div>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class='external-event label fc-event'>
+                                                                    <div class="dotEndText">
+                                                                        <span><i class="fa fa-circle"></i> </span>
+                                                                        <span>East Wing</span>
+                                                                    </div>
+                                                                    <div class="leaveTime">09:00 - 17:00</div>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class='external-event label fc-event'>
+                                                                    <div class="dotEndText">
+                                                                        <span><i class="fa fa-circle"></i> </span>
+                                                                        <span>East Wing</span>
+                                                                    </div>
+                                                                    <div class="leaveTime">09:00 - 17:00</div>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+
+                                            </div>
+                                        </aside>
+                                        <aside class="col-lg-3">
+                                            <div class="staff-wrapper">
+                                                <div class="staff-panel">
+
+                                                    <div class="panel-header">
+                                                        <i class="fa fa-user"></i>
+                                                        <span>Staff</span>
                                                     </div>
-                                                </aside>
-                                                <aside class="col-lg-3">
-                                                     <div class="staff-wrapper">
-                                                        <div class="staff-panel">
 
-                                                            <div class="panel-header">
-                                                            <i class="fa fa-user"></i>
-                                                            <span>Staff</span>
-                                                            </div>
+                                                    <div class="staff-list">
 
-                                                            <div class="staff-list">
-
-                                                            <div class="staff-item">
-                                                                <div class="avatar">AS</div>
-                                                                <div class="staff-info">
+                                                        <div class="staff-item">
+                                                            <div class="avatar">AS</div>
+                                                            <div class="staff-info">
                                                                 <div class="name">Alex Sheffield</div>
                                                                 <div class="hours">
                                                                     <span>8.0h / 40h</span>
-                                                                    <div class="progress"><div class="bar" style="width:20%"></div></div>
+                                                                    <div class="progress">
+                                                                        <div class="bar" style="width:20%"></div>
+                                                                    </div>
                                                                 </div>
-                                                                </div>
-                                                                <span class="badge">FT</span>
                                                             </div>
+                                                            <span class="badge">FT</span>
+                                                        </div>
 
-                                                            <div class="staff-item">
-                                                                <div class="avatar">BH</div>
-                                                                <div class="staff-info">
+                                                        <div class="staff-item">
+                                                            <div class="avatar">BH</div>
+                                                            <div class="staff-info">
                                                                 <div class="name">Becky Harrison</div>
                                                                 <div class="hours">
                                                                     <span>8.0h / 40h</span>
-                                                                    <div class="progress"><div class="bar" style="width:20%"></div></div>
+                                                                    <div class="progress">
+                                                                        <div class="bar" style="width:20%"></div>
+                                                                    </div>
                                                                 </div>
-                                                                </div>
-                                                                <span class="badge">FT</span>
                                                             </div>
+                                                            <span class="badge">FT</span>
+                                                        </div>
 
-                                                            <div class="staff-item">
-                                                                <div class="avatar">ER</div>
-                                                                <div class="staff-info">
+                                                        <div class="staff-item">
+                                                            <div class="avatar">ER</div>
+                                                            <div class="staff-info">
                                                                 <div class="name">Ellese Rothwell</div>
                                                                 <div class="hours">
                                                                     <span>8.0h / 48h</span>
-                                                                    <div class="progress"><div class="bar" style="width:17%"></div></div>
+                                                                    <div class="progress">
+                                                                        <div class="bar" style="width:17%"></div>
+                                                                    </div>
                                                                 </div>
-                                                                </div>
-                                                                <span class="badge">FT</span>
                                                             </div>
+                                                            <span class="badge">FT</span>
+                                                        </div>
 
-                                                            <div class="staff-item">
-                                                                <div class="avatar">EW</div>
-                                                                <div class="staff-info">
+                                                        <div class="staff-item">
+                                                            <div class="avatar">EW</div>
+                                                            <div class="staff-info">
                                                                 <div class="name">Emma Wilson</div>
                                                                 <div class="hours">
                                                                     <span>0.0h / 40h</span>
-                                                                    <div class="progress"><div class="bar" style="width:0%"></div></div>
+                                                                    <div class="progress">
+                                                                        <div class="bar" style="width:0%"></div>
+                                                                    </div>
                                                                 </div>
-                                                                </div>
-                                                                <span class="badge">FT</span>
                                                             </div>
+                                                            <span class="badge">FT</span>
+                                                        </div>
 
-                                                            <div class="staff-item">
-                                                                <div class="avatar">GA</div>
-                                                                <div class="staff-info">
+                                                        <div class="staff-item">
+                                                            <div class="avatar">GA</div>
+                                                            <div class="staff-info">
                                                                 <div class="name">George Ashmore</div>
                                                                 <div class="hours">
                                                                     <span>4.0h / 20h</span>
-                                                                    <div class="progress"><div class="bar" style="width:20%"></div></div>
+                                                                    <div class="progress">
+                                                                        <div class="bar" style="width:20%"></div>
+                                                                    </div>
                                                                 </div>
-                                                                </div>
-                                                                <span class="badge pt">PT</span>
                                                             </div>
+                                                            <span class="badge pt">PT</span>
+                                                        </div>
 
-                                                            <div class="staff-item">
-                                                                <div class="avatar">GA</div>
-                                                                <div class="staff-info">
+                                                        <div class="staff-item">
+                                                            <div class="avatar">GA</div>
+                                                            <div class="staff-info">
                                                                 <div class="name">George Ashmore</div>
                                                                 <div class="hours">
                                                                     <span>4.0h / 20h</span>
-                                                                    <div class="progress"><div class="bar" style="width:20%"></div></div>
+                                                                    <div class="progress">
+                                                                        <div class="bar" style="width:20%"></div>
+                                                                    </div>
                                                                 </div>
-                                                                </div>
-                                                                <span class="badge pt">PT</span>
                                                             </div>
-                                                            <div class="staff-item">
-                                                                <div class="avatar">ER</div>
-                                                                <div class="staff-info">
+                                                            <span class="badge pt">PT</span>
+                                                        </div>
+                                                        <div class="staff-item">
+                                                            <div class="avatar">ER</div>
+                                                            <div class="staff-info">
                                                                 <div class="name">Ellese Rothwell</div>
                                                                 <div class="hours">
                                                                     <span>8.0h / 48h</span>
-                                                                    <div class="progress"><div class="bar" style="width:17%"></div></div>
+                                                                    <div class="progress">
+                                                                        <div class="bar" style="width:17%"></div>
+                                                                    </div>
                                                                 </div>
-                                                                </div>
-                                                                <span class="badge">FT</span>
                                                             </div>
+                                                            <span class="badge">FT</span>
+                                                        </div>
 
-                                                            <div class="staff-item">
-                                                                <div class="avatar">EW</div>
-                                                                <div class="staff-info">
+                                                        <div class="staff-item">
+                                                            <div class="avatar">EW</div>
+                                                            <div class="staff-info">
                                                                 <div class="name">Emma Wilson</div>
                                                                 <div class="hours">
                                                                     <span>0.0h / 40h</span>
-                                                                    <div class="progress"><div class="bar" style="width:0%"></div></div>
+                                                                    <div class="progress">
+                                                                        <div class="bar" style="width:0%"></div>
+                                                                    </div>
                                                                 </div>
-                                                                </div>
-                                                                <span class="badge">FT</span>
                                                             </div>
+                                                            <span class="badge">FT</span>
+                                                        </div>
 
-                                                            <div class="staff-item">
-                                                                <div class="avatar">GA</div>
-                                                                <div class="staff-info">
+                                                        <div class="staff-item">
+                                                            <div class="avatar">GA</div>
+                                                            <div class="staff-info">
                                                                 <div class="name">George Ashmore</div>
                                                                 <div class="hours">
                                                                     <span>4.0h / 20h</span>
-                                                                    <div class="progress"><div class="bar" style="width:20%"></div></div>
+                                                                    <div class="progress">
+                                                                        <div class="bar" style="width:20%"></div>
+                                                                    </div>
                                                                 </div>
-                                                                </div>
-                                                                <span class="badge pt">PT</span>
                                                             </div>
+                                                            <span class="badge pt">PT</span>
+                                                        </div>
 
-                                                            <div class="staff-item">
-                                                                <div class="avatar">GA</div>
-                                                                <div class="staff-info">
+                                                        <div class="staff-item">
+                                                            <div class="avatar">GA</div>
+                                                            <div class="staff-info">
                                                                 <div class="name">George Ashmore</div>
                                                                 <div class="hours">
                                                                     <span>4.0h / 20h</span>
-                                                                    <div class="progress"><div class="bar" style="width:20%"></div></div>
+                                                                    <div class="progress">
+                                                                        <div class="bar" style="width:20%"></div>
+                                                                    </div>
                                                                 </div>
-                                                                </div>
-                                                                <span class="badge pt">PT</span>
                                                             </div>
-
-                                                            </div>
-                                                        </div>
+                                                            <span class="badge pt">PT</span>
                                                         </div>
 
-                                                </aside>
-                                                <aside class="col-lg-9">
-                                                    <div id="calendar" class="has-toolbar"></div>
-                                                </aside>
-                                                
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <!-- page end-->
-                                        </div>
-                                    </section>
+
+                                        </aside>
+                                        <aside class="col-lg-9">
+                                            <div id="calendar" class="has-toolbar"></div>
+                                        </aside>
+
+                                    </div>
                                     <!-- page end-->
-                               
+                                </div>
+                            </section>
+                            <!-- page end-->
+
                             <!--main content end-->
                             <!--right sidebar start-->
                             <div class="right-sidebar">
@@ -833,10 +863,191 @@
                         <h3>Split View</h3>
                         <p>Split layout appears here.</p>
                     </div>
-                </div>
+                </div> --}}
+                <div id="calendar"></div>
             </div>
 
         </div>
+
+        <!-- add Shift Schedule Modal -->
+        <div class="modal fade leaveCommunStyle" id="addShiftModal" tabindex="1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title"> Create New Shift</h4>
+                    </div>
+                    <div class="modal-body approveLeaveModal">
+                        <div class="carer-form">
+                            <form>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="">
+                                            <label>care Type</label>
+                                            <select class="form-control">
+                                                <option>Active</option>
+                                                <option>Inactive</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="calendarTabs leaveRequesttabs m-t-10">
+                                            <div class="tabs p-2 m-b-10" style="background-color: #f5f5f5;">
+                                                <button class="tab active" data-tab="scheduleLocation">
+                                                    Location
+                                                </button>
+
+                                                <button class="tab" data-tab="scheduleClient">
+                                                    Client
+                                                </button>
+
+                                                <button class="tab" data-tab="scheduleProperty">
+                                                    Property
+                                                </button>
+                                            </div>
+
+                                            <!-- TAB CONTENT -->
+                                            <div class="tab-content carertabcontent">
+                                                <div class="content active" id="scheduleLocation">
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            <select class="form-control">
+                                                                <option>Select Client</option>
+                                                                <option>Inactive</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-md-12 m-b-10">
+                                                            <label>care Type</label>
+                                                            <input type="date" class="form-control">
+                                                        </div>
+                                                    </div>
+                                                    <div class="row m-b-10">
+                                                        <div class="col-md-6">
+                                                            <label>Start Time *</label>
+                                                            <input type="time" class="form-control">
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label>Start Time *</label>
+                                                            <input type="time" class="form-control">
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            <label>Shift Type</label>
+                                                            <select class="form-control">
+                                                                <option>Select Client</option>
+                                                                <option>Inactive</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-md-12  m-t-10">
+                                                            <label>Tasks (comma separated)</label>
+                                                            <textarea class="form-control" rows="3" placeholder="Add any notes for the staff member..." name="approve_note"></textarea>
+                                                        </div>
+                                                        <div class="col-md-12  m-t-10">
+                                                            <label>Notes</label>
+                                                            <textarea class="form-control" rows="3" placeholder="Add any notes for the staff member..." name="approve_note"></textarea>
+                                                        </div>
+                                                        <div class="col-md-12  m-t-10">
+                                                            <div class="overtime">
+                                                                <label>
+                                                                    <input type="checkbox"> Make this a recurring shift
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-12">
+                                                            <div class="attached-documents">
+
+                                                                <div class="header">
+                                                                    <div class="title">
+                                                                        📎 <span>Attached Documents</span>
+                                                                    </div>
+                                                                    <button class="close-btn">✕</button>
+                                                                </div>
+
+                                                                <div class="upload-box">
+
+                                                                    <div class="upload-actions">
+                                                                        <button class="secondary">
+                                                                            📁 Select from System
+                                                                        </button>
+                                                                        <button class="primary">
+                                                                            ⬆ Upload File
+                                                                        </button>
+                                                                    </div>
+
+                                                                    <div class="row">
+                                                                        <div class="col-md-6">
+                                                                            <label>Document Name</label>
+                                                                            <input type="text" class="form-control" placeholder="e.g. Supervision Note">
+                                                                        </div>
+                                                                        <div class="col-md-6">
+                                                                            <label>Document Type</label>
+                                                                            <select class="form-control">
+                                                                                <option>Other</option>
+                                                                                <option>Care Plan</option>
+                                                                                <option>Risk Assessment</option>
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="checkbox">
+                                                                        <label>
+                                                                            <input type="checkbox">
+                                                                            Requires completion during shift
+                                                                        </label>
+                                                                    </div>
+
+                                                                    <button class="upload-btn">
+                                                                        ⬆ Upload & Attach
+                                                                    </button>
+
+                                                                </div>
+
+                                                                <div class="empty-state">
+                                                                    <div class="icon">📎</div>
+                                                                    <p><strong>No documents attached</strong></p>
+                                                                    <p class="hint">Click “Attach” to add documents</p>
+                                                                </div>
+
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="content" id="scheduleClient">
+                                                    Client
+                                                </div>
+
+                                                <div class="content" id="scheduleProperty">
+                                                    Property
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Tabs -->
+
+
+                                    </div>
+                                    <div class="col-md-6">
+
+                                    </div>
+                                </div>
+
+                                <!--
+                                        <div class="actions">
+                                            <button type="button" class="cancel">Cancel</button>
+                                            <button type="submit" class="submit">Create Carer</button>
+                                        </div> -->
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- FullCalendar Scheduler JS (includes core + interaction + resource) -->
+        <script src="https://cdn.jsdelivr.net/npm/fullcalendar-scheduler@6.1.11/index.global.min.js"></script>
 
         <!-- Advanced Filters  -->
         <script>
@@ -906,51 +1117,189 @@
 
             // });
 
-            $(document).ready(function() {
+            // $(document).ready(function() {
 
-                // Make external events draggable
-                $('#external-events .fc-event').each(function() {
+            //     // Make external events draggable
+            //     $('#external-events .fc-event').each(function() {
 
-                    var eventObject = {
-                        title: $.trim($(this).text())
-                    };
+            //         var eventObject = {
+            //             title: $.trim($(this).text())
+            //         };
 
-                    // store event data
-                    $(this).data('eventObject', eventObject);
+            //         // store event data
+            //         $(this).data('eventObject', eventObject);
 
-                    // make draggable
-                    $(this).draggable({
-                        zIndex: 999,
-                        revert: true,
-                        revertDuration: 0
-                    });
-                });
+            //         // make draggable
+            //         $(this).draggable({
+            //             zIndex: 999,
+            //             revert: true,
+            //             revertDuration: 0
+            //         });
+            //     });
 
-                // Initialize calendar
-                $('#calendar').fullCalendar({
+            //     // Initialize calendar
+            //     $('#calendar').fullCalendar({
 
-                    header: {
+            //         header: {
+            //             left: 'prev,next today',
+            //             center: 'title',
+            //             right: 'month,agendaWeek,agendaDay'
+            //         },
+
+            //         editable: true,
+            //         droppable: true,
+
+            //         drop: function(date, jsEvent, ui) {
+
+            //             var originalEventObject = $(this).data('eventObject');
+
+            //             var copiedEventObject = $.extend({}, originalEventObject);
+
+            //             copiedEventObject.start = date;
+
+            //             // 🔥 THIS LINE APPENDS EVENT TO CALENDAR
+            //             $('#calendar').fullCalendar('renderEvent', copiedEventObject, true);
+            //         }
+            //     });
+
+            // });
+        </script>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const calendarEl = document.getElementById('calendar');
+
+                const calendar = new FullCalendar.Calendar(calendarEl, {
+
+                    schedulerLicenseKey: 'GPL-My-Project-Is-Open-Source',
+
+                    initialView: 'resourceTimelineWeek',
+
+                    resourceOrder: 'order',
+
+                    height: 'auto',
+
+                    /* ===== HEADER BUTTONS ===== */
+                    headerToolbar: {
                         left: 'prev,next today',
                         center: 'title',
-                        right: 'month,agendaWeek,agendaDay'
+                        right: 'dayGridMonth,resourceTimelineWeek,resourceTimelineDay'
                     },
 
+                    /* ===== RESOURCE SETTINGS ===== */
+                    resourceAreaHeaderContent: 'Staff',
+
+                    /* ===== INTERACTION ===== */
                     editable: true,
-                    droppable: true,
+                    selectable: true,
 
-                    drop: function(date, jsEvent, ui) {
+                    /* ===== MONTH VIEW CONFIG ===== */
+                    views: {
+                        dayGridMonth: {
+                            dayMaxEventRows: 3
+                        },
+                        resourceTimelineWeek: {
+                            type: 'resourceTimeline',
+                            duration: {
+                                weeks: 1
+                            }
+                        },
+                        resourceTimelineDay: {
+                            type: 'resourceTimeline',
+                            duration: {
+                                days: 1
+                            }
+                        }
+                    },
 
-                        var originalEventObject = $(this).data('eventObject');
 
-                        var copiedEventObject = $.extend({}, originalEventObject);
+                    /* ===== CLICK MONTH DAY → OPEN WEEK ===== */
+                    dateClick: function(info) {
+                        if (calendar.view.type === 'dayGridMonth') {
+                            calendar.changeView('resourceTimelineWeek', info.dateStr);
+                        }
+                    },
 
-                        copiedEventObject.start = date;
 
-                        // 🔥 THIS LINE APPENDS EVENT TO CALENDAR
-                        $('#calendar').fullCalendar('renderEvent', copiedEventObject, true);
-                    }
+                    /* ===== STAFF (RESOURCES) ===== */
+                    resources: [{
+                            id: 'open',
+                            title: '🟡 Open Shifts',
+                            order: 0 // 👈 always first
+                        },
+                        {
+                            id: '1',
+                            title: 'Alex Sheffield',
+                            order: 1 // 👈 always first
+                        },
+                        {
+                            id: '2',
+                            title: 'Becky Harrison',
+                            order: 2
+                        },
+                        {
+                            id: '3',
+                            title: 'Emma Wilson',
+                            order: 3
+                        }
+                    ],
+
+                    /* ===== SHIFTS (EVENTS) ===== */
+                    events: [
+                        // 🟡 OPEN SHIFTS
+                        {
+                            id: '101',
+                            title: 'South Wing',
+                            start: '2025-12-22T09:00:00',
+                            end: '2025-12-22T13:00:00',
+                            resourceId: 'open',
+                            backgroundColor: '#fde68a'
+                        },
+                        {
+                            id: '102',
+                            title: 'Night Shift',
+                            start: '2025-12-23T20:00:00',
+                            end: '2025-12-24T06:00:00',
+                            resourceId: 'open',
+                            backgroundColor: '#fde68a'
+                        },
+                        {
+                            id: '103',
+                            title: 'East Wing',
+                            start: '2025-12-24T10:00:00',
+                            end: '2025-12-24T18:00:00',
+                            resourceId: 'open',
+                            backgroundColor: '#fde68a'
+                        },
+                        // 🟢 ASSIGNED SHIFTS
+                        {
+                            id: '201',
+                            title: 'South Wing',
+                            start: '2025-12-22T09:00:00',
+                            end: '2025-12-22T13:00:00',
+                            resourceId: '1',
+                            backgroundColor: '#d1fae5'
+                        },
+                        {
+                            id: '202',
+                            title: 'North Wing',
+                            start: '2025-12-23T09:00:00',
+                            end: '2025-12-23T17:00:00',
+                            resourceId: '2',
+                            backgroundColor: '#bbf7d0'
+                        },
+                        {
+                            id: '203',
+                            title: 'East Wing',
+                            start: '2025-12-24T10:00:00',
+                            end: '2025-12-24T18:00:00',
+                            resourceId: '3',
+                            backgroundColor: '#a7f3d0'
+                        }
+                    ]
                 });
 
+                calendar.render();
             });
         </script>
 

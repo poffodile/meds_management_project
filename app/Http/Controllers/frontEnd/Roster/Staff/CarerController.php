@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\User;
-use App\Services\Staff\StaffService;
+use App\Services\Staff\StaffService, App\Models\CompanyDepartment;
 
 class CarerController extends Controller
 {
@@ -25,10 +25,10 @@ class CarerController extends Controller
         if (!$homeId) {
             abort(403, 'Home ID not found.');
         }
-
+        $data['department'] = CompanyDepartment::getActiveCompanyDepartment();
         $data['activeStaff'] = $this->staffService->activeStaff($homeId);
         $data['inactiveStaff'] = $this->staffService->inactiveStaff($homeId);
-        // $data['onLeaveStaff'] = $this->staffService->onLeaveStaff($homeId);
+        $data['onLeaveStaff'] = $this->staffService->onLeaveStaff($homeId);
         $data['allStaff'] = $this->staffService->allStaff($homeId);
         $data['counts'] = $this->staffService->staffCounts($homeId);
 
