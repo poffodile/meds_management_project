@@ -32,6 +32,22 @@ class CarerController extends Controller
         $data['allStaff'] = $this->staffService->allStaff($homeId);
         $data['counts'] = $this->staffService->staffCounts($homeId);
 
+        $data['courses'] = $this->staffService->courses();
+
+        // dd($data['courses']);
+
         return view('frontEnd.roster.staff.carer', $data);
+    }
+
+    public function carer_details($carer_id)
+    {
+
+        if (!$carer_id) {
+            abort(400, 'User ID is required.');
+        }
+
+        $data['staffDetails'] = $this->staffService->getStaffDetails($carer_id);
+
+        return view('frontEnd.roster.staff.carer_details', $data);
     }
 }

@@ -9077,7 +9077,7 @@ ul.pop-notification>li a:hover i {
 
 .multi-upload {
     float: left;
-    width: 76%;
+    width: 100%;
 }
 
 /*---26-june-2017--*/
@@ -11098,4 +11098,16 @@ header.panel-heading.headingCapitilize {
 
 .attached-documents .empty-state .hint {
   font-size: 12px;
+}
+.heightScrollModal{
+    height: 628px;
+    overflow: auto;
+}
+.allBtnUseColor{
+    background-color: #2563eb;
+    color: #fff;
+}
+.allBtnUseColor:hover{
+    background-color: #1a53d1;
+    color: #fff;
 }

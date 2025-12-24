@@ -6,6 +6,7 @@ use App\User;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 
 class StaffService
 {
@@ -112,5 +113,23 @@ class StaffService
             'inactive'  => $this->inactiveStaff($homeId)->count(),
             'on_leave'  => $this->onLeaveStaff($homeId)->count(),
         ];
+    }
+
+    public function getStaffDetails($userId)
+    {
+        return User::where('id', $userId)->first();
+    }
+
+    public function courses()
+    {
+        $response = Http::get('http://66.116.198.68:8055/api/all-courses-list/');
+
+        if ($response->successful()) {
+            $data = $response->json();
+            $courses = $data['all_course_list'] ?? [];
+        } else {
+            $courses = [];
+        }
+        return $courses;
     }
 }

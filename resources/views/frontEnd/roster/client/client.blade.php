@@ -5,8 +5,6 @@
 
 @include('frontEnd.roster.common.roster_header')
 
-
-
  <main class="page-content">
         <div class="container-fluid">
 
@@ -16,7 +14,7 @@
                     <p class="header-subtitle">Manage client information and care plans</p>
                 </div>
                 <div class="header-actions">
-                    <button class="btn" data-toggle="modal" data-target="#addClientsModal"><i class="fa fa-plus"></i> Add Client</button>
+                    <button class="btn" data-toggle="modal" data-target="#addServiceUserModal"><i class="fa fa-plus"></i> Add Client</button>
                 </div> 
             </div>
 

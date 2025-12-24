@@ -85,7 +85,7 @@
                                                 <div class="user">
                                                     <div class="avatar">{{ strtoupper(substr(trim($carer->name), 0, 1)) }}</div>
                                                     <div class="info">
-                                                        <div class="name">{{ $carer->name }}</div>
+                                                        <div class="name"><a href="{{ url('roster/carer-details/' . $carer->id) }}">{{ $carer->name }}</a></div>
                                                         <div class="role">part time</div>
                                                     </div>
                                                 </div>
@@ -494,7 +494,6 @@
                     document.getElementById(tabName).classList.add("active");
                 });
             });
-
         </script>
 
     @endsection

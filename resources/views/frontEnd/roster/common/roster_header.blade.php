@@ -1,4 +1,5 @@
 
+<link href='https://cdn.boxicons.com/3.0.6/fonts/basic/boxicons.min.css' rel='stylesheet'>
 <style>
 
 .page-wrapper .sidebar-wrapper,
@@ -184,7 +185,7 @@
 }
 
 .sidebar-wrapper .sidebar-menu ul li a {
-  display: inline-block;
+  display: flex;
   width: 100%;
   text-decoration: none;
   position: relative;
@@ -193,7 +194,7 @@
 
 .sidebar-wrapper .sidebar-menu ul li a i {
   margin-right: 10px;
-  font-size: 16px;
+  font-size: 20px;
   width: 30px;
   height: 30px;
   line-height: 30px;
@@ -295,7 +296,7 @@
 /*------scroll bar---------------------*/
 
 ::-webkit-scrollbar {
-  width: 5px;
+  width: 6px;
   height: 7px;
 }
 ::-webkit-scrollbar-button {
@@ -303,9 +304,12 @@
   height: 0px;
 }
 ::-webkit-scrollbar-thumb {
-  background: #525965;
+  background: #bbbbbbff;
   border: 0px none #ffffff;
   border-radius: 0px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f1f1; 
 }
 /*-----------------------------chiller-theme-------------------------------------------------*/
 
@@ -398,6 +402,7 @@
     font-size: 13px;
     color: #686868;
     font-weight: 600;
+    line-height: 28px;
 }
 .sidebar-wrapper .sidebar-menu ul li a:hover {
     background: #f1f2f7;
@@ -442,32 +447,34 @@
       <div class="sidebar-menu">
         <ul>
           <li class="header-menu"> <span>Residential Care</span> </li>
-          <li> <a href="{{ url('/roster')}}"><i class="fa fa-tachometer"></i> <span>Dashboard</span> </a> </li>
-          <li> <a href="{{ url('/roster/manage-dashboard') }}"><i class="fa fa-shopping-cart"></i><span>Manager Dashboard</span> </a></li>        
-          <li> <a href="{{ url('/roster/schedule-shift') }}"><i class="fa fa-user"></i> <span>Schedule</span> </a> </li> 
-          <li> <a href="{{ url('/roster/carer-availability') }}"><i class="fa fa-globe"></i> <span>Carer Availability</span> </a> </li>
-          <li> <a href="{{ url('/roster/carer') }}"><i class="fa fa-globe"></i> <span>Carers</span> </a> </li>
-          <li> <a href="{{ url('/roster/client') }}"><i class="fa fa-globe"></i> <span>Clients</span> </a> </li>
-          <li> <a href="#"><i class="fa fa-globe"></i> <span>Daily Log</span> </a> </li>
+          <li> <a href="{{ url('/roster')}}"><i class='bx  bx-dashboard'></i>  <span>Dashboard</span> </a> </li>
+          <li> <a href="{{ url('/roster/manage-dashboard') }}"><i class='bx bx-dashboard'></i> <span>Manager Dashboard</span> </a></li>        
+          <li> <a href="{{ url('/roster/schedule-shift') }}"><i class='bx bx-calendar'></i> <span>Schedule</span> </a> </li> 
+          <!-- <li> <a href="{{ url('/roster/carer-availability') }}"><i class='bx bx-calendar'></i> <span>Carer Availability</span> </a> </li> -->
+          <li> <a href="#!"><i class='bx bx-calendar'></i> <span>Carer Availability</span> </a> </li>
+          <li> <a href="{{ url('/roster/carer') }}"><i class='bx bx-group'></i>  <span>Carers</span> </a> </li>
+          <li> <a href="{{ url('/roster/client') }}"><i class='bx bx-user-circle'></i>  <span>Clients</span> </a> </li>
+          <li> <a href="#"><i class='bx  bx-clipboard-detail'></i> <span>Daily Log</span> </a> </li>
           
           <li class="header-menu"> <span>Domiciliary Care</span> </li>
-          <li> <a href="#"><i class="fa fa-book"></i> <span>Dom Care Dashboard</span></a></li>
-          <li> <a href="#"><i class="fa fa-book"></i> <span>Visit Schedule</span></a></li>
-          <li> <a href="#"><i class="fa fa-book"></i> <span>Staff Availability</span></a></li>
-          <li> <a href="#"><i class="fa fa-book"></i> <span>Staff</span></a></li>
-          <li> <a href="#"><i class="fa fa-book"></i> <span>Clients</span></a></li>
-          <li> <a href="#"><i class="fa fa-book"></i> <span>Runs</span></a></li>
-          <li> <a href="{{ url('/roster/reports') }}"><i class="fa fa-globe"></i> <span> Reports </span> </a> </li>
-          <li> <a href="#"><i class="fa fa-book"></i> <span>Documentation</span></a></li>
-          <li> <a href="#"><i class="fa fa-calendar"></i> <span>Calendar</span> </a></li>
-          <li> <a href="#"> <i class="fa fa-folder"></i> <span>Examples</span> </a></li>
+          <li> <a href="#"><i class='bx bx-dashboard'></i>  <span>Dom Care Dashboard</span></a></li>
+          <li> <a href="#"><i class='bx bx-location'></i> <span>Visit Schedule</span></a></li>
+          <li> <a href="#"><i class='bx bx-calendar'></i> <span>Staff Availability</span></a></li>
+          <li> <a href="#"><i class='bx bx-group'></i> <span>Staff</span></a></li>
+          <li> <a href="#"><i class='bx bx-user-circle'></i> <span>Clients</span></a></li>
+          <li> <a href="#"><i class='bx bx-send'></i>  <span>Runs</span></a></li>
+          <!-- <li> <a href="{{ url('/roster/reports') }}"><i class='bx  bx-file-report'></i> <span> Reports </span> </a> </li> -->
+          <li> <a href="#!"><i class='bx  bx-file-report'></i> <span> Reports </span> </a> </li>
+          <li> <a href="#"><i class='bx bx-message'></i>  <span>Communications</span></a></li>
+          <li> <a href="#"><i class='bx bx-message'></i>  <span>Client Feedback</span> </a></li>
           
-          <li class="header-menu"> <span>General</span> </li>
-          <li> <a href="#"><i class="fa fa-book"></i> <span>Documentation</span></a></li>
-          <li> <a href="#"><i class="fa fa-calendar"></i> <span>Calendar</span> </a></li>
-          <li> <a href="#"> <i class="fa fa-folder"></i> <span>Examples</span> </a></li> 
+          <li class="header-menu"> <span>Supported Living</span> </li>
+          <li> <a href="#"><i class='bx bx-dashboard'></i> <span>SL Dashboard</span></a></li>
+          <li> <a href="#"><i class='bx bx-user-circle'></i> <span>Clients</span> </a></li>
+          <li> <a href="#"><i class='bx  bx-home'></i>  <span>Properties</span> </a></li> 
+          <li> <a href="#"><i class='bx bx-calendar'></i> <span>Schedule</span> </a></li> 
 
-          <li class="header-menu"> <span>General</span> </li>
+          <!-- <li class="header-menu"> <span>General</span> </li>
           <li> <a href="{{ url('/roster/messaging-center') }}"><i class="fa fa-globe"></i> <span> Messaging Center</span> </a> </li>
           <li> <a href="{{ url('/roster/staff-task') }}"><i class="fa fa-globe"></i> <span> Staff Tasks</span> </a> </li>
           <li> <a href="{{ url('/roster/care-document') }}"><i class="fa fa-globe"></i> <span> Care Documents</span> </a> </li>
@@ -476,8 +483,41 @@
           <li> <a href="#"><i class="fa fa-book"></i> <span>Documentation</span></a></li>
           <li> <a href="{{ url('/roster/incident-management') }}"><i class="fa fa-book"></i> <span>Incident Management</span></a></li>
           <li> <a href="#"><i class="fa fa-calendar"></i> <span>Calendar</span> </a></li>
-          <li> <a href="#"> <i class="fa fa-folder"></i> <span>Examples</span> </a></li>
+          <li> <a href="#"> <i class="fa fa-folder"></i> <span>Examples</span> </a></li> -->
+          <li class="header-menu"> <span>Day Centre</span> </li>
+          <li> <a href="#!"><i class='bx bx-dashboard'></i> <span> Day Centre Dashboard</span> </a> </li>
+          <li> <a href="#!"><i class='bx bx-user-circle'></i> <span> Clients</span> </a> </li>
+          <li> <a href="#!"><i class='bx bx-pulse'></i>  <span> Activities</span> </a> </li>
+          <li> <a href="#!"><i class='bx bx-calendar'></i> <span> Sessions </span> </a> </li>
+          <li> <a href="#!"><i class='bx  bx-clipboard-detail'></i> <span> Attendance </span> </a> </li>
+          <li> <a href="#!"><i class='bx  bx-clipboard-detail'></i> <span> Follow-up Tracker</span></a></li>
+          <li> <a href="#!"><i class='bx  bx-phone'></i> <span> Call Transcripts</span></a></li>
 
+          <li class="header-menu"> <span>General</span> </li>
+          <li> <a href="#!"><i class='bx  bx-mobile'></i> <span>Staff Portal</span> </a></li>
+          <li> <a href="#!"><i class='bx  bx-message'></i> <span>Messaging Center</span> </a></li>
+          <li> <a href="#!"><i class='bx  bx-clipboard-detail'></i> <span>Staff Tasks</span> </a></li>
+          <li> <a href="#!"><i class='bx  bx-folder-open'></i>  <span>Care Documents</span> </a></li>
+          <li> <a href="#!"><i class='bx  bx-clipboard-detail'></i> <span>Staff Supervisions</span> </a></li>
+          <li> <a href="#!"><i class='bx  bx-shield'></i>  <span>Incident Management</span> </a></li>
+          <li> <a href="#!"><i class='bx  bx-education'></i> <span>Training</span> </a></li>
+          <li> <a href="#!"><i class='bx  bx-bell'></i>  <span>Notifications</span> </a></li>
+          <li> <a href="{{ url('/roster/leave-request') }}"><i class='bx  bx-clipboard-detail'></i> <span>Leave Requests</span> </a></li>
+          <li> <a href="#!"><i class='bx bx-file-detail'></i> <span>Payroll & Finance</span> </a></li>
+          <li> <a href="#!"><i class='bx  bx-file-report'></i>  <span>Reports</span> </a></li>
+          <li> <a href="#!"><i class='bx  bx-shield'></i> <span>Compliance Hub</span> </a></li>
+          <li> <a href="#!"><i class='bx  bx-clipboard-detail'></i> <span>Task Center</span> </a></li>
+          <li> <a href="#!"><i class='bx  bx-clipboard-detail'></i> <span>Action Plan Progress</span> </a></li>
+          <li> <a href="#!"><i class='bx bx-file-detail'></i> <span>Reporting Engine</span> </a></li>
+          <li> <a href="#!"><i class='bx bx-file-detail'></i> <span>Audit Templates</span> </a></li>
+          <li> <a href="#!"><i class='bx bx-file-detail'></i> <span>Form Builder</span> </a></li>
+          <li> <a href="#!"><i class='bx bx-group'></i> <span>CRM Dashboard</span> </a></li>
+          <li> <a href="#!"><i class='bx  bx-message'></i>  <span>Client Comms Hub</span> </a></li>
+           <li class="header-menu"> <span>System</span> </li>
+          <li> <a href="#!"><i class='bx  bx-shield'></i>  <span>Role Management</span> </a></li>
+          <li> <a href="#!"><i class='bx  bx-cog'></i> <span>Module Settings</span> </a></li>
+          <li> <a href="#!"><i class='bx bx-group'></i> <span>User Management</span> </a></li>
+          <li> <a href="#!"><i class='bx bx-file-detail'></i> <span>Technical Spec</span> </a></li>
         </ul>
       </div>
       <!-- sidebar-menu  -->
