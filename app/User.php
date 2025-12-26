@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Mail;
 use Auth;
 use App\Home, App\Admin, App\StaffSickLeave;
 use App\Models\PersonalManagement\TimeSheet;
+use Illuminate\Support\Facades\Log;
 
 class User extends Authenticatable
 {
@@ -37,6 +38,13 @@ class User extends Authenticatable
     public static function getHomeUsers($home_id)
     {
         return User::where('home_id', $home_id)->select('id', 'name')->where('is_deleted', 0)->get();
+    }
+
+    protected static function booted()
+    {
+        static::addGlobalScope('active', function ($query) {
+            $query->where('user.status', 1);
+        });
     }
 
     public function access_level()
@@ -91,39 +99,105 @@ class User extends Authenticatable
         return false;
     }
 
-    public static function saveQualification($data = array(), $user_id = null)
+    // public static function saveQualification($data = array(), $user_id = null)
+    // {
+    //     //saving qualification info and certificates images
+    //     if (isset($data['qualification'])) {
+    //         foreach ($data['qualification'] as $key => $qualification_name) {
+    //             if (!empty($qualification_name) && !empty($_FILES['qualifiaction_cert']['name'][$key])) {
+
+    //                 $tmp_image  =   $_FILES['qualifiaction_cert']['tmp_name'][$key];
+    //                 $image_info =   pathinfo($_FILES['qualifiaction_cert']['name'][$key]);
+    //                 $ext        =   strtolower($image_info['extension']);
+    //                 $random_no  =   rand(111, 999) . '.' . $ext;
+    //                 $new_name   =   time() . $random_no . '.' . $ext;
+
+    //                 $allowed_ext = array('jpg', 'jpeg', 'png', 'pdf', 'doc', 'docx');
+
+    //                 if (in_array($ext, $allowed_ext)) {
+    //                     $destination = base_path() . '/public/images/userQualification';
+
+    //                     if (move_uploaded_file($tmp_image, $destination . '/' . $new_name)) {
+
+    //                         $qualification          = new UserQualification;
+    //                         $qualification->name    = $qualification_name;
+    //                         $qualification->image   = $new_name;
+    //                         $qualification->user_id = $user_id;
+    //                         $qualification->save();
+    //                     }
+    //                 }
+
+    //                 $quali[$key]['cert_image'] = $new_name;
+    //             }
+    //         }
+    //     }
+    // }
+
+    public static function saveQualification($data = [], $user_id = null)
     {
-        //saving qualification info and certificates images
-        if (isset($data['qualification'])) {
-            foreach ($data['qualification'] as $key => $qualification_name) {
-                if (!empty($qualification_name) && !empty($_FILES['qualifiaction_cert']['name'][$key])) {
+        Log::info('saveQualification called', [
+            'user_id' => $user_id,
+            'data'    => $data
+        ]);
 
-                    $tmp_image  =   $_FILES['qualifiaction_cert']['tmp_name'][$key];
-                    $image_info =   pathinfo($_FILES['qualifiaction_cert']['name'][$key]);
-                    $ext        =   strtolower($image_info['extension']);
-                    $random_no  =   rand(111, 999) . '.' . $ext;
-                    $new_name   =   time() . $random_no . '.' . $ext;
+        if (empty($data)) {
+            Log::warning('No qualifications found');
+            return;
+        }
 
-                    $allowed_ext = array('jpg', 'jpeg', 'png', 'pdf', 'doc', 'docx');
+        foreach ($data as $key => $qual) {
 
-                    if (in_array($ext, $allowed_ext)) {
-                        $destination = base_path() . '/public/images/userQualification';
+            Log::info("Processing qualification", ['key' => $key, 'qual' => $qual]);
 
-                        if (move_uploaded_file($tmp_image, $destination . '/' . $new_name)) {
-
-                            $qualification          = new UserQualification;
-                            $qualification->name    = $qualification_name;
-                            $qualification->image   = $new_name;
-                            $qualification->user_id = $user_id;
-                            $qualification->save();
-                        }
-                    }
-
-                    $quali[$key]['cert_image'] = $new_name;
-                }
+            // ✅ Only checked courses
+            if (
+                empty($qual['course_id']) ||
+                empty($qual['name'])
+            ) {
+                continue;
             }
+
+            // ✅ Certificate check
+            if (
+                !isset($qual['cert']) ||
+                !$qual['cert'] instanceof \Illuminate\Http\UploadedFile
+            ) {
+                continue;
+            }
+
+            $file = $qual['cert'];
+            $ext  = strtolower($file->getClientOriginalExtension());
+
+            $allowed_ext = ['jpg', 'jpeg', 'png', 'pdf', 'doc', 'docx'];
+            if (!in_array($ext, $allowed_ext)) {
+                continue;
+            }
+
+            $new_name = time() . rand(111, 999) . '.' . $ext;
+
+            $file->move(
+                public_path('images/userQualification'),
+                $new_name
+            );
+
+            UserQualification::create([
+                'user_id'   => $user_id,
+                'course_id' => $qual['course_id'],
+                'name'      => $qual['name'],
+                'image'     => $new_name,
+            ]);
+
+            Log::info('Saved qualification', [
+                'user_id' => $user_id,
+                'course_id' => $qual['course_id']
+            ]);
         }
     }
+
+
+
+
+
 
     public static function getstaffByResidentialId($department)
     {
@@ -263,6 +337,15 @@ class User extends Authenticatable
     {
         return $this->hasMany(Timesheet::class);
     }
+
+    public function emergencyContact()
+{
+    return $this->hasOne(
+        \App\Models\UserEmergencyContact::class,
+        'user_id',
+        'id'
+    );
+}
 
 
 

@@ -112,7 +112,7 @@
                                             </div>
                                             <div class="rate">
                                                 <div class="label">Hourly Rate</div>
-                                                <div class="amount">£15.00</div> {{ $carer->pay_rates }}
+                                                <div class="amount">£{{ $carer->pay_rate ?? '0.00' }}</div>
                                             </div>
                                             <div class="supervision">
                                                 <i class="fa-regular fa-clipboard"></i> <span>Supervision: No supervision</span>
@@ -145,7 +145,7 @@
                                             <div class="user">
                                                 <div class="avatar">{{ strtoupper(substr(trim($carer->name), 0, 1)) }}</div>
                                                 <div class="info">
-                                                    <div class="name">{{ $carer->name }}</div>
+                                                    <div class="name"><a href="{{ url('roster/carer-details/' . $carer->id) }}">{{ $carer->name }}</a></div>
                                                     <div class="role">part time</div>
                                                 </div>
                                             </div>
@@ -172,7 +172,7 @@
                                         </div>
                                         <div class="rate">
                                             <div class="label">Hourly Rate</div>
-                                            <div class="amount">£15.00</div> {{ $carer->pay_rates }}
+                                            <div class="amount">£{{ $carer->pay_rate ?? '0.00' }}</div>
                                         </div>
                                         <div class="supervision">
                                             <i class="fa-regular fa-clipboard"></i> <span>Supervision: No supervision</span>
@@ -207,7 +207,7 @@
                                         <div class="user">
                                             <div class="avatar">{{ strtoupper(substr(trim($carer->name), 0, 1)) }}</div>
                                             <div class="info">
-                                                <div class="name">{{ $carer->name }}</div>
+                                                <div class="name"><a href="{{ url('roster/carer-details/' . $carer->id) }}">{{ $carer->name }}</a></div>
                                                 <div class="role">part time</div>
                                             </div>
                                         </div>
@@ -234,7 +234,7 @@
                                     </div>
                                     <div class="rate">
                                         <div class="label">Hourly Rate</div>
-                                        <div class="amount">£15.00</div>
+                                        <div class="amount">£{{ $carer->pay_rate ?? '0.00' }}</div>
                                     </div>
                                     <div class="supervision">
                                         <i class="fa-regular fa-clipboard"></i> <span>Supervision: No supervision</span>
@@ -270,7 +270,7 @@
                                         <div class="user">
                                             <div class="avatar">{{ strtoupper(substr(trim($carer->name), 0, 1)) }}</div>
                                             <div class="info">
-                                                <div class="name">{{ $carer->name }}</div>
+                                                <div class="name"><a href="{{ url('roster/carer-details/' . $carer->id) }}">{{ $carer->name }}</a></div>
                                                 <div class="role">part time</div>
                                             </div>
                                         </div>
@@ -297,7 +297,7 @@
                                     </div>
                                     <div class="rate">
                                         <div class="label">Hourly Rate</div>
-                                        <div class="amount">£15.00</div>
+                                        <div class="amount">£{{ $carer->pay_rate ?? '0.00' }}</div>
                                     </div>
                                     <div class="supervision">
                                         <i class="fa-regular fa-clipboard"></i> <span>Supervision: No supervision</span>

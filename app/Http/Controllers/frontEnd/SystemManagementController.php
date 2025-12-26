@@ -5,8 +5,8 @@ namespace App\Http\Controllers\frontEnd;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\ServiceUser, App\User, App\HomeLabel, App\UserQualification, App\Ethnicity, App\EarningSchemeLabel, App\Models\CompanyDepartment;
-use DB;
-use Auth;
+use DB, Auth;
+use App\Services\Staff\UserEmergencyContactService;
 
 class SystemManagementController extends Controller
 {
@@ -117,11 +117,11 @@ class SystemManagementController extends Controller
     public function add_staff_user(Request $request)
     {
         if ($request->isMethod('post')) {
-            //echo "<pre>"; print_r($data); die;
             //echo "<pre>";
             /*print_r($_FILES);
             die;*/
             $data = $request->all();
+            // echo "<pre>"; print_r($data); die;
             $date_of_joining = date('Y-m-d', strtotime($data['date_of_joining']));
             $date_of_leaving = date('Y-m-d', strtotime($data['date_of_leaving']));
             // $home_id = Auth::user()->home_id;
@@ -138,7 +138,10 @@ class SystemManagementController extends Controller
             $user->department      = $data['department'];
             $user->description      = $data['description'];
             $user->payroll          = $data['payroll'];
-
+            $user->available_for_overtime = isset($data['available_for_overtime']) ? 1 : 0;
+            $user->employment_type  = $data['employment_type'];
+            $user->dbs_certificate_number = $data['dbs_certificate_number'];
+            $user->dbs_expiry_date  = date('Y-m-d', strtotime($data['dbs_expiry_date']));
             $user->date_of_joining  = $date_of_joining;
             $user->date_of_leaving  = $date_of_leaving;
             $user->holiday_entitlement = $data['holiday_entitlement'];
@@ -185,8 +188,9 @@ class SystemManagementController extends Controller
                     $user->access_rights = $access_level_info->access_rights;
                 }
             }*/
-            if ($user->save()) {
-                User::saveQualification($data, $user->id);
+                if ($user->save()) {
+                User::saveQualification($data['qualifications'], $user->id);
+                UserEmergencyContactService::saveContacts($user->id, $data['emergency_contact']);
 
                 if (isset($data['send_credentials'])) {
                     $response = User::sendCredentials($user->id);

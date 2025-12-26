@@ -8,6 +8,6 @@ class UserQualification extends Model
 	protected $table = 'user_qualification';
 
 	protected $fillable = [
-        'image','name','user_id'
+        'image','name','user_id','course_id'
     ];
 }

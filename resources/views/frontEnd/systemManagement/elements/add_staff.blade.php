@@ -42,15 +42,15 @@
                         <div class="form-group col-md-6 col-sm-6 col-xs-12">
                             <label>Employment Type</label>
                             <select name="employment_type" class="form-control" id="employment_type">
-                                <option value="Full Time">Full Time</option>
-                                <option value="Part Time">Part Time</option>
-                                <option value="Contract">Contract</option>
+                                <option value="full_time">Full Time</option>
+                                <option value="part_time">Part Time</option>
+                                <option value="contract">Contract</option>
                             </select>
                         </div>
 
                         <div class="form-group col-md-12 col-sm-12 col-xs-12 overtime">
                             <label>
-                                <input type="checkbox"> Available for Overtime
+                                <input type="checkbox" name="available_for_overtime" value="1"> Available for Overtime
                             </label>
                         </div>
 
@@ -143,54 +143,67 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="form-group col-md-12 col-sm-12 col-xs-12 m-0">
                             <label>Qualification Information</label>
-                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 qualification p-0">
+
+                            <div class="qualification p-0">
                                 <div class="input_fields_wrap">
-                                    <div class="form-group">
-                                        @foreach ($courses as $course)
-                                            <label><input type="checkbox" name="qualifications[]" value="{{ $course['course_id'] }}"> {{ $course['title'] }}</label>
-                                        @endforEach
-                                        {{-- <input type="text" name="qualification[]" class="form-control" /> --}}
-                                    </div>
-                                    <div class="col-md-3 btn-file form-group p-0">
-                                        <span class="btn btn-white btn-file">
-                                            <span class="fileupload-new"><i class="fa fa-upload"></i> Upload</span>
-                                            <input name="qualifiaction_cert[]" class="default qual_upload" type="file">
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-12 form-group">
-                                        <button class="add_field btn allBtnUseColor">Add More Fields <i class="fa fa-plus"></i></button>
-                                    </div>
+
+                                    @foreach ($courses as $key => $course)
+                                        <div class="form-group">
+                                            <label>
+                                                <input type="checkbox"
+                                                    name="qualifications[{{ $course['course_id'] }}][course_id]"
+                                                    value="{{ $course['course_id'] }}">
+
+                                                {{ $course['title'] }}
+
+                                                <input type="hidden"
+                                                    name="qualifications[{{ $course['course_id'] }}][name]"
+                                                    value="{{ $course['title'] }}">
+                                            </label>
+
+                                            <!-- certificate -->
+                                            <div class="btn-file form-group p-0">
+                                                <span class="btn btn-white btn-file">
+                                                    <i class="fa fa-upload"></i> Upload
+                                                    <input type="file"
+                                                        name="qualifications[{{ $course['course_id'] }}][cert]"
+                                                        class="default qual_upload">
+                                                </span>
+                                            </div>
+
+                                        </div>
+                                    @endforeach
+
                                 </div>
                             </div>
                         </div>
+
+
 
                         <div class="form-group col-md-12 col-sm-12 col-xs-12 m-0">
                             <label>Emergency Contact</label>
                             <div class="row">
                                 <div class="col-md-4">
-                                    <input type="text" class="form-control" placeholder="Name">
+                                    <input type="text" class="form-control" name="emergency_contact[name]" placeholder="Name">
                                 </div>
                                 <div class="col-md-4">
-                                    <input type="text" class="form-control" placeholder="Phone">
+                                    <input type="text" class="form-control" name="emergency_contact[phone_no]" placeholder="Phone">
                                 </div>
                                 <div class="col-md-4">
-                                    <input type="text" class="form-control" placeholder="Relationship">
+                                    <input type="text" class="form-control" name="emergency_contact[relationship]" placeholder="Relationship">
                                 </div>
                             </div>
                         </div>
 
                         <div class="form-group col-md-6 col-sm-6 col-xs-12 m-0">
                             <label>DBS Certificate Number</label>
-                            <input type="text" class="form-control">
+                            <input type="text" name="dbs_certificate_number" class="form-control">
                         </div>
                         <div class="form-group col-md-6 col-sm-6 col-xs-12 m-0">
                             <label>DBS Expiry Date</label>
-                            <input type="date" class="form-control">
+                            <input type="date" name="dbs_expiry_date" class="form-control">
                         </div>
 
                         <div class="form-group col-md-12 col-sm-12 col-xs-12">

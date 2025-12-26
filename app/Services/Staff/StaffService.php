@@ -17,7 +17,8 @@ class StaffService
     protected function getPayRateTypeId(): ?int
     {
         return DB::table('pay_rate_types')
-            ->where('type_name', 'Pay Rate')
+            ->where('type_name', 'Hourly Rate')
+            ->where('home_id', Auth::user()->home_id)
             ->value('id');
     }
 
@@ -37,6 +38,7 @@ class StaffService
                 }
             })
             ->where('user.home_id', $homeId)
+            ->where('user.is_deleted', 0)
             ->get();
     }
 
