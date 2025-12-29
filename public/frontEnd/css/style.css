@@ -9388,6 +9388,7 @@ a.close.edit_dyn_form {
     border-radius: 12px;
     padding: 20px;
     margin-bottom: 25px;
+    box-shadow: 0px 0px 3px 0px #00000021;
 }
 .section-header h2.section-title {
     margin: 0;
@@ -10240,6 +10241,7 @@ header.panel-heading.headingCapitilize {
     padding: 15px;
     border: 1px solid #dddddd;
     border-radius: 4px;
+        /* display: inline-flex; */
 }
 .calendarTabs.leaveRequesttabs .tab{
     flex-grow: inherit;
@@ -10251,7 +10253,7 @@ header.panel-heading.headingCapitilize {
 .leave-card {
     width: 100%;
     background: #fff;
-    border-radius: 15px;
+    border-radius: 8px;
     padding: 20px;
     border: 1px solid #e2e8f0;
     box-shadow: 0 2px 6px rgba(0,0,0,0.06);
@@ -10718,7 +10720,7 @@ header.panel-heading.headingCapitilize {
   border-radius: 14px;
   font-weight: 600;
 }
-.carertabcontent .status.inactive {
+.inactive {
   background: #f3f4f6;
   color: #374151;
 }
@@ -10789,16 +10791,21 @@ header.panel-heading.headingCapitilize {
 .carertabcontent .actions {
   display: flex;
   gap: 10px;
-  margin-top: 16px;
+  margin-top: 5px;
 }
-.carertabcontent .actions button {
-  border: 1px solid #e5e7eb;
-  background: #ffffff;
-  padding: 8px 14px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 13px;
+.carertabcontent .actions button { 
+    border: 1px solid #e5e7eb;
+    /* background: #ffffff; */
+    padding: 8px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    /* color: #333; */
+        display: flex;
+}
+.carertabcontent .actions button i{
+    font-size: 16px;
+    margin-right: 4px;
 }
 .carertabcontent .actions .edit {
   flex: 1;
@@ -11110,4 +11117,292 @@ header.panel-heading.headingCapitilize {
 .allBtnUseColor:hover{
     background-color: #1a53d1;
     color: #fff;
+}
+.allbuttonDarkClr{
+    background: #171717;
+    color: #fff;
+}
+.allbuttonDarkClr:hover{
+    background: #383838;
+    color: #fff;
+}
+/* **********************start Employee Css*************************** */
+
+.page-wrapper .page-content.empoyeeHeader .topHeaderCont{
+        background-color: #fff;
+    }
+    .empoyeeHeader .header-actions button.btn{
+        background-color: #fff;
+        color: #333;
+        box-shadow: 0px 0px 3px 0px #00000021;
+        font-size: 14px;
+        display: flex;
+        line-height: 18px;
+    }
+    .empoyeeHeader .header-actions button.btn i {
+        font-size: 18px;
+        margin-right: 6px;
+    }
+    .empoyeeHeader p.header-subtitle span{
+        font-size: 11px;
+        padding: 3px 10px;
+        border-radius: 14px;
+        margin-right: 8px;
+        font-weight: 600;
+        background-color: #fff;
+        color: #333;
+        box-shadow: 0px 0px 3px 0px #00000021;
+    }
+    .calendarTabs.employeeDetailsTabs .tabs {
+        display: inline-flex;
+    }
+    .employeeDetailsTabs .tabs button.tab{
+        border: none;
+    }
+    .calendarTabs.employeeDetailsTabs .tab.active {
+        background: #f1f2f7;
+        color: #181818;
+    }
+    /* .profile-details-card {
+        background: #fff;
+        border-radius: 14px;
+        padding: 28px 32px;
+        border: 1px solid #e5e7eb;
+        } */
+
+        .profile-details-card h3 {
+        font-size: 15px;
+        font-weight: 700;
+        margin-bottom: 18px;
+        color: #111827;
+        }
+
+        .profile-details-card .section {
+        margin-bottom: 24px;
+        }
+
+        .profile-details-card .two-col {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 60px;
+        }
+
+        .profile-details-card .three-col {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 40px;
+        }
+
+        .profile-details-card .item {
+        margin-bottom: 16px;
+        margin-bottom: 16px;
+        display: block;
+        align-items: start;
+        }
+
+        .profile-details-card .label {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        color: #828385;
+        margin-bottom: 0px;
+        text-align: left;
+        }
+
+        .profile-details-card .value {
+        display: block;
+        font-size: 14px;
+        color: #111827;
+        }
+
+        .profile-details-card .divider {
+        height: 1px;
+        background: #e5e7eb;
+        margin: 28px 0;
+        }
+        .certifiedList{
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            justify-content: space-between;
+        }
+        .roundBtntag{
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 14px;
+        }
+        .availabilityTabs__nav {
+    display: inline-flex;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    padding: 4px;
+    margin-bottom: 16px;
+}
+
+.availabilityTabs__tab {
+    padding: 6px 16px;
+    border: none;
+    background: transparent;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 13px;
+}
+
+.availabilityTabs__tab.active {
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,.1);
+}
+
+/* Panels */
+.availabilityTabs__panel {
+    display: none;
+}
+
+.availabilityTabs__panel.active {
+    display: block;
+}
+
+/* Card */
+.workHoursCard {
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 16px;
+    background-color: #fff;
+}
+
+/* Header */
+.workHoursHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+.workHoursHeader .title {
+    display: flex;
+    color: #333;
+    font-weight: 500;
+}
+.workHoursHeader .title i {
+    font-size: 18px;
+    margin-right: 4px;
+}
+.workHoursHeader .actions {
+    display: flex;
+    gap: 8px;
+}
+
+.workHoursHeader .badge {
+    background: #eef2ff;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    color: #2563eb;
+    height: 26px;
+    margin-top: 5px;
+    line-height: 18px;
+}
+
+
+/* Schedule */
+.schedulePattern {
+    background: #f0f7ff;
+    border: 1px solid #c7ddff;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+}
+.schedulePattern select {
+    width: 276px;
+}
+
+/* Day Rows */
+.workHoursCard .dayRow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    margin-bottom: 8px;
+}
+.workHoursCard .dayRow input.dayTime{
+    width: 120px;
+}
+.workHoursCard .dayRow.active {
+    background: #f0fdf4;
+    border-color: #86efac;
+}
+
+.workHoursCard .dayRow .day {
+    width: 90px;
+    font-weight: 500;
+}
+
+.workHoursCard .dayRow.weekend .day {
+    color: #7c3aed;
+}
+
+.notWorking {
+    color: #9ca3af;
+}
+
+.workHoursCard .dayRow .hours {
+    background: #dcfce7;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    box-shadow: 0px 0px 4px #00000036;
+}
+
+/* Toggle */
+.workHoursCard .switch {
+    position: relative;
+    width: 40px;
+    height: 20px;
+    margin: 0;
+}
+
+.workHoursCard .switch input {
+    display: none;
+}
+
+.workHoursCard .switch .slider {
+    position: absolute;
+    background: #e5e7eb;
+    border-radius: 999px;
+    inset: 0;
+}
+
+.workHoursCard .switch .slider::before {
+    content: "";
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background: #fff;
+    border-radius: 50%;
+    top: 2px;
+    left: 2px;
+    transition: .3s;
+}
+
+.workHoursCard .switch input:checked + .slider {
+    background: #111;
+}
+
+.workHoursCard .switch input:checked + .slider::before {
+    transform: translateX(20px);
+}
+
+.tabNumber{
+    background-color: #3b82f6;
+    padding: 4px;
+    color: #fff;
+    height: 17px;
+    line-height: 9px;
+    border-radius: 2px;
 }

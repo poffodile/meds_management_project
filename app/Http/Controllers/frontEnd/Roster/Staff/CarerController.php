@@ -51,24 +51,4 @@ class CarerController extends Controller
         return view('frontEnd.roster.staff.carer_details', $data);
     }
 
-    public function sms_api()
-    {
-        $user     = urlencode(trim('pinebh'));
-        $password = urlencode(trim('+ydpQI-400'));
-        $numbers  = '91795523576';
-        $sender   = urlencode('Serenity MC');
-        $message  = urlencode('Test SMS');
-        $lang     = 'en';
-
-        $url = "http://sms.bab-albahrain.com/sendsms.php"
-            . "?user={$user}"
-            . "&password={$password}"
-            . "&numbers={$numbers}"
-            . "&sender={$sender}"
-            . "&message={$message}"
-            . "&lang={$lang}";
-
-        $response = file_get_contents($url);
-        dd($response);
-    }
 }

@@ -124,7 +124,9 @@ class StaffService
 
     public function courses()
     {
-        $response = Http::get('http://66.116.198.68:8055/api/all-courses-list/');
+        // $response = Http::get('http://66.116.198.68:8055/api/all-courses-list/');
+        $response = Http::get('http://thunderingslap.com/api/all-courses-list/');
+        
 
         if ($response->successful()) {
             $data = $response->json();

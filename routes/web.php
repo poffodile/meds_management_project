@@ -129,10 +129,12 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 		Route::post('/leave/update', [LeaveRequestController::class, 'update'])->name('roster.leave.update');
 
 		Route::get('/carer', [CarerController::class, 'index'])->name('roster.staff.carer');
-		Route::get('/sms_api', [CarerController::class, 'sms_api']);
+		// Route::get('/sms_api', [CarerController::class, 'sms_api']);
 		Route::get('/carer-details/{carer_id}', [CarerController::class, 'carer_details'])->name('roster.staff.carer.details');
 		
 		Route::get('/client', [ClientController::class, 'index'])->name('roster.client');
+		Route::get('/client-details/{client_id}', [ClientController::class, 'client_details'])->name('roster.client.details');
+		
 		Route::get('/carer', [CarerController::class, 'index'])->name('roster.staff.carer');
 		
 		Route::get('/incident-management', [IncidentManagementController::class, 'index'])->name('roster.incident.management');

@@ -71,7 +71,7 @@
                                         <div class="user">
                                             <div class="avatar">L</div>
                                             <div class="info">
-                                                <div class="name">Logan Jones</div>
+                                                <div class="name"><a href="{{ url('roster/client-details/1') }}"> Logan Jones</div>
                                                 <div class="role">part time</div>
                                             </div>
                                         </div>

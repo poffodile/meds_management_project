@@ -160,19 +160,19 @@
                                     </div>
 
                                     <!--                             <div class="form-group">
-                                                                <label class="col-lg-2 control-label">Date of Joining</label>
-                                                                <div class="col-lg-10">
-                                                                   <input class="form-control date-format" type="text" value="{{ isset($user_info->date_of_joining) ? date('d-m-Y', strtotime($user_info->date_of_joining)) : '' }}" placeholder="DD-MM-YYYY" name="date_of_joining" value="" maxlength="10" autocomplete="off" />
+                                                                    <label class="col-lg-2 control-label">Date of Joining</label>
+                                                                    <div class="col-lg-10">
+                                                                       <input class="form-control date-format" type="text" value="{{ isset($user_info->date_of_joining) ? date('d-m-Y', strtotime($user_info->date_of_joining)) : '' }}" placeholder="DD-MM-YYYY" name="date_of_joining" value="" maxlength="10" autocomplete="off" />
 
+                                                                    </div>
                                                                 </div>
-                                                            </div>
 
-                                                            <div class="form-group">
-                                                                <label class="col-lg-2 control-label">Date of Leaving</label>
-                                                                <div class="col-lg-10">
-                                                                   <input class="form-control date-format" type="text" value="{{ isset($user_info->date_of_leaving) ? date('d-m-Y', strtotime($user_info->date_of_leaving)) : '' }}" placeholder="DD-MM-YYYY" name="date_of_leaving" value="" maxlength="10" autocomplete="off"/>
-                                                                </div>
-                                                            </div> -->
+                                                                <div class="form-group">
+                                                                    <label class="col-lg-2 control-label">Date of Leaving</label>
+                                                                    <div class="col-lg-10">
+                                                                       <input class="form-control date-format" type="text" value="{{ isset($user_info->date_of_leaving) ? date('d-m-Y', strtotime($user_info->date_of_leaving)) : '' }}" placeholder="DD-MM-YYYY" name="date_of_leaving" value="" maxlength="10" autocomplete="off"/>
+                                                                    </div>
+                                                                </div> -->
                                     <div class="form-group">
                                         <label class="col-lg-3 control-label">Date of Joining</label>
                                         <div class="col-lg-9">
@@ -188,11 +188,11 @@
                                     </div>
 
                                     <!--<div class="form-group">
-                                                                <label for="inputEmail1" class="col-lg-2 control-label">Email</label>
-                                                                <div class="col-lg-10">
-                                                                    <input type="email" name="name" class="form-control" id="inputEmail1" placeholder="Email">
-                                                                </div>
-                                                            </div> -->
+                                                                    <label for="inputEmail1" class="col-lg-2 control-label">Email</label>
+                                                                    <div class="col-lg-10">
+                                                                        <input type="email" name="name" class="form-control" id="inputEmail1" placeholder="Email">
+                                                                    </div>
+                                                                </div> -->
 
                                     <?php
                                     $image = env('APP_URL') . userProfileImagePath . '/default_user.jpg';
@@ -280,11 +280,11 @@
                                                     </div>
                                                 </div>
                                                 <!-- <div class="form-group">
-                                                                <label class="col-lg-2 control-label">Qualification Information</label>
-                                                                <div class="col-lg-10">
-                                                                    <textarea name="qualification_info" class="form-control" placeholder="Qualification information" rows="6" maxlength="2000">{{ isset($user_info->qualification_info) ? $user_info->qualification_info : '' }}</textarea>
-                                                                </div>
-                                                            </div> -->
+                                                                    <label class="col-lg-2 control-label">Qualification Information</label>
+                                                                    <div class="col-lg-10">
+                                                                        <textarea name="qualification_info" class="form-control" placeholder="Qualification information" rows="6" maxlength="2000">{{ isset($user_info->qualification_info) ? $user_info->qualification_info : '' }}</textarea>
+                                                                    </div>
+                                                                </div> -->
 
                                                 {{-- @if (isset($user_info->certificates))
                                                     <div class="form-group">
@@ -397,10 +397,10 @@
                                                         <input type="text" name="emergency_contact[name]" class="form-control" placeholder="Name" value="{{ isset($user_info->emergencyContact->name) ? $user_info->emergencyContact->name : '' }}" maxlength="60" {{ isset($del_status) ? $disabled : '' }}>
                                                     </div>
                                                     <div class="col-lg-3">
-                                                        <input type="text" name="emergency_contact[phone]" class="form-control" placeholder="Phone Number" value="{{ isset($user_info->emergencyContact->phone_no) ? $user_info->emergencyContact->phone_no : '' }}" maxlength="60" {{ isset($del_status) ? $disabled : '' }}>
+                                                        <input type="text" name="emergency_contact[phone_no]" class="form-control" placeholder="Phone Number" value="{{ isset($user_info->emergencyContact->phone_no) ? $user_info->emergencyContact->phone_no : '' }}" maxlength="60" {{ isset($del_status) ? $disabled : '' }}>
                                                     </div>
                                                     <div class="col-lg-3">
-                                                        <input type="text" name="emergency_contact[relation]" class="form-control" placeholder="Relation" value="{{ isset($user_info->emergencyContact->relationship) ? $user_info->emergencyContact->relationship : '' }}" maxlength="60" {{ isset($del_status) ? $disabled : '' }}>
+                                                        <input type="text" name="emergency_contact[relationship]" class="form-control" placeholder="Relation" value="{{ isset($user_info->emergencyContact->relationship) ? $user_info->emergencyContact->relationship : '' }}" maxlength="60" {{ isset($del_status) ? $disabled : '' }}>
                                                     </div>
                                                 </div>
 
@@ -414,7 +414,7 @@
                                                 <div class="form-group">
                                                     <label class="col-lg-3 control-label">DBS Expiry Date</label>
                                                     <div class="col-lg-9">
-                                                        <input type="text" name="dbs_expiry_date" class="form-control" placeholder="DBS Expiry Date" value="{{ isset($user_info->dbs_expiry_date) ? $user_info->dbs_expiry_date : '' }}" maxlength="60" {{ isset($del_status) ? $disabled : '' }}>
+                                                        <input type="text" name="dbs_expiry_date" class="form-control datepicker" placeholder="DBS Expiry Date" value="{{ isset($user_info->dbs_expiry_date) ? $user_info->dbs_expiry_date : '' }}" maxlength="60" {{ isset($del_status) ? $disabled : '' }}>
                                                     </div>
                                                 </div>
 
@@ -465,11 +465,11 @@
 
     <script>
         /*$(document).ready(function() {
-                                    $('.date-format').datepicker({  
+                                        $('.date-format').datepicker({  
 
-                                        format : 'dd-mm-yyyy', 
-                                    });
-                                });*/
+                                            format : 'dd-mm-yyyy', 
+                                        });
+                                    });*/
     </script>
 
     <script type="text/javascript">
@@ -507,6 +507,13 @@
             }).on('changeDate', function(ev) {
                 leaving_date.hide();
             }).data('datepicker');
+
+
+            $('.datepicker').datepicker({
+                format: "dd-mm-yyyy",
+                autoclose: true,
+                todayHighlight: true
+            });
         });
     </script>
 

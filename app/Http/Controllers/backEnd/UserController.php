@@ -171,8 +171,8 @@ class UserController extends Controller
             }
 
             if ($user->save()) {
-                 User::saveQualification($data['qualifications'], $user->id);
-                UserEmergencyContactService::saveContacts($user->id, $data['emergency_contact']);
+                User::saveQualification($request->qualifications, $user->id);
+                UserEmergencyContactService::saveContacts($user->id, $request->emergency_contact);
                 return redirect('admin/users')->with('success', 'User added successfully.');
             } else {
                 return redirect()->back()->with('error', 'Some error occurred. Please try after sometime.');
@@ -288,8 +288,8 @@ class UserController extends Controller
 
                 if ($user->save()) {
 
-                    User::saveQualification($data['qualifications'], $user->id);
-                    UserEmergencyContactService::saveContacts($user->id, $data['emergency_contact']);
+                    User::saveQualification($request->qualifications, $user->id);
+                    UserEmergencyContactService::saveContacts($user->id, $request->emergency_contact);
                     return redirect('admin/users')->with('success', 'User Updated successfully.');
                 } else {
                     return redirect()->back()->with('error', 'User could not be Updated.');
