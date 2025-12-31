@@ -135,10 +135,15 @@
                                     <div class="form-group">
                                         <label class="col-lg-3 control-label"></label>
                                         <div class="col-lg-9">
-                                            <input type="checkbox" name="available_for_overtime" value="1"> Available for Overtime
+                                            <input type="checkbox" id="available_for_overtime" name="available_for_overtime" value="1"  {{ !empty($user_info->available_for_overtime) ? 'checked' : '' }}> Available for Overtime
                                         </div>
                                     </div>
-
+                                    <div class="form-group extraHours">
+                                        <label class="col-lg-3 control-label">Max extra hours per week</label>
+                                        <div class="col-lg-9">
+                                            <input type="number" name="max_extra_hours" class="form-control" placeholder="max extra hours per week" value="{{ isset($user_info->max_extra_hours) ? $user_info->max_extra_hours : '' }}" maxlength="255">
+                                        </div>
+                                    </div>
                                     <div class="form-group">
                                         <label class="col-lg-3 control-label">Description</label>
                                         <div class="col-lg-9">
@@ -160,19 +165,19 @@
                                     </div>
 
                                     <!--                             <div class="form-group">
-                                                                    <label class="col-lg-2 control-label">Date of Joining</label>
-                                                                    <div class="col-lg-10">
-                                                                       <input class="form-control date-format" type="text" value="{{ isset($user_info->date_of_joining) ? date('d-m-Y', strtotime($user_info->date_of_joining)) : '' }}" placeholder="DD-MM-YYYY" name="date_of_joining" value="" maxlength="10" autocomplete="off" />
+                                                                            <label class="col-lg-2 control-label">Date of Joining</label>
+                                                                            <div class="col-lg-10">
+                                                                               <input class="form-control date-format" type="text" value="{{ isset($user_info->date_of_joining) ? date('d-m-Y', strtotime($user_info->date_of_joining)) : '' }}" placeholder="DD-MM-YYYY" name="date_of_joining" value="" maxlength="10" autocomplete="off" />
 
-                                                                    </div>
-                                                                </div>
+                                                                            </div>
+                                                                        </div>
 
-                                                                <div class="form-group">
-                                                                    <label class="col-lg-2 control-label">Date of Leaving</label>
-                                                                    <div class="col-lg-10">
-                                                                       <input class="form-control date-format" type="text" value="{{ isset($user_info->date_of_leaving) ? date('d-m-Y', strtotime($user_info->date_of_leaving)) : '' }}" placeholder="DD-MM-YYYY" name="date_of_leaving" value="" maxlength="10" autocomplete="off"/>
-                                                                    </div>
-                                                                </div> -->
+                                                                        <div class="form-group">
+                                                                            <label class="col-lg-2 control-label">Date of Leaving</label>
+                                                                            <div class="col-lg-10">
+                                                                               <input class="form-control date-format" type="text" value="{{ isset($user_info->date_of_leaving) ? date('d-m-Y', strtotime($user_info->date_of_leaving)) : '' }}" placeholder="DD-MM-YYYY" name="date_of_leaving" value="" maxlength="10" autocomplete="off"/>
+                                                                            </div>
+                                                                        </div> -->
                                     <div class="form-group">
                                         <label class="col-lg-3 control-label">Date of Joining</label>
                                         <div class="col-lg-9">
@@ -188,11 +193,11 @@
                                     </div>
 
                                     <!--<div class="form-group">
-                                                                    <label for="inputEmail1" class="col-lg-2 control-label">Email</label>
-                                                                    <div class="col-lg-10">
-                                                                        <input type="email" name="name" class="form-control" id="inputEmail1" placeholder="Email">
-                                                                    </div>
-                                                                </div> -->
+                                                                            <label for="inputEmail1" class="col-lg-2 control-label">Email</label>
+                                                                            <div class="col-lg-10">
+                                                                                <input type="email" name="name" class="form-control" id="inputEmail1" placeholder="Email">
+                                                                            </div>
+                                                                        </div> -->
 
                                     <?php
                                     $image = env('APP_URL') . userProfileImagePath . '/default_user.jpg';
@@ -280,11 +285,11 @@
                                                     </div>
                                                 </div>
                                                 <!-- <div class="form-group">
-                                                                    <label class="col-lg-2 control-label">Qualification Information</label>
-                                                                    <div class="col-lg-10">
-                                                                        <textarea name="qualification_info" class="form-control" placeholder="Qualification information" rows="6" maxlength="2000">{{ isset($user_info->qualification_info) ? $user_info->qualification_info : '' }}</textarea>
-                                                                    </div>
-                                                                </div> -->
+                                                                            <label class="col-lg-2 control-label">Qualification Information</label>
+                                                                            <div class="col-lg-10">
+                                                                                <textarea name="qualification_info" class="form-control" placeholder="Qualification information" rows="6" maxlength="2000">{{ isset($user_info->qualification_info) ? $user_info->qualification_info : '' }}</textarea>
+                                                                            </div>
+                                                                        </div> -->
 
                                                 {{-- @if (isset($user_info->certificates))
                                                     <div class="form-group">
@@ -465,11 +470,11 @@
 
     <script>
         /*$(document).ready(function() {
-                                        $('.date-format').datepicker({  
+                                                $('.date-format').datepicker({  
 
-                                            format : 'dd-mm-yyyy', 
-                                        });
-                                    });*/
+                                                    format : 'dd-mm-yyyy', 
+                                                });
+                                            });*/
     </script>
 
     <script type="text/javascript">
@@ -632,6 +637,28 @@
                 return true;
             });
 
+        });
+    </script>
+
+    <script>
+        $(document).ready(function() {
+
+            function toggleExtraHours() {
+                if ($('#available_for_overtime').is(':checked')) {
+                    $('.extraHours').show();
+                } else {
+                    $('.extraHours').hide();
+                    $('input[name="max_extra_hours"]').val('');
+                }
+            }
+
+            // On page load (edit case)
+            toggleExtraHours();
+
+            // On checkbox change
+            $('#available_for_overtime').on('change', function() {
+                toggleExtraHours();
+            });
         });
     </script>
 

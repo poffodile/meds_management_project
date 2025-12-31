@@ -48,10 +48,16 @@
                             </select>
                         </div>
 
-                        <div class="form-group col-md-12 col-sm-12 col-xs-12 overtime">
-                            <label>
-                                <input type="checkbox" name="available_for_overtime" value="1"> Available for Overtime
-                            </label>
+                        <div class="form-group col-md-12 col-sm-12 col-xs-12">
+                            <div class="overtime">
+                                <label>
+                                    <input type="checkbox" name="available_for_overtime" value="1"> Available for Overtime
+                                </label>
+                                <div class="extraHours">
+                                    <label>Max extra hours per week</label>
+                                    <input type="number" name="max_extra_hours" class="form-control">
+                                </div>
+                            </div>
                         </div>
 
                         {{-- <div class="form-group col-md-12 col-sm-12 col-xs-12">
@@ -147,7 +153,7 @@
                             <label>Qualification Information</label>
 
                             <div class="qualification p-0">
-                                <div class="input_fields_wrap">
+                                <div class="input_fields_wrap checkandUpload">
 
                                     @foreach ($courses as $key => $course)
                                         <div class="form-group">
@@ -164,12 +170,11 @@
                                             </label>
 
                                             <!-- certificate -->
-                                            <div class="btn-file form-group p-0">
-                                                <span class="btn btn-white btn-file">
-                                                    <i class="fa fa-upload"></i> Upload
-                                                    <input type="file"
-                                                        name="qualifications[{{ $course['course_id'] }}][cert]"
-                                                        class="default qual_upload">
+                                            <div class="btn-file p-0">
+                                                <span class="">
+                                                    <!-- btn btn-white btn-file -->
+                                                    <!-- <i class="fa fa-upload"></i> Upload -->
+                                                    <input type="file" name="qualifications[{{ $course['course_id'] }}][cert]" class="default qual_upload">
                                                 </span>
                                             </div>
 
@@ -182,7 +187,7 @@
 
 
 
-                        <div class="form-group col-md-12 col-sm-12 col-xs-12 m-0">
+                        <div class="form-group col-md-12 col-sm-12 col-xs-12 m-t-10">
                             <label>Emergency Contact</label>
                             <div class="row">
                                 <div class="col-md-4">
@@ -206,7 +211,7 @@
                             <input type="date" name="dbs_expiry_date" class="form-control">
                         </div>
 
-                        <div class="form-group col-md-12 col-sm-12 col-xs-12">
+                        <div class="form-group col-md-12 col-sm-12 col-xs-12 m-t-10">
                             <div class="checkbox">
                                 <label>
                                     <input type="checkbox" name="send_credentials" value="yes" id="sign-checkbox1" maxlength="255"> Send Credentials
@@ -482,5 +487,18 @@
             }
             return true;
         });
+    });
+</script>
+
+<script>
+    document.querySelectorAll('.overtime').forEach(wrapper => {
+
+        const checkbox = wrapper.querySelector('input[type="checkbox"]');
+        const extraHours = wrapper.querySelector('.extraHours');
+
+        checkbox.addEventListener('change', function() {
+            extraHours.style.display = this.checked ? 'block' : 'none';
+        });
+
     });
 </script>

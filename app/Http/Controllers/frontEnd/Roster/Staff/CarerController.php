@@ -41,13 +41,11 @@ class CarerController extends Controller
 
     public function carer_details($carer_id)
     {
-
         if (!$carer_id) {
             abort(400, 'User ID is required.');
         }
 
         $data['staffDetails'] = $this->staffService->getStaffDetails($carer_id);
-        // dd($data['staffDetails']);
         return view('frontEnd.roster.staff.carer_details', $data);
     }
 

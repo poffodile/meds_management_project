@@ -131,6 +131,7 @@ class UserController extends Controller
             $user->status               = $request->status;
             $user->phone_no             = $request->phone_no;
             $user->available_for_overtime = isset($request->available_for_overtime) ? 1 : 0;
+            $user->max_extra_hours      = $request->has('available_for_overtime') ? $request->input('max_extra_hours') : null;
             $user->employment_type      = $request->employment_type;
             $user->dbs_certificate_number = $request->dbs_certificate_number;
             $user->dbs_expiry_date      = date('Y-m-d', strtotime($request->dbs_expiry_date));
@@ -242,6 +243,7 @@ class UserController extends Controller
                 $user->status           = $request->status;
                 $user->phone_no         = $request->phone_no;
                 $user->available_for_overtime = isset($request->available_for_overtime) ? 1 : 0;
+                $user->max_extra_hours      = $request->has('available_for_overtime') ? $request->input('max_extra_hours') : null;    
                 $user->employment_type      = $request->employment_type;
                 $user->dbs_certificate_number = $request->dbs_certificate_number;
                 $user->dbs_expiry_date      = date('Y-m-d', strtotime($request->dbs_expiry_date));

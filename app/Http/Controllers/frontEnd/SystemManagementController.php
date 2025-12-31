@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\ServiceUser, App\User, App\HomeLabel, App\UserQualification, App\Ethnicity, App\EarningSchemeLabel, App\Models\CompanyDepartment;
 use DB, Auth;
 use App\Services\Staff\UserEmergencyContactService;
+use Carbon\Carbon;
 
 class SystemManagementController extends Controller
 {
@@ -35,7 +36,7 @@ class SystemManagementController extends Controller
     {
 
         if ($request->isMethod('post')) {
-            $data = $request->all();    
+            $data = $request->all();
             // print_r($data);
             // die;
             $home_ids = Auth::user()->home_id;
@@ -135,13 +136,16 @@ class SystemManagementController extends Controller
             $user->phone_no         = $data['staff_phone_no'];
             $user->email            = $data['staff_email'];
             $user->job_title        = $data['job_title'];
-            $user->department      = $data['department'];
+            $user->department       = $data['department'];
             $user->description      = $data['description'];
             $user->payroll          = $data['payroll'];
-            $user->available_for_overtime = isset($data['available_for_overtime']) ? 1 : 0;
+            $user->available_for_overtime = !empty($data['available_for_overtime']) ? 1 : 0;
+            $user->max_extra_hours = !empty($data['available_for_overtime']) ? ($data['max_extra_hours'] ?? null) : null;
             $user->employment_type  = $data['employment_type'];
             $user->dbs_certificate_number = $data['dbs_certificate_number'];
-            $user->dbs_expiry_date  = date('Y-m-d', strtotime($data['dbs_expiry_date']));
+            $user->dbs_expiry_date  = !empty($data['dbs_expiry_date'])
+                                    ? Carbon::parse($data['dbs_expiry_date'])->format('Y-m-d')
+                                    : null;
             $user->date_of_joining  = $date_of_joining;
             $user->date_of_leaving  = $date_of_leaving;
             $user->holiday_entitlement = $data['holiday_entitlement'];
@@ -188,7 +192,7 @@ class SystemManagementController extends Controller
                     $user->access_rights = $access_level_info->access_rights;
                 }
             }*/
-                if ($user->save()) {
+            if ($user->save()) {
                 User::saveQualification($data['qualifications'], $user->id);
                 UserEmergencyContactService::saveContacts($user->id, $data['emergency_contact']);
 

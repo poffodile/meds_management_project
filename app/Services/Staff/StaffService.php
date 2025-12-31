@@ -2,7 +2,7 @@
 
 namespace App\Services\Staff;
 
-use App\User;
+use App\User, App\UserQualification, App\Models\UserEmergencyContact;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -119,14 +119,38 @@ class StaffService
 
     public function getStaffDetails($userId)
     {
-        return User::where('id', $userId)->first();
+        $payRateTypeId = $this->getPayRateTypeId();
+
+        $user = User::select('user.*', 'pay_rates.pay_rate')
+            ->leftJoin('pay_rates', function ($join) use ($payRateTypeId) {
+                $join->on('user.access_level', '=', 'pay_rates.access_level_id');
+
+                // Apply rate type condition only if exists
+                if (!empty($payRateTypeId)) {
+                    $join->where('pay_rates.rate_type_id', $payRateTypeId);
+                }
+            })
+            ->where('user.id', $userId)
+            ->where('user.is_deleted', 0)
+            ->first();
+
+        if (!$user) {
+            return null;
+        }
+
+        // Attach related data
+        $user->emergencyContact = UserEmergencyContact::where('user_id', $userId)->first();
+        $user->qualifications   = UserQualification::where('user_id', $userId)->get();
+
+        return $user;
     }
+
 
     public function courses()
     {
         // $response = Http::get('http://66.116.198.68:8055/api/all-courses-list/');
         $response = Http::get('http://thunderingslap.com/api/all-courses-list/');
-        
+
 
         if ($response->successful()) {
             $data = $response->json();
