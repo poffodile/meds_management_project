@@ -1,19 +1,21 @@
 <!-- <script src="http://localhost/scits/public/frontEnd/js/jquery.js"></script> -->
-<!--   <script src="http://localhost/scits/public/frontEnd/js/jquery.validate.js"></script> -->
+<!-- <script src="http://localhost/scits/public/frontEnd/js/jquery.validate.js"></script> -->
+
 <!-- add staff model-->
 <div class="modal fade leaveCommunStyle" id="addStaffModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close cancel-btn" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title">Add Staff</h4>
+                <h4 class="modal-title" id="modalTitle">Add Staff</h4>
             </div>
             <form method="post" action="{{ url('add-staff-user') }}" enctype="multipart/form-data" id='add_staff'>
                 <div class="modal-body heightScrollModal">
                     <div class="row">
                         <div class="form-group col-md-6 col-sm-6 col-xs-12">
                             <label>Name</label>
-                            <input type="text" name="staff_name" placeholder="name" class="form-control" maxlength="255">
+                            <input type="hidden" name="staff_id" id="staff_id" value="">
+                            <input type="text" name="staff_name" id="staff_name" placeholder="name" class="form-control" maxlength="255">
                         </div>
                         <div class="form-group col-md-6 col-sm-6 col-xs-12">
                             <label>Username</label>
@@ -21,19 +23,19 @@
                         </div>
                         <div class="form-group col-md-6 col-sm-6 col-xs-12">
                             <label>Phone Number</label>
-                            <input type="text" name="staff_phone_no" required placeholder="phone number" class="form-control" maxlength="15">
+                            <input type="text" name="staff_phone_no" id="staff_phone_no" required placeholder="phone number" class="form-control" maxlength="15">
                         </div>
                         <div class="form-group col-md-16 col-sm-6 col-xs-12">
                             <label>Email</label>
-                            <input type="email" name="staff_email" placeholder="email" class="form-control" maxlength="255">
+                            <input type="email" name="staff_email" id="staff_email" placeholder="email" class="form-control" maxlength="255">
                         </div>
                         <div class="form-group col-md-6 col-sm-6 col-xs-12">
                             <label>Job Title</label>
-                            <input type="text" name="job_title" placeholder="job title" class="form-control" maxlength="255">
+                            <input type="text" name="job_title" placeholder="job title" id="job_title" class="form-control" maxlength="255">
                         </div>
                         <div class="form-group col-md-6 col-sm-6 col-xs-12">
                             <label>Department</label>
-                            <select class="form-control" name="department" id="">
+                            <select class="form-control" name="department" id="department">
                                 @foreach ($department as $dept)
                                     <option value="{{ $dept['id'] }}">{{ $dept['name'] }}</option>
                                 @endforeach
@@ -47,11 +49,19 @@
                                 <option value="contract">Contract</option>
                             </select>
                         </div>
+                        <div class="form-group col-md-6 col-sm-6 col-xs-12">
+                            <label>Status</label>
+                            <select name="status" class="form-control" id="status">
+                                <option value="1">Active</option>
+                                <option value="0">Inactive</option>
+                                <option value="2">On Leave</option>
+                            </select>
+                        </div>
 
                         <div class="form-group col-md-12 col-sm-12 col-xs-12">
                             <div class="overtime">
                                 <label>
-                                    <input type="checkbox" name="available_for_overtime" value="1"> Available for Overtime
+                                    <input type="checkbox" name="available_for_overtime" id="available_for_overtime" value="1"> Available for Overtime
                                 </label>
                                 <div class="extraHours">
                                     <label>Max extra hours per week</label>
@@ -60,23 +70,14 @@
                             </div>
                         </div>
 
-                        {{-- <div class="form-group col-md-12 col-sm-12 col-xs-12">
-                            <h4>Qualifications</h4>
-                            <div class="checkbox-grid">
-                                @foreach ($courses as $course)
-                                    <label><input type="checkbox" name="qualifications[]" value="{{ $course['course_id'] }}"> {{ $course['title'] }}</label>
-                                @endforeach
-                            </div>
-                        </div> --}}
-
                         <div class="form-group col-md-12 col-sm-12 col-xs-12">
                             <label>Description</label>
-                            <textarea name="description" class="form-control" rows="3" cols="20" placeholder="Short Description" maxlength="1000"></textarea>
+                            <textarea name="description" id="description" class="form-control" rows="3" cols="20" placeholder="Short Description" maxlength="1000"></textarea>
                         </div>
 
                         <div class="form-group col-md-6 col-sm-6 col-xs-12">
                             <label>Payroll</label>
-                            <input type="text" name="payroll" placeholder="payroll" class="form-control" maxlength="255">
+                            <input type="text" name="payroll" id="payroll" placeholder="payroll" class="form-control" maxlength="255">
                         </div>
                         <div class="form-group col-md-6 col-sm-6 col-xs-12">
                             <label>Holiday Entitlement</label>
@@ -85,17 +86,6 @@
 
                         <div class="form-group col-md-16 col-sm-6 col-xs-12 datepicker-sttng date-sttng">
                             <label>Date of Joining</label>
-                            <!-- <input name="date_of_birth" required class="form-control default-date-picker" type="text" value="" />
-                            <span class="input-group-btn add-on">
-                                <button class="btn btn-primary" type="button"><i class="fa fa-calendar"></i></button>
-                            </span> -->
-
-                            <!-- <div data-date-viewmode="years" data-date-format="dd-mm-yyyy" data-date=""  class="input-group date datetime-picker">
-                                <input name="date_of_birth" type="text" readonly value="" size="16" class="form-control">
-                                <span class="input-group-btn add-on">
-                                    <button class="btn btn-primary" type="button"><i class="fa fa-calendar"></i></button>
-                                </span>
-                            </div> -->
                             <div class="col-md-12 col-sm-12 col-xs-12 p-0">
                                 <div data-date-viewmode="years" data-date-format="dd-mm-yyyy" data-date="" class="input-group date"> <!-- dpYears -->
                                     <input name="date_of_joining" type="text" value="" readonly="" size="16" class="form-control joining-date">
@@ -109,17 +99,6 @@
 
                         <div class="form-group col-md-6 col-sm-6 col-xs-12 datepicker-sttng date-sttng">
                             <label>Date of Leaving</label>
-                            <!-- <input name="date_of_birth" required class="form-control default-date-picker" type="text" value="" />
-                            <span class="input-group-btn add-on">
-                                <button class="btn btn-primary" type="button"><i class="fa fa-calendar"></i></button>
-                            </span> -->
-
-                            <!-- <div data-date-viewmode="years" data-date-format="dd-mm-yyyy" data-date=""  class="input-group date datetime-picker">
-                                <input name="date_of_birth" type="text" readonly value="" size="16" class="form-control">
-                                <span class="input-group-btn add-on">
-                                    <button class="btn btn-primary" type="button"><i class="fa fa-calendar"></i></button>
-                                </span>
-                            </div> -->
                             <div class="col-md-12 col-sm-12 col-xs-12 p-0">
                                 <div data-date-viewmode="years" data-date-format="dd-mm-yyyy" data-date="" class="input-group date"> <!-- dpYears -->
                                     <input name="date_of_leaving" type="text" value="" readonly="" size="16" class="form-control leaving-date">
@@ -134,6 +113,9 @@
                         <div class="form-group col-md-12 col-sm-12 col-xs-12 m-0">
                             <div class="col-md-12 p-0">
                                 <div class="fileupload fileupload-new" data-provides="fileupload">
+                                    <div class="fileupload-new thumbnail" id="profile-picture" style="max-width: 200px; max-height: 150px; min-width: 150px; min-height: 100px; line-height: 100px; font-size: 40px; color: #c7c4c4;">
+                                        <img src="" alt="No Image" id="profile-picture-img" class="" /> 
+                                    </div>
                                     <div class="fileupload-new thumbnail" style="max-width: 200px; max-height: 150px; min-width: 150px; min-height: 100px; line-height: 100px; font-size: 40px; color: #c7c4c4;">
                                         <!-- <img src="" alt="No Image" class="temp_img" /> -->
                                         <i class="fa fa-upload"></i>
@@ -172,10 +154,9 @@
                                             <!-- certificate -->
                                             <div class="btn-file p-0">
                                                 <span class="">
-                                                    <!-- btn btn-white btn-file -->
-                                                    <!-- <i class="fa fa-upload"></i> Upload -->
-                                                    <input type="file" name="qualifications[{{ $course['course_id'] }}][cert]" class="default qual_upload">
+                                                    <input type="file" name="qualifications[{{ $course['course_id'] }}][cert]" class="default qual_upload"  accept="application/pdf,.pdf">
                                                 </span>
+                                                <div class="qual-preview" id="qual-preview-{{ $course['course_id'] }}" style="margin-top:8px;"></div>
                                             </div>
 
                                         </div>
@@ -184,8 +165,6 @@
                                 </div>
                             </div>
                         </div>
-
-
 
                         <div class="form-group col-md-12 col-sm-12 col-xs-12 m-t-10">
                             <label>Emergency Contact</label>
@@ -208,7 +187,28 @@
                         </div>
                         <div class="form-group col-md-6 col-sm-6 col-xs-12 m-0">
                             <label>DBS Expiry Date</label>
-                            <input type="date" name="dbs_expiry_date" class="form-control">
+
+
+                            <div class="col-md-12 col-sm-12 col-xs-12 p-0">
+
+                                <div class="input-group date">
+                                    <input type="text"
+                                        name="dbs_expiry_date"
+                                        class="form-control dbs-expiry-date"
+                                        readonly
+                                        size="16">
+
+                                    <span class="input-group-btn">
+                                        <input type="text"
+                                            id="dbs-expiry-picker"
+                                            class="form-control date-btn2">
+                                        <button class="btn allBtnUseColor" type="button">
+                                            <span class="glyphicon glyphicon-calendar"></span>
+                                        </button>
+                                    </span>
+                                </div>
+                            </div>
+
                         </div>
 
                         <div class="form-group col-md-12 col-sm-12 col-xs-12 m-t-10">
@@ -231,6 +231,8 @@
                 <div class="modal-footer m-t-0">
                     <button class="btn btn-default cancel-btn" data-dismiss="modal" type="button"> Cancel </button>
                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="existing_image" id="existing_image" value="">
+                    <input type="hidden" name="remove_image" id="remove_image" value="0">
                     <button class="btn allBtnUseColor validation_staff" type="submit"> Submit </button>
                 </div>
             </form>
@@ -239,10 +241,9 @@
 </div>
 
 
-<!-- STAFF JOINING DATE SCRIPT --><!-- STAFF JOINING DATE SCRIPT --><!-- STAFF JOINING DATE SCRIPT -->
+<!-- STAFF JOINING DATE SCRIPT -->
 <script>
     $(document).ready(function() {
-
         // today  = new Date; 
         $('#joining-date').datetimepicker({
             format: 'dd-mm-yyyy',
@@ -267,7 +268,7 @@
     });
 </script>
 
-<!-- STAFF LEAVING DATE SCRIPT --><!-- STAFF LEAVING DATE SCRIPT --><!-- STAFF LEAVING DATE SCRIPT -->
+<!-- STAFF LEAVING DATE SCRIPT -->
 <script>
     $(document).ready(function() {
         // today  = new Date; 
@@ -294,6 +295,42 @@
     });
 </script>
 
+<!-- DBS EXPIRY DATE SCRIPT -->
+<script>
+    $(document).ready(function() {
+
+        $('#dbs-expiry-picker').datetimepicker({
+            format: 'dd-mm-yyyy',
+            minView: 2,
+            autoclose: true
+        }).on('change.dp', function() {
+
+            var currdate = $(this).data("datetimepicker").getDate();
+
+            if (!currdate) return;
+
+            var newFormat =
+                String(currdate.getDate()).padStart(2, '0') + "-" +
+                String(currdate.getMonth() + 1).padStart(2, '0') + "-" +
+                currdate.getFullYear();
+
+            $('.dbs-expiry-date').val(newFormat);
+        });
+
+        $('#dbs-expiry-picker').on('click', function() {
+            $(this).datetimepicker('show');
+        });
+
+        $("#addStaffModal").scroll(function() {
+            $('#dbs-expiry-picker').datetimepicker('place');
+        });
+
+        $('#dbs-expiry-picker').on('change', function() {
+            $(this).datetimepicker('hide');
+        });
+
+    });
+</script>
 
 <script>
     $(document).ready(function() {
@@ -343,7 +380,7 @@
                     required: true,
                     regex: /^[0-9 +]{10,13}$/
                 },
-                image: "required",
+                // image: "required",
                 description: "required",
                 job_title: {
                     required: true,
@@ -389,7 +426,7 @@
                     required: "This field is required.",
                     regex: "Invalid Character"
                 },
-                image: "This field is required.",
+                // image: "This field is required.",
                 description: "This field is required.",
             },
             submitHandler: function(form) {
@@ -439,7 +476,7 @@
                                                         <span class="btn btn-white btn-file">
                                                            <span class="fileupload-new"><i class="fa fa-upload"></i> Upload
                                                            </span>
-                                                           <input name="qualifiaction_cert[]" class="default qual_upload" type="file">
+                                                           <input name="qualifiaction_cert[]" class="default qual_upload" type="file"  accept="application/pdf,.pdf">
                                                         </span>
                                                     
                                                         <span class="input-group-addon remove-addon"><a href="#" class="remove_field btn btn-danger">Remove</a>
@@ -491,14 +528,216 @@
 </script>
 
 <script>
-    document.querySelectorAll('.overtime').forEach(wrapper => {
+    function initOvertimeToggle() {
+        document.querySelectorAll('.overtime').forEach(wrapper => {
 
-        const checkbox = wrapper.querySelector('input[type="checkbox"]');
-        const extraHours = wrapper.querySelector('.extraHours');
+            const checkbox = wrapper.querySelector('input[type="checkbox"]');
+            const extraHours = wrapper.querySelector('.extraHours');
 
-        checkbox.addEventListener('change', function() {
-            extraHours.style.display = this.checked ? 'block' : 'none';
+            if (!checkbox || !extraHours) return;
+
+            extraHours.style.display = checkbox.checked ? 'block' : 'none';
+
+            checkbox.onchange = function() {
+                extraHours.style.display = this.checked ? 'block' : 'none';
+            };
         });
+    }
 
+    // page load
+    document.addEventListener('DOMContentLoaded', initOvertimeToggle);
+
+    // modal open (EDIT) - bind to the actual modal id
+    $('#addStaffModal').on('shown.bs.modal', initOvertimeToggle);
+</script>
+<script>
+    $(document).on('click', '.openStaffModal', function() {
+        const $btn = $(this);
+        const mode = $btn.attr('data-mode') || $btn.data('mode');
+
+        // Reset form and qualification checkboxes/dynamic fields
+        $('#add_staff')[0].reset();
+        $('input[name^="qualifications"]').prop('checked', false);
+        $('.appended-whole-div').remove();
+        // clear any existing qualification previews left from previous edit
+        $('.qual-preview').empty();
+        // clear any qualification file inputs
+        $('.qual_upload').val('');
+        // reset existing image/remove flags and profile preview
+        $('#existing_image').val('');
+        $('#remove_image').val('0');
+        $('#profile-picture-img').attr('src', '');
+        if (document.getElementById('profile-picture')) document.getElementById('profile-picture').style.display = 'none';
+
+        // remove any existing hidden method input
+        $('#formMethod').remove();
+
+        if (mode === 'add') {
+            $('#modalTitle').text('Add Staff');
+            $('#add_staff').attr('action', "{{ url('add-staff-user') }}");
+            $('#staff_id').val('');
+            document.getElementById('profile-picture').style.display = 'none';
+        } else {
+            $('#modalTitle').text('Edit Staff');
+            const staffId = $btn.attr('data-id') || $btn.data('id');
+            // set form action at runtime so staffId is appended correctly
+            $('#add_staff').attr('action', '{{ url('roster/carer-update') }}/' + staffId);
+
+            // qualifications may be passed as JSON in data-qualifications
+            let qualifications = [];
+            const qualAttr = $btn.attr('data-qualifications');
+            if (qualAttr) {
+                try {
+                    qualifications = JSON.parse(qualAttr);
+                } catch (e) {
+                    qualifications = $btn.data('qualifications') || [];
+                }
+            } else {
+                qualifications = $btn.data('qualifications') || [];
+            }
+
+            
+            if (Array.isArray(qualifications)) {
+                qualifications.forEach(q => {
+                    // Match qualification by course_id
+                    const courseId = q.course_id || q.courseId || q.id;
+                    if (!courseId) return; // Skip if no course_id
+                    
+                    const selector = 'input[name="qualifications[' + courseId + '][course_id]"]';
+                    const checkboxEl = $(selector);
+                    
+                    // Only check if the checkbox exists (course is available in form)
+                    if (checkboxEl.length > 0) {
+                        checkboxEl.prop('checked', true);
+                        
+                        // If a certificate path exists, render preview
+                        let img = q.image || q.cert || q.filename || q.file || q.path || null;
+                        const previewEl = $('#qual-preview-' + courseId);
+                        
+                        if (img && previewEl.length) {
+                            let url = String(img);
+
+                            // BASE URL (Laravel public folder)
+                            const BASE_URL = window.location.origin + '/socialcareitsolutions/public/images/userQualification/';
+
+                            // normalize path
+                            if (url.startsWith('http')) {
+                                // already full URL → do nothing
+                            } else if (url.startsWith('public/')) {
+                                url = BASE_URL + url.replace('public/', '');
+                            } else if (url.startsWith('/')) {
+                                url = BASE_URL + url.replace('/', '');
+                            } else {
+                                url = BASE_URL + url;
+                            }
+
+                            const lower = url.toLowerCase();
+                            if (lower.endsWith('.pdf')) {
+                                previewEl.html('<a href="' + url + '" target="_blank" class="btn btn-default">View PDF</a>');
+                            } else {
+                                previewEl.html('<a href="' + url + '" target="_blank">View file</a>');
+                            }
+                        }
+                    }
+                });
+            }
+
+       
+            // add hidden _method input for PUT
+            $('#add_staff').append('<input type="hidden" name="_method" id="formMethod" value="PUT">');
+
+            $('#staff_id').val(staffId);
+            $('#staff_name').val($btn.attr('data-name') || $btn.data('name'));
+            $('#staff_user_name').val($btn.attr('data-username') || $btn.data('username'));
+            $('#staff_phone_no').val($btn.attr('data-phone') || $btn.data('phone'));
+            $('#staff_email').val($btn.attr('data-email') || $btn.data('email'));
+            $('#job_title').val($btn.attr('data-job-title') || $btn.data('jobTitle') || $btn.data('job-title'));
+            $('#department').val($btn.attr('data-department') || $btn.data('department')).trigger('change');
+            $('#employment_type').val($btn.attr('data-employment-type') || $btn.data('employmentType') || $btn.data('employment-type')).trigger('change');
+            $('#status').val($btn.attr('data-status') || $btn.data('status')).trigger('change');
+
+            const overtime = $btn.attr('data-overtime-availability') || $btn.data('overtimeAvailability') || $btn.data('overtime-availability');
+            $('input[name="available_for_overtime"]').prop('checked', (overtime == 1 || overtime == '1' || overtime === true || overtime === 'true'));
+            // ensure toggle runs after setting the checkbox
+            initOvertimeToggle();
+            // populate max extra hours (support several possible data attribute naming conventions)
+            var maxHours = $btn.attr('data-max-extra-hours') || $btn.attr('data-max_extra_hours') || $btn.attr('data-maxhours') || $btn.data('maxExtraHours') || $btn.data('max_extra_hours') || $btn.data('max-extra-hours') || '';
+
+            // If maxHours exists but overtime flag not explicitly set, enable the overtime checkbox
+            if (maxHours && (maxHours !== '' && maxHours !== 'null')) {
+                $('input[name="available_for_overtime"]').prop('checked', true);
+            }
+
+            // set the max extra hours value
+            $('input[name="max_extra_hours"]').val(maxHours);
+
+            // trigger change so the extraHours container shows when we've programmatically checked the box
+            $('input[name="available_for_overtime"]').trigger('change');
+            $('#description').val($btn.attr('data-description') || $btn.data('description'));
+            $('input[name="payroll"]').val($btn.attr('data-payroll') || $btn.data('payroll'));
+            $('input[name="holiday_entitlement"]').val($btn.attr('holiday-entitlement') || $btn.data('holiday_entitlement') || $btn.data('holidayEntitlement'));
+
+            // Populate emergency contact fields (support multiple data-attribute naming conventions)
+            $('input[name="emergency_contact[name]"]').val(
+                $btn.attr('data-emergency_contact_name') || $btn.data('emergency_contact_name') || $btn.data('emergencyContactName') || ''
+            );
+            $('input[name="emergency_contact[phone_no]"]').val(
+                $btn.attr('data-emergency_contact_phone') || $btn.data('emergency_contact_phone') || $btn.data('emergencyContactPhone') || ''
+            );
+            $('input[name="emergency_contact[relationship]"]').val(
+                $btn.attr('data-emergency_contact_relationship') || $btn.data('emergency_contact_relationship') || $btn.data('emergencyContactRelationship') || ''
+            );
+            let profile_img = $btn.attr('data-image') || $btn.data('image') || '';
+            const BASE_URL = window.location.origin + '/socialcareitsolutions/public/images/userProfileImages/';
+            document.getElementById('profile-picture').style.display = 'block';
+            // populate hidden existing_image field so backend can decide whether to keep it
+            $('#existing_image').val(profile_img ? profile_img : '');
+            $('#remove_image').val('0');
+            $('#profile-picture-img').attr('src', profile_img ? (String(profile_img).startsWith('http') ? profile_img : BASE_URL + profile_img) : '');
+
+            function parseDbDate(dateStr) {
+                if (!dateStr) return null;
+
+                // Handles: YYYY-MM-DD or YYYY-MM-DD HH:mm:ss
+                const parts = dateStr.split(' ')[0].split('-');
+                return new Date(parts[0], parts[1] - 1, parts[2]);
+            }
+
+            function formatDate(date) {
+                return String(date.getDate()).padStart(2, '0') + '-' +
+                    String(date.getMonth() + 1).padStart(2, '0') + '-' +
+                    date.getFullYear();
+            }
+
+
+            const doj = $btn.data('dateOfJoining') || $btn.data('date_of_joining');
+            const dol = $btn.data('dateOfLeaving') || $btn.data('date_of_leaving');
+
+            const dojDate = parseDbDate(doj);
+            const dolDate = parseDbDate(dol);
+
+            if (dojDate) {
+                $('#joining-date').datetimepicker('setDate', dojDate);
+                $('.joining-date').val(formatDate(dojDate));
+            }
+
+            if (dolDate) {
+                $('#leaving-date').datetimepicker('setDate', dolDate);
+                $('.leaving-date').val(formatDate(dolDate));
+            }
+
+            const dbsExpiry = $btn.data('dbs_expiry_date');
+            const dbsDate = parseDbDate(dbsExpiry);
+
+            if (dbsDate) {
+                $('#dbs-expiry-picker').datetimepicker('setDate', dbsDate);
+                $('.dbs-expiry-date').val(formatDate(dbsDate));
+            }
+
+            $('input[name="dbs_certificate_number"]').val($btn.attr('data-dbs_certificate_number') || $btn.data('dbs_certificate_number') || $btn.data('dbsCertificateNumber'));
+
+        }
+
+        $('#addStaffModal').modal('show');
     });
 </script>

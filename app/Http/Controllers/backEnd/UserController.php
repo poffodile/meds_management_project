@@ -301,7 +301,7 @@ class UserController extends Controller
             }
         }
 
-        $user_info  = User::with('certificates', 'emergencyContact')
+        $user_info  = User::with('certificates', 'emergencyContacts')
             ->where('id', $user_id)
             ->where('is_deleted', $del_status)
             ->first();

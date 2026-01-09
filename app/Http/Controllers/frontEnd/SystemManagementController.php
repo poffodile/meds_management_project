@@ -139,6 +139,7 @@ class SystemManagementController extends Controller
             $user->department       = $data['department'];
             $user->description      = $data['description'];
             $user->payroll          = $data['payroll'];
+            $user->status           = $data['status'];
             $user->available_for_overtime = !empty($data['available_for_overtime']) ? 1 : 0;
             $user->max_extra_hours = !empty($data['available_for_overtime']) ? ($data['max_extra_hours'] ?? null) : null;
             $user->employment_type  = $data['employment_type'];

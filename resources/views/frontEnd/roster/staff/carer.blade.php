@@ -15,7 +15,7 @@
                     <p class="header-subtitle">Manage your care team</p>
                 </div>
                 <div class="header-actions">
-                    <button class="btn add_staff" data-toggle="modal" data-target="#addStaffModal"><i class="fa fa-plus"></i> Add Carer</button>
+                    <button class="btn add_staff openStaffModal" data-mode="add"><i class="fa fa-plus"></i> Add Carer</button>
                 </div>
             </div>
 
@@ -107,9 +107,18 @@
                                             <div class="sectionCarer">
                                                 <div class="label">Qualifications:</div>
                                                 <div class="tags">
-                                                    <span>Dementia Care</span> <span>Medication Administration</span>
+                                                    @if (!empty($carer->qualifications) && count($carer->qualifications))
+                                                        @foreach ($carer->qualifications as $qualification)
+                                                            <span>
+                                                                {{ $qualification->name ?? $qualification }}
+                                                            </span>
+                                                        @endforeach
+                                                    @else
+                                                        <span>No qualifications</span>
+                                                    @endif
                                                 </div>
                                             </div>
+                                          
                                             <div class="rate">
                                                 <div class="label">Hourly Rate</div>
                                                 <div class="amount">£{{ $carer->pay_rate ?? '0.00' }}</div>
@@ -118,7 +127,36 @@
                                                 <i class="fa-regular fa-clipboard"></i> <span>Supervision: No supervision</span>
                                             </div>
                                             <div class="actions">
-                                                <button class="edit" data-id="{{ $carer->id }}"> <i class="fa-regular fa-pen-to-square"></i> Edit </button>
+                                                <button 
+                                                    class="edit openStaffModal"  
+                                                    data-mode="edit" 
+                                                    data-id="{{ $carer->id }}"
+                                                    data-name="{{ $carer->name }}" 
+                                                    data-username="{{ $carer->user_name }}" 
+                                                    data-phone="{{ $carer->phone_no }}"
+                                                    data-email="{{ $carer->email }}"
+                                                    data-job-title="{{ $carer->job_title }}"
+                                                    data-department="{{ $carer->department }}"
+                                                    data-description="{{ $carer->description }}"
+                                                    data-status="{{ $carer->status }}"
+                                                    data-employment-type="{{ $carer->employment_type }}"
+                                                    data-pay-rate="{{ $carer->pay_rate }}"
+                                                    data-image="{{ $carer->image }}"
+                                                    data-emergency_contact_name="{{ $carer->emergency_contact_name }}"
+                                                    data-emergency_contact_phone="{{ $carer->emergency_contact_phone }}"
+                                                    data-emergency_contact_relationship="{{ $carer->emergency_contact_relationship }}"
+                                                    data-payroll="{{ $carer->payroll }}"
+                                                    data-dbs_expiry_date = "{{ $carer->dbs_expiry_date }}"
+                                                    data-dbs_certificate_number = "{{ $carer->dbs_certificate_number }}"
+                                                    data-date-of-joining = "{{ $carer->date_of_joining }}"
+                                                    data-date-of-leaving = "{{ $carer->date_of_leaving }}"
+                                                    data-holiday-entitlement="{{ $carer->holiday_entitlement}}"
+                                                    data-overtime-availability="{{ $carer->available_for_overtime }}"
+                                                    data-max-extra-hours="{{ $carer->max_extra_hours }}"
+                                                    data-current-location="{{ $carer->current_location }}"
+                                                    data-qualifications='@json($carer->qualifications)'> 
+                                                    <i class="fa-regular fa-pen-to-square"></i> Edit 
+                                                </button>
                                                 <button class="delete" data-id="{{ $carer->id }}"> <i class="fa-regular fa-trash-can"></i> </button>
                                             </div>
                                         </div>
@@ -167,7 +205,16 @@
                                         <div class="sectionCarer">
                                             <div class="label">Qualifications:</div>
                                             <div class="tags">
-                                                <span>Dementia Care</span> <span>Medication Administration</span>
+                                                @if (!empty($carer->qualifications) && count($carer->qualifications))
+                                                        @foreach ($carer->qualifications as $qualification)
+                                                            <span>
+                                                                {{ $qualification->name ?? $qualification }}
+                                                            </span>
+                                                        @endforeach
+                                                    @else
+                                                        <span>No qualifications</span>
+                                                    @endif
+
                                             </div>
                                         </div>
                                         <div class="rate">
@@ -178,8 +225,37 @@
                                             <i class="fa-regular fa-clipboard"></i> <span>Supervision: No supervision</span>
                                         </div>
                                         <div class="actions">
-                                            <button class="edit" data-id="{{ $carer->id }}"> <i class="fa-regular fa-pen-to-square"></i> Edit </button>
-                                            <button class="delete" data-id="{{ $carer->id }}"> <i class="fa-regular fa-trash-can"></i> </button>
+                                             <button 
+                                                    class="edit openStaffModal"  
+                                                    data-mode="edit" 
+                                                    data-id="{{ $carer->id }}"
+                                                    data-name="{{ $carer->name }}" 
+                                                    data-username="{{ $carer->user_name }}" 
+                                                    data-phone="{{ $carer->phone_no }}"
+                                                    data-email="{{ $carer->email }}"
+                                                    data-job-title="{{ $carer->job_title }}"
+                                                    data-department="{{ $carer->department }}"
+                                                    data-description="{{ $carer->description }}"
+                                                    data-status="{{ $carer->status }}"
+                                                    data-employment-type="{{ $carer->employment_type }}"
+                                                    data-pay-rate="{{ $carer->pay_rate }}"
+                                                    data-image="{{ $carer->image }}"
+                                                    data-emergency_contact_name="{{ $carer->emergency_contact_name }}"
+                                                    data-emergency_contact_phone="{{ $carer->emergency_contact_phone }}"
+                                                    data-emergency_contact_relationship="{{ $carer->emergency_contact_relationship }}"
+                                                    data-payroll="{{ $carer->payroll }}"
+                                                    data-dbs_expiry_date = "{{ $carer->dbs_expiry_date }}"
+                                                    data-dbs_certificate_number = "{{ $carer->dbs_certificate_number }}"
+                                                    data-date-of-joining = "{{ $carer->date_of_joining }}"
+                                                    data-date-of-leaving = "{{ $carer->date_of_leaving }}"
+                                                    data-holiday-entitlement="{{ $carer->holiday_entitlement}}"
+                                                    data-overtime-availability="{{ $carer->available_for_overtime }}"
+                                                    data-max-extra-hours="{{ $carer->max_extra_hours }}"
+                                                    data-current-location="{{ $carer->current_location }}"
+                                                    data-qualifications='@json($carer->qualifications)'> 
+                                                    <i class="fa-regular fa-pen-to-square"></i> Edit 
+                                                </button>
+                                                <button class="delete" data-id="{{ $carer->id }}"> <i class="fa-regular fa-trash-can"></i> </button>
                                         </div>
                                     </div>
                                 </div>
@@ -229,7 +305,15 @@
                                     <div class="sectionCarer">
                                         <div class="label">Qualifications:</div>
                                         <div class="tags">
-                                            <span>Dementia Care</span> <span>Medication Administration</span>
+                                             @if (!empty($carer->qualifications) && count($carer->qualifications))
+                                                        @foreach ($carer->qualifications as $qualification)
+                                                            <span>
+                                                                {{ $qualification->name ?? $qualification }}
+                                                            </span>
+                                                        @endforeach
+                                                    @else
+                                                        <span>No qualifications</span>
+                                                    @endif
                                         </div>
                                     </div>
                                     <div class="rate">
@@ -292,7 +376,15 @@
                                     <div class="sectionCarer">
                                         <div class="label">Qualifications:</div>
                                         <div class="tags">
-                                            <span>Dementia Care</span> <span>Medication Administration</span>
+                                            @if (!empty($carer->qualifications) && count($carer->qualifications))
+                                                        @foreach ($carer->qualifications as $qualification)
+                                                            <span>
+                                                                {{ $qualification->name ?? $qualification }}
+                                                            </span>
+                                                        @endforeach
+                                                    @else
+                                                        <span>No qualifications</span>
+                                                    @endif
                                         </div>
                                     </div>
                                     <div class="rate">
@@ -303,8 +395,37 @@
                                         <i class="fa-regular fa-clipboard"></i> <span>Supervision: No supervision</span>
                                     </div>
                                     <div class="actions">
-                                        <button class="edit" data-id="{{ $carer->id }}"> <i class="fa-regular fa-pen-to-square"></i> Edit </button>
-                                        <button class="delete" data-id="{{ $carer->id }}"> <i class="fa-regular fa-trash-can"></i> </button>
+                                         <button 
+                                                    class="edit openStaffModal"  
+                                                    data-mode="edit" 
+                                                    data-id="{{ $carer->id }}"
+                                                    data-name="{{ $carer->name }}" 
+                                                    data-username="{{ $carer->user_name }}" 
+                                                    data-phone="{{ $carer->phone_no }}"
+                                                    data-email="{{ $carer->email }}"
+                                                    data-job-title="{{ $carer->job_title }}"
+                                                    data-department="{{ $carer->department }}"
+                                                    data-description="{{ $carer->description }}"
+                                                    data-status="{{ $carer->status }}"
+                                                    data-employment-type="{{ $carer->employment_type }}"
+                                                    data-pay-rate="{{ $carer->pay_rate }}"
+                                                    data-image="{{ $carer->image }}"
+                                                    data-emergency_contact_name="{{ $carer->emergency_contact_name }}"
+                                                    data-emergency_contact_phone="{{ $carer->emergency_contact_phone }}"
+                                                    data-emergency_contact_relationship="{{ $carer->emergency_contact_relationship }}"
+                                                    data-payroll="{{ $carer->payroll }}"
+                                                    data-dbs_expiry_date = "{{ $carer->dbs_expiry_date }}"
+                                                    data-dbs_certificate_number = "{{ $carer->dbs_certificate_number }}"
+                                                    data-date-of-joining = "{{ $carer->date_of_joining }}"
+                                                    data-date-of-leaving = "{{ $carer->date_of_leaving }}"
+                                                    data-holiday-entitlement="{{ $carer->holiday_entitlement}}"
+                                                    data-overtime-availability="{{ $carer->available_for_overtime }}"
+                                                    data-max-extra-hours="{{ $carer->max_extra_hours }}"
+                                                    data-current-location="{{ $carer->current_location }}"
+                                                    data-qualifications='@json($carer->qualifications)'> 
+                                                    <i class="fa-regular fa-pen-to-square"></i> Edit 
+                                                </button>
+                                                <button class="delete" data-id="{{ $carer->id }}"> <i class="fa-regular fa-trash-can"></i> </button>
                                     </div>
                                 </div>
                             </div>
@@ -327,152 +448,6 @@
         </div>
         </div>
         </div>
-
-
-        <!-- add Carer Modal -->
-        {{-- <div class="modal fade leaveCommunStyle" id="addCarerModal" tabindex="1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-sm">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                        <h4 class="modal-title">Add New Carer</h4>
-                    </div>
-                    <div class="modal-body approveLeaveModal">
-                        <div class="carer-form">
-                            <form>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <label>Full Name *</label>
-                                        <input type="text" class="form-control">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label>Email *</label>
-                                        <input type="email" class="form-control">
-                                    </div>
-
-                                    <div class="col-md-6  m-t-10">
-                                        <label>Phone *</label>
-                                        <input type="text" class="form-control">
-                                    </div>
-                                    <div class="col-md-6  m-t-10">
-                                        <label>Status</label>
-                                        <select class="form-control">
-                                            <option>Active</option>
-                                            <option>Inactive</option>
-                                        </select>
-                                    </div>
-
-                                    <div class="col-md-6  m-t-10">
-                                        <label>Employment Type</label>
-                                        <select class="form-control">
-                                            <option>Full Time</option>
-                                            <option>Part Time</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6  m-t-10">
-                                        <label>Hourly Rate (£)</label>
-                                        <input type="number" value="15" class="form-control">
-                                    </div>
-                                </div>
-
-                                <div class="overtime">
-                                    <label>
-                                        <input type="checkbox"> Available for Overtime
-                                    </label>
-                                </div>
-
-                                <div class="qualifications">
-                                    <h4>Qualifications</h4>
-                                    <div class="checkbox-grid">
-                                        <label><input type="checkbox"> NVQ Level 2 Health & Social Care</label>
-                                        <label><input type="checkbox"> NVQ Level 3 Health & Social Care</label>
-                                        <label><input type="checkbox"> First Aid Certificate</label>
-                                        <label><input type="checkbox"> Dementia Care Specialist</label>
-                                        <label><input type="checkbox"> Medication Administration</label>
-                                        <label><input type="checkbox"> Care Certificate</label>
-                                        <label><input type="checkbox"> Dementia Care</label>
-                                        <label><input type="checkbox"> First Aid</label>
-                                    </div>
-                                </div>
-
-                                <div class="address">
-                                    <label>Address</label>
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <input type="text" class="form-control" placeholder="Street">
-                                        </div>
-                                        <div class="col-md-4">
-                                            <input type="text" class="form-control" placeholder="City">
-                                        </div>
-                                        <div class="col-md-4">
-                                            <input type="text" class="form-control" placeholder="Postcode">
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="emergency m-t-10">
-                                    <label>Emergency Contact</label>
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <input type="text" class="form-control" placeholder="Name">
-                                        </div>
-                                        <div class="col-md-4">
-                                            <input type="text" class="form-control" placeholder="Phone">
-                                        </div>
-                                        <div class="col-md-4">
-                                            <input type="text" class="form-control" placeholder="Relationship">
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row m-t-10">
-                                    <div class="col-md-4">
-                                        <label>DBS Certificate Number</label>
-                                        <input type="text" class="form-control">
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label>DBS Expiry Date</label>
-                                        <input type="date" class="form-control">
-                                    </div>
-                                </div>
-
-                                <div class="actions">
-                                    <button type="button" class="cancel">Cancel</button>
-                                    <button type="submit" class="submit">Create Carer</button>
-                                </div>
-
-                            </form>
-                        </div>
-
-                        <!-- <div class="leave-body">
-                                
-                                <div class="leave-info">
-                          
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Address</label>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            
-                                        </div>
-                                        <div class="col-md-6">
-                                            
-                                        </div>
-                                    </div>
-                                </div>
-
-                                
-
-                                <div class="footer-actions">
-                                    <button class="btn btn-cancel">Cancel</button>
-                                    <button class="btn btn-approve leave-approve-btn">Create Carer</button>
-                                </div>
-                            </div> -->
-                    </div>
-                </div>
-            </div>
-        </div> --}}
 
         @include('frontEnd.systemManagement.elements.add_staff')
 

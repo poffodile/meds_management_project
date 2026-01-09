@@ -338,14 +338,14 @@ class User extends Authenticatable
         return $this->hasMany(Timesheet::class);
     }
 
-    public function emergencyContact()
-{
-    return $this->hasOne(
-        \App\Models\UserEmergencyContact::class,
-        'user_id',
-        'id'
-    );
-}
+    public function emergencyContacts()
+    {
+        return $this->hasOne(
+            \App\Models\UserEmergencyContact::class,
+            'user_id',
+            'id'
+        );
+    }
 
 
 

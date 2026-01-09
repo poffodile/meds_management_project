@@ -4,6 +4,8 @@
 
     @include('frontEnd.roster.common.roster_header')
 
+    <link rel="stylesheet" href="{{ asset('public/frontEnd/staff/css/working-hours.css') }}">
+
     <main class="page-content empoyeeHeader">
         <div class="topHeaderCont">
             <div>
@@ -151,163 +153,305 @@
                                                 <button class="btn-outline"><i class='bx  bx-rotate-ccw'></i> Reset</button>
                                             </div>
                                         </div>
+                                        <div class="schedulePattern">
+                                            <div class="col-md-6 mb-3">
+                                                <label for="schedule_pattern">Schedule Pattern</label>
+                                                <select class="form-control" id="schedule_pattern">
+                                                    <option value="standard">Standard Weekly Pattern</option>
+                                                    <option value="alternate">Alternate Weeks</option>
+                                                    <option value="specific">Choose Specific Dates (next 60 days)</option>
+                                                </select>
+                                            </div>
 
-                                        <div class="schedulePattern"> 
-                                            <label>Schedule Pattern</label>
-                                            <select class="form-control" id="schedule_pattern">
-                                                <option value="standard">Standard Weekly Pattern</option>
-                                                <option value="alternate">Alternate Weeks</option>
-                                                <option value="specific">Choose Specific Dates (next 60 days)</option>
-                                            </select>
+                                            <div class="col-md-6 mb-3" id="editing_week" style="display:none;">
+                                                <label for="schedule_pattern_2">Editing Week</label>
+                                                <select class="form-control" id="schedule_pattern_2">
+                                                    <option value="week_1">Week 1</option>
+                                                    <option value="week_2">Week 2</option>
+                                                </select>
+                                            </div>
                                         </div>
-                                        
-
 
                                         <!-- Standard Weekly -->
                                         <div id="tab-standard">
                                             <div class="dayRow active">
                                                 <span class="day">Monday</span>
+
                                                 <label class="switch">
-                                                    <input type="checkbox" checked>
+                                                    <input type="checkbox" class="dayToggle" checked>
                                                     <span class="slider"></span>
                                                 </label>
-                                                <input type="time" value="09:00" class="dayTime form-control">
-                                                <span>to</span>
-                                                <input type="time" value="17:00" class="dayTime form-control">
-                                                <span class="hours">8.0 hrs</span>
-                                            </div>
 
+                                                <div class="workingFields">
+                                                    <input type="time" value="09:00" class="dayTime form-control startTime">
+                                                    <span>to</span>
+                                                    <input type="time" value="17:00" class="dayTime form-control endTime">
+                                                    <span class="hours">8.0 hrs</span>
+                                                </div>
+
+                                                <span class="notWorking" style="display:none;">Not working</span>
+                                            </div>
                                             <div class="dayRow">
                                                 <span class="day">Tuesday</span>
+
                                                 <label class="switch">
-                                                    <input type="checkbox">
+                                                    <input type="checkbox" class="dayToggle">
                                                     <span class="slider"></span>
                                                 </label>
+
+                                                <div class="workingFields" style="display:none;">
+                                                    <input type="time" value="09:00" class="dayTime form-control startTime">
+                                                    <span>to</span>
+                                                    <input type="time" value="17:00" class="dayTime form-control endTime">
+                                                    <span class="hours">8.0 hrs</span>
+                                                </div>
+
                                                 <span class="notWorking">Not working</span>
                                             </div>
-
                                             <div class="dayRow">
                                                 <span class="day">Wednesday</span>
+
                                                 <label class="switch">
-                                                    <input type="checkbox">
+                                                    <input type="checkbox" class="dayToggle">
                                                     <span class="slider"></span>
                                                 </label>
+
+                                                <div class="workingFields" style="display:none;">
+                                                    <input type="time" value="09:00" class="dayTime form-control startTime">
+                                                    <span>to</span>
+                                                    <input type="time" value="17:00" class="dayTime form-control endTime">
+                                                    <span class="hours">8.0 hrs</span>
+                                                </div>
+
                                                 <span class="notWorking">Not working</span>
                                             </div>
-
                                             <div class="dayRow">
                                                 <span class="day">Thursday</span>
+
                                                 <label class="switch">
-                                                    <input type="checkbox">
+                                                    <input type="checkbox" class="dayToggle">
                                                     <span class="slider"></span>
                                                 </label>
+
+                                                <div class="workingFields" style="display:none;">
+                                                    <input type="time" value="09:00" class="dayTime form-control startTime">
+                                                    <span>to</span>
+                                                    <input type="time" value="17:00" class="dayTime form-control endTime">
+                                                    <span class="hours">8.0 hrs</span>
+                                                </div>
+
                                                 <span class="notWorking">Not working</span>
                                             </div>
-
                                             <div class="dayRow">
                                                 <span class="day">Friday</span>
+
                                                 <label class="switch">
-                                                    <input type="checkbox">
+                                                    <input type="checkbox" class="dayToggle">
                                                     <span class="slider"></span>
                                                 </label>
+
+                                                <div class="workingFields" style="display:none;">
+                                                    <input type="time" value="09:00" class="dayTime form-control startTime">
+                                                    <span>to</span>
+                                                    <input type="time" value="17:00" class="dayTime form-control endTime">
+                                                    <span class="hours">8.0 hrs</span>
+                                                </div>
+
                                                 <span class="notWorking">Not working</span>
                                             </div>
-
                                             <div class="dayRow weekend">
                                                 <span class="day">Saturday</span>
+
                                                 <label class="switch">
-                                                    <input type="checkbox">
+                                                    <input type="checkbox" class="dayToggle">
                                                     <span class="slider"></span>
                                                 </label>
+
+                                                <div class="workingFields" style="display:none;">
+                                                    <input type="time" value="09:00" class="dayTime form-control startTime">
+                                                    <span>to</span>
+                                                    <input type="time" value="17:00" class="dayTime form-control endTime">
+                                                    <span class="hours">8.0 hrs</span>
+                                                </div>
+
                                                 <span class="notWorking">Not working</span>
                                             </div>
-
                                             <div class="dayRow weekend">
                                                 <span class="day">Sunday</span>
+
                                                 <label class="switch">
-                                                    <input type="checkbox">
+                                                    <input type="checkbox" class="dayToggle">
                                                     <span class="slider"></span>
                                                 </label>
+
+                                                <div class="workingFields" style="display:none;">
+                                                    <input type="time" value="09:00" class="dayTime form-control startTime">
+                                                    <span>to</span>
+                                                    <input type="time" value="17:00" class="dayTime form-control endTime">
+                                                    <span class="hours">8.0 hrs</span>
+                                                </div>
+
                                                 <span class="notWorking">Not working</span>
                                             </div>
-
                                         </div>
 
                                         <!-- Alternate Weeks -->
-                                        {{-- <div id="tab-alternate">
-                                            <h1>Alternate</h1>
-                                               <div class="dayRow active">
+                                        <div id="tab-alternate">
+                                            <div class="alternateInfoBox">
+                                                <div class="alternateInfoText">
+                                                    <strong>You are editing <span class="highlight">Week 1</span> of the alternating schedule.</strong>
+                                                    These hours will repeat every other week.
+                                                    Switch between <strong>Week 1</strong> and <strong>Week 2</strong> above to set different schedules.
+                                                </div>
+                                                <div class="alternateDebug">
+                                                    Debug: Week1 enabled days: <strong>7</strong> |
+                                                    Week2 enabled days: <strong>7</strong> |
+                                                    Current enabled days: <strong>7</strong>
+                                                </div>
+                                            </div>
+
+                                            <div class="dayRow active">
                                                 <span class="day">Monday</span>
                                                 <label class="switch">
-                                                    <input type="checkbox" checked>
+                                                    <input type="checkbox" class="dayToggle" checked>
                                                     <span class="slider"></span>
                                                 </label>
-                                                <input type="time" value="09:00" class="dayTime form-control">
-                                                <span>to</span>
-                                                <input type="time" value="17:00" class="dayTime form-control">
-                                                <span class="hours">8.0 hrs</span>
+                                                <div class="workingFields">
+                                                    <input type="time" value="09:00" class="dayTime form-control startTime">
+                                                    <span>to</span>
+                                                    <input type="time" value="17:00" class="dayTime form-control endTime">
+                                                    <span class="hours">8.0 hrs</span>
+                                                </div>
+                                                <span class="notWorking" style="display:none;">Not working</span>
                                             </div>
 
                                             <div class="dayRow">
                                                 <span class="day">Tuesday</span>
                                                 <label class="switch">
-                                                    <input type="checkbox">
+                                                    <input type="checkbox" class="dayToggle">
                                                     <span class="slider"></span>
                                                 </label>
+
+                                                <div class="workingFields" style="display:none;">
+                                                    <input type="time" value="09:00" class="dayTime form-control startTime">
+                                                    <span>to</span>
+                                                    <input type="time" value="17:00" class="dayTime form-control endTime">
+                                                    <span class="hours">8.0 hrs</span>
+                                                </div>
+
                                                 <span class="notWorking">Not working</span>
                                             </div>
-
                                             <div class="dayRow">
                                                 <span class="day">Wednesday</span>
+
                                                 <label class="switch">
-                                                    <input type="checkbox">
+                                                    <input type="checkbox" class="dayToggle">
                                                     <span class="slider"></span>
                                                 </label>
+
+                                                <div class="workingFields" style="display:none;">
+                                                    <input type="time" value="09:00" class="dayTime form-control startTime">
+                                                    <span>to</span>
+                                                    <input type="time" value="17:00" class="dayTime form-control endTime">
+                                                    <span class="hours">8.0 hrs</span>
+                                                </div>
+
                                                 <span class="notWorking">Not working</span>
                                             </div>
-
                                             <div class="dayRow">
                                                 <span class="day">Thursday</span>
+
                                                 <label class="switch">
-                                                    <input type="checkbox">
+                                                    <input type="checkbox" class="dayToggle">
                                                     <span class="slider"></span>
                                                 </label>
+
+                                                <div class="workingFields" style="display:none;">
+                                                    <input type="time" value="09:00" class="dayTime form-control startTime">
+                                                    <span>to</span>
+                                                    <input type="time" value="17:00" class="dayTime form-control endTime">
+                                                    <span class="hours">8.0 hrs</span>
+                                                </div>
+
                                                 <span class="notWorking">Not working</span>
                                             </div>
-
                                             <div class="dayRow">
                                                 <span class="day">Friday</span>
+
                                                 <label class="switch">
-                                                    <input type="checkbox">
+                                                    <input type="checkbox" class="dayToggle">
                                                     <span class="slider"></span>
                                                 </label>
+
+                                                <div class="workingFields" style="display:none;">
+                                                    <input type="time" value="09:00" class="dayTime form-control startTime">
+                                                    <span>to</span>
+                                                    <input type="time" value="17:00" class="dayTime form-control endTime">
+                                                    <span class="hours">8.0 hrs</span>
+                                                </div>
+
                                                 <span class="notWorking">Not working</span>
                                             </div>
-
                                             <div class="dayRow weekend">
                                                 <span class="day">Saturday</span>
+
                                                 <label class="switch">
-                                                    <input type="checkbox">
+                                                    <input type="checkbox" class="dayToggle">
                                                     <span class="slider"></span>
                                                 </label>
+
+                                                <div class="workingFields" style="display:none;">
+                                                    <input type="time" value="09:00" class="dayTime form-control startTime">
+                                                    <span>to</span>
+                                                    <input type="time" value="17:00" class="dayTime form-control endTime">
+                                                    <span class="hours">8.0 hrs</span>
+                                                </div>
+
                                                 <span class="notWorking">Not working</span>
                                             </div>
-
                                             <div class="dayRow weekend">
                                                 <span class="day">Sunday</span>
+
                                                 <label class="switch">
-                                                    <input type="checkbox">
+                                                    <input type="checkbox" class="dayToggle">
                                                     <span class="slider"></span>
                                                 </label>
+
+                                                <div class="workingFields" style="display:none;">
+                                                    <input type="time" value="09:00" class="dayTime form-control startTime">
+                                                    <span>to</span>
+                                                    <input type="time" value="17:00" class="dayTime form-control endTime">
+                                                    <span class="hours">8.0 hrs</span>
+                                                </div>
+
                                                 <span class="notWorking">Not working</span>
                                             </div>
                                         </div>
 
                                         <!-- Specific Dates -->
-                                        <div id="tab-specific">
-                                            
-                                        </div> --}}
+                                        <div id="tab-specific" class="availabilityScroller">
 
+                                            <!-- Header -->
+                                            <p class="helperText">
+                                                Select the specific dates over the next 60 days when this carer is available to work:
+                                            <div><span class="selectedCount" id="selectedCount">0 dates selected</span></div>
+                                            </p>
+
+                                            <!-- DATE GRID -->
+                                            <div class="calendarGrid" id="calendarGrid"></div>
+
+                                            <hr class="divider">
+
+                                            <!-- HOURS SECTION -->
+                                            <div class="hoursSection">
+                                                <div class="sectionTitle">
+                                                    <i class="bx bx-time"></i> Set Hours for Selected Dates
+                                                </div>
+
+                                                <div id="hoursList"></div>
+                                            </div>
+
+                                        </div>
 
                                         <div class="modal-footer m-t-0">
                                             <button class="btn allBtnUseColor validation_staff" type="submit"> Save Working Hours </button>
@@ -322,7 +466,52 @@
                                         <div class="workHoursHeader">
                                             <div class="title"><i class='bx  bx-calendar-alt-2'></i> Unavailability Periods</div>
                                             <div class="actions">
-                                                <button class="allbuttonDarkClr"> <i class='bx  bx-plus'></i> Add Unavailability</button>
+                                                <button class="allbuttonDarkClr addalertClientDetailsBtn"> <i class='bx  bx-plus'></i> Add Unavailability</button>
+                                            </div>
+                                        </div>
+                                         <div class="p-20">
+                                            <div class="clientFilterform addalertClientDetailsform">                                               
+                                                <form action="" >
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            <div class="form-group">
+                                                                <label>Type</label>
+                                                                  <select class="form-control">
+                                                                    <option>Single Day</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-12">
+                                                            <div class="form-group">
+                                                                <label>Date</label>
+                                                                <input type="Date" class="form-control" name="" placeholder="dd/mm/yyyy">
+                                                            </div>
+                                                        </div>
+                                                         <div class="col-md-6">
+                                                            <div class="form-group">
+                                                                <label>From Time (optional)</label>
+                                                                <input type="time" class="form-control" name="" placeholder="dd/mm/yyyy">
+                                                            </div>
+                                                        </div>
+                                                         <div class="col-md-6">
+                                                            <div class="form-group">
+                                                                <label>To Time (optional)</label>
+                                                                <input type="time" class="form-control" name="" placeholder="dd/mm/yyyy">
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-12">
+                                                            <div class="form-group">
+                                                                <label>Reason (optional)</label>
+                                                                <textarea name="short_description" required="" class="form-control" rows="3" cols="20" placeholder="e.g., Personal appointment, Training, etc."></textarea>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-12 text-center">
+                                                            
+                                                                <button class="btn allBtnUseColor image_val" type="submit"> Add Unavailability </button>
+                                                            
+                                                        </div>
+                                                    </div>
+                                                </form>
                                             </div>
                                         </div>
                                         <div class="leavebanktabCont">
@@ -353,36 +542,36 @@
 
 
                         <!-- <div class="calendarTabs leaveRequesttabs employeeDetailsTabs  m-t-20">
-                                    <div class="tabs p-1 ">
-                                        <button class="tab active" data-tab="workingHoursTab">
-                                            Working Hours
-                                        </button>
-                                        <button class="tab" data-tab="unavailabilityTab">
-                                            Unavailability
+                                <div class="tabs p-1 ">
+                                    <button class="tab active" data-tab="workingHoursTab">
+                                        Working Hours
+                                    </button>
+                                    <button class="tab" data-tab="unavailabilityTab">
+                                        Unavailability
 
-                                        </button>
-                                        <button class="tab" data-tab="summaryTab">
-                                            Summary
-                                        </button>
-                                  
+                                    </button>
+                                    <button class="tab" data-tab="summaryTab">
+                                        Summary
+                                    </button>
+                                
+                                </div>
+
+                                <div class="tab-content carertabcontent">
+                                    <div class="content active" id="workingHoursTab">
+                                        <div class="sectionWhiteBgAllUse">
+                                                <h1> Working Hours</h1>
+                                        </div>
                                     </div>
 
-                                    <div class="tab-content carertabcontent">
-                                        <div class="content active" id="workingHoursTab">
-                                            <div class="sectionWhiteBgAllUse">
-                                                   <h1> Working Hours</h1>
-                                            </div>
-                                        </div>
-
-                                        <div class="content" id="unavailabilityTab">
-                                            <h1>Unavailability</h1>
-                                        </div>
-                                        <div class="content" id="summaryTab">
-                                            <h1>Summary</h1>
-                                        </div>
-                                            
+                                    <div class="content" id="unavailabilityTab">
+                                        <h1>Unavailability</h1>
                                     </div>
-                                </div> -->
+                                    <div class="content" id="summaryTab">
+                                        <h1>Summary</h1>
+                                    </div>
+                                        
+                                </div>
+                            </div> -->
 
 
                     </div>
@@ -433,8 +622,8 @@
                                 </div>
                             </div>
                             <!-- <div class="leavebanktabCont">
-                                        <p>No shifts recorded</p>
-                                    </div> -->
+                                                                                                <p>No shifts recorded</p>
+                                                                                            </div> -->
                             <div class="">
                                 <div class="certifiedList">
                                     <span class="">
@@ -491,6 +680,7 @@
             </div>
 
         </div>
+        <script src="{{ asset('public/frontEnd/staff/js/working-hours.js') }}"></script>
 
         <script>
             const tabs = document.querySelectorAll(".tab");
@@ -533,7 +723,21 @@
 
             });
         </script>
-      
+
+        <script>
+        document.addEventListener("DOMContentLoaded", function() {
+
+            const toggleBtn = document.querySelector(".addalertClientDetailsBtn");
+            const formBox = document.querySelector(".addalertClientDetailsform");
+
+            if (toggleBtn && formBox) {
+                toggleBtn.addEventListener("click", function() {
+                    formBox.classList.toggle("active");
+                });
+            }
+
+        });
+    </script>
 
     @endsection
 </main>

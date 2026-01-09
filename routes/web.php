@@ -129,21 +129,15 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 		Route::post('/leave/update', [LeaveRequestController::class, 'update'])->name('roster.leave.update');
 
 		Route::get('/carer', [CarerController::class, 'index'])->name('roster.staff.carer');
-		// Route::get('/sms_api', [CarerController::class, 'sms_api']);
+		Route::put('/carer-update/{carer_id}', [CarerController::class, 'update'])->name('roster.staff.carer.update');
 		Route::get('/carer-details/{carer_id}', [CarerController::class, 'carer_details'])->name('roster.staff.carer.details');
 		
 		Route::get('/client', [ClientController::class, 'index'])->name('roster.client');
 		Route::get('/client-details/{client_id}', [ClientController::class, 'client_details'])->name('roster.client.details');
-		
 		Route::get('/carer', [CarerController::class, 'index'])->name('roster.staff.carer');
-		
 		Route::get('/incident-management', [IncidentManagementController::class, 'index'])->name('roster.incident.management');
-
-
 		Route::get('/payroll-finance', [PayrollFinanceController::class, 'index'])->name('roster.payroll.finance');
 
-		
-		
 	});
 
 	// Report Section
