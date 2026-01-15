@@ -6,6 +6,49 @@
 
     <link rel="stylesheet" href="{{ asset('public/frontEnd/staff/css/working-hours.css') }}">
 
+    <style>
+        .notContDetails {
+            display: flex;
+
+        }
+
+        .notContDetails span {
+            flex-grow: 3;
+        }
+
+        .leavebanktabCont i {
+            font-size: 18px;
+            color: #f00;
+        }
+
+        .notContDetails .planCard {
+            border: 1px solid #eee;
+        }
+
+        .commonDocfrmet i {
+            font-size: 54px;
+            color: #ddd;
+            line-height: 120px;
+        }
+
+        .documentsUploaded {
+            display: flex;
+        }
+
+        .commonDocfrmet {
+            border: 1px solid #eee;
+            height: 150px;
+            width: 150px;
+            margin-right: 18px;
+            line-height: 120px;
+            cursor: pointer;
+        }
+
+        .commonDocfrmet.docImg img {
+            height: 150px;
+            width: 150px;
+        }
+    </style>
     <main class="page-content empoyeeHeader">
         <div class="topHeaderCont">
             <div>
@@ -22,6 +65,7 @@
                     {{ $staffDetails->email }}
                 </p>
             </div>
+
             <div class="header-actions">
                 <a href="{{ url('/roster/schedule-shift') }}" class="btn"><i class='bx bx-calendar'></i> View Schedule</a>
                 <a href="#" class="btn"><i class='bx bx-calendar'></i> Planning</a>
@@ -469,14 +513,14 @@
                                                 <button class="allbuttonDarkClr addalertClientDetailsBtn"> <i class='bx  bx-plus'></i> Add Unavailability</button>
                                             </div>
                                         </div>
-                                         <div class="p-20">
-                                            <div class="clientFilterform addalertClientDetailsform">                                               
-                                                <form action="" >
+                                        <div class="p-20">
+                                            <div class="clientFilterform addalertClientDetailsform">
+                                                <form action="">
                                                     <div class="row">
                                                         <div class="col-md-12">
                                                             <div class="form-group">
                                                                 <label>Type</label>
-                                                                  <select class="form-control">
+                                                                <select class="form-control">
                                                                     <option>Single Day</option>
                                                                 </select>
                                                             </div>
@@ -487,13 +531,13 @@
                                                                 <input type="Date" class="form-control" name="" placeholder="dd/mm/yyyy">
                                                             </div>
                                                         </div>
-                                                         <div class="col-md-6">
+                                                        <div class="col-md-6">
                                                             <div class="form-group">
                                                                 <label>From Time (optional)</label>
                                                                 <input type="time" class="form-control" name="" placeholder="dd/mm/yyyy">
                                                             </div>
                                                         </div>
-                                                         <div class="col-md-6">
+                                                        <div class="col-md-6">
                                                             <div class="form-group">
                                                                 <label>To Time (optional)</label>
                                                                 <input type="time" class="form-control" name="" placeholder="dd/mm/yyyy">
@@ -506,9 +550,7 @@
                                                             </div>
                                                         </div>
                                                         <div class="col-md-12 text-center">
-                                                            
-                                                                <button class="btn allBtnUseColor image_val" type="submit"> Add Unavailability </button>
-                                                            
+                                                            <button class="btn allBtnUseColor image_val" type="submit"> Add Unavailability </button>
                                                         </div>
                                                     </div>
                                                 </form>
@@ -525,13 +567,10 @@
                                 <!-- SUMMARY -->
                                 <div class="availabilityTabs__panel" id="summaryPanel">
                                     <div class="">
-
                                         <div class="workHoursHeader">
-
                                             <div class="actions">
                                                 <button class="greenShowbtn"><i class='bx  bx-history'></i> 0 days • 0h/week</button>
                                                 <span class="badge">No working hours set</span>
-
                                             </div>
                                         </div>
                                     </div>
@@ -540,40 +579,37 @@
                             </div>
                         </div>
 
-
                         <!-- <div class="calendarTabs leaveRequesttabs employeeDetailsTabs  m-t-20">
-                                <div class="tabs p-1 ">
-                                    <button class="tab active" data-tab="workingHoursTab">
-                                        Working Hours
-                                    </button>
-                                    <button class="tab" data-tab="unavailabilityTab">
-                                        Unavailability
+                                                                            <div class="tabs p-1 ">
+                                                                                <button class="tab active" data-tab="workingHoursTab">
+                                                                                    Working Hours
+                                                                                </button>
+                                                                                <button class="tab" data-tab="unavailabilityTab">
+                                                                                    Unavailability
 
-                                    </button>
-                                    <button class="tab" data-tab="summaryTab">
-                                        Summary
-                                    </button>
-                                
-                                </div>
+                                                                                </button>
+                                                                                <button class="tab" data-tab="summaryTab">
+                                                                                    Summary
+                                                                                </button>
+                                                                            
+                                                                            </div>
 
-                                <div class="tab-content carertabcontent">
-                                    <div class="content active" id="workingHoursTab">
-                                        <div class="sectionWhiteBgAllUse">
-                                                <h1> Working Hours</h1>
-                                        </div>
-                                    </div>
+                                                                            <div class="tab-content carertabcontent">
+                                                                                <div class="content active" id="workingHoursTab">
+                                                                                    <div class="sectionWhiteBgAllUse">
+                                                                                            <h1> Working Hours</h1>
+                                                                                    </div>
+                                                                                </div>
 
-                                    <div class="content" id="unavailabilityTab">
-                                        <h1>Unavailability</h1>
-                                    </div>
-                                    <div class="content" id="summaryTab">
-                                        <h1>Summary</h1>
-                                    </div>
-                                        
-                                </div>
-                            </div> -->
-
-
+                                                                                <div class="content" id="unavailabilityTab">
+                                                                                    <h1>Unavailability</h1>
+                                                                                </div>
+                                                                                <div class="content" id="summaryTab">
+                                                                                    <h1>Summary</h1>
+                                                                                </div>
+                                                                                    
+                                                                            </div>
+                                                                        </div> -->
                     </div>
 
 
@@ -622,8 +658,8 @@
                                 </div>
                             </div>
                             <!-- <div class="leavebanktabCont">
-                                                                                                <p>No shifts recorded</p>
-                                                                                            </div> -->
+                                                                                <p>No shifts recorded</p>
+                                                                            </div> -->
                             <div class="">
                                 <div class="certifiedList">
                                     <span class="">
@@ -654,11 +690,34 @@
                             <div class="workHoursHeader">
                                 <div class="title">Documents</div>
                                 <div class="actions">
-                                    <button class="allbuttonDarkClr"> <i class='bx bx-file-detail'></i> Upload Document</button>
+                                    <button class="allbuttonDarkClr openUploadDocumentModal" data-id="{{ $staffDetails->id }}"> <i class='bx bx-file-detail'></i> Upload Document</button>
                                 </div>
                             </div>
                             <div class="leavebanktabCont">
-                                <p>No documents uploaded</p>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="carePlanWrapper">
+                                            <div class="planCard">
+                                                <div class="documentsUploaded">
+                                                    @forelse ($user_documents as $documents)
+                                                        <div class="planActions">
+                                                            <button type="button" class="danger delete-document" data-id="{{ $documents['id'] }}">
+                                                                <i class="bx bx-trash"></i>
+                                                            </button>
+                                                        </div>
+                                                        <div class="commonDocfrmet docImg">
+                                                            <img src="{{ asset('storage/app/public/' . $documents['file_path']) }}" alt="Document Image">
+                                                        </div>
+                                                    @empty
+                                                        <p>No documents uploaded</p>
+                                                    @endforelse
+
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -667,19 +726,124 @@
                             <div class="workHoursHeader">
                                 <div class="title">Notes</div>
                                 <div class="actions">
-                                    <button class="allbuttonDarkClr"> <i class='bx bx-file-detail'></i> Add Note</button>
+                                    <button class="allbuttonDarkClr openNotesModal" data-id="{{ $staffDetails->id }}"> <i class='bx bx-file-detail'></i> Add Note</button>
                                 </div>
                             </div>
                             <div class="leavebanktabCont">
-                                <p>No notes recorded </p>
+                                <div class="row">
+                                    @forelse ($user_notes as $note)
+                                        <div class="col-md-6">
+                                            <div class="notContDetails carePlanWrapper">
+                                                <div class="planCard">
+                                                    <div class="planTop">
+                                                        <div class="planMeta">
+                                                            <div>
+                                                                <strong>Date:</strong>
+                                                                {{ \Carbon\Carbon::parse($note['created_at'])->format('M d, Y') }}
+                                                            </div>
+                                                        </div>
+                                                        <div class="planActions">
+                                                            <button class="danger delete-note" data-id="{{ $note['id'] }}">
+                                                                <i class="bx bx-trash"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="planFooter">
+                                                        <span>{{ $note['note'] }}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @empty
+                                        <p>No notes recorded</p>
+                                    @endforelse
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <!-- END TAB CONTENT -->
             </div>
-
         </div>
+
+        {{-- Upload Document Model --}}
+        <div class="modal fade leaveCommunStyle" id="uploadDocumentModal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+
+                    <!-- FORM START -->
+                    <form id="uploadDocumentForm" method="POST" enctype="multipart/form-data">
+                        @csrf
+
+                        <!-- MODAL HEADER -->
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Upload Document</h4>
+                        </div>
+                        <!-- MODAL BODY -->
+                        <div class="modal-body">
+                            <input type="hidden" name="user_id" id="staff_id" value="">
+
+                            <div class="form-group">
+                                <label>Document Title</label>
+                                <input type="text" name="document_title" id="document_title" class="form-control" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Upload File</label>
+                                <input type="file" name="document_file" id="document_file" class="form-control" required>
+                            </div>
+                        </div>
+
+                        <!-- MODAL FOOTER -->
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                Cancel
+                            </button>
+                            <button type="submit" class="btn allBtnUseColor" id="saveNote">
+                                Save
+                            </button>
+                        </div>
+
+                    </form>
+                    <!-- FORM END -->
+
+                </div>
+            </div>
+        </div>
+
+        {{-- Upload Document Model --}}
+
+        {{-- Upload Notes Model --}}
+        <div class="modal fade leaveCommunStyle" id="noteModal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form id="noteForm">
+                        @csrf
+                        <input type="hidden" name="user_id" id="note_user_id">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Add Note</h4>
+                        </div>
+
+                        <div class="modal-body">
+                            <textarea name="note" class="form-control" required></textarea>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                Cancel
+                            </button>
+                            <button class="btn allBtnUseColor">Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        {{-- Upload Notes Model --}}
+
         <script src="{{ asset('public/frontEnd/staff/js/working-hours.js') }}"></script>
 
         <script>
@@ -725,19 +889,172 @@
         </script>
 
         <script>
-        document.addEventListener("DOMContentLoaded", function() {
+            document.addEventListener("DOMContentLoaded", function() {
 
-            const toggleBtn = document.querySelector(".addalertClientDetailsBtn");
-            const formBox = document.querySelector(".addalertClientDetailsform");
+                const toggleBtn = document.querySelector(".addalertClientDetailsBtn");
+                const formBox = document.querySelector(".addalertClientDetailsform");
 
-            if (toggleBtn && formBox) {
-                toggleBtn.addEventListener("click", function() {
-                    formBox.classList.toggle("active");
+                if (toggleBtn && formBox) {
+                    toggleBtn.addEventListener("click", function() {
+                        formBox.classList.toggle("active");
+                    });
+                }
+
+            });
+
+            $(document).on('click', '.openUploadDocumentModal', function() {
+
+                // Fill modal fields
+                const staffId = $(this).data('id');
+                $('#staff_id').val(staffId);
+
+                // Open modal
+                $('#uploadDocumentModal').modal('show');
+            });
+
+            $(document).on('click', '.openNotesModal', function() {
+                const staffId = $(this).data('id');
+                $('#note_user_id').val(staffId);
+
+                // Open modal
+                $('#noteModal').modal('show');
+            });
+        </script>
+
+        <script>
+            $('#uploadDocumentForm').on('submit', function(e) {
+                e.preventDefault();
+
+                let formData = new FormData(this);
+
+                $.ajax({
+                    url: "{{ route('carer.save.documents') }}", // update route
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        $('#uploadDocumentModal').modal('hide');
+                        // alert('Document uploaded successfully');
+                        location.reload();
+                    },
+                    error: function(xhr) {
+                        alert('Something went wrong');
+                    }
                 });
-            }
+            });
+        </script>
 
-        });
-    </script>
+        <script>
+            $(document).ready(function() {
+
+                /* -------------------------
+                   OPEN MODAL
+                -------------------------- */
+                $(document).on('click', '.openNoteModal', function() {
+                    let userId = $(this).data('id');
+
+                    $('#note_user_id').val(userId);
+                    $('#note_text').val('');
+                    $('#noteModal').modal('show');
+                });
+
+                /* -------------------------
+                   SAVE NOTE (AJAX)
+                -------------------------- */
+                $('#noteForm').on('submit', function(e) {
+                    e.preventDefault();
+
+                    let formData = $(this).serialize();
+
+                    $('#saveNoteBtn').prop('disabled', true).text('Saving...');
+
+                    $.ajax({
+                        url: "{{ url('/roster/carer/save-notes') }}",
+                        type: "POST",
+                        data: formData,
+                        success: function(res) {
+
+                            if (res.status) {
+                                $('#noteModal').modal('hide');
+
+                                $('#noteForm')[0].reset();
+                                location.reload();
+                                // alert('Note saved successfully');
+                            } else {
+                                alert(res.message ?? 'Something went wrong');
+                            }
+                        },
+                        error: function(xhr) {
+                            let errors = xhr.responseJSON?.errors;
+
+                            if (errors) {
+                                alert(Object.values(errors)[0][0]);
+                            } else {
+                                alert('Server error');
+                            }
+                        },
+                        complete: function() {
+                            $('#saveNoteBtn').prop('disabled', false).text('Save');
+                        }
+                    });
+                });
+
+            });
+        </script>
+
+        <script>
+            $(document).on('click', '.delete-note', function() {
+                let noteId = $(this).data('id');
+                    let button = $(this);
+                if (!confirm('Are you sure you want to delete this note?')) {
+                    return;
+                }
+
+                $.ajax({
+                    url: "{{ url('/roster/carer/delete-notes') }}/" + noteId,
+                    type: "DELETE",
+                    data: {
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            // Remove the note card from UI
+                            button.closest('.col-md-6').remove();
+                        }
+                    },
+                    error: function() {
+                        alert('Something went wrong. Please try again.');
+                    }
+                });
+            });
+
+            $(document).on('click', '.delete-document', function() {
+                let documentId = $(this).data('id');
+                 let button = $(this);
+                if (!confirm('Are you sure you want to delete this document?')) {
+                    return;
+                }
+
+                $.ajax({
+                    url: "{{ url('/roster/carer/delete-documents') }}/" + documentId,
+                    type: "DELETE",
+                    data: {
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                           location.reload();
+                        }
+                    },
+                    error: function() {
+                        alert('Something went wrong. Please try again.');
+                    }
+                });
+            });
+        </script>
+
+
 
     @endsection
 </main>

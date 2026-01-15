@@ -34,6 +34,7 @@ use App\Http\Controllers\frontEnd\Roster\Staff\CarerAvailabilityController;
 use App\Http\Controllers\frontEnd\Roster\Staff\StaffTaskController;
 use App\Http\Controllers\frontEnd\Roster\Client\ClientController;
 use App\Http\Controllers\frontEnd\Roster\Staff\CarerController;
+use App\Http\Controllers\frontEnd\Roster\Staff\CarerDetailsController;
 use App\Http\Controllers\frontEnd\Roster\CareDocumentController;
 use App\Http\Controllers\frontEnd\Roster\ReportController;
 use App\Http\Controllers\frontEnd\Roster\MessagingCenterController;
@@ -128,13 +129,22 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 		Route::get('/leave-request', [LeaveRequestController::class, 'index'])->name('roster.leave.request');
 		Route::post('/leave/update', [LeaveRequestController::class, 'update'])->name('roster.leave.update');
 
+		// Carer Section Start
 		Route::get('/carer', [CarerController::class, 'index'])->name('roster.staff.carer');
+		Route::post('/carer/get-hourly-rate', [CarerController::class, 'getHourlyRate'])->name('roster.staff.carer.get.hourly.rate');
 		Route::put('/carer-update/{carer_id}', [CarerController::class, 'update'])->name('roster.staff.carer.update');
-		Route::get('/carer-details/{carer_id}', [CarerController::class, 'carer_details'])->name('roster.staff.carer.details');
+		Route::post('/carer/getStaffByStatus', [CarerController::class, 'getStaffByStatus']);
+		
+		Route::get('/carer-details/{carer_id}', [CarerDetailsController::class, 'carer_details'])->name('roster.staff.carer.details'); 
+		Route::post('/carer/save-documents', [CarerDetailsController::class, 'saveDouments'])->name('carer.save.documents'); 
+		Route::post('/carer/save-notes', [CarerDetailsController::class, 'saveNote'])->name('carer.save.notes'); 
+		Route::delete('/carer/delete-notes/{id}', [CarerDetailsController::class, 'destroy_notes'])->name('carer.notes.delete'); 
+		Route::delete('/carer/delete-documents/{id}', [CarerDetailsController::class, 'destroy_documents'])->name('carer.documents.delete');
+		// Carer Section End
+
 		
 		Route::get('/client', [ClientController::class, 'index'])->name('roster.client');
 		Route::get('/client-details/{client_id}', [ClientController::class, 'client_details'])->name('roster.client.details');
-		Route::get('/carer', [CarerController::class, 'index'])->name('roster.staff.carer');
 		Route::get('/incident-management', [IncidentManagementController::class, 'index'])->name('roster.incident.management');
 		Route::get('/payroll-finance', [PayrollFinanceController::class, 'index'])->name('roster.payroll.finance');
 

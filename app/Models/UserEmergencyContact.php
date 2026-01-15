@@ -24,4 +24,6 @@ class UserEmergencyContact extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    
 }

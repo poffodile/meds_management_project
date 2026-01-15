@@ -1,6 +1,3 @@
-<!-- <script src="http://localhost/scits/public/frontEnd/js/jquery.js"></script> -->
-<!-- <script src="http://localhost/scits/public/frontEnd/js/jquery.validate.js"></script> -->
-
 <!-- add staff model-->
 <div class="modal fade leaveCommunStyle" id="addStaffModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -57,7 +54,18 @@
                                 <option value="2">On Leave</option>
                             </select>
                         </div>
-
+                        <div class="form-group col-md-6 col-sm-6 col-xs-12">
+                            <label>Access Level</label>
+                            <select name="access_level" class="form-control" id="access_level">
+                                @foreach ($access_levels as $level)
+                                    <option value="{{ $level['id'] }}">{{ $level['name'] }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6 col-sm-6 col-xs-12">
+                            <label>Hourly Rate</label>
+                            <input type="text" name="hourly_rate" id="hourly_rate" required class="form-control">
+                        </div>
                         <div class="form-group col-md-12 col-sm-12 col-xs-12">
                             <div class="overtime">
                                 <label>
@@ -114,7 +122,7 @@
                             <div class="col-md-12 p-0">
                                 <div class="fileupload fileupload-new" data-provides="fileupload">
                                     <div class="fileupload-new thumbnail" id="profile-picture" style="max-width: 200px; max-height: 150px; min-width: 150px; min-height: 100px; line-height: 100px; font-size: 40px; color: #c7c4c4;">
-                                        <img src="" alt="No Image" id="profile-picture-img" class="" /> 
+                                        <img src="" alt="No Image" id="profile-picture-img" class="" />
                                     </div>
                                     <div class="fileupload-new thumbnail" style="max-width: 200px; max-height: 150px; min-width: 150px; min-height: 100px; line-height: 100px; font-size: 40px; color: #c7c4c4;">
                                         <!-- <img src="" alt="No Image" class="temp_img" /> -->
@@ -154,7 +162,7 @@
                                             <!-- certificate -->
                                             <div class="btn-file p-0">
                                                 <span class="">
-                                                    <input type="file" name="qualifications[{{ $course['course_id'] }}][cert]" class="default qual_upload"  accept="application/pdf,.pdf">
+                                                    <input type="file" name="qualifications[{{ $course['course_id'] }}][cert]" class="default qual_upload" accept="application/pdf,.pdf">
                                                 </span>
                                                 <div class="qual-preview" id="qual-preview-{{ $course['course_id'] }}" style="margin-top:8px;"></div>
                                             </div>
@@ -187,10 +195,7 @@
                         </div>
                         <div class="form-group col-md-6 col-sm-6 col-xs-12 m-0">
                             <label>DBS Expiry Date</label>
-
-
                             <div class="col-md-12 col-sm-12 col-xs-12 p-0">
-
                                 <div class="input-group date">
                                     <input type="text"
                                         name="dbs_expiry_date"
@@ -373,13 +378,26 @@
                 },
                 staff_user_name: {
                     required: true,
-                    remote: "{{ url('/check-username-exists') }}",
-                    regex: /^[a-zA-Z0-9'_#@.\s]{2,40}$/
+                    regex: /^[a-zA-Z0-9'_#@.\s]{2,40}$/,
+                    remote: {
+                        url: "{{ url('/check-username-exists') }}",
+                        type: "post",
+                        data: {
+                            username: function() {
+                                return $("#staff_user_name").val();
+                            },
+                            staff_id: function() {
+                                return $("#staff_id").val(); // 👈 important
+                            },
+                            _token: "{{ csrf_token() }}"
+                        }
+                    }
                 },
                 staff_phone_no: {
                     required: true,
                     regex: /^[0-9 +]{10,13}$/
                 },
+                hourly_rate: "required",
                 // image: "required",
                 description: "required",
                 job_title: {
@@ -428,6 +446,7 @@
                 },
                 // image: "This field is required.",
                 description: "This field is required.",
+                hourly_rate: "This field is required",
             },
             submitHandler: function(form) {
                 form.submit();
@@ -452,6 +471,7 @@
         });
     });
 </script>
+
 <script type="text/javascript">
     $(document).ready(function() {
 
@@ -550,6 +570,7 @@
     // modal open (EDIT) - bind to the actual modal id
     $('#addStaffModal').on('shown.bs.modal', initOvertimeToggle);
 </script>
+
 <script>
     $(document).on('click', '.openStaffModal', function() {
         const $btn = $(this);
@@ -596,24 +617,24 @@
                 qualifications = $btn.data('qualifications') || [];
             }
 
-            
+
             if (Array.isArray(qualifications)) {
                 qualifications.forEach(q => {
                     // Match qualification by course_id
                     const courseId = q.course_id || q.courseId || q.id;
                     if (!courseId) return; // Skip if no course_id
-                    
+
                     const selector = 'input[name="qualifications[' + courseId + '][course_id]"]';
                     const checkboxEl = $(selector);
-                    
+
                     // Only check if the checkbox exists (course is available in form)
                     if (checkboxEl.length > 0) {
                         checkboxEl.prop('checked', true);
-                        
+
                         // If a certificate path exists, render preview
                         let img = q.image || q.cert || q.filename || q.file || q.path || null;
                         const previewEl = $('#qual-preview-' + courseId);
-                        
+
                         if (img && previewEl.length) {
                             let url = String(img);
 
@@ -642,7 +663,7 @@
                 });
             }
 
-       
+
             // add hidden _method input for PUT
             $('#add_staff').append('<input type="hidden" name="_method" id="formMethod" value="PUT">');
 
@@ -667,7 +688,7 @@
             if (maxHours && (maxHours !== '' && maxHours !== 'null')) {
                 $('input[name="available_for_overtime"]').prop('checked', true);
             }
-
+            $('#hourly_rate').val($btn.attr('data-hourly-rate') || $btn.data('hourly-rate'));
             // set the max extra hours value
             $('input[name="max_extra_hours"]').val(maxHours);
 
@@ -739,5 +760,40 @@
         }
 
         $('#addStaffModal').modal('show');
+    });
+</script>
+
+<script>
+    $(document).ready(function() {
+        $('#access_level').on('change', function() {
+            let accessLevelId = $(this).val();
+
+            if (!accessLevelId) {
+                $('#hourly_rate').val('');
+                return;
+            }
+
+            $.ajax({
+                url: "{{ url('/roster/carer/get-hourly-rate') }}",
+                type: "POST",
+                data: {
+                    access_level_id: accessLevelId,
+                    _token: "{{ csrf_token() }}"
+                },
+                success: function(response) {
+                    console.log(response);
+
+                    if (response.hourly_rate !== undefined) {
+                        $('#hourly_rate').val(response.hourly_rate);
+                    } else {
+                        $('#hourly_rate').val('');
+                    }
+                },
+                error: function(xhr) {
+                    console.error(xhr.responseText);
+                    $('#hourly_rate').val('');
+                }
+            });
+        });
     });
 </script>

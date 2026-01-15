@@ -2,7 +2,7 @@
 
 namespace App\Services\Staff;
 
-use App\User, App\UserQualification, App\Models\UserEmergencyContact;
+use App\User, App\UserQualification, App\Models\UserEmergencyContact, App\Models\HomeManagement\PayRate;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -15,11 +15,10 @@ use Illuminate\Support\Facades\Schema;
 
 class StaffService
 {
-
     /**
      * Get Pay Rate Type ID by name
      */
-    protected function getPayRateTypeId(): ?int
+    public function getPayRateTypeId(): ?int
     {
         return DB::table('pay_rate_types')
             ->where('type_name', 'Hourly Rate')
@@ -28,33 +27,33 @@ class StaffService
     }
 
     /**
+     * Get pay rate (hourly) for a given access level id
+     */
+    public function getPayRateForAccessLevel($access_level_id)
+    {
+        if (empty($access_level_id)) {
+            return null;
+        }
+
+        $hourly_rate_id = $this->getPayRateTypeId();
+        if (empty($hourly_rate_id)) {
+            return null;
+        }
+
+        return PayRate::where('access_level_id', $access_level_id)
+            ->where('rate_type_id', trim($hourly_rate_id))
+            ->where('status', 1)
+            ->value('pay_rate');
+    }
+
+    /**
      * Get all staff list
      */
     public function allStaff($homeId)
     {
-        $payRateTypeId = $this->getPayRateTypeId();
-
-        return User::select(
-            'user.*',
-            'pay_rates.pay_rate',
-            'user_emergency_contacts.name as emergency_contact_name',
-            'user_emergency_contacts.phone_no as emergency_contact_phone',
-            'user_emergency_contacts.relationship as emergency_contact_relationship',
-        )
-            ->leftJoin('pay_rates', function ($join) use ($payRateTypeId) {
-                $join->on('user.access_level', '=', 'pay_rates.access_level_id');
-
-                if ($payRateTypeId) {
-                    $join->where('pay_rates.rate_type_id', $payRateTypeId);
-                }
-            })
-            ->leftJoin('user_emergency_contacts', function ($join) {
-                $join->on('user.id', '=', 'user_emergency_contacts.user_id');
-            })
-            ->where('user.home_id', $homeId)
-            ->where('user.is_deleted', 0)
-            // ->orderBy('user.created_at', 'desc')
-            ->get();
+        return User::with('emergencyContacts')
+            ->where('home_id', $homeId)
+            ->where('is_deleted', 0);
     }
 
     /**
@@ -62,30 +61,10 @@ class StaffService
      */
     public function activeStaff($homeId)
     {
-        $payRateTypeId = $this->getPayRateTypeId();
-
-        return User::with('emergencyContacts')->select(
-            'user.*',
-            'pay_rates.pay_rate',
-            'user_emergency_contacts.name as emergency_contact_name',
-            'user_emergency_contacts.phone_no as emergency_contact_phone',
-            'user_emergency_contacts.relationship as emergency_contact_relationship',
-        )
-            ->leftJoin('pay_rates', function ($join) use ($payRateTypeId) {
-                $join->on('user.access_level', '=', 'pay_rates.access_level_id');
-
-                // Apply pay_rate_id condition only if it exists
-                if ($payRateTypeId) {
-                    $join->where('pay_rates.rate_type_id', $payRateTypeId);
-                }
-            })
-            ->leftJoin('user_emergency_contacts', function ($join) {
-                $join->on('user.id', '=', 'user_emergency_contacts.user_id');
-            })
-            ->where('user.home_id', $homeId)
-            ->where('user.status', 1)
-            ->where('user.is_deleted', 0)
-            ->get();
+        return User::with('emergencyContacts')->select('user.*')
+            ->where('home_id', $homeId)
+            ->where('is_deleted', 0)
+            ->where('status', 1);
     }
 
     /**
@@ -93,30 +72,12 @@ class StaffService
      */
     public function inactiveStaff($homeId)
     {
-        $payRateTypeId = $this->getPayRateTypeId();
-
-        return User::select(
-            'user.*',
-            'pay_rates.pay_rate',
-            'user_emergency_contacts.name as emergency_contact_name',
-            'user_emergency_contacts.phone_no as emergency_contact_phone',
-            'user_emergency_contacts.relationship as emergency_contact_relationship',
-        )
-            ->leftJoin('pay_rates', function ($join) use ($payRateTypeId) {
-                $join->on('user.access_level', '=', 'pay_rates.access_level_id');
-
-                // Apply pay_rate_id condition only if it exists
-                if ($payRateTypeId) {
-                    $join->where('pay_rates.rate_type_id', $payRateTypeId);
-                }
-            })
-            ->leftJoin('user_emergency_contacts', function ($join) {
-                $join->on('user.id', '=', 'user_emergency_contacts.user_id');
-            })
-            ->where('user.home_id', $homeId)
-            ->where('user.status', 0)
-            ->where('user.is_deleted', 0)
-            ->get();
+        // dd($homeId);
+        return  User::with('emergencyContacts')
+        ->where('home_id', $homeId)
+        ->where('is_deleted', 0)
+        ->where('status', 0);
+     
     }
 
     /**
@@ -126,6 +87,7 @@ class StaffService
     {
         $today = Carbon::today()->toDateString();
 
+        // return null;
         return User::join('staff_leaves', 'staff_leaves.user_id', '=', 'user.id')
             ->where('user.home_id', $homeId)
             ->where('user.is_deleted', 0)
@@ -133,8 +95,8 @@ class StaffService
             ->whereDate('staff_leaves.start_date', '<=', $today)
             ->whereDate('staff_leaves.end_date', '>=', $today)
             ->select('user.*')
-            ->distinct()
-            ->get();
+            ->distinct();
+            // ->get();
     }
 
     /**
@@ -227,11 +189,12 @@ class StaffService
             'staff_phone_no' => 'phone_no',
             'staff_email' => 'email',
             'job_title' => 'job_title',
-            'department' => 'department_id',
+            'department' => 'department',
             'employment_type' => 'employment_type',
             'status' => 'status',
             'description' => 'description',
             'payroll' => 'payroll',
+            'hourly_rate' => 'hourly_rate',
             'holiday_entitlement' => 'holiday_entitlement',
             'dbs_certificate_number' => 'dbs_certificate_number',
             'max_extra_hours' => 'max_extra_hours',

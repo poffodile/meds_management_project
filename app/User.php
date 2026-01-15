@@ -40,12 +40,12 @@ class User extends Authenticatable
         return User::where('home_id', $home_id)->select('id', 'name')->where('is_deleted', 0)->get();
     }
 
-    protected static function booted()
-    {
-        static::addGlobalScope('active', function ($query) {
-            $query->where('user.status', 1);
-        });
-    }
+    // protected static function booted()
+    // {
+    //     static::addGlobalScope('active', function ($query) {
+    //         $query->where('user.status', 1);
+    //     });
+    // }
 
     public function access_level()
     {

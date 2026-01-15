@@ -4,10 +4,11 @@ namespace App\Http\Controllers\frontEnd;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Auth, DB,Log;
+use Auth, DB;
 use App\User, App\ServiceUser, App\Admin, App\Home, App\LogBook;
 use Hash, Session;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
@@ -411,17 +412,30 @@ class UserController extends Controller
 	}
 	public function check_username_exists(Request $request)
 	{
+		Log::info('check_username_exists called', $request->all());
 
-		$data = $request->input();
+		$username = $request->username;
+		$userId   = $request->staff_id; // null on add, filled on edit
 
-		$user_name = '';
-		if (is_array($data)) {
-			$user_name_arr = array_values($data);
-			$user_name = $user_name_arr[0];
-		}
-		$response = Home::userNameUnique($user_name);
-		echo json_encode($response);
-		//echo $response; die;
+		$exists = User::where('user_name', $username)
+			->when($userId, function ($query) use ($userId) {
+				$query->where('id', '!=', $userId); // 👈 ignore current user
+			})
+			->exists();
+
+		// jQuery validate expects true or false
+		return response()->json(!$exists);
+
+		// $data = $request->input();
+
+		// $user_name = '';
+		// if (is_array($data)) {
+		// 	$user_name_arr = array_values($data);
+		// 	$user_name = $user_name_arr[0];
+		// }
+		// $response = Home::userNameUnique($user_name);
+		// echo json_encode($response);
+		// //echo $response; die;
 
 	}
 

@@ -9404,8 +9404,10 @@ a.close.edit_dyn_form {
     --black: #272727ff;
     --darkYellow: #92400e;
     --blueGrad: linear-gradient(82deg, rgba(239, 244, 255, 1) 59%, rgba(238, 242, 255, 1) 99%);
-     --lightRed: #fee2e2;
- 
+    --blackBtnColor: #171717;
+     --blackBtnColor: #171717;
+    --lightRedp: #fef2f2;
+    --darkOrangep: #d45f0c;
 } 
 
 /* ******************Start Dashboard Css***************************** */
@@ -10202,7 +10204,7 @@ header.panel-heading.headingCapitilize {
   /* padding: 15px;
   border: 1px solid #eee; */
   border-radius: 4px;
-  background: #fafafa;
+  /* background: #fafafa; */
 }
 
 .calendarTabs .tab-content .content.active {
@@ -10502,8 +10504,8 @@ header.panel-heading.headingCapitilize {
     padding: 40px 0;
 }
 .leavebanktabCont i{
-    font-size: 80px;
-    color: #c3c0c0;
+    font-size: 54px;
+    color: #cdd1d7;
 }
 .leavebanktabCont h4{
     font-size: 18px;
@@ -10817,6 +10819,7 @@ header.panel-heading.headingCapitilize {
   color: #6b7280;
   width: 16px;
 }
+
 .carertabcontent .sectionCarer {
   margin-top: 14px;
 }
@@ -10833,7 +10836,7 @@ header.panel-heading.headingCapitilize {
   font-size: 11px;
   padding: 3px 10px;
   border-radius: 14px;
-  /* border: 1px solid #e5e7eb; */
+  border: 1px solid #e5e7eb;
   margin-right: 6px;
   margin-bottom: 6px;
   /* background: #ffffff; */
@@ -10892,7 +10895,7 @@ header.panel-heading.headingCapitilize {
 }
 .carertabcontent .actions .delete {
   color: #dc2626;
-  border-color: #fecaca;
+  /* border-color: #fecaca; */
 }
 
 .orangeText{
@@ -10901,7 +10904,9 @@ header.panel-heading.headingCapitilize {
 .greenText{
     color: #16a34a;
 }
-
+.blueText{
+    color: var(--blueColor)
+}
 
 .carertabcontent .care-needs .label {
   display: flex;
@@ -11101,9 +11106,26 @@ header.panel-heading.headingCapitilize {
   border: 1px solid #e5e7eb;
   background: #fff;
   border-radius: 8px;
-  width: 32px;
-  height: 32px;
-  cursor: pointer;
+  /* width: 28px; */
+    /* height: 28px; */
+    cursor: pointer;
+    /* line-height: 20px;
+    font-size: 15px;
+    font-weight: 700; */
+}
+.attached-documents .AttachAndCloseBtn {
+    display: flex;
+    gap: 8px;
+}
+.attached-documents .AttachAndCloseBtn button i {
+    font-size: 18px;
+}
+.attached-documents .AttachAndCloseBtn button {
+    font-size: 12px;
+    display: flex;
+    line-height: 18px;
+    gap: 8px;
+    border-radius: 4px;
 }
 
 .attached-documents .upload-box {
@@ -11200,7 +11222,7 @@ header.panel-heading.headingCapitilize {
   font-size: 12px;
 }
 .heightScrollModal{
-    height: 628px;
+    height: 82vh;
     overflow: auto;
 }
 .allBtnUseColor{
@@ -11593,8 +11615,8 @@ header.panel-heading.headingCapitilize {
     color: #808080;
 }
 .clientFilterform{
-    background: #f5f9ff;
-    border: 1px solid #cfe0ff;
+    background: #f9fafb;
+    border: 1px solid #dadcdd;
     margin-top: 12px;
     padding: 18px;
     border-radius: 4px;
@@ -12173,7 +12195,7 @@ header.panel-heading.headingCapitilize {
 .planActions button {
     border: 1px solid #e5e7eb;
     background: #fff;
-    border-radius: 6px;
+    border-radius: 4px;
     padding: 6px 7px;
     margin-left: 6px;
     cursor: pointer;
@@ -12879,883 +12901,1516 @@ label.redtext{
     border: 1px solid #fde149;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- /*************************************** pratima css ***************************************/
-      .addnewicons .btn {
-        display: flex;
-    }
-    .addnewicons .btn i {
-        font-size: 20px;
-    }
- 
-    .emergencyMain {
-        border: 1px solid var(--borderColor);
-        box-shadow: var(--bxShadow);
-        border-radius: 12px;
-        background: #fff;
-    }
- 
-    .emergencyHeader {
-        background: #FEF2F2;
-        background: var(--redGradient);
-        border-bottom: 1px solid var(--borderColor);
-        padding: 24px;
-        border-radius: 12px 12px 0px 0px;
-    }
- 
-    .emeregencyParent {
-        display: flex;
-        justify-content: space-between;
-    }
- 
-    .borderBtn {
-        padding: 6px 16px;
-        background: #fff;
-        border: 1px solid var(--borderColor);
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 14px;
-        transition: 0.2s;
-        gap: 6px;
-        display: flex;
-        align-items: center;
-        box-shadow: 0 1px 2px 0 rgb(0 0 0 / .05);;
-        color: #0a0a0a;
-    }
- 
-    .emergencyContent h3,
-    .contactMain h3 {
-        color: #000;
-        font-weight: 600;
-        margin: 0px;
-        font-size: 17px;
-    }
- 
-    .userMum h2 {
-        color: #000;
-        font-weight: 600;
-        margin: 0px;
-        font-size: 18px;
-    }
- 
-    .emergencyContent {
-        gap: 5px;
-    }
- 
-    .radIconClr i {
-        color: var(--iconRadClr);
-    }
- 
-    .emergencybottom,
-    .contactMain {
-        margin: 24px;
-        border: 1px solid var(--borderColor);
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
-        border-radius: 12px;
-    }
- 
-    .contactMain {
-        background-color: #e5e5e5;
-    }
- 
-    .userMum .title {
-        border: 1px solid var(--borderColor);
-        padding: 2px 7px;
-        border-radius: 8px;
-        font-size: 13px;
-        color: #000;
-        font-weight: 600;
-        margin-top: 10px;
-        display: inline-block;
-    }
- 
-    .icon__pp {
-        height: 40px;
-        width: 40px;
-        background: #F97867;
-        background: linear-gradient(90deg, rgba(249, 120, 103, 1) 35%, rgba(251, 140, 70, 1) 99%);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #fff;
-    }
- 
-    .emergencyError p {
-        font-size: 12px;
-        color: #991b1b;
-        margin-top: 10px;
-        border: 1px solid #fecaca;
-        padding: 7px;
-        border-radius: 5px;
-        background-color: #fdf1f1;
-    }
- 
-    .contactMain {
-        border: 1px solid var(--borderColor);
-        background-color: #f9fafb;
-    }
- 
-    .deleteIcon i {
-        color: #dc2626;
-        font-size: 15px;
-    }
- 
-    .deleteIcon {
-        padding: 10px 15px;
-        border-radius: 8px;
-        transition: 0.7s;
-        cursor: pointer;
-    }
- 
-    .deleteIcon:hover {
-        background-color: #fdf1f1;
-    }
- 
- 
-    .contactBtn button {
-        border: 2px dotted var(--borderColor);
-        width: 100%;
-        padding: 8px 14;
-        border-radius: 5px;
-        gap: 9px;
-        background: #fff;
-        transition: 0.7s;
-    }
- 
-    .emergencyForm .form-label {
-        color: #000;
-        font-size: 14px;
-    }
- 
-    .redBtn {
-        background: #dc2626;
-        border: unset;
-        color: #fff;
-        font-weight: 600;
-        font-size: 15px;
-        padding: 8px 15px;
-        border-radius: 8px;
-    }
-    .formFooter {
-        margin: 24px;
-    }
-    #contactWrapper {
-        display: none;
-    }
-
-     /* pratima css */
+.addAlertForm .checkbox {
+    min-height: 24px;
+    line-height: 25px;
+}
+
+.addAlertForm .checkbox input[type=checkbox] {
+    accent-color: #717171;
+    height: 18px;
+    width: 18px;
+    margin-right: 10px;
+    margin-left: -30px;
+}
+.blankdesign button.btn{
+    display: inline-flex;
+    gap: 8px;
+}
+.blankdesign button.btn i{
+ font-size: 20px;
+}
+.overtime.followUpAction{
+    background: #fefce8;
+    border: 1px solid #fde149;
+}
+
+.timelineTab {
+    display: flex;
+    gap: 10px;
+    border: 1px solid #eee;
+    padding: 3px;
+    border-radius: 3px;
+    background: #eee;
+}
+.timelineTab button.tab {
+    padding: 2px 10px;
+}
+
+/* *************************************************************************************** */
+
+.dailyLogsdateSec .date-slider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    justify-content: space-between;
+}
+
+.dailyLogsdateSec .date-slider .nav-btn {
+    padding: 5px 14px;
+    border: 1px solid #ddd;
+    background: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    display: flex;
+    line-height: 22px;
+}
+.dailyLogsdateSec .date-slider .nav-btn i {
+    font-size: 22px;
+}
+
+.dailyLogsdateSec .date-slider .nav-btn:hover {
+    background: #f5f5f5;
+}
+
+.dailyLogsdateSec .date-slider .date-display {
+    overflow: hidden;
+    width: 395px;
+    text-align: center;
+}
+
+.dailyLogsdateSec .date-slider .date-inner {
+    transition: transform 0.35s ease, opacity 0.35s ease;
+    font-weight: 700;
+    font-size: 16px;
+}
+
+.dailyLogsdateSec .date-slider .dateIcon {
+    color: #2563eb;
+}
+
+.dailyLogsdateSec .changeDateSlide{
+    display: flex;
+    white-space: nowrap;
+    line-height: 34px;
+    gap: 10px;
+}
+
+.addEntryDetails .carePlanWrapper .planCard{
+  border: 1px solid #eee;
+}
+.addEntryDetails .heartIcon{
+    width: 40px;
+    height: 40px;
    
-    /* pratima css end */
-    /* doc */
-    .progress_history {
-        border: 1px solid var(--borderColor);
-        padding: 20px;
+    border-radius: 50%;
+    line-height: 40px;
+    text-align: center;
+}
+.addEntryDetails .heartIcon i {
+    line-height: 40px;
+}
+.carePlanWrapper .blueLightclr{
+  background: #dbeafe;
+  color: var(--darkBlurclr);
+}
+.carePlanWrapper .greenLightClr{
+    background-color: #d7efe2bd;
+    color: #06af51;
+}
+.inORoutTime {
+   line-height: 13px;
+    display: flex;
+    background: #f3f4f6;
+    border-radius: 4px;
+    padding: 8px 10px;
+    gap: 6px;
+}
+.gayClrIcon{
+    color: #a1a1a1;
+    font-size: 12px;
+}
+.planFooter .redalrttext{
+    color: rgb(239 68 68);
+    font-weight: 600;
+}
+.planFooter .redalrttext i{
+    font-size: 14px;
+}
+.AddFirstDetailsEntry{
+    padding-left: 50px;
+}
+.addEntryDetails .carePlanWrapper {
+    /* padding-left: 90px; */
+}
+
+.stepTimelineContentBx{
+    display: flex;
+}
+.entryCardbx{
+    width: 100%;
+}
+.step-timeline {
+    position: relative;
+    padding-left: 30px;
+        height: 100%;
+}
+.entryCardbxTimeline{
+
+}
+/* vertical line */
+.step-timeline::before {
+    content: "";
+    position: absolute;
+    left: 15px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #e5e7eb;
+}
+
+/* each step */
+.step-timeline .step-item {
+    position: relative;
+    margin-bottom: 155px;
+    left: -28px;
+}
+
+/* dot */
+.step-timeline .step-dot {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #e0ecff;
+    color: #1d4ed8;
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+}
+
+/* active step */
+.step-timeline .step-item.active .step-dot {
+    background: #dcfce7;
+    color: #166534;
+}
+.datechangeBtnTodayOrNext{
+    display: flex;
+    gap: 8px;
+}
+.details .item .greenText i{
+     color: #16a34a;
+}
+.byGroupContent .activity-icon{
+    background: transparent;
+    color: var(--grayColor);
+    height: 18px;
+    width: 18px;
+}
+.byGroupContent .roundTag{
+   display: inline-block;
+       margin: 8px 0;
+}
+.byGroupContent .planActions {
+    display: flex;
+}
+.byGroupContent .planActions button {
+    font-size: 13px;
+    line-height: 18px;
+    display: flex;
+    gap: 5px;
+    margin-left: 0;
+    margin-right: 6px;
+}
+.byGroupContent .planActions button i {
+    font-size: 16px;
+}
+
+.byGroupContent .activity-item {
+    position: relative;
+    background-color: #fff;
+}
+
+.byGroupContent .activity-item .planActions {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease;
+}
+
+/* Hover par show */
+.byGroupContent .activity-item:hover .planActions {
+    opacity: 1;
+    visibility: visible;
+}
+.selectfromSearch span{
+    background: #f1f2f7;
+    color: #0a0a0a;
+    border: 1px solid #e2e2e4;
+}
+.upload-box  {
+    background: #f9fafb;
+}
+.upload-box .availabilityTabs .availabilityTabs__nav {
+    width: 100%;
+}
+.byGroupContent .sectionWhiteBgAllUse {
+    background-color: #f6f9fd;
+    box-shadow: none;
+    border: 2px dashed #c6d8f1;
+}
+.addSystemList{
+    width: 100%;
+    height: 190px;
+    overflow: auto;
+    margin-top: 12px;
+}
+.addSystemList .systemList{
+    background: var(--whiteBgBtncolor);
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid var(--borderColor);
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: .5s;
+    margin-right: 5px;
+    margin-bottom: 12px;
+}
+.addSystemList .systemList:hover{
+   background: #eff6ff;
+   border: 1px solid #d1e2fb;
+}
+.addSystemList .systemList p{
+    font-size: 14px;
+    font-weight: 600;
+}
+.addSystemList .systemList .helthcareText .inactive{
+    display: inline-block;
+}
+.addSystemList .systemList .blueText{
+    font-size: 22px;
+}
+
+.pendingCompletion {
+    max-width: 520px;
+}
+.pendingCompletion .header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #ff6a00;
+    font-weight: 600;
+    margin-bottom: 10px;
+    font-size: 12px;
+}
+.pendingCompletion .dot {
+    width: 8px;
+    height: 8px;
+    border: 2px solid #ff6a00;
+    border-radius: 50%;
+}
+.pendingCompletion .card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+}
+.pendingCompletion .left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.pendingCompletion .icon {
+    width: 36px;
+    height: 36px;
+    background: #eef3ff;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+.pendingCompletion .info .title {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+.pendingCompletion .meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.pendingCompletion .badge {
+    font-size: 12px;
+    padding: 2px 8px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: #f9f9f9;
+}
+.pendingCompletion .date {
+    font-size: 12px;
+    color: #777;
+}
+.pendingCompletion .actions {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 16px;
+}
+.pendingCompletion .actions span { cursor: pointer;}
+.pendingCompletion .approve { color: #22b573;}
+.pendingCompletion .actions .delete {width: 20px;}
+.pendingCompletion .actions .view {color: #333;border: none;}
+.weeklyDaysSelect span {
+    background: #fff;
+    color: #000;
+    border-radius: 3px;
+    font-size: 12px;
+    text-align: center;
+    padding: 4px 14px;
+    margin-top: 5px;
+    display: inline-block;
+    cursor: pointer;
+}
+.weeklyDaysSelect span.active{
+    background: var(--blueColor);
+    color: var(--whiteBgBtncolor);
+}
+.overtime.recurringShift{
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 16px;
+    background: #f9fafb;
+}
+.overtime.recurringShift label input{
+    height: auto;
+}
+.createNewShiftTabBtn .tabs button.tab{
+    flex-grow: 3;
+}
+.createNewShiftTabBtn label{
+    font-weight: 600;
+}
+.createNewShiftRightSide .simpleCard .rota_dash-card{
+    border-radius: 6px;
+    border: 2px solid #bcd1f1;
+    padding: 18px 14px;
+}
+.createNewShiftRightSide .simpleCard .rota_dash-card .rota_dash-left .rota_title {
+    font-size: 12px;
+}
+.createNewShiftRightSide .simpleCard .rota_dash-card .rota_dash-left .rota_count {
+    font-size: 18px;
+    font-weight: 600;
+    margin-top: 10px;
+}
+.assignedCarer{
+    
+}
+.dashedBorder{
+    border: 2px dashed #eee;
         border-radius: 8px;
-        transition: 0.7s;
-    }
- 
-    .progress_history>div div:nth-child(3) .careBadg {
-        background-color: #f3f4f6;
-        color: var(--black);
-        width: 100%;
-        display: block;
-    }
- 
-    .d #clientDocumentsTab .emergencyHeader {
-        background: var(--blueGrad);
-    }
- 
-    .emergencyBtn i {
-        font-size: 18px;
-    }
- 
-    .bgBtn {
-        background-color: var(--blueColor);
-        padding: 6px 16px;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 14px;
-        transition: 0.2s;
-        gap: 6px;
-        display: flex;
-        align-items: center;
-        color: #f0fdfa;
-        border: unset;
-    }
- 
-    .bgBtn:hover {
-        background-color: #1a53d1;
-        color: #fff;
-    }
- 
-    .purpleBox {
- 
-        border: 1px solid var(--purple);
-        padding: 10px;
-        border-radius: 8px;
-        background-color: #faf5ff;
-    }
- 
-    .purpleBox p {
-        color: var(--purple);
-        font-size: 12px;
- 
-    }
- 
-    .purpleBox i {
-        color: var(--purple);
-        font-size: 20px;
-    }
- 
-    .careBadg {
-        background: #2563eb30;
-        padding: 2px 8px;
-        font-size: 11px;
-        border-radius: 5px;
-        color: #002b89;
-        box-shadow: var(--bxShadow);
-        font-weight: 600;
-        transition: 0.7s;
-    }
- 
-    .careBadg:hover {
-        background-color: #171717cc !important;
-        color: #fff !important;
-    }
- 
-    .bCardHead h3 {
-        margin-top: 0px;
-        font-size: 16px;
-        font-weight: 600;
-    }
- 
-    .bCardHead {
-        display: flex;
-        gap: 10px;
-    }
- 
-    .bCardHead i {
-        font-size: 20px;
-        color: var(--blueColor);
-    }
- 
- 
- 
-    .bBorderCard {
-        border: 1px solid var(--blueColor);
-        border-radius: 12px;
-        padding: 20px;
-        border-left: 4px solid var(--blueColor);
-    }
- 
-    .careIconButton button {
-        background: #fff;
-        border: unset;
-        box-shadow: var(--bxShadow);
-        padding: 10px 15px;
-        border-radius: 5px;
-        transition: 0.7s;
-        font-size: 14px;
-    }
- 
-    .careIconButton i {
-        font-size: 14px;
-    }
- 
-    .careIconButton div:nth-child(1) i {
-        color: var(--black)
-    }
- 
-    .careIconButton div:nth-child(2) i {
-        color: var(--redColor)
-    }
- 
-    .careIconButton div:nth-child(1) button:hover,
- 
- 
-    .borderBtn:hover,
-    .progress_history:hover {
-        background: #f5f5f5
-    }
- 
-    .careIconButton div:nth-child(2) button:hover {
-        background: #fef2f2
-    }
- 
-    .uploadBy {
-        display: flex;
-        gap: 30%;
-    }
- 
-    .docPlanD p {
-        font-size: 14px;
-        color: var(--black);
-    }
- 
-    .docPlanD span {
-        color: #5c5c5cff;
-    }
- 
-    .para.text-sm {
-        font-size: 13px;
-        color: #5c5c5cff;
- 
-    }
- 
-    .docForm input,
-    .docForm select {
-        background-color: transparent;
-        box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 5px 0px, rgba(0, 0, 0, 0.1) 0px 0px 1px 0px;
-        margin-bottom: 15px;
-        border-radius: 5px;
-        height: 40px;
-    }
- 
-    .docForm input[type="checkbox"] {
-        box-shadow: unset;
-        border: unset;
-        height: 15px;
-        width: 15px;
-        margin: unset;
-    }
- 
-    .docForm .emergencyHeader {
-        border-radius: 12px;
-    }
- 
-    .docForm .formFooter .redBtn,
-    #clientProgressReportTab .bgBtn {
-        background-color: var(--black);
-    }
- 
-    .docForm .formFooter .redBtn:hover,
-    #clientProgressReportTab .bgBtn:hover {
-        background-color: #171717e6;
-    }
- 
-    .docForm .formFooter {
-        margin: unset;
-    }
- 
-    .tooltip {
-        position: absolute;
-        background: #fff;
-        padding: 8px 12px;
-        border: 1px solid #a8a8a8;
-        border-radius: 6px;
-        font-size: 12px;
-        pointer-events: none;
-        opacity: 0;
-        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
-    }
- 
-    .grid line {
-        stroke: #ccc;
-        stroke-width: 1;
-        stroke-dasharray: 4, 4;
-        shape-rendering: crispEdges;
-    }
- 
-    .grid path {
-        stroke-width: 0;
-    }
- 
-    #chart-container,
-    #chart-container2 {
-        width: 100%;
-        height: 300px;
- 
-    }
- 
-    .tooltip {
-        position: absolute;
-        opacity: 0;
-        pointer-events: none;
-        background: white;
-        border: 1px solid #ccc;
-        padding: 10px;
-    }
- 
-    .apexcharts-toolbar {
-        display: none !important;
-    }
- 
-    .detail_chart_doc .careBadg {
-        background-color: #fee2e2;
-        color: #991b1b;
-    }
- 
-    .allertbox {
-        background-color: #fffbeb;
-        border: unset;
-    }
- 
-    .allertbox i,
-    .allertbox strong,
-    .allertbox ul li {
-        color: var(--darkYellow);
-    }
- 
-    .allertbox ul li {
-        color: #b45309;
-        font-size: 13px;
-        margin-bottom: 10px;
-    }
- 
-    .rowDoc_card .col-lg-4 {
-        padding: 10px;
-    }
- 
-    .allertbox ul {
-        padding-left: unset;
-    }
- 
-    .p24 {
-        padding: 24px;
-    }
- 
-    .detail_chart_doc h5,
-    .progress_history h5 {
-        margin: unset;
-        font-weight: 600;
-    }
- 
-    .rowDoc_card {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 20px;
-    }
- 
-    .docIndMain .col-lg-4 {
-        padding: 10px;
-    }
-    /* *************************************pratima css end **************************************/
-        /* dropdown */
-    .achieveTitle {
-        background-color: #f0fdf4;
-        border: 1px solid var(--borderColor);
-        padding: 1px 5px;
-        font-size: 12px;
-        color: var(--textblak);
-        border-radius: 5px;
-    }
- 
-    .badgeContainer,
-    .editBadgeContainer {
-        margin-top: 8px;
-        display: flex;
-        gap: 5px;
-        align-items: center;
-        flex-wrap: wrap;
-    }
- 
-    .concernBe .achieveTitle {
-        background-color: var(--lightyellowclr);
-    }
- 
-    .bgBtn.add-badge-btn {
-        height: 34px;
-    }
- 
-    .addBadgMain input {
-        width: 100%;
-    }
- 
-    .addBadgMain>div div:nth-child(1) {
-        width: 100%;
-    }
- 
-    .achieveTitle i {
-        color: var(--radBgClr);
-        vertical-align: middle;
-    }
- 
-    .nice-select {
-        height: unset;
-        line-height: unset;
-    }
- 
-    .trendClass-select {
-        background-color: #fff;
-        border: 1px solid var(--borderColor);
-        border-radius: 5px;
-        cursor: pointer;
-        height: 42px;
-        line-height: 40px;
-        padding: 0 30px 0 18px;
-        position: relative;
-        user-select: none;
-        transition: 0.2s ease-in-out;
-        color: var(--black);
-    }
- 
-    .trendClass-select:hover {
-        border-color: #d0dae5;
-    }
- 
-    .trendClass-select.open,
-    .trendClass-select:focus {
-        border-color: var(--darkBlurclr);
-    }
- 
-    .trendClass-select::after {
-        content: "";
-        position: absolute;
-        right: 12px;
-        top: 50%;
-        width: 5px;
-        height: 5px;
-        border-right: 2px solid #90a1b5;
-        border-bottom: 2px solid #90a1b5;
-        transform: rotate(45deg);
-        margin-top: -4px;
-        transition: 0.15s;
-    }
- 
-    .trendClass-select.open::after {
-        transform: rotate(-135deg);
-    }
- 
-    /* Dropdown list */
- 
-    .trendClass-select {
-        font-size: 13px;
-    }
- 
-    .trendGreenI {
-        color: var(--darkbgGreen);
-    }
- 
-    .trendRedI {
-        color: var(--radBgClr);
-    }
- 
-    .trendClass-list {
-        background: #fff;
-        border-radius: 5px;
-        box-shadow: 0 0 0 1px rgba(68, 88, 112, 0.11);
-        margin-top: 4px;
-        opacity: 0;
-        pointer-events: none;
-        position: absolute;
-        top: 100%;
-        left: 0;
-        transform: scale(0.75) translateY(-21px);
-        transform-origin: 50% 0;
-        transition: all 0.2s cubic-bezier(0.5, 0, 0, 1.25),
-            opacity 0.15s ease-out;
-        z-index: 9;
-        padding: 10px 0px;
-        width: 100%;
-    }
- 
-    .trendClass-select.open .trendClass-list {
-        opacity: 1;
-        pointer-events: auto;
-        transform: scale(1) translateY(0);
-    }
- 
-    /* Options */
-    .trendClass-option {
-        list-style: none;
-        padding: 0 10px 0 10px;
-        min-height: 40px;
-        cursor: pointer;
-        transition: 0.2s;
-    }
- 
-    .trendClass-option:hover {
-        background-color: #f6f7f9;
-    }
- 
-    .trendClass-option.selected {
-        font-weight: bold;
-    }
- 
- 
- 
-    /* Small variant */
-    .trendClass-select.small {
-        height: 36px;
-        line-height: 34px;
-        font-size: 13px;
-    }
- 
-    .trendClass-select.small::after {
-        width: 4px;
-        height: 4px;
-    }
- 
-    .trendClass-select.small .trendClass-option {
-        min-height: 34px;
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        color: var(--black);
-    }
- 
-    .trendClass-select.small i {
-        font-size: 18px;
-        vertical-align: middle;
-        margin-right: 5px;
-    }
- 
-    .recomBlueBadg .achieveTitle {
-        display: block;
-        width: 100%;
-        background: var(--lightblue);
-        padding: 10px;
-    }
- 
-    .recomBlueBadg .achieveTitle i {
-        float: right;
-    }
- 
-    /* dropdown custom end */
-    .pModalScroll .modal-content {
-        max-height: 90vh;
-        overflow: auto;
-        border-radius: 12px;
-    }
- 
-    .pModalScroll .heightScrollModal {
-        height: unset !important;
-        overflow: unset !important;
-    }
- 
-    .pModalScroll label {
-        font-weight: 600;
-    }
- 
-    .pActiveBehave .active {
-        color: var(--black);
-    }
- 
-    .trendClass-select .current {
-        color: var(--muteColor);
-    }
- 
- 
-    .trendClass-select.has-value .current {
-        color: var(--black);
-    }
- 
-    /* consent header */
-    .consentGreen .emergencyHeader {
-        background: var(--lightbgGreen);
-    }
- 
-    .pgreenBtn {
-        background-color: var(--darkbgGreen);
-    }
- 
-    .pgreenBtn:hover {
-        background-color: #15803d;
-    }
- 
-    .consentGreen .bBorderCard {
-        border: 1px solid var(--darkbgGreen);
-        border-left: 4px solid var(--darkbgGreen);
-    }
- 
-    .docForm textarea {
-        height: unset;
-    }
- 
-    .iconConsent i {
-        font-size: 25px;
-    }
- 
-    .pendingCare .careBadg {
-        background-color: #fef9c3;
-        color: var(--darkYellow);
-    }
- 
- 
-    .consent_detail {
-        display: grid;
-        grid-template-columns: 2fr 2fr;
-        gap: 10px;
-    }
- 
-    .consent_detail> :last-child {
-        grid-column: 1 / -1;
-    }
- 
-    .borderBadgC {
-        font-size: 11px;
-        padding: 2px 8px;
-        border-bottom: 5px;
-        border: 1px solid var(--borderColor);
-        color: var(--black);
-        border-radius: 5px;
-            font-weight: 600;
-    }
- 
-    .consent_detail p {
-        font-size: 14px;
-        color: var(--black);
-        margin-bottom: 0px;
-    }
- 
-    .consent_detail>div {
- 
-        padding: 10px;
-    }
- 
-    .consent_detail>div:nth-child(1),
-    .consent_detail>div:nth-child(2),
-    .consent_detail>div:nth-child(4) {
-        background: #f9fafb;
- 
-    }
- 
-    .consent_detail>div:nth-child(3),
-    .consent_detail>div:nth-child(4),
-    .consent_detail>div:nth-child(5) {
-        background-color: #eff6ff
-    }
- 
-    .greenCardConsent .careIconButton i {
-        font-size: 25px;
-    }
- 
-    .greenCardConsent .borderBtn {
-        color: var(--redColor);
-    }
- 
-    .pgranted .careBadg {
-        background-color: var(--lightbgGreen);
-        color: var(--darkbgGreen);
-    }
- 
-    .prefused .careBadg {
-        background-color: var(--lightRed);
-        color: var(--redColor);
-    }
- 
-    .greenCardConsent .careIconButton svg {
-        color: var(--redColor);
-    }
- 
-    /* *************************************pratima css end **************************************/
+}
+.dashedBorder p{
+    color: #cdd1d7;
+}
+/********************************************************************************Start pratima css ********************************************************************************/
+/********************************************************************************Start pratima css ********************************************************************************/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/******************************************************************************** pratima css ********************************************************************************/
+/******************************************************************************** pratima css ********************************************************************************/
+
+.addnewicons .btn {
+    display: flex;
+}
+.addnewicons .btn i {
+    font-size: 20px;
+}
+
+.emergencyMain {
+    border: 1px solid var(--borderColor);
+    box-shadow: var(--bxShadow);
+    border-radius: 12px;
+    background: #fff;
+}
+
+.emergencyHeader {
+    background: #fef2f2;
+    background: var(--redGradient);
+    border-bottom: 1px solid var(--borderColor);
+    padding: 24px;
+    border-radius: 12px 12px 0px 0px;
+}
+
+.emeregencyParent {
+    display: flex;
+    justify-content: space-between;
+}
+
+.borderBtn {
+    padding: 6px 16px;
+    background: #fff;
+    border: 1px solid var(--borderColor);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: 0.2s;
+    gap: 6px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    color: #0a0a0a;
+}
+
+.emergencyContent h3,
+.contactMain h3 {
+    color: #000;
+    font-weight: 600;
+    margin: 0px;
+    font-size: 17px;
+}
+
+.userMum h2 {
+    color: #000;
+    font-weight: 600;
+    margin: 0px;
+    font-size: 18px;
+}
+
+.emergencyContent {
+    gap: 5px;
+}
+
+.radIconClr i {
+    color: var(--iconRadClr);
+}
+
+.emergencybottom,
+.contactMain {
+    margin: 24px;
+    border: 1px solid var(--borderColor);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+    border-radius: 12px;
+}
+
+.contactMain {
+    background-color: #e5e5e5;
+}
+
+.userMum .title {
+    border: 1px solid var(--borderColor);
+    padding: 2px 7px;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #000;
+    font-weight: 600;
+    margin-top: 10px;
+    display: inline-block;
+}
+
+.icon__pp {
+    height: 40px;
+    width: 40px;
+    background: #f97867;
+    background: linear-gradient(
+        90deg,
+        rgba(249, 120, 103, 1) 35%,
+        rgba(251, 140, 70, 1) 99%
+    );
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+}
+
+.emergencyError p {
+    font-size: 12px;
+    color: #991b1b;
+    margin-top: 10px;
+    border: 1px solid #fecaca;
+    padding: 7px;
+    border-radius: 5px;
+    background-color: #fdf1f1;
+}
+
+.contactMain {
+    border: 1px solid var(--borderColor);
+    background-color: #f9fafb;
+}
+
+.deleteIcon i {
+    color: #dc2626;
+    font-size: 15px;
+}
+
+.deleteIcon {
+    padding: 10px 15px;
+    border-radius: 8px;
+    transition: 0.7s;
+    cursor: pointer;
+}
+
+.deleteIcon:hover {
+    background-color: #fdf1f1;
+}
+
+.contactBtn button {
+    border: 2px dotted var(--borderColor);
+    width: 100%;
+    padding: 8px 14;
+    border-radius: 5px;
+    gap: 9px;
+    background: #fff;
+    transition: 0.7s;
+}
+
+.emergencyForm .form-label {
+    color: #000;
+    font-size: 14px;
+}
+
+.redBtn {
+    background: #dc2626;
+    border: unset;
+    color: #fff;
+    font-weight: 600;
+    font-size: 15px;
+    padding: 8px 15px;
+    border-radius: 8px;
+}
+.formFooter {
+    margin: 24px;
+}
+#contactWrapper {
+    display: none;
+}
+
+
+.progress_history {
+    border: 1px solid var(--borderColor);
+    padding: 20px;
+    border-radius: 8px;
+    transition: 0.7s;
+}
+
+.progress_history > div div:nth-child(3) .careBadg {
+    background-color: #f3f4f6;
+    color: var(--black);
+    width: 100%;
+    display: block;
+}
+
+#clientDocumentsTab .emergencyHeader {
+    background: var(--blueGrad);
+}
+
+.emergencyBtn i {
+    font-size: 18px;
+}
+
+.bgBtn {
+    background-color: var(--blueColor);
+    padding: 6px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: 0.2s;
+    gap: 6px;
+    display: flex;
+    align-items: center;
+    color: #f0fdfa;
+    border: unset;
+}
+
+.bgBtn:hover {
+    background-color: #1a53d1;
+    color: #fff;
+}
+
+.purpleBox {
+    border: 1px solid var(--purple);
+    padding: 10px;
+    border-radius: 8px;
+    background-color: #faf5ff;
+}
+
+.purpleBox p {
+    color: var(--purple);
+    font-size: 12px;
+}
+
+.purpleBox i {
+    color: var(--purple);
+    font-size: 20px;
+}
+
+.careBadg {
+    background: #2563eb30;
+    padding: 2px 8px;
+    font-size: 11px;
+    border-radius: 5px;
+    color: #002b89;
+    box-shadow: var(--bxShadow);
+    font-weight: 600;
+    transition: 0.7s;
+}
+
+.careBadg:hover {
+    background-color: #171717cc !important;
+    color: #fff !important;
+}
+
+.bCardHead h3 {
+    margin-top: 0px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.bCardHead {
+    display: flex;
+    gap: 10px;
+}
+
+.bCardHead i {
+    font-size: 20px;
+    color: var(--blueColor);
+}
+
+.bBorderCard {
+    border: 1px solid var(--blueColor);
+    border-radius: 12px;
+    padding: 20px;
+    border-left: 4px solid var(--blueColor);
+}
+
+.careIconButton button {
+    background: #fff;
+    border: unset;
+    box-shadow: var(--bxShadow);
+    padding: 10px 15px;
+    border-radius: 5px;
+    transition: 0.7s;
+    font-size: 14px;
+}
+
+.careIconButton i {
+    font-size: 14px;
+}
+
+.careIconButton div:nth-child(1) i {
+    color: var(--black);
+}
+
+.careIconButton div:nth-child(2) i {
+    color: var(--redColor);
+}
+
+.careIconButton div:nth-child(1) button:hover,
+.borderBtn:hover,
+.progress_history:hover {
+    background: #f5f5f5;
+}
+
+.careIconButton div:nth-child(2) button:hover {
+    background: #fef2f2;
+}
+
+.uploadBy {
+    display: flex;
+    gap: 30%;
+}
+
+.docPlanD p {
+    font-size: 13px;
+    color: var(--black);
+}
+
+.docPlanD span {
+    color: #5c5c5cff;
+}
+
+.para.text-sm {
+    font-size: 13px;
+    color: var(--black);
+}
+
+/* new 1 */
+.docForm input,
+.docForm select,
+.docForm textarea {
+    background-color: transparent;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 5px 0px,
+        rgba(0, 0, 0, 0.1) 0px 0px 1px 0px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    height: 40px;
+}
+
+.docForm input[type="checkbox"] {
+    box-shadow: unset;
+    border: unset;
+    height: 15px;
+    width: 15px;
+    margin: unset;
+}
+
+.docForm .emergencyHeader {
+    border-radius: 12px;
+}
+
+/* modified */
+.docForm .formFooter .redBtn,
+#clientProgressReportTab .bgBtn,
+.add-badge-btn,
+.darkBg.submit {
+    background-color: var(--blackBtnColor);
+}
+
+.docForm .formFooter .redBtn:hover,
+#clientProgressReportTab .bgBtn:hover,
+.add-badge-btn:hover,
+.darkBg.submit:hover {
+    background-color: #171717e6;
+}
+
+/* modified */
+.docForm .formFooter {
+    margin: unset;
+}
+
+.tooltip {
+    position: absolute;
+    background: #fff;
+    padding: 8px 12px;
+    border: 1px solid #a8a8a8;
+    border-radius: 6px;
+    font-size: 12px;
+    pointer-events: none;
+    opacity: 0;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.grid line {
+    stroke: #ccc;
+    stroke-width: 1;
+    stroke-dasharray: 4, 4;
+    shape-rendering: crispEdges;
+}
+
+.grid path {
+    stroke-width: 0;
+}
+
+#chart-container,
+#chart-container2 {
+    width: 100%;
+    height: 300px;
+}
+
+.tooltip {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    background: white;
+    border: 1px solid #ccc;
+    padding: 10px;
+}
+
+.apexcharts-toolbar {
+    display: none !important;
+}
+
+.detail_chart_doc .careBadg {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+.allertbox {
+    background-color: #fffbeb;
+    border: unset;
+}
+
+.allertbox i,
+.allertbox strong,
+.allertbox ul li {
+    color: var(--darkYellow);
+}
+
+.allertbox ul li {
+    color: #b45309;
+    font-size: 13px;
+    margin-bottom: 10px;
+}
+
+.rowDoc_card .col-lg-4 {
+    padding: 10px;
+}
+
+.allertbox ul {
+    padding-left: unset;
+}
+
+.p24 {
+    padding: 24px;
+}
+
+.detail_chart_doc h5,
+.progress_history h5 {
+    margin: unset;
+    font-weight: 600;
+}
+
+.rowDoc_card {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.docIndMain .col-lg-4 {
+    padding: 10px;
+}
+
+/* new record css */
+/* dropdown */
+.achieveTitle {
+    background-color: #f0fdf4;
+    border: 1px solid var(--borderColor);
+    padding: 1px 5px;
+    font-size: 12px;
+    color: var(--textblak);
+    border-radius: 5px;
+}
+
+.badgeContainer,
+.editBadgeContainer {
+    margin-top: 8px;
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.concernBe .achieveTitle {
+    background-color: var(--lightyellowclr);
+}
+
+.bgBtn.add-badge-btn {
+    height: 34px;
+}
+
+.addBadgMain input {
+    width: 100%;
+}
+
+.addBadgMain > div div:nth-child(1) {
+    width: 100%;
+}
+
+.achieveTitle i {
+    color: var(--radBgClr);
+    vertical-align: middle;
+}
+
+.nice-select {
+    height: unset;
+    line-height: unset;
+}
+
+.trendClass-select {
+    background-color: #fff;
+    border: 1px solid var(--borderColor);
+    border-radius: 5px;
+    cursor: pointer;
+    height: 42px;
+    line-height: 40px;
+    padding: 0 30px 0 18px;
+    position: relative;
+    user-select: none;
+    transition: 0.2s ease-in-out;
+    color: var(--black);
+}
+
+.trendClass-select:hover {
+    border-color: #d0dae5;
+}
+
+.trendClass-select.open,
+.trendClass-select:focus {
+    border-color: var(--darkBlurclr);
+}
+
+.trendClass-select::after {
+    content: "";
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    width: 5px;
+    height: 5px;
+    border-right: 2px solid #90a1b5;
+    border-bottom: 2px solid #90a1b5;
+    transform: rotate(45deg);
+    margin-top: -4px;
+    transition: 0.15s;
+}
+
+.trendClass-select.open::after {
+    transform: rotate(-135deg);
+}
+
+/* Dropdown list */
+
+.trendClass-select {
+    font-size: 13px;
+}
+
+.trendGreenI {
+    color: var(--darkbgGreen);
+}
+
+.trendRedI {
+    color: var(--radBgClr);
+}
+
+.trendClass-list {
+    background: #fff;
+    border-radius: 5px;
+    box-shadow: 0 0 0 1px rgba(68, 88, 112, 0.11);
+    margin-top: 4px;
+    opacity: 0;
+    pointer-events: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    transform: scale(0.75) translateY(-21px);
+    transform-origin: 50% 0;
+    transition: all 0.2s cubic-bezier(0.5, 0, 0, 1.25), opacity 0.15s ease-out;
+    z-index: 9;
+    padding: 10px 0px;
+    width: 100%;
+}
+
+.trendClass-select.open .trendClass-list {
+    opacity: 1;
+    pointer-events: auto;
+    transform: scale(1) translateY(0);
+}
+
+/* Options */
+.trendClass-option {
+    list-style: none;
+    padding: 0 10px 0 10px;
+    min-height: 40px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.trendClass-option:hover {
+    background-color: #f6f7f9;
+}
+
+.trendClass-option.selected {
+    font-weight: bold;
+}
+
+/* Small variant */
+.trendClass-select.small {
+    height: 36px;
+    line-height: 34px;
+    font-size: 13px;
+}
+
+.trendClass-select.small::after {
+    width: 4px;
+    height: 4px;
+}
+
+.trendClass-select.small .trendClass-option {
+    min-height: 34px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--black);
+}
+
+.trendClass-select.small i {
+    font-size: 18px;
+    vertical-align: middle;
+    margin-right: 5px;
+}
+
+.recomBlueBadg .achieveTitle {
+    display: block;
+    width: 100%;
+    background: var(--lightblue);
+    padding: 10px;
+}
+
+.recomBlueBadg .achieveTitle i {
+    float: right;
+}
+
+/* dropdown custom end */
+.pModalScroll .modal-content {
+    max-height: 90vh;
+    overflow: auto;
+    border-radius: 12px;
+}
+
+.pModalScroll .heightScrollModal {
+    height: unset !important;
+    overflow: unset !important;
+}
+
+.pModalScroll label {
+    font-weight: 600;
+}
+
+.pActiveBehave .active {
+    color: var(--black);
+}
+
+.trendClass-select .current {
+    color: var(--muteColor);
+}
+
+.trendClass-select.has-value .current {
+    color: var(--black);
+}
+
+/* consent header */
+.consentGreen .emergencyHeader {
+    background: var(--lightbgGreen);
+}
+
+.pgreenBtn {
+    background-color: var(--darkbgGreen);
+}
+
+.pgreenBtn:hover {
+    background-color: #15803d;
+}
+
+.consentGreen .bBorderCard {
+    border: 1px solid var(--darkbgGreen);
+    border-left: 4px solid var(--darkbgGreen);
+}
+
+.docForm textarea {
+    height: unset;
+}
+
+.iconConsent i {
+    font-size: 25px;
+}
+
+.pendingCare .careBadg {
+    background-color: #fef9c3;
+    color: var(--darkYellow);
+}
+
+.consent_detail {
+    display: grid;
+    grid-template-columns: 2fr 2fr;
+    gap: 10px;
+}
+
+.consent_detail > :last-child {
+    grid-column: 1 / -1;
+}
+
+.borderBadgC {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-bottom: 5px;
+    border: 1px solid var(--borderColor);
+    color: var(--black);
+    border-radius: 5px;
+    font-weight: 600;
+}
+
+.consent_detail p {
+    font-size: 14px;
+    color: var(--black);
+    margin-bottom: 0px;
+}
+
+.consent_detail > div {
+    padding: 10px;
+}
+
+.consent_detail > div:nth-child(1),
+.consent_detail > div:nth-child(2),
+.consent_detail > div:nth-child(4) {
+    background: #f9fafb;
+}
+
+.consent_detail > div:nth-child(3),
+.consent_detail > div:nth-child(4),
+.consent_detail > div:nth-child(5) {
+    background-color: #eff6ff;
+}
+
+.greenCardConsent .careIconButton i {
+    font-size: 25px;
+}
+
+.greenCardConsent .borderBtn {
+    color: var(--redColor);
+}
+
+.pgranted .careBadg {
+    background-color: var(--lightbgGreen);
+    color: var(--darkbgGreen);
+}
+.prefused .careBadg {
+    background-color: var(--lightRed);
+    color: var(--redColor);
+}
+.greenCardConsent .careIconButton svg {
+    color: var(--redColor);
+}
+.d_none_CarePlanDetails {
+    display: none;
+}
+.changeDateSlide .date-display p{
+    margin-bottom: 0;
+    line-height: 14px;
+    font-size: 13px;
+}
+.calendarTabs .tab-content .content .days90Content{
+    background: #f6f9fd;
+}
+.totalShiftsCounter h2.rota_count{
+    font-size: 20px;
+    margin-top: 10px;
+}
+.weeklyBreakdownAddCont .planCard{
+    border: 1px solid #e5e7eb;
+}
+
+/* onboarding css */
+.onboardingMain h5 {
+    font-size: 16px;
+    font-weight: 600;
+}
+.onboardingMain .careBadg {
+    background: var(--darkbgGreen);
+    color: #fff;
+}
+.onboardingMain .topRow,
+.onboardingMain .value {
+    color: var(--black);
+    font-size: 14px;
+    font-weight: 600;
+}
+.onboardingBox {
+    background-color: var(--lightbgGreen);
+}
+.onboardingBox {
+    border: 2px solid #bbf7d0;
+    border-radius: 8px;
+    cursor: pointer;
+}
+.onboardingBox i {
+    font-size: 25px;
+}
+.onboardingBox h6 {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 5px !important;
+}
+ 
+.eyeOnboard i {
+    color: var(--black);
+    font-size: 18px;
+}
+.boardingStatus {
+    color: var(--darkbgGreen);
+    margin: 0px;
+    font-size: 13px;
+    font-weight: 600;
+}
+.onboardingMain .occupancyBox {
+    border-bottom: none;
+}
+.onboardContent {
+    border: 1px solid var(--borderColor);
+    border-radius: 8px;
+    margin-top: 10px;
+}
+/* staff css */
+.staffHeaderp h1 {
+    color: var(--black);
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0px 0px 5px 0px;
+}
+.staffHeaderp {
+    display: flex;
+    justify-content: space-between;
+}
+.staffCardp h3 {
+    font-size: 30px;
+    font-weight: 700;
+    margin-bottom: 2px;
+}
+.staffCardp p{
+    font-size: 13px;
+}
+.staffCardp i,
+.bgIconStaffT i {
+    font-size: 30px;
+}
+.staffCardp {
+    box-shadow: var(--bxShadow);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: 0.7s;
+}
+.staffCardp:hover {
+    transform: scale(1.05);
+}
+.staffCardCol:nth-child(1) .staffCardp {
+    background-color: var(--lightyellowclr);
+    border: 1px solid #fef08a;
+}
+.staffCardCol:nth-child(1) .staffCicon i,
+.staffCardCol:nth-child(1) h3,
+.staffCardCol:nth-child(1) p {
+    color: #ca8a04;
+}
+.staffCardCol:nth-child(2) .staffCardp {
+    background-color: var(--lightblue);
+    border: 1px solid #bfdbfe;
+}
+.staffCardCol:nth-child(2) .staffCicon i,
+.staffCardCol:nth-child(2) h3,
+.staffCardCol:nth-child(2) p {
+    color: var(--darkBlurclr);
+}
+.staffCardCol:nth-child(3) .staffCardp {
+    background-color: var(--lightRedp);
+    border: 1px solid #fecaca;
+}
+.staffCardCol:nth-child(3) .staffCicon i,
+.staffCardCol:nth-child(3) h3,
+.staffCardCol:nth-child(3) p {
+    color: var(--redColor);
+}
+.staffTaskTab .tabs {
+    background: unset !important;
+    border: unset !important;
+}
+.staffTaskTab .tab {
+    flex-grow: unset;
+}
+.mt20 {
+    margin-top: 20px;
+}
+.staffTaskTab span.title i,
+.AllStaffTabC .para i {
+    vertical-align: middle;
+}
+.bgIconStaffT i {
+    font-size: 23px;
+}
+ 
+.AllStaffTabC h5 {
+    font-size: 15px;
+    font-weight: 600;
+}
+.AllStaffTabC:hover {
+    box-shadow: rgba(17, 12, 46, 0.15) 0px 48px 100px 0px;
+}
+.AllStaffTabC .borderBtn i,
+.AllStaffTabC .bgBtn i {
+    font-size: 18px;
+}
+.orangeAllTabCard .bgIconStaffT i {
+    color: var(--darkOrangep);
+}
+.AllStaffTabC .bgIconStaffT {
+    height: 40px;
+    width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+}
+.orangeAllTabCard .bgIconStaffT {
+    background: #ffedd5;
+}
+ 
+.orangeBages {
+    background-color: #ffedd5;
+    color: var(--darkOrangep);
+}
+ 
+.blueAllTabCard .bgIconStaffT i {
+    color: var(--blueColor);
+}
+.blueAllTabCard .bgIconStaffT {
+    background: #dbeafe;
+}
+ 
+.yellowAllTabCard .bgIconStaffT i {
+    color: var(--darkYellow);
+}
+.yellowAllTabCard .bgIconStaffT {
+    background: #fef9c3;
+}
+ 
+.yellowBadges {
+    background-color: #fef9c3;
+    color: var(--darkYellow);
+}
+ 
+.muteAllTabCard .bgIconStaffT {
+    background: #f1f1ef;
+}
+ 
+.purpleAllTabCard .bgIconStaffT {
+    background: #f3e8ff;
+}
+.purpleAllTabCard .bgIconStaffT i {
+    color: var(--purple);
+}
+ 
+.AllStaffTabC .title {
+    font-size: 12px;
+}
+.muteBadges {
+    background-color: #f1f1ef;
+    color: #374151;
+}
+.purpleBadges {
+    color: var(--purple);
+    background-color: #f3e8ff;
+}
+.buleBadges {
+    color: var(--blueColor);
+    background-color: #2563eb30;
+}
+.greenbadges {
+    background-color: #dcfce7;
+    color: var(--darkbgGreen);
+}
+.redbadges {
+    color: var(--redColor);
+    background-color: var(--lightRedp);
+}
+.redDarkBadges {
+    background-color: var(--redColor);
+    color: #fff;
+}
+.highBadges {
+    background-color: #ffedd5;
+    color: var(--darkOrangep);
+}
+.completedTaskStaff .greenbadges {
+    padding: 5px 10px;
+}
+.completedTaskStaff .greenbadges i {
+    font-size: 20px;
+    vertical-align: middle;
+}
+.allterStafftask {
+    border: 1px solid var(--redColor);
+    background-color: var(--lightRedp);
+}
+.allertStaffTaskDate {
+    color: var(--redColor) !important;
+    font-weight: 600;
+}
+.customModalWidthp {
+    max-width: 480px;
+}
+/* pratima css end */

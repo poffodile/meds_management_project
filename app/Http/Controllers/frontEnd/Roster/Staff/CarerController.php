@@ -6,11 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\User;
-use App\Services\Staff\StaffService, App\Models\CompanyDepartment;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Str;
-use Carbon\Carbon;
+use App\Services\Staff\StaffService, App\Models\CompanyDepartment, App\AccessLevel, App\Models\Staff\UserNote;
+
 
 class CarerController extends Controller
 {
@@ -30,49 +27,115 @@ class CarerController extends Controller
             abort(403, 'Home ID not found.');
         }
         $data['department'] = CompanyDepartment::getActiveCompanyDepartment();
-        $data['allStaff'] = $this->staffService->allStaff($homeId);
-        $data['activeStaff'] = $this->staffService->activeStaff($homeId);
-        $data['inactiveStaff'] = $this->staffService->inactiveStaff($homeId);
-        $data['onLeaveStaff'] = $this->staffService->onLeaveStaff($homeId);
-
-        $data['allStaff'] = $this->staffService
-            ->attachQualifications(
-                $this->staffService->allStaff($homeId)
-            );
-        // dd($data['allStaff']);
-        $data['activeStaff'] = $this->staffService
-            ->attachQualifications(
-                $this->staffService->activeStaff($homeId)
-            );
-        $data['inactiveStaff'] = $this->staffService
-            ->attachQualifications(
-                $this->staffService->inactiveStaff($homeId)
-            );
-
-        // $data['onLeaveStaff'] = $this->staffService
-        //     ->attachQualifications(
-        //         $this->staffService->onLeaveStaff($homeId)
-        //     );
-
-
-       
+        $data['access_levels'] = AccessLevel::select('id', 'name')->where('home_id', $homeId)->get()->toArray();
         $data['counts'] = $this->staffService->staffCounts($homeId);
-
         $data['courses'] = $this->staffService->courses();
-
-        // dd($data['allStaff']);
 
         return view('frontEnd.roster.staff.carer', $data);
     }
 
-    public function carer_details($carer_id)
+    public function getStaffByStatus(Request $request)
     {
-        if (!$carer_id) {
-            abort(400, 'User ID is required.');
+        $homeIds = explode(',', auth()->user()->home_id);
+        $homeId  = $homeIds[0] ?? null;
+
+        if (!$homeId) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Home ID not found'
+            ]);
         }
 
-        $data['staffDetails'] = $this->staffService->getStaffDetails($carer_id);
-        return view('frontEnd.roster.staff.carer_details', $data);
+        $type   = $request->type ?? 'allCarerActibity';     // all | active | inactive | leave
+        $search = trim($request->search ?? ''); // username / name search
+
+        /**
+         * ----------------------------------
+         * Base query (COMMON CONDITIONS)
+         * ----------------------------------
+         */
+        switch ($type) {
+            case 'activeCarer':
+                $staff = $this->staffService->activeStaff($homeId);
+                break;
+
+            case 'inactiveCarer':
+                $staff = $this->staffService->inactiveStaff($homeId);
+                break;
+
+            case 'onLeaveCarer':
+                $staff = $this->staffService->onLeaveStaff($homeId); // if exists
+                break;
+
+            case 'allCarerActibity':
+            default:
+                $staff = $this->staffService->allStaff($homeId);
+                break;
+        }
+
+        /**
+         * ----------------------------------
+         * SEARCH (username / name)
+         * ----------------------------------
+         */
+        // if ($search !== '') {
+        //     $staff = $staff->filter(function ($user) use ($search) {
+        //         return str_contains(strtolower($user->name), strtolower($search))
+        //             || str_contains(strtolower($user->user_name ?? ''), strtolower($search));
+        //     })->values();
+        // }
+
+
+
+        /**
+         * ----------------------------------
+         * Apply TAB FILTER
+         * ----------------------------------
+         */
+        // $query = clone $baseQuery;
+
+        // if ($type === 'active') {
+        //     $query->where('status', 1);
+        // } elseif ($type === 'inactive') {
+        //     $query->where('status', 0);
+        // } elseif ($type === 'leave') {
+        //     // $query->where('on_leave', 1);
+        // }
+
+        /**
+         * ----------------------------------
+         * Apply SEARCH FILTER
+         * ----------------------------------
+         */
+        if (!empty($search)) {
+            $staff->where(function ($q) use ($search) {
+                $q->where('name', 'LIKE', "%{$search}%")
+                    ->orWhere('user_name', 'LIKE', "%{$search}%")
+                    ->orWhere('email', 'LIKE', "%{$search}%");
+            });
+        }
+
+        /**
+         * ----------------------------------
+         * Fetch staff
+         * ----------------------------------
+         */
+        $staff = $staff->get();
+
+        // dd($staff);
+
+        // Attach qualifications
+        $staff = $this->staffService->attachQualifications($staff);
+
+        /**
+         * ----------------------------------
+         * Response
+         * ----------------------------------
+         */
+        return response()->json([
+            'status' => true,
+            'data'   => $staff
+        ]);
     }
 
     public function update(Request $request, $carer_id)
@@ -90,4 +153,22 @@ class CarerController extends Controller
 
         return back()->with('success', 'Staff updated');
     }
+
+    public function getHourlyRate(Request $request)
+    {
+        $access_level_id = $request->input('access_level_id');
+
+        if (!$access_level_id) {
+            return response()->json(['error' => 'Access level is required.'], 400);
+        }
+
+        $pay_rate = $this->staffService->getPayRateForAccessLevel($access_level_id);
+
+        if (!$pay_rate) {
+            return response()->json(['error' => 'Pay rate not found.'], 404);
+        }
+
+        return response()->json(['hourly_rate' => $pay_rate]);
+    }
+
 }
