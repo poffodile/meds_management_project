@@ -9408,6 +9408,7 @@ a.close.edit_dyn_form {
      --blackBtnColor: #171717;
     --lightRedp: #fef2f2;
     --darkOrangep: #d45f0c;
+    --muteText: #6b7280;
 } 
 
 /* ******************Start Dashboard Css***************************** */
@@ -13305,9 +13306,6 @@ label.redtext{
     font-weight: 600;
     margin-top: 10px;
 }
-.assignedCarer{
-    
-}
 .dashedBorder{
     border: 2px dashed #eee;
         border-radius: 8px;
@@ -13315,6 +13313,286 @@ label.redtext{
 .dashedBorder p{
     color: #cdd1d7;
 }
+.schedulingIssues .accordion{
+  margin: 40px 0;
+}
+.schedulingIssues .accordion .item {
+    border: 1px solid #fdbb76;
+    margin-bottom: 50px;
+    background: none;
+    border-radius: 8px;
+    overflow: hidden;
+}
+.schedulingIssues .t-p{
+    padding: 18px;
+    background: #fff;
+}
+.schedulingIssues .accordion .item .item-header h2 button.btn.btn-link {
+   background-color: #fffaf0;
+    color: #742a11;
+    border-radius: 0px;
+    font-family: 'Poppins';
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 2.5;
+    text-decoration: none;
+    transition: .6s;
+}
+.schedulingIssues .accordion .item .item-header h2 button.btn.btn-link:hover {
+   background-color: #ffedd5;
+
+}
+.schedulingIssues .accordion .item .item-header {
+    border-bottom: none;
+    background: transparent;
+    padding: 0px;
+}
+
+.schedulingIssues .accordion .item .item-header h2 button {
+    color: white;
+    font-size: 20px;
+    padding: 15px;
+    display: block;
+    width: 100%;
+    text-align: left;
+}
+
+.schedulingIssues .accordion .item .item-header h2 i {
+    float: right;
+    font-size: 30px;
+    color: #eca300;
+    width: 60px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+}
+
+.schedulingIssues button.btn.btn-link.collapsed i {
+    transform: rotate(0deg);
+}
+
+.schedulingIssues button.btn.btn-link i {
+    transform: rotate(180deg);
+    transition: 0.5s;
+}
+.issuesDetectedHead {
+    display: inline-flex;
+    line-height: 24px;
+    gap: 12px;
+}
+.priorityNumber{
+    line-height: 24px;
+    font-size: 12px;
+    margin-bottom: 0;
+}
+.highProry{
+   color: #a71919;
+   font-weight: 700;
+   margin-right: 10px;
+}
+.schedulingIssues .accordion .item .item-header h2 .schedulingIcon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    line-height: 39px;
+    display: flex;
+}
+.schedulingIssues .accordion .item .item-header h2 .schedulingIcon i {
+    color: #fff;
+    font-size: 21px;
+}
+.schedulingIssues button.btn.btn-link .schedulingIcon i {
+    transform: inherit;
+}
+.achedulingAccordionTabs{
+
+}
+.calendarTabs .achedulingAccordionTabs .tab.active {
+    background: #ea580c;
+    color: #fff;
+    border-color: #ea580c;
+}
+.commonSchedulingIssues .planCard.yllowBgAndBorder{
+    background: #fef9c3;
+    border: 1px solid #fef08c;
+}
+.commonSchedulingIssues .planCard.redBgAndBorder{
+    background: #fee2e2;
+    border: 1px solid #fecbcb;
+}
+.commonSchedulingIssues .carePlanWrapper .planMeta {
+    display: block;
+}
+.commonSchedulingIssues .carePlanWrapper .planMeta strong {
+    color: #835216;
+}
+.commonSchedulingIssues .carePlanWrapper .planTop .commntagDesin {
+    align-self: flex-start;
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 6px;
+}
+.commonSchedulingIssues .planCard.yllowBgAndBorder .heartIcon{
+   color: #ca8a04;
+}
+.commonSchedulingIssues .planCard.redBgAndBorder .heartIcon{
+   color: #dc2626;
+}
+.commonSchedulingIssues .planCard.redBgAndBorder .commntagDesin.careBadg{
+    background: #dc2626;
+}
+.commonSchedulingIssues .planCard.redBgAndBorder .planMeta strong {
+    color: #a53333;
+}
+.commntagDesin.careBadg{
+   background: #ca8a04;
+   color: #fff;
+}
+.commntagDesin.effecTive{
+   border: 1px solid var(--borderColor);
+   color: #333;
+}
+.commntagDesin.dateBadg{
+     border: 1px solid var(--borderColor);
+   background: var(--whiteBgBtncolor);
+   color: #333;
+}
+.issuesDropdown {
+    position: relative;
+    display: inline-block;
+}
+.issuesDropdown .dropdownToggle {
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    color: #ca8a04;
+}
+.issuesDropdown .issuesDetectedDrop {
+    position: absolute;
+    top: 37px;
+    right: 0;
+    margin-top: 6px;
+    padding: 6px 0;
+    list-style: none;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-6px);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    z-index: 1000;
+}
+.issuesDropdown:focus-within .issuesDetectedDrop {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+.issuesDropdown:focus-within .dropdownToggle i {
+    transform: rotate(180deg);
+    transition: transform 0.25s ease;
+}
+.issuesDropdown .issuesDetectedDrop li a {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    text-decoration: none;
+    white-space: nowrap;
+}
+.issuesDropdown .issuesDetectedDrop li a:hover {
+    background: #f5f5f5;
+}
+
+.suggestedCarers {
+    max-height: 398px;
+    overflow-y: auto;
+    padding-right: 8px;
+}
+.suggestedCarers .title {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+.suggestedCarers .carerCard {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    margin-bottom: 12px;
+    background: #fff5f5;
+    border: 2px solid #ff8a8a;
+    border-radius: 12px;
+}
+.suggestedCarers .avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #ff8a8a;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 16px;
+}
+.suggestedCarers .details {
+    flex: 1;
+}
+.suggestedCarers .topRow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+.suggestedCarers .name {
+    font-weight: 600;
+    font-size: 14px;
+}
+.suggestedCarers .badge {
+    font-size: 11px;
+    padding: 4px 6px;
+    border-radius: 6px;
+    background: #fff5f5;
+    border: 1px solid #ddd;
+    color: #3a3939;
+}
+.suggestedCarers .tag {
+    display: inline-block;
+    margin: 4px 0;
+    padding: 3px 8px;
+    font-size: 11px;
+    border-radius: 5px;
+    background: #f25f5c;
+    color: #ffffff;
+    font-weight: 700;
+}
+/* warning */
+.suggestedCarers .warning {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #d32f2f;
+}
+.suggestedCarers .assignBtn {
+    padding: 6px 14px;
+    border: none;
+    border-radius: 6px;
+    background: #f25f5c;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+.suggestedCarers .assignBtn:hover {
+    opacity: 0.9;
+}
+
 /********************************************************************************Start pratima css ********************************************************************************/
 /********************************************************************************Start pratima css ********************************************************************************/
 
@@ -14227,12 +14505,12 @@ label.redtext{
     margin-top: 10px;
 }
 /* staff css */
-.staffHeaderp h1 {
+/* .staffHeaderp h1 {
     color: var(--black);
     font-size: 22px;
     font-weight: 700;
     margin: 0px 0px 5px 0px;
-}
+} */
 .staffHeaderp {
     display: flex;
     justify-content: space-between;
@@ -14413,4 +14691,54 @@ label.redtext{
 .customModalWidthp {
     max-width: 480px;
 }
-/* pratima css end */
+.mainTitlep {
+    font-size: 22px;
+    font-weight: 600;
+    margin: 0;
+    color: #484848;
+}
+.h5Head {
+    font-size: 16px;
+    font-weight: 600;
+}
+.f18 {
+    font-size: 18px;
+}
+.formIns {
+    font-size: 11px;
+    color: var(--muteText);
+    display: block;
+    margin-top: 3px;
+}
+.mb25 {
+    margin-bottom: 25px;
+}
+.checkboxp {
+    display: flex;
+    align-items: center; /* vertical center */
+    gap: 10px; /* space between checkbox and text */
+    margin-bottom: 10px;
+}
+ 
+.checkboxp input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin: 0; /* remove default offset */
+    cursor: pointer;
+}
+ 
+.checkboxp label {
+    margin: 0;
+    cursor: pointer;
+}
+.careRiskIcon{
+    color: var(--darkOrangep);
+    font-size: 20px;
+    vertical-align: middle;
+}
+.blackBtn{
+ background-color: var(--blackBtnColor);  
+}
+.blackBtn:hover{
+   background-color: #171717e6;;  
+}

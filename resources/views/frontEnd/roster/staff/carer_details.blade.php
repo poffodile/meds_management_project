@@ -580,36 +580,36 @@
                         </div>
 
                         <!-- <div class="calendarTabs leaveRequesttabs employeeDetailsTabs  m-t-20">
-                                                                            <div class="tabs p-1 ">
-                                                                                <button class="tab active" data-tab="workingHoursTab">
-                                                                                    Working Hours
-                                                                                </button>
-                                                                                <button class="tab" data-tab="unavailabilityTab">
-                                                                                    Unavailability
+                                                                                    <div class="tabs p-1 ">
+                                                                                        <button class="tab active" data-tab="workingHoursTab">
+                                                                                            Working Hours
+                                                                                        </button>
+                                                                                        <button class="tab" data-tab="unavailabilityTab">
+                                                                                            Unavailability
 
-                                                                                </button>
-                                                                                <button class="tab" data-tab="summaryTab">
-                                                                                    Summary
-                                                                                </button>
-                                                                            
-                                                                            </div>
-
-                                                                            <div class="tab-content carertabcontent">
-                                                                                <div class="content active" id="workingHoursTab">
-                                                                                    <div class="sectionWhiteBgAllUse">
-                                                                                            <h1> Working Hours</h1>
-                                                                                    </div>
-                                                                                </div>
-
-                                                                                <div class="content" id="unavailabilityTab">
-                                                                                    <h1>Unavailability</h1>
-                                                                                </div>
-                                                                                <div class="content" id="summaryTab">
-                                                                                    <h1>Summary</h1>
-                                                                                </div>
+                                                                                        </button>
+                                                                                        <button class="tab" data-tab="summaryTab">
+                                                                                            Summary
+                                                                                        </button>
                                                                                     
-                                                                            </div>
-                                                                        </div> -->
+                                                                                    </div>
+
+                                                                                    <div class="tab-content carertabcontent">
+                                                                                        <div class="content active" id="workingHoursTab">
+                                                                                            <div class="sectionWhiteBgAllUse">
+                                                                                                    <h1> Working Hours</h1>
+                                                                                            </div>
+                                                                                        </div>
+
+                                                                                        <div class="content" id="unavailabilityTab">
+                                                                                            <h1>Unavailability</h1>
+                                                                                        </div>
+                                                                                        <div class="content" id="summaryTab">
+                                                                                            <h1>Summary</h1>
+                                                                                        </div>
+                                                                                            
+                                                                                    </div>
+                                                                                </div> -->
                     </div>
 
 
@@ -618,7 +618,7 @@
                             <div class="workHoursHeader">
                                 <div class="title">Qualifications</div>
                                 <div class="actions">
-                                    <button class="allbuttonDarkClr"> <i class='bx  bx-education'></i> Add Qualification</button>
+                                    <button class="allbuttonDarkClr" id="addQualificationBtn"> <i class='bx  bx-education'></i> Add Qualification</button>
                                 </div>
                             </div>
 
@@ -658,8 +658,8 @@
                                 </div>
                             </div>
                             <!-- <div class="leavebanktabCont">
-                                                                                <p>No shifts recorded</p>
-                                                                            </div> -->
+                                            <p>No shifts recorded</p>
+                                        </div> -->
                             <div class="">
                                 <div class="certifiedList">
                                     <span class="">
@@ -841,8 +841,41 @@
                 </div>
             </div>
         </div>
-
         {{-- Upload Notes Model --}}
+
+        {{-- Qualification Model --}}
+        <div class="modal fade leaveCommunStyle" id="qualificationModal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Add Qualification</h4>
+                    </div>
+
+                    <div class="modal-body">
+                        <form id="qualificationForm">
+                            <div class="form-group">
+                                <label>Qualification Name</label>
+                                <input type="text" class="form-control" name="qualification_name">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Certificate</label>
+                                <input type="file" class="form-control" name="certificate">
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" id="saveQualification">
+                            Save
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{-- Qualification Model --}}
 
         <script src="{{ asset('public/frontEnd/staff/js/working-hours.js') }}"></script>
 
@@ -1006,7 +1039,7 @@
         <script>
             $(document).on('click', '.delete-note', function() {
                 let noteId = $(this).data('id');
-                    let button = $(this);
+                let button = $(this);
                 if (!confirm('Are you sure you want to delete this note?')) {
                     return;
                 }
@@ -1031,7 +1064,7 @@
 
             $(document).on('click', '.delete-document', function() {
                 let documentId = $(this).data('id');
-                 let button = $(this);
+                let button = $(this);
                 if (!confirm('Are you sure you want to delete this document?')) {
                     return;
                 }
@@ -1044,7 +1077,7 @@
                     },
                     success: function(response) {
                         if (response.success) {
-                           location.reload();
+                            location.reload();
                         }
                     },
                     error: function() {
@@ -1052,9 +1085,11 @@
                     }
                 });
             });
+
+            $(document).on('click', '#addQualificationBtn', function() {
+                $('#qualificationModal').modal('show');
+            });
         </script>
-
-
 
     @endsection
 </main>
