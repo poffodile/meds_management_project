@@ -35,6 +35,7 @@ use App\Http\Controllers\frontEnd\Roster\Staff\StaffTaskController;
 use App\Http\Controllers\frontEnd\Roster\Client\ClientController;
 use App\Http\Controllers\frontEnd\Roster\Staff\CarerController;
 use App\Http\Controllers\frontEnd\Roster\Staff\CarerDetailsController;
+use App\Http\Controllers\frontEnd\Roster\Staff\StaffQualificationController;
 use App\Http\Controllers\frontEnd\Roster\CareDocumentController;
 use App\Http\Controllers\frontEnd\Roster\ReportController;
 use App\Http\Controllers\frontEnd\Roster\MessagingCenterController;
@@ -140,6 +141,7 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 		Route::post('/carer/save-notes', [CarerDetailsController::class, 'saveNote'])->name('carer.save.notes'); 
 		Route::delete('/carer/delete-notes/{id}', [CarerDetailsController::class, 'destroy_notes'])->name('carer.notes.delete'); 
 		Route::delete('/carer/delete-documents/{id}', [CarerDetailsController::class, 'destroy_documents'])->name('carer.documents.delete');
+		Route::post('/carer/qualifications/store', [StaffQualificationController::class, 'store'])->name('staff.qualifications.store');
 		// Carer Section End
 
 		

@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Services\Staff\StaffService;
 use App\Models\Staff\Documents;
 use App\Models\Staff\UserNote;
+use Illuminate\Support\Facades\Storage;
 
 class CarerDetailsController extends Controller
 {
@@ -25,7 +26,12 @@ class CarerDetailsController extends Controller
         }
         // dd($carer_id);
         $data['staffDetails'] = $this->staffService->getStaffDetails($carer_id);
+        $data['selectedCourseIds'] = $data['staffDetails']->qualifications
+                            ->pluck('course_id')
+                            ->toArray();
+        // dd($data['staffDetails']);
         $data['user_documents'] = Documents::where('user_id', $carer_id)->get()->toArray();
+        $data['courses'] = $this->staffService->courses();
         $data['user_notes'] = UserNote::where('user_id', $carer_id)->orderBy('created_at', 'DESC')->get()->toArray();
 
         // dd($data['user_notes']);

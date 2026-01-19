@@ -119,8 +119,8 @@
 
         <script>
             /* -------------------------
-                    PAGE LOAD
-                    -------------------------- */
+            PAGE LOAD
+            -------------------------- */
             $(document).ready(function() {
                 loadStaff('allCarerActibity');
             });
@@ -140,8 +140,8 @@
             });
 
             /* -------------------------
-                   LOAD STAFF (AJAX)
-                -------------------------- */
+            LOAD STAFF (AJAX)
+            -------------------------- */
 
             function loadStaff(type, search = '') {
                 $.ajax({

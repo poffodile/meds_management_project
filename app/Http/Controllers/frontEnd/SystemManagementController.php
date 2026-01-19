@@ -33,7 +33,6 @@ class SystemManagementController extends Controller
             ->where('home_id', $home_id)
             ->get()
             ->toArray();
-        // echo "<pre>"; print_r($earning_scheme_label); die;
         $su_ethnicity = Ethnicity::select('id', 'name')->where('is_deleted', '0')->get()->toArray();
         $courses = $this->staffService->courses();
         $department = CompanyDepartment::getActiveCompanyDepartment();

@@ -166,7 +166,6 @@
                                                 </span>
                                                 <div class="qual-preview" id="qual-preview-{{ $course['course_id'] }}" style="margin-top:8px;"></div>
                                             </div>
-
                                         </div>
                                     @endforeach
 

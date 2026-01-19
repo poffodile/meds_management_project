@@ -9,7 +9,6 @@
     <style>
         .notContDetails {
             display: flex;
-
         }
 
         .notContDetails span {
@@ -25,28 +24,34 @@
             border: 1px solid #eee;
         }
 
-        .commonDocfrmet i {
-            font-size: 54px;
-            color: #ddd;
-            line-height: 120px;
+        .uploadDocumentCont .certifiedList {
+            background: #f6f9fd;
         }
 
-        .documentsUploaded {
+        span.showDocumentname {
             display: flex;
+            gap: 12px;
         }
 
-        .commonDocfrmet {
-            border: 1px solid #eee;
-            height: 150px;
-            width: 150px;
-            margin-right: 18px;
-            line-height: 120px;
-            cursor: pointer;
+        .showDocumentname span {
+            background: #ffffff;
+            color: #000;
+            padding: 9px 20px;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 12px;
         }
 
-        .commonDocfrmet.docImg img {
-            height: 150px;
-            width: 150px;
+        span.showDocumentname button {
+            display: flex;
+            gap: 8px;
+            color: #fff;
+            height: 34px;
+        }
+
+        span.showDocumentname i {
+            color: #fff;
+            line-height: 22px;
         }
     </style>
     <main class="page-content empoyeeHeader">
@@ -79,7 +84,7 @@
                 <div class="tabs p-1 ">
                     <button class="tab active" data-tab="generalTab">General</button>
                     <button class="tab" data-tab="availabilityTab">Availability</button>
-                    <button class="tab" data-tab="trainingQualificationsTab">Training & Qualifications <span class="tabNumber">2</span></button>
+                    <button class="tab" data-tab="trainingQualificationsTab">Training & Qualifications <span class="tabNumber">{{ count($staffDetails->qualifications) }}</span></button>
                     <button class="tab" data-tab="supervisionsTab">Supervisions</button>
                     <button class="tab" data-tab="shiftsTab">Shifts</button>
                     <button class="tab" data-tab="documentsTab">Documents</button>
@@ -580,64 +585,64 @@
                         </div>
 
                         <!-- <div class="calendarTabs leaveRequesttabs employeeDetailsTabs  m-t-20">
-                                                                                    <div class="tabs p-1 ">
-                                                                                        <button class="tab active" data-tab="workingHoursTab">
-                                                                                            Working Hours
-                                                                                        </button>
-                                                                                        <button class="tab" data-tab="unavailabilityTab">
-                                                                                            Unavailability
+                                                <div class="tabs p-1 ">
+                                                    <button class="tab active" data-tab="workingHoursTab">
+                                                        Working Hours
+                                                    </button>
+                                                    <button class="tab" data-tab="unavailabilityTab">
+                                                        Unavailability
+                                                    </button>
+                                                    <button class="tab" data-tab="summaryTab">
+                                                        Summary
+                                                    </button>
+                                                </div>
 
-                                                                                        </button>
-                                                                                        <button class="tab" data-tab="summaryTab">
-                                                                                            Summary
-                                                                                        </button>
-                                                                                    
-                                                                                    </div>
-
-                                                                                    <div class="tab-content carertabcontent">
-                                                                                        <div class="content active" id="workingHoursTab">
-                                                                                            <div class="sectionWhiteBgAllUse">
-                                                                                                    <h1> Working Hours</h1>
-                                                                                            </div>
-                                                                                        </div>
-
-                                                                                        <div class="content" id="unavailabilityTab">
-                                                                                            <h1>Unavailability</h1>
-                                                                                        </div>
-                                                                                        <div class="content" id="summaryTab">
-                                                                                            <h1>Summary</h1>
-                                                                                        </div>
-                                                                                            
-                                                                                    </div>
-                                                                                </div> -->
+                                                <div class="tab-content carertabcontent">
+                                                    <div class="content active" id="workingHoursTab">
+                                                        <div class="sectionWhiteBgAllUse">
+                                                                <h1> Working Hours</h1>
+                                                        </div>
+                                                    </div>
+                                                    <div class="content" id="unavailabilityTab">
+                                                        <h1>Unavailability</h1>
+                                                    </div>
+                                                    <div class="content" id="summaryTab">
+                                                        <h1>Summary</h1>
+                                                    </div>
+                                                </div>
+                                            </div> -->
                     </div>
-
 
                     <div class="content" id="trainingQualificationsTab">
                         <div class="leave-card">
                             <div class="workHoursHeader">
                                 <div class="title">Qualifications</div>
                                 <div class="actions">
-                                    <button class="allbuttonDarkClr" id="addQualificationBtn"> <i class='bx  bx-education'></i> Add Qualification</button>
+                                    <button class="allbuttonDarkClr" data-user-id="{{ $staffDetails->id }}" id="addQualificationBtn"> <i class='bx bx-education'></i> Add Qualification</button>
                                 </div>
                             </div>
 
                             <div class="">
-                                <div class="certifiedList">
-                                    <span class="">Certified to administer medications</span>
-                                    <span class="roundBtntag greenShowbtn"> Certified </span>
-                                </div>
-                                <div class="certifiedList">
-                                    <span class="">Certified to administer medications</span>
-                                    <span class="roundBtntag greenShowbtn"> Certified </span>
-                                </div>
-                                <div class="certifiedList">
-                                    <span class="">Certified to administer medications</span>
-                                    <span class="roundBtntag greenShowbtn"> Certified </span>
-                                </div>
+                                @forelse ($staffDetails->qualifications as $qualification)
+                                    <div class="certifiedList">
+                                        <span>{{ $qualification['name'] }}</span>
+
+                                        @if (!empty($qualification['image']))
+                                            <span class="roundBtntag greenShowbtn">Certified</span>
+                                        @else
+                                            <span class="roundBtntag greenShowbtn">Not Certified</span>
+                                        @endif
+                                    </div>
+                                @empty
+                                    <div class="certifiedList">
+                                        <span>No qualification and certificate available</span>
+                                    </div>
+                                @endforelse
+
                             </div>
                         </div>
                     </div>
+
                     <div class="content" id="supervisionsTab">
                         <div class="leave-card">
                             <div class="workHoursHeader">
@@ -658,8 +663,8 @@
                                 </div>
                             </div>
                             <!-- <div class="leavebanktabCont">
-                                            <p>No shifts recorded</p>
-                                        </div> -->
+                                                                <p>No shifts recorded</p>
+                                                            </div> -->
                             <div class="">
                                 <div class="certifiedList">
                                     <span class="">
@@ -693,28 +698,23 @@
                                     <button class="allbuttonDarkClr openUploadDocumentModal" data-id="{{ $staffDetails->id }}"> <i class='bx bx-file-detail'></i> Upload Document</button>
                                 </div>
                             </div>
-                            <div class="leavebanktabCont">
+                            <div class="">
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <div class="carePlanWrapper">
-                                            <div class="planCard">
-                                                <div class="documentsUploaded">
-                                                    @forelse ($user_documents as $documents)
-                                                        <div class="planActions">
-                                                            <button type="button" class="danger delete-document" data-id="{{ $documents['id'] }}">
-                                                                <i class="bx bx-trash"></i>
-                                                            </button>
-                                                        </div>
-                                                        <div class="commonDocfrmet docImg">
-                                                            <img src="{{ asset('storage/app/public/' . $documents['file_path']) }}" alt="Document Image">
-                                                        </div>
-                                                    @empty
-                                                        <p>No documents uploaded</p>
-                                                    @endforelse
-
+                                        <div class="uploadDocumentCont">
+                                            @forelse ($user_documents as $documents)
+                                                <div class="certifiedList">
+                                                    <span class="showDocumentname">
+                                                        <span>{{ $documents['title'] }}</span>
+                                                    </span>
+                                                    <div class="planActions">
+                                                        <a href="{{ asset('storage/app/public/' . $documents['file_path']) }}" class="viewDocOpen"><i class='bx bx-eye'></i> </a>
+                                                        <button class="danger"><i class="bx  bx-trash"></i> </button>
+                                                    </div>
                                                 </div>
-
-                                            </div>
+                                            @empty
+                                                <p>No documents uploaded</p>
+                                            @endforelse
                                         </div>
                                     </div>
                                 </div>
@@ -732,7 +732,7 @@
                             <div class="leavebanktabCont">
                                 <div class="row">
                                     @forelse ($user_notes as $note)
-                                        <div class="col-md-6">
+                                        <div class="col-md-12">
                                             <div class="notContDetails carePlanWrapper">
                                                 <div class="planCard">
                                                     <div class="planTop">
@@ -812,7 +812,6 @@
                 </div>
             </div>
         </div>
-
         {{-- Upload Document Model --}}
 
         {{-- Upload Notes Model --}}
@@ -851,24 +850,56 @@
                         <button type="button" class="close" data-dismiss="modal">&times;</button>
                         <h4 class="modal-title">Add Qualification</h4>
                     </div>
-
                     <div class="modal-body">
-                        <form id="qualificationForm">
-                            <div class="form-group">
-                                <label>Qualification Name</label>
-                                <input type="text" class="form-control" name="qualification_name">
-                            </div>
+                        <form id="qualificationForm" enctype="multipart/form-data">
+                            @csrf
+                            <input type="hidden" name="user_id" value="{{ $staffDetails->id }}" id="qualification_userId">
+                            @foreach ($courses as $course)
+                                @php
+                                    $qualification = $staffDetails->qualifications->where('course_id', $course['course_id'])->first();
 
-                            <div class="form-group">
-                                <label>Certificate</label>
-                                <input type="file" class="form-control" name="certificate">
-                            </div>
+                                    $isChecked = in_array($course['course_id'], $selectedCourseIds);
+                                @endphp
+
+                                <div class="form-group">
+                                    <label>
+                                        <input type="checkbox"
+                                            name="qualifications[{{ $course['course_id'] }}][course_id]"
+                                            value="{{ $course['course_id'] }}"
+                                            {{ $isChecked ? 'checked' : '' }}>
+                                        {{ $course['title'] }}
+
+                                        <input type="hidden"
+                                            name="qualifications[{{ $course['course_id'] }}][name]"
+                                            value="{{ $course['title'] }}">
+                                    </label>
+
+                                    {{-- Upload ALWAYS visible --}}
+                                    <div class="mt-1">
+                                        <input type="file"
+                                            name="qualifications[{{ $course['course_id'] }}][cert]"
+                                            class="qual_upload"
+                                            accept="application/pdf,.pdf">
+                                    </div>
+
+                                    {{-- View Certificate --}}
+                                    @if ($qualification && $qualification->image)
+                                        <div class="mt-1">
+                                            <a href="{{ asset('public/images/userQualification/' . $qualification->image) }}"
+                                                target="_blank">
+                                                View Certificate
+                                            </a>
+                                        </div>
+                                    @endif
+                                </div>
+                            @endforeach
+
                         </form>
                     </div>
 
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary" id="saveQualification">
+                        <button type="button" class="btn allBtnUseColor" id="saveQualification">
                             Save
                         </button>
                     </div>
@@ -1087,9 +1118,53 @@
             });
 
             $(document).on('click', '#addQualificationBtn', function() {
+                let userId = $(this).data('user-id');
+                // document.getElementById('qualification_userId') 
+                let id = $('#qualification_userId').val(userId);
                 $('#qualificationModal').modal('show');
             });
         </script>
 
+        <script>
+            $(document).ready(function() {
+
+                $('#saveQualification').on('click', function() {
+
+                    let form = document.getElementById('qualificationForm');
+                    let formData = new FormData(form);
+
+                    // Only include file if the checkbox is checked
+                    $('#qualificationForm input[type="checkbox"]').each(function() {
+                        let courseId = $(this).val();
+                        if (!$(this).is(':checked')) {
+                            formData.delete(`qualifications[${courseId}][cert]`);
+                        }
+                    });
+
+                    $.ajax({
+                        url: "{{ route('staff.qualifications.store') }}", // create this route
+                        type: "POST",
+                        data: formData,
+                        processData: false, // IMPORTANT
+                        contentType: false, // IMPORTANT
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        success: function(response) {
+                            // alert(response.message);
+                            $('#qualificationModal').modal('hide');
+                            form.reset();
+                            location.reload();
+                        },
+                        error: function(xhr) {
+                            alert('Something went wrong');
+                            console.log(xhr.responseText);
+                        }
+                    });
+
+                });
+
+            });
+        </script>
     @endsection
 </main>
