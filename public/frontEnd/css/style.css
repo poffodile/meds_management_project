@@ -9409,6 +9409,10 @@ a.close.edit_dyn_form {
     --lightRedp: #fef2f2;
     --darkOrangep: #d45f0c;
     --muteText: #6b7280;
+      --hoverRed: #b91c1c;
+    --lightGreenp: #f0fdf4;
+    --darkRedp: #a41d1d;
+    --bxShadowHover: rgba(17, 12, 46, 0.15) 0px 12px 30px 0px;
 } 
 
 /* ******************Start Dashboard Css***************************** */
@@ -13592,7 +13596,216 @@ label.redtext{
 .suggestedCarers .assignBtn:hover {
     opacity: 0.9;
 }
+.workPreferences label{
+    font-size: 13px;
+    color: #111827;
+}
+.workingHoursDifferentSchedules{
+    margin: 15px 0;
+    padding: 20px;
+    border-radius: 8px;
+    font-size: 13px;
+}
+.workingHoursDifferentSchedules p{
+    color: #924032;
+}
+.workingHoursDifferentSchedules p span {
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-weight: 600;
+    color: #ffffff;
+}
 
+.availabilityCalendar {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  max-width: 100%;
+  margin-top: 20px;
+}
+
+.availabilityCalendar .calendarHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.availabilityCalendar .nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.availabilityCalendar button {
+  border: 1px solid #ddd;
+  background: #fff;
+  border-radius: 4px;
+  padding: 4px 10px;
+  cursor: pointer;
+  font-size: 22px;
+}
+
+.availabilityCalendar .legend {
+  display: flex;
+  gap: 16px;
+  margin: 16px 0;
+  font-size: 13px;
+}
+
+.availabilityCalendar .legend span::before {
+  content: "";
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  margin-right: 6px;
+}
+
+.availabilityCalendar .working::before { background: #22c55e; }
+.availabilityCalendar .dayoff::before { background: #e5e7eb; }
+.availabilityCalendar .unavailable::before { background: #f97316; }
+.availabilityCalendar .leave::before { background: #a855f7; }
+
+.availabilityCalendar .calendarViewport {
+  overflow: hidden;
+  position: relative;
+}
+
+.availabilityCalendar .calendarTrack {
+  display: flex;
+  /* transition: transform 0.4s ease; */
+}
+
+.availabilityCalendar .month {
+  min-width: 100%;
+}
+
+.availabilityCalendar .week {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-weight: 600;
+  color: #6b7280;
+  margin-bottom: 10px;
+}
+
+.availabilityCalendar .dates {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 10px;
+}
+
+.availabilityCalendar .cell {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 8px;
+  min-height: 70px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: .4s;
+}
+.availabilityCalendar .cell:hover{
+    box-shadow: var(--bxShadow);
+}
+.availabilityCalendar .pill {
+  margin-top: 6px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  font-size: 11px;
+  /* display: inline-block; */
+  text-align: center;
+}
+
+.availabilityCalendar .pill.working {
+  background: #16a34a;
+  color: #fff;
+}
+.availabilityCalendar .cell.workingDateCle:hover {
+    background: var(--lightbgGreen);
+    border: 1px solid var(--lightBorderGreen);
+}
+.availabilityCalendar .cell.unavailableDateCle:hover {
+   background: #fef2f2;
+    border: 1px solid #f7d4d4;
+}
+.availabilityCalendar .pill.dayoff {
+  /* background: #f3f4f6; */
+  color: #6b7280;
+}
+
+.availabilityCalendar .pill.unavailable {
+  background: #ea580c;
+  color: #fff;
+}
+.availabilityCalendar .cell.active {
+  border: 2px solid #3b82f6;
+  background: #eff6ff;
+}
+
+.availabilityCalendar .cell.active > span {
+  font-weight: 700;
+}
+.addNoteContentList .noteDateAndText {
+ font-size: 13px;
+}
+
+.addQualificationForm .form-group {
+   background: #f6f9fd;
+   border-radius: 4px;
+   padding: 10px;
+   border: 1px solid #e5e7eb;
+       display: flex;
+}
+.addQualificationForm .form-group label {
+    width: 218px;
+}
+.addQualificationForm .form-group input[type=file] {
+    font-size: 13px;
+}
+.addUnavailabilityBtn button{
+    line-height: 34px;
+    width: 100%;
+}
+.addUnavailabilityList .planActions .cornorTags{
+    padding: 3px 8px;
+    font-size: 11px;
+    border-radius: 5px;
+}
+.addUnavailabilityList .planActions button{
+    border: transparent;
+}
+.addUnavailabilityList .planActions button:hover{
+    background-color: var(--lightRedbgClr);
+}
+.unavailabilityDateAndTime {
+    display: flex;
+    gap: 12px;
+}
+.unavailabilityDateAndTime .caldrIcon{
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    font-size: 18px;
+    color: var(--darkOrangep);
+    background: #ffe7c2;
+    border-radius: 50%;
+}
+.unavailabilityDateAndTime .caldrIcon i {
+    line-height: 40px;
+}
+.unavailabilityDateAndTime div strong{
+    font-size: 13px;
+}
+.addUnavailabilityForm.active {
+    display: block;
+}
+.addUnavailabilityForm {
+    display: none;
+}
 /********************************************************************************Start pratima css ********************************************************************************/
 /********************************************************************************Start pratima css ********************************************************************************/
 
@@ -14741,4 +14954,113 @@ label.redtext{
 }
 .blackBtn:hover{
    background-color: #171717e6;;  
+}
+.mainTitleIcon {
+    font-size: 35px;
+    color: var(--redColor);
+    vertical-align: middle;
+}
+.bgRedBtn {
+    background-color: var(--redColor);
+}
+.bgRedBtn:hover {
+    background-color: var(--hoverRed);
+}
+.pupleBorderBtn {
+    border: 1px solid var(--purple);
+}
+.pupleBorderBtn:hover {
+    background: #faf5ff;
+    background: radial-gradient(
+        circle,
+        rgba(250, 245, 255, 1) 59%,
+        rgba(250, 245, 255, 1) 99%
+    );
+}
+.urReqSec {
+    border-color: var(--redColor);
+    background-color: var(--lightRedp) !important;
+}
+.urReqCon .h5Head,
+.urReqCon span,
+.urReqCon i {
+    color: var(--darkRedp);
+}
+.urReqCon i {
+    font-size: 25px;
+    opacity: 0.7;
+}
+.urReqSec:hover .urReqCon i {
+    opacity: 1;
+}
+.pRotaCard .rota_title {
+    font-weight: 600 !important;
+}
+.pRotaCard .rota_title i {
+    font-size: 19px;
+    vertical-align: middle;
+}
+.bg-greenp-50 {
+    background-color: var(--lightGreenp);
+    border: 1px solid #bbf7d0;
+}
+.bg-greenp-50 .rota_title,
+.greenTextp {
+    color: var(--darkbgGreen);
+}
+.pRotaCard .rota_dash-card {
+    transition: transform 0.3s ease;
+    flex: 1;
+}
+.pRotaCard .rota_dash-card:hover {
+    transform: scale(1.05);
+    box-shadow: rgba(17, 12, 46, 0.15) 0px 48px 100px 0px;
+}
+ 
+.purpleBadgesDark {
+    background-color: var(--purple);
+    color: #fff;
+}
+.fallRedCon .para {
+    color: #4b5563;
+}
+.muchsmallText {
+    font-size: 10px;
+}
+ 
+.muchsmallText {
+    font-size: 11px;
+    color: var(--muteText);
+}
+.h6Head {
+    font-size: 14px;
+    font-weight: 600;
+}
+.allterStafftask {
+    border-left: 4px solid var(--redColor);
+}
+.bBorderCard {
+    background-color: #fff;
+}
+.bBorderCard:hover {
+    box-shadow: var(--bxShadowHover);
+}
+ 
+.orangeIncident {
+    border-color: var(--orangeColor);
+}
+.urReqDetails {
+    font-size: 13px;
+}
+.redDarkBadgesAni {
+    background-color: rgba(220, 38, 38, 0.6);
+    color: #fff;
+    animation: fadeBgOnly 2s ease-in-out infinite;
+    animation-delay: 2s;
+}
+ 
+@keyframes fadeBgOnly {
+    to {
+        background-color: rgba(220, 38, 38, 1);
+    }
 }

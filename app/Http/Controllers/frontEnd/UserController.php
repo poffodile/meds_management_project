@@ -4,11 +4,12 @@ namespace App\Http\Controllers\frontEnd;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Auth, DB;
+use DB;
 use App\User, App\ServiceUser, App\Admin, App\Home, App\LogBook;
 use Hash, Session;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -18,6 +19,7 @@ class UserController extends Controller
 		// echo "check";
 		// die();
 		if (Auth::check()) {
+			// return redirect('/roster/');
 			return redirect('/');
 		}
 		if ($request->isMethod('post')) {
@@ -33,7 +35,7 @@ class UserController extends Controller
 				->where('user_name', $username)
 				->where('is_deleted', '0')
 				->first();
-			//echo "<pre>"; print_r($user_info->login_date); die();
+			//echo "<pre>"; print_r($user_info->login_date); 
 			//echo "<pre>"; print_r($user_info);  
 
 			if (!empty($user_info)) {
@@ -50,7 +52,7 @@ class UserController extends Controller
 							$data = $request->input();
 							if ($user_info->user_type != 'N') {
 								if (Auth::attempt(['user_name' => $data['username'], 'password' => $data['password'], 'admn_id' => $user_info->admn_id])) {
-									echo "<pre>"; print_r($user_info); die; 
+									// echo "<pre>"; print_r($user_info); die; 
 									$new_home_ids = $hme_id . ',' . $user_info->home_id;
 									$new_home_ids = implode(',', array_unique(explode(',', $new_home_ids)));
 									$update_home_id = User::where('user_name', $username)->update(['home_id' => $new_home_ids]);
@@ -94,6 +96,7 @@ class UserController extends Controller
 									//echo csrf_token(); die;
 									//echo "222"; die;
 									return redirect('/')->with('success', 'Welcome back ' . Auth::user()->user_name);
+									// return redirect('/roster/')->with('success', 'Welcome back ' . Auth::user()->user_name);
 								}else {
 									return redirect()->back()->with('error', 'Incorrect email or password combination.');
 								}
@@ -149,6 +152,7 @@ class UserController extends Controller
 									$session_id_update->save();
 									User::setUserLogInStatus(1);
 									//echo csrf_token(); die;
+									// return redirect('/roster/')->with('success', 'Welcome back ' . Auth::user()->user_name);
 									return redirect('/')->with('success', 'Welcome back ' . Auth::user()->user_name);
 								} else {  //echo "string3"; die;
 									return redirect()->back()->with('error', 'Incorrect email or password combination.');
@@ -194,6 +198,7 @@ class UserController extends Controller
 								$session_id_update->save();
 								User::setUserLogInStatus(1);
 								//echo csrf_token(); die;
+								// return redirect('/roster/')->with('success', 'Welcome back ' . Auth::user()->user_name);
 								return redirect('/')->with('success', 'Welcome back ' . Auth::user()->user_name);
 							} else {
 								return redirect()->back()->with('error', 'Incorrect email or password combination.');
@@ -254,7 +259,8 @@ class UserController extends Controller
 						$session_id_update->login_ip=$login_ip;
 						$session_id_update->save();
 						User::setUserLogInStatus(1);
-						// echo csrf_token(); die;
+						//echo csrf_token(); die;
+						// return redirect('/roster/')->with('success', 'Welcome back ' . Auth::user()->user_name);
 						return redirect('/')->with('success', 'Welcome back ' . Auth::user()->user_name);
 					} else {
 						return redirect()->back()->with('error', 'Incorrect email or password combination.');

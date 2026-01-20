@@ -585,32 +585,32 @@
                         </div>
 
                         <!-- <div class="calendarTabs leaveRequesttabs employeeDetailsTabs  m-t-20">
-                                                <div class="tabs p-1 ">
-                                                    <button class="tab active" data-tab="workingHoursTab">
-                                                        Working Hours
-                                                    </button>
-                                                    <button class="tab" data-tab="unavailabilityTab">
-                                                        Unavailability
-                                                    </button>
-                                                    <button class="tab" data-tab="summaryTab">
-                                                        Summary
-                                                    </button>
-                                                </div>
+                                <div class="tabs p-1 ">
+                                    <button class="tab active" data-tab="workingHoursTab">
+                                        Working Hours
+                                    </button>
+                                    <button class="tab" data-tab="unavailabilityTab">
+                                        Unavailability
+                                    </button>
+                                    <button class="tab" data-tab="summaryTab">
+                                        Summary
+                                    </button>
+                                </div>
 
-                                                <div class="tab-content carertabcontent">
-                                                    <div class="content active" id="workingHoursTab">
-                                                        <div class="sectionWhiteBgAllUse">
-                                                                <h1> Working Hours</h1>
-                                                        </div>
-                                                    </div>
-                                                    <div class="content" id="unavailabilityTab">
-                                                        <h1>Unavailability</h1>
-                                                    </div>
-                                                    <div class="content" id="summaryTab">
-                                                        <h1>Summary</h1>
-                                                    </div>
-                                                </div>
-                                            </div> -->
+                                <div class="tab-content carertabcontent">
+                                    <div class="content active" id="workingHoursTab">
+                                        <div class="sectionWhiteBgAllUse">
+                                                <h1> Working Hours</h1>
+                                        </div>
+                                    </div>
+                                    <div class="content" id="unavailabilityTab">
+                                        <h1>Unavailability</h1>
+                                    </div>
+                                    <div class="content" id="summaryTab">
+                                        <h1>Summary</h1>
+                                    </div>
+                                </div>
+                            </div> -->
                     </div>
 
                     <div class="content" id="trainingQualificationsTab">
@@ -857,7 +857,7 @@
                             @foreach ($courses as $course)
                                 @php
                                     $qualification = $staffDetails->qualifications->where('course_id', $course['course_id'])->first();
-
+                                    
                                     $isChecked = in_array($course['course_id'], $selectedCourseIds);
                                 @endphp
 
@@ -1129,7 +1129,6 @@
             $(document).ready(function() {
 
                 $('#saveQualification').on('click', function() {
-
                     let form = document.getElementById('qualificationForm');
                     let formData = new FormData(form);
 
@@ -1140,7 +1139,6 @@
                             formData.delete(`qualifications[${courseId}][cert]`);
                         }
                     });
-
                     $.ajax({
                         url: "{{ route('staff.qualifications.store') }}", // create this route
                         type: "POST",
@@ -1163,7 +1161,6 @@
                     });
 
                 });
-
             });
         </script>
     @endsection
