@@ -14,11 +14,11 @@
         .notContDetails span {
             flex-grow: 3;
         }
-
+/* 
         .leavebanktabCont i {
             font-size: 18px;
             color: #f00;
-        }
+        } */
 
         .notContDetails .planCard {
             border: 1px solid #eee;
@@ -585,32 +585,32 @@
                         </div>
 
                         <!-- <div class="calendarTabs leaveRequesttabs employeeDetailsTabs  m-t-20">
-                                <div class="tabs p-1 ">
-                                    <button class="tab active" data-tab="workingHoursTab">
-                                        Working Hours
-                                    </button>
-                                    <button class="tab" data-tab="unavailabilityTab">
-                                        Unavailability
-                                    </button>
-                                    <button class="tab" data-tab="summaryTab">
-                                        Summary
-                                    </button>
-                                </div>
+                                                <div class="tabs p-1 ">
+                                                    <button class="tab active" data-tab="workingHoursTab">
+                                                        Working Hours
+                                                    </button>
+                                                    <button class="tab" data-tab="unavailabilityTab">
+                                                        Unavailability
+                                                    </button>
+                                                    <button class="tab" data-tab="summaryTab">
+                                                        Summary
+                                                    </button>
+                                                </div>
 
-                                <div class="tab-content carertabcontent">
-                                    <div class="content active" id="workingHoursTab">
-                                        <div class="sectionWhiteBgAllUse">
-                                                <h1> Working Hours</h1>
-                                        </div>
-                                    </div>
-                                    <div class="content" id="unavailabilityTab">
-                                        <h1>Unavailability</h1>
-                                    </div>
-                                    <div class="content" id="summaryTab">
-                                        <h1>Summary</h1>
-                                    </div>
-                                </div>
-                            </div> -->
+                                                <div class="tab-content carertabcontent">
+                                                    <div class="content active" id="workingHoursTab">
+                                                        <div class="sectionWhiteBgAllUse">
+                                                                <h1> Working Hours</h1>
+                                                        </div>
+                                                    </div>
+                                                    <div class="content" id="unavailabilityTab">
+                                                        <h1>Unavailability</h1>
+                                                    </div>
+                                                    <div class="content" id="summaryTab">
+                                                        <h1>Summary</h1>
+                                                    </div>
+                                                </div>
+                                            </div> -->
                     </div>
 
                     <div class="content" id="trainingQualificationsTab">
@@ -729,7 +729,20 @@
                                     <button class="allbuttonDarkClr openNotesModal" data-id="{{ $staffDetails->id }}"> <i class='bx bx-file-detail'></i> Add Note</button>
                                 </div>
                             </div>
-                            <div class="leavebanktabCont">
+                            <div class="addNoteContentList">
+                                    @forelse ($user_notes as $note)
+                                    <div class="certifiedList planActions">
+                                        <span class="noteDateAndText">
+                                            <div><strong>Date :</strong>  {{ \Carbon\Carbon::parse($note['created_at'])->format('M d, Y') }}</div>
+                                            <small>{{ $note['note'] }}</small>
+                                        </span>
+                                        <button class="danger delete-note" data-id="{{ $note['id'] }}"><i class="bx  bx-trash"></i> </button>
+                                    </div>
+                                    @empty
+                                    <p>No notes recorded</p>
+                                 @endforelse
+                            </div>
+                            <!-- <div class="leavebanktabCont">
                                 <div class="row">
                                     @forelse ($user_notes as $note)
                                         <div class="col-md-12">
@@ -759,7 +772,7 @@
                                         <p>No notes recorded</p>
                                     @endforelse
                                 </div>
-                            </div>
+                            </div> -->
                         </div>
                     </div>
                 </div>
@@ -851,50 +864,54 @@
                         <h4 class="modal-title">Add Qualification</h4>
                     </div>
                     <div class="modal-body">
-                        <form id="qualificationForm" enctype="multipart/form-data">
-                            @csrf
-                            <input type="hidden" name="user_id" value="{{ $staffDetails->id }}" id="qualification_userId">
-                            @foreach ($courses as $course)
-                                @php
-                                    $qualification = $staffDetails->qualifications->where('course_id', $course['course_id'])->first();
-                                    
-                                    $isChecked = in_array($course['course_id'], $selectedCourseIds);
-                                @endphp
+                        <div class="addQualificationForm">
+                            <form id="qualificationForm" enctype="multipart/form-data">
+                                @csrf
+                                <input type="hidden" name="user_id" value="{{ $staffDetails->id }}" id="qualification_userId">
+                                @foreach ($courses as $course)
+                                    @php
+                                        $qualification = $staffDetails->qualifications->where('course_id', $course['course_id'])->first();
 
-                                <div class="form-group">
-                                    <label>
-                                        <input type="checkbox"
-                                            name="qualifications[{{ $course['course_id'] }}][course_id]"
-                                            value="{{ $course['course_id'] }}"
-                                            {{ $isChecked ? 'checked' : '' }}>
-                                        {{ $course['title'] }}
+                                        $isChecked = in_array($course['course_id'], $selectedCourseIds);
+                                    @endphp
 
-                                        <input type="hidden"
-                                            name="qualifications[{{ $course['course_id'] }}][name]"
-                                            value="{{ $course['title'] }}">
-                                    </label>
+                                    <div class="form-group">
+                                        <label>
+                                            <input type="checkbox"
+                                                name="qualifications[{{ $course['course_id'] }}][course_id]"
+                                                value="{{ $course['course_id'] }}"
+                                                {{ $isChecked ? 'checked' : '' }}>
+                                            {{ $course['title'] }}
 
-                                    {{-- Upload ALWAYS visible --}}
-                                    <div class="mt-1">
-                                        <input type="file"
-                                            name="qualifications[{{ $course['course_id'] }}][cert]"
-                                            class="qual_upload"
-                                            accept="application/pdf,.pdf">
+                                            <input type="hidden"
+                                                name="qualifications[{{ $course['course_id'] }}][name]"
+                                                value="{{ $course['title'] }}">
+                                        </label>
+
+                                        {{-- Upload ALWAYS visible --}}
+                                       
+                                            <div class="">
+                                                <input type="file"
+                                                    name="qualifications[{{ $course['course_id'] }}][cert]"
+                                                    class="qual_upload"
+                                                    accept="application/pdf,.pdf">
+                                            </div>
+
+                                            {{-- View Certificate --}}
+                                            @if ($qualification && $qualification->image)
+                                                <div class="mt-1">
+                                                    <a href="{{ asset('public/images/userQualification/' . $qualification->image) }}"
+                                                        target="_blank">
+                                                        <i class='bx  bx-eye'></i> 
+                                                    </a>
+                                                </div>
+                                            @endif
+                                        
                                     </div>
+                                @endforeach
 
-                                    {{-- View Certificate --}}
-                                    @if ($qualification && $qualification->image)
-                                        <div class="mt-1">
-                                            <a href="{{ asset('public/images/userQualification/' . $qualification->image) }}"
-                                                target="_blank">
-                                                View Certificate
-                                            </a>
-                                        </div>
-                                    @endif
-                                </div>
-                            @endforeach
-
-                        </form>
+                            </form>
+                        </div>
                     </div>
 
                     <div class="modal-footer">
@@ -1129,6 +1146,7 @@
             $(document).ready(function() {
 
                 $('#saveQualification').on('click', function() {
+
                     let form = document.getElementById('qualificationForm');
                     let formData = new FormData(form);
 
@@ -1139,6 +1157,7 @@
                             formData.delete(`qualifications[${courseId}][cert]`);
                         }
                     });
+
                     $.ajax({
                         url: "{{ route('staff.qualifications.store') }}", // create this route
                         type: "POST",
@@ -1161,7 +1180,10 @@
                     });
 
                 });
+
             });
         </script>
+
+
     @endsection
 </main>

@@ -90,7 +90,7 @@ Route::post('api/remove-device', 'App\Http\Controllers\Api\DeviceController@remo
 /*------Api Routes End here-------*/
 
 // Route::match(['get','post'], '/login', 'App\Http\Controllers\frontEnd\UserController@login');
-Route::match(['get', 'post'], '/login', 'App\Http\Controllers\frontEnd\UserController@login')->middleware('PreventBack');
+Route::match(['get', 'post'], '/login', 'App\Http\Controllers\frontEnd\UserController@login')->middleware('PreventBack')->name('login');
 Route::get('/yes_logout', 'App\Http\Controllers\frontEnd\UserController@yes_logout');
 Route::post('/no_logout', 'App\Http\Controllers\frontEnd\UserController@no_logout');
 
@@ -135,6 +135,8 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 		Route::post('/carer/get-hourly-rate', [CarerController::class, 'getHourlyRate'])->name('roster.staff.carer.get.hourly.rate');
 		Route::put('/carer-update/{carer_id}', [CarerController::class, 'update'])->name('roster.staff.carer.update');
 		Route::post('/carer/getStaffByStatus', [CarerController::class, 'getStaffByStatus']);
+		Route::post('/carer/delete', [CarerController::class, 'deleteCarer'])->name('carer.delete');
+
 		
 		Route::get('/carer-details/{carer_id}', [CarerDetailsController::class, 'carer_details'])->name('roster.staff.carer.details'); 
 		Route::post('/carer/save-documents', [CarerDetailsController::class, 'saveDouments'])->name('carer.save.documents'); 

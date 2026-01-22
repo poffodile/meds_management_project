@@ -119,8 +119,8 @@
 
         <script>
             /* -------------------------
-            PAGE LOAD
-            -------------------------- */
+                    PAGE LOAD
+                    -------------------------- */
             $(document).ready(function() {
                 loadStaff('allCarerActibity');
             });
@@ -290,6 +290,34 @@
                     return `<span>${q.name ?? q}</span>`;
                 }).join('');
             }
+
+            $(document).on('click', '.deleteCarer', function() {
+                let carerId = $(this).data('id');
+
+                if (!confirm('Are you sure you want to delete this carer?')) {
+                    return;
+                }
+
+                $.ajax({
+                    url: "{{ url('/roster/carer/delete') }}",
+                    type: "POST",
+                    data: {
+                        carer_id: carerId,
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function(response) {
+                        if (response.status) {
+                            // alert(response.message);
+                            location.reload(); // or remove row dynamically
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                    error: function() {
+                        alert('Server error. Please try again.');
+                    }
+                });
+            });
         </script>
 
     @endsection

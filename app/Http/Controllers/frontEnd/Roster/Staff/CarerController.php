@@ -138,6 +138,8 @@ class CarerController extends Controller
         ]);
     }
 
+     
+
     public function update(Request $request, $carer_id)
     {
         $staff = User::findOrFail($carer_id);
@@ -171,4 +173,37 @@ class CarerController extends Controller
         return response()->json(['hourly_rate' => $pay_rate]);
     }
 
+    public function deleteCarer(Request $request)
+    {
+        try {
+            $request->validate([
+                'carer_id' => 'required|integer|exists:user,id'
+            ]);
+
+            $carer = User::find($request->carer_id);
+
+            if (!$carer) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Carer not found'
+                ]);
+            }
+
+            // Soft delete (recommended)
+            $carer->update(['is_deleted' => 1]);
+
+            // OR Hard delete
+            // $carer->delete();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Carer deleted successfully'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Something went wrong'
+            ], 500);
+        }
+    }
 }

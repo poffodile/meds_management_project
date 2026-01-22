@@ -9,6 +9,7 @@ use Auth;
 use App\Home, App\Admin, App\StaffSickLeave;
 use App\Models\PersonalManagement\TimeSheet;
 use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 
 class User extends Authenticatable
 {
@@ -19,10 +20,18 @@ class User extends Authenticatable
      *
      * @var array
      */
+
+    protected $casts = [
+        'date_of_joining' => 'date',
+        'date_of_leaving' => 'date',
+        'dbs_expiry_date' => 'date',
+    ];
+
     protected $fillable = [
         'name',
         'email',
         'password',
+        'is_deleted'
     ];
 
     /**
@@ -194,9 +203,9 @@ class User extends Authenticatable
         }
     }
 
-    public static function getstaffByResidentialId($department)
+    public static function getstaffByResidentialId()
     {
-        return self::where('home_id', Auth::user()->home_id)->where('department', $department)->where('status', 1)->where('is_deleted', 0)->count();
+        return self::where('home_id', Auth::user()->home_id)->where('status', 1)->where('is_deleted', 0)->count();
     }
 
     //one user login at a time

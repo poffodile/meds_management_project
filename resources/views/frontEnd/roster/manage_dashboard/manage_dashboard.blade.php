@@ -25,7 +25,7 @@
                 <div class="rota_dash-card blue">
                     <div class="rota_dash-left">
                         <p class="rota_title">Active Carers</p>
-                        <h2 class="rota_count">11</h2>
+                        <h2 class="rota_count">{{ $userCount }}</h2>
                     </div>
                     <div class="rota_dash-icon">
                         <i class="fa fa-users"></i>
@@ -332,9 +332,6 @@
                     </div>
                 </div>
             </div>
-
-
-
     </div>
     @endsection
  </main>

@@ -96,7 +96,7 @@
                             <label>Date of Joining</label>
                             <div class="col-md-12 col-sm-12 col-xs-12 p-0">
                                 <div data-date-viewmode="years" data-date-format="dd-mm-yyyy" data-date="" class="input-group date"> <!-- dpYears -->
-                                    <input name="date_of_joining" type="text" value="" readonly="" size="16" class="form-control joining-date">
+                                    <input name="date_of_joining" id="date_of_joining" type="text" value="" readonly="" size="16" class="form-control joining-date">
                                     <span class="input-group-btn add-on datetime-picker2">
                                         <input type="text" value="" name="" id="joining-date" class="form-control date-btn2">
                                         <button class="btn allBtnUseColor" type="button"><span class="glyphicon glyphicon-calendar"></span></button>
@@ -109,7 +109,7 @@
                             <label>Date of Leaving</label>
                             <div class="col-md-12 col-sm-12 col-xs-12 p-0">
                                 <div data-date-viewmode="years" data-date-format="dd-mm-yyyy" data-date="" class="input-group date"> <!-- dpYears -->
-                                    <input name="date_of_leaving" type="text" value="" readonly="" size="16" class="form-control leaving-date">
+                                    <input name="date_of_leaving" id="date_of_leaving" type="text" value="" readonly="" size="16" class="form-control leaving-date">
                                     <span class="input-group-btn add-on datetime-picker2">
                                         <input type="text" value="" name="" id="leaving-date" class="form-control date-btn2 ">
                                         <button class="btn allBtnUseColor" type="button"><span class="glyphicon glyphicon-calendar"></span></button>
@@ -715,44 +715,52 @@
             $('#remove_image').val('0');
             $('#profile-picture-img').attr('src', profile_img ? (String(profile_img).startsWith('http') ? profile_img : BASE_URL + profile_img) : '');
 
-            function parseDbDate(dateStr) {
-                if (!dateStr) return null;
+            function formatDateToDDMMYYYY(dateStr) {
+                if (!dateStr) return '';
 
-                // Handles: YYYY-MM-DD or YYYY-MM-DD HH:mm:ss
-                const parts = dateStr.split(' ')[0].split('-');
-                return new Date(parts[0], parts[1] - 1, parts[2]);
+                // already dd-mm-yyyy
+                if (dateStr.match(/^\d{2}-\d{2}-\d{4}$/)) {
+                    return dateStr;
+                }
+
+                // yyyy-mm-dd → dd-mm-yyyy
+                var parts = dateStr.split('-');
+                return parts[2] + '-' + parts[1] + '-' + parts[0];
             }
 
-            function formatDate(date) {
-                return String(date.getDate()).padStart(2, '0') + '-' +
-                    String(date.getMonth() + 1).padStart(2, '0') + '-' +
-                    date.getFullYear();
+
+
+            var joiningDate = $(this).data('date-of-joining');
+            var leavingDate = $(this).data('date-of-leaving');
+
+            // Convert format
+            joiningDate = formatDateToDDMMYYYY(joiningDate);
+            leavingDate = formatDateToDDMMYYYY(leavingDate);
+
+            // Set values in readonly inputs
+            $('#date_of_joining').val(joiningDate);
+            $('#date_of_leaving').val(leavingDate);
+
+            // Visible button inputs
+            $('#joining-date').val(joiningDate);
+            $('#leaving-date').val(leavingDate);
+
+            // Update bootstrap datepicker
+            if (joiningDate) {
+                $('#date_of_joining').datepicker('update', joiningDate);
+            }
+            if (leavingDate) {
+                $('#date_of_leaving').datepicker('update', leavingDate);
             }
 
 
-            const doj = $btn.data('dateOfJoining') || $btn.data('date_of_joining');
-            const dol = $btn.data('dateOfLeaving') || $btn.data('date_of_leaving');
+            // const dbsExpiry = $btn.data('dbs_expiry_date');
+            // const dbsDate = parseDbDate(dbsExpiry);
 
-            const dojDate = parseDbDate(doj);
-            const dolDate = parseDbDate(dol);
-
-            if (dojDate) {
-                $('#joining-date').datetimepicker('setDate', dojDate);
-                $('.joining-date').val(formatDate(dojDate));
-            }
-
-            if (dolDate) {
-                $('#leaving-date').datetimepicker('setDate', dolDate);
-                $('.leaving-date').val(formatDate(dolDate));
-            }
-
-            const dbsExpiry = $btn.data('dbs_expiry_date');
-            const dbsDate = parseDbDate(dbsExpiry);
-
-            if (dbsDate) {
-                $('#dbs-expiry-picker').datetimepicker('setDate', dbsDate);
-                $('.dbs-expiry-date').val(formatDate(dbsDate));
-            }
+            // if (dbsDate) {
+            //     $('#dbs-expiry-picker').datetimepicker('setDate', dbsDate);
+            //     $('.dbs-expiry-date').val(formatDate(dbsDate));
+            // }
 
             $('input[name="dbs_certificate_number"]').val($btn.attr('data-dbs_certificate_number') || $btn.data('dbs_certificate_number') || $btn.data('dbsCertificateNumber'));
 

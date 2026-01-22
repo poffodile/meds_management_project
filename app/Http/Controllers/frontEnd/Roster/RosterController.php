@@ -11,13 +11,14 @@ class RosterController extends Controller
     public function index(){
         $data['departments'] = CompanyDepartment::getActiveCompanyDepartment();
         $data['serviceUserCount'] = ServiceUser::getServiceUserByResidentialId(1);
-        $data['userCount'] = User::getstaffByResidentialId(1);
+        $data['userCount'] = User::getstaffByResidentialId();
         return view('frontEnd.roster.index', $data);
     }
 
     public function dashboard(){
         $data['serviceUserCount'] = ServiceUser::getServiceUserByResidentialId(1);
-        $data['userCount'] = User::getstaffByResidentialId(1);
+        $data['userCount'] = User::getstaffByResidentialId();
+        // dd($data['userCount']);
         return view('frontEnd.roster.dashboard', $data);
     }  
 }
