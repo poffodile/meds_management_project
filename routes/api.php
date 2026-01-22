@@ -29,7 +29,7 @@ Route::post('/get-user-activity', 'App\Http\Controllers\Android\AndroidApiContro
 // Route::post('/qrcode', 'Android\AndroidApiController@QRCode');
 Route::post('/get-company-data', 'App\Http\Controllers\Android\AndroidApiController@get_company_data');
 Route::post('/get-home-data', 'App\Http\Controllers\Android\AndroidApiController@get_home_data');
-
+Route::get('/courses-list', 'App\Http\Controllers\Api\Staff\UserController@cources_list');
 
 // Ram 19/08/2025
 Route::post('get-homes',[AndroidApiController::class,'get_homes']);
@@ -131,6 +131,7 @@ Route::group(['prefix' => '/service'], function () {
 });
 
 
+
 Route::group(['prefix' => '/staff'], function () {
 	Route::get('/service-users/{staff_id}', 'App\Http\Controllers\Api\Staff\ServiceUserController@listing_service_user');
 	Route::get('/daily-tasks/{staff_id}', 'App\Http\Controllers\Api\Staff\TaskAllocationController@index');
@@ -146,6 +147,8 @@ Route::group(['prefix' => '/staff'], function () {
 
 	// Staff Register
 	Route::post('/add-staff', 'App\Http\Controllers\Api\Staff\UserController@addStaffUser');
+	Route::post('/add-staff-qualification', 'App\Http\Controllers\Api\Staff\UserController@addStaffQualification');
 	Route::post('/set-password', 'App\Http\Controllers\Api\Staff\UserController@setPassword');
+
 });
 

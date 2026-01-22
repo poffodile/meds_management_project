@@ -12,9 +12,17 @@ use Illuminate\Support\Facades\Hash;
 use App\Services\Staff\AddStaffService;
 use App\Http\Requests\Staff\StoreStaffRequest;
 use Carbon\Carbon;
+use App\Services\Staff\StaffService;
+use App\UserQualification;
 
 class UserController extends Controller
 {
+	protected StaffService $staffService;
+
+	public function __construct(StaffService $staffService)
+	{
+		$this->staffService = $staffService;
+	}
 
 	public function login(Request $request)
 	{
@@ -437,4 +445,54 @@ class UserController extends Controller
 	}
 
 	public function setPassword() {}
+
+	public function cources_list()
+	{
+		$courses = $this->staffService->courses();
+
+		if (empty($courses)) {
+			return response()->json([
+				'success' => false,
+				'message' => 'No courses found',
+				'data'    => []
+			], 200);
+		}
+
+		return response()->json([
+			'success' => true,
+			'data'    => $courses
+		], 200);
+	}
+
+	public function addStaffQualification(Request $request)
+	{
+		$validator = Validator::make($request->all(), [
+			'user_id'    => 'required|exists:user,id',
+			'qualification' => 'required|array',
+			'qualification.*.course_id' => 'required|integer',
+			'qualification.*.name' => 'required|string',
+			'qualification.*.image' => 'nullable'
+		]);
+
+		if ($validator->fails()) {
+			return response()->json([
+				'success' => false,
+				'errors'  => $validator->errors()
+			], 422);
+		}
+
+		$result = UserQualification::saveQualification($request->qualification, $request->user_id);
+
+		if ($result === false) {
+			return response()->json([
+				'success' => false,
+				'message' => 'Failed to assign courses to staff user.'
+			], 500);
+		}
+
+		return response()->json([
+			'success' => true,
+			'message' => 'Qualification assigned to staff user successfully.'
+		], 200);
+	}
 }

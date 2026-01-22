@@ -298,46 +298,81 @@ class AndroidApiController extends Controller
 
     public function get_user_leave(Request $request)
     {
-        if ($request->user_id == null) {
-            return response()->json(['success' => false, 'message' => 'Please provide user id..!'], 200);
+        // Validate request
+        $request->validate([
+            'user_id' => 'required|integer|exists:user,id',
+        ]);
+
+        $leaves = Staffleaves::select(
+            'staff_leaves.*',
+            'leave_type.leave_name'
+        )
+            ->join('leave_type', 'leave_type.id', '=', 'staff_leaves.leave_type')
+            ->where('staff_leaves.user_id', $request->user_id)
+            ->where('staff_leaves.is_deleted', 1)
+            ->orderByDesc('staff_leaves.id')
+            ->get();
+
+        $leaveCounts = Staffleaves::where('user_id', $request->user_id)
+            ->where('is_deleted', 1)
+            ->selectRaw('
+                        COUNT(*) as total,
+                        SUM(CASE WHEN leave_status = 0 THEN 1 ELSE 0 END) as pending,
+                        SUM(CASE WHEN leave_status = 1 THEN 1 ELSE 0 END) as approved,
+                        SUM(CASE WHEN leave_status = 2 THEN 1 ELSE 0 END) as rejected
+                    ')
+            ->first();
+
+
+        if ($leaves->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No leave records found',
+                'data'    => []
+            ], 200);
         }
-        $recordArray = array();
-        $leaves = Staffleaves::where('user_id', $request->user_id)->where('is_deleted', 1)->orderBy('id', 'DESC')->get();
 
-        foreach ($leaves as $leave) {
-            $data['user_id'] = $leave->user_id;
-            $data['leave_type'] = $leave->leave_type;
-            $data['start_date'] = $leave->start_date;
+        $recordArray = $leaves->map(function ($leave) {
 
-            if (is_null($leave->end_date)) {
-                $end_date = "";
-                $days = 0;
-            } else {
-                $end_date = $leave->end_date;
-                $to = \Carbon\Carbon::parse($leave->start_date);
-                $from = \Carbon\Carbon::parse($leave->end_date);
-                $days = $to->diffInDays($from) + 1;
-            }
-            $data['days'] = $days;
-            $data['end_date'] = $end_date;
+            $startDate = $leave->start_date ? \Carbon\Carbon::parse($leave->start_date)->format('d M Y') : '';
 
-            if (is_null($leave->notes)) {
-                $notes = "";
-            } else {
-                $notes = $leave->notes;
-            }
-            $data['notes'] = $notes;
+            $endDate = $leave->end_date ? \Carbon\Carbon::parse($leave->end_date)->format('d M Y') : '';
 
-            $data['leave_status'] = $leave->leave_status;
-            $data['created_at'] = \Carbon\Carbon::parse($leave->created_at)->format('d-m-Y');
-            array_push($recordArray, $data);
-        }
+            $startDay = \Carbon\Carbon::parse($startDate)->format('D');
+            $endDay   = \Carbon\Carbon::parse($endDate)->format('D');
 
-        if (!$recordArray) {
-            return response()->json(['success' => false, 'message' => 'No data'], 200);
-        }
-        return response()->json(['success' => true, 'message' => '', 'Data' => $recordArray], 200);
+            $leaveDays = $startDay . ' to ' . $endDay ?? '';
+
+            $days = ($startDate && $endDate)
+                ? \Carbon\Carbon::parse($startDate)->diffInDays(\Carbon\Carbon::parse($endDate)) + 1
+                : 0;
+
+            return [
+                'user_id'      => $leave->user_id,
+                'leave_type'   => $leave->leave_name,
+                'start_date'   => $startDate ?? '',
+                'end_date'     => $endDate ?? '',
+                'leave_days'   => $leaveDays,
+                'days'         => $days,
+                'notes'        => $leave->notes ?? '',
+                'leave_status' => $leave->leave_status == 1
+                    ? 'Approved'
+                    : ($leave->leave_status == 2 ? 'Rejected' : 'Pending'),
+                'created_at'   => \Carbon\Carbon::parse($leave->created_at)->format('d M Y'),
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Leave records fetched successfully',
+            'total'    => (int) $leaveCounts->total,
+            'pending'  => (int) $leaveCounts->pending,
+            'approved' => (int) $leaveCounts->approved,
+            'rejected' => (int) $leaveCounts->rejected,
+            'data'    => $recordArray
+        ], 200);
     }
+
 
     public function add_login_activity(Request $request)
     {
