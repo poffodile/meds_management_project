@@ -1,0 +1,8 @@
+.shift.dragging {
+    opacity: 0.5;
+}
+
+.dropzone.drag-over {
+    background: #eef2ff;
+    outline: 2px dashed #2563eb;
+}

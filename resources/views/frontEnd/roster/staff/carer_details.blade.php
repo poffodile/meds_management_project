@@ -628,9 +628,9 @@
                                         <span>{{ $qualification['name'] }}</span>
 
                                         @if (!empty($qualification['image']))
-                                            <span class="roundBtntag greenShowbtn">Certified</span>
+                                            <span class="roundBtntag greenShowbtn"><a href="{{ asset(userQualificationImgPath . '/' .$qualification['image']) }}" target="_blank">Certified</a></span>
                                         @else
-                                            <span class="roundBtntag greenShowbtn">Not Certified</span>
+                                            <span class="roundBtntag radShowbtn">Not Certified</span>
                                         @endif
                                     </div>
                                 @empty

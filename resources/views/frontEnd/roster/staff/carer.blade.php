@@ -210,14 +210,14 @@
                                         <i class="fa-regular fa-envelope"></i> <span>${carer.email ?? '-'}</span>
                                     </div>
                                     <div class="item">
-                                        <i class="fa-solid fa-location-dot"></i> <span>${carer.current_location ?? '-'}</span>
+                                        <i class="fa-solid fa-location-dot"></i><span>${carer.current_location || 'No Address'}</span>
                                     </div>
                                 </div>
 
                                        <!-- ✅ Qualifications -->
                                         <div class="sectionCarer">
                                             <div class="label">Qualifications:</div>
-                                            <div class="tags">
+                                            <div class="tags care-list">
                                                 ${renderQualifications(carer.qualifications)}
                                             </div>
                                         </div>

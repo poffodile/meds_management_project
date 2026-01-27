@@ -254,8 +254,11 @@
             minView: 2
         }).on("change.dp", function(e) {
             var currdate = $(this).data("datetimepicker").getDate();
-            var newFormat = currdate.getDate() + "-" + (currdate.getMonth() + 1) + "-" + currdate.getFullYear();
+            if (!currdate) return;
+            var newFormat = String(currdate.getDate()).padStart(2, '0') + "-" + String(currdate.getMonth() + 1).padStart(2, '0') + "-" + currdate.getFullYear();
             $('.joining-date').val(newFormat);
+            // keep the picker UI in sync
+            $('#joining-date').datetimepicker('update', newFormat);
         });
 
         $('#joining-date').on('click', function() {
@@ -281,8 +284,11 @@
             minView: 2
         }).on("change.dp", function(e) {
             var currdate = $(this).data("datetimepicker").getDate();
-            var newFormat = currdate.getDate() + "-" + (currdate.getMonth() + 1) + "-" + currdate.getFullYear();
+            if (!currdate) return;
+            var newFormat = String(currdate.getDate()).padStart(2, '0') + "-" + String(currdate.getMonth() + 1).padStart(2, '0') + "-" + currdate.getFullYear();
             $('.leaving-date').val(newFormat);
+            // keep the picker UI in sync
+            $('#leaving-date').datetimepicker('update', newFormat);
         });
 
         $('#leaving-date').on('click', function() {
@@ -717,21 +723,54 @@
 
             function formatDateToDDMMYYYY(dateStr) {
                 if (!dateStr) return '';
+                dateStr = String(dateStr).trim();
 
                 // already dd-mm-yyyy
                 if (dateStr.match(/^\d{2}-\d{2}-\d{4}$/)) {
                     return dateStr;
                 }
 
-                // yyyy-mm-dd → dd-mm-yyyy
+                // YYYY-MM-DD or YYYY-MM-DDTHH... → dd-mm-yyyy
+                var iso = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})/);
+                if (iso) {
+                    return iso[3] + '-' + iso[2] + '-' + iso[1];
+                }
+
+                // common slash format DD/MM/YYYY or D/M/YYYY
+                var slash = dateStr.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+                if (slash) {
+                    var dd = String(slash[1]).padStart(2, '0');
+                    var mm = String(slash[2]).padStart(2, '0');
+                    return dd + '-' + mm + '-' + slash[3];
+                }
+
+                // weird format like "29T00:00:00.000000Z-12-2025" or parts joined with '-'
                 var parts = dateStr.split('-');
-                return parts[2] + '-' + parts[1] + '-' + parts[0];
+                if (parts.length >= 3) {
+                    var year = parts[parts.length - 1];
+                    var month = parts[parts.length - 2];
+                    var dayPart = parts.slice(0, parts.length - 2).join('-');
+                    var day = (dayPart.split('T')[0] || '').replace(/[^0-9]/g, '');
+                    if (/^\d{1,2}$/.test(day) && /^\d{1,2}$/.test(month) && /^\d{4}$/.test(year)) {
+                        return String(day).padStart(2, '0') + '-' + String(month).padStart(2, '0') + '-' + year;
+                    }
+                }
+
+                // fallback: try Date parse
+                var d = new Date(dateStr);
+                if (!isNaN(d)) {
+                    var dd = String(d.getDate()).padStart(2, '0');
+                    var mm = String(d.getMonth() + 1).padStart(2, '0');
+                    var yyyy = d.getFullYear();
+                    return dd + '-' + mm + '-' + yyyy;
+                }
+
+                return '';
             }
 
-
-
-            var joiningDate = $(this).data('date-of-joining');
-            var leavingDate = $(this).data('date-of-leaving');
+            // prefer the stored $btn reference — $(this) inside this scope may not be the button
+            var joiningDate = $btn.attr('data-date-of-joining') || $btn.data('date-of-joining') || $btn.data('dateOfJoining') || $btn.data('dateOfJoining') || '';
+            var leavingDate = $btn.attr('data-date-of-leaving') || $btn.data('date-of-leaving') || $btn.data('dateOfLeaving') || $btn.data('dateOfLeaving') || '';
 
             // Convert format
             joiningDate = formatDateToDDMMYYYY(joiningDate);
@@ -741,26 +780,86 @@
             $('#date_of_joining').val(joiningDate);
             $('#date_of_leaving').val(leavingDate);
 
-            // Visible button inputs
-            $('#joining-date').val(joiningDate);
-            $('#leaving-date').val(leavingDate);
+            // Use datepicker/datetimepicker update APIs so the pickers format dates consistently
+            function setPickerDate(pickerSelector, readonlySelector, dateStr) {
+                // If no date provided, clear both pickers
+                if (!dateStr) {
+                    try { $(pickerSelector).datetimepicker('update', ''); } catch (e) {}
+                    try { $(readonlySelector).datepicker('update', ''); } catch (e) {}
+                    return;
+                }
 
-            // Update bootstrap datepicker
-            if (joiningDate) {
-                $('#date_of_joining').datepicker('update', joiningDate);
+                // dateStr expected as dd-mm-yyyy (from formatDateToDDMMYYYY)
+                var parts = String(dateStr).split('-');
+                var dt = null;
+                if (parts.length === 3) {
+                    var dd = Number(parts[0]);
+                    var mm = Number(parts[1]);
+                    var yyyy = Number(parts[2]);
+                    dt = new Date(yyyy, mm - 1, dd);
+                } else {
+                    // try Date parse fallback
+                    var parsed = new Date(dateStr);
+                    if (!isNaN(parsed)) dt = parsed;
+                }
+
+                // Use pickers' update with a Date object so they render using their own `dd-mm-yyyy` config
+                if (dt) {
+                    try { $(pickerSelector).datetimepicker('update', dt); } catch (e) {}
+                    try { $(readonlySelector).datepicker('update', dt); } catch (e) {}
+                } else {
+                    // final fallback: clear
+                    try { $(pickerSelector).datetimepicker('update', ''); } catch (e) {}
+                    try { $(readonlySelector).datepicker('update', ''); } catch (e) {}
+                }
             }
-            if (leavingDate) {
-                $('#date_of_leaving').datepicker('update', leavingDate);
+
+            // Update both picker inputs via their APIs (ensures configured format is used)
+            setPickerDate('#joining-date', '#date_of_joining', joiningDate);
+            setPickerDate('#leaving-date', '#date_of_leaving', leavingDate);
+
+            function parseDBSDate(dateStr) {
+                if (!dateStr) return null;
+                dateStr = String(dateStr).trim();
+
+                // use same formatting helpers as above — try to extract dd,mm,yyyy
+                // handle ISO-like prefixes
+                var iso = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})/);
+                if (iso) return new Date(iso[1], iso[2] - 1, iso[3]);
+
+                // handle weird hyphenated form where day part contains T
+                var parts = dateStr.split('-');
+                if (parts.length >= 3) {
+                    var year = parts[parts.length - 1];
+                    var month = parts[parts.length - 2];
+                    var dayPart = parts.slice(0, parts.length - 2).join('-');
+                    var day = (dayPart.split('T')[0] || '').replace(/[^0-9]/g, '');
+                    if (/^\d{1,2}$/.test(day) && /^\d{1,2}$/.test(month) && /^\d{4}$/.test(year)) {
+                        return new Date(Number(year), Number(month) - 1, Number(day));
+                    }
+                }
+
+                // try Date parse fallback
+                var d = new Date(dateStr);
+                if (!isNaN(d)) return d;
+
+                return null;
             }
+            var dbsExpiryDateStr = $btn.attr('data-dbs_expiry_date') || $btn.data('dbs_expiry_date') || $btn.data('dbsExpiryDate') || $btn.data('dbs-expiry-date') || '';
+            var dbsExpiryDate = parseDBSDate(dbsExpiryDateStr);
+            if (dbsExpiryDate) {
+                var day = String(dbsExpiryDate.getDate()).padStart(2, '0');
+                var month = String(dbsExpiryDate.getMonth() + 1).padStart(2, '0');
+                var year = dbsExpiryDate.getFullYear();
+                var formattedDBSDate = day + '-' + month + '-' + year;
 
-
-            // const dbsExpiry = $btn.data('dbs_expiry_date');
-            // const dbsDate = parseDbDate(dbsExpiry);
-
-            // if (dbsDate) {
-            //     $('#dbs-expiry-picker').datetimepicker('setDate', dbsDate);
-            //     $('.dbs-expiry-date').val(formatDate(dbsDate));
-            // }
+                // Set values in readonly input
+                $('.dbs-expiry-date').val(formattedDBSDate);
+                // Update bootstrap datepicker
+                $('.dbs-expiry-date').datepicker('update', formattedDBSDate);
+            } else {
+                $('.dbs-expiry-date').val('');
+            }
 
             $('input[name="dbs_certificate_number"]').val($btn.attr('data-dbs_certificate_number') || $btn.data('dbs_certificate_number') || $btn.data('dbsCertificateNumber'));
 
