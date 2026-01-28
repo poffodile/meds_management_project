@@ -119,8 +119,8 @@
 
         <script>
             /* -------------------------
-                    PAGE LOAD
-                    -------------------------- */
+                            PAGE LOAD
+                            -------------------------- */
             $(document).ready(function() {
                 loadStaff('allCarerActibity');
             });
@@ -197,9 +197,11 @@
                                             <div class="role">${carer.job_title ?? ''}</div>
                                         </div>
                                     </div>
-                                    <span class="status ${carer.status == 1 ? 'greenShowbtn' : 'inactive'}">
-                                        ${carer.status == 1 ? 'Active' : 'Inactive'}
+                                    <span class="status 
+                                        ${carer.status == 1 ? 'greenShowbtn' : carer.status == 2 ? 'radShowbtn' : 'inactive'}">
+                                        ${carer.status == 1 ? 'Active' : carer.status == 2 ? 'On Leave' : 'Inactive'}
                                     </span>
+
                                 </div>
 
                                 <div class="details">
@@ -224,7 +226,7 @@
 
                                     <div class="rate">
                                         <div class="label">Hourly Rate</div>
-                                        <div class="amount">£${carer.hourly_rate ?? '0.00'}</div>
+                                        <div class="amount">£${(carer.hourly_rate ?? 0).toFixed(2)}</div>
                                     </div>
 
                                     <div class="supervision">

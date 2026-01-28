@@ -57,7 +57,7 @@
         </button>
         <!--logo start-->
         <div class="brand ">
-            <a href="{{ url('/') }}" class="logo">
+            <a href="{{ url('/roster') }}" class="logo">
                 <span style="color: white;">SCITS </span>
             </a>
         </div>

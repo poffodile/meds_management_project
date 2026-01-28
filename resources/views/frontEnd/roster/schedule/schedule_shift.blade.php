@@ -7,71 +7,6 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar-scheduler@6.1.11/index.global.min.css">
     <link rel="stylesheet" href="{{ url('/public/frontEnd/staff/css/schedule-shift.css') }}">
 
-
-    <style>
-        .mainCalendar {
-            background-color: #fff;
-        }
-
-        .fc-button {
-            top: -10px;
-        }
-
-        .fc-header-title {
-            margin-top: -5px;
-        }
-
-        .external-event {
-            border: 1px dashed #ea580c;
-            background: #fef9ef;
-        }
-
-        .dotEndText span i {
-            font-size: 8px;
-            color: #09db9cff;
-        }
-
-        .dotEndText span {
-            font-size: 13px;
-            font-weight: 700;
-            color: #146a50;
-        }
-
-        .leaveTime {
-            font-size: 10px;
-            margin-top: 5px;
-            color: #146a50;
-        }
-
-        .table tbody>tr>td {
-            padding: 6px;
-            background: #fef9ef;
-        }
-
-        .openShifts {
-            width: 167px;
-            color: #cf4b06;
-            font-weight: 600;
-            font-size: 13px;
-            padding-top: 17px;
-        }
-
-        .fc-grid th {
-            background: #f7f7f7 !important;
-        }
-
-        .calendarTabs .tab {
-            font-size: 13px;
-            flex-grow: inherit;
-        }
-
-        /* .fc-widget-header{
-                height: 50px;
-                line-height: 50px;
-                text-align: center;
-                background: #e4e4e4 !important;
-            } */
-    </style>
     <script type="text/javascript" src="{{ url('/public/frontEnd/js/external-dragging-calendar.js') }}"></script>
     <main class="page-content">
         <div class="container-fluid">
@@ -457,45 +392,91 @@
                 </div>
 
                 <!-- <div class="careTaskstbbg sectionWhiteBgAllUse p-0">
-                                <header class="panel-heading headingCapitilize clntalertheader">
-                                    <div class="clientHeadung">
-                                        <div class="onlyheadingmain radIconClr"><i class="bx  bx-alert-triangle"></i> 52 Scheduling Issues Detected </div>
-                                        <p>14 High Priority <span>38 Medium Priority</span> </p>
-                                    </div>
+                        <header class="panel-heading headingCapitilize clntalertheader">
+                            <div class="clientHeadung">
+                                <div class="onlyheadingmain radIconClr"><i class="bx  bx-alert-triangle"></i> 52 Scheduling Issues Detected </div>
+                                <p>14 High Priority <span>38 Medium Priority</span> </p>
+                            </div>
 
-                                    <div class="actions mt-0">
-                                        <button class="btn addAssessmentBtn addalertClientDetailsBtn"> <i class="bx  bx-plus"></i> Add alert</button>
-                                    </div>
-                                </header>
+                            <div class="actions mt-0">
+                                <button class="btn addAssessmentBtn addalertClientDetailsBtn"> <i class="bx  bx-plus"></i> Add alert</button>
+                            </div>
+                        </header>
 
-                                <div class="p-20">
-                                    <div class="clientFilterform addalertClientDetailsform" style="border: 2px solid #fdabab; background: #fef2f2;">
-
-                                        <div class="createNewAlert"><i class="bx  bx-alert-triangle"></i> Create New Alert </div>
-
-                                    </div>
-
-                                </div>
-                            </div> -->
+                        <div class="p-20">
+                            <div class="clientFilterform addalertClientDetailsform" style="border: 2px solid #fdabab; background: #fef2f2;">
+                                <div class="createNewAlert"><i class="bx  bx-alert-triangle"></i> Create New Alert </div>
+                            </div>
+                        </div>
+                    </div> -->
 
                 <!-- ********************************** -->
 
                 <!-- TAB CONTENT -->
                 <div class="tab-content">
                     <div class="content active" id="roster">
+                        <!-- Top Blue Bar -->
+                        <div class="roster-top">
+                            <div class="title">
+                                <h2>Care Home</h2> <span>Shift Roster</span>
+                            </div>
+                            <div class="stats">
+                                <div class="stat"> <strong>12</strong> <small>Total Shifts</small> </div>
+                                <div class="divider"></div>
+                                <div class="stat filled"> <strong>0</strong> <small>Filled</small> </div>
+                                <div class="divider"></div>
+                                <div class="stat open"> <strong>12</strong> <small>Open</small> </div>
+                                <div class="divider"></div>
+                                <div class="stat hours"> <strong>96h</strong> <small>Hours</small> </div>
+                            </div>
+                        </div>
+                        <!-- Date / Navigation Row -->
+                        <div class="roster-nav">
+                            <div class="left">
+                                <button class="icon-btn" id="btnPrev">‹</button>
+
+                                <button id="btnDay">Day</button>
+                                <button id="btnWeek" class="active">Week</button>
+
+                                <button class="date-btn" id="dateRange">
+                                    📅 --
+                                </button>
+
+                                <button class="icon-btn" id="btnNext">›</button>
+                                <button id="btnToday">Today</button>
+                            </div>
+
+                            <div class="right">
+                                <button class="outline">Bulk Actions</button>
+                                <button class="primary">👥 Staff</button>
+                                <button>📍 Locations</button>
+                                <button>👤 Clients</button>
+                                <button>⇄ Split</button>
+                            </div>
+                        </div>
+
+
                         <div id="calendar"></div>
                         <div class="cell dropzone"
                             data-date="2026-01-21"
                             data-staff-id="12">
 
-                            <div class="shift"
-                                draggable="true"
-                                data-shift-id="45">
-                                <strong>North Wing</strong>
-                                <span>09:00 – 17:00</span>
+                            <div class="roster-footer">
+                                <div class="shift-types">
+                                    <span class="label">Shift Types:</span>
+
+                                    <span class="shift"><i class="dot morning"></i> Morning</span>
+                                    <span class="shift"><i class="dot afternoon"></i> Afternoon</span>
+                                    <span class="shift"><i class="dot evening"></i> Evening</span>
+                                    <span class="shift"><i class="dot night"></i> Night</span>
+                                    <span class="shift"><i class="dot sleepin"></i> Sleep In</span>
+                                </div>
+
+                                <div class="unassigned">
+                                    <i class="dashed-box"></i> Unassigned
+                                </div>
                             </div>
                         </div>
-
                     </div>
                     <!-- ********************************************************* -->
 
@@ -780,7 +761,6 @@
                     </div>
 
                     <div class="content" id="list">
-
                         <div class="days90Content carertabcontent">
                             <div class="row">
                                 <div class="col-md-4">
@@ -1055,15 +1035,12 @@
                                 </div>
                             </div>
                         </div>
-
                     </div>
 
                     <div class="content" id="bygroup">
                         <div class="byGroupContent">
-
-
                             <div class="workHoursHeader">
-                                <div class="title radIconClr"> Phil Holt <i class='bx  bx-alert-circle'></i> </div>
+                                <div class="title radIconClr"> Phil Holt <i class='bx bx-alert-circle'></i> </div>
                                 <div class="actions">
                                     10 shifts
                                     <div class="roundBtntag radShowbtn">67.0h</div>
@@ -1071,8 +1048,8 @@
                             </div>
                             <div class="recent-activity sectionWhiteBgAllUse">
                                 <!-- <div class="section-header">
-                                        <h2 class="section-title">Recent Activity</h2>
-                                    </div> -->
+                                                            <h2 class="section-title">Recent Activity</h2>
+                                                        </div> -->
 
                                 <div class="activity-item">
                                     <div class="activity-icon"><i class='bx  bx-apps'></i> </div>
@@ -1109,9 +1086,7 @@
                                     </div>
                                     <div class="roundBtntag greenShowbtn">unfilled</div>
                                 </div>
-
                             </div>
-
                         </div>
                     </div>
 
@@ -1762,13 +1737,6 @@
                                         </div>
                                     </div>
                                 </div>
-
-                                <!--
-                                            <div class="actions">
-                                                <button type="button" class="cancel">Cancel</button>
-                                                <button type="submit" class="submit">Create Carer</button>
-                                            </div> -->
-
                             </form>
                         </div>
                     </div>
@@ -1780,8 +1748,6 @@
         <!-- FullCalendar Scheduler JS (includes core + interaction + resource) -->
         <script src="https://cdn.jsdelivr.net/npm/fullcalendar-scheduler@6.1.11/index.global.min.js"></script>
         <script src="{{ url('public/frontEnd/staff/js/schedule-shift.js') }}"></script>
-
-
 
 
         <!-- Advanced Filters  -->
@@ -1806,26 +1772,19 @@
 
             tabs.forEach(tab => {
                 tab.addEventListener("click", () => {
-
                     const tabName = tab.getAttribute("data-tab");
-
                     let scope = tab.parentElement;
-
                     while (scope && !scope.querySelector(`#${tabName}`)) {
                         scope = scope.parentElement;
                     }
-
                     if (!scope) return;
                     scope.querySelectorAll(".tab.active").forEach(t => {
                         t.classList.remove("active");
                     });
-
                     tab.classList.add("active");
-
                     scope.querySelectorAll(".content.active").forEach(c => {
                         c.classList.remove("active");
                     });
-
                     const target = scope.querySelector(`#${tabName}`);
                     if (target) {
                         target.classList.add("active");
@@ -1833,51 +1792,43 @@
                 });
             });
 
-
-
-
             // Make external events draggable
-            // $('#external-events .fc-event').each(function() {
+            $('#external-events .fc-event').each(function() {
 
-            //     $(this).data('event', {
-            //         title: $.trim($(this).text()),
-            //         stick: true
-            //     });
+                $(this).data('event', {
+                    title: $.trim($(this).text()),
+                    stick: true
+                });
 
-            //     $(this).draggable({
-            //         zIndex: 999,
-            //         revert: true,
-            //         revertDuration: 0
-            //     });
-            // });
-            // $(document).ready(function() {
+                $(this).draggable({
+                    zIndex: 999,
+                    revert: true,
+                    revertDuration: 0
+                });
+            });
+            $(document).ready(function() {
+                $('#calendar').fullCalendar({
+                    header: {
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: 'agendaWeek,agendaDay'
+                    },
 
-            //     $('#calendar').fullCalendar({
-            //         header: {
-            //             left: 'prev,next today',
-            //             center: 'title',
-            //             right: 'month,agendaWeek,agendaDay'
-            //         },
+                    editable: true,
+                    droppable: true,
 
-            //         editable: true,
-            //         droppable: true,
-
-            //         drop: function(date) {
-            //             console.log('Dropped on ' + date.format());
-            //         }
-            //     });
-
-            // });
+                    drop: function(date) {
+                        console.log('Dropped on ' + date.format());
+                    }
+                });
+            });
 
             // $(document).ready(function() {
-
             //     // Make external events draggable
             //     $('#external-events .fc-event').each(function() {
-
             //         var eventObject = {
             //             title: $.trim($(this).text())
             //         };
-
             //         // store event data
             //         $(this).data('eventObject', eventObject);
 
@@ -1891,24 +1842,17 @@
 
             //     // Initialize calendar
             //     $('#calendar').fullCalendar({
-
             //         header: {
             //             left: 'prev,next today',
             //             center: 'title',
-            //             right: 'month,agendaWeek,agendaDay'
+            //             right: 'agendaWeek,agendaDay'
             //         },
-
             //         editable: true,
             //         droppable: true,
-
             //         drop: function(date, jsEvent, ui) {
-
             //             var originalEventObject = $(this).data('eventObject');
-
             //             var copiedEventObject = $.extend({}, originalEventObject);
-
             //             copiedEventObject.start = date;
-
             //             // 🔥 THIS LINE APPENDS EVENT TO CALENDAR
             //             $('#calendar').fullCalendar('renderEvent', copiedEventObject, true);
             //         }
@@ -1918,166 +1862,25 @@
         </script>
         <script>
             document.querySelectorAll(".availabilityTabs").forEach(wrapper => {
-
                 const tabs = wrapper.querySelectorAll(".availabilityTabs__tab");
                 const panels = wrapper.querySelectorAll(".availabilityTabs__panel");
 
                 tabs.forEach(tab => {
                     tab.addEventListener("click", () => {
-
                         tabs.forEach(t => t.classList.remove("active"));
                         panels.forEach(p => p.classList.remove("active"));
-
                         tab.classList.add("active");
                         wrapper
                             .querySelector("#" + tab.dataset.target)
                             .classList.add("active");
                     });
                 });
-
             });
         </script>
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                const calendarEl = document.getElementById('calendar');
 
-                const calendar = new FullCalendar.Calendar(calendarEl, {
-
-                    schedulerLicenseKey: 'GPL-My-Project-Is-Open-Source',
-
-                    initialView: 'resourceTimelineWeek',
-
-                    resourceOrder: 'order',
-
-                    height: 'auto',
-
-                    /* ===== HEADER BUTTONS ===== */
-                    headerToolbar: {
-                        left: 'prev,next today',
-                        center: 'title',
-                        right: 'dayGridMonth,resourceTimelineWeek,resourceTimelineDay'
-                    },
-
-                    /* ===== RESOURCE SETTINGS ===== */
-                    resourceAreaHeaderContent: 'Staff',
-
-                    /* ===== INTERACTION ===== */
-                    editable: true,
-                    selectable: true,
-
-                    /* ===== MONTH VIEW CONFIG ===== */
-                    views: {
-                        dayGridMonth: {
-                            dayMaxEventRows: 3
-                        },
-                        resourceTimelineWeek: {
-                            type: 'resourceTimeline',
-                            duration: {
-                                weeks: 1
-                            }
-                        },
-                        resourceTimelineDay: {
-                            type: 'resourceTimeline',
-                            duration: {
-                                days: 1
-                            }
-                        }
-                    },
-
-
-                    /* ===== CLICK MONTH DAY → OPEN WEEK ===== */
-                    dateClick: function(info) {
-                        if (calendar.view.type === 'dayGridMonth') {
-                            calendar.changeView('resourceTimelineWeek', info.dateStr);
-                        }
-                    },
-
-
-                    /* ===== STAFF (RESOURCES) ===== */
-                    resources: [{
-                            id: 'open',
-                            title: '🟡 Open Shifts',
-                            order: 0 // 👈 always first
-                        },
-                        {
-                            id: '1',
-                            title: 'Alex Sheffield',
-                            order: 1 // 👈 always first
-                        },
-                        {
-                            id: '2',
-                            title: 'Becky Harrison',
-                            order: 2
-                        },
-                        {
-                            id: '3',
-                            title: 'Emma Wilson',
-                            order: 3
-                        }
-                    ],
-
-                    /* ===== SHIFTS (EVENTS) ===== */
-                    events: [
-                        // 🟡 OPEN SHIFTS
-                        {
-                            id: '101',
-                            title: 'South Wing',
-                            start: '2025-12-22T09:00:00',
-                            end: '2025-12-22T13:00:00',
-                            resourceId: 'open',
-                            backgroundColor: '#fde68a'
-                        },
-                        {
-                            id: '102',
-                            title: 'Night Shift',
-                            start: '2025-12-23T20:00:00',
-                            end: '2025-12-24T06:00:00',
-                            resourceId: 'open',
-                            backgroundColor: '#fde68a'
-                        },
-                        {
-                            id: '103',
-                            title: 'East Wing',
-                            start: '2025-12-24T10:00:00',
-                            end: '2025-12-24T18:00:00',
-                            resourceId: 'open',
-                            backgroundColor: '#fde68a'
-                        },
-                        // 🟢 ASSIGNED SHIFTS
-                        {
-                            id: '201',
-                            title: 'South Wing',
-                            start: '2025-12-22T09:00:00',
-                            end: '2025-12-22T13:00:00',
-                            resourceId: '1',
-                            backgroundColor: '#d1fae5'
-                        },
-                        {
-                            id: '202',
-                            title: 'North Wing',
-                            start: '2025-12-23T09:00:00',
-                            end: '2025-12-23T17:00:00',
-                            resourceId: '2',
-                            backgroundColor: '#bbf7d0'
-                        },
-                        {
-                            id: '203',
-                            title: 'East Wing',
-                            start: '2025-12-24T10:00:00',
-                            end: '2025-12-24T18:00:00',
-                            resourceId: '3',
-                            backgroundColor: '#a7f3d0'
-                        }
-                    ]
-                });
-
-                calendar.render();
-            });
-        </script>
 
         <!--Start JS 90-Day Overview -->
-
-        <script>
+        {{-- <script>
             let currentDate = new Date();
             const dayText = document.querySelector(".day-text");
             const fullDate = document.querySelector(".full-date");
@@ -2129,12 +1932,8 @@
                 currentDate = new Date(this.value);
                 updateDate();
             });
-        </script>
+        </script> --}}
         <!--End JS 90-Day Overview -->
-        <!-- Start action dropdown -->
-
-        <!-- End off action dropdown -->
-
 
     @endsection
 </main>

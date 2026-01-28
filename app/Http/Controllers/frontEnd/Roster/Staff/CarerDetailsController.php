@@ -32,7 +32,7 @@ class CarerDetailsController extends Controller
         // dd($data['staffDetails']);
         $data['user_documents'] = Documents::where('user_id', $carer_id)->get()->toArray();
         $data['courses'] = $this->staffService->courses();
-        $data['user_notes'] = UserNote::where('user_id', $carer_id)->orderBy('created_at', 'DESC')->get()->toArray();
+        $data['user_notes'] = UserNote::where('user_id', $carer_id)->where('deleted_at', null)->orderBy('created_at', 'DESC')->get()->toArray();
 
         // dd($data['user_notes']);
         return view('frontEnd.roster.staff.carer_details', $data);

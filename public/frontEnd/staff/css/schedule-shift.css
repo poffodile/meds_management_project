@@ -1,8 +1,430 @@
-.shift.dragging {
-    opacity: 0.5;
+#calendar {
+    background: #fff;
+    font-family: Inter, system-ui, -apple-system, sans-serif;
 }
 
-.dropzone.drag-over {
+/* ===============================
+   TOOLBAR / HEADER
+================================ */
+.fc-toolbar {
+    margin-bottom: 8px !important;
+}
+
+.fc-toolbar-title {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.fc-button {
+    border-radius: 6px !important;
+    font-size: 13px !important;
+    padding: 6px 10px;
+}
+
+/* Remove duplicate toolbar */
+.fc-header-toolbar + .fc-header-toolbar {
+    display: none !important;
+}
+
+/* ===============================
+   RESOURCE (STAFF) COLUMN
+================================ */
+.fc-resource-area {
+    background: #fafafa;
+    border-right: 1px solid #e5e7eb;
+}
+
+.fc-resource-area-header {
+    background: #f9fafb;
+    font-weight: 600;
+}
+
+.fc-resource {
+    padding: 10px 8px;
+}
+
+/* Highlight Open Shifts row */
+.fc-resource[data-resource-id="open"] {
+    background: #fffbeb !important;
+    font-weight: 600;
+}
+
+/* ===============================
+   TIMELINE ROWS
+================================ */
+.fc-timeline-lane {
+    min-height: 80px;
+}
+
+/* Softer grid */
+.fc-timeline-slot-frame {
+    border-color: #f1f5f9;
+}
+
+/* Today column highlight */
+.fc-today {
+    background: #eef2ff !important;
+}
+
+/* ===============================
+   EVENTS (SHIFTS)
+================================ */
+.fc-timeline-event {
+    border-radius: 8px !important;
+    padding: 6px 8px;
+    font-size: 13px;
+    border: none !important;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+/* Dot indicator */
+.fc-event-title::before {
+    content: "●";
+    margin-right: 6px;
+    font-size: 10px;
+}
+
+/* Assigned shifts */
+.fc-event {
+    background: #dcfce7;
+    color: #065f46;
+}
+
+/* Open shifts */
+.fc-event[data-event-id="101"],
+.fc-event[data-event-id="102"],
+.fc-event[data-event-id="103"] {
+    background: #fde68a !important;
+    color: #92400e !important;
+}
+
+/* ===============================
+   DRAG STATES
+================================ */
+.fc-event-dragging {
+    opacity: 0.6;
+}
+
+.fc-timeline-slot.fc-dropzone {
     background: #eef2ff;
     outline: 2px dashed #2563eb;
+}
+
+.roster-footer {
+    position: sticky;
+    bottom: 0;
+    background: #fff;
+    border-top: 1px solid #e5e7eb;
+    padding: 10px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    z-index: 20;
+}
+
+/* Shift legend */
+.shift-types {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.shift-types .label {
+    font-weight: 600;
+    color: #374151;
+}
+
+.shift {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #374151;
+}
+
+/* Colored dots */
+.dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.dot.morning   { background: #22c55e; }
+.dot.afternoon { background: #0ea5e9; }
+.dot.evening   { background: #8b5cf6; }
+.dot.night     { background: #1f2937; }
+.dot.sleepin   { background: #6366f1; }
+
+/* Unassigned */
+.unassigned {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #f97316;
+    font-weight: 500;
+}
+
+.dashed-box {
+    width: 14px;
+    height: 14px;
+    border: 2px dashed #f97316;
+    border-radius: 4px;
+}
+
+.roster-header {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 6px 18px rgba(0,0,0,.06);
+    margin-bottom: 12px;
+}
+
+/* Top bar */
+.roster-top {
+    background: linear-gradient(90deg, #2563eb, #4f46e5);
+    color: #fff;
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.roster-top .title h2 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.roster-top .title span {
+    font-size: 13px;
+    opacity: .9;
+}
+
+/* Stats */
+.stats {
+    display: flex;
+    align-items: center;
+}
+
+.stat {
+    text-align: center;
+    padding: 0 14px;
+}
+
+.stat strong {
+    font-size: 20px;
+}
+
+.stat small {
+    font-size: 12px;
+    opacity: .9;
+}
+
+.stat.filled strong { color: #86efac; }
+.stat.open strong   { color: #fde047; }
+.stat.hours strong  { color: #e0e7ff; }
+
+.divider {
+    width: 1px;
+    height: 28px;
+    background: rgba(255,255,255,.3);
+}
+
+/* Filters */
+.roster-filters {
+    padding: 12px 16px;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.roster-filters select,
+.roster-filters .lock-btn,
+.roster-filters .search {
+    border: 1px solid #e5e7eb;
+    padding: 6px 10px;
+    border-radius: 8px;
+    background: #fff;
+    font-size: 13px;
+}
+
+.lock-btn {
+    background: #f0fdf4;
+    border-color: #86efac;
+    color: #166534;
+}
+
+/* Navigation */
+.roster-nav {
+    padding: 10px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.roster-nav button {
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    font-size: 13px;
+}
+
+.roster-nav button.active {
+    background: #2563eb;
+    color: #fff;
+    border-color: #2563eb;
+}
+
+.roster-nav .primary {
+    background: #2563eb;
+    color: #fff;
+    border-color: #2563eb;
+}
+
+.roster-nav .outline {
+    border: 1px solid #2563eb;
+    color: #2563eb;
+    background: #fff;
+}
+
+.roster-header {
+    border-radius: 16px 16px 0 0;
+    overflow: hidden;
+    background: #fff;
+}
+
+/* TOP BLUE BAR */
+.roster-top {
+    background: linear-gradient(90deg, #2563eb, #4f46e5);
+    color: #fff;
+    padding: 20px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.roster-top h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.roster-top span {
+    font-size: 13px;
+    opacity: 0.9;
+}
+
+.stats {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.stat strong {
+    font-size: 22px;
+    font-weight: 700;
+    display: block;
+    text-align: center;
+}
+
+.stat small {
+    font-size: 12px;
+    opacity: 0.9;
+}
+
+.stat.filled strong { color: #86efac; }
+.stat.open strong { color: #fde68a; }
+.stat.hours strong { color: #fff; }
+
+.divider {
+    width: 1px;
+    height: 30px;
+    background: rgba(255,255,255,0.25);
+}
+.roster-filters {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 20px;
+    border-bottom: 1px solid #e5e7eb;
+    background: #fff;
+}
+
+.roster-filters select,
+.lock-btn {
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 13px;
+}
+
+.lock-btn {
+    background: #f0fdf4;
+    border-color: #86efac;
+    color: #166534;
+}
+
+.search {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 6px 12px;
+}
+.roster-nav {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 20px;
+    background: #fff;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.roster-nav button {
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.roster-nav button.active {
+    background: #2563eb;
+    color: #fff;
+    border-color: #2563eb;
+}
+
+.roster-nav .primary {
+    background: #2563eb;
+    color: #fff;
+    border-color: #2563eb;
+}
+
+.roster-nav .outline {
+    border: 1px solid #2563eb;
+    color: #2563eb;
+    background: #fff;
+}
+.roster-footer {
+    position: sticky;
+    bottom: 0;
+    background: #fff;
+    border-top: 1px solid #e5e7eb;
+    padding: 12px 20px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    z-index: 10;
+}
+.fc {
+    border-radius: 0 0 16px 16px;
+    overflow: hidden;
+}
+
+.fc-resource-area {
+    background: #fafafa;
+}
+
+.fc-timeline-slot {
+    background: #fff;
 }

@@ -133,7 +133,8 @@
                                         </div>
                                         <div class="item">
                                             <span class="label">Hourly Rate</span>
-                                            <span class="value">£{{ $staffDetails->pay_rate ?? '0.00' }}</span>
+                                           <span class="value"> £{{ number_format($staffDetails->hourly_rate ?? 0, 2) }}/hr</span>
+
                                         </div>
                                         <div class="item">
                                             <span class="label">Status</span>

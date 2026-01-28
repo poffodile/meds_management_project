@@ -77,7 +77,6 @@ class StaffService
         ->where('home_id', $homeId)
         ->where('is_deleted', 0)
         ->where('status', 0);
-     
     }
 
     /**
@@ -85,18 +84,10 @@ class StaffService
      */
     public function onLeaveStaff($homeId)
     {
-        $today = Carbon::today()->toDateString();
-
-        // return null;
-        return User::join('staff_leaves', 'staff_leaves.user_id', '=', 'user.id')
-            ->where('user.home_id', $homeId)
-            ->where('user.is_deleted', 0)
-            ->where('staff_leaves.leave_status', 1)
-            ->whereDate('staff_leaves.start_date', '<=', $today)
-            ->whereDate('staff_leaves.end_date', '>=', $today)
-            ->select('user.*')
-            ->distinct();
-            // ->get();
+        return  User::with('emergencyContacts')
+        ->where('home_id', $homeId)
+        ->where('is_deleted', 0)
+        ->where('status', 2);
     }
 
     /**
@@ -116,15 +107,7 @@ class StaffService
     {
         $payRateTypeId = $this->getPayRateTypeId();
 
-        $user = User::select('user.*', 'pay_rates.pay_rate')
-            ->leftJoin('pay_rates', function ($join) use ($payRateTypeId) {
-                $join->on('user.access_level', '=', 'pay_rates.access_level_id');
-
-                // Apply rate type condition only if exists
-                if (!empty($payRateTypeId)) {
-                    $join->where('pay_rates.rate_type_id', $payRateTypeId);
-                }
-            })
+        $user = User::select('user.*')
             ->where('user.id', $userId)
             ->where('user.is_deleted', 0)
             ->first();
@@ -193,7 +176,7 @@ class StaffService
             'employment_type' => 'employment_type',
             'status' => 'status',
             'description' => 'description',
-            'payroll' => 'payroll',
+            // 'payroll' => 'payroll',
             'hourly_rate' => 'hourly_rate',
             'holiday_entitlement' => 'holiday_entitlement',
             'dbs_certificate_number' => 'dbs_certificate_number',

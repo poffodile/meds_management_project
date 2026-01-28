@@ -83,15 +83,11 @@
                             <textarea name="description" id="description" class="form-control" rows="3" cols="20" placeholder="Short Description" maxlength="1000"></textarea>
                         </div>
 
-                        <div class="form-group col-md-6 col-sm-6 col-xs-12">
+                        {{-- <div class="form-group col-md-6 col-sm-6 col-xs-12">
                             <label>Payroll</label>
                             <input type="text" name="payroll" id="payroll" placeholder="payroll" class="form-control" maxlength="255">
-                        </div>
-                        <div class="form-group col-md-6 col-sm-6 col-xs-12">
-                            <label>Holiday Entitlement</label>
-                            <input type="text" name="holiday_entitlement" placeholder="holiday entitlement" class="form-control" maxlength="255">
-                        </div>
-
+                        </div> --}}
+                        
                         <div class="form-group col-md-16 col-sm-6 col-xs-12 datepicker-sttng date-sttng">
                             <label>Date of Joining</label>
                             <div class="col-md-12 col-sm-12 col-xs-12 p-0">
@@ -116,6 +112,10 @@
                                     </span>
                                 </div>
                             </div>
+                        </div>
+                        <div class="form-group col-md-6 col-sm-6 col-xs-12">
+                            <label>Holiday Entitlement</label>
+                            <input type="text" name="holiday_entitlement" placeholder="holiday entitlement" class="form-control" maxlength="255">
                         </div>
 
                         <div class="form-group col-md-12 col-sm-12 col-xs-12 m-0">
@@ -409,10 +409,10 @@
                     required: true,
                     regex: /^[a-zA-Z0-9'.\s]{1,40}$/
                 },
-                payroll: {
-                    required: true,
-                    regex: /^[a-zA-Z0-9'.\s]{1,40}$/
-                },
+                // payroll: {
+                //     required: true,
+                //     regex: /^[a-zA-Z0-9'.\s]{1,40}$/
+                // },
                 holiday_entitlement: {
                     required: true,
                     regex: /^[a-zA-Z0-9'.\s]{1,40}$/
@@ -441,10 +441,10 @@
                     required: "This field is required.",
                     regex: "Invalid Character"
                 },
-                payroll: {
-                    required: "This field is required.",
-                    regex: "Invalid Character"
-                },
+                // payroll: {
+                //     required: "This field is required.",
+                //     regex: "Invalid Character"
+                // },
                 holiday_entitlement: {
                     required: "This field is required.",
                     regex: "Invalid Character"
@@ -497,13 +497,11 @@
                                             </div>
                                             <div class="col-md-4 form-group">
                                                 <div class="input-group">
-                                                    
                                                         <span class="btn btn-white btn-file">
                                                            <span class="fileupload-new"><i class="fa fa-upload"></i> Upload
                                                            </span>
                                                            <input name="qualifiaction_cert[]" class="default qual_upload" type="file"  accept="application/pdf,.pdf">
                                                         </span>
-                                                    
                                                         <span class="input-group-addon remove-addon"><a href="#" class="remove_field btn btn-danger">Remove</a>
                                                     </span>
                                                 </div>
@@ -599,6 +597,8 @@
         $('#formMethod').remove();
 
         if (mode === 'add') {
+            let accessLevelId = $('#access_level').val();
+            fetchHourlyRate(accessLevelId);
             $('#modalTitle').text('Add Staff');
             $('#add_staff').attr('action', "{{ url('add-staff-user') }}");
             $('#staff_id').val('');
@@ -693,14 +693,23 @@
             if (maxHours && (maxHours !== '' && maxHours !== 'null')) {
                 $('input[name="available_for_overtime"]').prop('checked', true);
             }
-            $('#hourly_rate').val($btn.attr('data-hourly-rate') || $btn.data('hourly-rate'));
+            let hourlyRate = $btn.data('hourly-rate'); // preferred jQuery way
+
+            if (hourlyRate !== undefined && hourlyRate !== null && hourlyRate !== '') {
+                $('#hourly_rate').val(hourlyRate);
+            } else {
+                // Trigger change to fetch hourly rate via AJAX
+                $('#access_level').trigger('change');
+            }
+
+
             // set the max extra hours value
             $('input[name="max_extra_hours"]').val(maxHours);
 
             // trigger change so the extraHours container shows when we've programmatically checked the box
             $('input[name="available_for_overtime"]').trigger('change');
             $('#description').val($btn.attr('data-description') || $btn.data('description'));
-            $('input[name="payroll"]').val($btn.attr('data-payroll') || $btn.data('payroll'));
+            // $('input[name="payroll"]').val($btn.attr('data-payroll') || $btn.data('payroll'));
             $('input[name="holiday_entitlement"]').val($btn.attr('holiday-entitlement') || $btn.data('holiday_entitlement') || $btn.data('holidayEntitlement'));
 
             // Populate emergency contact fields (support multiple data-attribute naming conventions)
@@ -784,8 +793,12 @@
             function setPickerDate(pickerSelector, readonlySelector, dateStr) {
                 // If no date provided, clear both pickers
                 if (!dateStr) {
-                    try { $(pickerSelector).datetimepicker('update', ''); } catch (e) {}
-                    try { $(readonlySelector).datepicker('update', ''); } catch (e) {}
+                    try {
+                        $(pickerSelector).datetimepicker('update', '');
+                    } catch (e) {}
+                    try {
+                        $(readonlySelector).datepicker('update', '');
+                    } catch (e) {}
                     return;
                 }
 
@@ -805,12 +818,20 @@
 
                 // Use pickers' update with a Date object so they render using their own `dd-mm-yyyy` config
                 if (dt) {
-                    try { $(pickerSelector).datetimepicker('update', dt); } catch (e) {}
-                    try { $(readonlySelector).datepicker('update', dt); } catch (e) {}
+                    try {
+                        $(pickerSelector).datetimepicker('update', dt);
+                    } catch (e) {}
+                    try {
+                        $(readonlySelector).datepicker('update', dt);
+                    } catch (e) {}
                 } else {
                     // final fallback: clear
-                    try { $(pickerSelector).datetimepicker('update', ''); } catch (e) {}
-                    try { $(readonlySelector).datepicker('update', ''); } catch (e) {}
+                    try {
+                        $(pickerSelector).datetimepicker('update', '');
+                    } catch (e) {}
+                    try {
+                        $(readonlySelector).datepicker('update', '');
+                    } catch (e) {}
                 }
             }
 
@@ -871,35 +892,38 @@
 
 <script>
     $(document).ready(function() {
+        // 🔁 On access level change
         $('#access_level').on('change', function() {
-            let accessLevelId = $(this).val();
-
-            if (!accessLevelId) {
-                $('#hourly_rate').val('');
-                return;
-            }
-
-            $.ajax({
-                url: "{{ url('/roster/carer/get-hourly-rate') }}",
-                type: "POST",
-                data: {
-                    access_level_id: accessLevelId,
-                    _token: "{{ csrf_token() }}"
-                },
-                success: function(response) {
-                    console.log(response);
-
-                    if (response.hourly_rate !== undefined) {
-                        $('#hourly_rate').val(response.hourly_rate);
-                    } else {
-                        $('#hourly_rate').val('');
-                    }
-                },
-                error: function(xhr) {
-                    console.error(xhr.responseText);
-                    $('#hourly_rate').val('');
-                }
-            });
+            fetchHourlyRate($(this).val());
         });
     });
+
+    function fetchHourlyRate(accessLevelId) {
+        if (!accessLevelId) {
+            $('#hourly_rate').val('');
+            return;
+        }
+
+        $.ajax({
+            url: "{{ url('/roster/carer/get-hourly-rate') }}",
+            type: "POST",
+            data: {
+                access_level_id: accessLevelId,
+                _token: "{{ csrf_token() }}"
+            },
+            success: function(response) {
+                  if(isAuthenticated(resp) == false){
+                    return false;
+                }
+                if (response.hourly_rate !== undefined) {
+                    $('#hourly_rate').val(response.hourly_rate);
+                } else {
+                    $('#hourly_rate').val('');
+                }
+            },
+            error: function() {
+                $('#hourly_rate').val('');
+            }
+        });
+    }
 </script>
