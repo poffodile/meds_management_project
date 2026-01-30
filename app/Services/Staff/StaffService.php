@@ -74,9 +74,9 @@ class StaffService
     {
         // dd($homeId);
         return  User::with('emergencyContacts')
-        ->where('home_id', $homeId)
-        ->where('is_deleted', 0)
-        ->where('status', 0);
+            ->where('home_id', $homeId)
+            ->where('is_deleted', 0)
+            ->where('status', 0);
     }
 
     /**
@@ -85,9 +85,9 @@ class StaffService
     public function onLeaveStaff($homeId)
     {
         return  User::with('emergencyContacts')
-        ->where('home_id', $homeId)
-        ->where('is_deleted', 0)
-        ->where('status', 2);
+            ->where('home_id', $homeId)
+            ->where('is_deleted', 0)
+            ->where('status', 2);
     }
 
     /**
@@ -172,6 +172,9 @@ class StaffService
             'staff_phone_no' => 'phone_no',
             'staff_email' => 'email',
             'job_title' => 'job_title',
+            'street' => 'street',
+            'city' => 'city',
+            'postcode' => 'postcode',
             'department' => 'department',
             'employment_type' => 'employment_type',
             'status' => 'status',
@@ -202,10 +205,20 @@ class StaffService
             }
         }
 
-        // Overtime
+        // Overtime (FIXED)
         if (Schema::hasColumn('users', 'available_for_overtime')) {
-            $staff->available_for_overtime = $request->has('available_for_overtime') ? 1 : 0;
+            $isOvertime = (int) $request->input('available_for_overtime', 0);
+            $staff->available_for_overtime = $isOvertime;
+
+            if ($isOvertime === 1) {
+                // Save only when checked
+                $staff->max_extra_hours = (int) $request->input('max_extra_hours', 0);
+            } else {
+                // Clear when unchecked
+                $staff->max_extra_hours = null;
+            }
         }
+
         if (Schema::hasColumn('users', 'max_extra_hours')) {
             $staff->max_extra_hours = $request->input('max_extra_hours');
         }

@@ -119,8 +119,8 @@
 
         <script>
             /* -------------------------
-                            PAGE LOAD
-                            -------------------------- */
+                                    PAGE LOAD
+                                    -------------------------- */
             $(document).ready(function() {
                 loadStaff('allCarerActibity');
             });
@@ -182,6 +182,9 @@
                 const BASE_URL = "{{ url('/') }}";
 
                 staff.forEach(carer => {
+
+                    const ec = carer.emergency_contacts || {};
+
                     container.innerHTML += `
                             <div class="col-md-4">
                                 <div class="profile-card">
@@ -194,7 +197,15 @@
                                                     ${carer.name}
                                                 </a>
                                             </div>
-                                            <div class="role">${carer.job_title ?? ''}</div>
+                                           <div class="role">
+                                            ${({
+                                                full_time: 'Full Time',
+                                                part_time: 'Part Time',
+                                                contract: 'Contract'
+                                            }[carer.employment_type] || '')}
+                                        </div>
+
+
                                         </div>
                                     </div>
                                     <span class="status 
@@ -244,6 +255,9 @@
                                             data-status="${carer.status ?? ''}"
 
                                             data-job-title="${carer.job_title ?? ''}"
+                                            data-street="${carer.street ?? ''}"
+                                            data-city="${carer.city ?? ''}"
+                                            data-postcode="${carer.postcode ?? ''}"
                                             data-department="${carer.department ?? ''}"
                                             data-description="${carer.description ?? ''}"
                                             data-employment-type="${carer.employment_type ?? ''}"
@@ -252,9 +266,9 @@
                                             data-image="${carer.image ?? ''}"
                                             data-hourly-rate="${carer.hourly_rate ?? ''}"
 
-                                            data-emergency_contact_name="${carer.emergency_contact_name ?? ''}"
-                                            data-emergency_contact_phone="${carer.emergency_contact_phone ?? ''}"
-                                            data-emergency_contact_relationship="${carer.emergency_contact_relationship ?? ''}"
+                                            data-emergency_contact_name="${ec.name || ''}"
+                                            data-emergency_contact_phone="${ec.phone_no || ''}"
+                                            data-emergency_contact_relationship="${ec.relationship || ''}"
 
                                             data-payroll="${carer.payroll ?? ''}"
 

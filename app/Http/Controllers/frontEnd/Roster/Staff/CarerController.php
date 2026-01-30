@@ -126,7 +126,7 @@ class CarerController extends Controller
 
         // Attach qualifications
         $staff = $this->staffService->attachQualifications($staff);
-
+        // dd($staff);
         /**
          * ----------------------------------
          * Response

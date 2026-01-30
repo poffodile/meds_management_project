@@ -1,6 +1,6 @@
 <!-- add staff model-->
 <div class="modal fade leaveCommunStyle" id="addStaffModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close cancel-btn" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -69,6 +69,7 @@
                         <div class="form-group col-md-12 col-sm-12 col-xs-12">
                             <div class="overtime">
                                 <label>
+                                    <input type="hidden" name="available_for_overtime" value="0">
                                     <input type="checkbox" name="available_for_overtime" id="available_for_overtime" value="1"> Available for Overtime
                                 </label>
                                 <div class="extraHours">
@@ -87,7 +88,7 @@
                             <label>Payroll</label>
                             <input type="text" name="payroll" id="payroll" placeholder="payroll" class="form-control" maxlength="255">
                         </div> --}}
-                        
+
                         <div class="form-group col-md-16 col-sm-6 col-xs-12 datepicker-sttng date-sttng">
                             <label>Date of Joining</label>
                             <div class="col-md-12 col-sm-12 col-xs-12 p-0">
@@ -172,7 +173,20 @@
                                 </div>
                             </div>
                         </div>
-
+                        <div class="form-group col-md-12 col-sm-12 col-xs-12 m-t-10">
+                            <label>Address</label>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control" name="street" id="street" placeholder="Street">
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control" name="city" id="city" placeholder="City">
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control" name="postcode" id="postcode" placeholder="Postcode">
+                                </div>
+                            </div>
+                        </div>
                         <div class="form-group col-md-12 col-sm-12 col-xs-12 m-t-10">
                             <label>Emergency Contact</label>
                             <div class="row">
@@ -644,7 +658,8 @@
                             let url = String(img);
 
                             // BASE URL (Laravel public folder)
-                            const BASE_URL = window.location.origin + '/socialcareitsolutions/public/images/userQualification/';
+                            // const BASE_URL = window.location.origin + '/socialcareitsolutions/public/images/userQualification/';
+                            const BASE_URL = "{{ asset('public/images/userQualification') }}/";
 
                             // normalize path
                             if (url.startsWith('http')) {
@@ -678,21 +693,36 @@
             $('#staff_phone_no').val($btn.attr('data-phone') || $btn.data('phone'));
             $('#staff_email').val($btn.attr('data-email') || $btn.data('email'));
             $('#job_title').val($btn.attr('data-job-title') || $btn.data('jobTitle') || $btn.data('job-title'));
+            $('#street').val($btn.attr('data-street') || $btn.data('street'));
+            $('#city').val($btn.attr('data-city') || $btn.data('city'));
+            $('#postcode').val($btn.attr('data-postcode') || $btn.data('postcode'));
             $('#department').val($btn.attr('data-department') || $btn.data('department')).trigger('change');
             $('#employment_type').val($btn.attr('data-employment-type') || $btn.data('employmentType') || $btn.data('employment-type')).trigger('change');
             $('#status').val($btn.attr('data-status') || $btn.data('status')).trigger('change');
 
-            const overtime = $btn.attr('data-overtime-availability') || $btn.data('overtimeAvailability') || $btn.data('overtime-availability');
-            $('input[name="available_for_overtime"]').prop('checked', (overtime == 1 || overtime == '1' || overtime === true || overtime === 'true'));
+            const overtimeRaw =
+                $btn.attr('data-overtime-availability') ??
+                $btn.data('overtimeAvailability') ??
+                $btn.data('overtime-availability');
+
+            const maxHoursRaw =
+                $btn.attr('data-max-extra-hours') ??
+                $btn.attr('data-max_extra_hours') ??
+                $btn.data('maxExtraHours') ??
+                $btn.data('max-extra-hours');
+
+            // Normalize values
+            const overtime = Number(overtimeRaw) === 1;
+            const maxHours = Number(maxHoursRaw);
+
+            // Final condition
+            const shouldCheck = overtime || maxHours > 0;
+
+            $('input[name="available_for_overtime"]').prop('checked', shouldCheck);
+
             // ensure toggle runs after setting the checkbox
             initOvertimeToggle();
-            // populate max extra hours (support several possible data attribute naming conventions)
-            var maxHours = $btn.attr('data-max-extra-hours') || $btn.attr('data-max_extra_hours') || $btn.attr('data-maxhours') || $btn.data('maxExtraHours') || $btn.data('max_extra_hours') || $btn.data('max-extra-hours') || '';
 
-            // If maxHours exists but overtime flag not explicitly set, enable the overtime checkbox
-            if (maxHours && (maxHours !== '' && maxHours !== 'null')) {
-                $('input[name="available_for_overtime"]').prop('checked', true);
-            }
             let hourlyRate = $btn.data('hourly-rate'); // preferred jQuery way
 
             if (hourlyRate !== undefined && hourlyRate !== null && hourlyRate !== '') {
@@ -912,7 +942,7 @@
                 _token: "{{ csrf_token() }}"
             },
             success: function(response) {
-                  if(isAuthenticated(resp) == false){
+                if (isAuthenticated(response) == false) {
                     return false;
                 }
                 if (response.hourly_rate !== undefined) {

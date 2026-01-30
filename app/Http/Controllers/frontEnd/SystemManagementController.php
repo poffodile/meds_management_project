@@ -272,6 +272,9 @@ class SystemManagementController extends Controller
             $user->phone_no         = $data['staff_phone_no'];
             $user->email            = $data['staff_email'];
             $user->job_title        = $data['job_title'];
+            $user->street           = $data['street'];
+            $user->city             = $data['city'];
+            $user->postcode         = $data['postcode'];
             $user->department       = $data['department'];
             $user->description      = $data['description'];
             // $user->payroll          = $data['payroll'];

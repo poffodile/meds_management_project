@@ -14,11 +14,12 @@
         .notContDetails span {
             flex-grow: 3;
         }
-/* 
-        .leavebanktabCont i {
-            font-size: 18px;
-            color: #f00;
-        } */
+
+        /*
+                .leavebanktabCont i {
+                    font-size: 18px;
+                    color: #f00;
+                } */
 
         .notContDetails .planCard {
             border: 1px solid #eee;
@@ -52,6 +53,12 @@
         span.showDocumentname i {
             color: #fff;
             line-height: 22px;
+        }
+
+        .items-row {
+            display: flex;
+            gap: 40px;
+            /* space between items */
         }
     </style>
     <main class="page-content empoyeeHeader">
@@ -133,16 +140,35 @@
                                         </div>
                                         <div class="item">
                                             <span class="label">Hourly Rate</span>
-                                           <span class="value"> £{{ number_format($staffDetails->hourly_rate ?? 0, 2) }}/hr</span>
+                                            <span class="value"> £{{ number_format($staffDetails->hourly_rate ?? 0, 2) }}/hr</span>
 
                                         </div>
                                         <div class="item">
                                             <span class="label">Status</span>
-                                            <span class="value">{{ $staffDetails->status ? 'Active' : 'Inactive' }}</span>
+                                            <span class="value">
+                                                @if ($staffDetails->status == 1)
+                                                    Active
+                                                @elseif ($staffDetails->status == 0)
+                                                    Inactive
+                                                @elseif ($staffDetails->status == 2)
+                                                    On Leave
+                                                @else
+                                                    —
+                                                @endif
+                                            </span>
+
                                         </div>
                                         <div class="item">
                                             <span class="label">Overtime Available</span>
-                                            <span class="value">{{ $staffDetails->overtime_available ? 'Yes' : 'No' }}</span>
+                                            {{-- <span class="value">{{ $staffDetails->overtime_available ? 'Yes' : 'No' }}</span> --}}
+                                            <span class="value">
+                                                @if ($staffDetails->available_for_overtime == 1)
+                                                    Yes (max {{ $staffDetails->max_extra_hours }} hrs/week)
+                                                @else
+                                                    No
+                                                @endif
+                                            </span>
+
                                         </div>
                                     </div>
                                 </div>
@@ -171,9 +197,15 @@
 
                                 <div class="section">
                                     <h3>DBS Information</h3>
-                                    <div class="item">
-                                        <span class="label">DBS Expiry</span>
-                                        <span class="value">{{ $staffDetails->dbs_expiry_date ? \Carbon\Carbon::parse($staffDetails->dbs_expiry_date)->format('F jS, Y') : '' }}</span>
+                                    <div class="items-row">
+                                        <div class="item">
+                                            <span class="label">DBS Number</span>
+                                            <span class="value">{{ $staffDetails->dbs_certificate_number ? $staffDetails->dbs_certificate_number : '' }}</span>
+                                        </div>
+                                        <div class="item">
+                                            <span class="label">DBS Expiry</span>
+                                            <span class="value">{{ $staffDetails->dbs_expiry_date ? \Carbon\Carbon::parse($staffDetails->dbs_expiry_date)->format('F jS, Y') : '' }}</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -586,32 +618,32 @@
                         </div>
 
                         <!-- <div class="calendarTabs leaveRequesttabs employeeDetailsTabs  m-t-20">
-                                                <div class="tabs p-1 ">
-                                                    <button class="tab active" data-tab="workingHoursTab">
-                                                        Working Hours
-                                                    </button>
-                                                    <button class="tab" data-tab="unavailabilityTab">
-                                                        Unavailability
-                                                    </button>
-                                                    <button class="tab" data-tab="summaryTab">
-                                                        Summary
-                                                    </button>
-                                                </div>
-
-                                                <div class="tab-content carertabcontent">
-                                                    <div class="content active" id="workingHoursTab">
-                                                        <div class="sectionWhiteBgAllUse">
-                                                                <h1> Working Hours</h1>
+                                                        <div class="tabs p-1 ">
+                                                            <button class="tab active" data-tab="workingHoursTab">
+                                                                Working Hours
+                                                            </button>
+                                                            <button class="tab" data-tab="unavailabilityTab">
+                                                                Unavailability
+                                                            </button>
+                                                            <button class="tab" data-tab="summaryTab">
+                                                                Summary
+                                                            </button>
                                                         </div>
-                                                    </div>
-                                                    <div class="content" id="unavailabilityTab">
-                                                        <h1>Unavailability</h1>
-                                                    </div>
-                                                    <div class="content" id="summaryTab">
-                                                        <h1>Summary</h1>
-                                                    </div>
-                                                </div>
-                                            </div> -->
+
+                                                        <div class="tab-content carertabcontent">
+                                                            <div class="content active" id="workingHoursTab">
+                                                                <div class="sectionWhiteBgAllUse">
+                                                                        <h1> Working Hours</h1>
+                                                                </div>
+                                                            </div>
+                                                            <div class="content" id="unavailabilityTab">
+                                                                <h1>Unavailability</h1>
+                                                            </div>
+                                                            <div class="content" id="summaryTab">
+                                                                <h1>Summary</h1>
+                                                            </div>
+                                                        </div>
+                                                    </div> -->
                     </div>
 
                     <div class="content" id="trainingQualificationsTab">
@@ -629,7 +661,7 @@
                                         <span>{{ $qualification['name'] }}</span>
 
                                         @if (!empty($qualification['image']))
-                                            <span class="roundBtntag greenShowbtn"><a href="{{ asset(userQualificationImgPath . '/' .$qualification['image']) }}" target="_blank">Certified</a></span>
+                                            <span class="roundBtntag greenShowbtn"><a href="{{ asset(userQualificationImgPath . '/' . $qualification['image']) }}" target="_blank">Certified</a></span>
                                         @else
                                             <span class="roundBtntag radShowbtn">Not Certified</span>
                                         @endif
@@ -664,8 +696,8 @@
                                 </div>
                             </div>
                             <!-- <div class="leavebanktabCont">
-                                                                <p>No shifts recorded</p>
-                                                            </div> -->
+                                                                        <p>No shifts recorded</p>
+                                                                    </div> -->
                             <div class="">
                                 <div class="certifiedList">
                                     <span class="">
@@ -704,13 +736,13 @@
                                     <div class="col-md-12">
                                         <div class="uploadDocumentCont">
                                             @forelse ($user_documents as $documents)
-                                                <div class="certifiedList">
+                                                <div class="certifiedList remove-document">
                                                     <span class="showDocumentname">
                                                         <span>{{ $documents['title'] }}</span>
                                                     </span>
                                                     <div class="planActions">
                                                         <a href="{{ asset('storage/app/public/' . $documents['file_path']) }}" class="viewDocOpen"><i class='bx bx-eye'></i> </a>
-                                                        <button class="danger"><i class="bx  bx-trash"></i> </button>
+                                                        <button class="danger delete-document" data-id="{{ $documents['id'] }}"><i class="bx bx-trash"></i> </button>
                                                     </div>
                                                 </div>
                                             @empty
@@ -731,49 +763,49 @@
                                 </div>
                             </div>
                             <div class="addNoteContentList">
-                                    @forelse ($user_notes as $note)
-                                    <div class="certifiedList planActions">
+                                @forelse ($user_notes as $note)
+                                    <div class="certifiedList planActions remove-note">
                                         <span class="noteDateAndText">
-                                            <div><strong>Date :</strong>  {{ \Carbon\Carbon::parse($note['created_at'])->format('M d, Y') }}</div>
+                                            <div><strong>Date :</strong> {{ \Carbon\Carbon::parse($note['created_at'])->format('M d, Y') }}</div>
                                             <small>{{ $note['note'] }}</small>
                                         </span>
                                         <button class="danger delete-note" data-id="{{ $note['id'] }}"><i class="bx  bx-trash"></i> </button>
                                     </div>
-                                    @empty
+                                @empty
                                     <p>No notes recorded</p>
-                                 @endforelse
+                                @endforelse
                             </div>
                             <!-- <div class="leavebanktabCont">
-                                <div class="row">
-                                    @forelse ($user_notes as $note)
-                                        <div class="col-md-12">
-                                            <div class="notContDetails carePlanWrapper">
-                                                <div class="planCard">
-                                                    <div class="planTop">
-                                                        <div class="planMeta">
-                                                            <div>
-                                                                <strong>Date:</strong>
-                                                                {{ \Carbon\Carbon::parse($note['created_at'])->format('M d, Y') }}
+                                        <div class="row">
+                                            @forelse ($user_notes as $note)
+                                                <div class="col-md-12">
+                                                    <div class="notContDetails carePlanWrapper">
+                                                        <div class="planCard">
+                                                            <div class="planTop">
+                                                                <div class="planMeta">
+                                                                    <div>
+                                                                        <strong>Date:</strong>
+                                                                        {{ \Carbon\Carbon::parse($note['created_at'])->format('M d, Y') }}
+                                                                    </div>
+                                                                </div>
+                                                                <div class="planActions">
+                                                                    <button class="danger delete-note" data-id="{{ $note['id'] }}">
+                                                                        <i class="bx bx-trash"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="planFooter">
+                                                                <span>{{ $note['note'] }}</span>
                                                             </div>
                                                         </div>
-                                                        <div class="planActions">
-                                                            <button class="danger delete-note" data-id="{{ $note['id'] }}">
-                                                                <i class="bx bx-trash"></i>
-                                                            </button>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="planFooter">
-                                                        <span>{{ $note['note'] }}</span>
                                                     </div>
                                                 </div>
-                                            </div>
+                                        @empty
+                                                    <p>No notes recorded</p>
+                                        @endforelse
                                         </div>
-                                    @empty
-                                        <p>No notes recorded</p>
-                                    @endforelse
-                                </div>
-                            </div> -->
+                                    </div> -->
                         </div>
                     </div>
                 </div>
@@ -890,24 +922,24 @@
                                         </label>
 
                                         {{-- Upload ALWAYS visible --}}
-                                       
-                                            <div class="">
-                                                <input type="file"
-                                                    name="qualifications[{{ $course['course_id'] }}][cert]"
-                                                    class="qual_upload"
-                                                    accept="application/pdf,.pdf">
-                                            </div>
 
-                                            {{-- View Certificate --}}
-                                            @if ($qualification && $qualification->image)
-                                                <div class="mt-1">
-                                                    <a href="{{ asset('public/images/userQualification/' . $qualification->image) }}"
-                                                        target="_blank">
-                                                        <i class='bx  bx-eye'></i> 
-                                                    </a>
-                                                </div>
-                                            @endif
-                                        
+                                        <div class="">
+                                            <input type="file"
+                                                name="qualifications[{{ $course['course_id'] }}][cert]"
+                                                class="qual_upload"
+                                                accept="application/pdf,.pdf">
+                                        </div>
+
+                                        {{-- View Certificate --}}
+                                        @if ($qualification && $qualification->image)
+                                            <div class="mt-1">
+                                                <a href="{{ asset('public/images/userQualification/' . $qualification->image) }}"
+                                                    target="_blank">
+                                                    <i class='bx  bx-eye'></i>
+                                                </a>
+                                            </div>
+                                        @endif
+
                                     </div>
                                 @endforeach
 
@@ -1102,7 +1134,7 @@
                     success: function(response) {
                         if (response.success) {
                             // Remove the note card from UI
-                            button.closest('.col-md-6').remove();
+                            button.closest('.remove-note').remove();
                         }
                     },
                     error: function() {
@@ -1126,7 +1158,8 @@
                     },
                     success: function(response) {
                         if (response.success) {
-                            location.reload();
+                            button.closest('.remove-document').remove();
+                            // location.reload();
                         }
                     },
                     error: function() {
@@ -1184,7 +1217,5 @@
 
             });
         </script>
-
-
     @endsection
 </main>
