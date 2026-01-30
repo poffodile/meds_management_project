@@ -1,6 +1,8 @@
 document.addEventListener('DOMContentLoaded', function () {
     const calendarEl = document.getElementById('calendar');
-
+    const BASE_URL = document
+    .querySelector('meta[name="base-url"]')
+    .getAttribute('content');
     const calendar = new FullCalendar.Calendar(calendarEl, {
 
         schedulerLicenseKey: 'GPL-My-Project-Is-Open-Source',
@@ -25,16 +27,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 'active',
                 info.view.type === 'resourceTimelineWeek'
             );
+
+            updateDateRange(info.view);
+            updateStats(); // optional but recommended
         },
 
-
-
-        /* ===== HEADER BUTTONS ===== */
-        // headerToolbar: {
-        //     left: 'prev,next today',
-        //     center: 'title',
-        //     right: 'resourceTimelineWeek,resourceTimelineDay'
-        // },
         headerToolbar: false,
         footerToolbar: false,
 
@@ -64,19 +61,39 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         },
 
-        eventContent: function (arg) {
-            const isWeek = arg.view.type === 'resourceTimelineWeek';
+        // eventContent: function (arg) {
+        //     const isWeek = arg.view.type === 'resourceTimelineWeek';
 
-            return {
-                html: `
-            <div class="shift-card">
-                <strong>${arg.event.title}</strong>
-                ${!isWeek ? `<div class="time">
-                    ${arg.timeText}
-                </div>` : ''}
-            </div>
-        `
-            };
+        //     return {
+        //         html: `
+        //     <div class="shift-card">
+        //         <strong>${arg.event.title}</strong>
+        //         ${!isWeek ? `<div class="time">
+        //             ${arg.timeText}
+        //         </div>` : ''}
+        //     </div>
+        // `
+        //     };
+        // },
+
+        eventContent: function (arg) {
+            if (arg.event.extendedProps.type === 'open') {
+                return {
+                    html: `
+                    <div class="open-shift-box">
+                        <div class="dot"></div>
+                        <div class="details">
+                            <strong>${arg.event.extendedProps.location}</strong>
+                            <div class="time">
+                                ${formatTime(arg.event.start)} - ${formatTime(arg.event.end)}
+                            </div>
+                        </div>
+                    </div>
+                `
+                };
+            }
+
+            return { html: `<div class="normal-event">${arg.event.title}</div>` };
         },
 
         eventAllow: function (dropInfo, draggedEvent) {
@@ -129,43 +146,50 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
         /* ===== STAFF (RESOURCES) ===== */
-        resources: [{
-            id: 'open',
-            title: '🟡 Open Shifts',
-            order: 0 // 👈 always first
-        },
-        {
-            id: '1',
-            title: 'Alex Sheffield',
-            order: 1 // 👈 always first
-        },
-        {
-            id: '2',
-            title: 'Becky Harrison',
-            order: 2
-        },
-        {
-            id: '3',
-            title: 'Emma Wilson',
-            order: 3
-        },
-        {
-            id: '4',
-            title: 'Alex Sheffield',
-            order: 4 // 👈 always first
-        },
-        {
-            id: '5',
-            title: 'Becky Harrison',
-            order: 5
-        },
-        {
-            id: '6',
-            title: 'Emma Wilson',
-            order: 6
-        }
-        ],
+        // resources: [{
+        //     id: 'open',
+        //     title: '🟡 Open Shifts',
+        //     order: 0 // 👈 always first
+        // },
+        // {
+        //     id: '1',
+        //     title: 'Alex Sheffield',
+        //     order: 1 // 👈 always first
+        // },
+        // {
+        //     id: '2',
+        //     title: 'Becky Harrison',
+        //     order: 2
+        // },
+        // {
+        //     id: '3',
+        //     title: 'Emma Wilson',
+        //     order: 3
+        // },
+        // {
+        //     id: '4',
+        //     title: 'Alex Sheffield',
+        //     order: 4 // 👈 always first
+        // },
+        // {
+        //     id: '5',
+        //     title: 'Becky Harrison',
+        //     order: 5
+        // },
+        // {
+        //     id: '6',
+        //     title: 'Emma Wilson',
+        //     order: 6
+        // }
+        // ],
 
+        resources: {
+            url: `${BASE_URL}/roster/carer/shift-resources`,  // 👈 your Laravel route
+            method: 'GET',
+            failure() {
+                alert('Failed to load resources');
+            }
+        },
         /* ===== SHIFTS (EVENTS) ===== */
         events: [
             // 🟡 OPEN SHIFTS
@@ -285,4 +309,22 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('btnWeek').onclick = () =>
         calendar.changeView('resourceTimelineWeek');
 
+    function updateDateRange(view) {
+        document.getElementById('dateRange').innerText =
+            '📅 ' + formatDateRange(view);
+    }
+
+
 });
+
+calendar.on('datesSet', function (info) {
+    document.getElementById('dateRange').innerText =
+        '📅 ' + formatDateRange(info.view);
+});
+
+function formatTime(date) {
+    return date.toLocaleTimeString('en-GB', {
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+}

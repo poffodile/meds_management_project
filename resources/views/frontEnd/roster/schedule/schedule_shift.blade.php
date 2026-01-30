@@ -1,7 +1,7 @@
 @extends('frontEnd.layouts.master')
 @section('title', 'Schedule Shift')
 @section('content')
-
+    <meta name="base-url" content="{{ url('') }}">
     @include('frontEnd.roster.common.roster_header')
     <!-- FullCalendar Scheduler CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar-scheduler@6.1.11/index.global.min.css">
@@ -392,23 +392,23 @@
                 </div>
 
                 <!-- <div class="careTaskstbbg sectionWhiteBgAllUse p-0">
-                        <header class="panel-heading headingCapitilize clntalertheader">
-                            <div class="clientHeadung">
-                                <div class="onlyheadingmain radIconClr"><i class="bx  bx-alert-triangle"></i> 52 Scheduling Issues Detected </div>
-                                <p>14 High Priority <span>38 Medium Priority</span> </p>
-                            </div>
+                            <header class="panel-heading headingCapitilize clntalertheader">
+                                <div class="clientHeadung">
+                                    <div class="onlyheadingmain radIconClr"><i class="bx  bx-alert-triangle"></i> 52 Scheduling Issues Detected </div>
+                                    <p>14 High Priority <span>38 Medium Priority</span> </p>
+                                </div>
 
-                            <div class="actions mt-0">
-                                <button class="btn addAssessmentBtn addalertClientDetailsBtn"> <i class="bx  bx-plus"></i> Add alert</button>
-                            </div>
-                        </header>
+                                <div class="actions mt-0">
+                                    <button class="btn addAssessmentBtn addalertClientDetailsBtn"> <i class="bx  bx-plus"></i> Add alert</button>
+                                </div>
+                            </header>
 
-                        <div class="p-20">
-                            <div class="clientFilterform addalertClientDetailsform" style="border: 2px solid #fdabab; background: #fef2f2;">
-                                <div class="createNewAlert"><i class="bx  bx-alert-triangle"></i> Create New Alert </div>
+                            <div class="p-20">
+                                <div class="clientFilterform addalertClientDetailsform" style="border: 2px solid #fdabab; background: #fef2f2;">
+                                    <div class="createNewAlert"><i class="bx  bx-alert-triangle"></i> Create New Alert </div>
+                                </div>
                             </div>
-                        </div>
-                    </div> -->
+                        </div> -->
 
                 <!-- ********************************** -->
 
@@ -418,7 +418,7 @@
                         <!-- Top Blue Bar -->
                         <div class="roster-top">
                             <div class="title">
-                                <h2>Care Home</h2> <span>Shift Roster</span>
+                                <h2 class="h2-color">Care Home</h2> <span>Shift Roster</span>
                             </div>
                             <div class="stats">
                                 <div class="stat"> <strong>12</strong> <small>Total Shifts</small> </div>
@@ -430,6 +430,30 @@
                                 <div class="stat hours"> <strong>96h</strong> <small>Hours</small> </div>
                             </div>
                         </div>
+
+                        <!-- Filters Row -->
+                        <div class="roster-filters">
+                            <div class="left">
+                                <select>
+                                    <option>Runs</option>
+                                </select>
+                                <select>
+                                    <option>By Visit</option>
+                                </select>
+                                <select>
+                                    <option>View: Planned</option>
+                                </select>
+                                <select>
+                                    <option>Duration: 1 Day</option>
+                                </select>
+
+                                <button class="lock-btn">
+                                    ✔ Locked Visits
+                                </button>
+                            </div>
+
+                            <input type="text" class="search" placeholder="Search..." />
+                        </div>
                         <!-- Date / Navigation Row -->
                         <div class="roster-nav">
                             <div class="left">
@@ -438,7 +462,7 @@
                                 <button id="btnDay">Day</button>
                                 <button id="btnWeek" class="active">Week</button>
 
-                                <button class="date-btn" id="dateRange">
+                                <button class="" id="dateRange">
                                     📅 --
                                 </button>
 
@@ -1048,8 +1072,8 @@
                             </div>
                             <div class="recent-activity sectionWhiteBgAllUse">
                                 <!-- <div class="section-header">
-                                                            <h2 class="section-title">Recent Activity</h2>
-                                                        </div> -->
+                                                                <h2 class="section-title">Recent Activity</h2>
+                                                            </div> -->
 
                                 <div class="activity-item">
                                     <div class="activity-icon"><i class='bx  bx-apps'></i> </div>

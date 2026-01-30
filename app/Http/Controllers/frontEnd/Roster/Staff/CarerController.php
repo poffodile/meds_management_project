@@ -138,7 +138,7 @@ class CarerController extends Controller
         ]);
     }
 
-     
+
 
     public function update(Request $request, $carer_id)
     {
@@ -205,5 +205,29 @@ class CarerController extends Controller
                 'message' => 'Something went wrong'
             ], 500);
         }
+    }
+
+    public function shift_resources()
+    {
+        $staff = User::where('home_id', Auth::user()->home_id)->select('id', 'name')->where('is_deleted', 0)->where('status', 1)->get();
+
+        $resources = [];
+
+        // Open Shifts FIRST
+        $resources[] = [
+            'id'    => 'open',
+            'title' => '🟡 Open Shifts',
+            'order' => 0
+        ];
+
+        foreach ($staff as $index => $member) {
+            $resources[] = [
+                'id'    => (string) $member->id,
+                'title' => $member->name,
+                'order' => $index + 1
+            ];
+        }
+
+        return response()->json($resources);
     }
 }

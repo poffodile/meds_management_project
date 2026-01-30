@@ -3,6 +3,36 @@
     font-family: Inter, system-ui, -apple-system, sans-serif;
 }
 
+.h2-color{
+    color: #fff;
+}
+
+/* Filters */
+.roster-filters {
+    padding: 12px 16px;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.roster-filters select,
+.roster-filters .lock-btn,
+.roster-filters .search {
+    border: 1px solid #e5e7eb;
+    padding: 6px 10px;
+    border-radius: 8px;
+    background: #fff;
+    font-size: 13px;
+}
+
+.lock-btn {
+    background: #f0fdf4;
+    border-color: #86efac;
+    color: #166534;
+}
+
 /* ===============================
    TOOLBAR / HEADER
 ================================ */
@@ -427,4 +457,33 @@
 
 .fc-timeline-slot {
     background: #fff;
+}
+
+.open-shift-box {
+    background: #fff7ed;
+    border: 1px dashed #ff9f43;
+    border-radius: 6px;
+    padding: 6px 8px;
+    font-size: 12px;
+    display: flex;
+    gap: 6px;
+    align-items: flex-start;
+}
+
+.open-shift-box .dot {
+    width: 8px;
+    height: 8px;
+    background: #28c76f;
+    border-radius: 50%;
+    margin-top: 4px;
+}
+
+.open-shift-box strong {
+    display: block;
+    font-weight: 600;
+}
+
+.open-shift-box .time {
+    font-size: 11px;
+    color: #666;
 }
