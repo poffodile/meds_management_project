@@ -23,7 +23,7 @@ class DynamicFormBuilder extends Model
     public static function getFormList(){
 
         $home_id = Auth::user()->home_id; 
-        $dynamic_forms = DynamicFormBuilder::select('id','title','location_ids')
+        $dynamic_forms = DynamicFormBuilder::select('id','title','location_ids', 'detail')
                                 ->where('home_id',$home_id)
                                 ->get()
                                 ->toArray();

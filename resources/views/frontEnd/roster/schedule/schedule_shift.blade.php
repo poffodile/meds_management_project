@@ -8,6 +8,29 @@
     <link rel="stylesheet" href="{{ url('/public/frontEnd/staff/css/schedule-shift.css') }}">
 
     <script type="text/javascript" src="{{ url('/public/frontEnd/js/external-dragging-calendar.js') }}"></script>
+
+    <style>
+        .documentContent {
+            display: none;
+        }
+
+        .pendingCompletionSection {
+            display: none;
+        }
+
+        @media print {
+            #pendingCount {
+                display: inline;
+                margin: 0;
+                padding: 0;
+                white-space: nowrap;
+            }
+        }
+
+        #close_document {
+            display: none;
+        }
+    </style>
     <main class="page-content">
         <div class="container-fluid">
 
@@ -53,8 +76,10 @@
                     <div class="rota_alert-icon"><i class="fa fa fa-calendar-o"></i></div>
                     <div class="rota_alert-content">
                         <div class="rota_alert-title">Mixed Shift - 09:30</div>
-                        <div class="rota_alert-description">Ron contacted for PDA one can I have contact No one assigned</div>
-                        <div class="rota_alert-bottmDescription"> <i class="fa fa-bolt"></i> Contact care immediately and verify shift status</div>
+                        <div class="rota_alert-description">Ron contacted for PDA one can I have contact No one assigned
+                        </div>
+                        <div class="rota_alert-bottmDescription"> <i class="fa fa-bolt"></i> Contact care immediately and
+                            verify shift status</div>
                     </div>
                     <div class="rota_alert-badge">New</div>
                 </div>
@@ -63,8 +88,10 @@
                     <div class="rota_alert-icon"><i class="fa fa fa-calendar-o"></i></div>
                     <div class="rota_alert-content">
                         <div class="rota_alert-title">Mixed Shift</div>
-                        <div class="rota_alert-description">Ron contacted for PDA one can I have contact No one assigned</div>
-                        <div class="rota_alert-bottmDescription"> <i class="fa fa-bolt"></i> Contact care immediately and verify shift status</div>
+                        <div class="rota_alert-description">Ron contacted for PDA one can I have contact No one assigned
+                        </div>
+                        <div class="rota_alert-bottmDescription"> <i class="fa fa-bolt"></i> Contact care immediately and
+                            verify shift status</div>
                     </div>
                     <div class="rota_alert-badge">New</div>
                 </div>
@@ -73,8 +100,10 @@
                     <div class="rota_alert-icon"><i class="fa fa fa-calendar-o"></i></div>
                     <div class="rota_alert-content">
                         <div class="rota_alert-title">Unfilled Shift in Next 24 Hours</div>
-                        <div class="rota_alert-description">May 12, 2025: 16:30 at All or Care Home assigned care! Check Margaret Smith</div>
-                        <div class="rota_alert-bottmDescription"> <i class="fa fa-bolt"></i> Assign a qualified carer to this shift urgently</div>
+                        <div class="rota_alert-description">May 12, 2025: 16:30 at All or Care Home assigned care! Check
+                            Margaret Smith</div>
+                        <div class="rota_alert-bottmDescription"> <i class="fa fa-bolt"></i> Assign a qualified carer to
+                            this shift urgently</div>
                     </div>
                     <div class="rota_alert-badge">New</div>
                 </div>
@@ -198,19 +227,24 @@
                         <div class="item">
                             <div class="item-header" id="headingFour">
                                 <h2 class="mb-0 mt-0">
-                                    <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                                    <button class="btn btn-link collapsed" type="button" data-toggle="collapse"
+                                        data-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
                                         <div class="issuesDetectedHead">
-                                            <div class="schedulingIcon" style="background-color: #ea580c;"> <i class="bx  bx-alert-triangle"></i> </div>
+                                            <div class="schedulingIcon" style="background-color: #ea580c;"> <i
+                                                    class="bx  bx-alert-triangle"></i> </div>
                                             <span>
                                                 52 Scheduling Issues Detected
-                                                <p class="priorityNumber"><span class="highProry"> 14 High Priority </span> <span> 38 Medium Priority </span></p>
+                                                <p class="priorityNumber"><span class="highProry"> 14 High Priority </span>
+                                                    <span> 38 Medium Priority </span>
+                                                </p>
                                             </span>
                                         </div>
                                         <i class="fa fa-angle-down"></i>
                                     </button>
                                 </h2>
                             </div>
-                            <div id="collapseFour" class="collapse" aria-labelledby="headingFour" data-parent="#accordionExample">
+                            <div id="collapseFour" class="collapse" aria-labelledby="headingFour"
+                                data-parent="#accordionExample">
                                 <div class="t-p achedulingAccordionTabs">
                                     <div class="tabs">
                                         <button class="tab active" data-tab="allSchedulingIssues">
@@ -236,18 +270,21 @@
                                                 <div class="planCard yllowBgAndBorder">
                                                     <div class="planTop">
                                                         <div class="planTitle">
-                                                            <span class="heartIcon"><i class="bx  bx-alert-triangle"></i> </span>
+                                                            <span class="heartIcon"><i class="bx  bx-alert-triangle"></i>
+                                                            </span>
                                                             <span class="commntagDesin careBadg">MEDIUM</span>
                                                             <span class="commntagDesin effecTive">effective</span>
                                                             <span class="commntagDesin dateBadg"><i class="bx bx-calendar"></i> 01 Jan</span>
                                                         </div>
 
                                                         <div class="header-actions">
-                                                            <button class="btn purpleBgBtn"><i class="bx bx-brain"></i> AI Resolve</button>
+                                                            <button class="btn purpleBgBtn"><i class="bx bx-brain"></i> AI
+                                                                Resolve</button>
                                                         </div>
                                                     </div>
                                                     <div class="planMeta">
-                                                        <div><strong>Emma Wilson scheduled for 10.0 hours on Jan 1 (approaching limit) </strong></div>
+                                                        <div><strong>Emma Wilson scheduled for 10.0 hours on Jan 1
+                                                                (approaching limit) </strong></div>
                                                     </div>
                                                     <div class="planMeta">
                                                         <div> Total scheduled: 10.0 hours</div>
@@ -256,7 +293,8 @@
                                                 <div class="planCard redBgAndBorder">
                                                     <div class="planTop">
                                                         <div class="planTitle">
-                                                            <span class="heartIcon"><i class="bx  bx-alert-triangle"></i> </span>
+                                                            <span class="heartIcon"><i class="bx  bx-alert-triangle"></i>
+                                                            </span>
                                                             <span class="commntagDesin careBadg">HIGH</span>
                                                             <span class="commntagDesin">unfilled</span>
                                                         </div>
@@ -274,24 +312,29 @@
                                                         </div>
                                                     </div>
                                                     <div class="planMeta">
-                                                        <div><strong>Unfilled shift for Unknown on Jan 8 at 09:00 </strong></div>
+                                                        <div><strong>Unfilled shift for Unknown on Jan 8 at 09:00 </strong>
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div class="planCard yllowBgAndBorder">
                                                     <div class="planTop">
                                                         <div class="planTitle">
-                                                            <span class="heartIcon"><i class="bx  bx-alert-triangle"></i> </span>
+                                                            <span class="heartIcon"><i class="bx  bx-alert-triangle"></i>
+                                                            </span>
                                                             <span class="commntagDesin careBadg">MEDIUM</span>
                                                             <span class="commntagDesin effecTive">availability</span>
-                                                            <span class="commntagDesin dateBadg"><i class="bx bx-calendar"></i>03 Feb</span>
+                                                            <span class="commntagDesin dateBadg"><i
+                                                                    class="bx bx-calendar"></i>03 Feb</span>
                                                         </div>
 
                                                         <div class="header-actions">
-                                                            <button class="btn purpleBgBtn"><i class="bx bx-brain"></i> AI Resolve</button>
+                                                            <button class="btn purpleBgBtn"><i class="bx bx-brain"></i> AI
+                                                                Resolve</button>
                                                         </div>
                                                     </div>
                                                     <div class="planMeta">
-                                                        <div><strong>Unknown is Not a working day on Feb 3 (09:00-17:00) </strong></div>
+                                                        <div><strong>Unknown is Not a working day on Feb 3 (09:00-17:00)
+                                                            </strong></div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -301,7 +344,8 @@
                                                 <div class="planCard yllowBgAndBorder">
                                                     <div class="planTop">
                                                         <div class="planTitle">
-                                                            <span class="heartIcon"><i class="bx  bx-alert-triangle"></i> </span>
+                                                            <span class="heartIcon"><i class="bx  bx-alert-triangle"></i>
+                                                            </span>
                                                             <span class="commntagDesin careBadg">MEDIUM</span>
                                                             <span class="commntagDesin effecTive">effective</span>
                                                             <span class="commntagDesin dateBadg"><i class="bx bx-calendar"></i> 01 Jan</span>
@@ -325,7 +369,7 @@
                                                 <div class="planCard redBgAndBorder">
                                                     <div class="planTop">
                                                         <div class="planTitle">
-                                                            <span class="heartIcon"><i class="bx  bx-alert-triangle"></i> </span>
+                                                            <span class="heartIcon"><i class="bx  bx-alert-triangle"></i></span>
                                                             <span class="commntagDesin careBadg">HIGH</span>
                                                             <span class="commntagDesin">unfilled</span>
                                                         </div>
@@ -347,18 +391,21 @@
                                                 <div class="planCard yllowBgAndBorder">
                                                     <div class="planTop">
                                                         <div class="planTitle">
-                                                            <span class="heartIcon"><i class="bx  bx-alert-triangle"></i> </span>
+                                                            <span class="heartIcon"><i class="bx  bx-alert-triangle"></i>
+                                                            </span>
                                                             <span class="commntagDesin careBadg">MEDIUM</span>
                                                             <span class="commntagDesin effecTive">availability</span>
                                                             <span class="commntagDesin dateBadg"><i class="bx bx-calendar"></i>03 Feb</span>
                                                         </div>
 
                                                         <div class="header-actions">
-                                                            <button class="btn purpleBgBtn"><i class="bx bx-brain"></i> AI Resolve</button>
+                                                            <button class="btn purpleBgBtn"><i class="bx bx-brain"></i> AI
+                                                                Resolve</button>
                                                         </div>
                                                     </div>
                                                     <div class="planMeta">
-                                                        <div><strong>Unknown is Not a working day on Feb 3 (09:00-17:00) </strong></div>
+                                                        <div><strong>Unknown is Not a working day on Feb 3 (09:00-17:00)
+                                                            </strong></div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -368,7 +415,7 @@
                                                 <div class="planCard yllowBgAndBorder">
                                                     <div class="planTop">
                                                         <div class="planTitle">
-                                                            <span class="heartIcon"><i class="bx  bx-alert-triangle"></i> </span>
+                                                            <span class="heartIcon"><i class="bx  bx-alert-triangle"></i></span>
                                                             <span class="commntagDesin careBadg">MEDIUM</span>
                                                             <span class="commntagDesin effecTive">availability</span>
                                                             <span class="commntagDesin dateBadg"><i class="bx bx-calendar"></i>03 Feb</span>
@@ -392,23 +439,23 @@
                 </div>
 
                 <!-- <div class="careTaskstbbg sectionWhiteBgAllUse p-0">
-                            <header class="panel-heading headingCapitilize clntalertheader">
-                                <div class="clientHeadung">
-                                    <div class="onlyheadingmain radIconClr"><i class="bx  bx-alert-triangle"></i> 52 Scheduling Issues Detected </div>
-                                    <p>14 High Priority <span>38 Medium Priority</span> </p>
-                                </div>
+                                                                <header class="panel-heading headingCapitilize clntalertheader">
+                                                                    <div class="clientHeadung">
+                                                                        <div class="onlyheadingmain radIconClr"><i class="bx  bx-alert-triangle"></i> 52 Scheduling Issues Detected </div>
+                                                                        <p>14 High Priority <span>38 Medium Priority</span> </p>
+                                                                    </div>
 
-                                <div class="actions mt-0">
-                                    <button class="btn addAssessmentBtn addalertClientDetailsBtn"> <i class="bx  bx-plus"></i> Add alert</button>
-                                </div>
-                            </header>
+                                                                    <div class="actions mt-0">
+                                                                        <button class="btn addAssessmentBtn addalertClientDetailsBtn"> <i class="bx  bx-plus"></i> Add alert</button>
+                                                                    </div>
+                                                                </header>
 
-                            <div class="p-20">
-                                <div class="clientFilterform addalertClientDetailsform" style="border: 2px solid #fdabab; background: #fef2f2;">
-                                    <div class="createNewAlert"><i class="bx  bx-alert-triangle"></i> Create New Alert </div>
-                                </div>
-                            </div>
-                        </div> -->
+                                                                <div class="p-20">
+                                                                    <div class="clientFilterform addalertClientDetailsform" style="border: 2px solid #fdabab; background: #fef2f2;">
+                                                                        <div class="createNewAlert"><i class="bx  bx-alert-triangle"></i> Create New Alert </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div> -->
 
                 <!-- ********************************** -->
 
@@ -481,9 +528,7 @@
 
 
                         <div id="calendar"></div>
-                        <div class="cell dropzone"
-                            data-date="2026-01-21"
-                            data-staff-id="12">
+                        <div class="cell dropzone" data-date="2026-01-21" data-staff-id="12">
 
                             <div class="roster-footer">
                                 <div class="shift-types">
@@ -524,7 +569,8 @@
                             <div class="sectionWhiteBgAllUse">
                                 <div class="dailyLogsdateSec">
                                     <div class="date-slider">
-                                        <button class="nav-btn prev-btn"><i class='bx  bx-chevron-left'></i> Previous</button>
+                                        <button class="nav-btn prev-btn"><i class='bx  bx-chevron-left'></i>
+                                            Previous</button>
 
                                         <div class="changeDateSlide">
                                             <div class="date-display">
@@ -537,7 +583,8 @@
                                         </div>
                                         <div class="datechangeBtnTodayOrNext">
                                             <button class="btn borderBtn">Today</button>
-                                            <button class="nav-btn next-btn">Next <i class='bx  bx-chevron-right'></i> </button>
+                                            <button class="nav-btn next-btn">Next <i class='bx  bx-chevron-right'></i>
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -791,7 +838,8 @@
                                     <div class="profile-card careTasksCard mb-0">
                                         <div class="details mt-0">
                                             <div class="item">
-                                                <i class="bx  bx-clock"></i><span><strong> Fri, Oct 16 </strong> </span> • <span>09:00 - 17:00 (8h)</span>
+                                                <i class="bx  bx-clock"></i><span><strong> Fri, Oct 16 </strong> </span> •
+                                                <span>09:00 - 17:00 (8h)</span>
                                             </div>
                                         </div>
                                         <div class="sectionCarer">
@@ -803,7 +851,8 @@
                                         </div>
                                         <div class="details">
                                             <div class="item">
-                                                <span class="greenText"><i class='bx  bx-home-alt-2'></i> </span> <span><strong> East Wing </strong> </span>
+                                                <span class="greenText"><i class='bx  bx-home-alt-2'></i> </span>
+                                                <span><strong> East Wing </strong> </span>
                                             </div>
                                             <div class="item redalrttext">
                                                 <i class='bx  bx-user'></i> <span>Unassigned</span>
@@ -811,9 +860,12 @@
                                         </div>
                                         <hr />
                                         <div class="actions">
-                                            <button class="borderBtn edit" data-id="120"> <i class='bx  bx-edit'></i> Edit </button>
-                                            <button class="borderBtn delete" data-id="120"> <i class='bx  bx-trash'></i> </button>
-                                            <button class="borderBtn edit" data-id="120"> <i class='bx  bx-paper-plane'></i> Request </button>
+                                            <button class="borderBtn edit" data-id="120"> <i class='bx  bx-edit'></i> Edit
+                                            </button>
+                                            <button class="borderBtn delete" data-id="120"> <i class='bx  bx-trash'></i>
+                                            </button>
+                                            <button class="borderBtn edit" data-id="120"> <i class='bx  bx-paper-plane'></i>
+                                                Request </button>
                                         </div>
                                     </div>
                                 </div>
@@ -821,7 +873,8 @@
                                     <div class="profile-card careTasksCard mb-0">
                                         <div class="details mt-0">
                                             <div class="item">
-                                                <i class="bx  bx-clock"></i><span><strong> Fri, Oct 16 </strong> </span> • <span>09:00 - 17:00 (8h)</span>
+                                                <i class="bx  bx-clock"></i><span><strong> Fri, Oct 16 </strong> </span> •
+                                                <span>09:00 - 17:00 (8h)</span>
                                             </div>
                                         </div>
                                         <div class="sectionCarer">
@@ -833,7 +886,8 @@
                                         </div>
                                         <div class="details">
                                             <div class="item">
-                                                <span class="greenText"><i class='bx  bx-home-alt-2'></i> </span> <span><strong> East Wing </strong> </span>
+                                                <span class="greenText"><i class='bx  bx-home-alt-2'></i> </span>
+                                                <span><strong> East Wing </strong> </span>
                                             </div>
                                             <div class="item redalrttext">
                                                 <i class='bx  bx-user'></i> <span>Unassigned</span>
@@ -841,9 +895,12 @@
                                         </div>
                                         <hr />
                                         <div class="actions">
-                                            <button class="borderBtn edit" data-id="120"> <i class='bx  bx-edit'></i> Edit </button>
-                                            <button class="borderBtn delete" data-id="120"> <i class='bx  bx-trash'></i> </button>
-                                            <button class="borderBtn edit" data-id="120"> <i class='bx  bx-paper-plane'></i> Request </button>
+                                            <button class="borderBtn edit" data-id="120"> <i class='bx  bx-edit'></i> Edit
+                                            </button>
+                                            <button class="borderBtn delete" data-id="120"> <i class='bx  bx-trash'></i>
+                                            </button>
+                                            <button class="borderBtn edit" data-id="120"> <i class='bx  bx-paper-plane'></i>
+                                                Request </button>
                                         </div>
                                     </div>
                                 </div>
@@ -851,7 +908,8 @@
                                     <div class="profile-card careTasksCard mb-0">
                                         <div class="details mt-0">
                                             <div class="item">
-                                                <i class="bx  bx-clock"></i><span><strong> Fri, Oct 16 </strong> </span> • <span>09:00 - 17:00 (8h)</span>
+                                                <i class="bx  bx-clock"></i><span><strong> Fri, Oct 16 </strong> </span> •
+                                                <span>09:00 - 17:00 (8h)</span>
                                             </div>
                                         </div>
                                         <div class="sectionCarer">
@@ -863,7 +921,8 @@
                                         </div>
                                         <div class="details">
                                             <div class="item">
-                                                <span class="greenText"> <i class='bx  bx-home-alt-2'></i></span> <span><strong> East Wing </strong> </span>
+                                                <span class="greenText"> <i class='bx  bx-home-alt-2'></i></span>
+                                                <span><strong> East Wing </strong> </span>
                                             </div>
                                             <div class="item redalrttext">
                                                 <i class='bx  bx-user'></i> <span> Unassigned</span>
@@ -871,9 +930,12 @@
                                         </div>
                                         <hr />
                                         <div class="actions">
-                                            <button class="borderBtn edit" data-id="120"> <i class='bx  bx-edit'></i> Edit </button>
-                                            <button class="borderBtn delete" data-id="120"> <i class='bx  bx-trash'></i> </button>
-                                            <button class="borderBtn edit" data-id="120"> <i class='bx  bx-paper-plane'></i> Request </button>
+                                            <button class="borderBtn edit" data-id="120"> <i class='bx  bx-edit'></i> Edit
+                                            </button>
+                                            <button class="borderBtn delete" data-id="120"> <i class='bx  bx-trash'></i>
+                                            </button>
+                                            <button class="borderBtn edit" data-id="120"> <i class='bx  bx-paper-plane'></i>
+                                                Request </button>
                                         </div>
                                     </div>
                                 </div>
@@ -881,7 +943,8 @@
                                     <div class="profile-card careTasksCard mb-0">
                                         <div class="details mt-0">
                                             <div class="item">
-                                                <i class="bx  bx-clock"></i><span><strong> Fri, Oct 16 </strong> </span> • <span>09:00 - 17:00 (8h)</span>
+                                                <i class="bx  bx-clock"></i><span><strong> Fri, Oct 16 </strong> </span> •
+                                                <span>09:00 - 17:00 (8h)</span>
                                             </div>
                                         </div>
                                         <div class="sectionCarer">
@@ -893,7 +956,8 @@
                                         </div>
                                         <div class="details">
                                             <div class="item">
-                                                <span class="greenText"><i class='bx  bx-home-alt-2'></i> </span> <span><strong> East Wing </strong> </span>
+                                                <span class="greenText"><i class='bx  bx-home-alt-2'></i> </span>
+                                                <span><strong> East Wing </strong> </span>
                                             </div>
                                             <div class="item redalrttext">
                                                 <i class='bx  bx-user'></i> <span>Unassigned</span>
@@ -901,9 +965,12 @@
                                         </div>
                                         <hr />
                                         <div class="actions">
-                                            <button class="borderBtn edit" data-id="120"> <i class='bx  bx-edit'></i> Edit </button>
-                                            <button class="borderBtn delete" data-id="120"> <i class='bx  bx-trash'></i> </button>
-                                            <button class="borderBtn edit" data-id="120"> <i class='bx  bx-paper-plane'></i> Request </button>
+                                            <button class="borderBtn edit" data-id="120"> <i class='bx  bx-edit'></i> Edit
+                                            </button>
+                                            <button class="borderBtn delete" data-id="120"> <i class='bx  bx-trash'></i>
+                                            </button>
+                                            <button class="borderBtn edit" data-id="120"> <i class='bx  bx-paper-plane'></i>
+                                                Request </button>
                                         </div>
                                     </div>
                                 </div>
@@ -911,7 +978,8 @@
                                     <div class="profile-card careTasksCard mb-0">
                                         <div class="details mt-0">
                                             <div class="item">
-                                                <i class="bx  bx-clock"></i><span><strong> Fri, Oct 16 </strong> </span> • <span>09:00 - 17:00 (8h)</span>
+                                                <i class="bx  bx-clock"></i><span><strong> Fri, Oct 16 </strong> </span> •
+                                                <span>09:00 - 17:00 (8h)</span>
                                             </div>
                                         </div>
                                         <div class="sectionCarer">
@@ -923,7 +991,8 @@
                                         </div>
                                         <div class="details">
                                             <div class="item">
-                                                <span class="greenText"><i class='bx  bx-home-alt-2'></i> </span> <span><strong> East Wing </strong> </span>
+                                                <span class="greenText"><i class='bx  bx-home-alt-2'></i> </span>
+                                                <span><strong> East Wing </strong> </span>
                                             </div>
                                             <div class="item redalrttext">
                                                 <i class='bx  bx-user'></i> <span>Unassigned</span>
@@ -931,9 +1000,12 @@
                                         </div>
                                         <hr />
                                         <div class="actions">
-                                            <button class="borderBtn edit" data-id="120"> <i class='bx  bx-edit'></i> Edit </button>
-                                            <button class="borderBtn delete" data-id="120"> <i class='bx  bx-trash'></i> </button>
-                                            <button class="borderBtn edit" data-id="120"> <i class='bx  bx-paper-plane'></i> Request </button>
+                                            <button class="borderBtn edit" data-id="120"> <i class='bx  bx-edit'></i> Edit
+                                            </button>
+                                            <button class="borderBtn delete" data-id="120"> <i class='bx  bx-trash'></i>
+                                            </button>
+                                            <button class="borderBtn edit" data-id="120"> <i class='bx  bx-paper-plane'></i>
+                                                Request </button>
                                         </div>
                                     </div>
                                 </div>
@@ -941,7 +1013,8 @@
                                     <div class="profile-card careTasksCard mb-0">
                                         <div class="details mt-0">
                                             <div class="item">
-                                                <i class="bx  bx-clock"></i><span><strong> Fri, Oct 16 </strong> </span> • <span>09:00 - 17:00 (8h)</span>
+                                                <i class="bx  bx-clock"></i><span><strong> Fri, Oct 16 </strong> </span> •
+                                                <span>09:00 - 17:00 (8h)</span>
                                             </div>
                                         </div>
                                         <div class="sectionCarer">
@@ -953,7 +1026,8 @@
                                         </div>
                                         <div class="details">
                                             <div class="item">
-                                                <span class="greenText"> <i class='bx  bx-home-alt-2'></i></span> <span><strong> East Wing </strong> </span>
+                                                <span class="greenText"> <i class='bx  bx-home-alt-2'></i></span>
+                                                <span><strong> East Wing </strong> </span>
                                             </div>
                                             <div class="item redalrttext">
                                                 <i class='bx  bx-user'></i> <span> Unassigned</span>
@@ -961,9 +1035,12 @@
                                         </div>
                                         <hr />
                                         <div class="actions">
-                                            <button class="borderBtn edit" data-id="120"> <i class='bx  bx-edit'></i> Edit </button>
-                                            <button class="borderBtn delete" data-id="120"> <i class='bx  bx-trash'></i> </button>
-                                            <button class="borderBtn edit" data-id="120"> <i class='bx  bx-paper-plane'></i> Request </button>
+                                            <button class="borderBtn edit" data-id="120"> <i class='bx  bx-edit'></i> Edit
+                                            </button>
+                                            <button class="borderBtn delete" data-id="120"> <i class='bx  bx-trash'></i>
+                                            </button>
+                                            <button class="borderBtn edit" data-id="120"> <i class='bx  bx-paper-plane'></i>
+                                                Request </button>
                                         </div>
                                     </div>
                                 </div>
@@ -971,7 +1048,8 @@
                                     <div class="profile-card careTasksCard mb-0">
                                         <div class="details mt-0">
                                             <div class="item">
-                                                <i class="bx  bx-clock"></i><span><strong> Fri, Oct 16 </strong> </span> • <span>09:00 - 17:00 (8h)</span>
+                                                <i class="bx  bx-clock"></i><span><strong> Fri, Oct 16 </strong> </span> •
+                                                <span>09:00 - 17:00 (8h)</span>
                                             </div>
                                         </div>
                                         <div class="sectionCarer">
@@ -983,7 +1061,8 @@
                                         </div>
                                         <div class="details">
                                             <div class="item">
-                                                <span class="greenText"><i class='bx  bx-home-alt-2'></i> </span> <span><strong> East Wing </strong> </span>
+                                                <span class="greenText"><i class='bx  bx-home-alt-2'></i> </span>
+                                                <span><strong> East Wing </strong> </span>
                                             </div>
                                             <div class="item redalrttext">
                                                 <i class='bx  bx-user'></i> <span>Unassigned</span>
@@ -991,9 +1070,12 @@
                                         </div>
                                         <hr />
                                         <div class="actions">
-                                            <button class="borderBtn edit" data-id="120"> <i class='bx  bx-edit'></i> Edit </button>
-                                            <button class="borderBtn delete" data-id="120"> <i class='bx  bx-trash'></i> </button>
-                                            <button class="borderBtn edit" data-id="120"> <i class='bx  bx-paper-plane'></i> Request </button>
+                                            <button class="borderBtn edit" data-id="120"> <i class='bx  bx-edit'></i> Edit
+                                            </button>
+                                            <button class="borderBtn delete" data-id="120"> <i class='bx  bx-trash'></i>
+                                            </button>
+                                            <button class="borderBtn edit" data-id="120"> <i class='bx  bx-paper-plane'></i>
+                                                Request </button>
                                         </div>
                                     </div>
                                 </div>
@@ -1001,7 +1083,8 @@
                                     <div class="profile-card careTasksCard mb-0">
                                         <div class="details mt-0">
                                             <div class="item">
-                                                <i class="bx  bx-clock"></i><span><strong> Fri, Oct 16 </strong> </span> • <span>09:00 - 17:00 (8h)</span>
+                                                <i class="bx  bx-clock"></i><span><strong> Fri, Oct 16 </strong> </span> •
+                                                <span>09:00 - 17:00 (8h)</span>
                                             </div>
                                         </div>
                                         <div class="sectionCarer">
@@ -1013,7 +1096,8 @@
                                         </div>
                                         <div class="details">
                                             <div class="item">
-                                                <span class="greenText"><i class='bx  bx-home-alt-2'></i> </span> <span><strong> East Wing </strong> </span>
+                                                <span class="greenText"><i class='bx  bx-home-alt-2'></i> </span>
+                                                <span><strong> East Wing </strong> </span>
                                             </div>
                                             <div class="item redalrttext">
                                                 <i class='bx  bx-user'></i> <span>Unassigned</span>
@@ -1021,9 +1105,12 @@
                                         </div>
                                         <hr />
                                         <div class="actions">
-                                            <button class="borderBtn edit" data-id="120"> <i class='bx  bx-edit'></i> Edit </button>
-                                            <button class="borderBtn delete" data-id="120"> <i class='bx  bx-trash'></i> </button>
-                                            <button class="borderBtn edit" data-id="120"> <i class='bx  bx-paper-plane'></i> Request </button>
+                                            <button class="borderBtn edit" data-id="120"> <i class='bx  bx-edit'></i> Edit
+                                            </button>
+                                            <button class="borderBtn delete" data-id="120"> <i class='bx  bx-trash'></i>
+                                            </button>
+                                            <button class="borderBtn edit" data-id="120"> <i class='bx  bx-paper-plane'></i>
+                                                Request </button>
                                         </div>
                                     </div>
                                 </div>
@@ -1031,7 +1118,8 @@
                                     <div class="profile-card careTasksCard mb-0">
                                         <div class="details mt-0">
                                             <div class="item">
-                                                <i class="bx  bx-clock"></i><span><strong> Fri, Oct 16 </strong> </span> • <span>09:00 - 17:00 (8h)</span>
+                                                <i class="bx  bx-clock"></i><span><strong> Fri, Oct 16 </strong> </span> •
+                                                <span>09:00 - 17:00 (8h)</span>
                                             </div>
                                         </div>
                                         <div class="sectionCarer">
@@ -1043,7 +1131,8 @@
                                         </div>
                                         <div class="details">
                                             <div class="item">
-                                                <span class="greenText"> <i class='bx  bx-home-alt-2'></i></span> <span><strong> East Wing </strong> </span>
+                                                <span class="greenText"> <i class='bx  bx-home-alt-2'></i></span>
+                                                <span><strong> East Wing </strong> </span>
                                             </div>
                                             <div class="item redalrttext">
                                                 <i class='bx  bx-user'></i> <span> Unassigned</span>
@@ -1051,9 +1140,12 @@
                                         </div>
                                         <hr />
                                         <div class="actions">
-                                            <button class="borderBtn edit" data-id="120"> <i class='bx  bx-edit'></i> Edit </button>
-                                            <button class="borderBtn delete" data-id="120"> <i class='bx  bx-trash'></i> </button>
-                                            <button class="borderBtn edit" data-id="120"> <i class='bx  bx-paper-plane'></i> Request </button>
+                                            <button class="borderBtn edit" data-id="120"> <i class='bx  bx-edit'></i> Edit
+                                            </button>
+                                            <button class="borderBtn delete" data-id="120"> <i class='bx  bx-trash'></i>
+                                            </button>
+                                            <button class="borderBtn edit" data-id="120"> <i class='bx  bx-paper-plane'></i>
+                                                Request </button>
                                         </div>
                                     </div>
                                 </div>
@@ -1072,8 +1164,8 @@
                             </div>
                             <div class="recent-activity sectionWhiteBgAllUse">
                                 <!-- <div class="section-header">
-                                                                <h2 class="section-title">Recent Activity</h2>
-                                                            </div> -->
+                                                                                                <h2 class="section-title">Recent Activity</h2>
+                                                                                            </div> -->
 
                                 <div class="activity-item">
                                     <div class="activity-icon"><i class='bx  bx-apps'></i> </div>
@@ -1119,13 +1211,12 @@
                         <p>Split layout appears here.</p>
                     </div>
                 </div>
-
             </div>
-
         </div>
 
         <!-- add Shift Schedule Modal -->
-        <div class="modal fade leaveCommunStyle" id="addShiftModal" tabindex="1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal fade leaveCommunStyle" id="addShiftModal" tabindex="1" role="dialog"
+            aria-labelledby="myModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -1138,32 +1229,34 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="">
-                                            <label>care Type</label>
-                                            <select class="form-control">
-                                                <option>Active</option>
-                                                <option>Inactive</option>
+                                            <label>Care Type</label>
+                                            <select class="form-control" id="careType" name="care_type">
+                                                @foreach ($company_department as $department)
+                                                    <option value="{{ $department->id }}">{{ $department->name }}</option>
+                                                @endforeach
                                             </select>
                                         </div>
 
                                         <div class="calendarTabs leaveRequesttabs m-t-10">
                                             <label>Assignment *</label>
                                             <div class="tabs p-2 m-b-10" style="background-color: #f5f5f5;">
-                                                <button type="button" class="tab active" data-tab="scheduleLocation">
+                                                <button type="button" class="tab" id="locationTab" data-tab="scheduleLocation">
                                                     <i class='bx  bx-location'></i> Location
                                                 </button>
 
-                                                <button type="button" class="tab" data-tab="scheduleClient">
+                                                <button type="button" class="tab active" id="clientTab" data-tab="scheduleClient">
                                                     <i class='bx  bx-user'></i> Client
                                                 </button>
 
-                                                <button type="button" class="tab" data-tab="scheduleProperty">
+                                                <button type="button" class="tab" id="propertyTab" data-tab="scheduleProperty">
                                                     <i class="fa fa-building-o"></i> Property
                                                 </button>
                                             </div>
 
                                             <!-- TAB CONTENT -->
                                             <div class="tab-content carertabcontent">
-                                                <div class="content active" id="scheduleLocation">
+                                                {{-- Locaton Section --}}
+                                                <div class="content" id="scheduleLocation">
                                                     <div class="row">
                                                         <div class="col-md-12">
                                                             <select class="form-control">
@@ -1172,485 +1265,221 @@
                                                             </select>
                                                         </div>
                                                         <div class="col-md-12 m-t-10">
-                                                            <input type="text" name="" id="" class="form-control" placeholder="Enter custom location name">
+                                                            <input type="text" name="" id="" class="form-control"
+                                                                placeholder="Enter custom location name">
                                                         </div>
                                                         <div class="col-md-12 m-t-10">
-                                                            <input type="text" name="" id="" class="form-control" placeholder="Address (optional)">
+                                                            <input type="text" name="" id="" class="form-control"
+                                                                placeholder="Address (optional)">
                                                         </div>
-                                                        <div class="col-md-12 m-t-10">
-                                                            <label>Date *</label>
-                                                            <input type="date" class="form-control">
-                                                        </div>
+
                                                     </div>
-                                                    <div class="row m-t-10">
-                                                        <div class="col-md-6">
-                                                            <label>Start Time *</label>
-                                                            <input type="time" class="form-control">
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <label>End Time *</label>
-                                                            <input type="time" class="form-control">
-                                                        </div>
-                                                    </div>
+                                                </div>
+                                                {{-- Location Section --}}
+
+                                                {{-- Client Section --}}
+                                                <div class="content active" id="scheduleClient">
                                                     <div class="row">
-                                                        <div class="col-md-12  m-t-10">
-                                                            <label>Shift Type</label>
+                                                        <div class="col-md-12">
                                                             <select class="form-control">
-                                                                <option>Morning</option>
-                                                                <option>Afternoon</option>
-                                                                <option>Evening</option>
-                                                                <option>Night</option>
+                                                                @foreach ($service_users as $service_user)
+                                                                    <option value="{{ $service_user->id }}">
+                                                                        {{ $service_user->name }}
+                                                                    </option>
+                                                                @endforeach
                                                             </select>
                                                         </div>
-                                                        <div class="col-md-12  m-t-10">
-                                                            <label>Tasks (comma separated)</label>
-                                                            <textarea class="form-control" rows="3" placeholder="e.g., Medication, Personal care, Meal preparation" name=""></textarea>
-                                                        </div>
-                                                        <div class="col-md-12  m-t-10">
-                                                            <label>Notes</label>
-                                                            <textarea class="form-control" rows="3" placeholder="Additional notes or instructions" name=""></textarea>
-                                                        </div>
-                                                        <div class="col-md-12  m-t-10">
-                                                            <div class="overtime  recurringShift">
-                                                                <label>
-                                                                    <input type="checkbox"> Make this a recurring shift
-                                                                </label>
 
-                                                                <div class="row">
-                                                                    <div class="col-md-12">
-                                                                        <label>Frequency</label>
-                                                                        <select class="form-control">
-                                                                            <option>Fortnightly</option>
-                                                                            <option>Daily</option>
-                                                                            <option>Weekly</option>
-                                                                        </select>
-                                                                    </div>
-                                                                    <div class="col-md-12 m-t-10">
-                                                                        <label>Frequency</label>
-                                                                        <div class="weeklyDaysSelect">
-                                                                            <span class="active">Sun</span>
-                                                                            <span>Mon</span>
-                                                                            <span>Tue</span>
-                                                                            <span>Wed</span>
-                                                                            <span>Thu</span>
-                                                                            <span>Fri</span>
-                                                                            <span>Sat</span>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="col-md-12 m-t-10">
-                                                                        <label>End Date</label>
-                                                                        <input type="date" class="form-control">
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
+                                                    </div>
+                                                </div>
+                                                {{-- Client Section --}}
+
+                                                {{-- Property Section --}}
+                                                <div class="content" id="scheduleProperty">
+                                                    <div class="row">
                                                         <div class="col-md-12">
-                                                            <div class="attached-documents">
+                                                            <select class="form-control">
+                                                                <option value="">Select Property</option>
+                                                            </select>
+                                                        </div>
 
-                                                                <div class="header">
-                                                                    <div class="title">
-                                                                        📎 <span>Attached Documents</span>
-                                                                    </div>
-                                                                    <div class="AttachAndCloseBtn">
-                                                                        <button type="button" class="close-btn"><i class='bx  bx-plus'></i> Attach</button>
-                                                                        <button type="button" class="close-btn"><i class='bx  bx-x'></i> </button>
-                                                                    </div>
-                                                                </div>
+                                                    </div>
+                                                </div>
+                                                {{-- Property Section --}}
+                                            </div>
+                                            <div class="row m-t-10">
+                                                <div class="col-md-12">
+                                                    <label>Date *</label>
+                                                    <input type="date" class="form-control">
+                                                </div>
+                                                <div class="col-md-6 m-t-10">
+                                                    <label>Start Time *</label>
+                                                    <input type="time" class="form-control">
+                                                </div>
+                                                <div class="col-md-6 m-t-10">
+                                                    <label>End Time *</label>
+                                                    <input type="time" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-12  m-t-10">
+                                                    <label>Shift Type</label>
+                                                    <select class="form-control" name="shift_type">
+                                                        <option value="morning">Morning</option>
+                                                        <option value="afternoon">Afternoon</option>
+                                                        <option value="evening">Evening</option>
+                                                        <option value="night">Night</option>
+                                                        <option value="supervision">Supervision</option>
+                                                        <option value="shadowing">Shadowing</option>
+                                                        <option value="sleep_in">Sleep In</option>
+                                                        <option value="waking_night">Waking Night</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-12  m-t-10">
+                                                    <label>Tasks (comma separated)</label>
+                                                    <textarea class="form-control" rows="3"
+                                                        placeholder="e.g., Medication, Personal care, Meal preparation"
+                                                        name=""></textarea>
+                                                </div>
+                                                <div class="col-md-12  m-t-10">
+                                                    <label>Notes</label>
+                                                    <textarea class="form-control" rows="3"
+                                                        placeholder="Additional notes or instructions" name=""></textarea>
+                                                </div>
 
-                                                                <div class="upload-box">
+                                                <div class="col-md-12  m-t-10">
+                                                    <div class="overtime  recurringShift">
+                                                        <label>
+                                                            <input type="checkbox" id="recurringClientToggle"> Make this a recurring shift
+                                                        </label>
 
-
-                                                                    <div class="" id="availabilityTab">
-                                                                        <div class="availabilityTabs">
-                                                                            <!-- TAB HEADER -->
-                                                                            <div class="availabilityTabs__nav">
-                                                                                <button type="button" class="availabilityTabs__tab active" data-target="selectfromSystem"> 📁 Select from System</button>
-                                                                                <button type="button" class="availabilityTabs__tab" data-target="uploadFiles"> ⬆ Upload File</button>
-                                                                            </div>
-
-                                                                            <div class="availabilityTabs__content">
-
-                                                                                <div class="availabilityTabs__panel active" id="selectfromSystem">
-                                                                                    <div class="selectfromSystemTabCont">
-                                                                                        <div class="input-group selectfromSearch">
-                                                                                            <span class="input-group-addon btn-white"><i class="fa fa-search"></i></span>
-                                                                                            <input type="text" class="form-control" placeholder="Search entries...">
-                                                                                        </div>
-
-                                                                                        <div class="addSystemList">
-                                                                                            <div class="systemList">
-                                                                                                <span class="blueText"><i class='bx  bx-file-detail'></i> </span>
-                                                                                                <div class="helthcareText">
-                                                                                                    <p>Restrictive Physical Intervention Record</p>
-                                                                                                    <div class="inactive roundTag">helthcare</div>
-                                                                                                </div>
-                                                                                                <span><i class='bx  bx-plus'></i> </span>
-                                                                                            </div>
-                                                                                            <div class="systemList">
-                                                                                                <span class="blueText"><i class='bx  bx-file-detail'></i> </span>
-                                                                                                <div class="helthcareText">
-                                                                                                    <p>Restrictive Physical Intervention Record</p>
-                                                                                                    <div class="inactive roundTag">helthcare</div>
-                                                                                                </div>
-                                                                                                <span><i class='bx  bx-plus'></i> </span>
-                                                                                            </div>
-                                                                                            <div class="systemList">
-                                                                                                <span class="blueText"><i class='bx  bx-file-detail'></i> </span>
-                                                                                                <div class="helthcareText">
-                                                                                                    <p>Restrictive Physical Intervention Record</p>
-                                                                                                    <div class="inactive roundTag">helthcare</div>
-                                                                                                </div>
-                                                                                                <span><i class='bx  bx-plus'></i> </span>
-                                                                                            </div>
-                                                                                            <div class="systemList">
-                                                                                                <span class="blueText"><i class='bx  bx-file-detail'></i> </span>
-                                                                                                <div class="helthcareText">
-                                                                                                    <p>Restrictive Physical Intervention Record</p>
-                                                                                                    <div class="inactive roundTag">helthcare</div>
-                                                                                                </div>
-                                                                                                <span><i class='bx  bx-plus'></i> </span>
-                                                                                            </div>
-
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div>
-
-                                                                                <div class="availabilityTabs__panel" id="uploadFiles">
-
-                                                                                    <div class="row">
-                                                                                        <div class="col-md-6">
-                                                                                            <label>Document Name</label>
-                                                                                            <input type="text" class="form-control" placeholder="e.g. Supervision Note">
-                                                                                        </div>
-                                                                                        <div class="col-md-6">
-                                                                                            <label>Document Type</label>
-                                                                                            <select class="form-control">
-                                                                                                <option>Other</option>
-                                                                                                <option>Care Plan</option>
-                                                                                                <option>Risk Assessment</option>
-                                                                                            </select>
-                                                                                        </div>
-                                                                                    </div>
-
-                                                                                    <div class="checkbox">
-                                                                                        <label>
-                                                                                            <input type="checkbox">
-                                                                                            Requires completion during shift
-                                                                                        </label>
-                                                                                    </div>
-
-                                                                                    <button class="upload-btn">
-                                                                                        ⬆ Upload & Attach
-                                                                                    </button>
-                                                                                </div>
-
-                                                                            </div>
-                                                                        </div>
-
-                                                                    </div>
-
-                                                                </div>
-
-                                                                <div class="m-t-15">
-                                                                    <div class="pendingCompletion">
-                                                                        <div class="header">
-                                                                            Pending Completion (2)
-                                                                        </div>
-
-                                                                        <div class="card">
-                                                                            <div class="left">
-                                                                                <div class="icon blueText"><i class='bx  bx-file'></i> </div>
-                                                                                <div class="info">
-                                                                                    <div class="title">Restrictive Physical Interventi...</div>
-                                                                                    <div class="meta">
-                                                                                        <div class="inactive roundTag">incident</div>
-                                                                                        <span class="date">Jan 13, 2026</span>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-
-                                                                            <div class="actions">
-                                                                                <span class="approve"><i class='bx  bx-check-circle'></i> </span>
-                                                                                <span class="delete"><i class='bx  bx-trash'></i> </span>
-                                                                            </div>
-                                                                        </div>
-
-                                                                        <div class="card">
-                                                                            <div class="left">
-                                                                                <div class="icon blueText"><i class='bx  bx-image'></i> </div>
-                                                                                <div class="info">
-                                                                                    <div class="title">dzad</div>
-                                                                                    <div class="meta">
-                                                                                        <div class="inactive roundTag">audit</div>
-                                                                                        <span class="date">Jan 13, 2026</span>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-
-                                                                            <div class="actions">
-                                                                                <span class="view"><i class='bx  bx-eye'></i> </span>
-                                                                                <span class="approve"><i class='bx  bx-check-circle'></i> </span>
-                                                                                <span class="delete"><i class='bx  bx-trash'></i> </span>
-                                                                            </div>
-                                                                        </div>
-
-                                                                    </div>
-
-                                                                </div>
-
-                                                                <div class="empty-state">
-                                                                    <div class="icon">📎</div>
-                                                                    <p><strong>No documents attached</strong></p>
-                                                                    <p class="hint">Click “Attach” to add documents</p>
-                                                                </div>
-
+                                                        <div class="row recurringOptions" id="recurringClientDiv">
+                                                            <div class="col-md-12">
+                                                                <label>Frequency</label>
+                                                                <select class="form-control" name="frequency">
+                                                                    <option value="daily">Daily</option>
+                                                                    <option value="weekly">Weekly</option>
+                                                                    <option value="fortnightly">Fortnightly</option>
+                                                                    <option value="monthly">Monthly</option>
+                                                                </select>
                                                             </div>
-
+                                                            <div class="col-md-12 m-t-10">
+                                                                <label>Days of Week</label>
+                                                                <input type="hidden" name="week_days" id="week_days">
+                                                                <div class="weeklyDaysSelect">
+                                                                    <span class="active">Sun</span>
+                                                                    <span>Mon</span>
+                                                                    <span>Tue</span>
+                                                                    <span>Wed</span>
+                                                                    <span>Thu</span>
+                                                                    <span>Fri</span>
+                                                                    <span>Sat</span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-12 m-t-10">
+                                                                <label>End Date</label>
+                                                                <input type="date" name="emd_date" class="form-control">
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
 
-                                                <div class="content" id="scheduleClient">
-                                                    <div class="row">
-                                                        <div class="col-md-12">
-                                                            <select class="form-control">
-                                                                <option>Select Client</option>
-                                                                <option>Inactive</option>
-                                                            </select>
+                                                <div class="col-md-12">
+                                                    <div class="attached-documents">
+                                                        <div class="header">
+                                                            <div class="title">
+                                                                📎<span>Attached Documents</span>
+                                                            </div>
+                                                            <div class="AttachAndCloseBtn">
+                                                                <button type="button" id="attach_document" class="close-btn"><i class='bx bx-plus'></i> Attach</button>
+                                                                <button type="button" id="close_document" class="close-btn"><i class='bx bx-x'></i> </button>
+                                                            </div>
                                                         </div>
-                                                        <div class="col-md-12 m-t-10">
-                                                            <label>care Type</label>
-                                                            <input type="date" class="form-control">
-                                                        </div>
-                                                    </div>
-                                                    <div class="row m-t-10">
-                                                        <div class="col-md-6">
-                                                            <label>Start Time *</label>
-                                                            <input type="time" class="form-control">
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <label>Start Time *</label>
-                                                            <input type="time" class="form-control">
-                                                        </div>
-                                                    </div>
-                                                    <div class="row">
-                                                        <div class="col-md-12  m-t-10">
-                                                            <label>Shift Type</label>
-                                                            <select class="form-control">
-                                                                <option>Select Client</option>
-                                                                <option>Inactive</option>
-                                                            </select>
-                                                        </div>
-                                                        <div class="col-md-12  m-t-10">
-                                                            <label>Tasks (comma separated)</label>
-                                                            <textarea class="form-control" rows="3" placeholder="Add any notes for the staff member..." name="approve_note"></textarea>
-                                                        </div>
-                                                        <div class="col-md-12  m-t-10">
-                                                            <label>Notes</label>
-                                                            <textarea class="form-control" rows="3" placeholder="Add any notes for the staff member..." name="approve_note"></textarea>
-                                                        </div>
-                                                        <div class="col-md-12  m-t-10">
-                                                            <div class="overtime  recurringShift">
-                                                                <label>
-                                                                    <input type="checkbox"> Make this a recurring shift
-                                                                </label>
-
-                                                                <div class="row">
-                                                                    <div class="col-md-12">
-                                                                        <label>Frequency</label>
-                                                                        <select class="form-control">
-                                                                            <option>Fortnightly</option>
-                                                                            <option>Daily</option>
-                                                                            <option>Weekly</option>
-                                                                        </select>
-                                                                    </div>
-                                                                    <div class="col-md-12 m-t-10">
-                                                                        <label>Frequency</label>
-                                                                        <div class="weeklyDaysSelect">
-                                                                            <span class="active">Sun</span>
-                                                                            <span>Mon</span>
-                                                                            <span>Tue</span>
-                                                                            <span>Wed</span>
-                                                                            <span>Thu</span>
-                                                                            <span>Fri</span>
-                                                                            <span>Sat</span>
+                                                        <div class="documentContent" id="documentContent">
+                                                            <div class="upload-box">
+                                                                <div class="" id="availabilityTab">
+                                                                    <div class="availabilityTabs">
+                                                                        <!-- TAB HEADER -->
+                                                                        <div class="availabilityTabs__nav">
+                                                                            <button type="button" class="availabilityTabs__tab active" data-target="selectfromSystem"> 📁
+                                                                                Select from System</button>
+                                                                            <button type="button" class="availabilityTabs__tab" data-target="uploadFiles"> <i class="fa fa-upload"></i> Upload File</button>
                                                                         </div>
-                                                                    </div>
-                                                                    <div class="col-md-12 m-t-10">
-                                                                        <label>End Date</label>
-                                                                        <input type="date" class="form-control">
+
+                                                                        <div class="availabilityTabs__content">
+                                                                            <div class="availabilityTabs__panel active" id="selectfromSystem">
+                                                                                <div class="selectfromSystemTabCont">
+                                                                                    <div class="input-group selectfromSearch">
+                                                                                        <span class="input-group-addon btn-white"><i class="fa fa-search"></i></span>
+                                                                                        <input type="text" id="systemSearch" class="form-control" placeholde r="Search entries...">
+                                                                                    </div>
+
+                                                                                    <div class="addSystemList">
+                                                                                        <p id="noResults" style="display:none;">No results found</p>
+
+                                                                                        @foreach ($dynamic_form_builder as $form)
+                                                                                            <div class="systemList addFormItem">
+                                                                                                <span class="blueText"><i class='bx bx-file-detail'></i></span>
+                                                                                                <div class="helthcareText">
+                                                                                                    <p>{{ $form['title'] }}</p>
+                                                                                                    <div class="inactive roundTag"> {{ $form['title'] }} </div>
+                                                                                                </div>
+                                                                                                <span><i class='bx bx-plus'></i></span>
+                                                                                            </div>
+                                                                                        @endforeach
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+
+                                                                            <div class="availabilityTabs__panel" id="uploadFiles">
+                                                                                <div class="row">
+                                                                                    <div class="col-md-6">
+                                                                                        <label>Document Name</label>
+                                                                                        <input type="text" class="form-control" placeholder="e.g. Supervision Note">
+                                                                                    </div>
+                                                                                    <div class="col-md-6">
+                                                                                        <label>Document Type</label>
+                                                                                        <select class="form-control">
+                                                                                            <option>Other</option>
+                                                                                            <option>Supervision Form</option>
+                                                                                            <option>Care Plan</option>
+                                                                                            <option>Risk Assessment</option>
+                                                                                            <option>Medication Chart</option>
+                                                                                            <option>Daily Notes Template</option>
+                                                                                            <option>Incident Form</option>
+                                                                                            <option>Consent Form</option>
+                                                                                            <option>Assessment</option>
+                                                                                            <option>Training Record</option>
+                                                                                        </select>
+                                                                                    </div>
+                                                                                </div>
+
+                                                                                <div class="checkbox">
+                                                                                    <label>
+                                                                                        <input type="checkbox"> Requires completion during shift
+                                                                                    </label>
+                                                                                </div>
+
+                                                                                <button class="upload-btn"> <i class="fa fa-upload"></i> Upload & Attach </button>
+                                                                            </div>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
-                                                        <div class="col-md-12">
-                                                            <div class="attached-documents">
-
-                                                                <div class="header">
-                                                                    <div class="title">
-                                                                        📎 <span>Attached Documents</span>
-                                                                    </div>
-                                                                    <div class="AttachAndCloseBtn">
-                                                                        <button type="button" class="close-btn"><i class='bx  bx-plus'></i> Attach</button>
-                                                                        <button type="button" class="close-btn"><i class='bx  bx-x'></i> </button>
-                                                                    </div>
+                                                            <div class="m-t-15 pendingCompletionSection" id="pendingCompletionSection">
+                                                                <div class="pendingCompletion" id="pendingCompletion">
+                                                                    <div class="header" id="pendingHeader">Pending Completion</div>
                                                                 </div>
-
-                                                                <div class="upload-box">
-
-
-                                                                    <div class="" id="availabilityTab">
-                                                                        <div class="availabilityTabs">
-                                                                            <!-- TAB HEADER -->
-                                                                            <div class="availabilityTabs__nav">
-                                                                                <button type="button" class="availabilityTabs__tab active" data-target="selectfromSystem"> 📁 Select from System</button>
-                                                                                <button type="button" class="availabilityTabs__tab" data-target="uploadFiles"> ⬆ Upload File</button>
-                                                                            </div>
-
-                                                                            <div class="availabilityTabs__content">
-
-                                                                                <div class="availabilityTabs__panel active" id="selectfromSystem">
-                                                                                    <div class="selectfromSystemTabCont">
-                                                                                        <div class="input-group selectfromSearch">
-                                                                                            <span class="input-group-addon btn-white"><i class="fa fa-search"></i></span>
-                                                                                            <input type="text" class="form-control" placeholder="Search entries...">
-                                                                                        </div>
-
-                                                                                        <div class="addSystemList">
-                                                                                            <div class="systemList">
-                                                                                                <span class="blueText"><i class='bx  bx-file-detail'></i> </span>
-                                                                                                <div class="helthcareText">
-                                                                                                    <p>Restrictive Physical Intervention Record</p>
-                                                                                                    <div class="inactive roundTag">helthcare</div>
-                                                                                                </div>
-                                                                                                <span><i class='bx  bx-plus'></i> </span>
-                                                                                            </div>
-                                                                                            <div class="systemList">
-                                                                                                <span class="blueText"><i class='bx  bx-file-detail'></i> </span>
-                                                                                                <div class="helthcareText">
-                                                                                                    <p>Restrictive Physical Intervention Record</p>
-                                                                                                    <div class="inactive roundTag">helthcare</div>
-                                                                                                </div>
-                                                                                                <span><i class='bx  bx-plus'></i> </span>
-                                                                                            </div>
-                                                                                            <div class="systemList">
-                                                                                                <span class="blueText"><i class='bx  bx-file-detail'></i> </span>
-                                                                                                <div class="helthcareText">
-                                                                                                    <p>Restrictive Physical Intervention Record</p>
-                                                                                                    <div class="inactive roundTag">helthcare</div>
-                                                                                                </div>
-                                                                                                <span><i class='bx  bx-plus'></i> </span>
-                                                                                            </div>
-                                                                                            <div class="systemList">
-                                                                                                <span class="blueText"><i class='bx  bx-file-detail'></i> </span>
-                                                                                                <div class="helthcareText">
-                                                                                                    <p>Restrictive Physical Intervention Record</p>
-                                                                                                    <div class="inactive roundTag">helthcare</div>
-                                                                                                </div>
-                                                                                                <span><i class='bx  bx-plus'></i> </span>
-                                                                                            </div>
-
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div>
-
-                                                                                <div class="availabilityTabs__panel" id="uploadFiles">
-
-                                                                                    <div class="row">
-                                                                                        <div class="col-md-6">
-                                                                                            <label>Document Name</label>
-                                                                                            <input type="text" class="form-control" placeholder="e.g. Supervision Note">
-                                                                                        </div>
-                                                                                        <div class="col-md-6">
-                                                                                            <label>Document Type</label>
-                                                                                            <select class="form-control">
-                                                                                                <option>Other</option>
-                                                                                                <option>Care Plan</option>
-                                                                                                <option>Risk Assessment</option>
-                                                                                            </select>
-                                                                                        </div>
-                                                                                    </div>
-
-                                                                                    <div class="checkbox">
-                                                                                        <label>
-                                                                                            <input type="checkbox">
-                                                                                            Requires completion during shift
-                                                                                        </label>
-                                                                                    </div>
-
-                                                                                    <button class="upload-btn">
-                                                                                        ⬆ Upload & Attach
-                                                                                    </button>
-                                                                                </div>
-
-                                                                            </div>
-                                                                        </div>
-
-                                                                    </div>
-
-                                                                </div>
-
-                                                                <div class="m-t-15">
-                                                                    <div class="pendingCompletion">
-                                                                        <div class="header">
-                                                                            Pending Completion (2)
-                                                                        </div>
-
-                                                                        <div class="card">
-                                                                            <div class="left">
-                                                                                <div class="icon blueText"><i class='bx  bx-file'></i> </div>
-                                                                                <div class="info">
-                                                                                    <div class="title">Restrictive Physical Interventi...</div>
-                                                                                    <div class="meta">
-                                                                                        <div class="inactive roundTag">incident</div>
-                                                                                        <span class="date">Jan 13, 2026</span>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-
-                                                                            <div class="actions">
-                                                                                <span class="approve"><i class='bx  bx-check-circle'></i> </span>
-                                                                                <span class="delete"><i class='bx  bx-trash'></i> </span>
-                                                                            </div>
-                                                                        </div>
-
-                                                                        <div class="card">
-                                                                            <div class="left">
-                                                                                <div class="icon blueText"><i class='bx  bx-image'></i> </div>
-                                                                                <div class="info">
-                                                                                    <div class="title">dzad</div>
-                                                                                    <div class="meta">
-                                                                                        <div class="inactive roundTag">audit</div>
-                                                                                        <span class="date">Jan 13, 2026</span>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-
-                                                                            <div class="actions">
-                                                                                <span class="view"><i class='bx  bx-eye'></i> </span>
-                                                                                <span class="approve"><i class='bx  bx-check-circle'></i> </span>
-                                                                                <span class="delete"><i class='bx  bx-trash'></i> </span>
-                                                                            </div>
-                                                                        </div>
-
-                                                                    </div>
-
-                                                                </div>
-
-                                                                <div class="empty-state">
-                                                                    <div class="icon">📎</div>
-                                                                    <p><strong>No documents attached</strong></p>
-                                                                    <p class="hint">Click “Attach” to add documents</p>
-                                                                </div>
-
                                                             </div>
-
                                                         </div>
-                                                    </div>
-                                                </div> <!--  -->
+                                                        <div class="empty-state attachDocumentSection" id="attachDocumentSection">
+                                                            <div class="icon">📎</div>
+                                                            <p><strong>No documents attached</strong></p>
+                                                            <p class="hint">Click “Attach” to add documents</p>
+                                                        </div>
 
-                                                <div class="content" id="scheduleProperty">
-                                                    Property
+                                                    </div>
+
                                                 </div>
                                             </div>
                                         </div>
@@ -1678,9 +1507,9 @@
                                                     </div>
 
                                                     <div class="">
-                                                        <div class="suggestedCarers">
-
-                                                            <h4 class="title">Suggested Carers (Ranked by compatibility):</h4>
+                                                        <div class="suggestedCarers" style="display:none">
+                                                            <h4 class="title">Suggested Carers (Ranked by compatibility):
+                                                            </h4>
 
                                                             <div class="carerCard">
                                                                 <div class="avatar">G</div>
@@ -1698,7 +1527,6 @@
                                                                 </div>
                                                                 <button class="assignBtn">Assign</button>
                                                             </div>
-
                                                             <div class="carerCard">
                                                                 <div class="avatar">K</div>
                                                                 <div class="details">
@@ -1731,7 +1559,6 @@
                                                                 </div>
                                                                 <button class="assignBtn">Assign</button>
                                                             </div>
-
                                                             <div class="carerCard">
                                                                 <div class="avatar">K</div>
                                                                 <div class="details">
@@ -1750,16 +1577,15 @@
                                                             </div>
 
                                                         </div>
-
-
                                                     </div>
-
                                                 </div>
                                             </div>
-
-
                                         </div>
                                     </div>
+                                </div>
+                                <div class="actions">
+                                    <button type="button" class="cancel">Cancel</button>
+                                    <button type="submit" class="submit">Create Carer</button>
                                 </div>
                             </form>
                         </div>
@@ -1846,43 +1672,6 @@
                     }
                 });
             });
-
-            // $(document).ready(function() {
-            //     // Make external events draggable
-            //     $('#external-events .fc-event').each(function() {
-            //         var eventObject = {
-            //             title: $.trim($(this).text())
-            //         };
-            //         // store event data
-            //         $(this).data('eventObject', eventObject);
-
-            //         // make draggable
-            //         $(this).draggable({
-            //             zIndex: 999,
-            //             revert: true,
-            //             revertDuration: 0
-            //         });
-            //     });
-
-            //     // Initialize calendar
-            //     $('#calendar').fullCalendar({
-            //         header: {
-            //             left: 'prev,next today',
-            //             center: 'title',
-            //             right: 'agendaWeek,agendaDay'
-            //         },
-            //         editable: true,
-            //         droppable: true,
-            //         drop: function(date, jsEvent, ui) {
-            //             var originalEventObject = $(this).data('eventObject');
-            //             var copiedEventObject = $.extend({}, originalEventObject);
-            //             copiedEventObject.start = date;
-            //             // 🔥 THIS LINE APPENDS EVENT TO CALENDAR
-            //             $('#calendar').fullCalendar('renderEvent', copiedEventObject, true);
-            //         }
-            //     });
-
-            // });
         </script>
         <script>
             document.querySelectorAll(".availabilityTabs").forEach(wrapper => {
@@ -1902,62 +1691,194 @@
             });
         </script>
 
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const recurringClientToggle = document.getElementById('recurringClientToggle');
+                const recurringClientDiv = document.getElementById('recurringClientDiv');
 
-        <!--Start JS 90-Day Overview -->
-        {{-- <script>
-            let currentDate = new Date();
-            const dayText = document.querySelector(".day-text");
-            const fullDate = document.querySelector(".full-date");
-            const dateInner = document.querySelector(".date-inner");
-            const datePicker = document.querySelector(".date-picker");
+                if (!recurringClientToggle || !recurringClientDiv) return;
 
-            function formatDate(date) {
-                const options = {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                };
-                const parts = date.toLocaleDateString('en-US', options).split(',');
-                return {
-                    day: parts[0],
-                    full: parts.slice(1).join(',').trim()
-                };
+                // Set initial state (important on page load)
+                recurringClientDiv.style.display = recurringClientToggle.checked ? 'block' : 'none';
+
+                recurringClientToggle.addEventListener('change', function() {
+                    recurringClientDiv.style.display = this.checked ? 'block' : 'none';
+                });
+
+            });
+        </script>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+
+                const careType = document.getElementById('careType');
+                const locationTab = document.getElementById('locationTab');
+                const propertyTab = document.getElementById('propertyTab');
+
+                function toggleTabs() {
+                    if (careType.value == '1') {
+
+                        // Disable Location & Property
+                        locationTab.classList.add('disabled');
+                        propertyTab.classList.add('disabled');
+
+                        locationTab.disabled = true;
+                        propertyTab.disabled = true;
+
+                    } else {
+
+                        // Enable all
+                        locationTab.classList.remove('disabled');
+                        propertyTab.classList.remove('disabled');
+
+                        locationTab.disabled = false;
+                        propertyTab.disabled = false;
+                    }
+                }
+
+                // Run on page load
+                toggleTabs();
+
+                // Run on change
+                careType.addEventListener('change', toggleTabs);
+            });
+        </script>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+
+                const frequencySelect = document.querySelector('select[name="frequency"]');
+                const daysWrapper = document.querySelector('.weeklyDaysSelect').closest('.col-md-12');
+
+                function toggleWeeklyDays() {
+                    if (frequencySelect.value === 'weekly') {
+                        daysWrapper.style.display = 'block';
+                    } else {
+                        daysWrapper.style.display = 'none';
+                    }
+                }
+
+                // Run on page load
+                toggleWeeklyDays();
+
+                // Run on change
+                frequencySelect.addEventListener('change', toggleWeeklyDays);
+            });
+        </script>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+
+                const days = document.querySelectorAll('.weeklyDaysSelect span');
+                const hiddenInput = document.getElementById('week_days');
+
+                function updateSelectedDays() {
+                    const selectedDays = [];
+                    document.querySelectorAll('.weeklyDaysSelect span.active')
+                        .forEach(day => selectedDays.push(day.innerText));
+
+                    hiddenInput.value = selectedDays.join(',');
+                }
+
+                days.forEach(day => {
+                    day.addEventListener('click', function() {
+                        this.classList.toggle('active');
+                        updateSelectedDays();
+                    });
+                });
+
+                // Set initial value (in case Sun is preselected)
+                updateSelectedDays();
+            });
+        </script>
+
+        <script>
+            const attach_document = document.getElementById('attach_document');
+            const close_document = document.getElementById('close_document');
+            const documentContent = document.getElementById('documentContent');
+
+            attach_document.addEventListener('click', function() {
+                documentContent.style.display = 'block';
+                attach_document.style.display = 'none';
+                close_document.style.display = 'inline-block';
+                document.querySelector('.upload-box').style.display = 'block';
+            });
+
+            close_document.addEventListener('click', function() {
+                documentContent.style.display = 'none';
+                close_document.style.display = 'none';
+                attach_document.style.display = 'inline-block';
+            });
+        </script>
+        <script>
+            document.getElementById('systemSearch').addEventListener('keyup', function() {
+                let searchValue = this.value.toLowerCase();
+                let systemLists = document.querySelectorAll('.addSystemList .systemList');
+                let noResults = document.getElementById('noResults');
+                let hasVisible = false;
+
+                systemLists.forEach(function(item) {
+                    let titleText = item.querySelector('.helthcareText p').innerText.toLowerCase();
+
+                    if (titleText.includes(searchValue)) {
+                        item.style.display = 'flex';
+                        hasVisible = true;
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+
+                noResults.style.display = hasVisible ? 'none' : 'block';
+            });
+        </script>
+
+
+
+        <script>
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('.addFormItem')) {
+                    let clickedItem = e.target.closest('.addFormItem');
+
+                    let title = clickedItem.querySelector('.helthcareText p').innerText;
+                    let today = new Date().toISOString().split('T')[0];
+
+                    let newSection = `
+                            <div class="card pendingCard">
+                                <div class="left">
+                                    <div class="icon blueText"><i class='bx bx-file'></i></div>
+                                    <div class="info">
+                                        <div class="title">${title}</div>
+                                        <div class="meta">
+                                            <div class="inactive roundTag">${title}</div>
+                                            <span class="date">${today}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="actions">
+                                    <span class="approve"><i class='bx bx-check-circle'></i></span>
+                                    <span class="delete"><i class='bx bx-trash'></i></span>
+                                </div>
+                            </div>
+                        `;
+
+                    document.getElementById('pendingCompletionSection').style.display = 'block';
+                    document.getElementById('attachDocumentSection').style.display = 'none';
+                    document.getElementById('pendingCompletion').insertAdjacentHTML('beforeend', newSection);
+
+                    updatePendingCount();
+                    document.getElementById('close_document').style.display = 'none';
+                    document.querySelector('.upload-box').style.display = 'none';
+                    document.getElementById('attach_document').style.display = 'inline-block';
+                    
+                }
+            });
+
+            function updatePendingCount() {
+                let count = document.querySelectorAll('#pendingCompletion .pendingCard').length;
+                document.getElementById('pendingHeader').textContent = 'Pending Completion (' + count + ')';
             }
-
-            function updateDate(direction = "next") {
-                dateInner.style.transform = direction === "next" ?
-                    "translateX(-100%)" :
-                    "translateX(100%)";
-                dateInner.style.opacity = "0";
-
-                setTimeout(() => {
-                    const formatted = formatDate(currentDate);
-                    console.log(formatted)
-                    dayText.textContent = formatted.day;
-                    fullDate.textContent = formatted.full;
-
-                    dateInner.style.transform = "translateX(0)";
-                    dateInner.style.opacity = "1";
-                }, 300);
-            }
-
-            document.querySelector(".next-btn").addEventListener("click", () => {
-                currentDate.setDate(currentDate.getDate() + 1);
-                updateDate("next");
-            });
-
-            document.querySelector(".prev-btn").addEventListener("click", () => {
-                currentDate.setDate(currentDate.getDate() - 1);
-                updateDate("prev");
-            });
-
-            datePicker.addEventListener("change", function() {
-                currentDate = new Date(this.value);
-                updateDate();
-            });
-        </script> --}}
-        <!--End JS 90-Day Overview -->
+        </script>
 
     @endsection
 </main>
