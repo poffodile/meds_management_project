@@ -137,6 +137,7 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 		Route::post('/carer/getStaffByStatus', [CarerController::class, 'getStaffByStatus']);
 		Route::post('/carer/delete', [CarerController::class, 'deleteCarer'])->name('carer.delete');
 		Route::get('/carer/shift-resources', [CarerController::class, 'shift_resources'])->name('carer.shift');
+		Route::get('/carer/get-shift-carer/{client_id}', [CarerController::class, 'getShiftStaff'])->name('carer.shift.staff');
 
 		
 		Route::get('/carer-details/{carer_id}', [CarerDetailsController::class, 'carer_details'])->name('roster.staff.carer.details'); 

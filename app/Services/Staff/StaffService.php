@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Schema;
+use App\ServiceUser;
 
 
 class StaffService
@@ -299,5 +300,80 @@ class StaffService
         }
 
         return $staff;
+    }
+
+    public function getShiftUser($id)
+    {
+        $client = ServiceUser::find($id);
+        // $latitude = $client->postcode;
+        $latLong = $this->getLatLongFromPostcode($client->postcode);
+        // dd($latLong);
+        $user = User::select('id', 'name', 'postcode')->where('home_id', Auth::user()->home_id)->where('status', 1)->get();
+        // dd($user);
+        foreach ($user as $staff) {
+            $staffLatLong = $this->getLatLongFromPostcode($staff->postcode);
+            
+            if ($latLong && $staffLatLong) {
+                $distance = $this->calculateDistance($latLong['latitude'], $latLong['longitude'], $staffLatLong['latitude'], $staffLatLong['longitude']);
+                $staff->distance = $distance; // Add distance attribute to staff
+            } else {
+                $staff->distance = null; // Unable to calculate distance
+            }
+        }
+
+        return $user;
+    }
+
+    private function calculateDistance($lat1, $lon1, $lat2, $lon2)
+    {
+        $earthRadius = 6371; // Earth radius in KM
+
+        $dLat = deg2rad($lat2 - $lat1);
+        $dLon = deg2rad($lon2 - $lon1);
+
+        $a = sin($dLat / 2) * sin($dLat / 2) +
+            cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
+            sin($dLon / 2) * sin($dLon / 2);
+
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+
+        $distance = $earthRadius * $c;
+
+        return round($distance, 2); // Distance in KM (2 decimal points)
+    }
+
+
+    public function getLatLongFromPostcode($postcode)
+    {
+        if (empty($postcode)) {
+            return null;
+        }
+
+        $apiKey = env('GOOGLE_MAPS_KEY');
+
+        $url = 'https://maps.googleapis.com/maps/api/geocode/json?address='
+            . urlencode($postcode)
+            . '&key=' . $apiKey;
+
+        $geo = @file_get_contents($url);
+
+        if (!$geo) {
+            return null; // API call failed
+        }
+
+        $geo = json_decode($geo, true);
+
+        if (
+            isset($geo['status']) &&
+            $geo['status'] === 'OK' &&
+            isset($geo['results'][0]['geometry']['location'])
+        ) {
+            return [
+                'latitude'  => $geo['results'][0]['geometry']['location']['lat'],
+                'longitude' => $geo['results'][0]['geometry']['location']['lng']
+            ];
+        }
+
+        return null; // if blank / invalid postcode
     }
 }

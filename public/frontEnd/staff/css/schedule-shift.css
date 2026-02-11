@@ -487,3 +487,60 @@
     font-size: 11px;
     color: #666;
 }
+
+.assessment-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 16px;
+    background: #fff;
+    max-width: 520px;
+    font-family: Arial, sans-serif;
+}
+
+/* Header */
+.assessment-header {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.doc-icon {
+    color: #7c3aed;
+    font-size: 18px;
+    margin-top: 3px;
+}
+
+.assessment-header h4 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: #111827;
+}
+
+.assessment-header p {
+    margin: 4px 0 0;
+    font-size: 13px;
+    color: #6b7280;
+}
+
+/* Upload Box */
+.upload-box {
+    border: 2px dashed #c4b5fd;
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+}
+
+/* Upload Button (assessment only) */
+.assessment-upload-btn {
+    background: none;
+    border: none;
+    color: #7c3aed;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+

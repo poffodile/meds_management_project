@@ -230,4 +230,22 @@ class CarerController extends Controller
 
         return response()->json($resources);
     }
+
+    public function getShiftStaff($client_id)
+    {
+        $staff = $this->staffService->getShiftUser($client_id);
+
+        if ($staff && $staff->count() > 0) {
+            return response()->json([
+                'status' => true,
+                'data'   => $staff
+            ], 200);
+        }
+
+        return response()->json([
+            'status'  => false,
+            'message' => 'No staff found',
+            'data'    => []
+        ], 200);
+    }
 }

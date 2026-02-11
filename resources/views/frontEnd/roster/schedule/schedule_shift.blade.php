@@ -40,7 +40,6 @@
                     <p class="header-subtitle">Manage and assign shifts to carers</p>
                 </div>
                 <div class="topFilters">
-
                     <button class="filterBtn activeDot">
                         <span class="dot"></span> All Active
                     </button>
@@ -293,8 +292,7 @@
                                                 <div class="planCard redBgAndBorder">
                                                     <div class="planTop">
                                                         <div class="planTitle">
-                                                            <span class="heartIcon"><i class="bx  bx-alert-triangle"></i>
-                                                            </span>
+                                                            <span class="heartIcon"><i class="bx  bx-alert-triangle"></i></span>
                                                             <span class="commntagDesin careBadg">HIGH</span>
                                                             <span class="commntagDesin">unfilled</span>
                                                         </div>
@@ -319,22 +317,18 @@
                                                 <div class="planCard yllowBgAndBorder">
                                                     <div class="planTop">
                                                         <div class="planTitle">
-                                                            <span class="heartIcon"><i class="bx  bx-alert-triangle"></i>
-                                                            </span>
+                                                            <span class="heartIcon"><i class="bx  bx-alert-triangle"></i></span>
                                                             <span class="commntagDesin careBadg">MEDIUM</span>
                                                             <span class="commntagDesin effecTive">availability</span>
-                                                            <span class="commntagDesin dateBadg"><i
-                                                                    class="bx bx-calendar"></i>03 Feb</span>
+                                                            <span class="commntagDesin dateBadg"><i class="bx bx-calendar"></i>03 Feb</span>
                                                         </div>
 
                                                         <div class="header-actions">
-                                                            <button class="btn purpleBgBtn"><i class="bx bx-brain"></i> AI
-                                                                Resolve</button>
+                                                            <button class="btn purpleBgBtn"><i class="bx bx-brain"></i> AI Resolve</button>
                                                         </div>
                                                     </div>
                                                     <div class="planMeta">
-                                                        <div><strong>Unknown is Not a working day on Feb 3 (09:00-17:00)
-                                                            </strong></div>
+                                                        <div><strong>Unknown is Not a working day on Feb 3 (09:00-17:00) </strong></div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -439,23 +433,23 @@
                 </div>
 
                 <!-- <div class="careTaskstbbg sectionWhiteBgAllUse p-0">
-                                                                <header class="panel-heading headingCapitilize clntalertheader">
-                                                                    <div class="clientHeadung">
-                                                                        <div class="onlyheadingmain radIconClr"><i class="bx  bx-alert-triangle"></i> 52 Scheduling Issues Detected </div>
-                                                                        <p>14 High Priority <span>38 Medium Priority</span> </p>
-                                                                    </div>
+                                            <header class="panel-heading headingCapitilize clntalertheader">
+                                                <div class="clientHeadung">
+                                                    <div class="onlyheadingmain radIconClr"><i class="bx  bx-alert-triangle"></i> 52 Scheduling Issues Detected </div>
+                                                    <p>14 High Priority <span>38 Medium Priority</span> </p>
+                                                </div>
 
-                                                                    <div class="actions mt-0">
-                                                                        <button class="btn addAssessmentBtn addalertClientDetailsBtn"> <i class="bx  bx-plus"></i> Add alert</button>
-                                                                    </div>
-                                                                </header>
+                                                <div class="actions mt-0">
+                                                    <button class="btn addAssessmentBtn addalertClientDetailsBtn"> <i class="bx  bx-plus"></i> Add alert</button>
+                                                </div>
+                                            </header>
 
-                                                                <div class="p-20">
-                                                                    <div class="clientFilterform addalertClientDetailsform" style="border: 2px solid #fdabab; background: #fef2f2;">
-                                                                        <div class="createNewAlert"><i class="bx  bx-alert-triangle"></i> Create New Alert </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div> -->
+                                            <div class="p-20">
+                                                <div class="clientFilterform addalertClientDetailsform" style="border: 2px solid #fdabab; background: #fef2f2;">
+                                                    <div class="createNewAlert"><i class="bx  bx-alert-triangle"></i> Create New Alert </div>
+                                                </div>
+                                            </div>
+                                        </div> -->
 
                 <!-- ********************************** -->
 
@@ -493,7 +487,6 @@
                                 <select>
                                     <option>Duration: 1 Day</option>
                                 </select>
-
                                 <button class="lock-btn">
                                     ✔ Locked Visits
                                 </button>
@@ -505,14 +498,9 @@
                         <div class="roster-nav">
                             <div class="left">
                                 <button class="icon-btn" id="btnPrev">‹</button>
-
                                 <button id="btnDay">Day</button>
                                 <button id="btnWeek" class="active">Week</button>
-
-                                <button class="" id="dateRange">
-                                    📅 --
-                                </button>
-
+                                <button class="" id="dateRange"> 📅 -- </button>
                                 <button class="icon-btn" id="btnNext">›</button>
                                 <button id="btnToday">Today</button>
                             </div>
@@ -533,7 +521,6 @@
                             <div class="roster-footer">
                                 <div class="shift-types">
                                     <span class="label">Shift Types:</span>
-
                                     <span class="shift"><i class="dot morning"></i> Morning</span>
                                     <span class="shift"><i class="dot afternoon"></i> Afternoon</span>
                                     <span class="shift"><i class="dot evening"></i> Evening</span>
@@ -569,8 +556,7 @@
                             <div class="sectionWhiteBgAllUse">
                                 <div class="dailyLogsdateSec">
                                     <div class="date-slider">
-                                        <button class="nav-btn prev-btn"><i class='bx  bx-chevron-left'></i>
-                                            Previous</button>
+                                        <button class="nav-btn prev-btn"><i class='bx  bx-chevron-left'></i> Previous</button>
 
                                         <div class="changeDateSlide">
                                             <div class="date-display">
@@ -860,12 +846,9 @@
                                         </div>
                                         <hr />
                                         <div class="actions">
-                                            <button class="borderBtn edit" data-id="120"> <i class='bx  bx-edit'></i> Edit
-                                            </button>
-                                            <button class="borderBtn delete" data-id="120"> <i class='bx  bx-trash'></i>
-                                            </button>
-                                            <button class="borderBtn edit" data-id="120"> <i class='bx  bx-paper-plane'></i>
-                                                Request </button>
+                                            <button class="borderBtn edit" data-id="120"> <i class='bx  bx-edit'></i> Edit </button>
+                                            <button class="borderBtn delete" data-id="120"> <i class='bx  bx-trash'></i></button>
+                                            <button class="borderBtn edit" data-id="120"> <i class='bx  bx-paper-plane'></i> Request </button>
                                         </div>
                                     </div>
                                 </div>
@@ -895,12 +878,9 @@
                                         </div>
                                         <hr />
                                         <div class="actions">
-                                            <button class="borderBtn edit" data-id="120"> <i class='bx  bx-edit'></i> Edit
-                                            </button>
-                                            <button class="borderBtn delete" data-id="120"> <i class='bx  bx-trash'></i>
-                                            </button>
-                                            <button class="borderBtn edit" data-id="120"> <i class='bx  bx-paper-plane'></i>
-                                                Request </button>
+                                            <button class="borderBtn edit" data-id="120"> <i class='bx  bx-edit'></i> Edit </button>
+                                            <button class="borderBtn delete" data-id="120"> <i class='bx  bx-trash'></i> </button>
+                                            <button class="borderBtn edit" data-id="120"> <i class='bx  bx-paper-plane'></i> Request </button>
                                         </div>
                                     </div>
                                 </div>
@@ -1164,8 +1144,8 @@
                             </div>
                             <div class="recent-activity sectionWhiteBgAllUse">
                                 <!-- <div class="section-header">
-                                                                                                <h2 class="section-title">Recent Activity</h2>
-                                                                                            </div> -->
+                                                                                                                                                        <h2 class="section-title">Recent Activity</h2>
+                                                                                                                                                    </div> -->
 
                                 <div class="activity-item">
                                     <div class="activity-icon"><i class='bx  bx-apps'></i> </div>
@@ -1281,11 +1261,9 @@
                                                 <div class="content active" id="scheduleClient">
                                                     <div class="row">
                                                         <div class="col-md-12">
-                                                            <select class="form-control">
+                                                            <select class="form-control" id="clientSelect">
                                                                 @foreach ($service_users as $service_user)
-                                                                    <option value="{{ $service_user->id }}">
-                                                                        {{ $service_user->name }}
-                                                                    </option>
+                                                                    <option value="{{ $service_user->id }}"> {{ $service_user->name }} </option>
                                                                 @endforeach
                                                             </select>
                                                         </div>
@@ -1388,7 +1366,7 @@
                                                     <div class="attached-documents">
                                                         <div class="header">
                                                             <div class="title">
-                                                                📎<span>Attached Documents</span>
+                                                                <i class="fa fa-paperclip"></i> <span>Attached Documents</span>
                                                             </div>
                                                             <div class="AttachAndCloseBtn">
                                                                 <button type="button" id="attach_document" class="close-btn"><i class='bx bx-plus'></i> Attach</button>
@@ -1459,8 +1437,8 @@
                                                                                         <input type="checkbox"> Requires completion during shift
                                                                                     </label>
                                                                                 </div>
-
-                                                                                <button class="upload-btn"> <i class="fa fa-upload"></i> Upload & Attach </button>
+                                                                                <button class="upload-btn" type="button"> <i class="fa fa-upload"></i> Upload & Attach </button>
+                                                                                <input type="file" id="imageUpload" accept="image/*" style="display:none;">
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -1473,7 +1451,7 @@
                                                             </div>
                                                         </div>
                                                         <div class="empty-state attachDocumentSection" id="attachDocumentSection">
-                                                            <div class="icon">📎</div>
+                                                            <div class="icon"> <i class="fa fa-paperclip"></i> </div>
                                                             <p><strong>No documents attached</strong></p>
                                                             <p class="hint">Click “Attach” to add documents</p>
                                                         </div>
@@ -1481,6 +1459,27 @@
                                                     </div>
 
                                                 </div>
+
+                                                <div class="col-md-12 mt-3">
+                                                    <div class="assessment-card">
+                                                        <div class="assessment-header">
+                                                            <i class="fa fa-file-text-o doc-icon"></i>
+                                                            <div>
+                                                                <h4>Assessment Documents</h4>
+                                                                <p>Attach pre-admission or care assessment documents to AI-generate a care plan</p>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="upload-box">
+                                                            <button type="button" class="assessment-upload-btn">
+                                                                <i class="fa fa-upload"></i>
+                                                                Upload Assessment Document
+                                                            </button>
+                                                            <input type="file" id="assessmentUpload" accept=".pdf,.doc,.docx" style="display:none;">
+                                                        </div>
+                                                    </div>
+                                                </div>
+
                                             </div>
                                         </div>
                                         <!-- Tabs -->
@@ -1491,7 +1490,7 @@
                                                 <div class="rota_dash-card bg-blue-50">
                                                     <div class="rota_dash-left">
                                                         <p class="rota_title">Assigned To:</p>
-                                                        <h2 class="rota_count">Not assigned</h2>
+                                                        <h2 class="rota_count" id="assignedClientTo">Not assigned</h2>
                                                     </div>
                                                 </div>
                                             </div>
@@ -1499,81 +1498,35 @@
                                             <div class="assignedCarer m-t-15">
                                                 <label>Assigned Carer</label>
                                                 <div class="">
-                                                    <div class="dashedBorder">
+                                                    <div class="dashedBorder" id="assignedCarerBlankSection">
                                                         <div class="leavebanktabCont">
-                                                            <i class='bx  bx-home-alt'></i>
+                                                            <i class='bx bx-home-alt'></i>
                                                             <p>Select assignment first to see carer suggestions</p>
                                                         </div>
                                                     </div>
 
                                                     <div class="">
-                                                        <div class="suggestedCarers" style="display:none">
-                                                            <h4 class="title">Suggested Carers (Ranked by compatibility):
-                                                            </h4>
+                                                        <div class="suggestedCarers">
+                                                          <div id="suggested_carer"></div>
 
-                                                            <div class="carerCard">
-                                                                <div class="avatar">G</div>
-                                                                <div class="details">
-                                                                    <div class="topRow">
-                                                                        <span class="name">Georgia Ashmore</span>
-                                                                        <span class="badge">WA9 3BT</span>
+                                                            <div id="carerSelect">
+
+                                                                {{-- <div class="carerCard">
+                                                                    <div class="avatar">G</div>
+                                                                    <div class="details">
+                                                                        <div class="topRow">
+                                                                            <span class="name">Georgia Ashmore</span>
+                                                                            <span class="badge">WA9 3BT</span>
+                                                                        </div>
+                                                                        <span class="tag">Geographic Mismatch</span>
+                                                                        <div class="warning">
+                                                                            <i class='bx bx-alert-circle'></i>
+                                                                            <i class='bx bx-alert-triangle'></i> Very far from client
+                                                                        </div>
                                                                     </div>
-                                                                    <span class="tag">Geographic Mismatch</span>
-                                                                    <div class="warning">
-                                                                        <i class='bx  bx-alert-circle'></i>
-                                                                        <i class='bx  bx-alert-triangle'></i>
-                                                                        Very far from client
-                                                                    </div>
-                                                                </div>
-                                                                <button class="assignBtn">Assign</button>
-                                                            </div>
-                                                            <div class="carerCard">
-                                                                <div class="avatar">K</div>
-                                                                <div class="details">
-                                                                    <div class="topRow">
-                                                                        <span class="name">Kelly Moss</span>
-                                                                        <span class="badge">WA9 3BT</span>
-                                                                    </div>
-                                                                    <span class="tag">Geographic Mismatch</span>
-                                                                    <div class="warning">
-                                                                        <i class='bx  bx-alert-circle'></i>
-                                                                        <i class='bx  bx-alert-triangle'></i>
-                                                                        Very far from client
-                                                                    </div>
-                                                                </div>
-                                                                <button class="assignBtn">Assign</button>
-                                                            </div>
-                                                            <div class="carerCard">
-                                                                <div class="avatar">G</div>
-                                                                <div class="details">
-                                                                    <div class="topRow">
-                                                                        <span class="name">Georgia Ashmore</span>
-                                                                        <span class="badge">WA9 3BT</span>
-                                                                    </div>
-                                                                    <span class="tag">Geographic Mismatch</span>
-                                                                    <div class="warning">
-                                                                        <i class='bx  bx-alert-circle'></i>
-                                                                        <i class='bx  bx-alert-triangle'></i>
-                                                                        Very far from client
-                                                                    </div>
-                                                                </div>
-                                                                <button class="assignBtn">Assign</button>
-                                                            </div>
-                                                            <div class="carerCard">
-                                                                <div class="avatar">K</div>
-                                                                <div class="details">
-                                                                    <div class="topRow">
-                                                                        <span class="name">Kelly Moss</span>
-                                                                        <span class="badge">WA9 3BT</span>
-                                                                    </div>
-                                                                    <span class="tag">Geographic Mismatch</span>
-                                                                    <div class="warning">
-                                                                        <i class='bx  bx-alert-circle'></i>
-                                                                        <i class='bx  bx-alert-triangle'></i>
-                                                                        Very far from client
-                                                                    </div>
-                                                                </div>
-                                                                <button class="assignBtn">Assign</button>
+                                                                    <button class="assignBtn">Assign</button>
+                                                                </div> --}}
+                                                            
                                                             </div>
 
                                                         </div>
@@ -1870,7 +1823,7 @@
                     document.getElementById('close_document').style.display = 'none';
                     document.querySelector('.upload-box').style.display = 'none';
                     document.getElementById('attach_document').style.display = 'inline-block';
-                    
+
                 }
             });
 
@@ -1879,6 +1832,160 @@
                 document.getElementById('pendingHeader').textContent = 'Pending Completion (' + count + ')';
             }
         </script>
+
+        <script>
+            document.querySelector('.upload-btn').addEventListener('click', function() {
+                document.getElementById('imageUpload').click();
+            });
+
+            document.getElementById('imageUpload').addEventListener('change', function() {
+                if (this.files.length === 0) return;
+
+                const file = this.files[0];
+                const fileName = file.name;
+                const today = new Date().toISOString().split('T')[0];
+
+                let newSection = `
+                                <div class="card pendingCard">
+                                    <div class="left">
+                                        <div class="icon blueText">
+                                            <i class='bx bx-file'></i>
+                                        </div>
+                                        <div class="info">
+                                            <div class="title">${fileName}</div>
+                                            <div class="meta">
+                                                <div class="inactive roundTag">Attachment</div>
+                                                <span class="date">${today}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="actions">
+                                        <span class="approve"><i class='bx bx-check-circle'></i></span>
+                                        <span class="delete"><i class='bx bx-trash'></i></span>
+                                    </div>
+                                </div>
+                            `;
+
+                document.getElementById('pendingCompletionSection').style.display = 'block';
+                document.getElementById('attachDocumentSection').style.display = 'none';
+                document.getElementById('pendingCompletion').insertAdjacentHTML('beforeend', newSection);
+
+                updatePendingCount();
+
+                document.getElementById('close_document').style.display = 'none';
+                document.querySelector('.upload-box').style.display = 'none';
+                document.getElementById('attach_document').style.display = 'inline-block';
+
+                // reset input so same file can be selected again
+                this.value = '';
+            });
+        </script>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+
+                const assessmentBtn = document.querySelector('.assessment-upload-btn');
+                const assessmentInput = document.getElementById('assessmentUpload');
+
+                if (assessmentBtn && assessmentInput) {
+
+                    // Open file picker
+                    assessmentBtn.addEventListener('click', function() {
+                        assessmentInput.click();
+                    });
+
+                    // Handle selected file
+                    assessmentInput.addEventListener('change', function() {
+                        if (this.files.length > 0) {
+                            console.log('Selected file:', this.files[0]);
+
+                            // future use:
+                            // - preview
+                            // - AJAX upload
+                            // - append to pending section
+                        }
+                    });
+                }
+
+            });
+        </script>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+
+                const clientSelect = document.getElementById('clientSelect');
+                const carerContainer = document.getElementById('carerSelect'); // it's now a DIV
+
+                clientSelect.addEventListener('change', function() {
+                    const clientId = this.value;
+                    const heading = document.getElementById('assignedClientTo');
+                    
+                    if (this.value === "") {
+                        heading.textContent = "Not assigned";
+                        return;
+                    }
+                    
+                    let selectedText = this.options[this.selectedIndex].text;
+                    heading.textContent = selectedText;
+                    
+                    console.log("clientId", clientId);
+                    carerContainer.innerHTML = "Loading carers...";
+
+                    if (!clientId) {
+                        carerContainer.innerHTML = "";
+                        return;
+                    }
+
+                    fetch("{{ route('carer.shift.staff', ':id') }}".replace(':id', clientId))
+                        .then(response => response.json())
+                        .then(res => {
+                            document.getElementById('assignedCarerBlankSection').style.display = 'none';
+                            carerContainer.innerHTML = ''; // clear old cards
+
+                            if (res.status && res.data.length > 0) {
+                                const suggested_carer = document.getElementById('suggested_carer');
+                                suggested_carer.innerHTML = '<h4 class="title">Suggested Carers (Ranked by compatibility):</h4>';
+
+                                res.data.forEach(carer => {
+
+                                    let firstLetter = carer.name.charAt(0).toUpperCase();
+
+                                    let card = `<div class="carerCard">
+                                                    <div class="avatar">${firstLetter}</div>
+                                                    <div class="details">
+                                                        <div class="topRow">
+                                                            <span class="name">${carer.name}</span>
+                                                            <span class="badge">${carer.postcode ?? ''}</span>
+                                                        </div>
+                                                        <span class="tag">${carer.tag ?? 'Geographic Mismatch'}</span>
+                                                        <div class="warning">
+                                                            <i class='bx bx-alert-circle'></i>
+                                                            <i class='bx bx-alert-triangle'></i>
+                                                            ${carer.warning ?? 'Very far from client'}
+                                                        </div>
+                                                    </div>
+                                                    <button class="assignBtn" data-id="${carer.id}">
+                                                        Assign
+                                                    </button>
+                                                </div>
+                                            `;
+
+                                    carerContainer.insertAdjacentHTML('beforeend', card);
+                                });
+
+                            } else {
+                                carerContainer.innerHTML = '<p>No Carer Found</p>';
+                            }
+                        })
+                        .catch(() => {
+                            carerContainer.innerHTML = '<p>Failed to load carers</p>';
+                        });
+                });
+            });
+        </script>
+
+
 
     @endsection
 </main>
