@@ -62,7 +62,7 @@
                 </div>
 
                 <!-- TAB CONTENT -->
-                <div class="tab-content carertabcontent">
+                <div class="tab-content carertabcontent clientCardBox">
                     <div class="content active" id="allCarerActibity">
                         <div class="row all_ClienData">
                             @forelse($child as $childVal)
@@ -73,7 +73,7 @@
                                             <div class="avatar">{{ strtoupper(substr($childVal->name, 0, 1)) }}</div>
                                             <div class="info">
                                                 <div class="name"><a href="{{ url('roster/client-details/'.$childVal->id) }}"> {{ $childVal->name }}</a></div>
-                                                <div class="role">part time</div>
+                                                <div class="role">{{$childVal->suFundingType}}</div>
                                             </div>
                                         </div>
                                         @if($childVal->status == 1)
@@ -99,7 +99,7 @@
 
                                         <div class="sectionCarer">
 
-                                            <div class="tags">
+                                            <div class="tags care-list">
                                                 <?php 
                                                     $moreNeedsAll=0;
                                                     if(!empty($childVal->care_needs)){
@@ -154,7 +154,7 @@
                                             <div class="avatar">{{ strtoupper(substr($activeVal->name, 0, 1)) }}</div>
                                             <div class="info">
                                                 <div class="name"><a href="{{ url('roster/client-details/'.$activeVal->id) }}">{{$activeVal->name}}</a></div>
-                                                <div class="role">part time</div>
+                                                <div class="role">{{$activeVal->suFundingType}}</div>
                                             </div>
                                         </div>
                                         <span class="status greenShowbtn">Active</span>
@@ -176,7 +176,7 @@
 
                                         <div class="sectionCarer">
 
-                                            <div class="tags">
+                                            <div class="tags care-list">
                                                  <?php 
                                                     $moreNeedsActive=0;
                                                     if(!empty($activeVal->care_needs)){
@@ -229,7 +229,7 @@
                                         <div class="avatar">{{ strtoupper(substr($inactiveVal->name, 0, 1)) }}</div>
                                         <div class="info">
                                             <div class="name"><a href="{{ url('roster/client-details/'.$inactiveVal->id) }}">{{$inactiveVal->name}}</a></div>
-                                            <div class="role">part time</div>
+                                            <div class="role">{{$inactiveVal->suFundingType}}</div>
                                         </div>
                                     </div>
                                     <span class="status radShowbtn">Inactive</span>
@@ -251,7 +251,7 @@
 
                                     <div class="sectionCarer">
 
-                                        <div class="tags">
+                                        <div class="tags care-list">
                                            <?php 
                                                     $moreNeedsInactive=0;
                                                     if(!empty($inactiveVal->care_needs)){
@@ -443,6 +443,7 @@
 <script>
     $(document).on('click','.edit', function(){
         let childId = $(this).data('child_id');
+        $("#ClientModalTitle").text("Edit Client");
         $.ajax({
             url: "{{ url('/roster/child-courses') }}/" + childId,
             type: "GET",

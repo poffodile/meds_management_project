@@ -154,3 +154,75 @@
   //     });
   // } );
 </script>
+<script>
+  // function childCourseData(){
+  //   $.ajax({
+  //       url: "{{ url('/proxy/courses') }}",
+  //       type: "GET",
+  //       success: function(response) {
+  //         console.log(response);
+  //         var courseHtml='<option selected disabled >Select Course</option>';
+  //         if(response.status === true){
+  //             var courseList=response.all_course_list;
+  //             courseList.forEach((val) =>{
+  //                 courseHtml+=`
+  //                     <option value="${val.title}" data-level="${val.level}" data-image="${val.image}" data-description="${val.description}" data-coursenumber="${val.coursenumber}">${val.title}</option>
+  //                 `;
+  //             });
+  //         }
+  //         $("#childCourse").html(courseHtml);
+  //       },
+  //       error: function(xhr) {
+  //           console.log("Error", xhr);
+  //       }
+  //   });
+  // }
+  function childCourseData(id = null, callback = null){
+    $("#ClientModalTitle").text("Add Client");
+    if (callback){
+      $("#ClientModalTitle").text("Edit Client");
+    }else{
+      $("#add_service_user")[0].reset();
+      var $fileupload = $('.fileupload');
+      var $preview = $fileupload.find('.fileupload-preview');
+      $preview.html(
+          '<img src="" ' +
+          'style="max-height:150px; max-width:200px;" />'
+      );
+      $fileupload.removeClass('fileupload-exists').addClass('fileupload-new');
+    }
+    $.ajax({
+        url: "{{ url('/proxy/courses') }}",
+        type: "GET",
+        success: function(response) {
+          console.log("proxcy courses response:::");
+          console.log(response);
+          var courseHtml='';
+          if(response.status === true){
+              var courseList=response.all_course_list;
+              courseList.forEach((val, key) => {
+                    courseHtml += `
+                        <div class="course-box" data-index="${key}">
+                            <label>
+                                <input type="checkbox" class="course_qualifications" data-coursenumber="${val.coursenumber}">${val.title}
+                            </label>
+                            <input type="hidden" data-name="courses[${key}][coursenumber]" value="${val.coursenumber}">
+                            <input type="hidden" data-name="courses[${key}][title]" value="${val.title}">
+                            <input type="hidden" data-name="courses[${key}][level]" value="${val.level}">
+                            <input type="hidden" data-name="courses[${key}][course_image]" value="${val.image}">
+                            <input type="hidden" data-name="courses[${key}][description]" value="${val.description}">
+                            
+                        </div>
+                    `;
+                });
+                // <input type="file" class="qual_upload" data-name="courses[${key}][certificate]" disabled>
+          }
+          $(".su_usercheckbox-grid").html(courseHtml);
+          if (callback) callback();
+        },
+        error: function(xhr) {
+            console.log("Error", xhr);
+        }
+    });
+  }
+</script>

@@ -76,6 +76,11 @@ Route::get('clear', function () {
 	return "Cleared!";
 });
 
+Route::get('/proxy/courses', function () {
+	return Http::get("http://thunderingslap.com/api/all-courses-list/")->json();
+	// return Http::get("http://66.116.198.68:8055/api/all-courses-list/")->json();
+});
+
 //  QR code for company
 Route::post('/qrcode', 'App\Http\Controllers\Android\AndroidApiController@QRCode');
 
@@ -151,8 +156,19 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 		
 		Route::get('/client', [ClientController::class, 'index'])->name('roster.client');
 		Route::get('/client-details/{client_id}', [ClientController::class, 'client_details'])->name('roster.client.details');
+		Route::get('/child-courses/{childId}', [ClientController::class, 'child_courses']);
+		Route::post('/client-delete', [ClientController::class, 'client_delete']);
+		Route::post('/client-search', [ClientController::class, 'client_search']);
+		Route::get('/care-task-add', [ClientController::class, 'care_task_add']);
+
 		Route::get('/incident-management', [IncidentManagementController::class, 'index'])->name('roster.incident.management');
+		Route::get('/incident-ai-prevention', [IncidentManagementController::class, 'ai_prevention']);
+		Route::get('/incident-report-details/{id}', [IncidentManagementController::class, 'incident_report_details']);
+		Route::post('/incident-report-save', [IncidentManagementController::class, 'incident_report_save']);
+		Route::post('/incident-report-loadData', [IncidentManagementController::class, 'incidentReportLoadData']);
 		Route::get('/payroll-finance', [PayrollFinanceController::class, 'index'])->name('roster.payroll.finance');
+		Route::get('/payroll-processing', [PayrollFinanceController::class, 'payrollprocessing']);
+		Route::get('/timesheet-reconciliation', [PayrollFinanceController::class, 'timesheetreconciliation']);
 
 	});
 

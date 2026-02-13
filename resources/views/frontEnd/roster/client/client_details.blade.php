@@ -59,7 +59,9 @@
                                     </div>
                                     <div class="item">
                                         <span class="label">Date Of Birth</span>
+                                        @if(!empty($clientDetails['date_of_birth']))
                                         <span class="value">{{date('d.m.Y',strtotime($clientDetails['date_of_birth']))}}</span>
+                                        @endif
                                     </div>
                                     <div class="item">
                                         <span class="label">Address</span>
@@ -122,7 +124,7 @@
                             </div>
                             <div class="occupancyBox">
                                 <div class="topRow">
-                                    <span>Client Onboarding Progress</span>
+                                    <span>Overall Progress</span>
                                     <span class="value" style="color:#272727">3/3 Complete</span>
                                 </div>
 
@@ -1300,7 +1302,7 @@
                             </div>
                             <div class="actions mt-0">
                                 <button class="btn borderBtn"> <i class="bx  bx-sparkles"></i> AI Generate from Care Needs</button>
-                                <button class="allBtnUseColor"> <i class='bx  bx-plus'></i> Add Task</button>
+                                <button class="allBtnUseColor" type="button" onclick="window.location.href='{{url('roster/care-task-add')}}'"> <i class='bx  bx-plus'></i> Add Task</button>
                             </div>
                         </header>
                         <div class="p-20 p-b-0">

@@ -161,5 +161,8 @@ class ClientController extends Controller
         }
         return $html_data;
     }
+    public function care_task_add(){
+        return view('frontEnd.roster.client.care_task_form');
+    }
    
 }

@@ -193,6 +193,19 @@ class StaffService
             }
         }
 
+        $address = $request->input('street') . ' ' . $request->input('city') . ' ' . $request->input('postcode');
+        $staffLatLong = $this->getLatLongFromAddress($address);
+
+        // Save latitude and longitude if available
+        if ($staffLatLong) {
+            if (Schema::hasColumn('user', 'latitude')) {
+                $staff->latitude = $staffLatLong['latitude'];
+            }
+            if (Schema::hasColumn('user', 'longitude')) {
+                $staff->longitude = $staffLatLong['longitude'];
+            }
+        }
+
         // Dates
         $dateFields = ['date_of_joining', 'date_of_leaving', 'dbs_expiry_date'];
         foreach ($dateFields as $df) {
@@ -305,25 +318,77 @@ class StaffService
     public function getShiftUser($id)
     {
         $client = ServiceUser::find($id);
-        // $latitude = $client->postcode;
-        $latLong = $this->getLatLongFromPostcode($client->postcode);
-        // dd($latLong);
-        $user = User::select('id', 'name', 'postcode')->where('home_id', Auth::user()->home_id)->where('status', 1)->get();
-        // dd($user);
-        foreach ($user as $staff) {
-            $staffLatLong = $this->getLatLongFromPostcode($staff->postcode);
-            
-            if ($latLong && $staffLatLong) {
-                $distance = $this->calculateDistance($latLong['latitude'], $latLong['longitude'], $staffLatLong['latitude'], $staffLatLong['longitude']);
-                $staff->distance = $distance; // Add distance attribute to staff
-            } else {
-                $staff->distance = null; // Unable to calculate distance
-            }
+        
+        // Check if service user has latitude and longitude
+        if (!$client || !$client->latitude || !$client->longitude) {
+            return collect(); // Return empty collection if no location data
         }
 
-        return $user;
+        $clientLatitude = $client->latitude;
+        $clientLongitude = $client->longitude;
+        $maxDistance = 20; // 20km range
+        
+        $users = User::select('id', 'name', 'postcode', 'latitude', 'longitude')
+            ->where('home_id', Auth::user()->home_id)
+            ->where('status', 1)
+            ->get();
+        
+        // Filter staff by distance
+        $nearbyStaff = $users->filter(function ($staff) use ($clientLatitude, $clientLongitude, $maxDistance) {
+            // Skip if staff doesn't have location data
+            if (!$staff->latitude || !$staff->longitude) {
+                return false;
+            }
+            
+            // Calculate distance
+            $distance = $this->calculateDistance($clientLatitude, $clientLongitude, $staff->latitude, $staff->longitude);
+            
+            // Add distance attribute and filter by range
+            $staff->distance = $distance;
+            return $distance <= $maxDistance;
+        })->sortBy('distance'); // Sort by closest distance first
+        
+        return $nearbyStaff->values(); // Reset collection keys
     }
 
+    public function getLatLongFromAddress($address)
+    {
+        if (empty($address)) {
+            return null;
+        }
+
+        $apiKey = env('GOOGLE_MAPS_KEY');
+
+        $url = 'https://maps.googleapis.com/maps/api/geocode/json?address='
+            . urlencode($address)
+            . '&key=' . $apiKey;
+
+        $response = @file_get_contents($url);
+
+        if (!$response) {
+            return null;
+        }
+
+        $geo = json_decode($response, true);
+
+        if (
+            isset($geo['status']) &&
+            $geo['status'] === 'OK' &&
+            isset($geo['results'][0]['geometry']['location'])
+        ) {
+            return [
+                'latitude'  => $geo['results'][0]['geometry']['location']['lat'],
+                'longitude' => $geo['results'][0]['geometry']['location']['lng']
+            ];
+        }
+
+        return null;
+    }
+
+    /**
+     * Calculate distance between two coordinates using Haversine formula
+     * Returns distance in kilometers
+     */
     private function calculateDistance($lat1, $lon1, $lat2, $lon2)
     {
         $earthRadius = 6371; // Earth radius in KM
@@ -340,40 +405,5 @@ class StaffService
         $distance = $earthRadius * $c;
 
         return round($distance, 2); // Distance in KM (2 decimal points)
-    }
-
-
-    public function getLatLongFromPostcode($postcode)
-    {
-        if (empty($postcode)) {
-            return null;
-        }
-
-        $apiKey = env('GOOGLE_MAPS_KEY');
-
-        $url = 'https://maps.googleapis.com/maps/api/geocode/json?address='
-            . urlencode($postcode)
-            . '&key=' . $apiKey;
-
-        $geo = @file_get_contents($url);
-
-        if (!$geo) {
-            return null; // API call failed
-        }
-
-        $geo = json_decode($geo, true);
-
-        if (
-            isset($geo['status']) &&
-            $geo['status'] === 'OK' &&
-            isset($geo['results'][0]['geometry']['location'])
-        ) {
-            return [
-                'latitude'  => $geo['results'][0]['geometry']['location']['lat'],
-                'longitude' => $geo['results'][0]['geometry']['location']['lng']
-            ];
-        }
-
-        return null; // if blank / invalid postcode
     }
 }

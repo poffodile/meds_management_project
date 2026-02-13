@@ -136,6 +136,10 @@ class SystemManagementController extends Controller
             $home_ids = Auth::user()->home_id;
             $ex_home_ids = explode(',', $home_ids);
             $home_id = $ex_home_ids[0];
+
+            $address = $data['street'] . ' ' . $data['city'] . ' ' . $data['postcode'];
+            $service_user_latLong = $this->staffService->getLatLongFromAddress($address);
+
             // $home_id = Auth::user()->home_id;
             // echo '<pre>'; print_r($_FILES);die;
             $date_of_birth = date('Y-m-d', strtotime($data['date_of_birth']));
@@ -146,7 +150,7 @@ class SystemManagementController extends Controller
                 $user              = new ServiceUser;
                 $successMessage = 'User added successfully.';
             }
-           
+          
             $user->name             = $data['su_name'];
             $user->user_name        = $data['su_user_name'];
             $user->email            = $data['email'];
@@ -165,25 +169,27 @@ class SystemManagementController extends Controller
             $user->end_date         =  date('Y-m-d', strtotime($data['end_date']));
             $user->section          = $data['section'];
             $user->short_description = $data['short_description'];
-            $user->height_unit           =  $data['height_unit'];
-            $user->height_ft             =  $data['height_ft'];
-            $user->height_in             =  $data['height_in'];
-            $user->weight_unit           =  $data['weight_unit'];
-            $user->weight                =  $data['weight'];
-            $user->hair_and_eyes    = $data['hair_and_eyes'];
-            $user->markings         = $data['markings'];
-            $user->ethnicity_id     = $data['ethnicity_id'];
-            $user->suMobility     = $data['suMobility'];
+            $user->height_unit       =  $data['height_unit'];
+            $user->height_ft         =  $data['height_ft'];
+            $user->height_in         =  $data['height_in'];
+            $user->weight_unit       =  $data['weight_unit'];
+            $user->weight            =  $data['weight'];
+            $user->hair_and_eyes     = $data['hair_and_eyes'];
+            $user->markings          = $data['markings'];
+            $user->ethnicity_id      = $data['ethnicity_id'];
+            $user->suMobility        = $data['suMobility'];
             $user->suFundingType     = $data['suFundingType'];
-            $user->street     = $data['street'];
-            $user->city     = $data['city'];
-            $user->postcode     = $data['postcode'];
-            $user->care_needs     = $data['care_needs'];
+            $user->street            = $data['street'];
+            $user->city              = $data['city'];
+            $user->postcode          = $data['postcode'];
+            $user->latitude          = $service_user_latLong['latitude'] ?? null;
+            $user->longitude         = $service_user_latLong['longitude'] ?? null;
+            $user->care_needs        = $data['care_needs'];
             $user->medical_notes     = $data['medical_notes'];
-            $user->em_name     = $data['em_name'];
-            $user->em_phone     = $data['em_phone'];
-            $user->relationship     = $data['relationship'];
-            $user->status     = $data['suStatus'] ?? 1;
+            $user->em_name           = $data['em_name'];
+            $user->em_phone          = $data['em_phone'];
+            $user->relationship      = $data['relationship'];
+            $user->status            = $data['suStatus'] ?? 1;
             // $user->status        = $request->status;
  
             $user->home_id               = $home_id;
@@ -232,7 +238,7 @@ class SystemManagementController extends Controller
                         $certificate_image = null;
                         $su_user_course=new suUserCourse;
                         $su_user_course->su_user_id= $user->id;
-                        $su_user_course->coursenumber= $course['coursenumber'];
+                        $su_user_course->coursenumber= $course['course_id'];
                         $su_user_course->title= $course['title'];
                         $su_user_course->level= $course['level'];
                         $su_user_course->image= $course['course_image'];
@@ -266,6 +272,9 @@ class SystemManagementController extends Controller
             $ex_home_ids = explode(',', $home_ids);
             $home_id = $ex_home_ids[0];
 
+            $address = $data['street'] . ' ' . $data['city'] . ' ' . $data['postcode'];
+            $staffLatLong = $this->staffService->getLatLongFromAddress($address);
+
             $user                   = new User;
             $user->name             = $data['staff_name'];
             $user->user_name        = $data['staff_user_name'];
@@ -275,6 +284,8 @@ class SystemManagementController extends Controller
             $user->street           = $data['street'];
             $user->city             = $data['city'];
             $user->postcode         = $data['postcode'];
+            $user->latitude         = $staffLatLong['latitude'] ?? null;
+            $user->longitude        = $staffLatLong['longitude'] ?? null;
             $user->department       = $data['department'];
             $user->description      = $data['description'];
             // $user->payroll          = $data['payroll'];

@@ -4,7 +4,40 @@
 @section('content')
 
     @include('frontEnd.roster.common.roster_header')
+    <style>
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+        }
 
+        /* Export Button */
+        .btn-export {
+            background: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            color: #374151;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 6px;
+        }
+
+        .btn-export:hover {
+            background: #e5e7eb;
+        }
+
+        /* Add Carer Button */
+        .btn-add-carer {
+            background: #2563eb;
+            border: none;
+            color: #fff;
+            font-weight: 500;
+            padding: 8px 18px;
+            border-radius: 6px;
+        }
+
+        .btn-add-carer:hover {
+            background: #1d4ed8;
+        }
+    </style>
     <main class="page-content">
         <div class="container-fluid">
             <div class="topHeaderCont">
@@ -12,9 +45,15 @@
                     <h1>Carers</h1>
                     <p class="header-subtitle">Manage your care team</p>
                 </div>
-                <div class="header-actions">
-                    <button class="btn add_staff openStaffModal" data-mode="add"><i class="fa fa-plus"></i> Add Carer</button>
+                <div class="action-buttons">
+                    <button class="btn btn-export add_staff openStaffModal"><i class="fa fa-download"></i> Export </button>
+                    <button class="btn btn-add-carer add_staff openStaffModal"> <i class="fa fa-plus"></i> Add Carer </button>
                 </div>
+
+                {{-- <div class="header-actions">
+                    <button class="btn add_staff openStaffModal" data-mode="add"> Export </button>
+                    <button class="btn add_staff openStaffModal" data-mode="add"><i class="fa fa-plus"></i> Add Carer</button>
+                </div> --}}
             </div>
 
             <div class="rota_dashboard-cards simpleCard">
@@ -119,8 +158,8 @@
 
         <script>
             /* -------------------------
-                                    PAGE LOAD
-                                    -------------------------- */
+                PAGE LOAD
+            -------------------------- */
             $(document).ready(function() {
                 loadStaff('allCarerActibity');
             });
