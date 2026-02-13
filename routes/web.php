@@ -125,6 +125,7 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 		Route::get('/dashboard', [RosterController::class, 'dashboard'])->name('roster.dashboard');
 		Route::get('/manage-dashboard', [ManageDashboardController::class, 'index'])->name('roster.manage.dashboard');
 		Route::get('/schedule-shift', [ScheduleShiftController::class, 'index'])->name('roster.schedule.dashboard');
+		Route::post('/schedule-shift/store', [ScheduleShiftController::class, 'store'])->name('roster.schedule.store');
 		Route::get('/carer-availability', [CarerAvailabilityController::class, 'index'])->name('roster.carer.availability');
 		Route::get('/messaging-center', [MessagingCenterController::class, 'index'])->name('roster.carer.availability');
 		Route::get('/staff-task', [StaffTaskController::class, 'index'])->name('roster.staff.task');

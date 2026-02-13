@@ -326,26 +326,44 @@ class StaffService
 
         $clientLatitude = $client->latitude;
         $clientLongitude = $client->longitude;
-        $maxDistance = 20; // 20km range
-        
+
         $users = User::select('id', 'name', 'postcode', 'latitude', 'longitude')
             ->where('home_id', Auth::user()->home_id)
-            ->where('status', 1)
+            ->where('status', 1)    
             ->get();
         
-        // Filter staff by distance
-        $nearbyStaff = $users->filter(function ($staff) use ($clientLatitude, $clientLongitude, $maxDistance) {
-            // Skip if staff doesn't have location data
-            if (!$staff->latitude || !$staff->longitude) {
-                return false;
+        // dd($users);
+
+        // Map staff to process distance logic for everyone
+        $nearbyStaff = $users->map(function ($staff) use ($clientLatitude, $clientLongitude) {
+            
+            $distance = null;
+
+            // Check if staff has location data
+            if ($staff->latitude && $staff->longitude) {
+                // Calculate distance
+                $distance = $this->calculateDistance($clientLatitude, $clientLongitude, $staff->latitude, $staff->longitude);
+                $staff->distance = $distance;
+            } else {
+                // No location data -> Treat as very far / mismatch
+                $staff->distance = 999999; 
             }
-            
-            // Calculate distance
-            $distance = $this->calculateDistance($clientLatitude, $clientLongitude, $staff->latitude, $staff->longitude);
-            
-            // Add distance attribute and filter by range
-            $staff->distance = $distance;
-            return $distance <= $maxDistance;
+
+            // Assign Card Color & Tag based on distance
+            if ($distance !== null && $distance < 20) {
+                // $staff->card_color = 'greenCarerCard';
+                // $staff->tag = 'Best Match';
+                
+            } elseif ($distance !== null && $distance == 20) {
+                $staff->card_color = 'muteCarerCard';
+                $staff->tag = 'Standard Match';
+            } else { // Greater than 20 or no location
+                $staff->card_color = 'red';
+                $staff->tag = 'Geographic Mismatch';
+                $staff->warning = 'Very far from client';
+            }
+
+            return $staff;
         })->sortBy('distance'); // Sort by closest distance first
         
         return $nearbyStaff->values(); // Reset collection keys

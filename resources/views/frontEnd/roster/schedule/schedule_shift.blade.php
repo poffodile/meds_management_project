@@ -30,6 +30,10 @@
         #close_document {
             display: none;
         }
+
+        .assessment-card {
+            display: none;
+        }
     </style>
     <main class="page-content">
         <div class="container-fluid">
@@ -1144,8 +1148,8 @@
                             </div>
                             <div class="recent-activity sectionWhiteBgAllUse">
                                 <!-- <div class="section-header">
-                                                                                                                                                        <h2 class="section-title">Recent Activity</h2>
-                                                                                                                                                    </div> -->
+                                        <h2 class="section-title">Recent Activity</h2>
+                                    </div> -->
 
                                 <div class="activity-item">
                                     <div class="activity-icon"><i class='bx  bx-apps'></i> </div>
@@ -1197,7 +1201,7 @@
         <!-- add Shift Schedule Modal -->
         <div class="modal fade leaveCommunStyle" id="addShiftModal" tabindex="1" role="dialog"
             aria-labelledby="myModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
+            <div class="modal-dialog newShiftModal">
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -1205,7 +1209,9 @@
                     </div>
                     <div class="modal-body approveLeaveModal heightScrollModal">
                         <div class="carer-form createNewShiftTabBtn">
-                            <form>
+                            <form id="createShiftForm" action="{{ route('roster.schedule.store') }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="carer_id" id="selected_carer_id">
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="">
@@ -1239,17 +1245,17 @@
                                                 <div class="content" id="scheduleLocation">
                                                     <div class="row">
                                                         <div class="col-md-12">
-                                                            <select class="form-control">
-                                                                <option>Select location</option>
+                                                            <select class="form-control" name="location_id">
+                                                                <option value="">Select location</option>
                                                                 <option>Inactive</option>
                                                             </select>
                                                         </div>
                                                         <div class="col-md-12 m-t-10">
-                                                            <input type="text" name="" id="" class="form-control"
+                                                            <input type="text" name="location_name" id="" class="form-control"
                                                                 placeholder="Enter custom location name">
                                                         </div>
                                                         <div class="col-md-12 m-t-10">
-                                                            <input type="text" name="" id="" class="form-control"
+                                                            <input type="text" name="location_address" id="" class="form-control"
                                                                 placeholder="Address (optional)">
                                                         </div>
 
@@ -1261,7 +1267,8 @@
                                                 <div class="content active" id="scheduleClient">
                                                     <div class="row">
                                                         <div class="col-md-12">
-                                                            <select class="form-control" id="clientSelect">
+                                                            <select class="form-control" id="clientSelect" name="client_id">
+                                                                <option value="">Select Client</option>
                                                                 @foreach ($service_users as $service_user)
                                                                     <option value="{{ $service_user->id }}"> {{ $service_user->name }} </option>
                                                                 @endforeach
@@ -1276,7 +1283,7 @@
                                                 <div class="content" id="scheduleProperty">
                                                     <div class="row">
                                                         <div class="col-md-12">
-                                                            <select class="form-control">
+                                                            <select class="form-control" name="property_id">
                                                                 <option value="">Select Property</option>
                                                             </select>
                                                         </div>
@@ -1288,15 +1295,15 @@
                                             <div class="row m-t-10">
                                                 <div class="col-md-12">
                                                     <label>Date *</label>
-                                                    <input type="date" class="form-control">
+                                                    <input type="date" name="start_date" class="form-control" required>
                                                 </div>
                                                 <div class="col-md-6 m-t-10">
                                                     <label>Start Time *</label>
-                                                    <input type="time" class="form-control">
+                                                    <input type="time" name="start_time" class="form-control" required>
                                                 </div>
                                                 <div class="col-md-6 m-t-10">
                                                     <label>End Time *</label>
-                                                    <input type="time" class="form-control">
+                                                    <input type="time" name="end_time" class="form-control" required>
                                                 </div>
                                             </div>
                                             <div class="row">
@@ -1317,18 +1324,18 @@
                                                     <label>Tasks (comma separated)</label>
                                                     <textarea class="form-control" rows="3"
                                                         placeholder="e.g., Medication, Personal care, Meal preparation"
-                                                        name=""></textarea>
+                                                        name="tasks"></textarea>
                                                 </div>
                                                 <div class="col-md-12  m-t-10">
                                                     <label>Notes</label>
                                                     <textarea class="form-control" rows="3"
-                                                        placeholder="Additional notes or instructions" name=""></textarea>
+                                                        placeholder="Additional notes or instructions" name="notes"></textarea>
                                                 </div>
 
                                                 <div class="col-md-12  m-t-10">
                                                     <div class="overtime  recurringShift">
                                                         <label>
-                                                            <input type="checkbox" id="recurringClientToggle"> Make this a recurring shift
+                                                            <input type="checkbox" id="recurringClientToggle" name="is_recurring" value="1"> Make this a recurring shift
                                                         </label>
 
                                                         <div class="row recurringOptions" id="recurringClientDiv">
@@ -1356,7 +1363,7 @@
                                                             </div>
                                                             <div class="col-md-12 m-t-10">
                                                                 <label>End Date</label>
-                                                                <input type="date" name="emd_date" class="form-control">
+                                                                <input type="date" name="end_date" class="form-control">
                                                             </div>
                                                         </div>
                                                     </div>
@@ -1389,7 +1396,7 @@
                                                                                 <div class="selectfromSystemTabCont">
                                                                                     <div class="input-group selectfromSearch">
                                                                                         <span class="input-group-addon btn-white"><i class="fa fa-search"></i></span>
-                                                                                        <input type="text" id="systemSearch" class="form-control" placeholde r="Search entries...">
+                                                                                        <input type="text" id="systemSearch" class="form-control" placeholder="Search entries...">
                                                                                     </div>
 
                                                                                     <div class="addSystemList">
@@ -1413,11 +1420,11 @@
                                                                                 <div class="row">
                                                                                     <div class="col-md-6">
                                                                                         <label>Document Name</label>
-                                                                                        <input type="text" class="form-control" placeholder="e.g. Supervision Note">
+                                                                                        <input type="text" name="doc_name" class="form-control" placeholder="e.g. Supervision Note">
                                                                                     </div>
                                                                                     <div class="col-md-6">
                                                                                         <label>Document Type</label>
-                                                                                        <select class="form-control">
+                                                                                        <select class="form-control" name="doc_type">
                                                                                             <option>Other</option>
                                                                                             <option>Supervision Form</option>
                                                                                             <option>Care Plan</option>
@@ -1434,11 +1441,11 @@
 
                                                                                 <div class="checkbox">
                                                                                     <label>
-                                                                                        <input type="checkbox"> Requires completion during shift
+                                                                                        <input type="checkbox" name="doc_required"> Requires completion during shift
                                                                                     </label>
                                                                                 </div>
                                                                                 <button class="upload-btn" type="button"> <i class="fa fa-upload"></i> Upload & Attach </button>
-                                                                                <input type="file" id="imageUpload" accept="image/*" style="display:none;">
+                                                                                <input type="file" id="imageUpload" name="doc_file" accept="image/*" style="display:none;">
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -1461,7 +1468,7 @@
                                                 </div>
 
                                                 <div class="col-md-12 mt-3">
-                                                    <div class="assessment-card">
+                                                    <div class="assessment-card" id="assessment_card"> 
                                                         <div class="assessment-header">
                                                             <i class="fa fa-file-text-o doc-icon"></i>
                                                             <div>
@@ -1475,7 +1482,7 @@
                                                                 <i class="fa fa-upload"></i>
                                                                 Upload Assessment Document
                                                             </button>
-                                                            <input type="file" id="assessmentUpload" accept=".pdf,.doc,.docx" style="display:none;">
+                                                            <input type="file" id="assessmentUpload" name="assessment_doc" accept=".pdf,.doc,.docx" style="display:none;">
                                                         </div>
                                                     </div>
                                                 </div>
@@ -1510,25 +1517,10 @@
                                                           <div id="suggested_carer"></div>
 
                                                             <div id="carerSelect">
-
-                                                                {{-- <div class="carerCard">
-                                                                    <div class="avatar">G</div>
-                                                                    <div class="details">
-                                                                        <div class="topRow">
-                                                                            <span class="name">Georgia Ashmore</span>
-                                                                            <span class="badge">WA9 3BT</span>
-                                                                        </div>
-                                                                        <span class="tag">Geographic Mismatch</span>
-                                                                        <div class="warning">
-                                                                            <i class='bx bx-alert-circle'></i>
-                                                                            <i class='bx bx-alert-triangle'></i> Very far from client
-                                                                        </div>
-                                                                    </div>
-                                                                    <button class="assignBtn">Assign</button>
-                                                                </div> --}}
-                                                            
+                                                                
+                                                                <!-- Carer cards injected here by JS -->
+                                                          
                                                             </div>
-
                                                         </div>
                                                     </div>
                                                 </div>
@@ -1537,7 +1529,7 @@
                                     </div>
                                 </div>
                                 <div class="actions">
-                                    <button type="button" class="cancel">Cancel</button>
+                                    <button type="button" class="cancel" data-dismiss="modal">Cancel</button>
                                     <button type="submit" class="submit">Create Carer</button>
                                 </div>
                             </form>
@@ -1946,32 +1938,77 @@
                             if (res.status && res.data.length > 0) {
                                 const suggested_carer = document.getElementById('suggested_carer');
                                 suggested_carer.innerHTML = '<h4 class="title">Suggested Carers (Ranked by compatibility):</h4>';
-
+                                console.log("res.data", res.data);
+                                document.getElementById('assessment_card').style.display = 'block';
                                 res.data.forEach(carer => {
 
                                     let firstLetter = carer.name.charAt(0).toUpperCase();
+                                    
+                                    // Ensure distance is treated as a number
+                                    let dist = parseFloat(carer.distance);
+                                    let cardHtml = '';
 
-                                    let card = `<div class="carerCard">
-                                                    <div class="avatar">${firstLetter}</div>
-                                                    <div class="details">
-                                                        <div class="topRow">
-                                                            <span class="name">${carer.name}</span>
-                                                            <span class="badge">${carer.postcode ?? ''}</span>
-                                                        </div>
-                                                        <span class="tag">${carer.tag ?? 'Geographic Mismatch'}</span>
-                                                        <div class="warning">
-                                                            <i class='bx bx-alert-circle'></i>
-                                                            <i class='bx bx-alert-triangle'></i>
-                                                            ${carer.warning ?? 'Very far from client'}
-                                                        </div>
+                                    if (dist < 20) {
+                                        // GREEN CARD (< 20km)
+                                        cardHtml = `
+                                            <div class="carerCard greenCarerCard">
+                                                <div class="avatar">${firstLetter}</div>
+                                                <div class="details">
+                                                    <div class="topRow">
+                                                        <div><span class="name">${carer.name}</span></div>
+                                                        <div><span class="badge">${carer.postcode ?? ''}</span></div>
+                                                        <div><span class="careBadg darkGreenBadges">Best Match</span></div>
                                                     </div>
-                                                    <button class="assignBtn" data-id="${carer.id}">
-                                                        Assign
-                                                    </button>
+                                                    <span class="badge">${carer.tag ?? 'Score'}</span>
+                                                    <div class="d-flex gap-2 mt-2">
+                                                        <p class="fs13 darkGreenTextp mb-0"><i class='bx bx-check-circle me-1'></i> Within ${dist.toFixed(1)} km</p>
+                                                        <p class="fs13 darkGreenTextp mb-0"><i class='bx bx-check-circle me-1'></i> ${carer.qualifications_count ?? '0'} Qualifications</p>
+                                                    </div>
                                                 </div>
-                                            `;
+                                                <button class="bgBtn assignBtn" data-id="${carer.id}">Assign</button>
+                                            </div>`;
+                                            
+                                    } else if (dist === 20) {
+                                        // WHITE / MUTE CARD (== 20km)
+                                        cardHtml = `
+                                            <div class="carerCard muteCarerCard">
+                                                <div class="avatar">${firstLetter}</div>
+                                                <div class="details">
+                                                    <div class="topRow">
+                                                        <div><span class="name">${carer.name}</span></div>
+                                                        <div><span class="badge">${carer.postcode ?? ''}</span></div>
+                                                    </div>
+                                                    <span class="badge">${carer.tag ?? 'Standard Match'}</span>
+                                                    <div class="d-flex gap-2 mt-2">
+                                                        <p class="fs13 darkGreenTextp mb-0"><i class='bx bx-check-circle me-1'></i> 20 km away</p>
+                                                        <p class="fs13 darkGreenTextp mb-0"><i class='bx bx-check-circle me-1'></i> ${carer.qualifications_count ?? '0'} Qualifications</p>
+                                                    </div>
+                                                </div>
+                                                <button class="bgBtn assignBtn" data-id="${carer.id}">Assign</button>
+                                            </div>`;
 
-                                    carerContainer.insertAdjacentHTML('beforeend', card);
+                                    } else {
+                                        // RED CARD (> 20km or Default)
+                                        cardHtml = `
+                                            <div class="carerCard">
+                                                <div class="avatar">${firstLetter}</div>
+                                                <div class="details">
+                                                    <div class="topRow">
+                                                        <span class="name">${carer.name}</span>
+                                                        <span class="badge">${carer.postcode ?? ''}</span>
+                                                    </div>
+                                                    <span class="tag">${carer.tag ?? 'Geographic Mismatch'}</span>
+                                                    <div class="warning">
+                                                        <i class='bx bx-alert-circle'></i>
+                                                        <i class='bx bx-alert-triangle'></i>
+                                                        ${carer.warning ?? 'Very far from client'}
+                                                    </div>
+                                                </div>
+                                                <button class="assignBtn" data-id="${carer.id}">Assign</button>
+                                            </div>`;
+                                    }
+
+                                    carerContainer.insertAdjacentHTML('beforeend', cardHtml);
                                 });
 
                             } else {
@@ -1981,6 +2018,65 @@
                         .catch(() => {
                             carerContainer.innerHTML = '<p>Failed to load carers</p>';
                         });
+                });
+
+                // Handle Assignment
+                document.getElementById('carerSelect').addEventListener('click', function(e) {
+                    if (e.target.classList.contains('assignBtn')) {
+                        e.preventDefault();
+                        
+                        // Get Carer ID
+                        let carerId = e.target.getAttribute('data-id');
+                        document.getElementById('selected_carer_id').value = carerId;
+                        
+                        // 1. Reset all cards
+                        document.querySelectorAll('.carerCard').forEach(card => {
+                            card.style.border = "1px solid #e5e7eb";
+                            let btn = card.querySelector('.assignBtn');
+                            if(btn) {
+                                btn.innerText = "Assign"; 
+                                btn.classList.remove('btn-success');
+                            }
+                        });
+
+                        // 2. Highlight selected card
+                        let selectedCard = e.target.closest('.carerCard');
+                        selectedCard.style.border = "2px solid #22c55e"; // Green border
+                        
+                        let btn = e.target;
+                        btn.innerText = "Assigned";
+                        btn.classList.add('btn-success');
+                        
+                        // 3. Update "Assigned To" text
+                        let carerName = selectedCard.querySelector('.name').innerText;
+                        let assignedTitle = document.getElementById('assignedClientTo');
+                        if(assignedTitle) assignedTitle.innerText = carerName;
+
+                        // 4. Update the dashed placeholder
+                        let placeholder = document.getElementById('assignedCarerBlankSection');
+                        if(placeholder) {
+                            placeholder.innerHTML = `
+                                <div style="text-align:center; padding: 20px;">
+                                    <div class="avatar" style="width:50px;height:50px;border-radius:50%;background:#3b82f6;color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;margin:0 auto 10px;">
+                                        ${carerName.charAt(0)}
+                                    </div>
+                                    <h4 style="margin:0;font-weight:600">${carerName}</h4>
+                                    <span class="badge" style="background:#dcfce7;color:#166534;margin-top:5px">Assigned</span>
+                                </div>
+                            `;
+                            placeholder.style.border = "1px solid #d1fae5";
+                            placeholder.style.background = "#fff";
+                        }
+                    }
+                });
+
+                // Form Validation
+                document.getElementById('createShiftForm').addEventListener('submit', function(e) {
+                    let carerId = document.getElementById('selected_carer_id').value;
+                    if(!carerId) {
+                        e.preventDefault();
+                        alert('Please assign a carer before creating the shift.');
+                    }
                 });
             });
         </script>

@@ -271,8 +271,18 @@
             if (!currdate) return;
             var newFormat = String(currdate.getDate()).padStart(2, '0') + "-" + String(currdate.getMonth() + 1).padStart(2, '0') + "-" + currdate.getFullYear();
             $('.joining-date').val(newFormat);
-            // keep the picker UI in sync
+             // keep the picker UI in sync
             $('#joining-date').datetimepicker('update', newFormat);
+
+            // Constraint: Leaving date must be after joining date
+            $('#leaving-date').datetimepicker('setStartDate', currdate);
+
+            // If existing leaving date is invalid (before new joining date), clear it
+            var leavingDate = $('#leaving-date').data("datetimepicker").getDate();
+            if (leavingDate && leavingDate < currdate) {
+                $('.leaving-date').val('');
+                $('#leaving-date').datetimepicker('update', '');
+            }
         });
 
         $('#joining-date').on('click', function() {
@@ -868,6 +878,14 @@
             // Update both picker inputs via their APIs (ensures configured format is used)
             setPickerDate('#joining-date', '#date_of_joining', joiningDate);
             setPickerDate('#leaving-date', '#date_of_leaving', leavingDate);
+
+            // Enforce constraints on edit load
+            var currentJoining = $('#joining-date').data("datetimepicker").getDate();
+            if (currentJoining) {
+                $('#leaving-date').datetimepicker('setStartDate', currentJoining);
+            } else {
+                $('#leaving-date').datetimepicker('setStartDate', null);
+            }
 
             function parseDBSDate(dateStr) {
                 if (!dateStr) return null;

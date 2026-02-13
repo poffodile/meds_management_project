@@ -1364,6 +1364,7 @@ ul.top-menu>li>a:focus {
 }
 
 /*badge*/
+
 .badge.bg-primary {
     background: #8075c4;
 }
@@ -9422,7 +9423,7 @@ a.close.edit_dyn_form {
     --lightRedbgClr: #fef2f2;
     --purpleBlueCle: #4f46e5;
     --pinkClr: #db2777;
-    /* pratima */
+    /* pratima root */
     --borderColor: #ddd;
     --redColor: #dc2626;
     --blueColor: #2563eb;
@@ -9437,11 +9438,41 @@ a.close.edit_dyn_form {
     --hoverRed: #b91c1c;
     --lightGreenp: #f0fdf4;
     --darkRedp: #a41d1d;
+    --darkPink: #9d174d;
     --bxShadowHover: rgba(17, 12, 46, 0.15) 0px 12px 30px 0px;
     --darkBlue: #1e3a8a;
---darkPurple: #581c87;
+    --darkPurple: #581c87;
     --purple: #9333ea;
-
+    --darkCyan: #115e59;
+    --cyanTextClr: #0d9488;
+    --darkskyBlue: #155e75;
+    --skyBlue: #0891b2;
+    --font13: 13px;
+    --lightRedBorder: #fecaca;
+    --darkGreenp: #14532d;
+    --lightBlueClr: #eff6ff;
+    --blueMediumBorder: #93c5fd;
+    --violet70Border: #a6b5fc;
+    --purple70Border: #c4b5fd;
+    --orange70Border: #fdba74;
+    --green70Border: #87efad;
+    --pink70Border: #f9a8d4;
+    --red70Border: #fca5a5;
+    --cyan70Border: #5eead4;
+    --yellow70Border: #fde047;
+    --skyBlue70Border: #67e8f9;
+    --violet: #3730a3;
+    --blue70: #dbeafe;
+    --violet70: #e0e7ff;
+    --purple70: #ede9fe;
+    --orange70: #ffedd5;
+    --green70: #dcfce7;
+    --pink70: #fce7f3;
+    --red70: #fee2e2;
+    --cyan70: #ccfbf1;
+    --yellow70: #fef9c3;
+    --skyBlue70: #cffafe;
+    --darkGray: #4b5563;
 }
 
 /* ******************Start Dashboard Css***************************** */
@@ -9453,15 +9484,15 @@ a.close.edit_dyn_form {
 }
 
 .topHeaderCont h1 {
-    font-size: 22px;
-    font-weight: 600;
+    font-size: 25px;
+    font-weight: 700;
     margin-top: 0;
-    color: #484848;
+    color: var(--black);
 }
 
 .header-subtitle {
-    color: #718096;
-    font-size: 12px;
+    color: var(--darkGray);
+    font-size: 13px;
 }
 
 .header-actions {
@@ -9723,7 +9754,8 @@ a.close.edit_dyn_form {
     font-weight: 600;
 }
 
-.rota_dash-left .rota_count {
+.rota_dash-left .rota_count,
+.cardBoldTitle {
     font-size: 24px;
     font-weight: 700;
 }
@@ -10726,14 +10758,15 @@ header.panel-heading.headingCapitilize {
 }
 
 .leavebanktabCont i {
-    font-size: 54px;
-    color: #cdd1d7;
+    font-size: 55px;
+    color: #d1d5db;
+
 }
 
 .leavebanktabCont h4 {
     font-size: 18px;
-    color: #0a0a0a;
-    font-weight: 600;
+    color: var(--muteText);
+
 }
 
 
@@ -11009,6 +11042,7 @@ header.panel-heading.headingCapitilize {
     margin-bottom: 20px;
     /* min-height: 430px; */
 }
+
 .clientCardBox .profile-card {
     min-height: 370px;
 }
@@ -11167,17 +11201,6 @@ header.panel-heading.headingCapitilize {
     /* border-color: #fecaca; */
 }
 
-.orangeText {
-    color: #ff7417;
-}
-
-.greenText {
-    color: #16a34a;
-}
-
-.blueText {
-    color: var(--blueColor)
-}
 
 .carertabcontent .care-needs .label {
     display: flex;
@@ -11187,9 +11210,11 @@ header.panel-heading.headingCapitilize {
 
 .carertabcontent .care-list {
     margin-top: 8px;
-    height: 80px;
+    max-height: 55px;
     overflow: auto;
+    min-height: 10px;
 }
+
 
 .carertabcontent .care-item {
     border: 1px solid #e5e7eb;
@@ -12905,10 +12930,11 @@ header.panel-heading.headingCapitilize {
 }
 
 .roundTag {
-    border-radius: 20px;
-    padding: 2px 12px;
+    border-radius: 4px;
+    padding: 3px 10px;
     font-size: 11px;
 }
+
 
 .borderBtn.backBtn i {
     font-size: 22px;
@@ -13235,7 +13261,7 @@ header.panel-heading.headingCapitilize {
     color: #000;
 }
 
-label.redtext {
+.redtext {
     color: var(--iconRadClr);
 }
 
@@ -13553,6 +13579,7 @@ label.redtext {
     border-radius: 4px;
     padding: 8px 10px;
     gap: 6px;
+    align-items: center;
 }
 
 .gayClrIcon {
@@ -13723,7 +13750,6 @@ label.redtext {
     display: flex;
     gap: 10px;
     align-items: center;
-    justify-content: space-between;
     cursor: pointer;
     transition: .5s;
     margin-right: 5px;
@@ -14472,6 +14498,66 @@ label.redtext {
     display: none;
 }
 
+/* ********09/02/2026********* */
+.planFooter.rota_alerts {
+    display: block;
+}
+
+.inORoutTime.mrsEleanorMargaret {
+    background: transparent;
+}
+
+.nameTitlebott {
+    font-size: 12px;
+    color: #4d4d4d;
+}
+
+.dliLogname label {
+    margin: 0;
+}
+
+.inORoutTime span {
+    font-size: 12.5px;
+}
+
+.simpleCard .rota_dash-left .rota_title i {
+    font-size: 20px;
+}
+
+.messagingCenterTabs {}
+
+.calendarTabs.leaveRequesttabs.messagingCenterTabs .tabs {
+    background: #f5f5f5;
+    border: 1px solid #f5f5f5;
+    padding: 6px;
+
+}
+
+.calendarTabs.leaveRequesttabs.messagingCenterTabs .tabs button.tab {
+    width: 100%;
+    text-align: center;
+    display: block;
+    background: #f5f5f5;
+    border: 1px solid #f5f5f5;
+    font-size: 13px;
+}
+
+.calendarTabs.leaveRequesttabs.messagingCenterTabs .tabs button.tab i {
+    font-size: 16px;
+}
+
+.calendarTabs.leaveRequesttabs.messagingCenterTabs .tabs button.tab.active {
+    background: #ffffff;
+    color: #000000;
+    border-color: #ffffff;
+}
+
+.textBlueClr {
+    color: var(--blueColor);
+}
+
+/* ********09/02/2026********* */
+
 /********************************************************************************Start pratima css ********************************************************************************/
 /********************************************************************************Start pratima css ********************************************************************************/
 
@@ -14559,10 +14645,76 @@ label.redtext {
 
 
 
-
-
 /******************************************************************************** pratima css ********************************************************************************/
 /******************************************************************************** pratima css ********************************************************************************/
+.bgBtn {
+    background-color: var(--blueColor);
+    padding: 6px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: 0.2s;
+    gap: 6px;
+    display: flex;
+    align-items: center;
+    color: #f0fdfa;
+    border: unset;
+    justify-content: center;
+    font-weight: 600;
+}
+
+/* text color pp */
+.darkBlueTextp {
+    color: var(--darkBlue);
+}
+
+.purpleTextp {
+    color: var(--purple);
+}
+
+.darkPurpleTextp {
+    color: var(--darkPurple);
+}
+
+.orangeText {
+    color: #ff7417;
+}
+
+
+.greenText {
+    color: #16a34a;
+}
+
+.violetText {
+    color: var(--violet);
+}
+
+.blueText {
+    color: var(--blueColor)
+}
+
+.darkGreenTextp {
+    color: var(--darkGreenp);
+}
+
+.darkRedText {
+    color: var(--darkRedp);
+}
+
+.darkRedC,
+.textRedp {
+    color: var(--darkRedp) !important;
+}
+
+.darkOrangeTextp {
+    color: var(--darkYellow);
+}
+
+.textGray {
+    color: var(--darkGray);
+}
+
+/* text color  pp*/
 
 .addnewicons .btn {
     display: flex;
@@ -14605,6 +14757,8 @@ label.redtext {
     align-items: center;
     box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
     color: #0a0a0a;
+    justify-content: center;
+    font-weight: 600;
 }
 
 .emergencyContent h3,
@@ -14642,16 +14796,6 @@ label.redtext {
     background-color: #e5e5e5;
 }
 
-.userMum .title {
-    border: 1px solid var(--borderColor);
-    padding: 2px 7px;
-    border-radius: 8px;
-    font-size: 13px;
-    color: #000;
-    font-weight: 600;
-    margin-top: 10px;
-    display: inline-block;
-}
 
 .icon__pp {
     height: 40px;
@@ -14684,14 +14828,15 @@ label.redtext {
 
 .deleteIcon i {
     color: #dc2626;
-    font-size: 15px;
+    font-size: 17px;
 }
 
 .deleteIcon {
-    padding: 10px 15px;
+    padding: 5px 15px;
     border-radius: 8px;
     transition: 0.7s;
     cursor: pointer;
+    text-align: center;
 }
 
 .deleteIcon:hover {
@@ -14710,7 +14855,7 @@ label.redtext {
 
 .emergencyForm .form-label {
     color: #000;
-    font-size: 14px;
+    font-size: 13px;
 }
 
 .redBtn {
@@ -14718,7 +14863,7 @@ label.redtext {
     border: unset;
     color: #fff;
     font-weight: 600;
-    font-size: 15px;
+    font-size: 13px;
     padding: 8px 15px;
     border-radius: 8px;
 }
@@ -14754,20 +14899,6 @@ label.redtext {
     font-size: 18px;
 }
 
-.bgBtn {
-    background-color: var(--blueColor);
-    padding: 6px 16px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 13px;
-    transition: 0.2s;
-    gap: 6px;
-    display: flex;
-    align-items: center;
-    color: #f0fdfa;
-    border: unset;
-    justify-content: center;
-}
 
 .bgBtn:hover {
     background-color: #1a53d1;
@@ -14793,13 +14924,24 @@ label.redtext {
 
 .careBadg {
     background: #2563eb30;
-    padding: 2px 8px;
-    font-size: 11px;
+    padding: 2px 10px;
+    font-size: 12px;
     border-radius: 5px;
     color: #002b89;
     box-shadow: var(--bxShadow);
     font-weight: 600;
     transition: 0.7s;
+}
+
+.userMum .title {
+    border: 1px solid var(--borderColor);
+    padding: 2px 10px;
+    border-radius: 8px;
+    font-size: 12px !important;
+    color: #000;
+    font-weight: 600;
+    margin-top: 10px;
+    display: inline-block;
 }
 
 .careBadg:hover {
@@ -15424,8 +15566,7 @@ label.redtext {
     font-size: 13px;
 }
 
-.staffCardp i,
-.bgIconStaffT i {
+.staffCardp i {
     font-size: 30px;
 }
 
@@ -15483,7 +15624,7 @@ label.redtext {
 }
 
 .mt20 {
-    margin-top: 20px;
+    margin-top: 24px;
 }
 
 .staffTaskTab span.title i,
@@ -15513,7 +15654,7 @@ label.redtext {
     color: var(--darkOrangep);
 }
 
-.AllStaffTabC .bgIconStaffT {
+.bgIconStaffT {
     height: 40px;
     width: 40px;
     display: flex;
@@ -15547,10 +15688,7 @@ label.redtext {
     background: #fef9c3;
 }
 
-.yellowBadges {
-    background-color: #fef9c3;
-    color: var(--darkYellow);
-}
+
 
 .muteAllTabCard .bgIconStaffT {
     background: #f1f1ef;
@@ -15566,6 +15704,22 @@ label.redtext {
 
 .AllStaffTabC .title {
     font-size: 12px;
+}
+
+/* badges pratima */
+.darkBlackBadg {
+    background-color: #000;
+    color: #fff;
+}
+
+.darkBlueBadg {
+    background: var(--blueColor);
+    color: #fff;
+}
+
+.yellowBadges {
+    background-color: #fef9c3;
+    color: var(--darkYellow);
 }
 
 .muteBadges {
@@ -15584,13 +15738,13 @@ label.redtext {
 }
 
 .greenbadges {
-    background-color: #dcfce7;
+    background-color: var(--green70);
     color: var(--darkbgGreen);
 }
 
 .redbadges {
     color: var(--redColor);
-    background-color: var(--lightRedp);
+    background-color: #fee2e2;
 }
 
 .redDarkBadges {
@@ -15601,6 +15755,26 @@ label.redtext {
 .highBadges {
     background-color: #ffedd5;
     color: var(--darkOrangep);
+}
+
+.purpleBadgesDark {
+    background-color: var(--purple);
+    color: #fff;
+}
+
+.darkGreenBadges {
+    background-color: var(--darkbgGreen);
+    color: #fff;
+}
+
+.darkOrangeBadg {
+    background-color: var(--darkOrangep);
+    color: #fff;
+}
+
+.pinkBadges {
+    color: var(--pinkClr);
+    background-color: #eda4c15e;
 }
 
 .completedTaskStaff .greenbadges {
@@ -15627,20 +15801,50 @@ label.redtext {
 }
 
 .mainTitlep {
-    font-size: 22px;
-    font-weight: 600;
+    font-size: 25px;
+    font-weight: 700;
     margin-top: 0;
-    color: #484848;
+    color: var(--black);
 }
 
-.h5Head {
-    font-size: 16px;
-    font-weight: 600;
+
+.muchsmallText {
+    font-size: 11px;
+    color: var(--muteText);
+}
+
+.h6Head {
+    font-size: 14px;
     margin-top: 0px;
+    font-weight: 600;
 }
 
 .f18 {
     font-size: 18px;
+}
+
+.fs30 {
+    font-size: 30px;
+}
+
+.fs23 {
+    font-size: 23px;
+}
+
+.fs16 {
+    font-size: 16px;
+}
+
+.f20 {
+    font-size: 20px;
+}
+
+.fs11 {
+    font-size: 11px;
+}
+
+.mb25 {
+    margin-bottom: 25px;
 }
 
 .formIns {
@@ -15650,9 +15854,6 @@ label.redtext {
     margin-top: 3px;
 }
 
-.mb25 {
-    margin-bottom: 25px;
-}
 
 .checkboxp {
     display: flex;
@@ -15766,29 +15967,12 @@ label.redtext {
     box-shadow: rgba(17, 12, 46, 0.15) 0px 48px 100px 0px;
 }
 
-.purpleBadgesDark {
-    background-color: var(--purple);
-    color: #fff;
-}
+
 
 .fallRedCon .para {
-    color: #4b5563;
+    color: var(--darkGray);
 }
 
-.muchsmallText {
-    font-size: 10px;
-}
-
-.muchsmallText {
-    font-size: 11px;
-    color: var(--muteText);
-}
-
-.h6Head {
-    font-size: 14px;
-    margin-top: 0px;
-    font-weight: 600;
-}
 
 .allterStafftask {
     border-left: 4px solid var(--redColor);
@@ -15823,9 +16007,7 @@ label.redtext {
     }
 }
 
-.f20 {
-    font-size: 20px;
-}
+
 
 .purpleGradBtn {
     background: linear-gradient(136deg, rgba(153, 92, 247, 1) 41%, rgba(84, 119, 246, 1) 82%);
@@ -15851,12 +16033,7 @@ label.redtext {
     font-size: 30px;
 }
 
-.h3Head {
-    color: var(--black);
-    font-weight: 600;
-    font-size: 20px;
-    margin-top: 0px;
-}
+
 
 .activeRiskMain {
     border: 1px solid #fed7aa !important;
@@ -15882,10 +16059,7 @@ label.redtext {
     color: var(--darkOrangep)
 }
 
-.darkBlueBadg {
-    background: var(--blueColor);
-    color: #fff;
-}
+
 
 .contentAipreBlue p,
 .contentAipreBlue strong {
@@ -15902,54 +16076,51 @@ label.redtext {
     flex-direction: column;
     gap: 10px;
     display: flex;
-} 
+}
 
 .reportRedBox p,
 .reportRedBox strong {
     color: var(--darkRedp) !important;
 }
- 
+
 .reportRedBox input[type="checkbox"] {
     background-color: unset;
 }
- 
+
 .reportRedBox {
     border-color: #fecaca;
     background-color: var(--lightRedp);
 }
- 
+
 .reportyellowBox {
     background-color: var(--lightyellowclr);
     border: 1px solid #fef08a;
 }
- 
+
 .reportyellowBox p,
 .reportyellowBox strong,
 .darkyellowIc,
 .addIncidentList li {
     color: var(--darkYellow) !important;
 }
- 
-.darkRedC,
-.textRedp {
-    color: var(--darkRedp) !important;
-}
- 
+
+
+
 .addReportCheck input[type="checkbox"] {
     height: 13px;
     width: 13px;
 }
- 
+
 .addReportCheck .checkboxp label {
     font-size: 13px;
     font-weight: 400;
     color: var(--darkRedp);
 }
- 
+
 .carer-form textarea {
     font-size: 13px;
 }
- 
+
 .checkFamilyNoti {
     border: 1px solid var(--borderColor);
     border-radius: 5px;
@@ -15959,31 +16130,796 @@ label.redtext {
     display: flex;
     align-items: center;
 }
- 
+
 .addReportCheck input[type="checkbox"] {
     height: unset;
     width: unset;
     margin: unset;
 }
- 
+
 .pupleTextp {
     color: var(--darkPurple);
 }
- 
+
 .addIncidentList li {
     font-size: 13px;
     gap: 10px;
     margin-top: 5px;
 }
- 
- 
+
+
 .redBtn i {
     vertical-align: middle;
 }
- 
+
 .incidentAddFooter>div:nth-child(1) {
     width: 90%;
 }
- 
-  
- 
+
+/* 30-1-2026 */
+.incidentDetailHead .h5Head i {
+    color: var(--redColor);
+    font-size: 25px;
+    vertical-align: middle;
+}
+
+.incidentDetailHead .h5Head {
+    font-size: 20px;
+}
+
+.cardHeaderp {
+    border-bottom: 1px solid var(--borderColor);
+    border-radius: 12px 12px 0px 0px;
+}
+
+.incidentDeCon strong,
+.icndentDeFooter strong {
+    font-size: var(--font13);
+    color: var(--darkGray);
+    font-weight: 600;
+}
+
+.incidentDeCon p {
+    font-size: var(--font13);
+}
+
+.incidentDeCon .bg-blue-50 p,
+.incidentDeCon .bg-blue-50 p strong {
+    color: var(--darkBlue);
+    font-size: var(--font13);
+}
+
+.incidentDeCon .bg-blue-50 {
+    border-radius: 8px;
+}
+
+.icndentDeFooter {
+    border-top: 1px solid var(--borderColor);
+
+}
+
+.w50 {
+    width: 50%;
+}
+
+.emergencyMain.bg-red-50 {
+    background: #fef2f2;
+    border: 1px solid var(--lightRedBorder);
+}
+
+.IncidentDetailsafe .cardHeaderp {
+    border-bottom: 1px solid var(--lightRedBorder);
+}
+
+.IncidentDetailsafe h5,
+.IncidentDetailsafe h5 i,
+.IncidentDetailsafe .incidentDeCon strong {
+    color: var(--darkRedp);
+    vertical-align: middle;
+}
+
+.parentRedBad {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+}
+
+.incidentRrqAction {
+    border: 1px solid var(--lightRedBorder);
+    background: #fff;
+    border-radius: 8px;
+}
+
+.incidentRrqAction ul {
+    padding-left: 16px;
+    margin-top: 10px;
+}
+
+.incidentRrqAction ul li {
+    font-size: var(--font13);
+    color: var(--darkRedp);
+    margin-bottom: 5px;
+}
+
+.aiInciDetaReport .cardHeaderp .h5Head i {
+    color: var(--purple);
+}
+
+i {
+    vertical-align: middle;
+}
+
+.redIColor {
+    color: var(--redColor);
+}
+
+.aiInciDetaReport .incidentRrqAction {
+    background: #fef2f2;
+}
+
+.aiInciDetaReport .incidentRrqAction strong,
+.aiInciDetaReport .incidentRrqAction p {
+    color: var(--darkRedp);
+}
+
+
+
+.inDeimpactAssest {
+    border-radius: 8px;
+}
+
+
+.inDeimpactAssest p strong,
+.inciDeRight strong {
+    font-size: var(--font13);
+
+    font-weight: 600;
+}
+
+.inDeimpactAssest p,
+.inciDeRight p,
+.inciDeRight p strong,
+.fs13 {
+    font-size: var(--font13);
+}
+
+.inDeimpactAssest.bg-orange-50 p,
+.inDeimpactAssest.bg-orange-50 strong {
+    color: var(--darkYellow);
+}
+
+.parentRedBad .userMum .title {
+    background-color: #fff;
+}
+
+.inDeimpactAssest.bg-greenp-50 p,
+.inDeimpactAssest.bg-greenp-50 p strong,
+.inDeimpactAssest.bg-greenp-50 h6 {
+    color: var(--darkbgGreen);
+}
+
+.cyanGrad {
+    background: linear-gradient(to right, #eff7ff, #ecfeff);
+}
+
+.rounded8 {
+    border-radius: 8px;
+}
+
+.muteBg {
+    background-color: #f9fafb;
+}
+
+.maincqcInde.bg-purple-50 {
+    background: #faf5ff !important;
+    border: 1px solid #dec5f7 !important;
+}
+
+.maincqcInde.bg-purple-50 h6,
+.maincqcInde.bg-purple-50 p,
+.maincqcInde.bg-purple-50 li {
+    color: var(--purple);
+}
+
+.listcqcInDe ul {
+    padding-left: 19px;
+}
+
+.maincqcInde p,
+.listcqcInDe li {
+    font-size: 12px;
+    margin-bottom: 5px;
+}
+
+.emergencyMain.bg-purple-50 .cardHeaderp {
+    border-bottom: 1px solid #dec5f7 !important;
+}
+
+.listcqcInDe ul {
+    margin-top: 10px;
+}
+
+
+.rtcozCardInDe h6 {
+    color: #000;
+}
+
+
+.dotC {
+    height: 3px;
+    width: 3px;
+    display: inline-block;
+    background: #000000;
+    border-radius: 50%;
+}
+
+.textBlue {
+    color: var(--blueColor);
+}
+
+.textGreen {
+    color: var(--darkbgGreen);
+}
+
+.flexWrap {
+    flex-wrap: wrap;
+}
+
+.h7Head {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.h5Head {
+    font-size: 16px;
+    font-weight: 600;
+    margin-top: 0px;
+}
+
+.h3Head {
+    color: var(--black);
+    font-weight: 600;
+    font-size: 20px;
+    margin-top: 0px;
+}
+
+.rtcozCardInDe {
+    border: 1px solid var(--borderColor);
+}
+
+.competeMentalSt {
+    font-size: 15px;
+    color: var(--muteText);
+}
+
+.h2Head {
+    font-size: 25px;
+    font-weight: 600;
+}
+
+.tabStaffDe .tabs {
+    overflow-x: auto;
+}
+
+.tabStaffDe .tabs button {
+    white-space: nowrap;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+/* hide scrollbar (optional) */
+.tabStaffDe .tabs::-webkit-scrollbar {
+    height: 6px;
+}
+
+.tabStaffDe .tabs::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 10px;
+}
+
+.occupancyBox.bg-blue-50 .value {
+    color: var(--darkBlue);
+    font-size: 13px;
+}
+
+.formLabel {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--black);
+}
+
+.bgWhite {
+    background-color: #fff;
+}
+
+.tableSTDetail {
+    border: 1px solid #dddddd;
+    margin-top: 10px;
+    border-radius: 8px;
+}
+
+.tableSTDetail thead {
+    background: #f9fafb;
+
+}
+
+.tableSTDetail table th,
+.tableSTDetail table td {
+    font-size: 13px;
+    color: #374151;
+    vertical-align: middle !important;
+}
+
+.tableSTDetail table td input {
+    width: 100%;
+    height: 34px;
+    border: 1px solid var(--borderColor);
+    border-radius: 5px;
+    padding: 5px;
+}
+
+.tableSTDetail table tfoot button {
+    width: 100%;
+}
+
+.tableSTDetail table th:nth-child(1) {
+    border-top-left-radius: 8px;
+}
+
+.pt24 {
+    padding-top: 24px;
+}
+
+.h5Bold {
+    font-size: 20px;
+    font-weight: 700;
+    text-align: left;
+}
+
+
+
+.rounded50 {
+    border-radius: 50%;
+}
+
+.gradp-blue-50 {
+    background: linear-gradient(132deg, rgba(235, 244, 255, 1) 30%, rgba(223, 236, 254, 1) 82%);
+}
+
+.gradp-green-50 {
+    background: linear-gradient(132deg, #eefdf3, #defce8);
+}
+
+.gradp-orange-50 {
+    background: linear-gradient(132deg, #fff6eb, #ffeed8);
+}
+
+.gradp-red-50 {
+    background: linear-gradient(132deg, #fef1f1, #fee4e4);
+}
+
+.gradp-purple-50 {
+    background: linear-gradient(132deg, #faf4ff, #f4eaff);
+}
+
+.h1Pay700 {
+    font-size: 30px;
+    font-weight: 700;
+}
+
+.lightBorderp {
+    border: 1px solid var(--borderColor);
+}
+
+.w100 {
+    width: 100%;
+}
+
+
+
+.font700 {
+    font-weight: 700;
+}
+
+.font600 {
+    font-weight: 600;
+}
+
+.lightBlueBg {
+    background-color: var(--lightBlueClr);
+}
+
+.orderListpayPro li {
+    margin-bottom: 5px;
+}
+
+.orderListpayPro {
+    padding-left: 15px;
+}
+
+.greenBorderClr {
+    border-color: var(--darkbgGreen) !important;
+}
+
+.rounded12 {
+    border-radius: 12px;
+}
+
+.payRollCard {
+    min-height: 100px;
+}
+
+.equalColRow {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.h100 {
+    height: 100%;
+}
+
+.bottomRadUnset {
+    border-radius: 12px 12px 0px 0px;
+}
+
+.card-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.card-col {
+    flex: 0 0 calc(20% - 12px);
+    display: flex;
+}
+
+.emergencyMain {
+    flex: 1;
+}
+
+@media (max-width: 992px) {
+    .card-col {
+        flex: 0 0 calc(33.33% - 10px);
+
+    }
+}
+
+@media (max-width: 768px) {
+    .card-col {
+        flex: 0 0 calc(50% - 8px);
+
+    }
+}
+
+@media (max-width: 480px) {
+    .card-col {
+        flex: 0 0 100%;
+
+    }
+}
+
+
+.payRollAcood .panel-heading {
+    padding: 0px;
+}
+
+/* Default state: down */
+.accIcon {
+    float: right;
+    font-size: 25px;
+    transition: transform 0.3s;
+    transform: rotate(0deg);
+
+}
+
+.panel-title a[aria-expanded="true"] .accIcon {
+    transform: rotate(180deg);
+}
+
+.payRollAcood .panel-title a {
+    color: #000000 !important;
+    font-size: 15px;
+    font-weight: 600;
+    width: 100%;
+    display: block;
+    padding: 25px 15px;
+}
+
+.payRollAcood .panel-title a:hover {
+    text-decoration: unset !important;
+    border: unset;
+}
+
+.payRollAcood .lightBlueBg:hover {
+    background-color: #dbeafe !important;
+}
+
+.payRollAcood .lighOrangeBg:hover {
+    background-color: #ffedd5 !important;
+}
+
+.payRollAcood .lightGreeBg:hover {
+    background-color: #dcfce7 !important;
+}
+
+.panel.panel-default.payRollAcood {
+    border-radius: 12px;
+    padding-bottom: 0px !important;
+}
+
+.lighOrangeBg {
+    background: #fff7ed;
+}
+
+.lightGreeBg {
+    background-color: var(--lightGreenp);
+}
+
+
+
+.dailyLogList .bgIconStaffT i {
+    font-size: 20px !important;
+}
+
+.blueDailyForm input,
+.blueDailyForm .trendClass-select,
+.blueDailyForm textarea {
+    background-color: transparent;
+}
+
+.addDailyCheck label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #fff;
+    border-radius: 5px;
+    padding: 10px 10px;
+    cursor: pointer;
+    margin: 0;
+}
+
+.addDailyCheck input[type="checkbox"] {
+    height: 15px;
+    margin: 0px;
+    width: 15px;
+}
+
+.middleAlign {
+    vertical-align: middle;
+}
+
+.lightMute {
+    color: #cdd1d7;
+}
+
+/* 9/2/2026 */
+.care6card .card-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+/* Desktop – 6 cards in one row */
+.care6card .card-col {
+    flex: 0 0 calc(16.66% - 13px);
+    display: flex;
+}
+
+/* Laptop / Tablet */
+@media (max-width: 1240px) {
+    .care6card .card-col {
+        flex: 0 0 calc(33.33% - 10px);
+        /* 3 per row */
+    }
+}
+
+.borderLeftThick {
+    border-left-width: 4px;
+}
+
+.bg-blue-70 {
+    background-color: var(--blue70);
+    border-color: var(--blueMediumBorder);
+}
+
+.bg-violet-70 {
+    background-color: var(--violet70);
+    border-color: var(--violet70Border);
+}
+
+.bg-purple-70 {
+    background-color: var(--purple70);
+    border-color: var(--purple70Border);
+}
+
+.bg-orange-70 {
+    background-color: var(--orange70);
+    border-color: var(--orange70Border);
+}
+
+/*  border badges */
+.blueBorderBadg {
+    border: 1px solid var(--blueMediumBorder);
+    color: var(--blueColor);
+    background-color: var(--blue70);
+
+}
+
+.violetBorderBadg {
+    color: var(--violet);
+    border: 1px solid var(--violet70Border);
+    background-color: var(--violet70);
+}
+
+.purpleBorderBadg {
+    color: var(--iconPurpul);
+    border: 1px solid var(--purple70Border);
+    background-color: var(--purple70);
+}
+
+.orangeBorderBadg {
+    color: var(--darkYellow);
+    border: 1px solid var(--orange70Border);
+    background-color: var(--orange70);
+}
+
+.greenBorderBadg {
+    color: var(--darkGreenp);
+    border: 1px solid var(--green70Border);
+    background-color: var(--green70);
+}
+
+.pinkBorderBadg {
+    color: var(--darkPink);
+    border: 1px solid var(--pink70Border);
+    background-color: var(--pink70);
+}
+
+.redBorderBadg {
+    color: var(--darkRedp);
+    border: 1px solid var(--red70Border);
+    background-color: var(--red70);
+}
+
+.cyanBorderBadg {
+    color: var(--darkCyan);
+    border: 1px solid var(--cyan70Border);
+    background-color: var(--cyan70);
+}
+
+.yellowBorderBadg {
+    color: var(--darkYellow);
+    border: 1px solid var(--yellow70Border);
+    background-color: var(--yellow70);
+}
+
+.skyBorderBadg {
+    color: var(--darkYellow);
+    border: 1px solid var(--skyBlue70Border);
+    background-color: var(--skyBlue70);
+}
+
+/* end border bades */
+
+
+.whiteBtn {
+    background-color: #fff;
+}
+
+.careDocCard .whiteBtn:hover {
+    color: var(--black);
+    background-color: #f5f5f5;
+}
+
+.violetText {
+    color: var(--violet);
+}
+
+.borderBadg {
+    border: 1px solid var(--borderColor);
+    padding: 2px 10px;
+    color: var(--black);
+    font-size: var(--font13);
+    border-radius: 5px;
+}
+
+.bg-green-70 {
+    background-color: var(--green70);
+    border: 1px solid var(--green70Border);
+}
+
+.bg-pink-70 {
+    background-color: var(--pink70);
+    border: 1px solid var(--pink70Border);
+}
+
+.bg-red-70 {
+    background-color: var(--red70);
+    border: 1px solid var(--red70Border);
+}
+
+.bg-cyan-70 {
+    background-color: var(--cyan70);
+    border: 1px solid var(--cyan70Border);
+}
+
+.bg-yellow-70 {
+    background-color: var(--yellow70);
+    border: 1px solid var(--yellow70Border);
+}
+
+.bg-sky-70 {
+    background-color: var(--skyBlue70);
+    border: 1px solid var(--skyBlue70Border);
+}
+
+.darkPinkText {
+    color: var(--darkPink);
+}
+
+.pinkText {
+    color: var(--pinkClr);
+}
+
+.cyanText {
+    color: var(--cyanTextClr);
+}
+
+.darkCyanText {
+    color: var(--darkCyan);
+}
+
+.darkSkyText {
+    color: var(--darkskyBlue);
+}
+
+.skyBlueTex {
+    color: var(--skyBlue)
+}
+
+/* 11-2-2026 */
+.viewCareDoc h6 {
+    text-transform: uppercase;
+}
+
+.checkBoxHW {
+    width: 15px;
+    height: 15px;
+    margin: 0 !important;
+    cursor: pointer;
+}
+
+.trans {
+    background-color: transparent;
+}
+
+/* KOMAL SYS */
+.greenCarerCard {
+    border-color: var(--darkbgGreen) !important;
+    background-color: #f1fdf5 !important;
+}
+
+.greenCarerCard .avatar,
+.muteCarerCard .avatar {
+    background: var(--blueColor);
+}
+
+.suggestedCarers .greenCarerCard .badge {
+    background: #f1fdf5 !important;
+
+}
+
+.newShiftModal {
+    width: 1000px !important;
+}
+
+.muteCarerCard {
+    background-color: #fff !important;
+    border-color: var(--borderColor) !important;
+}
+
+.suggestedCarers .muteCarerCard .badge {
+    background: #fff !important;
+
+
+}
