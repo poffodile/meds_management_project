@@ -3,7 +3,7 @@
     font-family: Inter, system-ui, -apple-system, sans-serif;
 }
 
-.h2-color{
+.h2-color {
     color: #fff;
 }
 
@@ -52,7 +52,7 @@
 }
 
 /* Remove duplicate toolbar */
-.fc-header-toolbar + .fc-header-toolbar {
+.fc-header-toolbar+.fc-header-toolbar {
     display: none !important;
 }
 
@@ -104,7 +104,7 @@
     padding: 6px 8px;
     font-size: 13px;
     border: none !important;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 /* Dot indicator */
@@ -179,11 +179,25 @@
     border-radius: 50%;
 }
 
-.dot.morning   { background: #22c55e; }
-.dot.afternoon { background: #0ea5e9; }
-.dot.evening   { background: #8b5cf6; }
-.dot.night     { background: #1f2937; }
-.dot.sleepin   { background: #6366f1; }
+.dot.morning {
+    background: #22c55e;
+}
+
+.dot.afternoon {
+    background: #0ea5e9;
+}
+
+.dot.evening {
+    background: #8b5cf6;
+}
+
+.dot.night {
+    background: #1f2937;
+}
+
+.dot.sleepin {
+    background: #6366f1;
+}
 
 /* Unassigned */
 .unassigned {
@@ -205,7 +219,7 @@
     background: #fff;
     border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 6px 18px rgba(0,0,0,.06);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .06);
     margin-bottom: 12px;
 }
 
@@ -249,14 +263,22 @@
     opacity: .9;
 }
 
-.stat.filled strong { color: #86efac; }
-.stat.open strong   { color: #fde047; }
-.stat.hours strong  { color: #e0e7ff; }
+.stat.filled strong {
+    color: #86efac;
+}
+
+.stat.open strong {
+    color: #fde047;
+}
+
+.stat.hours strong {
+    color: #e0e7ff;
+}
 
 .divider {
     width: 1px;
     height: 28px;
-    background: rgba(255,255,255,.3);
+    background: rgba(255, 255, 255, .3);
 }
 
 /* Filters */
@@ -364,15 +386,24 @@
     opacity: 0.9;
 }
 
-.stat.filled strong { color: #86efac; }
-.stat.open strong { color: #fde68a; }
-.stat.hours strong { color: #fff; }
+.stat.filled strong {
+    color: #86efac;
+}
+
+.stat.open strong {
+    color: #fde68a;
+}
+
+.stat.hours strong {
+    color: #fff;
+}
 
 .divider {
     width: 1px;
     height: 30px;
-    background: rgba(255,255,255,0.25);
+    background: rgba(255, 255, 255, 0.25);
 }
+
 .roster-filters {
     display: flex;
     justify-content: space-between;
@@ -401,6 +432,7 @@
     border-radius: 8px;
     padding: 6px 12px;
 }
+
 .roster-nav {
     display: flex;
     justify-content: space-between;
@@ -435,6 +467,7 @@
     color: #2563eb;
     background: #fff;
 }
+
 .roster-footer {
     position: sticky;
     bottom: 0;
@@ -446,6 +479,7 @@
     font-size: 13px;
     z-index: 10;
 }
+
 .fc {
     border-radius: 0 0 16px 16px;
     overflow: hidden;
@@ -543,4 +577,3 @@
     align-items: center;
     gap: 6px;
 }
-

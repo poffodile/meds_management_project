@@ -8,6 +8,10 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\CompanyDepartment;
 use App\Services\ServiceUser\ServiceUserServices;
 use App\DynamicFormBuilder;
+use App\Models\ScheduledShift;
+use App\Models\ShiftRecurrence;
+use App\Models\ShiftAssessment;
+use App\Models\ShiftDocument;
 
 class ScheduleShiftController extends Controller
 {
@@ -23,6 +27,17 @@ class ScheduleShiftController extends Controller
         $data['company_department'] = CompanyDepartment::getActiveCompanyDepartment();
         $data['service_users'] = $this->serviceUserService->getAllserviceUser();
         $data['dynamic_form_builder'] = DynamicFormBuilder::getFormList();
+
+        $data['scheduled_shifts'] = ScheduledShift::with(['client', 'staff'])
+            ->where('home_id', Auth::user()->home_id)
+            ->orderBy('start_date', 'desc')
+            ->get()
+            ->map(function ($shift) {
+                $shift->client_name = $shift->client->name ?? 'Unknown Client';
+                $shift->staff_name = $shift->staff->name ?? 'Unassigned';
+                return $shift;
+            });
+
         return view('frontEnd.roster.schedule.schedule_shift', $data);
     }
 
@@ -32,23 +47,22 @@ class ScheduleShiftController extends Controller
         $request->validate([
             'client_id'  => 'required',
             'start_date' => 'required',
-            'carer_id'   => 'required',
+            'carer_id'   => 'nullable',
             'start_time' => 'required',
             'end_time'   => 'required|after:start_time',
         ]);
 
         try {
-            // 1. Insert the main shift record
-            $shiftId = \Illuminate\Support\Facades\DB::table('scheduled_shifts')->insertGetId([
+            // 1. Create the main shift record using Eloquent
+            $shift = ScheduledShift::create([
                 'home_id'           => Auth::user()->home_id,
                 'care_type_id'      => $request->care_type,
                 'assignment'        => $request->assignment ?? 'Client',
-                'client_id'         => $request->client_id,
+                'service_user_id'   => $request->client_id,
                 'property_id'       => $request->property_id,
                 'location_name'     => $request->location_name,
                 'location_address'  => $request->location_address,
-                'carer_id'          => $request->carer_id,
-                'form_id'           => $request->form_id,
+                'staff_id'          => $request->carer_id,
                 'start_date'        => $request->start_date,
                 'start_time'        => $request->start_time,
                 'end_time'          => $request->end_time,
@@ -56,22 +70,17 @@ class ScheduleShiftController extends Controller
                 'tasks'             => $request->tasks,
                 'notes'             => $request->notes,
                 'is_recurring'      => $request->has('is_recurring') ? 1 : 0,
-                'frequency'         => $request->frequency,
-                'week_days'         => $request->week_days,
-                'end_recurring_date' => $request->end_date,
-                'created_at'        => now(),
-                'updated_at'        => now(),
             ]);
+
+            $shiftId = $shift->id;
 
             // 1.1 Insert into shift_recurrences if recurring
             if ($request->has('is_recurring')) {
-                \Illuminate\Support\Facades\DB::table('shift_recurrences')->insert([
+                ShiftRecurrence::create([
                     'shift_id'           => $shiftId,
                     'frequency'          => $request->frequency,
                     'week_days'          => $request->week_days,
                     'end_recurring_date' => $request->end_date,
-                    'created_at'         => now(),
-                    'updated_at'         => now(),
                 ]);
             }
 
@@ -85,12 +94,10 @@ class ScheduleShiftController extends Controller
 
                     $type = $request->assessment_types[$key] ?? 'other';
 
-                    \Illuminate\Support\Facades\DB::table('shift_assessments')->insert([
+                    ShiftAssessment::create([
                         'shift_id'        => $shiftId,
                         'assessment_doc'  => $path,
                         'assessment_type' => $type,
-                        'created_at'      => now(),
-                        'updated_at'      => now(),
                     ]);
                 }
             }
@@ -103,35 +110,29 @@ class ScheduleShiftController extends Controller
                 $file->move($destinationPath, $filename);
                 $doc_file_path = 'uploads/shifts/documents/' . $filename;
 
-                \Illuminate\Support\Facades\DB::table('shift_documents')->insert([
+                ShiftDocument::create([
                     'shift_id'     => $shiftId,
                     'doc_name'     => $request->doc_name,
                     'doc_type'     => $request->doc_type,
                     'doc_file'     => $doc_file_path,
                     'doc_required' => $request->has('doc_required') ? 1 : 0,
-                    'created_at'   => now(),
-                    'updated_at'   => now(),
                 ]);
             }
 
             // 4. Handle System Forms if selected
             if ($request->has('form_ids') && is_array($request->form_ids)) {
                 foreach ($request->form_ids as $key => $formId) {
-                    \Illuminate\Support\Facades\DB::table('shift_documents')->insert([
+                    ShiftDocument::create([
                         'shift_id'   => $shiftId,
                         'form_id'    => $formId,
                         'doc_name'   => $request->form_names[$key] ?? 'System Form',
-                        'created_at' => now(),
-                        'updated_at' => now(),
                     ]);
                 }
             } elseif ($request->form_id) {
-                \Illuminate\Support\Facades\DB::table('shift_documents')->insert([
+                ShiftDocument::create([
                     'shift_id'   => $shiftId,
                     'form_id'    => $request->form_id,
                     'doc_name'   => $request->form_name ?? 'System Form',
-                    'created_at' => now(),
-                    'updated_at' => now(),
                 ]);
             }
 

@@ -340,6 +340,188 @@
     #suggested_carer::-webkit-scrollbar-thumb:hover {
         background: #94a3b8;
     }
+
+    /* Recurring Shift Modal Styles */
+    .recurring-modal .modal-dialog {
+        max-width: 800px;
+    }
+
+    .recurring-modal .modal-content {
+        border-radius: 12px;
+        border: none;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    .recurring-modal .modal-header {
+        border-bottom: 1px solid #f1f5f9;
+        padding: 20px 24px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: #fff;
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
+    }
+
+    .recurring-modal .modal-header .header-icon {
+        color: #3b82f6;
+        font-size: 20px;
+        background: #eff6ff;
+        padding: 8px;
+        border-radius: 8px;
+    }
+
+    .recurring-modal .modal-header .modal-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .recurring-modal .step-badge {
+        background: #f1f5f9;
+        color: #64748b;
+        font-size: 12px;
+        font-weight: 500;
+        padding: 4px 12px;
+        border-radius: 20px;
+    }
+
+    .recurring-modal .modal-body {
+        padding: 24px;
+    }
+
+    .recurring-modal .section-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 20px;
+    }
+
+    .recurring-modal .form-group {
+        margin-bottom: 20px;
+    }
+
+    .recurring-modal .form-group label {
+        display: block;
+        font-size: 14px;
+        font-weight: 500;
+        color: #334155;
+        margin-bottom: 8px;
+    }
+
+    .recurring-modal .form-control {
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 10px 12px;
+        font-size: 14px;
+        color: #1e293b;
+        transition: all 0.2s;
+        height: auto;
+        box-shadow: none;
+    }
+
+    .recurring-modal .form-control:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        outline: none;
+    }
+
+    .recurring-modal .input-with-icon {
+        position: relative;
+    }
+
+    .recurring-modal .input-with-icon i {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+        pointer-events: none;
+    }
+
+    .recurring-modal .task-input-group {
+        display: flex;
+        gap: 8px;
+    }
+
+    .recurring-modal .btn-add-task {
+        background: #1e293b;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 0 20px;
+        font-weight: 500;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .recurring-modal .btn-add-task:hover {
+        background: #0f172a;
+    }
+
+    .recurring-modal .modal-footer {
+        border-top: 1px solid #f1f5f9;
+        padding: 20px 24px;
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+    }
+
+    .recurring-modal .btn-cancel {
+        background: #fff;
+        color: #475569;
+        border: 1px solid #e2e8f0;
+        padding: 10px 24px;
+        border-radius: 8px;
+        font-weight: 500;
+        font-size: 14px;
+        transition: all 0.2s;
+    }
+
+    .recurring-modal .btn-cancel:hover {
+        background: #f8fafc;
+        border-color: #cbd5e1;
+    }
+
+    .recurring-modal .btn-next {
+        background: #94a3b8;
+        color: #fff;
+        border: none;
+        padding: 10px 24px;
+        border-radius: 8px;
+        font-weight: 500;
+        font-size: 14px;
+        transition: all 0.2s;
+    }
+
+    .recurring-modal .btn-next.active {
+        background: #3b82f6;
+    }
+
+    .recurring-modal .btn-next.active:hover {
+        background: #2563eb;
+    }
+
+    .recurring-modal .duration-readonly {
+        background: #f8fafc;
+        cursor: not-allowed;
+    }
+
+    .recurring-modal .close {
+        opacity: 0.5;
+        font-weight: 300;
+        font-size: 28px;
+        margin-top: -5px;
+    }
+
+    .recurring-modal .close:hover {
+        opacity: 1;
+    }
 </style>
 <main class="page-content">
     <div class="container-fluid">
@@ -350,30 +532,14 @@
                 <p class="header-subtitle">Manage and assign shifts to carers</p>
             </div>
             <div class="topFilters">
-                <button class="filterBtn activeDot">
-                    <span class="dot"></span> All Active
-                </button>
-                <button class="filterBtn">
-                    📅 Today
-                </button>
-                <button class="filterBtn">
-                    📆 This Week
-                </button>
-                <button class="filterBtn">
-                    ⭐ Saved Views
-                </button>
-                <button class="filterBtn">
-                    ⬇ Export
-                </button>
-                <button class="filterBtn highlight">
-                    ✨ AI Generate
-                </button>
-                <button class="filterBtn">
-                    🛠 Smart Allocate
-                </button>
-                <button class="filterBtn lightGreen">
-                    🔁 Recurring
-                </button>
+                <button class="filterBtn activeDot"><span class="dot"></span> All Active </button>
+                <button class="filterBtn"> 📅 Today </button>
+                <button class="filterBtn"> 📆 This Week </button>
+                <button class="filterBtn"> ⭐ Saved Views </button>
+                <button class="filterBtn"> ⬇ Export </button>
+                <button class="filterBtn highlight"> ✨ AI Generate </button>
+                <button class="filterBtn"> 🛠 Smart Allocate </button>
+                <button class="filterBtn lightGreen" data-toggle="modal" data-target="#recurringShiftModal"> 🔁 Recurring </button>
                 <button class="btn allBtnUseColor" data-toggle="modal" data-target="#addShiftModal">+ Add Shift</button>
             </div>
 
@@ -381,43 +547,34 @@
 
         <!-- Alerts -->
         <div class="rota_alerts">
+            @forelse ($scheduled_shifts as $shift)
             <div class="rota_alert">
                 <div class="rota_alert-icon"><i class="fa fa fa-calendar-o"></i></div>
                 <div class="rota_alert-content">
-                    <div class="rota_alert-title">Mixed Shift - 09:30</div>
-                    <div class="rota_alert-description">Ron contacted for PDA one can I have contact No one assigned
+                    <div class="rota_alert-title">{{ $shift->client_name ?? 'Unknown Client' }} - {{ date('H:i', strtotime($shift->start_time)) }}</div>
+                    <div class="rota_alert-description">
+                        Assigned to: {{ $shift->staff_name ?? 'Unassigned' }} |
+                        Shift Type: {{ ucfirst($shift->shift_type) }} |
+                        Date: {{ date('M d, Y', strtotime($shift->start_date)) }}
                     </div>
-                    <div class="rota_alert-bottmDescription"> <i class="fa fa-bolt"></i> Contact care immediately and
-                        verify shift status</div>
-                </div>
-                <div class="rota_alert-badge">New</div>
-            </div>
-
-            <div class="rota_alert">
-                <div class="rota_alert-icon"><i class="fa fa fa-calendar-o"></i></div>
-                <div class="rota_alert-content">
-                    <div class="rota_alert-title">Mixed Shift</div>
-                    <div class="rota_alert-description">Ron contacted for PDA one can I have contact No one assigned
+                    <div class="rota_alert-bottmDescription">
+                        <i class="fa fa-clock-o"></i> {{ date('h:i A', strtotime($shift->start_time)) }} - {{ date('h:i A', strtotime($shift->end_time)) }}
+                        @if($shift->notes)
+                        <br><i class="fa fa-info-circle"></i> {{ $shift->notes }}
+                        @endif
                     </div>
-                    <div class="rota_alert-bottmDescription"> <i class="fa fa-bolt"></i> Contact care immediately and
-                        verify shift status</div>
                 </div>
                 <div class="rota_alert-badge">New</div>
             </div>
-
+            @empty
             <div class="rota_alert">
-                <div class="rota_alert-icon"><i class="fa fa fa-calendar-o"></i></div>
                 <div class="rota_alert-content">
-                    <div class="rota_alert-title">Unfilled Shift in Next 24 Hours</div>
-                    <div class="rota_alert-description">May 12, 2025: 16:30 at All or Care Home assigned care! Check
-                        Margaret Smith</div>
-                    <div class="rota_alert-bottmDescription"> <i class="fa fa-bolt"></i> Assign a qualified carer to
-                        this shift urgently</div>
+                    <div class="rota_alert-title">No shifts found</div>
                 </div>
-                <div class="rota_alert-badge">New</div>
             </div>
+            @endforelse
 
-            <div class="rota_view-all">View All (4 More) →</div>
+            <div class="rota_view-all">View All ({{ count($scheduled_shifts) }}) →</div>
         </div>
 
         <!-- Smart Suggestions -->
@@ -1582,7 +1739,6 @@
                                                             @endforeach
                                                         </select>
                                                     </div>
-
                                                 </div>
                                             </div>
                                             {{-- Client Section --}}
@@ -1859,6 +2015,107 @@
     </div>
 
 
+    <!-- Create Recurring Shifts Modal -->
+    <div class="modal fade recurring-modal" id="recurringShiftModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="header-icon"><i class='bx bx-refresh'></i></div>
+                    <h4 class="modal-title">Create Recurring Shifts <span class="step-badge">Step 1 of 3</span></h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <h5 class="section-title">Shift Details</h5>
+                    <form id="recurringShiftForm">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Client *</label>
+                                    <select class="form-control" name="client_id" required>
+                                        <option value="">Select client</option>
+                                        @foreach ($service_users as $service_user)
+                                        <option value="{{ $service_user->id }}">{{ $service_user->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Carer (Optional)</label>
+                                    <select class="form-control" name="staff_id">
+                                        <option value="">Unassigned</option>
+                                        <!-- Carers will be loaded dynamically if needed -->
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Start Time *</label>
+                                    <div class="input-with-icon">
+                                        <input type="time" name="start_time" class="form-control" value="09:00" required>
+                                        <i class='bx bx-time'></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>End Time *</label>
+                                    <div class="input-with-icon">
+                                        <input type="time" name="end_time" class="form-control" value="17:00" required>
+                                        <i class='bx bx-time'></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Shift Type</label>
+                                    <select class="form-control" name="shift_type">
+                                        <option value="morning">Morning</option>
+                                        <option value="afternoon">Afternoon</option>
+                                        <option value="evening">Evening</option>
+                                        <option value="night">Night</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Duration (hours)</label>
+                                    <input type="text" class="form-control duration-readonly" value="8" readonly>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Tasks</label>
+                            <div class="task-input-group">
+                                <input type="text" class="form-control" placeholder="Add a task...">
+                                <button type="button" class="btn-add-task">Add</button>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Notes</label>
+                            <textarea class="form-control" name="notes" rows="3" placeholder="Any special instructions or notes..."></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-cancel" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn-next active">Next: Recurrence Pattern</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <!-- FullCalendar Scheduler JS (includes core + interaction + resource) -->
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar-scheduler@6.1.11/index.global.min.js"></script>
     <script src="{{ url('public/frontEnd/staff/js/schedule-shift.js') }}"></script>
@@ -1880,7 +2137,6 @@
 
 
     <!-- calendarTabs -->
-
     <script>
         const tabs = document.querySelectorAll(".tab");
 
@@ -2440,12 +2696,19 @@
 
             // Form Validation
             document.getElementById('createShiftForm').addEventListener('submit', function(e) {
-                let carerId = selectedCarerIdInput.value;
-                if (!carerId) {
+                const clientId = document.getElementById('clientSelect').value;
+                if (!clientId) {
                     e.preventDefault();
-                    alert('Please assign a carer before creating the shift.');
+                    alert('Please select a client before creating the shift.');
                     return;
                 }
+
+                // let carerId = selectedCarerIdInput.value;
+                // if (!carerId) {
+                //     e.preventDefault();
+                //     alert('Please assign a carer before creating the shift.');
+                //     return;
+                // }
 
                 // Time Validation
                 const startTime = document.querySelector('input[name="start_time"]').value;
@@ -2475,6 +2738,38 @@
     </script>
 
 
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const startTimeInput = document.querySelector('#recurringShiftModal [name="start_time"]');
+            const endTimeInput = document.querySelector('#recurringShiftModal [name="end_time"]');
+            const durationInput = document.querySelector('#recurringShiftModal .duration-readonly');
+
+            function calculateDuration() {
+                const startTime = startTimeInput.value;
+                const endTime = endTimeInput.value;
+
+                if (startTime && endTime) {
+                    let start = new Date(`2000-01-01T${startTime}`);
+                    let end = new Date(`2000-01-01T${endTime}`);
+
+                    if (end <= start) {
+                        end.setDate(end.getDate() + 1); // Overnight shift
+                    }
+
+                    const diffMs = end - start;
+                    const diffHours = diffMs / (1000 * 60 * 60);
+                    durationInput.value = diffHours.toFixed(1);
+                }
+            }
+
+            if (startTimeInput && endTimeInput) {
+                startTimeInput.addEventListener('change', calculateDuration);
+                endTimeInput.addEventListener('change', calculateDuration);
+                calculateDuration();
+            }
+        });
+    </script>
 
     @endsection
 </main>

@@ -318,7 +318,7 @@ class StaffService
     public function getShiftUser($id)
     {
         $client = ServiceUser::find($id);
-        
+
         // Check if service user has latitude and longitude
         if (!$client || !$client->latitude || !$client->longitude) {
             return collect(); // Return empty collection if no location data
@@ -329,14 +329,14 @@ class StaffService
 
         $users = User::select('id', 'name', 'postcode', 'latitude', 'longitude')
             ->where('home_id', Auth::user()->home_id)
-            ->where('status', 1)    
+            ->where('status', 1)
             ->get();
-        
+
         // dd($users);
 
         // Map staff to process distance logic for everyone
         $nearbyStaff = $users->map(function ($staff) use ($clientLatitude, $clientLongitude) {
-            
+
             $distance = null;
 
             // Check if staff has location data
@@ -346,14 +346,14 @@ class StaffService
                 $staff->distance = $distance;
             } else {
                 // No location data -> Treat as very far / mismatch
-                $staff->distance = 999999; 
+                $staff->distance = 999999;
             }
 
             // Assign Card Color & Tag based on distance
             if ($distance !== null && $distance < 20) {
                 // $staff->card_color = 'greenCarerCard';
                 // $staff->tag = 'Best Match';
-                
+
             } elseif ($distance !== null && $distance == 20) {
                 $staff->card_color = 'muteCarerCard';
                 $staff->tag = 'Standard Match';
@@ -365,7 +365,7 @@ class StaffService
 
             return $staff;
         })->sortBy('distance'); // Sort by closest distance first
-        
+
         return $nearbyStaff->values(); // Reset collection keys
     }
 

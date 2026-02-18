@@ -1,8 +1,8 @@
 document.addEventListener('DOMContentLoaded', function () {
     const calendarEl = document.getElementById('calendar');
     const BASE_URL = document
-    .querySelector('meta[name="base-url"]')
-    .getAttribute('content');
+        .querySelector('meta[name="base-url"]')
+        .getAttribute('content');
     const calendar = new FullCalendar.Calendar(calendarEl, {
 
         schedulerLicenseKey: 'GPL-My-Project-Is-Open-Source',

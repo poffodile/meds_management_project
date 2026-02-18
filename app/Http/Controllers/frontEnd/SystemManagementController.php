@@ -128,7 +128,7 @@ class SystemManagementController extends Controller
  
         if ($request->isMethod('post')) {
             if (!$request->has('courses')) {
-                return redirect()->back()->with('error', 'Please checked preferred carers');
+                return redirect()->back()->with('error', 'Please checked preferred services');
             }
             $data = $request->all();    
             // echo "<pre>";print_r($data);
@@ -238,7 +238,8 @@ class SystemManagementController extends Controller
                         $certificate_image = null;
                         $su_user_course=new suUserCourse;
                         $su_user_course->su_user_id= $user->id;
-                        $su_user_course->coursenumber= $course['course_id'];
+                        $su_user_course->course_id= $course['course_id'];
+                        $su_user_course->coursenumber= $course['coursenumber'];
                         $su_user_course->title= $course['title'];
                         $su_user_course->level= $course['level'];
                         $su_user_course->image= $course['course_image'];

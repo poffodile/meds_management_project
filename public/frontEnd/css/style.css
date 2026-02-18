@@ -9664,6 +9664,13 @@ a.close.edit_dyn_form {
     border: 2px solid transparent;
     overflow: hidden;
     flex-grow: 1;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.rota_dash-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
 }
 
 /* Background Blob */

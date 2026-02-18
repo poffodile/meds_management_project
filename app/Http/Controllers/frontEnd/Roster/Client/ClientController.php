@@ -9,10 +9,17 @@ use Carbon\Carbon;
 use App\ServiceUser;
 use App\Models\suUserCourse;
 use Auth,DB,Session;
+use App\Services\Staff\ClientManagementService;
 use Illuminate\Support\Facades\Validator;
 
 class ClientController extends Controller
 {
+    protected $clientService;
+
+    public function __construct(ClientManagementService $clientService)
+    {
+        $this->clientService = $clientService;
+    }
     public function index()
     {
         $home_ids = Auth::user()->home_id;
@@ -163,6 +170,62 @@ class ClientController extends Controller
     }
     public function care_task_add(){
         return view('frontEnd.roster.client.care_task_form');
+    }
+    public function medication_log_save(Request $request){
+        // echo "<pre>";print_r($request->all());die;
+        if(!empty($request->id)){
+            $validator = Validator::make($request->all(), [
+                'id'=>'required|exists:medication_logs,id',
+                'medication_name'=>'required',
+                'dosage'=>'required',
+                'administrator_date'=>'required',
+                'status'=>'required',
+            ]);
+        }else{
+            $validator = Validator::make($request->all(), [
+                'medication_name'=>'required',
+                'dosage'=>'required',
+                'administrator_date'=>'required',
+                'status'=>'required',
+            ]);
+        }
+        
+        if ($validator->fails()) {
+            return [
+                'success' => false,
+                'errors' => $validator->errors()->first()
+            ];
+        }
+        try {
+            $home_ids = Auth::user()->home_id;
+            $ex_home_ids = explode(',', $home_ids);
+            $home_id = $ex_home_ids[0];
+            $requestData = $request->all();
+            $requestData['home_id'] = $home_id;
+            $requestData['user_id'] = Auth::user()->id;
+            // echo "<pre>";print_r($requestData);die;
+            $clientMediLog = $this->clientService->store($requestData);
+            return response()->json(['success'=>true,'message'=>"Medication Log saved successfully",'data'=>$clientMediLog]);
+
+        } catch (Exception $e) {
+            return response()->json(['success'=>false,'message'=>"Something went wrong",'data'=>$e->getMessage()]);
+        }
+    }
+    public function medication_log_list(Request $request){
+        // echo "<pre>";print_r($request->all());die;
+        $requestData = $request->all();
+        $requestData['user_id'] = Auth::user()->id;
+        $medicationLogs = $this->clientService->list($requestData);
+        return response()->json([
+            'success'=>true,
+            'message'=>'Medication Log List',
+            'data'=>$medicationLogs->items(),
+            'total'=>$medicationLogs->total(),
+            'pagination' => [
+                    'next_page_url' => $medicationLogs->nextPageUrl(),
+                    'prev_page_url' => $medicationLogs->previousPageUrl(),
+                ]
+        ]);
     }
    
 }

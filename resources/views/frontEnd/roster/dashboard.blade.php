@@ -7,33 +7,6 @@
 <section id="main-content">
     <div class="wrapper ps-0 pe-0 ">
         <div class="container-fluid">
-            {{-- <div class="row">
-                <div class="col-md-12">
-                    <div class="wrappermenu">
-                        <nav>
-                            <input type="checkbox" id="show-search">
-                            <input type="checkbox" id="show-menu">
-                            <label for="show-menu" class="menu-icon"><i class="fas fa-bars"></i></label>
-                            <div class="content">
-                                <ul class="links">
-                                    <li><a href="#"> <i class="fa fa-tachometer"></i> Dashboard</a></li>
-                                    <li><a href="{{ url('/roster/manage-dashboard') }}"> <i class="fa fa-tachometer"></i> Manager Dashboard</a></li>
-                                    <li><a href="{{ url('/roster/schedule-shift') }}"> <i class="fa fa-tachometer"></i> Schedule</a></li>
-                                    <li><a href="#"> <i class="fa fa-tachometer"></i> Carer Availability</a></li>
-                                    <li><a href="#"> <i class="fa fa-tachometer"></i> Messaging Center</a></li>
-                                    <li><a href="#"> <i class="fa fa-tachometer"></i> Staff Tasks</a></li>
-                                    <li><a href="#"> <i class="fa fa-tachometer"></i> Carers</a></li>
-                                    <li><a href="#"> <i class="fa fa-tachometer"></i> Clients</a></li>
-                                    <li><a href="#"> <i class="fa fa-tachometer"></i> Care Documents</a></li>
-                                    <li><a href="#"> <i class="fa fa-tachometer"></i> Reports</a></li>
-                                    <li><a href="#"> <i class="fa fa-tachometer"></i> Leave Requests</a></li>
-                                    <li><a href="#"> <i class="fa fa-tachometer"></i> Daily Log</a></li>
-                                </ul>
-                            </div>
-                        </nav>
-                    </div>
-                </div>
-            </div> --}}
             <div class="row">
                 <div class="col-md-9">
                     <div class="m-t-30">
@@ -82,7 +55,7 @@
                                                 </div>
                                             </div>
                                             <div class="rotsBoxRightCont">
-                                                <h4>44 </h4>
+                                                <h4>{{ $today_shifts_count }} </h4>
                                                 <p> Today's Shifts </p>
                                             </div>
                                         </div>
@@ -98,7 +71,7 @@
                                                 </div>
                                             </div>
                                             <div class="rotsBoxRightCont">
-                                                <h4>22 </h4>
+                                                <h4>{{ $unfilled_shifts_count }} </h4>
                                                 <p>Unfilled Shifts</p>
                                             </div>
                                         </div>
@@ -109,98 +82,44 @@
                         </div>
                     </div>
                     <div class="row">
-                        
+
                         <div class="col-md-12">
                             <div class="panel">
                                 <header class="panel-heading headingCapitilize"> Today's Shifts</header>
                                 <div class="panel-body">
+                                    @forelse ($today_shifts->slice(0, 3) as $shift)
+                                    <div class="todayShiftsList {{ !$loop->first ? 'm-t-15' : '' }}">
+                                        <div class="siftTime">
+                                            <div class="siftTimeCont">
+                                                <i class="fa fa-clock-o"></i>
+                                                <span><strong>{{ date('H:i', strtotime($shift->start_time)) }} - {{ date('H:i', strtotime($shift->end_time)) }}</strong></span>
+                                            </div>
+                                            <div class="unfilledbtn">{{ $shift->staff_id ? 'scheduled' : 'unfilled' }}</div>
+                                        </div>
+                                        <div class="siftTime">
+                                            <div class="siftTimeCont">
+                                                <i class="fa fa-user-o"></i>
+                                                <span>Carer: <strong> {{ $shift->staff_name ?? 'Unassigned' }}</strong></span>
+                                            </div>
+                                        </div>
+                                        <div class="siftTime">
+                                            <div class="siftTimeCont">
+                                                <i class="fa  fa-map-marker"></i>
+                                                <span>Client: <strong> {{ $shift->client_name ?? 'Unknown Client' }}</strong></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @empty
                                     <div class="todayShiftsList">
-                                        <div class="siftTime">
-                                            <div class="siftTimeCont">
-                                                <i class="fa fa-clock-o"></i>
-                                                <span><strong>09:00 - 17:00</strong></span>
-                                            </div>
-                                            <div class="unfilledbtn">Unfilled</div>
-                                        </div>
-                                        <div class="siftTime">
-                                            <div class="siftTimeCont">
-                                                <i class="fa fa-user-o"></i>
-                                                <span>Carer: <strong> Unassigned</strong></span>
-                                            </div>
-                                        </div>
-                                        <div class="siftTime">
-                                            <div class="siftTimeCont">
-                                                <i class="fa  fa-map-marker"></i>
-                                                <span>Client: <strong> Unknown Client</strong></span>
-                                            </div>
-                                        </div>
+                                        <p>No shifts scheduled for today.</p>
                                     </div>
+                                    @endforelse
 
-                                    <div class="todayShiftsList m-t-15">
-                                        <div class="siftTime">
-                                            <div class="siftTimeCont">
-                                                <i class="fa fa-clock-o"></i>
-                                                <span><strong>09:00 - 17:00</strong></span>
-                                            </div>
-                                            <div class="unfilledbtn">Unfilled</div>
-                                        </div>
-                                        <div class="siftTime">
-                                            <div class="siftTimeCont">
-                                                <i class="fa fa-user-o"></i>
-                                                <span>Carer: <strong> Unassigned</strong></span>
-                                            </div>
-                                        </div>
-                                        <div class="siftTime">
-                                            <div class="siftTimeCont">
-                                                <i class="fa  fa-map-marker"></i>
-                                                <span>Client: <strong> Unknown Client</strong></span>
-                                            </div>
-                                        </div>
+                                    @if(count($today_shifts) > 3)
+                                    <div class="text-center p-t-10">
+                                        <a href="#!" style="color: #4299e1; font-weight: 600;">View All Today's Shifts ({{ count($today_shifts) }}) →</a>
                                     </div>
-
-                                    <div class="todayShiftsList m-t-15">
-                                        <div class="siftTime">
-                                            <div class="siftTimeCont">
-                                                <i class="fa fa-clock-o"></i>
-                                                <span><strong>09:00 - 17:00</strong></span>
-                                            </div>
-                                            <div class="unfilledbtn">Unfilled</div>
-                                        </div>
-                                        <div class="siftTime">
-                                            <div class="siftTimeCont">
-                                                <i class="fa fa-user-o"></i>
-                                                <span>Carer: <strong> Unassigned</strong></span>
-                                            </div>
-                                        </div>
-                                        <div class="siftTime">
-                                            <div class="siftTimeCont">
-                                                <i class="fa  fa-map-marker"></i>
-                                                <span>Client: <strong> Unknown Client</strong></span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="todayShiftsList m-t-15">
-                                        <div class="siftTime">
-                                            <div class="siftTimeCont">
-                                                <i class="fa fa-clock-o"></i>
-                                                <span><strong>09:00 - 17:00</strong></span>
-                                            </div>
-                                            <div class="unfilledbtn">Unfilled</div>
-                                        </div>
-                                        <div class="siftTime">
-                                            <div class="siftTimeCont">
-                                                <i class="fa fa-user-o"></i>
-                                                <span>Carer: <strong> Unassigned</strong></span>
-                                            </div>
-                                        </div>
-                                        <div class="siftTime">
-                                            <div class="siftTimeCont">
-                                                <i class="fa  fa-map-marker"></i>
-                                                <span>Client: <strong> Unknown Client</strong></span>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -212,7 +131,7 @@
                                     <div class="row">
                                         <div class="col-md-6">
                                             <a href="#!">
-                                                <div class="quickActions">   
+                                                <div class="quickActions">
                                                     <div class="activityCalendar"> <i class="fa fa-calendar-o"></i></div>
                                                     <div class="rotsBoxRightCont">
                                                         <h4>Create Shift </h4>
@@ -222,7 +141,7 @@
                                         </div>
                                         <div class="col-md-6">
                                             <a href="#!">
-                                                <div class="quickActions">   
+                                                <div class="quickActions">
                                                     <div class="activityCalendar"> <i class="fa fa-calendar-o"></i></div>
                                                     <div class="rotsBoxRightCont">
                                                         <h4>Add Carer </h4>
@@ -232,7 +151,7 @@
                                         </div>
                                         <div class="col-md-6">
                                             <a href="#!">
-                                                <div class="quickActions  m-t-15">   
+                                                <div class="quickActions  m-t-15">
                                                     <div class="activityCalendar"> <i class="fa fa-calendar-o"></i></div>
                                                     <div class="rotsBoxRightCont">
                                                         <h4>Add Client </h4>
@@ -242,7 +161,7 @@
                                         </div>
                                         <div class="col-md-6">
                                             <a href="#!">
-                                                <div class="quickActions m-t-15">   
+                                                <div class="quickActions m-t-15">
                                                     <div class="activityCalendar"> <i class="fa fa-calendar-o"></i></div>
                                                     <div class="rotsBoxRightCont">
                                                         <h4>Leave Requests</h4>
@@ -250,7 +169,7 @@
                                                 </div>
                                             </a>
                                         </div>
-                                    </div>                            
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -259,85 +178,48 @@
                             <div class="panel">
                                 <header class="panel-heading headingCapitilize"> Recent Activity</header>
                                 <div class="panel-body">
+                                    @forelse ($scheduled_shifts->slice(0, 3) as $shift)
+                                    <div class="todayShiftsList recentActivity {{ !$loop->first ? 'm-t-15' : '' }}">
+                                        <div class="activityCalendar"> <i class="fa fa-calendar-o"></i></div>
+                                        <div class="recentCant">
+                                            <div class="siftTime">
+                                                <div class="siftTimeCont">
+                                                    <span><strong>New Shift Created</strong></span>
+                                                </div>
+                                                <div class="unfilledbtn">{{ $shift->staff_id ? 'scheduled' : 'unfilled' }}</div>
+                                            </div>
+                                            <div class="siftTime">
+                                                <div class="siftTimeCont">
+                                                    <p class="m-b-5"> {{ $shift->client_name ?? 'Unknown' }} → {{ $shift->staff_name ?? 'Unassigned' }}</p>
+                                                    <span>{{ date('M d, Y at h:i A', strtotime($shift->created_at)) }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @empty
                                     <div class="todayShiftsList recentActivity">
-                                        <div class="activityCalendar"> <i class="fa fa-calendar-o"></i></div>
                                         <div class="recentCant">
                                             <div class="siftTime">
                                                 <div class="siftTimeCont">
-                                                    <span><strong>Shift unfilled</strong></span>
-                                                </div>
-                                                <div class="unfilledbtn">Unfilled</div>
-                                            </div>
-                                            <div class="siftTime">
-                                                <div class="siftTimeCont">
-                                                    <p class="m-b-5"> Unknown → Unknown</p>
-                                                    <span>Nov 27, 2025 at 11:13 AM</span>
+                                                    <span><strong>No recent activity</strong></span>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                    
-                                    <div class="todayShiftsList recentActivity m-t-15">
-                                        <div class="activityCalendar"> <i class="fa fa-calendar-o"></i></div>
-                                        <div class="recentCant">
-                                            <div class="siftTime">
-                                                <div class="siftTimeCont">
-                                                    <span><strong>Shift unfilled</strong></span>
-                                                </div>
-                                                <div class="unfilledbtn">Unfilled</div>
-                                            </div>
-                                            <div class="siftTime">
-                                                <div class="siftTimeCont">
-                                                    <p class="m-b-5"> Unknown → Unknown</p>
-                                                    <span>Nov 27, 2025 at 11:13 AM</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    @endforelse
 
-                                    <div class="todayShiftsList recentActivity m-t-15">
-                                        <div class="activityCalendar"> <i class="fa fa-calendar-o"></i></div>
-                                        <div class="recentCant">
-                                            <div class="siftTime">
-                                                <div class="siftTimeCont">
-                                                    <span><strong>Shift unfilled</strong></span>
-                                                </div>
-                                                <div class="unfilledbtn">Unfilled</div>
-                                            </div>
-                                            <div class="siftTime">
-                                                <div class="siftTimeCont">
-                                                    <p class="m-b-5"> Unknown → Unknown</p>
-                                                    <span>Nov 27, 2025 at 11:13 AM</span>
-                                                </div>
-                                            </div>
-                                        </div>
+                                    @if(count($scheduled_shifts) > 3)
+                                    <div class="text-center p-t-10">
+                                        <a href="#!" style="color: #4299e1; font-weight: 600;">View All Activity ({{ count($scheduled_shifts) }}) →</a>
                                     </div>
-
-                                    <div class="todayShiftsList recentActivity m-t-15">
-                                        <div class="activityCalendar"> <i class="fa fa-calendar-o"></i></div>
-                                        <div class="recentCant">
-                                            <div class="siftTime">
-                                                <div class="siftTimeCont">
-                                                    <span><strong>Shift unfilled</strong></span>
-                                                </div>
-                                                <div class="unfilledbtn">Unfilled</div>
-                                            </div>
-                                            <div class="siftTime">
-                                                <div class="siftTimeCont">
-                                                    <p class="m-b-5"> Unknown → Unknown</p>
-                                                    <span>Nov 27, 2025 at 11:13 AM</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
+                                    @endif
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                   
-                
+
+
                 <div class="col-md-3">
 
                     <div class="rotawhitebgColor m-t-30">
