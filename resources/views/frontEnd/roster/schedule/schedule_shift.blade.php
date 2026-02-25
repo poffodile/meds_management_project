@@ -340,188 +340,6 @@
     #suggested_carer::-webkit-scrollbar-thumb:hover {
         background: #94a3b8;
     }
-
-    /* Recurring Shift Modal Styles */
-    .recurring-modal .modal-dialog {
-        max-width: 800px;
-    }
-
-    .recurring-modal .modal-content {
-        border-radius: 12px;
-        border: none;
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    }
-
-    .recurring-modal .modal-header {
-        border-bottom: 1px solid #f1f5f9;
-        padding: 20px 24px;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        background: #fff;
-        border-top-left-radius: 12px;
-        border-top-right-radius: 12px;
-    }
-
-    .recurring-modal .modal-header .header-icon {
-        color: #3b82f6;
-        font-size: 20px;
-        background: #eff6ff;
-        padding: 8px;
-        border-radius: 8px;
-    }
-
-    .recurring-modal .modal-header .modal-title {
-        font-size: 18px;
-        font-weight: 600;
-        color: #1e293b;
-        margin: 0;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
-
-    .recurring-modal .step-badge {
-        background: #f1f5f9;
-        color: #64748b;
-        font-size: 12px;
-        font-weight: 500;
-        padding: 4px 12px;
-        border-radius: 20px;
-    }
-
-    .recurring-modal .modal-body {
-        padding: 24px;
-    }
-
-    .recurring-modal .section-title {
-        font-size: 16px;
-        font-weight: 600;
-        color: #1e293b;
-        margin-bottom: 20px;
-    }
-
-    .recurring-modal .form-group {
-        margin-bottom: 20px;
-    }
-
-    .recurring-modal .form-group label {
-        display: block;
-        font-size: 14px;
-        font-weight: 500;
-        color: #334155;
-        margin-bottom: 8px;
-    }
-
-    .recurring-modal .form-control {
-        border: 1px solid #e2e8f0;
-        border-radius: 8px;
-        padding: 10px 12px;
-        font-size: 14px;
-        color: #1e293b;
-        transition: all 0.2s;
-        height: auto;
-        box-shadow: none;
-    }
-
-    .recurring-modal .form-control:focus {
-        border-color: #3b82f6;
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        outline: none;
-    }
-
-    .recurring-modal .input-with-icon {
-        position: relative;
-    }
-
-    .recurring-modal .input-with-icon i {
-        position: absolute;
-        right: 12px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #94a3b8;
-        pointer-events: none;
-    }
-
-    .recurring-modal .task-input-group {
-        display: flex;
-        gap: 8px;
-    }
-
-    .recurring-modal .btn-add-task {
-        background: #1e293b;
-        color: #fff;
-        border: none;
-        border-radius: 8px;
-        padding: 0 20px;
-        font-weight: 500;
-        font-size: 14px;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-
-    .recurring-modal .btn-add-task:hover {
-        background: #0f172a;
-    }
-
-    .recurring-modal .modal-footer {
-        border-top: 1px solid #f1f5f9;
-        padding: 20px 24px;
-        display: flex;
-        justify-content: flex-end;
-        gap: 12px;
-    }
-
-    .recurring-modal .btn-cancel {
-        background: #fff;
-        color: #475569;
-        border: 1px solid #e2e8f0;
-        padding: 10px 24px;
-        border-radius: 8px;
-        font-weight: 500;
-        font-size: 14px;
-        transition: all 0.2s;
-    }
-
-    .recurring-modal .btn-cancel:hover {
-        background: #f8fafc;
-        border-color: #cbd5e1;
-    }
-
-    .recurring-modal .btn-next {
-        background: #94a3b8;
-        color: #fff;
-        border: none;
-        padding: 10px 24px;
-        border-radius: 8px;
-        font-weight: 500;
-        font-size: 14px;
-        transition: all 0.2s;
-    }
-
-    .recurring-modal .btn-next.active {
-        background: #3b82f6;
-    }
-
-    .recurring-modal .btn-next.active:hover {
-        background: #2563eb;
-    }
-
-    .recurring-modal .duration-readonly {
-        background: #f8fafc;
-        cursor: not-allowed;
-    }
-
-    .recurring-modal .close {
-        opacity: 0.5;
-        font-weight: 300;
-        font-size: 28px;
-        margin-top: -5px;
-    }
-
-    .recurring-modal .close:hover {
-        opacity: 1;
-    }
 </style>
 <main class="page-content">
     <div class="container-fluid">
@@ -532,13 +350,13 @@
                 <p class="header-subtitle">Manage and assign shifts to carers</p>
             </div>
             <div class="topFilters">
-                <button class="filterBtn activeDot"><span class="dot"></span> All Active </button>
+                <!-- <button class="filterBtn activeDot"><span class="dot"></span> All Active </button>
                 <button class="filterBtn"> 📅 Today </button>
                 <button class="filterBtn"> 📆 This Week </button>
                 <button class="filterBtn"> ⭐ Saved Views </button>
                 <button class="filterBtn"> ⬇ Export </button>
                 <button class="filterBtn highlight"> ✨ AI Generate </button>
-                <button class="filterBtn"> 🛠 Smart Allocate </button>
+                <button class="filterBtn"> 🛠 Smart Allocate </button> -->
                 <button class="filterBtn lightGreen" data-toggle="modal" data-target="#recurringShiftModal"> 🔁 Recurring </button>
                 <button class="btn allBtnUseColor" data-toggle="modal" data-target="#addShiftModal">+ Add Shift</button>
             </div>
@@ -548,7 +366,7 @@
         <!-- Alerts -->
         <div class="rota_alerts">
             @forelse ($scheduled_shifts as $shift)
-            <div class="rota_alert">
+            <div class="rota_alert {{ $loop->index >= 3 ? 'extra-shift' : '' }}" style="{{ $loop->index >= 3 ? 'display: none;' : '' }}">
                 <div class="rota_alert-icon"><i class="fa fa fa-calendar-o"></i></div>
                 <div class="rota_alert-content">
                     <div class="rota_alert-title">{{ $shift->client_name ?? 'Unknown Client' }} - {{ date('H:i', strtotime($shift->start_time)) }}</div>
@@ -574,11 +392,34 @@
             </div>
             @endforelse
 
-            <div class="rota_view-all">View All ({{ count($scheduled_shifts) }}) →</div>
+            <div class="rota_view-all" onclick="toggleShifts()" style="cursor: pointer;">View All ({{ count($scheduled_shifts) }}) →</div>
+
+            <script>
+                function toggleShifts() {
+                    const hiddenShifts = document.querySelectorAll('.extra-shift');
+                    const btn = document.querySelector('.rota_view-all');
+                    let isHidden = false;
+
+                    // Check status of first hidden element to decide action
+                    if (hiddenShifts.length > 0) {
+                        isHidden = hiddenShifts[0].style.display === 'none';
+                    }
+
+                    hiddenShifts.forEach(shift => {
+                        shift.style.display = isHidden ? '' : 'none';
+                    });
+
+                    if (isHidden) {
+                        btn.innerHTML = 'Show Less ↑';
+                    } else {
+                        btn.innerHTML = 'View All ({{ count($scheduled_shifts) }}) →';
+                    }
+                }
+            </script>
         </div>
 
         <!-- Smart Suggestions -->
-        <div class="suggestions">
+        <!-- <div class="suggestions">
             <div class="suggestion-card" style="border: 1px solid #fdbb76; border-left:4px solid #fdbb76">
                 <div class="suggestion-icon" style="background-color: #ea580c;">⚠️</div>
                 <div class="suggestionRightCont">
@@ -591,11 +432,12 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> -->
+        <!-- Smart Suggestions -->
 
         <!-- advancedFiltersBox -->
 
-        <div class="advancedFiltersBox m-b-15">
+        <!-- <div class="advancedFiltersBox m-b-15">
             <button class="advBtn">
                 🔍 Advanced Filters ▼
             </button>
@@ -648,7 +490,7 @@
                 </div>
 
             </div>
-        </div>
+        </div> -->
         <!-- End of advancedFiltersBox -->
 
         <div class="calendarTabs">
@@ -899,27 +741,6 @@
                 </div>
             </div>
 
-            <!-- <div class="careTaskstbbg sectionWhiteBgAllUse p-0">
-                                            <header class="panel-heading headingCapitilize clntalertheader">
-                                                <div class="clientHeadung">
-                                                    <div class="onlyheadingmain radIconClr"><i class="bx  bx-alert-triangle"></i> 52 Scheduling Issues Detected </div>
-                                                    <p>14 High Priority <span>38 Medium Priority</span> </p>
-                                                </div>
-
-                                                <div class="actions mt-0">
-                                                    <button class="btn addAssessmentBtn addalertClientDetailsBtn"> <i class="bx  bx-plus"></i> Add alert</button>
-                                                </div>
-                                            </header>
-
-                                            <div class="p-20">
-                                                <div class="clientFilterform addalertClientDetailsform" style="border: 2px solid #fdabab; background: #fef2f2;">
-                                                    <div class="createNewAlert"><i class="bx  bx-alert-triangle"></i> Create New Alert </div>
-                                                </div>
-                                            </div>
-                                        </div> -->
-
-            <!-- ********************************** -->
-
             <!-- TAB CONTENT -->
             <div class="tab-content">
                 <div class="content active" id="roster">
@@ -1004,18 +825,72 @@
                 <!-- ********************************************************* -->
 
                 <div class="content" id="day">
-                    <h3>Day View</h3>
-                    <p>Day schedule appears here.</p>
+                    <div style="background:#fff;border-radius:12px;border:1px solid #e5e7eb;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+                        <button id="dayPrevBtn" class="btn borderBtn" style="padding:6px 12px;font-size:18px;">‹</button>
+                        <div style="text-align:center;">
+                            <h2 id="dayDateDisplay" style="margin:0;font-size:20px;font-weight:700;color:#111827;">Loading...</h2>
+                            <p id="dayShiftsCount" style="margin:0;color:#6b7280;font-size:13px;margin-top:2px;">0 shifts scheduled</p>
+                        </div>
+                        <div style="display:flex;gap:8px;">
+                            <button id="dayTodayBtn" class="btn borderBtn" style="padding:6px 16px;">Today</button>
+                            <button id="dayNextBtn" class="btn borderBtn" style="padding:6px 12px;font-size:18px;">›</button>
+                        </div>
+                    </div>
+
+                    <div id="dayShiftsList" style="display:flex;flex-direction:column;gap:12px;">
+                        <!-- JS populated shifts will inject here -->
+                        <div style="text-align:center;padding:24px;color:#9ca3af;">Loading shifts...</div>
+                    </div>
                 </div>
 
                 <div class="content" id="week">
-                    <h3>Week View</h3>
-                    <p>Weekly details appear here.</p>
+                    <div style="background:#fff;border-radius:12px;border:1px solid #e5e7eb;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+                        <button id="weekPrevBtn" class="btn borderBtn" style="padding:6px 16px;">‹ Previous Week</button>
+                        <div style="text-align:center;">
+                            <h2 id="weekDateDisplay" style="margin:0;font-size:18px;font-weight:700;color:#111827;">Loading...</h2>
+                        </div>
+                        <div style="display:flex;gap:8px;">
+                            <button id="weekTodayBtn" class="btn borderBtn" style="padding:6px 16px;">This Week</button>
+                            <button id="weekNextBtn" class="btn borderBtn" style="padding:6px 16px;">Next Week ›</button>
+                        </div>
+                    </div>
+
+                    <div id="weekShiftsList" style="display:grid;grid-template-columns:repeat(7, 1fr);gap:8px;overflow-x:auto;padding-bottom:12px;">
+                        <!-- Columns will be injected here -->
+                        <div style="grid-column: span 7;text-align:center;padding:24px;color:#9ca3af;">Loading week data...</div>
+                    </div>
                 </div>
 
                 <div class="content" id="month">
-                    <h3>Month View</h3>
-                    <p>Monthly overview shown here.</p>
+                    <div style="background:#fff;border-radius:12px;border:1px solid #e5e7eb;padding:24px;">
+
+                        <!-- Custom Header for Month View -->
+                        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
+                            <button id="monthPrevBtn" class="btn borderBtn" style="padding:6px 16px;">‹</button>
+                            <h2 id="monthDateDisplay" style="margin:0;font-size:24px;font-weight:700;color:#111827;">Loading...</h2>
+                            <div style="display:flex;gap:8px;">
+                                <button id="monthTodayBtn" class="btn borderBtn" style="padding:6px 16px;">Today</button>
+                                <button id="monthNextBtn" class="btn borderBtn" style="padding:6px 16px;">›</button>
+                            </div>
+                        </div>
+
+                        <!-- Calendar Grid -->
+                        <div id="monthCalendar"></div>
+
+                        <!-- Legend -->
+                        <div style="margin-top: 24px; font-size: 13px;">
+                            <strong style="color:#374151;display:block;margin-bottom:8px;">Legend:</strong>
+                            <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+                                <div style="display:flex;align-items:center;gap:4px;"><span style="width:12px;height:12px;border-radius:2px;background:#22c55e;"></span> Completed</div>
+                                <div style="display:flex;align-items:center;gap:4px;"><span style="width:12px;height:12px;border-radius:2px;background:#eab308;"></span> In Progress</div>
+                                <div style="display:flex;align-items:center;gap:4px;"><span style="width:12px;height:12px;border-radius:2px;background:#a855f7;"></span> Scheduled</div>
+                                <div style="display:flex;align-items:center;gap:4px;"><span style="width:12px;height:12px;border-radius:2px;background:#3b82f6;"></span> Published</div>
+                                <div style="display:flex;align-items:center;gap:4px;"><span style="width:12px;height:12px;border-radius:2px;background:#f97316;"></span> Unfilled</div>
+                                <div style="display:flex;align-items:center;gap:4px;"><span style="width:12px;height:12px;border-radius:2px;background:#ef4444;"></span> Cancelled</div>
+                                <div style="display:flex;align-items:center;gap:4px;"><span style="width:12px;height:12px;border-radius:2px;background:#9ca3af;"></span> Draft</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="content" id="days90">
@@ -1043,39 +918,37 @@
                             </div>
                         </div>
 
-
                         <div class="rota_dashboard-cards simpleCard">
                             <div class="rota_dash-card blue">
                                 <div class="rota_dash-left">
                                     <p class="rota_title">Total Shifts</p>
-                                    <h2 class="rota_count">37</h2>
+                                    <h2 class="rota_count" id="totalShifts">37</h2>
                                 </div>
                             </div>
 
                             <div class="rota_dash-card orangeClr">
                                 <div class="rota_dash-left">
                                     <p class="rota_title">Filled</p>
-                                    <h2 class="rota_count greenText">36</h2>
+                                    <h2 class="rota_count greenText" id="filledShifts">36</h2>
                                 </div>
                             </div>
 
                             <div class="rota_dash-card green">
                                 <div class="rota_dash-left">
                                     <p class="rota_title">Unfilled</p>
-                                    <h2 class="rota_count orangeText">0</h2>
+                                    <h2 class="rota_count orangeText" id="unfilledShifts">0</h2>
                                 </div>
                             </div>
 
                             <div class="rota_dash-card redClr">
                                 <div class="rota_dash-left">
                                     <p class="rota_title">Fill Rate</p>
-                                    <h2 class="rota_count blueText">1</h2>
+                                    <h2 class="rota_count blueText" id="fillRate">1</h2>
                                 </div>
                             </div>
                         </div>
 
-
-                        <div class="carePlanWrapper proactiveSuggestionsWrap weeklyBreakdownAddCont">
+                        <div class="carePlanWrapper proactiveSuggestionsWrap weeklyBreakdownAddCont" id="weeklyContainer">
                             <div class="psHeader">
                                 <span class="psIcon"><i class="bx  bx-trending-up"></i> </span>
                                 <span class="psTitle">Weekly Breakdown</span>
@@ -1287,375 +1160,122 @@
                 <div class="content" id="list">
                     <div class="days90Content carertabcontent">
                         <div class="row">
-                            <div class="col-md-4">
+                            @forelse($scheduled_shifts as $shift)
+                            @php
+                            $start = \Carbon\Carbon::parse($shift->start_time);
+                            $end = \Carbon\Carbon::parse($shift->end_time);
+                            $duration = $start->diffInHours($end);
+                            @endphp
+                            <div class="col-md-4 {{ $loop->index >= 3 ? 'm-t-25' : '' }}">
                                 <div class="profile-card careTasksCard mb-0">
                                     <div class="details mt-0">
                                         <div class="item">
-                                            <i class="bx  bx-clock"></i><span><strong> Fri, Oct 16 </strong> </span> •
-                                            <span>09:00 - 17:00 (8h)</span>
+                                            <i class="bx  bx-clock"></i><span><strong> {{ date('D, M d', strtotime($shift->start_date)) }} </strong> </span> •
+                                            <span>{{ date('H:i', strtotime($shift->start_time)) }} - {{ date('H:i', strtotime($shift->end_time)) }} ({{ $duration }}h)</span>
                                         </div>
                                     </div>
                                     <div class="sectionCarer">
                                         <div class="tags">
-                                            <span class="yellow">unfilled</span>
-                                            <span class="inactive">Morning</span>
-                                            <span class="inactive">residential care</span>
+                                            <span class="yellow">{{ $shift->status ?? 'unfilled' }}</span>
+                                            <span class="inactive">{{ ucfirst($shift->shift_type) }}</span>
+                                            <!-- <span class="inactive">residential care</span> -->
                                         </div>
                                     </div>
                                     <div class="details">
                                         <div class="item">
                                             <span class="greenText"><i class='bx  bx-home-alt-2'></i> </span>
-                                            <span><strong> East Wing </strong> </span>
+                                            <span><strong> {{ $shift->location_name ?? 'East Wing' }} </strong> </span>
                                         </div>
                                         <div class="item redalrttext">
-                                            <i class='bx  bx-user'></i> <span>Unassigned</span>
+                                            <i class='bx  bx-user'></i> <span>{{ $shift->staff_name ?? 'Unassigned' }}</span>
                                         </div>
                                     </div>
                                     <hr />
                                     <div class="actions">
-                                        <button class="borderBtn edit" data-id="120"> <i class='bx  bx-edit'></i> Edit </button>
-                                        <button class="borderBtn delete" data-id="120"> <i class='bx  bx-trash'></i></button>
-                                        <button class="borderBtn edit" data-id="120"> <i class='bx  bx-paper-plane'></i> Request </button>
+                                        <button class="borderBtn edit day-shift-item"
+                                            data-id="{{ $shift->id }}"
+                                            data-client="{{ $shift->service_user_id ?? '' }}"
+                                            data-property="{{ $shift->property_id ?? '' }}"
+                                            data-location="{{ $shift->location_name ?? '' }}"
+                                            data-address="{{ $shift->location_address ?? '' }}"
+                                            data-date="{{ $shift->start_date ?? '' }}"
+                                            data-start="{{ \Carbon\Carbon::parse($shift->start_time)->format('H:i') }}"
+                                            data-end="{{ \Carbon\Carbon::parse($shift->end_time)->format('H:i') }}"
+                                            data-staff="{{ $shift->staff_id ?? '' }}"
+                                            data-type="{{ $shift->shift_type ?? '' }}"
+                                            data-care="{{ $shift->care_type_id ?? '' }}"
+                                            data-assignment="{{ $shift->assignment ?? '' }}"
+                                            data-notes="{{ $shift->notes ?? '' }}"
+                                            data-tasks="{{ $shift->tasks ?? '' }}">
+                                            <i class='bx bx-edit'></i> Edit
+                                        </button>
+                                        <button class="borderBtn delete" data-id="{{ $shift->id }}"> <i class='bx  bx-trash'></i></button>
+                                        <button class="borderBtn edit" data-id="{{ $shift->id }}"> <i class='bx  bx-paper-plane'></i> Request </button>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="profile-card careTasksCard mb-0">
-                                    <div class="details mt-0">
-                                        <div class="item">
-                                            <i class="bx  bx-clock"></i><span><strong> Fri, Oct 16 </strong> </span> •
-                                            <span>09:00 - 17:00 (8h)</span>
-                                        </div>
-                                    </div>
-                                    <div class="sectionCarer">
-                                        <div class="tags">
-                                            <span class="yellow">unfilled</span>
-                                            <span class="inactive">Morning</span>
-                                            <span class="inactive">residential care</span>
-                                        </div>
-                                    </div>
-                                    <div class="details">
-                                        <div class="item">
-                                            <span class="greenText"><i class='bx  bx-home-alt-2'></i> </span>
-                                            <span><strong> East Wing </strong> </span>
-                                        </div>
-                                        <div class="item redalrttext">
-                                            <i class='bx  bx-user'></i> <span>Unassigned</span>
-                                        </div>
-                                    </div>
-                                    <hr />
-                                    <div class="actions">
-                                        <button class="borderBtn edit" data-id="120"> <i class='bx  bx-edit'></i> Edit </button>
-                                        <button class="borderBtn delete" data-id="120"> <i class='bx  bx-trash'></i> </button>
-                                        <button class="borderBtn edit" data-id="120"> <i class='bx  bx-paper-plane'></i> Request </button>
-                                    </div>
-                                </div>
+                            @empty
+                            <div class="col-md-12">
+                                <p>No scheduled shifts found.</p>
                             </div>
-                            <div class="col-md-4">
-                                <div class="profile-card careTasksCard mb-0">
-                                    <div class="details mt-0">
-                                        <div class="item">
-                                            <i class="bx  bx-clock"></i><span><strong> Fri, Oct 16 </strong> </span> •
-                                            <span>09:00 - 17:00 (8h)</span>
-                                        </div>
-                                    </div>
-                                    <div class="sectionCarer">
-                                        <div class="tags">
-                                            <span class="yellow">unfilled</span>
-                                            <span class="inactive">Morning</span>
-                                            <span class="inactive">residential care</span>
-                                        </div>
-                                    </div>
-                                    <div class="details">
-                                        <div class="item">
-                                            <span class="greenText"> <i class='bx  bx-home-alt-2'></i></span>
-                                            <span><strong> East Wing </strong> </span>
-                                        </div>
-                                        <div class="item redalrttext">
-                                            <i class='bx  bx-user'></i> <span> Unassigned</span>
-                                        </div>
-                                    </div>
-                                    <hr />
-                                    <div class="actions">
-                                        <button class="borderBtn edit" data-id="120"> <i class='bx  bx-edit'></i> Edit
-                                        </button>
-                                        <button class="borderBtn delete" data-id="120"> <i class='bx  bx-trash'></i>
-                                        </button>
-                                        <button class="borderBtn edit" data-id="120"> <i class='bx  bx-paper-plane'></i>
-                                            Request </button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4 m-t-25">
-                                <div class="profile-card careTasksCard mb-0">
-                                    <div class="details mt-0">
-                                        <div class="item">
-                                            <i class="bx  bx-clock"></i><span><strong> Fri, Oct 16 </strong> </span> •
-                                            <span>09:00 - 17:00 (8h)</span>
-                                        </div>
-                                    </div>
-                                    <div class="sectionCarer">
-                                        <div class="tags">
-                                            <span class="yellow">unfilled</span>
-                                            <span class="inactive">Morning</span>
-                                            <span class="inactive">residential care</span>
-                                        </div>
-                                    </div>
-                                    <div class="details">
-                                        <div class="item">
-                                            <span class="greenText"><i class='bx  bx-home-alt-2'></i> </span>
-                                            <span><strong> East Wing </strong> </span>
-                                        </div>
-                                        <div class="item redalrttext">
-                                            <i class='bx  bx-user'></i> <span>Unassigned</span>
-                                        </div>
-                                    </div>
-                                    <hr />
-                                    <div class="actions">
-                                        <button class="borderBtn edit" data-id="120"> <i class='bx  bx-edit'></i> Edit
-                                        </button>
-                                        <button class="borderBtn delete" data-id="120"> <i class='bx  bx-trash'></i>
-                                        </button>
-                                        <button class="borderBtn edit" data-id="120"> <i class='bx  bx-paper-plane'></i>
-                                            Request </button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4 m-t-25">
-                                <div class="profile-card careTasksCard mb-0">
-                                    <div class="details mt-0">
-                                        <div class="item">
-                                            <i class="bx  bx-clock"></i><span><strong> Fri, Oct 16 </strong> </span> •
-                                            <span>09:00 - 17:00 (8h)</span>
-                                        </div>
-                                    </div>
-                                    <div class="sectionCarer">
-                                        <div class="tags">
-                                            <span class="yellow">unfilled</span>
-                                            <span class="inactive">Morning</span>
-                                            <span class="inactive">residential care</span>
-                                        </div>
-                                    </div>
-                                    <div class="details">
-                                        <div class="item">
-                                            <span class="greenText"><i class='bx  bx-home-alt-2'></i> </span>
-                                            <span><strong> East Wing </strong> </span>
-                                        </div>
-                                        <div class="item redalrttext">
-                                            <i class='bx  bx-user'></i> <span>Unassigned</span>
-                                        </div>
-                                    </div>
-                                    <hr />
-                                    <div class="actions">
-                                        <button class="borderBtn edit" data-id="120"> <i class='bx  bx-edit'></i> Edit
-                                        </button>
-                                        <button class="borderBtn delete" data-id="120"> <i class='bx  bx-trash'></i>
-                                        </button>
-                                        <button class="borderBtn edit" data-id="120"> <i class='bx  bx-paper-plane'></i>
-                                            Request </button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4 m-t-25">
-                                <div class="profile-card careTasksCard mb-0">
-                                    <div class="details mt-0">
-                                        <div class="item">
-                                            <i class="bx  bx-clock"></i><span><strong> Fri, Oct 16 </strong> </span> •
-                                            <span>09:00 - 17:00 (8h)</span>
-                                        </div>
-                                    </div>
-                                    <div class="sectionCarer">
-                                        <div class="tags">
-                                            <span class="yellow">unfilled</span>
-                                            <span class="inactive">Morning</span>
-                                            <span class="inactive">residential care</span>
-                                        </div>
-                                    </div>
-                                    <div class="details">
-                                        <div class="item">
-                                            <span class="greenText"> <i class='bx  bx-home-alt-2'></i></span>
-                                            <span><strong> East Wing </strong> </span>
-                                        </div>
-                                        <div class="item redalrttext">
-                                            <i class='bx  bx-user'></i> <span> Unassigned</span>
-                                        </div>
-                                    </div>
-                                    <hr />
-                                    <div class="actions">
-                                        <button class="borderBtn edit" data-id="120"> <i class='bx  bx-edit'></i> Edit
-                                        </button>
-                                        <button class="borderBtn delete" data-id="120"> <i class='bx  bx-trash'></i>
-                                        </button>
-                                        <button class="borderBtn edit" data-id="120"> <i class='bx  bx-paper-plane'></i>
-                                            Request </button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4 m-t-25">
-                                <div class="profile-card careTasksCard mb-0">
-                                    <div class="details mt-0">
-                                        <div class="item">
-                                            <i class="bx  bx-clock"></i><span><strong> Fri, Oct 16 </strong> </span> •
-                                            <span>09:00 - 17:00 (8h)</span>
-                                        </div>
-                                    </div>
-                                    <div class="sectionCarer">
-                                        <div class="tags">
-                                            <span class="yellow">unfilled</span>
-                                            <span class="inactive">Morning</span>
-                                            <span class="inactive">residential care</span>
-                                        </div>
-                                    </div>
-                                    <div class="details">
-                                        <div class="item">
-                                            <span class="greenText"><i class='bx  bx-home-alt-2'></i> </span>
-                                            <span><strong> East Wing </strong> </span>
-                                        </div>
-                                        <div class="item redalrttext">
-                                            <i class='bx  bx-user'></i> <span>Unassigned</span>
-                                        </div>
-                                    </div>
-                                    <hr />
-                                    <div class="actions">
-                                        <button class="borderBtn edit" data-id="120"> <i class='bx  bx-edit'></i> Edit
-                                        </button>
-                                        <button class="borderBtn delete" data-id="120"> <i class='bx  bx-trash'></i>
-                                        </button>
-                                        <button class="borderBtn edit" data-id="120"> <i class='bx  bx-paper-plane'></i>
-                                            Request </button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4 m-t-25">
-                                <div class="profile-card careTasksCard mb-0">
-                                    <div class="details mt-0">
-                                        <div class="item">
-                                            <i class="bx  bx-clock"></i><span><strong> Fri, Oct 16 </strong> </span> •
-                                            <span>09:00 - 17:00 (8h)</span>
-                                        </div>
-                                    </div>
-                                    <div class="sectionCarer">
-                                        <div class="tags">
-                                            <span class="yellow">unfilled</span>
-                                            <span class="inactive">Morning</span>
-                                            <span class="inactive">residential care</span>
-                                        </div>
-                                    </div>
-                                    <div class="details">
-                                        <div class="item">
-                                            <span class="greenText"><i class='bx  bx-home-alt-2'></i> </span>
-                                            <span><strong> East Wing </strong> </span>
-                                        </div>
-                                        <div class="item redalrttext">
-                                            <i class='bx  bx-user'></i> <span>Unassigned</span>
-                                        </div>
-                                    </div>
-                                    <hr />
-                                    <div class="actions">
-                                        <button class="borderBtn edit" data-id="120"> <i class='bx  bx-edit'></i> Edit
-                                        </button>
-                                        <button class="borderBtn delete" data-id="120"> <i class='bx  bx-trash'></i>
-                                        </button>
-                                        <button class="borderBtn edit" data-id="120"> <i class='bx  bx-paper-plane'></i>
-                                            Request </button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4 m-t-25">
-                                <div class="profile-card careTasksCard mb-0">
-                                    <div class="details mt-0">
-                                        <div class="item">
-                                            <i class="bx  bx-clock"></i><span><strong> Fri, Oct 16 </strong> </span> •
-                                            <span>09:00 - 17:00 (8h)</span>
-                                        </div>
-                                    </div>
-                                    <div class="sectionCarer">
-                                        <div class="tags">
-                                            <span class="yellow">unfilled</span>
-                                            <span class="inactive">Morning</span>
-                                            <span class="inactive">residential care</span>
-                                        </div>
-                                    </div>
-                                    <div class="details">
-                                        <div class="item">
-                                            <span class="greenText"> <i class='bx  bx-home-alt-2'></i></span>
-                                            <span><strong> East Wing </strong> </span>
-                                        </div>
-                                        <div class="item redalrttext">
-                                            <i class='bx  bx-user'></i> <span> Unassigned</span>
-                                        </div>
-                                    </div>
-                                    <hr />
-                                    <div class="actions">
-                                        <button class="borderBtn edit" data-id="120"> <i class='bx  bx-edit'></i> Edit
-                                        </button>
-                                        <button class="borderBtn delete" data-id="120"> <i class='bx  bx-trash'></i>
-                                        </button>
-                                        <button class="borderBtn edit" data-id="120"> <i class='bx  bx-paper-plane'></i>
-                                            Request </button>
-                                    </div>
-                                </div>
-                            </div>
+                            @endforelse
                         </div>
                     </div>
                 </div>
 
+
                 <div class="content" id="bygroup">
-                    <div class="byGroupContent">
-                        <div class="workHoursHeader">
-                            <div class="title radIconClr"> Phil Holt <i class='bx bx-alert-circle'></i> </div>
-                            <div class="actions">
-                                10 shifts
-                                <div class="roundBtntag radShowbtn">67.0h</div>
-                            </div>
-                        </div>
-                        <div class="recent-activity sectionWhiteBgAllUse">
-                            <!-- <div class="section-header">
-                                        <h2 class="section-title">Recent Activity</h2>
-                                    </div> -->
 
-                            <div class="activity-item">
-                                <div class="activity-icon"><i class='bx  bx-apps'></i> </div>
-                                <div class="activity-content">
-                                    <div class="activity-title">Unknown</div>
-                                    <div class="activity-description"><i class='bx  bx-clock-4'></i> 09:00 AM - 05:00 PM</div>
-                                    <div class="activity-time"><i class='bx  bx-calendar'></i> 2026-01-25</div>
-                                    <div class="inactive roundTag">Morning</div>
-
-                                    <div class="planActions">
-                                        <button><i class="bx  bx-edit"></i> Edit </button>
-                                        <button class="danger"><i class="bx  bx-trash"></i> Delete </button>
-                                    </div>
-                                </div>
-                                <div class="roundBtntag greenShowbtn">unfilled</div>
-                            </div>
-
-                            <div class="activity-item">
-                                <div class="activity-icon"><i class='bx  bx-apps'></i> </div>
-                                <div class="activity-content">
-                                    <div class="activity-title">Unknown</div>
-                                    <div class="activity-description"><i class='bx  bx-clock-4'></i> 09:00 AM - 05:00 PM</div>
-                                    <div class="activity-time"><i class='bx  bx-calendar'></i> 2026-01-25</div>
-                                    <div class="inactive roundTag">Morning</div>
-
-                                    <div class="instructionBox">
-                                        Time overlap with another shift (09:00-17:00)
-                                    </div>
-
-                                    <div class="planActions">
-                                        <button><i class="bx  bx-edit"></i> Edit </button>
-                                        <button class="danger"><i class="bx  bx-trash"></i> Delete </button>
-                                    </div>
-                                </div>
-                                <div class="roundBtntag greenShowbtn">unfilled</div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
                 <div class="content" id="split">
-                    <h3>Split View</h3>
-                    <p>Split layout appears here.</p>
+                    <!-- Split View: Navigation Bar -->
+                    <div class="sv-nav-bar">
+                        <button class="sv-nav-btn" id="sv-prev-week">
+                            <i class="bx bx-chevron-left"></i> Previous Week
+                        </button>
+                        <div class="sv-week-title" id="sv-week-title">Loading...</div>
+                        <div class="sv-nav-right">
+                            <button class="sv-nav-btn sv-nav-today" id="sv-today">This Week</button>
+                            <button class="sv-nav-btn" id="sv-next-week">
+                                Next Week <i class="bx bx-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Split View: Main Body -->
+                    <div class="sv-body">
+                        <!-- Left Panel: Care Team -->
+                        <div class="sv-left-panel">
+                            <div class="sv-team-header">
+                                <div class="sv-team-title">Care Team</div>
+                                <div class="sv-team-subtitle" id="sv-team-count">0 active carers</div>
+                            </div>
+                            <div class="sv-team-list" id="sv-team-list">
+                                <!-- Staff cards populated by JS -->
+                            </div>
+                        </div>
+
+                        <!-- Right Panel: Timeline -->
+                        <div class="sv-right-panel" id="sv-right-panel">
+                            <!-- Day headers -->
+                            <div class="sv-timeline-wrapper">
+                                <div class="sv-day-header-row" id="sv-day-header-row">
+                                    <!-- Day columns populated by JS -->
+                                </div>
+                                <!-- Timeline rows for each staff -->
+                                <div class="sv-rows-container" id="sv-rows-container">
+                                    <!-- Rows populated by JS -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Loading overlay -->
+                    <div class="sv-loading" id="sv-loading">
+                        <div class="sv-spinner"></div>
+                        <span>Loading shifts...</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1690,6 +1310,7 @@
 
                                     <div class="calendarTabs leaveRequesttabs m-t-10">
                                         <label>Assignment *</label>
+                                        <input type="hidden" name="assignment" id="selected_assignment" value="Client">
                                         <div class="tabs p-2 m-b-10" style="background-color: #f5f5f5;">
                                             <button type="button" class="tab" id="locationTab" data-tab="scheduleLocation">
                                                 <i class='bx  bx-location'></i> Location
@@ -2182,22 +1803,22 @@
                 revertDuration: 0
             });
         });
-        $(document).ready(function() {
-            $('#calendar').fullCalendar({
-                header: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'agendaWeek,agendaDay'
-                },
+        // $(document).ready(function() {
+        //     $('#calendar').fullCalendar({
+        //         header: {
+        //             left: 'prev,next today',
+        //             center: 'title',
+        //             right: 'agendaWeek,agendaDay'
+        //         },
 
-                editable: true,
-                droppable: true,
+        //         editable: true,
+        //         droppable: true,
 
-                drop: function(date) {
-                    console.log('Dropped on ' + date.format());
-                }
-            });
-        });
+        //         drop: function(date) {
+        //             console.log('Dropped on ' + date.format());
+        //         }
+        //     });
+        // });
     </script>
     <script>
         document.querySelectorAll(".availabilityTabs").forEach(wrapper => {
@@ -2768,6 +2389,981 @@
                 endTimeInput.addEventListener('change', calculateDuration);
                 calculateDuration();
             }
+        });
+    </script>
+
+    {{-- ===== SPLIT VIEW GANTT SCHEDULER ===== --}}
+    <script>
+        (function() {
+            'use strict';
+
+            // ---------- Helpers ----------
+            const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+            // Timezone-safe date-to-string (avoids UTC shift on +05:30 etc.)
+            function localISODate(d) {
+                const y = d.getFullYear();
+                const mo = String(d.getMonth() + 1).padStart(2, '0');
+                const dy = String(d.getDate()).padStart(2, '0');
+                return `${y}-${mo}-${dy}`;
+            }
+
+            function formatDate(d) {
+                return `${MONTHS[d.getMonth()]} ${d.getDate()}`;
+            }
+
+            function formatDateFull(d) {
+                return `${MONTHS[d.getMonth()]} ${String(d.getDate()).padStart(2,'0')}, ${d.getFullYear()}`;
+            }
+
+            function isToday(d) {
+                const now = new Date();
+                return d.getFullYear() === now.getFullYear() &&
+                    d.getMonth() === now.getMonth() &&
+                    d.getDate() === now.getDate();
+            }
+
+            function getInitials(name) {
+                if (!name) return '?';
+                const parts = name.trim().split(/\s+/);
+                return parts.length >= 2 ?
+                    (parts[0][0] + parts[parts.length - 1][0]).toUpperCase() :
+                    name[0].toUpperCase();
+            }
+
+            // Monday as start of week
+            function startOfWeek(date) {
+                const d = new Date(date);
+                const day = d.getDay();
+                d.setDate(d.getDate() - day + (day === 0 ? -6 : 1));
+                d.setHours(0, 0, 0, 0);
+                return d;
+            }
+
+            // ---------- State ----------
+            let currentWeekStart = startOfWeek(new Date());
+
+            // ---------- DOM refs ----------
+            const splitTab = document.querySelector('.tab[data-tab="split"]');
+            const weekTitle = document.getElementById('sv-week-title');
+            const teamList = document.getElementById('sv-team-list');
+            const teamCount = document.getElementById('sv-team-count');
+            const dayHeaders = document.getElementById('sv-day-header-row');
+            const rowsContainer = document.getElementById('sv-rows-container');
+            const loadingEl = document.getElementById('sv-loading');
+            const btnPrev = document.getElementById('sv-prev-week');
+            const btnNext = document.getElementById('sv-next-week');
+            const btnToday = document.getElementById('sv-today');
+
+            if (!splitTab || !weekTitle) return;
+
+            // ---------- Render header ----------
+            function renderHeader(weekStart) {
+                const weekEnd = new Date(weekStart);
+                weekEnd.setDate(weekEnd.getDate() + 6);
+                weekTitle.textContent = `${formatDate(weekStart)} - ${formatDateFull(weekEnd)}`;
+
+                dayHeaders.innerHTML = '';
+                for (let i = 0; i < 7; i++) {
+                    const d = new Date(weekStart);
+                    d.setDate(d.getDate() + i);
+                    const col = document.createElement('div');
+                    col.className = 'sv-day-col-header' + (isToday(d) ? ' sv-today-col' : '');
+                    col.innerHTML = `<div class="sv-day-name">${DAYS[d.getDay()]}</div>
+                                  <div class="sv-day-date">${formatDate(d)}</div>`;
+                    dayHeaders.appendChild(col);
+                }
+            }
+
+            // ---------- Render rows ----------
+            function renderRows(staff, shifts, weekStart) {
+                teamList.innerHTML = '';
+                rowsContainer.innerHTML = '';
+
+                if (!staff || staff.length === 0) {
+                    teamList.innerHTML = '<div class="sv-empty-state"><i class="bx bx-user-x"></i><span>No staff found</span></div>';
+                    return;
+                }
+
+                teamCount.textContent = `${staff.length} active carer${staff.length !== 1 ? 's' : ''}`;
+
+                // Pre-build a lookup: staffId -> [shift, ...] keyed by date string
+                const shiftMap = {};
+                shifts.forEach(sh => {
+                    const key = `${sh.staff_id}__${sh.start_date}`;
+                    if (!shiftMap[key]) shiftMap[key] = [];
+                    shiftMap[key].push(sh);
+                });
+
+                staff.forEach(member => {
+                    const initials = getInitials(member.name);
+
+                    // ---- Left panel card ----
+                    const card = document.createElement('div');
+                    card.className = 'sv-staff-card';
+                    card.innerHTML = `
+                    <div class="sv-avatar">${initials}</div>
+                    <div class="sv-staff-info">
+                        <div class="sv-staff-name">${member.name || 'Unknown'}</div>
+                        <div class="sv-staff-type">${(member.employment_type || 'full time').replace('_', ' ')}</div>
+                    </div>`;
+                    teamList.appendChild(card);
+
+                    // ---- Timeline row ----
+                    const row = document.createElement('div');
+                    row.className = 'sv-row-container';
+
+                    // Small avatar column at row start
+                    const avatarCol = document.createElement('div');
+                    avatarCol.className = 'sv-row-avatar-col';
+                    avatarCol.innerHTML = `<div class="sv-row-avatar">${initials}</div>`;
+                    row.appendChild(avatarCol);
+
+                    // 7 day cells
+                    const daysDiv = document.createElement('div');
+                    daysDiv.className = 'sv-row-days';
+
+                    for (let i = 0; i < 7; i++) {
+                        const day = new Date(weekStart);
+                        day.setDate(day.getDate() + i);
+                        const dayStr = localISODate(day);
+                        const key = `${member.id}__${dayStr}`;
+
+                        const cell = document.createElement('div');
+                        cell.className = 'sv-day-cell' + (isToday(day) ? ' sv-today-cell' : '');
+
+                        const cellShifts = shiftMap[key] || [];
+                        cellShifts.forEach(sh => {
+                            const isFilled = !!sh.staff_id;
+                            const block = document.createElement('div');
+                            block.className = 'sv-shift-block day-shift-item' + (!isFilled ? ' sv-unfilled' : '');
+                            block.style.cursor = 'pointer';
+
+                            // Edit Modal Bindings Payload
+                            block.dataset.id = sh.id || '';
+                            block.dataset.client = sh.client_id || '';
+                            block.dataset.property = sh.property_id || '';
+                            block.dataset.location = sh.location_name || '';
+                            block.dataset.address = sh.location_address || '';
+                            block.dataset.date = sh.start_date || '';
+                            block.dataset.start = sh.start_time_raw || '';
+                            block.dataset.end = sh.end_time_raw || '';
+                            block.dataset.staff = sh.staff_id || '';
+                            block.dataset.type = sh.shift_type_raw || '';
+                            block.dataset.care = sh.care_type_id || '';
+                            block.dataset.assignment = sh.assignment || '';
+                            block.dataset.notes = sh.notes || '';
+                            block.dataset.tasks = sh.tasks || '';
+
+                            const st = sh.start_time ? sh.start_time.substring(0, 5) : '?';
+                            const et = sh.end_time ? sh.end_time.substring(0, 5) : '?';
+                            const label = sh.location || sh.shift_type || 'Shift';
+                            block.innerHTML = `<div class="sv-shift-time">${st} - ${et}</div>
+                                           <div class="sv-shift-label">${label}</div>`;
+                            cell.appendChild(block);
+                        });
+
+                        daysDiv.appendChild(cell);
+                    }
+
+                    row.appendChild(daysDiv);
+                    rowsContainer.appendChild(row);
+                });
+            }
+
+            // ---------- Fetch & load ----------
+            function loadWeek(weekStart) {
+                loadingEl.classList.add('sv-active');
+                renderHeader(weekStart);
+
+                const dateParam = localISODate(weekStart);
+                fetch(`{{ url('/roster/schedule-shift/weekly-data') }}?week=${dateParam}`, {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(r => r.json())
+                    .then(data => {
+                        loadingEl.classList.remove('sv-active');
+                        renderRows(data.staff || [], data.shifts || [], weekStart);
+                    })
+                    .catch(err => {
+                        loadingEl.classList.remove('sv-active');
+                        console.error('Split view fetch error:', err);
+                        rowsContainer.innerHTML = '<div class="sv-empty-state"><i class="bx bx-error-circle"></i><span>Failed to load data. Check console.</span></div>';
+                    });
+            }
+
+            // ---------- Tab trigger ----------
+            let loaded = false;
+            splitTab.addEventListener('click', function() {
+                if (!loaded) {
+                    loaded = true;
+                    loadWeek(currentWeekStart);
+                }
+            });
+
+            // ---------- Navigation ----------
+            if (btnPrev) btnPrev.addEventListener('click', function() {
+                currentWeekStart.setDate(currentWeekStart.getDate() - 7);
+                loaded = true; // mark loaded so navigation always works
+                loadWeek(currentWeekStart);
+            });
+
+            if (btnNext) btnNext.addEventListener('click', function() {
+                currentWeekStart.setDate(currentWeekStart.getDate() + 7);
+                loaded = true;
+                loadWeek(currentWeekStart);
+            });
+
+            if (btnToday) btnToday.addEventListener('click', function() {
+                currentWeekStart = startOfWeek(new Date());
+                loaded = true;
+                loadWeek(currentWeekStart);
+            });
+
+        })();
+
+        $(document).ready(function() {
+            fetchData();
+            load90DaysData();
+        });
+
+        function fetchData() {
+            $.ajax({
+                url: '{{ route("roster.scheduleShiftByGroup") }}',
+                type: 'GET',
+                success: function(response) {
+
+                    let html = '';
+
+                    response.forEach(function(user) {
+
+                        // ✅ Skip user if no shifts
+                        if (!user.shifts || user.shifts.length === 0) {
+                            return; // continue to next user
+                        }
+
+                        let totalHours = 0;
+
+                        user.shifts.forEach(function(shift) {
+                            totalHours += parseFloat(shift.total_hours ?? 0);
+                        });
+
+                        html += `
+                <div class="byGroupContent">
+                    <div class="workHoursHeader">
+                        <div class="title radIconClr">
+                            ${user.name}
+                        </div>
+                        <div class="actions">
+                            ${user.shifts.length} shifts
+                            <div class="roundBtntag radShowbtn">
+                                ${totalHours}h
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="recent-activity sectionWhiteBgAllUse">
+            `;
+
+                        user.shifts.forEach(function(shift) {
+
+                            html += `
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class='bx bx-apps'></i>
+                        </div>
+
+                        <div class="activity-content">
+                            <div class="activity-title">
+                                ${shift.client_name ?? 'Unknown'}
+                            </div>
+
+                            <div class="activity-description">
+                                <i class='bx bx-clock-4'></i>
+                                ${shift.start_time} - ${shift.end_time}
+                            </div>
+
+                            <div class="activity-time">
+                                <i class='bx bx-calendar'></i>
+                                ${shift.shift_date}
+                            </div>
+
+                            <div class="inactive roundTag">
+                                ${shift.shift_type ?? ''}
+                            </div>
+
+                            <div class="planActions" style="display:flex; gap: 8px;">
+                                <button class="day-shift-item" style="border: 1px solid #d1d5db; border-radius: 4px; padding: 4px 8px; background: transparent; cursor: pointer;"
+                                    data-id="${shift.id || ''}"
+                                    data-client="${shift.client_id || ''}"
+                                    data-property="${shift.property_id || ''}"
+                                    data-location="${shift.location_name || ''}"
+                                    data-address="${shift.location_address || ''}"
+                                    data-date="${shift.start_date || ''}"
+                                    data-start="${shift.start_time_raw || ''}"
+                                    data-end="${shift.end_time_raw || ''}"
+                                    data-staff="${shift.staff_id || ''}"
+                                    data-type="${shift.shift_type_raw || ''}"
+                                    data-care="${shift.care_type_id || ''}"
+                                    data-assignment="${shift.assignment || ''}"
+                                    data-notes="${shift.notes || ''}"
+                                    data-tasks="${shift.tasks || ''}">
+                                    <i class="bx bx-edit"></i> Edit
+                                </button>
+
+                                <button class="danger delete" style="border: 1px solid #ef4444; color: #ef4444; border-radius: 4px; padding: 4px 8px; background: transparent; cursor: pointer;" data-id="${shift.id}">
+                                    <i class="bx bx-trash"></i> Delete
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="roundBtntag greenShowbtn">
+                            ${shift.status ?? 'unfilled'}
+                        </div>
+                    </div>
+                `;
+                        });
+
+                        html += `
+                    </div>
+                </div>
+            `;
+                    });
+
+                    $('#bygroup').html(html);
+                }
+            });
+        }
+
+        function load90DaysData(date = null) {
+
+            fetch(`/roster/90-days-data?date=${date ?? ''}`)
+                .then(response => response.json())
+                .then(data => {
+
+                    // SUMMARY
+                    document.getElementById('totalShifts').innerText = data.summary.total;
+                    document.getElementById('filledShifts').innerText = data.summary.filled;
+                    document.getElementById('unfilledShifts').innerText = data.summary.unfilled;
+                    document.getElementById('fillRate').innerText = data.summary.fill_rate + '%';
+
+                    // WEEKLY
+                    let container = document.getElementById('weeklyContainer');
+                    container.innerHTML = '';
+
+                    data.weekly.forEach(week => {
+
+                        let badgeClass = week.fill_rate === 100 ?
+                            'greenShowbtn' :
+                            'radShowbtn';
+
+                        container.innerHTML += `
+                <div class="planCard">
+                    <div class="planTop">
+                        <div class="planTitle">
+                            Week: ${formatDate(week.week_start)} - ${formatDate(week.week_end)}
+                        </div>
+                        <div class="planActions">
+                            <span class="roundBtntag ${badgeClass}">
+                                ${week.fill_rate}% Filled
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="planMeta totalShiftsCounter">
+                        <div class="rota_dash-left">
+                            Total Shifts
+                            <h2 class="rota_count">${week.total}</h2>
+                        </div>
+                        <div class="rota_dash-left">
+                            Filled
+                            <h2 class="rota_count greenText">${week.filled}</h2>
+                        </div>
+                        <div class="rota_dash-left">
+                            Unfilled
+                            <h2 class="rota_count orangeText">${week.unfilled}</h2>
+                        </div>
+                        <div class="rota_dash-left">
+                            Completed
+                            <h2 class="rota_count blueText">${week.completed}</h2>
+                        </div>
+                    </div>
+
+                    <div class="progressBar">
+                        <div class="progressFill" style="width:${week.fill_rate}%"></div>
+                    </div>
+                </div>
+            `;
+                    });
+
+                });
+        }
+
+        function formatDate(dateStr) {
+            let date = new Date(dateStr);
+            return date.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric'
+            });
+        }
+
+        // Load on page start
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var calendarEl = document.getElementById('monthCalendar');
+
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                schedulerLicenseKey: 'GPL-My-Project-Is-Open-Source',
+                initialView: 'dayGridMonth',
+                headerToolbar: false, // We'll build our own controls
+                dayMaxEvents: 3, // Shows "+X more" if more than 3
+
+                events: function(fetchInfo, successCallback, failureCallback) {
+                    $.ajax({
+                        url: "{{ route('get.monthly.shifts') }}",
+                        type: "GET",
+                        data: {
+                            start: fetchInfo.startStr,
+                            end: fetchInfo.endStr
+                        },
+                        success: function(response) {
+                            successCallback(response);
+                        },
+                        error: function() {
+                            failureCallback();
+                        }
+                    });
+                },
+
+                loading: function(isLoading) {
+                    if (isLoading) {
+                        document.getElementById('monthDateDisplay').innerText = 'Loading Events...';
+                    }
+                },
+
+                datesSet: function(info) {
+                    // Update our custom header string
+                    let monthNameDate = info.view.currentStart;
+                    let monthStr = monthNameDate.toLocaleString('default', {
+                        month: 'long',
+                        year: 'numeric'
+                    });
+                    document.getElementById('monthDateDisplay').innerText = monthStr;
+                },
+
+                eventContent: function(arg) {
+                    let ev = arg.event;
+                    let timeStr = ev.title; // We send the formatted time as the title from PHP
+                    let status = ev.extendedProps.status; // from PHP
+                    let isUnfilled = status === 'unfilled';
+
+                    // Pick an icon badge string
+                    let iconStr = isUnfilled ? '!' : '✓';
+
+                    return {
+                        html: `<div style="background:${ev.backgroundColor};color:#fff;border-radius:4px;padding:3px 6px;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:space-between;width:100%;text-overflow:ellipsis;overflow:hidden;white-space:nowrap;cursor:pointer;">
+                            <span>${timeStr}</span>
+                            <span>${iconStr}</span>
+                        </div>`
+                    };
+                },
+
+                eventClick: function(arg) {
+                    let props = arg.event.extendedProps;
+
+                    const shiftId = props.shift_id;
+                    const client = props.client_id;
+                    const date = props.start_date;
+                    const start = props.start_time_raw;
+                    const end = props.end_time_raw;
+                    const staff = props.staff_id;
+                    const type = props.shift_type_raw;
+                    const property = props.property_id;
+                    const locationName = props.location_name;
+                    const locationAddress = props.location_address;
+                    const careType = props.care_type;
+                    const assignment = props.assignment;
+                    const notes = props.notes;
+                    const tasks = props.tasks;
+
+                    const form = $('#createShiftForm');
+
+                    // Change form action to update
+                    let updateUrl = '{{ url("roster/schedule-shift/update") }}/' + shiftId;
+                    form.attr('action', updateUrl);
+                    form.closest('.modal-content').find('.modal-title').text('Edit Shift');
+                    form.find('button[type="submit"]').html('Update Shift');
+
+                    // Populate fields
+                    if (client) {
+                        form.find('[name="client_id"]').val(client).trigger('change');
+                    } else {
+                        form.find('[name="client_id"]').val('').trigger('change');
+                    }
+                    form.find('[name="start_date"]').val(date);
+                    form.find('[name="start_time"]').val(start);
+                    form.find('[name="end_time"]').val(end);
+
+                    if (staff) {
+                        form.find('[name="carer_id"]').val(staff).trigger('change');
+                    } else {
+                        form.find('[name="carer_id"]').val('').trigger('change');
+                    }
+
+                    form.find('[name="shift_type"]').val(type).trigger('change');
+                    if (property) form.find('[name="property_id"]').val(property).trigger('change');
+                    form.find('[name="location_name"]').val(locationName || '');
+                    form.find('[name="location_address"]').val(locationAddress || '');
+
+                    if (careType) {
+                        form.find('[name="care_type"]').val(careType).trigger('change');
+                    }
+
+                    if (assignment) {
+                        form.find('[name="assignment"]').val(assignment).trigger('change');
+                        let assignLower = assignment.toLowerCase();
+                        if (assignLower === 'location') $('#locationTab').click();
+                        else if (assignLower === 'client') $('#clientTab').click();
+                        else if (assignLower === 'property') $('#propertyTab').click();
+                    } else {
+                        form.find('[name="assignment"]').val('Client').trigger('change');
+                        $('#clientTab').click();
+                    }
+
+                    form.find('[name="notes"]').val(notes || '');
+
+                    if (tasks) {
+                        form.find('[name="tasks"]').val(tasks).trigger('change');
+                    } else {
+                        form.find('[name="tasks"]').val('').trigger('change');
+                    }
+
+                    $('#addShiftModal').modal('show');
+                }
+            });
+
+            calendar.render();
+
+            // Setup a ResizeObserver so whenever the user clicks the "Month" tab and this div 
+            // becomes visible (display changes from none to block), the calendar instantly resizes and renders.
+            if (window.ResizeObserver) {
+                new ResizeObserver(function() {
+                    calendar.updateSize();
+                }).observe(calendarEl);
+            }
+
+            // Bind our custom Header Controls
+            $('#monthPrevBtn').click(function() {
+                calendar.prev();
+            });
+            $('#monthNextBtn').click(function() {
+                calendar.next();
+            });
+            $('#monthTodayBtn').click(function() {
+                calendar.today();
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let dayCursor = new Date(); // tracks the day being viewed
+
+            function loadDayShifts() {
+                // Ensure correct local date string "YYYY-MM-DD"
+                let targetDate = dayCursor.getFullYear() + "-" + String(dayCursor.getMonth() + 1).padStart(2, '0') + "-" + String(dayCursor.getDate()).padStart(2, '0');
+                let baseUrl = document.querySelector('meta[name="base-url"]').getAttribute('content');
+
+                $('#dayShiftsList').html('<div style="text-align:center;padding:24px;color:#9ca3af;">Loading shifts...</div>');
+
+                $.ajax({
+                    url: baseUrl + '/roster/carer/shifts/day?date=' + targetDate,
+                    type: 'GET',
+                    success: function(res) {
+                        $('#dayDateDisplay').text(res.date);
+                        $('#dayShiftsCount').text(res.total + (res.total === 1 ? ' shift scheduled' : ' shifts scheduled'));
+
+                        let html = '';
+                        if (res.shifts.length === 0) {
+                            html = '<div style="background:#fff;border-radius:8px;border:1px solid #e5e7eb;padding:32px;text-align:center;color:#6b7280;font-size:14px;">No shifts scheduled for this day.</div>';
+                        } else {
+                            res.shifts.forEach(function(shift) {
+                                html += `
+                                <div class="day-shift-item" style="background:#fff;border-radius:8px;border:1px solid #e5e7eb;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.02);cursor:pointer;transition:all 0.2s;" onmouseover="this.style.boxShadow='0 4px 6px -1px rgba(0,0,0,0.1)'" onmouseout="this.style.boxShadow='0 1px 3px rgba(0,0,0,0.02)'"
+                                    data-id="${shift.id}"
+                                    data-client="${shift.client_id || ''}"
+                                    data-property="${shift.property_id || ''}"
+                                    data-location="${shift.location_name || ''}"
+                                    data-address="${shift.location_address || ''}"
+                                    data-date="${shift.start_date || ''}"
+                                    data-start="${shift.start_time_raw || ''}"
+                                    data-end="${shift.end_time_raw || ''}"
+                                    data-staff="${shift.staff_id || ''}"
+                                    data-type="${shift.shift_type_raw || ''}"
+                                    data-care="${shift.care_type || ''}"
+                                    data-assignment="${shift.assignment || ''}"
+                                    data-notes="${shift.notes || ''}"
+                                    data-tasks="${shift.tasks || ''}">
+                                    <div style="display:flex;gap:8px;margin-bottom:12px;">
+                                        <span style="background:#f3e8ff;color:#9333ea;padding:4px 8px;border-radius:6px;font-size:12px;font-weight:600;">scheduled</span>
+                                        <span style="border:1px solid #e5e7eb;color:#374151;padding:4px 8px;border-radius:6px;font-size:12px;font-weight:600;">${shift.shift_type}</span>
+                                    </div>
+                                    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+                                        <div style="display:flex;align-items:center;gap:6px;font-weight:600;color:#111827;font-size:14px;min-width:180px;">
+                                            <i class="bx bx-time" style="color:#6b7280;font-size:16px;"></i>
+                                            ${shift.start_time} - ${shift.end_time} <span style="color:#9ca3af;font-weight:normal;">(${shift.duration})</span>
+                                        </div>
+                                        <div style="display:flex;align-items:center;gap:6px;color:#374151;font-size:14px;min-width:150px;">
+                                            <i class="bx bx-user" style="color:#9ca3af;font-size:16px;"></i>
+                                            ${shift.staff_name}
+                                        </div>
+                                        <div style="display:flex;align-items:center;gap:6px;color:#374151;font-size:14px;min-width:150px;">
+                                            <i class="bx bx-map" style="color:#9ca3af;font-size:16px;"></i>
+                                            ${shift.client_name}
+                                        </div>
+                                    </div>
+                                </div>`;
+                            });
+                        }
+                        $('#dayShiftsList').html(html);
+                    },
+                    error: function() {
+                        $('#dayShiftsList').html('<div style="text-align:center;padding:24px;color:#ef4444;">Failed to load shifts. Please try again.</div>');
+                    }
+                });
+            }
+
+            // Bind click events
+            $('#dayPrevBtn').click(function() {
+                dayCursor.setDate(dayCursor.getDate() - 1);
+                loadDayShifts();
+            });
+
+            $('#dayNextBtn').click(function() {
+                dayCursor.setDate(dayCursor.getDate() + 1);
+                loadDayShifts();
+            });
+
+            $('#dayTodayBtn').click(function() {
+                dayCursor = new Date();
+                loadDayShifts();
+            });
+
+            // If the user clicks "Day" view tab from header, fetch data on demand or immediately
+            $('#btnDay').click(function() {
+                loadDayShifts();
+            });
+
+            // Initiate first load
+            loadDayShifts();
+
+            // Handle edit modal opening
+            $(document).on('click', '.day-shift-item', function() {
+                const shiftId = $(this).data('id');
+                const client = $(this).data('client');
+                const date = $(this).data('date');
+                const start = $(this).data('start');
+                const end = $(this).data('end');
+                const staff = $(this).data('staff');
+                const type = $(this).data('type');
+                const property = $(this).data('property');
+                const locationName = $(this).data('location');
+                const locationAddress = $(this).data('address');
+                const careType = $(this).data('care');
+                const assignment = $(this).data('assignment');
+                const notes = $(this).data('notes');
+                const tasks = $(this).data('tasks');
+
+                const form = $('#createShiftForm');
+
+                // Change form action to update
+                form.attr('action', '{{ url("roster/schedule-shift/update") }}/' + shiftId);
+                form.closest('.modal-content').find('.modal-title').text('Edit Shift');
+                form.find('button[type="submit"]').html('Update Shift');
+
+                // Populate fields
+                form.find('[name="client_id"]').val(client).trigger('change');
+                form.find('[name="start_date"]').val(date);
+                form.find('[name="start_time"]').val(start);
+                form.find('[name="end_time"]').val(end);
+
+                // Handle optional/empty selects
+                if (staff) {
+                    form.find('[name="carer_id"]').val(staff).trigger('change');
+                } else {
+                    form.find('[name="carer_id"]').val('').trigger('change');
+                }
+
+                form.find('[name="shift_type"]').val(type).trigger('change');
+                form.find('[name="property_id"]').val(property).trigger('change');
+                form.find('[name="location_name"]').val(locationName);
+                form.find('[name="location_address"]').val(locationAddress);
+
+                if (careType) {
+                    form.find('[name="care_type"]').val(careType).trigger('change');
+                }
+                if (assignment) {
+                    form.find('[name="assignment"]').val(assignment).trigger('change');
+                    let assignLower = assignment.toLowerCase();
+                    if (assignLower === 'location') $('#locationTab').click();
+                    else if (assignLower === 'client') $('#clientTab').click();
+                    else if (assignLower === 'property') $('#propertyTab').click();
+                } else {
+                    form.find('[name="assignment"]').val('Client').trigger('change');
+                    $('#clientTab').click();
+                }
+                form.find('[name="notes"]').val(notes);
+
+                if (tasks) {
+                    form.find('[name="tasks"]').val(tasks).trigger('change');
+                } else {
+                    form.find('[name="tasks"]').val('').trigger('change');
+                }
+
+                $('#addShiftModal').modal('show');
+            });
+
+            // Handle delete shift
+            $(document).on('click', '.delete', function(e) {
+                e.preventDefault();
+                const shiftId = $(this).data('id');
+                const baseUrl = document.querySelector('meta[name="base-url"]').getAttribute('content');
+
+                if (confirm('Are you sure you want to delete this shift?')) {
+                    $.ajax({
+                        url: baseUrl + '/roster/schedule-shift/delete/' + shiftId,
+                        type: 'DELETE',
+                        data: {
+                            _token: $('meta[name="csrf-token"]').attr('content')
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                window.location.reload();
+                            } else {
+                                alert(response.message || 'Error deleting shift.');
+                            }
+                        },
+                        error: function() {
+                            alert('An error occurred while deleting the shift.');
+                        }
+                    });
+                }
+            });
+
+            // Reset modal attributes when closed so "Add Shift" works correctly
+            $('#addShiftModal').on('hidden.bs.modal', function() {
+                const form = $('#createShiftForm');
+
+                // Ensure action defaults to store
+                form.attr('action', '{{ route("roster.schedule.store") }}');
+                form.closest('.modal-content').find('.modal-title').text('Create New Shift');
+                form.find('button[type="submit"]').html('Create Shift');
+
+                // Reset form fields
+                form[0].reset();
+                form.find('select').val('').trigger('change');
+            });
+
+            // --- WEEK VIEW LOGIC ---
+            let weekCursor = new Date();
+
+            function loadWeekShifts() {
+                let targetDate = weekCursor.getFullYear() + "-" + String(weekCursor.getMonth() + 1).padStart(2, '0') + "-" + String(weekCursor.getDate()).padStart(2, '0');
+                let baseUrl = document.querySelector('meta[name="base-url"]').getAttribute('content');
+
+                $('#weekShiftsList').html('<div style="grid-column: span 7;text-align:center;padding:24px;color:#9ca3af;">Loading week data...</div>');
+
+                $.ajax({
+                    url: baseUrl + '/roster/carer/shifts/week?date=' + targetDate,
+                    type: 'GET',
+                    success: function(res) {
+                        $('#weekDateDisplay').text(res.week_label);
+
+                        let html = '';
+                        res.days.forEach(function(day) {
+                            let colStyle = 'background:#fafafa;border-radius:12px;border:1px solid #e5e7eb;min-width:160px;display:flex;flex-direction:column;';
+                            if (day.is_today) {
+                                colStyle = 'background:#f0f9ff;border-radius:12px;border:2px solid #3b82f6;min-width:160px;display:flex;flex-direction:column;box-shadow:0 0 0 1px rgba(59,130,246,0.2) inset;';
+                            }
+
+                            let todayBadge = day.is_today ? '<div style="background:#3b82f6;color:#fff;font-size:11px;padding:2px 8px;border-radius:12px;display:inline-block;margin-top:4px;">Today</div>' : '';
+                            let dayTitleColor = day.is_today ? '#3b82f6' : '#111827';
+
+                            html += `<div style="${colStyle}">
+                                <!-- Column Header -->
+                                <div style="padding:16px 16px 12px;border-bottom:1px solid #e5e7eb;background:transparent;">
+                                    <div style="font-size:14px;color:#6b7280;font-weight:600;">${day.day_name}</div>
+                                    <div style="font-size:24px;font-weight:700;color:${dayTitleColor};line-height:1.2;">${day.day_number}</div>
+                                    ${todayBadge}
+                                </div>
+                                <!-- Shifts Container -->
+                                <div style="padding:10px;flex:1;display:flex;flex-direction:column;gap:8px;">`;
+
+                            if (day.shifts.length === 0) {
+                                html += `<div style="text-align:center;color:#d1d5db;font-size:12px;padding:12px 0;"></div>`;
+                            } else {
+                                day.shifts.forEach(function(shift) {
+                                    html += `
+                                    <div class="day-shift-item" style="border:1px solid #e5e7eb;border-radius:8px;padding:10px;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,0.02);cursor:pointer;transition:all 0.2s;" onmouseover="this.style.boxShadow='0 4px 6px -1px rgba(0,0,0,0.1)'" onmouseout="this.style.boxShadow='0 1px 2px rgba(0,0,0,0.02)'"
+                                        data-id="${shift.id}"
+                                        data-client="${shift.client_id || ''}"
+                                        data-property="${shift.property_id || ''}"
+                                        data-location="${shift.location_name || ''}"
+                                        data-address="${shift.location_address || ''}"
+                                        data-date="${shift.start_date || ''}"
+                                        data-start="${shift.start_time_raw || ''}"
+                                        data-end="${shift.end_time_raw || ''}"
+                                        data-staff="${shift.staff_id || ''}"
+                                        data-type="${shift.shift_type_raw || ''}"
+                                        data-care="${shift.care_type || ''}"
+                                        data-assignment="${shift.assignment || ''}"
+                                        data-notes="${shift.notes || ''}"
+                                        data-tasks="${shift.tasks || ''}">
+                                        <div style="display:flex;align-items:center;gap:6px;font-weight:600;color:#1f2937;font-size:13px;margin-bottom:6px;">
+                                            <span style="width:6px;height:6px;background:#3b82f6;border-radius:50%;"></span>
+                                            ${shift.start_time}
+                                        </div>
+                                        <div style="display:flex;align-items:center;gap:4px;color:#6b7280;font-size:12px;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                                            <i class="bx bx-user" style="color:#9ca3af;"></i> ${shift.staff_name}
+                                        </div>
+                                        <div style="display:flex;align-items:center;gap:4px;color:#6b7280;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                                            <i class="bx bx-right-arrow-alt" style="color:#9ca3af;"></i> ${shift.client_name}
+                                        </div>
+                                    </div>`;
+                                });
+                            }
+
+                            html += `</div></div>`;
+                        });
+                        $('#weekShiftsList').html(html);
+                    },
+                    error: function() {
+                        $('#weekShiftsList').html('<div style="grid-column: span 7;text-align:center;padding:24px;color:#ef4444;">Failed to load week data.</div>');
+                    }
+                });
+            }
+
+            // Bind click events for Week View
+            $('#weekPrevBtn').click(function() {
+                weekCursor.setDate(weekCursor.getDate() - 7);
+                loadWeekShifts();
+            });
+
+            $('#weekNextBtn').click(function() {
+                weekCursor.setDate(weekCursor.getDate() + 7);
+                loadWeekShifts();
+            });
+
+            $('#weekTodayBtn').click(function() {
+                weekCursor = new Date();
+                loadWeekShifts();
+            });
+
+            // If the user clicks "Week" view tab from header
+            $('#btnWeek').click(function() {
+                loadWeekShifts();
+            });
+
+            // Initiate first load for week
+            loadWeekShifts();
+
+            // --- 90 DAYS OVERVIEW LOGIC ---
+            let days90Cursor = new Date();
+
+            function load90DaysShifts() {
+                let targetDate = days90Cursor.getFullYear() + "-" + String(days90Cursor.getMonth() + 1).padStart(2, '0') + "-" + String(days90Cursor.getDate()).padStart(2, '0');
+                let baseUrl = document.querySelector('meta[name="base-url"]').getAttribute('content');
+
+                $('#weeklyContainer').html('<div style="text-align:center;padding:24px;color:#9ca3af;">Loading 90-day overview...</div>');
+
+                $.ajax({
+                    url: baseUrl + '/roster/carer/shifts/90days?date=' + targetDate,
+                    type: 'GET',
+                    success: function(res) {
+                        $('#days90 .full-date').text(res.overview_date);
+                        $('#days90 .day-text').text(res.overview_date.split(',')[0]);
+                        $('#totalShifts').text(res.summary.total);
+                        $('#filledShifts').text(res.summary.filled);
+                        $('#unfilledShifts').text(res.summary.unfilled);
+                        $('#fillRate').text(res.summary.fill_rate + '%');
+
+                        let html = '';
+                        html += `
+                            <div class="psHeader">
+                                <span class="psIcon"><i class="bx bx-trending-up"></i> </span>
+                                <span class="psTitle">Weekly Breakdown</span>
+                            </div>`;
+
+                        res.weeks.forEach(function(week) {
+                            let badgeClass = week.fill_rate === 100 ? 'greenShowbtn' : (week.fill_rate === 0 ? 'radShowbtn' : 'yllowShowbtn');
+                            let barColor = week.fill_rate === 100 ? '#22c55e' : (week.fill_rate === 0 ? '#ef4444' : '#eab308');
+
+                            html += `
+                            <div class="planCard" style="border-bottom: 3px solid ${barColor};">
+                                <div class="planTop">
+                                    <div class="planTitle" style="font-weight: 600; color: #1f2937;">
+                                        ${week.label}
+                                    </div>
+                                    <div class="planActions">
+                                        <span class="roundBtntag ${badgeClass}">${week.fill_rate}% Filled</span>
+                                    </div>
+                                </div>
+
+                                <div class="planMeta totalShiftsCounter" style="display:flex; justify-content:space-between; text-align:left; border-top: 1px solid #e5e7eb; padding-top: 12px; margin-top: 12px;">
+                                    <div class="rota_dash-left">
+                                        <p style="margin:0 0 4px 0; font-size:12px; color:#6b7280; font-weight:500;">Total Shifts</p>
+                                        <h2 class="rota_count" style="margin:0; font-size:18px; font-weight:700; color:#111827;">${week.total}</h2>
+                                    </div>
+                                    <div class="rota_dash-left">
+                                        <p style="margin:0 0 4px 0; font-size:12px; color:#6b7280; font-weight:500;">Filled</p>
+                                        <h2 class="rota_count" style="margin:0; font-size:18px; font-weight:700; color:#22c55e;">${week.filled}</h2>
+                                    </div>
+                                    <div class="rota_dash-left">
+                                        <p style="margin:0 0 4px 0; font-size:12px; color:#6b7280; font-weight:500;">Unfilled</p>
+                                        <h2 class="rota_count" style="margin:0; font-size:18px; font-weight:700; color:#ef4444;">${week.unfilled}</h2>
+                                    </div>
+                                    <div class="rota_dash-left">
+                                        <p style="margin:0 0 4px 0; font-size:12px; color:#6b7280; font-weight:500;">Completed</p>
+                                        <h2 class="rota_count" style="margin:0; font-size:18px; font-weight:700; color:#3b82f6;">${week.completed}</h2>
+                                    </div>
+                                </div>
+                            </div>`;
+                        });
+
+                        $('#weeklyContainer').html(html);
+                    },
+                    error: function() {
+                        $('#weeklyContainer').html('<div style="text-align:center;padding:24px;color:#ef4444;">Failed to load 90-day overview data.</div>');
+                    }
+                });
+            }
+
+            $('#days90 .prev-btn').click(function() {
+                days90Cursor.setDate(days90Cursor.getDate() - 90);
+                load90DaysShifts();
+            });
+
+            $('#days90 .next-btn').click(function() {
+                days90Cursor.setDate(days90Cursor.getDate() + 90);
+                load90DaysShifts();
+            });
+
+            $('#days90 .datechangeBtnTodayOrNext .btn.borderBtn').click(function() {
+                days90Cursor = new Date();
+                load90DaysShifts();
+            });
+
+            $('[data-tab="days90"]').click(function() {
+                load90DaysShifts();
+            });
+
+            load90DaysShifts();
         });
     </script>
 

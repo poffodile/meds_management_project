@@ -176,7 +176,7 @@
 
                 <div class="logo-text">
 
-                  <a href="{{url('/')}}">
+                  <a href="{{url('/roster')}}">
                     <h3>SCI<span>TS</span></h3>
                   </a>
 

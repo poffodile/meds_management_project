@@ -1,117 +1,117 @@
 
 var protocol = $(location).attr('protocol');
 var hostname = $(location).attr('hostname');
-var path     = protocol+'//'+hostname;
-var host     = path+'/socialcareitsolutions/';
+var path = protocol + '//' + hostname;
+var host = path + '/socialcareitsolutions/';
 
 //admin user  account
 $('#add_user_form').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "name": 
+        "name":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 2,
                     max: 30,
                     message: 'Name must between 2 to 30 alphabets'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z ]+$/,
                     message: 'Name can only consist of alphabets'
                 }
             }
         },
-        "user_name": 
+        "user_name":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 2,
                     max: 30,
                     message: 'User Name must between 2 to 30 characters'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9,_,@,# ]+$/,
                     message: 'User Name can only consist of alphanumeric characters'
                 },
-                remote: 
+                remote:
                 {
-                   message: 'User Name already exists',
-                   url: 'check_username_unique',
-                   type: 'GET',
-                   delay: 2000     // Send Ajax request every 2 seconds
+                    message: 'User Name already exists',
+                    url: 'check_username_unique',
+                    type: 'GET',
+                    delay: 2000     // Send Ajax request every 2 seconds
                 }
             }
         },
-        "email": 
+        "email":
         {
-            validators: 
+            validators:
             {
-               notEmpty: 
-               {
-                  message: 'This field is required'
-               },
-               emailAddress: 
-               {
-                  message: 'The value is not a valid email address'
-               },
-               regexp: 
-               {
-                  regexp: '^[^@\\s]+@([^@\\s]+\\.)+[^@\\s]+$',
-                  message: 'The value is not a valid email address'
-               }
-               // },
-               // remote: 
-               // {
-               //     message: 'Email already exists',
-               //     url: 'check-user-email-exists',
-               //     type: 'GET',
-               //     delay: 2000     // Send Ajax request every 2 seconds
-               // }
+                notEmpty:
+                {
+                    message: 'This field is required'
+                },
+                emailAddress:
+                {
+                    message: 'The value is not a valid email address'
+                },
+                regexp:
+                {
+                    regexp: '^[^@\\s]+@([^@\\s]+\\.)+[^@\\s]+$',
+                    message: 'The value is not a valid email address'
+                }
+                // },
+                // remote: 
+                // {
+                //     message: 'Email already exists',
+                //     url: 'check-user-email-exists',
+                //     type: 'GET',
+                //     delay: 2000     // Send Ajax request every 2 seconds
+                // }
             }
         },
-        "job_title": 
+        "job_title":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 2,
                     max: 30,
                     message: 'This field must between 2 to 30 characters'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: "This field can only consist of 'A-Z,a-z,0-9 &-' characters"
@@ -133,79 +133,79 @@ $('#add_user_form').formValidation({
         //         message: 'This field can only consist of alphanumeric characters'
         //     }
         // },
-        "phone_no": 
+        "phone_no":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
                     message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 8,
                     // max: 13,
                     message: 'Phone number must contain atleast 8 digits'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[0-9 +]+$/,
                     message: 'Phone number can only consist of digits'
                 }
             }
         },
-        "description": 
+        "description":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'This field can only consist of characters'
                 }
             }
         },
-        "payroll": 
+        "payroll":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'This field can only consist of alphanumeric characters'
                 }
             }
         },
-        "holiday_entitlement": 
+        "holiday_entitlement":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'This field can only consist of alphanumeric characters'
                 }
             }
         },
-        "status": 
+        "status":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 }
             }
         },
@@ -220,16 +220,16 @@ $('#add_user_form').formValidation({
 
             }
         },
-        "date_of_leaving":
-        {
-            validators:
-            {
-                notEmpty:
-                {
-                    message: 'This field is required'
-                }
-            }
-        },
+        // "date_of_leaving":
+        // {
+        //     validators:
+        //     {
+        //         notEmpty:
+        //         {
+        //             message: 'This field is required'
+        //         }
+        //     }
+        // },
         "current_location":
         {
             validators:
@@ -269,42 +269,42 @@ $('#add_user_form').formValidation({
                   message: 'This field is required'
                 }
             }
-        }  */              
+        }  */
 
-    }  
+    }
 });
 
 $('#edit_user_form').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "name": 
+        "name":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 2,
                     max: 30,
                     message: 'Name must between 2 to 30 alphabets'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z ]+$/,
                     message: 'Name can only consist of alphabets'
@@ -339,23 +339,23 @@ $('#edit_user_form').formValidation({
         //         }
         //     }
         // },
-        "email": 
+        "email":
         {
-            validators: 
+            validators:
             {
-               notEmpty: 
-               {
-                  message: 'This field is required'
-               },
-               emailAddress: 
-               {
-                  message: 'The value is not a valid email address'
-               },
-               regexp: 
-               {
-                  regexp: '^[^@\\s]+@([^@\\s]+\\.)+[^@\\s]+$',
-                  message: 'The value is not a valid email address'
-               }/*,
+                notEmpty:
+                {
+                    message: 'This field is required'
+                },
+                emailAddress:
+                {
+                    message: 'The value is not a valid email address'
+                },
+                regexp:
+                {
+                    regexp: '^[^@\\s]+@([^@\\s]+\\.)+[^@\\s]+$',
+                    message: 'The value is not a valid email address'
+                }/*,
                remote: 
                {
                    message: 'Email already exists',
@@ -365,123 +365,123 @@ $('#edit_user_form').formValidation({
                }*/
             }
         },
-        "job_title": 
+        "job_title":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 2,
                     max: 30,
                     message: 'This field must between 2 to 30 characters'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'This field can only consist of characters'
                 }
             }
         },
-        "access_level": 
+        "access_level":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'This field can only consist of alphanumeric characters'
                 }
             }
         },
-        "phone_no": 
+        "phone_no":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
                     message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 8,
                     // max: 13,
                     message: 'Phone number must contain atleast 8 digits'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[0-9 +]+$/,
                     message: 'Phone number can only consist of digits'
                 }
             }
         },
-        "description": 
+        "description":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 }
             },
-            regexp: 
+            regexp:
             {
                 regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                 message: 'This field can only consist of alphanumeric characters'
             }
         },
-        "payroll": 
+        "payroll":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 }
             },
-            regexp: 
+            regexp:
             {
                 regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                 message: 'This field can only consist of alphanumeric characters'
             }
         },
-        "holiday_entitlement": 
+        "holiday_entitlement":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 }
             },
-            regexp: 
+            regexp:
             {
                 regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                 message: 'This field can only consist of alphanumeric characters'
             },
-            stringLength: 
+            stringLength:
             {
                 min: 1,
                 max: 100,
                 message: 'This field can contain between 1 to 100 characters'
             }
         },
-        "status": 
+        "status":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 1,
                     max: 2,
@@ -497,19 +497,19 @@ $('#edit_user_form').formValidation({
                 {
                     message: 'This field is required'
                 },
-                
+
             }
         },
-        "date_of_leaving":
-        {
-            validators:
-            {
-                notEmpty:
-                {
-                    message: 'This field is required'
-                }
-            }
-        },
+        // "date_of_leaving":
+        // {
+        //     validators:
+        //     {
+        //         notEmpty:
+        //         {
+        //             message: 'This field is required'
+        //         }
+        //     }
+        // },
         "current_location":
         {
             validators:
@@ -550,7 +550,7 @@ $('#edit_user_form').formValidation({
                 }
             }
         }*/
-    }  
+    }
 });
 
 //admin agent Account
@@ -559,198 +559,198 @@ $('#add_agent_form').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "name": 
+        "name":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 2,
                     max: 30,
                     message: 'Name must between 2 to 30 alphabets'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z ]+$/,
                     message: 'Name can only consist of alphabets'
                 }
             }
         },
-        "user_name": 
+        "user_name":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 2,
                     max: 30,
                     message: 'User Name must between 2 to 30 characters'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9,_,@,# ]+$/,
                     message: 'User Name can only consist of alphanumeric characters'
                 },
-                remote: 
+                remote:
                 {
-                   message: 'User Name already exists',
-                   url: 'check_username_unique',
-                   type: 'GET',
-                   delay: 2000     // Send Ajax request every 2 seconds
+                    message: 'User Name already exists',
+                    url: 'check_username_unique',
+                    type: 'GET',
+                    delay: 2000     // Send Ajax request every 2 seconds
                 }
             }
         },
-        "email": 
+        "email":
         {
-            validators: 
+            validators:
             {
-               notEmpty: 
-               {
-                  message: 'This field is required'
-               },
-               emailAddress: 
-               {
-                  message: 'The value is not a valid email address'
-               },
-               regexp: 
-               {
-                  regexp: '^[^@\\s]+@([^@\\s]+\\.)+[^@\\s]+$',
-                  message: 'The value is not a valid email address'
-               }
-               // },
-               // remote: 
-               // {
-               //     message: 'Email already exists',
-               //     url: 'check-user-email-exists',
-               //     type: 'GET',
-               //     delay: 2000     // Send Ajax request every 2 seconds
-               // }
+                notEmpty:
+                {
+                    message: 'This field is required'
+                },
+                emailAddress:
+                {
+                    message: 'The value is not a valid email address'
+                },
+                regexp:
+                {
+                    regexp: '^[^@\\s]+@([^@\\s]+\\.)+[^@\\s]+$',
+                    message: 'The value is not a valid email address'
+                }
+                // },
+                // remote: 
+                // {
+                //     message: 'Email already exists',
+                //     url: 'check-user-email-exists',
+                //     type: 'GET',
+                //     delay: 2000     // Send Ajax request every 2 seconds
+                // }
             }
         },
-        "job_title": 
+        "job_title":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 2,
                     max: 30,
                     message: 'This field must between 2 to 30 characters'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: "This field can only consist of 'A-Z,a-z,0-9 &-' characters"
                 }
             }
         },
-        "home_id[]": 
+        "home_id[]":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 }
             },
         },
-        "phone_no": 
+        "phone_no":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
                     message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 8,
                     // max: 13,
                     message: 'Phone number must contain atleast 8 digits'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[0-9 +]+$/,
                     message: 'Phone number can only consist of digits'
                 }
             }
         },
-        "description": 
+        "description":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'This field can only consist of characters'
                 }
             }
         },
-        "payroll": 
+        "payroll":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'This field can only consist of alphanumeric characters'
                 }
             }
         },
-        "holiday_entitlement": 
+        "holiday_entitlement":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'This field can only consist of alphanumeric characters'
                 }
             }
         },
-        "status": 
+        "status":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 }
             }
         },
@@ -827,42 +827,42 @@ $('#add_agent_form').formValidation({
                   message: 'This field is required'
                 }
             }
-        }  */              
+        }  */
 
-    }  
+    }
 });
 
 $('#edit_agent_form').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "name": 
+        "name":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 2,
                     max: 30,
                     message: 'Name must between 2 to 30 alphabets'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z ]+$/,
                     message: 'Name can only consist of alphabets'
@@ -897,23 +897,23 @@ $('#edit_agent_form').formValidation({
         //         }
         //     }
         // },
-        "email": 
+        "email":
         {
-            validators: 
+            validators:
             {
-               notEmpty: 
-               {
-                  message: 'This field is required'
-               },
-               emailAddress: 
-               {
-                  message: 'The value is not a valid email address'
-               },
-               regexp: 
-               {
-                  regexp: '^[^@\\s]+@([^@\\s]+\\.)+[^@\\s]+$',
-                  message: 'The value is not a valid email address'
-               }/*,
+                notEmpty:
+                {
+                    message: 'This field is required'
+                },
+                emailAddress:
+                {
+                    message: 'The value is not a valid email address'
+                },
+                regexp:
+                {
+                    regexp: '^[^@\\s]+@([^@\\s]+\\.)+[^@\\s]+$',
+                    message: 'The value is not a valid email address'
+                }/*,
                remote: 
                {
                    message: 'Email already exists',
@@ -923,119 +923,119 @@ $('#edit_agent_form').formValidation({
                }*/
             }
         },
-        "job_title": 
+        "job_title":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 2,
                     max: 30,
                     message: 'This field must between 2 to 30 characters'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'This field can only consist of characters'
                 }
             }
         },
-        "home_id[]": 
+        "home_id[]":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
-                {
-                  message: 'This field is required'
-                },
-                
-            }
-        },
-        "phone_no": 
-        {
-            validators: 
-            {
-                notEmpty: 
+                notEmpty:
                 {
                     message: 'This field is required'
                 },
-                stringLength: 
+
+            }
+        },
+        "phone_no":
+        {
+            validators:
+            {
+                notEmpty:
+                {
+                    message: 'This field is required'
+                },
+                stringLength:
                 {
                     min: 8,
                     // max: 13,
                     message: 'Phone number must contain atleast 8 digits'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[0-9 +]+$/,
                     message: 'Phone number can only consist of digits'
                 }
             }
         },
-        "description": 
+        "description":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 }
             },
-            regexp: 
+            regexp:
             {
                 regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                 message: 'This field can only consist of alphanumeric characters'
             }
         },
-        "payroll": 
+        "payroll":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 }
             },
-            regexp: 
+            regexp:
             {
                 regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                 message: 'This field can only consist of alphanumeric characters'
             }
         },
-        "holiday_entitlement": 
+        "holiday_entitlement":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 }
             },
-            regexp: 
+            regexp:
             {
                 regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                 message: 'This field can only consist of alphanumeric characters'
             },
-            stringLength: 
+            stringLength:
             {
                 min: 1,
                 max: 100,
                 message: 'This field can contain between 1 to 100 characters'
             }
         },
-        "status": 
+        "status":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 1,
                     max: 2,
@@ -1051,7 +1051,7 @@ $('#edit_agent_form').formValidation({
                 {
                     message: 'This field is required'
                 },
-                
+
             }
         },
         "date_of_leaving":
@@ -1105,241 +1105,241 @@ $('#edit_agent_form').formValidation({
             }
         }*/
 
-    }  
+    }
 });
 /* Childs */
 $('#add_service_user_form').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "name": 
+        "name":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 2,
                     max: 30,
                     message: 'Name must between 2 to 30 alphabets'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z ]+$/,
                     message: 'Name can only consist of alphabets'
                 }
             }
         },
-        "user_name": 
+        "user_name":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 2,
                     max: 30,
                     message: 'Username must be between 2 to 30 characters'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9,_,@,# ]+$/,
                     message: 'User Name can only consist of alphanumeric characters'
                 },
-                remote: 
+                remote:
                 {
-                   message: 'User Name already exists',
-                   url: 'check_username_exists',
-                   type: 'GET',
-                   delay: 2000     // Send Ajax request every 2 seconds
+                    message: 'User Name already exists',
+                    url: 'check_username_exists',
+                    type: 'GET',
+                    delay: 2000     // Send Ajax request every 2 seconds
                 }
             }
-        },  
-        "admission_number": 
+        },
+        "admission_number":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 2,
                     max: 30,
                     message: 'This field must between 2 to 30 characters'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'Admission Number  can only consist of characters'
                 }
             }
         },
-         "section": 
+        "section":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
-                }   ,
-                stringLength: 
+                    message: 'This field is required'
+                },
+                stringLength:
                 {
                     min: 1,
                     max: 30,
                     message: 'This field must between 1 to 30 characters'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'Section Name can only consist of characters'
                 }
             }
         },
-        "local_authority": 
+        "local_authority":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
                 stringLength: {
                     min: 2,
                     max: 30,
                     message: 'This field must between 1 to 30 characters'
                 },
-                regexp: 
+                regexp:
                 {
-                   regexp: /^[A-Za-z]+$/,
+                    regexp: /^[A-Za-z]+$/,
                     message: 'Local Authority can only contain letters (A-Z or a-z)'
                 }
             }
         },
-        "height": 
+        "height":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 1,
                     max: 20,
                     message: 'This field must between 1 to 30 characters'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'Height  can only consist of characters'
                 }
             }
         },
-        "phone_no": 
+        "phone_no":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
                     message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 8,
                     // max: 13,
                     message: 'Phone number must contain atleast 8 digits'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[0-9 +]+$/,
                     message: 'Phone number can only consist of digits'
                 }
             }
         },
-        "mobile": 
+        "mobile":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
                     message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 8,
                     // max: 13,
                     message: 'Mobile No. must contain atleast 8 digits'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[0-9 +]+$/,
                     message: 'Mobile No can only consist of digits'
                 }
             }
         },
-        "email": 
+        "email":
         {
-            validators: 
+            validators:
             {
-               notEmpty: 
-               {
-                  message: 'This field is required'
-               },
-                emailAddress: 
+                notEmpty:
                 {
-                  message: 'The value is not a valid email address'
+                    message: 'This field is required'
                 },
-               regexp: 
-               {
-                  regexp: '^[^@\\s]+@([^@\\s]+\\.)+[^@\\s]+$',
-                  message: 'The value is not a valid email address'
-               },
-               remote: 
-               {
-                   message: 'Email already exists',
-                   url: 'check-serviceuser-email-exists',
-                   type: 'GET',
-                   delay: 2000     // Send Ajax request every 2 seconds
-               }
+                emailAddress:
+                {
+                    message: 'The value is not a valid email address'
+                },
+                regexp:
+                {
+                    regexp: '^[^@\\s]+@([^@\\s]+\\.)+[^@\\s]+$',
+                    message: 'The value is not a valid email address'
+                },
+                remote:
+                {
+                    message: 'Email already exists',
+                    url: 'check-serviceuser-email-exists',
+                    type: 'GET',
+                    delay: 2000     // Send Ajax request every 2 seconds
+                }
             }
         },
-    
-        "weight": 
+
+        "weight":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 1,
                     max: 30,
                     message: 'This field must between 1 to 30 characters'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'Height  can only consist of characters'
@@ -1347,21 +1347,21 @@ $('#add_service_user_form').formValidation({
             }
         },
 
-        "hair_and_eyes": 
+        "hair_and_eyes":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 2,
                     max: 100,
                     message: 'This field must between 1 to 50 characters'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'This field can only consist of characters'
@@ -1369,34 +1369,34 @@ $('#add_service_user_form').formValidation({
             }
         },
 
-        "markings": 
+        "markings":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 1,
                     max: 100,
                     message: 'This field must between 1 to 100 characters'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'This field  can only consist of characters'
                 }
             }
         },
-        "short_description": 
+        "short_description":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
                 /*stringLength: 
                 {
@@ -1404,22 +1404,22 @@ $('#add_service_user_form').formValidation({
                     max: 200,
                     message: 'This field must between 2 to 200 characters'
                 },*/
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'This field  can only consist of alphanumeric characters'
                 }
             }
         },
-        "status": 
+        "status":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 1,
                     max: 2,
@@ -1427,85 +1427,85 @@ $('#add_service_user_form').formValidation({
                 }
             }
         },
-       /* "image":
+        /* "image":
+         {
+             validators: 
+             {
+                 notEmpty: 
+                 {
+                   message: 'This field is required'
+                 }
+             }
+         },*/
+        "personal_info":
         {
-            validators: 
-            {
-                notEmpty: 
-                {
-                  message: 'This field is required'
-                }
-            }
-        },*/
-        "personal_info": 
-        {
-            validators: 
+            validators:
             {
                 /*notEmpty: 
                 {
                   message: 'This field is required'
                 },*/
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'This field  can only consist of alphanumeric characters'
                 }
             }
-        },        
-        "education_history": 
+        },
+        "education_history":
         {
-            validators: 
+            validators:
             {
                 /*notEmpty: 
                 {
                   message: 'This field is required'
                 },*/
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'This field  can only consist of alphanumeric characters'
                 }
             }
-        },        
-        "bereavement_issues": 
+        },
+        "bereavement_issues":
         {
-            validators: 
+            validators:
             {
                 /*notEmpty: 
                 {
                   message: 'This field is required'
                 },*/
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'This field  can only consist of alphanumeric characters'
                 }
             }
-        },        
-        "drug_n_alcohol_issues": 
+        },
+        "drug_n_alcohol_issues":
         {
-            validators: 
+            validators:
             {
                 /*notEmpty: 
                 {
                   message: 'This field is required'
                 },*/
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'This field  can only consist of alphanumeric characters'
                 }
             }
-        },        
-        "mental_health_issues": 
+        },
+        "mental_health_issues":
         {
-            validators: 
+            validators:
             {
                 /*notEmpty: 
                 {
                   message: 'This field is required'
                 },*/
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'This field  can only consist of alphanumeric characters'
@@ -1513,105 +1513,105 @@ $('#add_service_user_form').formValidation({
             }
         }
 
-    }  
+    }
 });
 
 $('#edit_service_user_form').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "name": 
+        "name":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 2,
                     max: 30,
                     message: 'Name must between 2 to 30 alphabets'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z ]+$/,
                     message: 'Name can only consist of alphabets'
                 }
             }
         },
-        "admission_number": 
+        "admission_number":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 2,
                     max: 30,
                     message: 'This field must between 2 to 30 characters'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'Admission Number  can only consist of characters'
                 }
             }
         },
-         "section": 
+        "section":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 1,
                     max: 30,
                     message: 'This field must between 1 to 30 characters'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'Section Name can only consist of alphanumeric characters'
                 }
             }
         },
-        "email": 
+        "email":
         {
-            validators: 
+            validators:
             {
-               /*notEmpty: 
-               {
-                  message: 'This field is required'
-               },*/
-               emailAddress: 
-               {
-                  message: 'The value is not a valid email address'
-               },
-               regexp: 
-               {
-                  regexp: '^[^@\\s]+@([^@\\s]+\\.)+[^@\\s]+$',
-                  message: 'The value is not a valid email address'
-               }/*,
+                /*notEmpty: 
+                {
+                   message: 'This field is required'
+                },*/
+                emailAddress:
+                {
+                    message: 'The value is not a valid email address'
+                },
+                regexp:
+                {
+                    regexp: '^[^@\\s]+@([^@\\s]+\\.)+[^@\\s]+$',
+                    message: 'The value is not a valid email address'
+                }/*,
                remote: 
                {
                    message: 'Email already exists',
@@ -1621,52 +1621,52 @@ $('#edit_service_user_form').formValidation({
                }*/
             }
         },
-         "height": 
+        "height":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 1,
                     max: 30,
                     message: 'This field must between 1 to 30 characters'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'Height  can only consist of characters'
                 }
             }
         },
-        
-        "phone_no": 
+
+        "phone_no":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
                     message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 8,
                     // max: 13,
                     message: 'Phone number must contain atleast 8 digits'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[0-9 +]+$/,
                     message: 'Phone number can only consist of digits'
                 }
             }
         },
-        "mobile": 
+        "mobile":
         {
-            validators: 
+            validators:
             {
                 /*notEmpty: 
                 {
@@ -1678,34 +1678,34 @@ $('#edit_service_user_form').formValidation({
                     max: 13,
                     message: 'Mobile No must be between 10 to 13 digits'
                 },*/
-                stringLength: 
+                stringLength:
                 {
                     min: 8,
                     // max: 13,
                     message: 'Mobile No. must contain atleast 8 digits'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[0-9 +]+$/,
                     message: 'Mobile No can only consist of digits'
                 }
             }
         },
-        "weight": 
+        "weight":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 1,
                     max: 30,
                     message: 'This field must between 1 to 30 characters'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'Height  can only consist of characters'
@@ -1713,55 +1713,55 @@ $('#edit_service_user_form').formValidation({
             }
         },
 
-        "hair_and_eyes": 
+        "hair_and_eyes":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 2,
                     max: 100,
                     message: 'This field must between 1 to 100 characters'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'This field  can only consist of alphanumeric characters'
                 }
             }
         },
-        "markings": 
+        "markings":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 2,
                     max: 100,
                     message: 'This field must between 1 to 100 characters'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'This field  can only consist of characters'
                 }
             }
         },
-        "short_description": 
+        "short_description":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
                 /*stringLength: 
                 {
@@ -1769,98 +1769,98 @@ $('#edit_service_user_form').formValidation({
                     max: 200,
                     message: 'This field must between 1 to 200 characters'
                 },*/
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'This field can not contain special characters'
                 }
             }
         },
-        "status": 
+        "status":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 1,
                     max: 2,
                     message: 'This field can contain between 1 to 2 characters'
                 }
             }
-        },       
-        "personal_info": 
+        },
+        "personal_info":
         {
-            validators: 
+            validators:
             {
                 /*notEmpty: 
                 {
                   message: 'This field is required'
                 },*/
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'This field  can only consist of alphanumeric characters'
                 }
             }
-        },        
-        "education_history": 
+        },
+        "education_history":
         {
-            validators: 
+            validators:
             {
                 /*notEmpty: 
                 {
                   message: 'This field is required'
                 },*/
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'This field  can only consist of alphanumeric characters'
                 }
             }
-        },        
-        "bereavement_issues": 
+        },
+        "bereavement_issues":
         {
-            validators: 
+            validators:
             {
                 /*notEmpty: 
                 {
                   message: 'This field is required'
                 },*/
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'This field  can only consist of alphanumeric characters'
                 }
             }
-        },        
-        "drug_n_alcohol_issues": 
+        },
+        "drug_n_alcohol_issues":
         {
-            validators: 
+            validators:
             {
                 /*notEmpty: 
                 {
                   message: 'This field is required'
                 },*/
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'This field  can only consist of alphanumeric characters'
                 }
             }
-        },        
-        "mental_health_issues": 
+        },
+        "mental_health_issues":
         {
-            validators: 
+            validators:
             {
                 /*notEmpty: 
                 {
                   message: 'This field is required'
                 },*/
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'This field  can only consist of alphanumeric characters'
@@ -1878,54 +1878,54 @@ $('#edit_service_user_form').formValidation({
             }
         }*/
 
-    }  
+    }
 });
 
 $('#add_daily_record_form').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "description": 
+        "description":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },/*,
                 stringLength: {
                     min: 2,
                     max: 30,
                     message: 'Name must between 2 to 30 alphabets'
                 },*/
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'This field can not contain special characters'
                 }
             }
         },
-        "score": 
+        "score":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 1,
                     max: 2,
@@ -1933,15 +1933,15 @@ $('#add_daily_record_form').formValidation({
                 }
             }
         },
-        "status": 
+        "status":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 1,
                     max: 2,
@@ -1949,54 +1949,54 @@ $('#add_daily_record_form').formValidation({
                 }
             }
         }
-    }  
+    }
 });
 
 $('#edit_daily_record_form').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "description": 
+        "description":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },/*,
                 stringLength: {
                     min: 2,
                     max: 30,
                     message: 'Name must between 2 to 30 alphabets'
                 },*/
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'This field can only consist of alphanumeric characters'
                 }
             }
         },
-        "score": 
+        "score":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 1,
                     max: 2,
@@ -2004,15 +2004,15 @@ $('#edit_daily_record_form').formValidation({
                 }
             }
         },
-        "status": 
+        "status":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 1,
                     max: 2,
@@ -2020,34 +2020,34 @@ $('#edit_daily_record_form').formValidation({
                 }
             }
         }
-    }  
+    }
 });
 
 $('#add_risk_form').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "description": 
+        "description":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'This field can only consist of alphanumeric characters'
@@ -2064,15 +2064,15 @@ $('#add_risk_form').formValidation({
                 }
             }
         },*/
-        "status": 
+        "status":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 1,
                     max: 2,
@@ -2087,27 +2087,27 @@ $('#edit_risk_form').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "description": 
+        "description":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'This field can only consist of alphanumeric characters'
@@ -2124,15 +2124,15 @@ $('#edit_risk_form').formValidation({
                 }
             }
         },*/
-        "status": 
+        "status":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 1,
                     max: 2,
@@ -2147,27 +2147,27 @@ $('#add_earning_scheme_form').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "title": 
+        "title":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 1,
                     max: 100,
@@ -2175,15 +2175,15 @@ $('#add_earning_scheme_form').formValidation({
                 }
             }
         },
-        "icon": 
+        "icon":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 1,
                     max: 30,
@@ -2192,15 +2192,15 @@ $('#add_earning_scheme_form').formValidation({
 
             }
         },
-        "status": 
+        "status":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 1,
                     max: 2,
@@ -2216,27 +2216,27 @@ $('#edit_earning_scheme_form').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "title": 
+        "title":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 1,
                     max: 100,
@@ -2255,15 +2255,15 @@ $('#edit_earning_scheme_form').formValidation({
                 }
             }
         },*/
-        "status": 
+        "status":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 1,
                     max: 2,
@@ -2278,45 +2278,45 @@ $('#add_earning_scheme_form').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "title": 
+        "title":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 }
             }
         },
-        "icon": 
+        "icon":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 }
             }
         },
-        "status": 
+        "status":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 }
             }
         }
@@ -2327,25 +2327,25 @@ $('#edit_earning_scheme_form').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "title": 
+        "title":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 }
             }
         },
@@ -2359,13 +2359,13 @@ $('#edit_earning_scheme_form').formValidation({
                 }
             }
         },*/
-        "status": 
+        "status":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 }
             }
         }
@@ -2376,38 +2376,38 @@ $('#add_incentive_earning_scheme_form').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "name": 
+        "name":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 }
             }
         },
-        
-        "details": 
+
+        "details":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'This field can only consist of alphanumeric characters'
@@ -2415,15 +2415,15 @@ $('#add_incentive_earning_scheme_form').formValidation({
             }
         },
 
-        "stars": 
+        "stars":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[0-9 \n]+$/,
                     message: 'This field can only consist of numeric characters'
@@ -2431,15 +2431,15 @@ $('#add_incentive_earning_scheme_form').formValidation({
             }
         },
 
-        "url": 
+        "url":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&?/=:#$%!_+-.,'" \n]+$/,
                     message: 'This field can only consist of characters'
@@ -2447,13 +2447,13 @@ $('#add_incentive_earning_scheme_form').formValidation({
             }
         },
 
-        "status": 
+        "status":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 }
             }
         }
@@ -2464,38 +2464,38 @@ $('#edit_incentive_earning_scheme_form').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "name": 
+        "name":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 }
             }
         },
-        
-        "details": 
+
+        "details":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'This field can only consist of alphanumeric characters'
@@ -2503,15 +2503,15 @@ $('#edit_incentive_earning_scheme_form').formValidation({
             }
         },
 
-        "stars": 
+        "stars":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[0-9 \n]+$/,
                     message: 'This field can only consist of numeric characters'
@@ -2519,15 +2519,15 @@ $('#edit_incentive_earning_scheme_form').formValidation({
             }
         },
 
-        "url": 
+        "url":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&?/=:#$%!_+-.,'" \n]+$/,
                     message: 'This field can only consist of characters'
@@ -2535,13 +2535,13 @@ $('#edit_incentive_earning_scheme_form').formValidation({
             }
         },
 
-        "status": 
+        "status":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 }
             }
         }
@@ -2552,35 +2552,35 @@ $('#add_service_users_care_history_form').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "title": 
+        "title":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 }
             }
         },
-        "date": 
+        "date":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 }
             }
         }
@@ -2590,35 +2590,35 @@ $('#edit_service_users_care_history_form').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "title": 
+        "title":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 }
             }
         },
-        "date": 
+        "date":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 }
             }
         }
@@ -2630,75 +2630,75 @@ $('#add_care_team_form').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "name": 
+        "name":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 2,
                     max: 30,
                     message: 'Name must between 2 to 30 alphabets'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z ]+$/,
                     message: 'Name can only consist of alphabets'
                 }
             }
         },
-        "job_title_id": 
+        "job_title_id":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 1,
                     max: 30,
                     message: 'This field must between 1 to 30 characters'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'This field can only consist of alphanumeric characters'
                 }
             }
         },
-        "phone_no": 
+        "phone_no":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
                     message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 8,
                     // max: 13,
                     message: 'Phone number must contain atleast 8 digits'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[0-9 +]+$/,
                     message: 'This field can only consist of digits and plus sign'
@@ -2724,15 +2724,15 @@ $('#add_care_team_form').formValidation({
                }
             }
         },*/
-        "address": 
+        "address":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'This field can only consist of characters'
@@ -2748,21 +2748,21 @@ $('#add_care_team_form').formValidation({
                   message: 'This field is required'
                 }
             }
-        }*/                
-    }  
+        }*/
+    }
 });
 
 $('#welcome_form').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
@@ -2770,88 +2770,88 @@ $('#welcome_form').formValidation({
     {
         "home":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 }
             }
         },
         "company":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 }
             }
-        }                
-    }  
+        }
+    }
 });
 
 $('#add_homelist_form').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "title": 
+        "title":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 2,
                     max: 30,
                     message: 'Name must between 2 to 30 characters'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9 ]+$/,
                     message: 'Name can only consist of characters'
                 }
             }
         },
-        "location_history_duration": 
+        "location_history_duration":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[0-9]+$/,
                     message: 'This field should contain numbers only'
                 }
             }
-        },   
-        "address": 
+        },
+        "address":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&#+-.,'" \n]+$/,
                     message: 'This field can only consist of characters'
@@ -2873,71 +2873,71 @@ $('#add_homelist_form').formValidation({
                         message: 'The selected file is not valid'
                 }
             }
-        },*/          
-    }  
+        },*/
+    }
 });
 
 $('#edit_homelist_form').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "title": 
+        "title":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 2,
                     max: 30,
                     message: 'Name must between 2 to 30 characters'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9,_ ]+$/,
                     message: 'Name can only consist of characters'
                 }
             }
         },
-        "location_history_duration":    
+        "location_history_duration":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[0-9]+$/,
                     message: 'This field should contain numbers only'
                 }
             }
         },
-        "address": 
+        "address":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&#+-.,:;?£/'" \n]+$/,
                     message: 'This field can only consist of characters'
@@ -2953,8 +2953,8 @@ $('#edit_homelist_form').formValidation({
                   message: 'This field is required'
                 }
             }
-        } */               
-    }  
+        } */
+    }
 });
 
 // admins_form
@@ -2962,236 +2962,236 @@ $('#add_system_admins_form').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "name": 
+        "name":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 2,
                     max: 30,
                     message: 'Name must between 2 to 30 alphabets'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z ]+$/,
                     message: 'Name can only consist of alphabets'
                 }
             }
         },
-        "user_name": 
+        "user_name":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 2,
                     max: 30,
                     message: 'User Name must between 2 to 30 characters'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9,_ ]+$/,
                     message: 'User Name can only consist of alphanumeric characters'
                 },
-                remote: 
+                remote:
                 {
-                   message: 'Username already exists',
-                   url: 'check_user_username_exists',
-                   type: 'GET',
-                   delay: 2000     // Send Ajax request every 2 seconds
+                    message: 'Username already exists',
+                    url: 'check_user_username_exists',
+                    type: 'GET',
+                    delay: 2000     // Send Ajax request every 2 seconds
                 }
             }
         },
-        "password": 
+        "password":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 }
             }
         },
-        "email": 
+        "email":
         {
-            validators: 
+            validators:
             {
-               notEmpty: 
-               {
-                  message: 'This field is required'
-               },
-               emailAddress: 
-               {
-                  message: 'The value is not a valid email address'
-               },
-               regexp: 
-               {
-                  regexp: '^[^@\\s]+@([^@\\s]+\\.)+[^@\\s]+$',
-                  message: 'The value is not a valid email address'
-               }
-            }
-        },
-        "company": 
-        {
-            validators: 
-            {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                emailAddress:
+                {
+                    message: 'The value is not a valid email address'
+                },
+                regexp:
+                {
+                    regexp: '^[^@\\s]+@([^@\\s]+\\.)+[^@\\s]+$',
+                    message: 'The value is not a valid email address'
+                }
+            }
+        },
+        "company":
+        {
+            validators:
+            {
+                notEmpty:
+                {
+                    message: 'This field is required'
+                },
+                stringLength:
                 {
                     min: 2,
                     max: 100,
                     message: 'This fields must between 2 to 100 characters'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9,_ ]+$/,
                     message: 'This field allows only alphanumeric characters'
-                },  
-                remote: 
+                },
+                remote:
                 {
-                   message: 'Company already exists',
-                   url: 'check_user_company_exists',
-                   type: 'GET',
-                   delay: 2000     // Send Ajax request every 2 seconds
+                    message: 'Company already exists',
+                    url: 'check_user_company_exists',
+                    type: 'GET',
+                    delay: 2000     // Send Ajax request every 2 seconds
                 }
             }
-        }         
-    }  
+        }
+    }
 });
 
 $('#edit_system_admins_form').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "name": 
+        "name":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 2,
                     max: 30,
                     message: 'Name must between 2 to 30 alphabets'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z ]+$/,
                     message: 'Name can only consist of alphabets'
                 }
             }
         },
-        "user_name": 
+        "user_name":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 2,
                     max: 30,
                     message: 'User Name must between 2 to 30 characters'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9,_ ]+$/,
                     message: 'User Name can only consist of alphanumeric characters'
                 }
             }
         },
-        "password": 
+        "password":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 }
             }
         },
-        "email": 
+        "email":
         {
-            validators: 
+            validators:
             {
-               notEmpty: 
-               {
-                  message: 'This field is required'
-               },
-               emailAddress: 
-               {
-                  message: 'The value is not a valid email address'
-               },
-               regexp: 
-               {
-                  regexp: '^[^@\\s]+@([^@\\s]+\\.)+[^@\\s]+$',
-                  message: 'The value is not a valid email address'
-               }
+                notEmpty:
+                {
+                    message: 'This field is required'
+                },
+                emailAddress:
+                {
+                    message: 'The value is not a valid email address'
+                },
+                regexp:
+                {
+                    regexp: '^[^@\\s]+@([^@\\s]+\\.)+[^@\\s]+$',
+                    message: 'The value is not a valid email address'
+                }
             }
         },
-        "company": 
+        "company":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 2,
                     max: 100,
                     message: 'This fields must between 2 to 100 characters'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9,_ ]+$/,
                     message: 'This field allows only alphanumeric characters'
                 }
             }
-        }         
-    }  
+        }
+    }
 });
 
 $('#edit_company_charge').formValidation({
@@ -3199,213 +3199,213 @@ $('#edit_company_charge').formValidation({
     live: 'disabled',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "start_range": 
+        "start_range":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 1,
                     max: 8,
                     message: 'Maximum 8 digits are allowed.'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[0-9.+]+$/,
                     message: 'Only digits are allowed'
                 },
-                remote: 
+                remote:
                 {
-                   message: 'Range overlaps previous range.',
-                   url: host+'admin/company-charge/validate-home-range',
-                   type: "post",
-                   data:{
-                        previous_range: function(){
+                    message: 'Range overlaps previous range.',
+                    url: host + 'admin/company-charge/validate-home-range',
+                    type: "post",
+                    data: {
+                        previous_range: function () {
                             return $("#previous_range").val();
                         },
-                        start_range: function(){
+                        start_range: function () {
                             return $("#start_range").val();
                         },
-                        end_range: function(){
+                        end_range: function () {
                             return $("#end_range").val();
                         },
-                        package_type: function(){
+                        package_type: function () {
                             return $("#package_type").val();
                         },
                     },
                 }
             }
         },
-        "end_range": 
+        "end_range":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 1,
                     max: 8,
                     message: 'Maximum 8 digits are allowed.'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[0-9.+]+$/,
                     message: 'Only digits are allowed'
                 },
-                remote: 
+                remote:
                 {
-                   message: 'Range end should be greater than range start.',
-                   url: host+'admin/company-charge/validate-range-gap',
-                   type: "post",
-                   data:{
-                        start_range: function(){
+                    message: 'Range end should be greater than range start.',
+                    url: host + 'admin/company-charge/validate-range-gap',
+                    type: "post",
+                    data: {
+                        start_range: function () {
                             return $("#start_range").val();
                         },
-                        end_range: function(){
+                        end_range: function () {
                             return $("#end_range").val();
                         },
                     },
                 }
             }
         },
-        "price_monthly": 
+        "price_monthly":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 1,
                     max: 8,
                     message: 'Maximum 8 digits are allowed.'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[0-9.+]+$/,
                     message: 'Only digits are allowed'
                 }
             }
         },
-        "price_yearly": 
+        "price_yearly":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 1,
                     max: 8,
                     message: 'Maximum 8 digits are allowed.'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[0-9.+]+$/,
                     message: 'Only digits are allowed'
                 }
             }
         },
-        "days": 
+        "days":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 1,
                     max: 8,
                     message: 'Maximum 8 digits are allowed.'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[0-9+]+$/,
                     message: 'Only digits are allowed'
                 }
             }
-        }, 
-    }  
+        },
+    }
 });
 
 $('#add_manager_form').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "name": 
+        "name":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 2,
                     max: 30,
                     message: 'Name must between 2 to 30 alphabets'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z ]+$/,
                     message: 'Name can only consist of alphabets'
                 },
             }
         },
-      
-        "contact_no": 
+
+        "contact_no":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
                     message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 8,
                     // max: 13,
                     message: 'Contact number must contain atleast 8 digits'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[0-9+]+$/,
                     message: 'Contact number can only consist of digits'
@@ -3434,14 +3434,14 @@ $('#add_manager_form').formValidation({
                 // },
             }
         },
-        "address":{
-            validators:{
-                notEmpty:{
+        "address": {
+            validators: {
+                notEmpty: {
                     message: 'This field is required'
                 }
             }
         }
-    }  
+    }
 });
 
 $('#edit_manager_form').formValidation({
@@ -3449,55 +3449,55 @@ $('#edit_manager_form').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "name": 
+        "name":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 2,
                     max: 30,
                     message: 'Name must between 2 to 30 alphabets'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z ]+$/,
                     message: 'Name can only consist of alphabets'
                 }
             }
         },
-   
-        "contact_no": 
+
+        "contact_no":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
                     message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 8,
                     // max: 13,
                     message: 'Contact number must contain atleast 8 digits'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[0-9+]+$/,
                     message: 'Contact number can only consist of digits'
@@ -3522,182 +3522,182 @@ $('#edit_manager_form').formValidation({
                 // },
             }
         },
-        "address":{
-            validators:{
-                notEmpty:{
+        "address": {
+            validators: {
+                notEmpty: {
                     message: 'This field is required'
                 }
             }
         }
-    }  
+    }
 });
 
 $('#send_migration_request_form').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "new_home_id": 
+        "new_home_id":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 1,
                     max: 50,
                     message: 'This field must between 1 to 50 characters'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z0-9 ]+$/,
                     message: 'This field can only consist of characters'
                 }
             }
-        },        
-        "company": 
+        },
+        "company":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 1,
                     max: 50,
                     message: 'This field must between 1 to 50 characters'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z0-9. ]+$/,
                     message: 'This field can only consist of characters'
                 }
             }
         },
-        "reason": 
+        "reason":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 2,
                     max: 255,
                     message: 'This field must between 2 to 255 characters'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'This field can only consist of alphanumeric characters'
                 }
             }
-        }         
-    }  
+        }
+    }
 });
 
 $('#sup_migration_update').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "new_status": 
+        "new_status":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 1,
                     max: 2,
                     message: 'This field must between 2 to 30 alphabets'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z]+$/,
                     message: 'This field can only consist of alphabets'
                 }
             }
         },
-        "reply": 
+        "reply":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 2,
                     max: 255,
                     message: 'This field must between 2 to 255 characters'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'This field can only consist of alphanumeric characters'
                 }
             }
-        }         
-    }  
+        }
+    }
 });
 
- $('#add_living_skill_form').formValidation({
+$('#add_living_skill_form').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "description": 
+        "description":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
                 stringLength: {
                     min: 2,
@@ -3712,15 +3712,15 @@ $('#sup_migration_update').formValidation({
                 // }
             }
         },
-        "status": 
+        "status":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 1,
                     max: 2,
@@ -3728,32 +3728,32 @@ $('#sup_migration_update').formValidation({
                 }
             }
         }
-    }  
+    }
 });
 
 $('#edit_living_skill_form').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "description": 
+        "description":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
                 stringLength: {
                     min: 2,
@@ -3768,15 +3768,15 @@ $('#edit_living_skill_form').formValidation({
                 // }
             }
         },
-        "status": 
+        "status":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 1,
                     max: 2,
@@ -3784,7 +3784,7 @@ $('#edit_living_skill_form').formValidation({
                 }
             }
         }
-    }  
+    }
 });
 
 
@@ -3793,25 +3793,25 @@ $('#add_education_training_form').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
-    {   
+    {
         "description":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
                 /*stringLength: 
                 {
@@ -3819,30 +3819,30 @@ $('#add_education_training_form').formValidation({
                     max: 200,
                     message: 'This field must between 2 to 200 characters'
                 },*/
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,'" \n]+$/,
                     message: 'This field  can only consist of alphanumeric characters'
                 }
             }
         },
-        "status": 
+        "status":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 1,
                     max: 2,
                     message: 'This field can contain between 1 to 2 characters'
                 }
             }
-        }         
-    }  
+        }
+    }
 });
 
 // Edit Education Training Form
@@ -3850,25 +3850,25 @@ $('#edit_education_training_form').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "description": 
+        "description":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
                 /*stringLength: 
                 {
@@ -3876,30 +3876,30 @@ $('#edit_education_training_form').formValidation({
                     max: 200,
                     message: 'This field must between 2 to 200 characters'
                 },*/
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'This field can only consist of alphanumeric characters'
                 }
             }
         },
-        "status": 
+        "status":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 1,
                     max: 2,
                     message: 'This field can contain between 1 to 2 characters'
                 }
             }
-        }         
-    }  
+        }
+    }
 });
 
 // Add MFC Form 
@@ -3907,25 +3907,25 @@ $('#add_mfc_form').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
-    {   
+    {
         "description":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
                 /*stringLength: 
                 {
@@ -3933,30 +3933,30 @@ $('#add_mfc_form').formValidation({
                     max: 200,
                     message: 'This field must between 2 to 200 characters'
                 },*/
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'This field  can only consist of alphanumeric characters'
                 }
             }
         },
-        "status": 
+        "status":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 1,
                     max: 2,
                     message: 'This field can contain between 1 to 2 characters'
                 }
             }
-        }         
-    }  
+        }
+    }
 });
 
 // Edit MFC Form
@@ -3964,25 +3964,25 @@ $('#edit_mfc_form').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
-    {   
+    {
         "description":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
                 /*stringLength: 
                 {
@@ -3990,63 +3990,63 @@ $('#edit_mfc_form').formValidation({
                     max: 200,
                     message: 'This field must between 2 to 200 characters'
                 },*/
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'This field  can only consist of alphanumeric characters'
                 }
             }
         },
-        "status": 
+        "status":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 1,
                     max: 2,
                     message: 'This field can contain between 1 to 2 characters'
                 }
             }
-        }         
-    }  
+        }
+    }
 });
 
 $('#add_job_title_form').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "title": 
+        "title":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 2,
                     max: 30,
                     message: 'Job Title must between 2 to 30 alphabets'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'Job Title can only consist of alphabets'
@@ -4060,33 +4060,33 @@ $('#edit_job_title_form').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "title": 
+        "title":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 2,
                     max: 30,
                     message: 'Job Title must between 2 to 30 alphabets'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'Job Title can only consist of alphabets'
@@ -4101,33 +4101,33 @@ $('#add_mood_form').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "name": 
+        "name":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 2,
                     max: 30,
                     message: 'Name must between 2 to 30 alphabets'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z ]+$/,
                     message: 'Name can only consist of alphabets'
@@ -4136,59 +4136,59 @@ $('#add_mood_form').formValidation({
         },
         "image":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 }
             }
         },
-        "status": 
+        "status":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 }
             }
-        }                
+        }
 
-    }  
+    }
 });
 
 $('#edit_mood_form').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "name": 
+        "name":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 2,
                     max: 30,
                     message: 'Name must between 2 to 30 alphabets'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z ]+$/,
                     message: 'Name can only consist of alphabets'
@@ -4205,18 +4205,18 @@ $('#edit_mood_form').formValidation({
         //         }
         //     }
         // },
-        "status": 
+        "status":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 }
             }
-        }                
+        }
 
-    }  
+    }
 });
 // $('#edit_mood_form').formValidation({
 //     framework: 'bootstrap',
@@ -4242,7 +4242,7 @@ $('#edit_mood_form').formValidation({
 //                 {
 //                   message: 'This field is required'
 //                 },
-                
+
 //                 regexp: 
 //                 {
 //                     regexp: /^[A-Z,a-z,0-9&+-.,'" \n]+$/,
@@ -4259,35 +4259,35 @@ $('#edit_contact_form').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "reply": 
+        "reply":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                
-                regexp: 
+
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'Reply can only consist of alphabets'
                 }
             }
-        }         
-    }  
+        }
+    }
 });
 
 
@@ -4295,33 +4295,33 @@ $('#admin_profile_form').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "name": 
+        "name":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 2,
                     max: 30,
                     message: 'Name must between 2 to 30 alphabets'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z ]+$/,
                     message: 'Name can only consist of alphabets'
@@ -4357,89 +4357,89 @@ $('#admin_profile_form').formValidation({
         //     }
         // },
 
-        "email": 
+        "email":
         {
-            validators: 
+            validators:
             {
-               notEmpty: 
-               {
-                  message: 'This field is required'
-               },
-               emailAddress: 
-               {
-                  message: 'The value is not a valid email address'
-               },
-               regexp: 
-               {
-                  regexp: '^[^@\\s]+@([^@\\s]+\\.)+[^@\\s]+$',
-                  message: 'The value is not a valid email address'
-               }
-               // },
-               // remote: 
-               // {
-               //     message: 'Email already exists',
-               //     url: 'check-user-email-exists',
-               //     type: 'GET',
-               //     delay: 2000     // Send Ajax request every 2 seconds
-               // }
+                notEmpty:
+                {
+                    message: 'This field is required'
+                },
+                emailAddress:
+                {
+                    message: 'The value is not a valid email address'
+                },
+                regexp:
+                {
+                    regexp: '^[^@\\s]+@([^@\\s]+\\.)+[^@\\s]+$',
+                    message: 'The value is not a valid email address'
+                }
+                // },
+                // remote: 
+                // {
+                //     message: 'Email already exists',
+                //     url: 'check-user-email-exists',
+                //     type: 'GET',
+                //     delay: 2000     // Send Ajax request every 2 seconds
+                // }
             }
         },
 
-        "company": 
+        "company":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 2,
                     max: 30,
                     message: 'Company must between 2 to 30 alphabets'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z ]+$/,
                     message: 'Company can only consist of alphabets'
                 }
             }
         }
-    }  
+    }
 });
 
 $('#add_access_name_form').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "name": 
+        "name":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 2,
                     max: 30,
                     message: 'Job Title must between 2 to 30 alphabets'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z ]+$/,
                     message: 'Job Title can only consist of alphabets'
@@ -4453,33 +4453,33 @@ $('#edit_access_name_form').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "name": 
+        "name":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 2,
                     max: 30,
                     message: 'Job Title must between 2 to 30 alphabets'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z ]+$/,
                     message: 'Job Title can only consist of alphabets'
@@ -4490,180 +4490,180 @@ $('#edit_access_name_form').formValidation({
 });
 
 
- $('#rota_shift_form').formValidation({
+$('#rota_shift_form').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "start_time": 
+        "start_time":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 }
             }
-        }, 
-        "end_time": 
+        },
+        "end_time":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 }
             }
-        }         
-    }  
+        }
+    }
 });
 
 $('#edit_daily_record_score_form').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "title": 
+        "title":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 }
             }
-        } 
-    }  
+        }
+    }
 });
 
 $('#add_shift_plan').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "name": 
+        "name":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z ]+$/,
                     message: 'Shift Name can only consist of alphabets'
                 }
             }
         },
-        "start_time": 
+        "start_time":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 }
             }
-        }, 
-        "end_time": 
+        },
+        "end_time":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 }
             }
-        }         
-    }  
+        }
+    }
 });
 
 $('#edit_shift_plan').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "name": 
+        "name":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z ]+$/,
                     message: 'Shift Name can only consist of alphabets'
                 }
             }
         },
-        "start_time": 
+        "start_time":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 }
             }
-        }, 
-        "end_time": 
+        },
+        "end_time":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 }
             }
-        }         
-    }  
+        }
+    }
 });
 
 //////////////  July 15, 2017 -------  SYSTEM GUIDE  /////////////
@@ -4671,117 +4671,117 @@ $('#add_system_guide_form').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "question": 
+        "question":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 }
             }
         },
-        "answer": 
+        "answer":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 }
             }
-        }     
-    }  
+        }
+    }
 });
 
 $('#add_system_guide_form').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "question": 
+        "question":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 }
             }
         },
-        "answer": 
+        "answer":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 }
             }
-        }     
-    }  
+        }
+    }
 });
 
 $('#edit_system_guide_form').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "question": 
+        "question":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 }
             }
         },
-        "answer": 
+        "answer":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 }
             }
-        }     
-    }  
+        }
+    }
 });
 
 ///////////--------Add External Service(backEnd) -> Childs Section-------//////////////
@@ -4790,97 +4790,97 @@ $('#add_external_service_form').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "company_name": 
+        "company_name":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
-                {
-                  message: 'This field is required'
-                },
-                regexp: 
-                {
-                    regexp: /^[A-Z,a-z ]+$/,
-                    message: 'Company name can only consist of alphabets'
-                }
-            }
-        },
-        "contact_name": 
-        {
-            validators: 
-            {
-                notEmpty: 
-                {
-                  message: 'This field is required'
-                },
-                regexp: 
-                {
-                    regexp: /^[A-Z,a-z ]+$/,
-                    message: 'Company name can only consist of alphabets'
-                }
-            }
-        },
-        "email": 
-        {
-            validators: 
-            {
-               notEmpty: 
-               {
-                  message: 'This field is required'
-               },
-               emailAddress: 
-               {
-                  message: 'The value is not a valid email address'
-               },
-               regexp: 
-               {
-                  regexp: '^[^@\\s]+@([^@\\s]+\\.)+[^@\\s]+$',
-                  message: 'The value is not a valid email address'
-               }
-               // },
-               // remote: 
-               // {
-               //     message: 'Email already exists',
-               //     url: 'check-user-email-exists',
-               //     type: 'GET',
-               //     delay: 2000     // Send Ajax request every 2 seconds
-               // }
-            }
-        },
-        "phone_no": 
-        {
-            validators: 
-            {
-                notEmpty: 
+                notEmpty:
                 {
                     message: 'This field is required'
                 },
-                stringLength: 
+                regexp:
+                {
+                    regexp: /^[A-Z,a-z ]+$/,
+                    message: 'Company name can only consist of alphabets'
+                }
+            }
+        },
+        "contact_name":
+        {
+            validators:
+            {
+                notEmpty:
+                {
+                    message: 'This field is required'
+                },
+                regexp:
+                {
+                    regexp: /^[A-Z,a-z ]+$/,
+                    message: 'Company name can only consist of alphabets'
+                }
+            }
+        },
+        "email":
+        {
+            validators:
+            {
+                notEmpty:
+                {
+                    message: 'This field is required'
+                },
+                emailAddress:
+                {
+                    message: 'The value is not a valid email address'
+                },
+                regexp:
+                {
+                    regexp: '^[^@\\s]+@([^@\\s]+\\.)+[^@\\s]+$',
+                    message: 'The value is not a valid email address'
+                }
+                // },
+                // remote: 
+                // {
+                //     message: 'Email already exists',
+                //     url: 'check-user-email-exists',
+                //     type: 'GET',
+                //     delay: 2000     // Send Ajax request every 2 seconds
+                // }
+            }
+        },
+        "phone_no":
+        {
+            validators:
+            {
+                notEmpty:
+                {
+                    message: 'This field is required'
+                },
+                stringLength:
                 {
                     min: 8,
                     // max: 13,
                     message: 'Phone number must contain atleast 8 digits'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[0-9 +]+$/,
                     message: 'Phone number can only consist of digits'
                 }
             }
-        }         
-    }  
+        }
+    }
 });
 
 ///////////--------Edit External Service(backEnd) -> Childs Section-------//////////////
@@ -4888,97 +4888,97 @@ $('#edit_external_service_form').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "company_name": 
+        "company_name":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
-                {
-                  message: 'This field is required'
-                },
-                regexp: 
-                {
-                    regexp: /^[A-Z,a-z ]+$/,
-                    message: 'Company name can only consist of alphabets'
-                }
-            }
-        },
-        "contact_name": 
-        {
-            validators: 
-            {
-                notEmpty: 
-                {
-                  message: 'This field is required'
-                },
-                regexp: 
-                {
-                    regexp: /^[A-Z,a-z ]+$/,
-                    message: 'Company name can only consist of alphabets'
-                }
-            }
-        },
-        "email": 
-        {
-            validators: 
-            {
-               notEmpty: 
-               {
-                  message: 'This field is required'
-               },
-               emailAddress: 
-               {
-                  message: 'The value is not a valid email address'
-               },
-               regexp: 
-               {
-                  regexp: '^[^@\\s]+@([^@\\s]+\\.)+[^@\\s]+$',
-                  message: 'The value is not a valid email address'
-               }
-               // },
-               // remote: 
-               // {
-               //     message: 'Email already exists',
-               //     url: 'check-user-email-exists',
-               //     type: 'GET',
-               //     delay: 2000     // Send Ajax request every 2 seconds
-               // }
-            }
-        },
-        "phone_no": 
-        {
-            validators: 
-            {
-                notEmpty: 
+                notEmpty:
                 {
                     message: 'This field is required'
                 },
-                stringLength: 
+                regexp:
+                {
+                    regexp: /^[A-Z,a-z ]+$/,
+                    message: 'Company name can only consist of alphabets'
+                }
+            }
+        },
+        "contact_name":
+        {
+            validators:
+            {
+                notEmpty:
+                {
+                    message: 'This field is required'
+                },
+                regexp:
+                {
+                    regexp: /^[A-Z,a-z ]+$/,
+                    message: 'Company name can only consist of alphabets'
+                }
+            }
+        },
+        "email":
+        {
+            validators:
+            {
+                notEmpty:
+                {
+                    message: 'This field is required'
+                },
+                emailAddress:
+                {
+                    message: 'The value is not a valid email address'
+                },
+                regexp:
+                {
+                    regexp: '^[^@\\s]+@([^@\\s]+\\.)+[^@\\s]+$',
+                    message: 'The value is not a valid email address'
+                }
+                // },
+                // remote: 
+                // {
+                //     message: 'Email already exists',
+                //     url: 'check-user-email-exists',
+                //     type: 'GET',
+                //     delay: 2000     // Send Ajax request every 2 seconds
+                // }
+            }
+        },
+        "phone_no":
+        {
+            validators:
+            {
+                notEmpty:
+                {
+                    message: 'This field is required'
+                },
+                stringLength:
                 {
                     min: 8,
                     // max: 13,
                     message: 'Phone number must contain atleast 8 digits'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[0-9 +]+$/,
                     message: 'Phone number can only consist of digits'
                 }
             }
-        }         
-    }  
+        }
+    }
 });
 
 // for superAdmin, user-add module, user_form.blade
@@ -4987,65 +4987,65 @@ $('#SuperAdminUserAddForm').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "name": 
+        "name":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z ]+$/,
                     message: 'Name can only consist of alphabets'
                 }
             }
         },
-        "user_name": 
+        "user_name":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                regexp: 
+                regexp:
                 {
-                     regexp: /^[A-Z,a-z,0-9,_,@,# ]+$/,
-                     message: 'User Name can only consist of alphanumeric characters'
+                    regexp: /^[A-Z,a-z,0-9,_,@,# ]+$/,
+                    message: 'User Name can only consist of alphanumeric characters'
                 }
             }
         },
-        "email": 
+        "email":
         {
-            validators: 
+            validators:
             {
-               notEmpty: 
-               {
-                  message: 'This field is required'
-               },
-               emailAddress: 
-               {
-                  message: 'The value is not a valid email address'
-               },
-               regexp: 
-               {
-                  regexp: '^[^@\\s]+@([^@\\s]+\\.)+[^@\\s]+$',
-                  message: 'The value is not a valid email address'
-               }
+                notEmpty:
+                {
+                    message: 'This field is required'
+                },
+                emailAddress:
+                {
+                    message: 'The value is not a valid email address'
+                },
+                regexp:
+                {
+                    regexp: '^[^@\\s]+@([^@\\s]+\\.)+[^@\\s]+$',
+                    message: 'The value is not a valid email address'
+                }
             }
         }/*,
         "image": 
@@ -5064,65 +5064,65 @@ $('#SuperAdminUserEditForm').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "name": 
+        "name":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z ]+$/,
                     message: 'Name can only consist of alphabets'
                 }
             }
         },
-        "user_name": 
+        "user_name":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                regexp: 
+                regexp:
                 {
-                     regexp: /^[A-Z,a-z,0-9,_,@,# ]+$/,
-                     message: 'User Name can only consist of alphanumeric characters'
+                    regexp: /^[A-Z,a-z,0-9,_,@,# ]+$/,
+                    message: 'User Name can only consist of alphanumeric characters'
                 }
             }
         },
-        "email": 
+        "email":
         {
-            validators: 
+            validators:
             {
-               notEmpty: 
-               {
-                  message: 'This field is required'
-               },
-               emailAddress: 
-               {
-                  message: 'The value is not a valid email address'
-               },
-               regexp: 
-               {
-                  regexp: '^[^@\\s]+@([^@\\s]+\\.)+[^@\\s]+$',
-                  message: 'The value is not a valid email address'
-               }
+                notEmpty:
+                {
+                    message: 'This field is required'
+                },
+                emailAddress:
+                {
+                    message: 'The value is not a valid email address'
+                },
+                regexp:
+                {
+                    regexp: '^[^@\\s]+@([^@\\s]+\\.)+[^@\\s]+$',
+                    message: 'The value is not a valid email address'
+                }
             }
         }/*,
         "image": 
@@ -5143,65 +5143,65 @@ $('#HomeAdminAddForm').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "name": 
+        "name":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z ]+$/,
                     message: 'Name can only consist of alphabets'
                 }
             }
         },
-        "user_name": 
+        "user_name":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                regexp: 
+                regexp:
                 {
-                     regexp: /^[A-Z,a-z,0-9,_,@,# ]+$/,
-                     message: 'User Name can only consist of alphanumeric characters'
+                    regexp: /^[A-Z,a-z,0-9,_,@,# ]+$/,
+                    message: 'User Name can only consist of alphanumeric characters'
                 }
             }
         },
-        "email": 
+        "email":
         {
-            validators: 
+            validators:
             {
-               notEmpty: 
-               {
-                  message: 'This field is required'
-               },
-               emailAddress: 
-               {
-                  message: 'The value is not a valid email address'
-               },
-               regexp: 
-               {
-                  regexp: '^[^@\\s]+@([^@\\s]+\\.)+[^@\\s]+$',
-                  message: 'The value is not a valid email address'
-               }
+                notEmpty:
+                {
+                    message: 'This field is required'
+                },
+                emailAddress:
+                {
+                    message: 'The value is not a valid email address'
+                },
+                regexp:
+                {
+                    regexp: '^[^@\\s]+@([^@\\s]+\\.)+[^@\\s]+$',
+                    message: 'The value is not a valid email address'
+                }
             }
         }/*,
         "image": 
@@ -5221,65 +5221,65 @@ $('#HomeAdminEditForm').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "name": 
+        "name":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z ]+$/,
                     message: 'Name can only consist of alphabets'
                 }
             }
         },
-        "user_name": 
+        "user_name":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                regexp: 
+                regexp:
                 {
-                     regexp: /^[A-Z,a-z,0-9,_,@,# ]+$/,
-                     message: 'User Name can only consist of alphanumeric characters'
+                    regexp: /^[A-Z,a-z,0-9,_,@,# ]+$/,
+                    message: 'User Name can only consist of alphanumeric characters'
                 }
             }
         },
-        "email": 
+        "email":
         {
-            validators: 
+            validators:
             {
-               notEmpty: 
-               {
-                  message: 'This field is required'
-               },
-               emailAddress: 
-               {
-                  message: 'The value is not a valid email address'
-               },
-               regexp: 
-               {
-                  regexp: '^[^@\\s]+@([^@\\s]+\\.)+[^@\\s]+$',
-                  message: 'The value is not a valid email address'
-               }
+                notEmpty:
+                {
+                    message: 'This field is required'
+                },
+                emailAddress:
+                {
+                    message: 'The value is not a valid email address'
+                },
+                regexp:
+                {
+                    regexp: '^[^@\\s]+@([^@\\s]+\\.)+[^@\\s]+$',
+                    message: 'The value is not a valid email address'
+                }
             }
         }/*,
         "image": 
@@ -5299,27 +5299,27 @@ $('#FileManagerCategoryAdd').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "name": 
+        "name":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,&,0-9 ]+$/,
                     message: 'Name can only consist of alphanumeric'
@@ -5333,27 +5333,27 @@ $('#FileManagerCategoryEdit').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "name": 
+        "name":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,&,0-9 ]+$/,
                     message: 'Name can only consist of alphanumeric'
@@ -5367,27 +5367,27 @@ $('#SuperAdminSocailAppAddForm').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "name": 
+        "name":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'This field can only consist of alphanumeric characters'
@@ -5401,27 +5401,27 @@ $('#SuperAdminSocailAppEditForm').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "name": 
+        "name":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'This field can only consist of alphanumeric characters'
@@ -5435,40 +5435,40 @@ $('#AddUserTaskAllocation').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "title": 
+        "title":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'This field can only consist of alphanumeric characters'
                 }
             }
         },
-        "status": 
+        "status":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 }
             }
         }
@@ -5480,40 +5480,40 @@ $('#EditUserTaskAllocation').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "title": 
+        "title":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'This field can only consist of alphanumeric characters'
                 }
             }
         },
-        "status": 
+        "status":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 }
             }
         }
@@ -5525,36 +5525,36 @@ $('#AddUserSickLeave').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "title": 
+        "title":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'This field can only consist of alphanumeric characters'
                 }
             }
         },
-        "leave_date": 
+        "leave_date":
         {
-            validators: 
+            validators:
             {
                 // notEmpty: 
                 // {
@@ -5573,15 +5573,15 @@ $('#AddUserSickLeave').formValidation({
                 }
             }
         },
-        "reason": 
+        "reason":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'This field can only consist of alphanumeric characters'
@@ -5596,40 +5596,40 @@ $('#EditUserSickLeave').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "title": 
+        "title":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'This field can only consist of alphanumeric characters'
                 }
             }
         },
-        "leave_date": 
+        "leave_date":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
                 date: {
                     format: 'MM/DD/YYYY',
@@ -5637,15 +5637,15 @@ $('#EditUserSickLeave').formValidation({
                 }
             }
         },
-        "reason": 
+        "reason":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'This field can only consist of alphanumeric characters'
@@ -5660,27 +5660,27 @@ $('#SuperAdminEthnicityAddForm').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "name": 
+        "name":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'This field can only consist of alphanumeric characters'
@@ -5694,27 +5694,27 @@ $('#SuperAdminEthnicityEditForm').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "name": 
+        "name":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'This field can only consist of alphanumeric characters'
@@ -5728,27 +5728,27 @@ $('#AddUserAnnualLeave').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "title": 
+        "title":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'This field can only consist of alphanumeric characters'
@@ -5776,15 +5776,15 @@ $('#AddUserAnnualLeave').formValidation({
         //         }
         //     }
         // },
-        "reason": 
+        "reason":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'This field can only consist of alphanumeric characters'
@@ -5799,27 +5799,27 @@ $('#EditUserAnnualLeave').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "title": 
+        "title":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'This field can only consist of alphanumeric characters'
@@ -5840,15 +5840,15 @@ $('#EditUserAnnualLeave').formValidation({
         //         }
         //     }
         // },
-        "reason": 
+        "reason":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'This field can only consist of alphanumeric characters'
@@ -5865,46 +5865,46 @@ $('#sanction_leave_form').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "sanction_leave": 
+        "sanction_leave":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
             }
         },
-        "home_id": 
+        "home_id":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
             }
         },
-        "staff_user_id": 
+        "staff_user_id":
         {
-            validators: 
+            validators:
             {
-               notEmpty: 
-               {
-                  message: 'This field is required'
-               },
+                notEmpty:
+                {
+                    message: 'This field is required'
+                },
             }
         },
         "date":
@@ -5918,196 +5918,196 @@ $('#sanction_leave_form').formValidation({
 
             }
         },
-    }  
+    }
 });
 
 $('#add_company_manager_form').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "name": 
+        "name":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 2,
                     max: 30,
                     message: 'Name must between 2 to 30 alphabets'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z ]+$/,
                     message: 'Name can only consist of alphabets'
                 }
             }
         },
-        "user_name": 
+        "user_name":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 2,
                     max: 30,
                     message: 'User Name must between 2 to 30 characters'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9,_,@,# ]+$/,
                     message: 'User Name can only consist of alphanumeric characters'
                 },
-                remote: 
+                remote:
                 {
-                   message: 'User Name already exists',
-                   url: 'check_username_unique',
-                   type: 'GET',
-                   delay: 2000     // Send Ajax request every 2 seconds
+                    message: 'User Name already exists',
+                    url: 'check_username_unique',
+                    type: 'GET',
+                    delay: 2000     // Send Ajax request every 2 seconds
                 }
             }
         },
-        "email": 
+        "email":
         {
-            validators: 
+            validators:
             {
-               notEmpty: 
-               {
-                  message: 'This field is required'
-               },
-               emailAddress: 
-               {
-                  message: 'The value is not a valid email address'
-               },
-               regexp: 
-               {
-                  regexp: '^[^@\\s]+@([^@\\s]+\\.)+[^@\\s]+$',
-                  message: 'The value is not a valid email address'
-               }
-               // },
-               // remote: 
-               // {
-               //     message: 'Email already exists',
-               //     url: 'check-user-email-exists',
-               //     type: 'GET',
-               //     delay: 2000     // Send Ajax request every 2 seconds
-               // }
+                notEmpty:
+                {
+                    message: 'This field is required'
+                },
+                emailAddress:
+                {
+                    message: 'The value is not a valid email address'
+                },
+                regexp:
+                {
+                    regexp: '^[^@\\s]+@([^@\\s]+\\.)+[^@\\s]+$',
+                    message: 'The value is not a valid email address'
+                }
+                // },
+                // remote: 
+                // {
+                //     message: 'Email already exists',
+                //     url: 'check-user-email-exists',
+                //     type: 'GET',
+                //     delay: 2000     // Send Ajax request every 2 seconds
+                // }
             }
         },
-        "job_title": 
+        "job_title":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 2,
                     max: 30,
                     message: 'This field must between 2 to 30 characters'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: "This field can only consist of 'A-Z,a-z,0-9 &-' characters"
                 }
             }
         },
-      
-        "phone_no": 
+
+        "phone_no":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
                     message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 8,
                     // max: 13,
                     message: 'Phone number must contain atleast 8 digits'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[0-9 +]+$/,
                     message: 'Phone number can only consist of digits'
                 }
             }
         },
-        "description": 
+        "description":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'This field can only consist of characters'
                 }
             }
         },
-        "payroll": 
+        "payroll":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'This field can only consist of alphanumeric characters'
                 }
             }
         },
-        "holiday_entitlement": 
+        "holiday_entitlement":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'This field can only consist of alphanumeric characters'
                 }
             }
         },
-        "status": 
+        "status":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 }
             }
         },
@@ -6163,11 +6163,11 @@ $('#add_company_manager_form').formValidation({
         },
         "company_id[]":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 }
             }
         }
@@ -6181,42 +6181,42 @@ $('#add_company_manager_form').formValidation({
                   message: 'This field is required'
                 }
             }
-        }  */              
+        }  */
 
-    }  
+    }
 });
 
 $('#edit_company_manager_form').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "name": 
+        "name":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 2,
                     max: 30,
                     message: 'Name must between 2 to 30 alphabets'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z ]+$/,
                     message: 'Name can only consist of alphabets'
@@ -6251,23 +6251,23 @@ $('#edit_company_manager_form').formValidation({
         //         }
         //     }
         // },
-        "email": 
+        "email":
         {
-            validators: 
+            validators:
             {
-               notEmpty: 
-               {
-                  message: 'This field is required'
-               },
-               emailAddress: 
-               {
-                  message: 'The value is not a valid email address'
-               },
-               regexp: 
-               {
-                  regexp: '^[^@\\s]+@([^@\\s]+\\.)+[^@\\s]+$',
-                  message: 'The value is not a valid email address'
-               }/*,
+                notEmpty:
+                {
+                    message: 'This field is required'
+                },
+                emailAddress:
+                {
+                    message: 'The value is not a valid email address'
+                },
+                regexp:
+                {
+                    regexp: '^[^@\\s]+@([^@\\s]+\\.)+[^@\\s]+$',
+                    message: 'The value is not a valid email address'
+                }/*,
                remote: 
                {
                    message: 'Email already exists',
@@ -6277,108 +6277,108 @@ $('#edit_company_manager_form').formValidation({
                }*/
             }
         },
-        "job_title": 
+        "job_title":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 2,
                     max: 30,
                     message: 'This field must between 2 to 30 characters'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                     message: 'This field can only consist of characters'
                 }
             }
         },
-        "phone_no": 
+        "phone_no":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
                     message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 8,
                     // max: 13,
                     message: 'Phone number must contain atleast 8 digits'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[0-9 +]+$/,
                     message: 'Phone number can only consist of digits'
                 }
             }
         },
-        "description": 
+        "description":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 }
             },
-            regexp: 
+            regexp:
             {
                 regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                 message: 'This field can only consist of alphanumeric characters'
             }
         },
-        "payroll": 
+        "payroll":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 }
             },
-            regexp: 
+            regexp:
             {
                 regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                 message: 'This field can only consist of alphanumeric characters'
             }
         },
-        "holiday_entitlement": 
+        "holiday_entitlement":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 }
             },
-            regexp: 
+            regexp:
             {
                 regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
                 message: 'This field can only consist of alphanumeric characters'
             },
-            stringLength: 
+            stringLength:
             {
                 min: 1,
                 max: 100,
                 message: 'This field can contain between 1 to 100 characters'
             }
         },
-        "status": 
+        "status":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 1,
                     max: 2,
@@ -6394,7 +6394,7 @@ $('#edit_company_manager_form').formValidation({
                 {
                     message: 'This field is required'
                 },
-                
+
             }
         },
         "date_of_leaving":
@@ -6439,15 +6439,15 @@ $('#edit_company_manager_form').formValidation({
         },
         "company_id[]":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 }
             }
         }
-    } 
+    }
 });
 //Card Form
 
@@ -6650,78 +6650,78 @@ $('#add_earning_scheme_label_form').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "name": 
+        "name":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 2,
                     max: 30,
                     message: 'Name must between 2 to 30 alphabets'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z \/]+$/,
                     message: 'Name can only consist of alphabets'
                 }
             }
         }
-    }  
+    }
 });
 
 $('#edit_earning_scheme_label_form').formValidation({
     framework: 'bootstrap',
     excluded: [':disabled'],
     message: 'This value is not valid',
-    icon: 
+    icon:
     {
         valid: 'fa fa-check',
         invalid: 'fa fa-times',
         validating: 'fa fa-refresh'
     },
-    err: 
+    err:
     {
         container: 'popover'
     },
     fields:
     {
-        "name": 
+        "name":
         {
-            validators: 
+            validators:
             {
-                notEmpty: 
+                notEmpty:
                 {
-                  message: 'This field is required'
+                    message: 'This field is required'
                 },
-                stringLength: 
+                stringLength:
                 {
                     min: 2,
                     max: 30,
                     message: 'Name must between 2 to 30 alphabets'
                 },
-                regexp: 
+                regexp:
                 {
                     regexp: /^[A-Z,a-z \/]+$/,
                     message: 'Name can only consist of alphabets'
                 }
             }
         }
-    }  
+    }
 });

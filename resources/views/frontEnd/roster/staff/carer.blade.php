@@ -3,228 +3,228 @@
 @section('title', 'Carer')
 @section('content')
 
-    @include('frontEnd.roster.common.roster_header')
-    <style>
-        .action-buttons {
-            display: flex;
-            gap: 12px;
-        }
+@include('frontEnd.roster.common.roster_header')
+<style>
+    .action-buttons {
+        display: flex;
+        gap: 12px;
+    }
 
-        /* Export Button */
-        .btn-export {
-            background: #f3f4f6;
-            border: 1px solid #e5e7eb;
-            color: #374151;
-            font-weight: 500;
-            padding: 8px 16px;
-            border-radius: 6px;
-        }
+    /* Export Button */
+    .btn-export {
+        background: #f3f4f6;
+        border: 1px solid #e5e7eb;
+        color: #374151;
+        font-weight: 500;
+        padding: 8px 16px;
+        border-radius: 6px;
+    }
 
-        .btn-export:hover {
-            background: #e5e7eb;
-        }
+    .btn-export:hover {
+        background: #e5e7eb;
+    }
 
-        /* Add Carer Button */
-        .btn-add-carer {
-            background: #2563eb;
-            border: none;
-            color: #fff;
-            font-weight: 500;
-            padding: 8px 18px;
-            border-radius: 6px;
-        }
+    /* Add Carer Button */
+    .btn-add-carer {
+        background: #2563eb;
+        border: none;
+        color: #fff;
+        font-weight: 500;
+        padding: 8px 18px;
+        border-radius: 6px;
+    }
 
-        .btn-add-carer:hover {
-            background: #1d4ed8;
-        }
-    </style>
-    <main class="page-content">
-        <div class="container-fluid">
-            <div class="topHeaderCont">
-                <div>
-                    <h1>Carers</h1>
-                    <p class="header-subtitle">Manage your care team</p>
-                </div>
-                <div class="action-buttons">
-                    <button class="btn btn-export add_staff openStaffModal"><i class="fa fa-download"></i> Export </button>
-                    <button class="btn btn-add-carer add_staff openStaffModal"> <i class="fa fa-plus"></i> Add Carer </button>
-                </div>
-
-                {{-- <div class="header-actions">
-                    <button class="btn add_staff openStaffModal" data-mode="add"> Export </button>
-                    <button class="btn add_staff openStaffModal" data-mode="add"><i class="fa fa-plus"></i> Add Carer</button>
-                </div> --}}
+    .btn-add-carer:hover {
+        background: #1d4ed8;
+    }
+</style>
+<main class="page-content">
+    <div class="container-fluid">
+        <div class="topHeaderCont">
+            <div>
+                <h1>Carers</h1>
+                <p class="header-subtitle">Manage your care team</p>
+            </div>
+            <div class="action-buttons">
+                <button class="btn btn-export add_staff" data-mode="export"><i class="fa fa-download"></i> Export </button>
+                <button class="btn btn-add-carer add_staff openStaffModal" data-mode="add"> <i class="fa fa-plus"></i> Add Carer </button>
             </div>
 
-            <div class="rota_dashboard-cards simpleCard">
-                <div class="rota_dash-card blue">
-                    <div class="rota_dash-left">
-                        <p class="rota_title">Total Carers</p>
-                        <h2 class="rota_count" id="countAll">{{ $counts['all'] }}</h2>
-                    </div>
-                </div>
+            <!-- <div class="header-actions">
+                <button class="btn add_staff openStaffModal" data-mode="add"> Export </button>
+                <button class="btn add_staff openStaffModal" data-mode="add"><i class="fa fa-plus"></i> Add Carer</button>
+            </div> -->
+        </div>
 
-                <div class="rota_dash-card orangeClr">
-                    <div class="rota_dash-left">
-                        <p class="rota_title">Active</p>
-                        <h2 class="rota_count greenText" id="countActive">{{ $counts['active'] }}</h2>
-                    </div>
-                </div>
-
-                <div class="rota_dash-card green">
-                    <div class="rota_dash-left">
-                        <p class="rota_title">On Leave</p>
-                        <h2 class="rota_count orangeText" id="countLeave">{{ $counts['on_leave'] }}</h2>
-                    </div>
-                </div>
-
-                <div class="rota_dash-card redClr">
-                    <div class="rota_dash-left">
-                        <p class="rota_title">Inactive</p>
-                        <h2 class="rota_count" id="countInactive">{{ $counts['inactive'] }}</h2>
-                    </div>
+        <div class="rota_dashboard-cards simpleCard">
+            <div class="rota_dash-card blue">
+                <div class="rota_dash-left">
+                    <p class="rota_title">Total Carers</p>
+                    <h2 class="rota_count" id="countAll">{{ $counts['all'] }}</h2>
                 </div>
             </div>
 
-            <div class="calendarTabs leaveRequesttabs m-t-20">
-                <div class="tabs">
-                    <div class="input-group searchWithtabs">
-                        <span class="input-group-addon btn-white"><i class="fa fa-search"></i></span>
-                        <input type="text" class="form-control" placeholder="Username">
-                    </div>
-                    <button class="tab active" data-tab="allCarerActibity">All</button>
-                    <button class="tab" data-tab="activeCarer">Active</button>
-                    <button class="tab" data-tab="onLeaveCarer">On Leave</button>
-                    <button class="tab" data-tab="inactiveCarer">Inactive</button>
+            <div class="rota_dash-card orangeClr">
+                <div class="rota_dash-left">
+                    <p class="rota_title">Active</p>
+                    <h2 class="rota_count greenText" id="countActive">{{ $counts['active'] }}</h2>
                 </div>
+            </div>
 
-                <!-- TAB CONTENT -->
-                <div class="tab-content carertabcontent">
-                    <div class="content active" id="allCarerActibity">
-                        <div class="row"></div>
-                    </div>
-                    <div class="content" id="activeCarer">
-                        <div class="row"></div>
-                    </div>
-
-                    <div class="content" id="onLeaveCarer">
-                        <div class="row"></div>
-                    </div>
-
-                    <div class="content" id="inactiveCarer">
-                        <div class="row"></div>
-                    </div>
+            <div class="rota_dash-card green">
+                <div class="rota_dash-left">
+                    <p class="rota_title">On Leave</p>
+                    <h2 class="rota_count orangeText" id="countLeave">{{ $counts['on_leave'] }}</h2>
                 </div>
-                <!-- END TAB CONTENT -->
+            </div>
+
+            <div class="rota_dash-card redClr">
+                <div class="rota_dash-left">
+                    <p class="rota_title">Inactive</p>
+                    <h2 class="rota_count" id="countInactive">{{ $counts['inactive'] }}</h2>
+                </div>
             </div>
         </div>
+
+        <div class="calendarTabs leaveRequesttabs m-t-20">
+            <div class="tabs">
+                <div class="input-group searchWithtabs">
+                    <span class="input-group-addon btn-white"><i class="fa fa-search"></i></span>
+                    <input type="text" class="form-control" placeholder="Username">
+                </div>
+                <button class="tab active" data-tab="allCarerActibity">All</button>
+                <button class="tab" data-tab="activeCarer">Active</button>
+                <button class="tab" data-tab="onLeaveCarer">On Leave</button>
+                <button class="tab" data-tab="inactiveCarer">Inactive</button>
+            </div>
+
+            <!-- TAB CONTENT -->
+            <div class="tab-content carertabcontent">
+                <div class="content active" id="allCarerActibity">
+                    <div class="row"></div>
+                </div>
+                <div class="content" id="activeCarer">
+                    <div class="row"></div>
+                </div>
+
+                <div class="content" id="onLeaveCarer">
+                    <div class="row"></div>
+                </div>
+
+                <div class="content" id="inactiveCarer">
+                    <div class="row"></div>
+                </div>
+            </div>
+            <!-- END TAB CONTENT -->
         </div>
-        </div>
+    </div>
+    </div>
+    </div>
 
-        @include('frontEnd.systemManagement.elements.add_staff')
+    @include('frontEnd.systemManagement.elements.add_staff')
 
-        <script>
-            let currentTab = 'allCarerActibity';
-            let searchTimer;
+    <script>
+        let currentTab = 'allCarerActibity';
+        let searchTimer;
 
-            const tabs = document.querySelectorAll(".tab");
-            const contents = document.querySelectorAll(".content");
+        const tabs = document.querySelectorAll(".tab");
+        const contents = document.querySelectorAll(".content");
 
-            function activateTab(tab) {
-                // Change active tab UI
-                document.querySelector(".tab.active")?.classList.remove("active");
-                tab.classList.add("active");
+        function activateTab(tab) {
+            // Change active tab UI
+            document.querySelector(".tab.active")?.classList.remove("active");
+            tab.classList.add("active");
 
-                // Set current tab
-                currentTab = tab.getAttribute("data-tab");
+            // Set current tab
+            currentTab = tab.getAttribute("data-tab");
 
-                // CLEAR SEARCH INPUT
-                $('.searchWithtabs input').val('');
-                clearTimeout(searchTimer);
+            // CLEAR SEARCH INPUT
+            $('.searchWithtabs input').val('');
+            clearTimeout(searchTimer);
 
-                // Switch content
-                contents.forEach(content => content.classList.remove("active"));
-                document.getElementById(currentTab).classList.add("active");
+            // Switch content
+            contents.forEach(content => content.classList.remove("active"));
+            document.getElementById(currentTab).classList.add("active");
 
-                // Load fresh data WITHOUT search
-                loadStaff(currentTab, '');
-            }
+            // Load fresh data WITHOUT search
+            loadStaff(currentTab, '');
+        }
 
 
-            tabs.forEach(tab => {
-                tab.addEventListener("click", () => activateTab(tab));
-            });
-        </script>
+        tabs.forEach(tab => {
+            tab.addEventListener("click", () => activateTab(tab));
+        });
+    </script>
 
-        <script>
-            /* -------------------------
+    <script>
+        /* -------------------------
                 PAGE LOAD
             -------------------------- */
-            $(document).ready(function() {
-                loadStaff('allCarerActibity');
+        $(document).ready(function() {
+            loadStaff('allCarerActibity');
+        });
+
+        /* -------------------------
+        SEARCH (USERNAME)
+        -------------------------- */
+        $('.searchWithtabs input').on('keyup', function() {
+            clearTimeout(searchTimer);
+            const $input = $(this);
+
+            searchTimer = setTimeout(() => {
+                const keyword = $input.val().trim();
+                // Request server with current tab and search term; server returns filtered data + counts
+                loadStaff(currentTab, keyword);
+            }, 300);
+        });
+
+        /* -------------------------
+        LOAD STAFF (AJAX)
+        -------------------------- */
+
+        function loadStaff(type, search = '') {
+            $.ajax({
+                url: "{{ url('/roster/carer/getStaffByStatus') }}",
+                type: "POST",
+                data: {
+                    type: type,
+                    search: search,
+                    _token: "{{ csrf_token() }}"
+                },
+                success: function(res) {
+                    if (!res.status) return;
+
+                    // DATA
+                    renderStaff(type, res.data);
+                }
             });
-
-            /* -------------------------
-            SEARCH (USERNAME)
-            -------------------------- */
-            $('.searchWithtabs input').on('keyup', function() {
-                clearTimeout(searchTimer);
-                const $input = $(this);
-
-                searchTimer = setTimeout(() => {
-                    const keyword = $input.val().trim();
-                    // Request server with current tab and search term; server returns filtered data + counts
-                    loadStaff(currentTab, keyword);
-                }, 300);
-            });
-
-            /* -------------------------
-            LOAD STAFF (AJAX)
-            -------------------------- */
-
-            function loadStaff(type, search = '') {
-                $.ajax({
-                    url: "{{ url('/roster/carer/getStaffByStatus') }}",
-                    type: "POST",
-                    data: {
-                        type: type,
-                        search: search,
-                        _token: "{{ csrf_token() }}"
-                    },
-                    success: function(res) {
-                        if (!res.status) return;
-
-                        // DATA
-                        renderStaff(type, res.data);
-                    }
-                });
-            }
+        }
 
 
-            /* -------------------------
-            RENDER STAFF
-            -------------------------- */
-            function renderStaff(type, staff) {
-                const container = document.querySelector(`#${type} .row`);
-                container.innerHTML = '';
+        /* -------------------------
+        RENDER STAFF
+        -------------------------- */
+        function renderStaff(type, staff) {
+            const container = document.querySelector(`#${type} .row`);
+            container.innerHTML = '';
 
-                if (staff.length === 0) {
-                    container.innerHTML = `
+            if (staff.length === 0) {
+                container.innerHTML = `
                         <div class="leave-card">
                             <div class="leavebanktabCont">
                                 <h4>No carers found</h4>
                             </div>
                         </div>`;
-                    return;
-                }
+                return;
+            }
 
-                const BASE_URL = "{{ url('/') }}";
+            const BASE_URL = "{{ url('/') }}";
 
-                staff.forEach(carer => {
+            staff.forEach(carer => {
 
-                    const ec = carer.emergency_contacts || {};
+                const ec = carer.emergency_contacts || {};
 
-                    container.innerHTML += `
+                container.innerHTML += `
                             <div class="col-md-4">
                                 <div class="profile-card">
                                     <div class="card-header">
@@ -332,48 +332,48 @@
                                         </div>
                                     </div>
                             </div>`;
-                });
-            }
-
-            function renderQualifications(qualifications) {
-                if (!qualifications || qualifications.length === 0) {
-                    return `<span>No qualifications</span>`;
-                }
-
-                return qualifications.map(q => {
-                    // q can be object or string
-                    return `<span>${q.name ?? q}</span>`;
-                }).join('');
-            }
-
-            $(document).on('click', '.deleteCarer', function() {
-                let carerId = $(this).data('id');
-
-                if (!confirm('Are you sure you want to delete this carer?')) {
-                    return;
-                }
-
-                $.ajax({
-                    url: "{{ url('/roster/carer/delete') }}",
-                    type: "POST",
-                    data: {
-                        carer_id: carerId,
-                        _token: "{{ csrf_token() }}"
-                    },
-                    success: function(response) {
-                        if (response.status) {
-                            // alert(response.message);
-                            location.reload(); // or remove row dynamically
-                        } else {
-                            alert(response.message);
-                        }
-                    },
-                    error: function() {
-                        alert('Server error. Please try again.');
-                    }
-                });
             });
-        </script>
+        }
+
+        function renderQualifications(qualifications) {
+            if (!qualifications || qualifications.length === 0) {
+                return `<span>No qualifications</span>`;
+            }
+
+            return qualifications.map(q => {
+                // q can be object or string
+                return `<span>${q.name ?? q}</span>`;
+            }).join('');
+        }
+
+        $(document).on('click', '.deleteCarer', function() {
+            let carerId = $(this).data('id');
+
+            if (!confirm('Are you sure you want to delete this carer?')) {
+                return;
+            }
+
+            $.ajax({
+                url: "{{ url('/roster/carer/delete') }}",
+                type: "POST",
+                data: {
+                    carer_id: carerId,
+                    _token: "{{ csrf_token() }}"
+                },
+                success: function(response) {
+                    if (response.status) {
+                        // alert(response.message);
+                        location.reload(); // or remove row dynamically
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function() {
+                    alert('Server error. Please try again.');
+                }
+            });
+        });
+    </script>
 
     @endsection
 </main>

@@ -8,9 +8,8 @@ document.addEventListener('DOMContentLoaded', function () {
         schedulerLicenseKey: 'GPL-My-Project-Is-Open-Source',
         initialView: 'resourceTimelineWeek',
         resourceOrder: 'order',
-        height: 'auto',
-        expandRows: false,
-        contentHeight: 'auto',
+        height: 'calc(100vh - 250px)',
+        expandRows: true,
 
         datesSet(info) {
             // Update date range text
@@ -37,63 +36,85 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
         resourceLabelContent: function (arg) {
-            return {
-                html: `
-            <div style="display:flex;gap:10px;align-items:center">
-                <div style="
-                    width:36px;
-                    height:36px;
-                    border-radius:50%;
-                    background:#3b82f6;
-                    color:#fff;
-                    display:flex;
-                    align-items:center;
-                    justify-content:center;
-                    font-weight:600">
-                    ${arg.resource.title.substring(0, 2)}
-                </div>
-                <div>
-                    <strong>${arg.resource.title}</strong><br>
-                    <small style="color:#6b7280">0h / 40h</small>
-                </div>
-            </div>
-        `
-            }
-        },
-
-        // eventContent: function (arg) {
-        //     const isWeek = arg.view.type === 'resourceTimelineWeek';
-
-        //     return {
-        //         html: `
-        //     <div class="shift-card">
-        //         <strong>${arg.event.title}</strong>
-        //         ${!isWeek ? `<div class="time">
-        //             ${arg.timeText}
-        //         </div>` : ''}
-        //     </div>
-        // `
-        //     };
-        // },
-
-        eventContent: function (arg) {
-            if (arg.event.extendedProps.type === 'open') {
+            if (arg.resource.id === 'open') {
                 return {
                     html: `
-                    <div class="open-shift-box">
-                        <div class="dot"></div>
-                        <div class="details">
-                            <strong>${arg.event.extendedProps.location}</strong>
-                            <div class="time">
-                                ${formatTime(arg.event.start)} - ${formatTime(arg.event.end)}
-                            </div>
-                        </div>
-                    </div>
-                `
+                    <div style="display:flex;align-items:center;gap:6px;color:#ea580c;font-size:14px;font-weight:600;padding:6px 4px;">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                        Open Shifts
+                    </div>`
                 };
             }
 
-            return { html: `<div class="normal-event">${arg.event.title}</div>` };
+            const initials = arg.resource.title.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+            // Try to extract hours or default
+            const hoursLogged = 0;
+            const hoursTotal = 40;
+            const progress = (hoursLogged / hoursTotal) * 100;
+
+            return {
+                html: `
+                <div style="display:flex;gap:12px;align-items:center;padding:8px 4px;">
+                    <div style="
+                        width:32px;
+                        height:32px;
+                        border-radius:50%;
+                        background:#3b82f6;
+                        color:#fff;
+                        display:flex;
+                        align-items:center;
+                        justify-content:center;
+                        font-size:13px;
+                        font-weight:600">
+                        ${initials}
+                    </div>
+                    <div style="flex:1;">
+                        <div style="font-weight:600;color:#1f2937;font-size:13px;">${arg.resource.title}</div>
+                        <div style="display:flex;align-items:center;gap:6px;margin-top:2px;">
+                            <small style="color:#6b7280;font-size:11px;">0.0h / 40h</small>
+                            <div style="flex:1;height:4px;background:#e5e7eb;border-radius:2px;position:relative;">
+                                <div style="width:${progress}%;height:100%;background:#3b82f6;border-radius:2px;"></div>
+                            </div>
+                            <small style="color:#9ca3af;font-size:9px;font-weight:700;">FT</small>
+                        </div>
+                    </div>
+                </div>`
+            }
+        },
+
+        eventContent: function (arg) {
+            const isAssigned = arg.event.getResources().length > 0 && arg.event.getResources()[0].id !== 'open';
+            const title = arg.event.title;
+
+            // Format time safely
+            const startStr = arg.event.start ? arg.event.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) : '';
+            const endStr = arg.event.end ? arg.event.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) : '';
+            const timeStr = startStr && endStr ? `${startStr} - ${endStr}` : '';
+
+            if (!isAssigned) {
+                // Open shift styling (yellow bg implies brownish text)
+                return {
+                    html: `
+                    <div style="padding: 4px; color: #92400e; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 13px; font-weight: 500; line-height: 1.2;">
+                        <div style="display:flex; align-items:center; gap: 4px;">
+                            ${title}
+                        </div>
+                        ${timeStr ? `<div style="font-size: 11px; opacity: 0.8; margin-top: 2px; font-weight: normal;">${timeStr}</div>` : ''}
+                    </div>`
+                };
+            }
+
+            // Assigned shift styling (green bg implies dark green text)
+            return {
+                html: `
+                <div style="padding: 4px; color: #065f46; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 13px; font-weight: 500; line-height: 1.2;">
+                    <div style="display:flex; align-items:center; gap: 4px;">
+                        <span style="height: 6px; width: 6px; background-color: #059669; border-radius: 50%; display: inline-block; flex-shrink: 0;"></span>
+                        <span style="overflow: hidden; text-overflow: ellipsis;">${title}</span>
+                    </div>
+                    ${timeStr ? `<div style="font-size: 11px; opacity: 0.8; margin-top: 2px; font-weight: normal;">${timeStr}</div>` : ''}
+                </div>`
+            };
         },
 
         eventAllow: function (dropInfo, draggedEvent) {
@@ -104,7 +125,14 @@ document.addEventListener('DOMContentLoaded', function () {
         },
 
         /* ===== RESOURCE SETTINGS ===== */
-        resourceAreaHeaderContent: 'Staff',
+        resourceAreaHeaderContent: function () {
+            return {
+                html: `<div style="display:flex;align-items:center;gap:8px;color:#4b5563;font-size:14px;font-weight:600;">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                    Staff
+                </div>`
+            }
+        },
 
         /* ===== INTERACTION ===== */
         editable: true,
@@ -119,9 +147,22 @@ document.addEventListener('DOMContentLoaded', function () {
                 // 👇 THIS removes hours
                 slotDuration: { days: 1 },
 
-                slotLabelFormat: [
-                    { weekday: 'short', day: 'numeric' } // Mon 9
-                ]
+                slotLabelContent: function (arg) {
+                    const date = arg.date;
+                    const weekd = date.toLocaleDateString('en-US', { weekday: 'short' });
+                    const dayNum = date.getDate();
+
+                    const isToday = date.toDateString() === new Date().toDateString();
+                    const topColor = isToday ? '#3b82f6' : '#6b7280';
+                    const botColor = isToday ? '#3b82f6' : '#111827';
+
+                    return {
+                        html: `<div style="text-align:center;line-height:1.2;padding:4px 0;">
+                            <div style="font-size:12px;color:${topColor};font-weight:500;">${weekd}</div>
+                            <div style="font-size:16px;font-weight:600;margin-top:2px;color:${botColor};">${dayNum}</div>
+                        </div>`
+                    };
+                }
             },
 
             resourceTimelineDay: {
@@ -144,45 +185,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         },
 
-
-        /* ===== STAFF (RESOURCES) ===== */
-        // resources: [{
-        //     id: 'open',
-        //     title: '🟡 Open Shifts',
-        //     order: 0 // 👈 always first
-        // },
-        // {
-        //     id: '1',
-        //     title: 'Alex Sheffield',
-        //     order: 1 // 👈 always first
-        // },
-        // {
-        //     id: '2',
-        //     title: 'Becky Harrison',
-        //     order: 2
-        // },
-        // {
-        //     id: '3',
-        //     title: 'Emma Wilson',
-        //     order: 3
-        // },
-        // {
-        //     id: '4',
-        //     title: 'Alex Sheffield',
-        //     order: 4 // 👈 always first
-        // },
-        // {
-        //     id: '5',
-        //     title: 'Becky Harrison',
-        //     order: 5
-        // },
-        // {
-        //     id: '6',
-        //     title: 'Emma Wilson',
-        //     order: 6
-        // }
-        // ],
-
         resources: {
             url: `${BASE_URL}/roster/carer/shift-resources`,  // 👈 your Laravel route
             method: 'GET',
@@ -191,82 +193,17 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         },
         /* ===== SHIFTS (EVENTS) ===== */
-        events: [
-            // 🟡 OPEN SHIFTS
-            {
-                id: '101',
-                title: 'South Wing',
-                start: '2026-01-22T09:00:00',
-                end: '2026-01-22T13:00:00',
-                resourceId: 'open',
-                backgroundColor: '#fde68a'
+        events: {
+            url: `${BASE_URL}/roster/carer/shifts`,
+            method: 'GET',
+            success: function (data) {
+                console.log("🔥 Successfully fetched shifts data: ", data);
             },
-            {
-                id: '102',
-                title: 'Night Shift',
-                start: '2026-01-23T20:00:00',
-                end: '2026-01-24T06:00:00',
-                resourceId: 'open',
-                backgroundColor: '#fde68a'
-            },
-            {
-                id: '103',
-                title: 'East Wing',
-                start: '2026-01-24T10:00:00',
-                end: '2026-01-24T18:00:00',
-                resourceId: 'open',
-                backgroundColor: '#fde68a'
-            },
-            // 🟢 ASSIGNED SHIFTS
-            {
-                id: '104',
-                title: 'South Wing',
-                start: '2026-01-22T09:00:00',
-                end: '2026-01-22T13:00:00',
-                resourceId: '1',
-                backgroundColor: '#d1fae5'
-            },
-            {
-                id: '105',
-                title: 'North Wing',
-                start: '2026-01-23T09:00:00',
-                end: '2026-01-23T17:00:00',
-                resourceId: '2',
-                backgroundColor: '#bbf7d0'
-            },
-            {
-                id: '106',
-                title: 'East Wing',
-                start: '2026-01-24T10:00:00',
-                end: '2026-01-24T18:00:00',
-                resourceId: '3',
-                backgroundColor: '#a7f3d0'
-            },
-            {
-                id: '107',
-                title: 'South Wing',
-                start: '2026-01-22T09:00:00',
-                end: '2026-01-22T13:00:00',
-                resourceId: '1',
-                backgroundColor: '#d1fae5'
-            },
-            {
-                id: '108',
-                title: 'North Wing',
-                start: '2026-01-23T09:00:00',
-                end: '2026-01-23T17:00:00',
-                resourceId: '2',
-                backgroundColor: '#bbf7d0'
-            },
-            {
-                id: '109',
-                title: 'East Wing',
-                start: '2026-01-24T10:00:00',
-                end: '2026-01-24T18:00:00',
-                resourceId: '3',
-                backgroundColor: '#a7f3d0'
+            failure: function () {
+                console.error("❌ Failed to load shifts!");
+                alert('Failed to load shifts');
             }
-        ]
+        }
     });
 
     calendar.render();
@@ -314,12 +251,12 @@ document.addEventListener('DOMContentLoaded', function () {
             '📅 ' + formatDateRange(view);
     }
 
+    if (window.ResizeObserver) {
+        new ResizeObserver(function () {
+            calendar.updateSize();
+        }).observe(calendarEl);
+    }
 
-});
-
-calendar.on('datesSet', function (info) {
-    document.getElementById('dateRange').innerText =
-        '📅 ' + formatDateRange(info.view);
 });
 
 function formatTime(date) {

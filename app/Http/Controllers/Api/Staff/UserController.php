@@ -14,6 +14,7 @@ use App\Http\Requests\Staff\StoreStaffRequest;
 use Carbon\Carbon;
 use App\Services\Staff\StaffService;
 use App\UserQualification;
+use App\Models\ScheduledShift;
 
 class UserController extends Controller
 {
@@ -446,10 +447,46 @@ class UserController extends Controller
 
 	public function setPassword() {}
 
-	public function cources_list()
+	public function cources_list(Request $request)
 	{
+		$validator = Validator::make($request->all(), [
+			'user_id' => 'required',
+		]);
+		if ($validator->fails()) {
+			return [
+				'success' => false,
+				'errors' => $validator->errors()->first()
+			];
+		}
 		$courses = $this->staffService->courses();
-
+		// echo "<pre>";print_r($courses);die;
+		$data = array();
+		foreach ($courses as $val) {
+			$isSelect = 0;
+			$previous_id = '';
+			$previous_image = '';
+			$qualificationDetails = UserQualification::where(['user_id' => $request->user_id, 'course_id' => $val['course_id'], 'is_deleted' => 0])
+				->first();
+			if ($qualificationDetails) {
+				$isSelect = 1;
+				$previous_id = $qualificationDetails->id;
+				$previous_image = url('public/images/userQualification') . '/' . $qualificationDetails->image;
+			}
+			$data[] = [
+				'course_id' => $val['course_id'],
+				'coursenumber' => $val['coursenumber'],
+				'title' => $val['title'],
+				'level' => $val['level'],
+				'country_name' => $val['country_name'],
+				'image' => $val['image'],
+				'description' => $val['description'],
+				'course_credit' => $val['course_credit'],
+				'passing_score' => $val['passing_score'],
+				'isSelect' => $isSelect,
+				'previous_id' => $previous_id,
+				'previous_image' => $previous_image
+			];
+		}
 		if (empty($courses)) {
 			return response()->json([
 				'success' => false,
@@ -460,18 +497,62 @@ class UserController extends Controller
 
 		return response()->json([
 			'success' => true,
-			'data'    => $courses
+			'message' => "Course List",
+			'data'    => $data
 		], 200);
 	}
 
+	// public function addStaffQualification(Request $request)
+	// {
+	// 	// echo "<pre>";print_r($request->all());die;
+	// 	$validator = Validator::make($request->all(), [
+	// 		'user_id'    => 'required|exists:user,id',
+	// 		'qualification' => 'required|array',
+	// 		'qualification.*.course_id' => 'required|integer',
+	// 		'qualification.*.name' => 'required|string',
+	// 		'qualification.*.cert' => 'nullable',
+	// 		'qualification.*.previous_id' => 'nullable|integer|exists:user_qualification,id',
+	// 	]);
+	// 	if ($validator->fails()) {
+	// 		return response()->json([
+	// 			'success' => false,
+	// 			'errors'  => $validator->errors()
+	// 		], 422);
+	// 	}
+
+	// 	$result = UserQualification::saveQualification($request->qualification, $request->user_id);
+
+	// 	if ($result === false) {
+	// 		return response()->json([
+	// 			'success' => false,
+	// 			'message' => 'Failed to assign courses to staff user.'
+	// 		], 500);
+	// 	}
+
+	// 	return response()->json([
+	// 		'success' => true,
+	// 		'message' => 'Qualification assigned to staff user successfully.'
+	// 	], 200);
+	// }
 	public function addStaffQualification(Request $request)
 	{
-		$validator = Validator::make($request->all(), [
-			'user_id'    => 'required|exists:user,id',
+		// echo "<pre>";print_r($request->all());die;
+		$qualifications = $request->input('qualification', []);
+		$flatQualifications = collect($qualifications)
+			->flatten(1)
+			->values()
+			->all();
+
+		$data = $request->all();
+		$data['qualification'] = $flatQualifications;
+		$validator = Validator::make($data, [
+			'user_id' => 'required|exists:user,id',
+
 			'qualification' => 'required|array',
 			'qualification.*.course_id' => 'required|integer',
 			'qualification.*.name' => 'required|string',
-			'qualification.*.image' => 'nullable'
+			'qualification.*.cert' => 'nullable',
+			'qualification.*.previous_id' => 'nullable|integer|exists:user_qualification,id',
 		]);
 
 		if ($validator->fails()) {
@@ -481,7 +562,7 @@ class UserController extends Controller
 			], 422);
 		}
 
-		$result = UserQualification::saveQualification($request->qualification, $request->user_id);
+		$result = UserQualification::saveQualification($flatQualifications, $request->user_id);
 
 		if ($result === false) {
 			return response()->json([
@@ -493,6 +574,106 @@ class UserController extends Controller
 		return response()->json([
 			'success' => true,
 			'message' => 'Qualification assigned to staff user successfully.'
+		], 200);
+	}
+	public function staffQualificationList(Request $request)
+	{
+		$validator = Validator::make($request->all(), [
+			'user_id' => 'required',
+		]);
+		if ($validator->fails()) {
+			return [
+				'success' => false,
+				'errors' => $validator->errors()->first()
+			];
+		}
+		$qualifications = UserQualification::where(['user_id' => $request->user_id, 'is_deleted' => 0])
+			->get();
+		$data = array();
+		foreach ($qualifications as $val) {
+			$data[] = [
+				'id' => $val->id,
+				'user_id' => $val->user_id,
+				'name' => $val->name,
+				'image' => url('public/images/userQualification') . '/' . $val->image,
+			];
+		}
+		return response()->json([
+			'success' => true,
+			'data' => $data,
+			'message' => 'Qualification List.'
+		], 200);
+	}
+
+	public function dashboard(Request $request)
+	{
+		// Validate the incoming request
+		$validator = Validator::make($request->all(), [
+			'staff_id' => 'required',
+		]);
+		if ($validator->fails()) {
+			return [
+				'success' => false,
+				'errors' => $validator->errors()->first()
+			];
+		}
+
+		// Fetch scheduled shifts for the given staff member
+		$staffId = $request->input('staff_id');
+		$shifts = ScheduledShift::where('staff_id', $staffId);
+		// echo "<pre>"; print_r($shifts); die;
+		$londonTime = Carbon::now('Europe/London');
+		$data['date_time'] = $londonTime->format('D d M Y');
+		$hour = $londonTime->hour;
+
+		if ($hour >= 5 && $hour < 12) {
+			$greeting = "Good Morning";
+		} elseif ($hour >= 12 && $hour < 17) {
+			$greeting = "Good Afternoon";
+		} elseif ($hour >= 17 && $hour < 21) {
+			$greeting = "Good Evening";
+		} else {
+			$greeting = "Good Night";
+		}
+		$user = User::where('id', $staffId)->select('name')->first();
+		$data['greeting'] = $greeting . ", " . $user->name;
+		$today = $londonTime->toDateString();
+		// echo "<pre>";
+		// print_r($today);
+		// die;
+		// Today shift: next assigned shift after current time
+		$todayShift = ScheduledShift::where('staff_id', $staffId)
+			->where('start_date', $today)
+			->where('status', 'in_progress')
+			// ->where('start_time', '>', $londonTime->format('H:i:s'))
+			->select('start_time', 'end_time', 'tasks', 'notes', 'id')
+			->first();
+		// dd($todayShift);
+
+		if ($todayShift) {
+			$todayShift->start_time = Carbon::parse($todayShift->start_time)->format('H:i');
+			$todayShift->end_time   = Carbon::parse($todayShift->end_time)->format('H:i');
+			$data['today_shift'] = $todayShift;
+		} else {
+			$data['today_shift'] = null;
+		}
+
+		// Tomorrow shift: first shift after today
+		$tomorrowShift = ScheduledShift::where('staff_id', $staffId)
+			->select('start_time', 'end_time', 'tasks', 'id')
+			->where('start_date', '>', $today)
+			->first();
+		if ($tomorrowShift) {
+			$tomorrowShift->start_time = Carbon::parse($tomorrowShift->start_time)->format('H:i');
+			$tomorrowShift->end_time   = Carbon::parse($tomorrowShift->end_time)->format('H:i');
+			$data['tommorrow_shift'] = $tomorrowShift;
+		} else {
+			$data['tommorrow_shift'] = null;
+		}
+		return response()->json([
+			'success' => true,
+			'data' => $data,
+			'message' => 'Shift schedule fetched successfully.'
 		], 200);
 	}
 }

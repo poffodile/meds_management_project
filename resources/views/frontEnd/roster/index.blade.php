@@ -22,7 +22,7 @@
         <!-- Alerts -->
         <div class="rota_alerts" id="alertsContainer">
             @forelse ($scheduled_shifts as $shift)
-            <div class="rota_alert" @if($loop->index >= 3) style="display: none;" class="rota_alert extra-alert" @endif>
+            <div class="rota_alert {{ $loop->index >= 3 ? 'extra-alert' : '' }}" @if($loop->index >= 3) style="display: none;" @endif>
                 <div class="rota_alert-icon"><i class="fa fa fa-calendar-o"></i></div>
                 <div class="rota_alert-content">
                     <div class="rota_alert-title">{{ $shift->client_name ?? 'Unknown Client' }} - {{ date('H:i', strtotime($shift->start_time)) }}</div>
@@ -49,15 +49,29 @@
             @endforelse
 
             @if(count($scheduled_shifts) > 3)
-            <div class="rota_view-all" id="viewAllAlerts" style="cursor: pointer;" onclick="showAllAlerts()">View All ({{ count($scheduled_shifts) }}) →</div>
+            <div class="rota_view-all" id="viewAllAlerts" style="cursor: pointer;" onclick="toggleAlerts()">View All ({{ count($scheduled_shifts) }}) →</div>
             @endif
         </div>
 
         <script>
-            function showAllAlerts() {
-                const extras = document.querySelectorAll('#alertsContainer .rota_alert');
-                extras.forEach(item => item.style.display = 'flex');
-                document.getElementById('viewAllAlerts').style.display = 'none';
+            function toggleAlerts() {
+                const extras = document.querySelectorAll('#alertsContainer .extra-alert');
+                const btn = document.getElementById('viewAllAlerts');
+                let isHidden = true;
+
+                if (extras.length > 0) {
+                    isHidden = extras[0].style.display === 'none';
+                }
+
+                extras.forEach(item => {
+                    item.style.display = isHidden ? 'flex' : 'none';
+                });
+
+                if (isHidden) {
+                    btn.innerText = 'Show Less ↑';
+                } else {
+                    btn.innerText = 'View All ({{ count($scheduled_shifts) }}) →';
+                }
             }
         </script>
 

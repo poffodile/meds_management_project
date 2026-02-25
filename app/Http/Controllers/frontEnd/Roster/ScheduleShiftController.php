@@ -12,6 +12,8 @@ use App\Models\ScheduledShift;
 use App\Models\ShiftRecurrence;
 use App\Models\ShiftAssessment;
 use App\Models\ShiftDocument;
+use Carbon\Carbon;
+use App\User;
 
 class ScheduleShiftController extends Controller
 {
@@ -27,6 +29,10 @@ class ScheduleShiftController extends Controller
         $data['company_department'] = CompanyDepartment::getActiveCompanyDepartment();
         $data['service_users'] = $this->serviceUserService->getAllserviceUser();
         $data['dynamic_form_builder'] = DynamicFormBuilder::getFormList();
+        $data['scheduled_shifts_by_group'] = ScheduledShift::with(['client', 'staff'])
+            ->where('home_id', Auth::user()->home_id)
+            ->orderBy('start_date', 'desc')
+            ->get();
 
         $data['scheduled_shifts'] = ScheduledShift::with(['client', 'staff'])
             ->where('home_id', Auth::user()->home_id)
@@ -51,7 +57,8 @@ class ScheduleShiftController extends Controller
             'start_time' => 'required',
             'end_time'   => 'required|after:start_time',
         ]);
-
+        // Determine shift status based on staff assignment
+        $status = isset($request->carer_id) ? 'assigned' : 'unfilled';
         try {
             // 1. Create the main shift record using Eloquent
             $shift = ScheduledShift::create([
@@ -66,6 +73,7 @@ class ScheduleShiftController extends Controller
                 'start_date'        => $request->start_date,
                 'start_time'        => $request->start_time,
                 'end_time'          => $request->end_time,
+                'status'            => $status,
                 'shift_type'        => $request->shift_type,
                 'tasks'             => $request->tasks,
                 'notes'             => $request->notes,
@@ -140,5 +148,259 @@ class ScheduleShiftController extends Controller
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Error saving shift: ' . $e->getMessage());
         }
+    }
+
+    public function updateShift(Request $request, $id)
+    {
+        $shift = ScheduledShift::findOrFail($id);
+
+        $request->validate([
+            'client_id'  => 'required',
+            'start_date' => 'required',
+            'carer_id'   => 'nullable',
+            'start_time' => 'required',
+            'end_time'   => 'required|after:start_time',
+        ]);
+
+        $status = isset($request->carer_id) ? 'assigned' : 'unfilled';
+
+        try {
+            $shift->update([
+                'care_type_id'      => $request->care_type,
+                'assignment'        => $request->assignment ?? 'Client',
+                'service_user_id'   => $request->client_id,
+                'property_id'       => $request->property_id,
+                'location_name'     => $request->location_name,
+                'location_address'  => $request->location_address,
+                'staff_id'          => $request->carer_id,
+                'start_date'        => $request->start_date,
+                'start_time'        => $request->start_time,
+                'end_time'          => $request->end_time,
+                'status'            => $status,
+                'shift_type'        => $request->shift_type,
+                'tasks'             => $request->tasks,
+                'notes'             => $request->notes,
+            ]);
+
+            return redirect()->back()->with('success', 'Shift updated successfully');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Error updating shift: ' . $e->getMessage());
+        }
+    }
+
+    public function getWeeklyData(Request $request)
+    {
+        $startOfWeek = $request->week
+            ? Carbon::parse($request->week)->startOfWeek()
+            : Carbon::now()->startOfWeek();
+
+        $endOfWeek = $startOfWeek->copy()->endOfWeek();
+
+        $home_id = auth()->user()->home_id;
+
+        $staff = User::where('home_id', $home_id)
+            ->where('status', 1)
+            ->where('is_deleted', 0)
+            ->get();
+
+        $shifts = ScheduledShift::where('home_id', $home_id)
+            ->whereBetween('start_date', [
+                $startOfWeek->format('Y-m-d'),
+                $endOfWeek->format('Y-m-d')
+            ])
+            ->get()
+            ->map(function ($shift) {
+                $startTime = \Carbon\Carbon::parse($shift->start_time);
+                $endTime = \Carbon\Carbon::parse($shift->end_time);
+
+                return [
+                    'id'               => $shift->id,
+                    'staff_id'         => $shift->staff_id,
+                    'start_date'       => Carbon::parse($shift->start_date)->format('Y-m-d'),
+                    'start_time'       => $shift->start_time,
+                    'end_time'         => $shift->end_time,
+                    'shift_type'       => $shift->shift_type,
+                    'location'         => $shift->location_name,
+                    'client_id'        => $shift->service_user_id,
+                    'property_id'      => $shift->property_id,
+                    'location_name'    => $shift->location_name,
+                    'location_address' => $shift->location_address,
+                    'start_time_raw'   => $startTime->format('H:i'),
+                    'end_time_raw'     => $endTime->format('H:i'),
+                    'shift_type_raw'   => $shift->shift_type,
+                    'care_type_id'     => $shift->care_type_id,
+                    'assignment'       => $shift->assignment,
+                    'notes'            => $shift->notes,
+                    'tasks'            => $shift->tasks,
+                ];
+            });
+
+        return response()->json([
+            'staff'  => $staff,
+            'shifts' => $shifts,
+            'start'  => $startOfWeek->format('Y-m-d'),
+            'end'    => $endOfWeek->format('Y-m-d'),
+        ]);
+    }
+
+    public function scheduleShiftByGroup()
+    {
+        $homeId = auth()->user()->home_id;
+
+        $staffs = User::with(['shifts' => function ($query) use ($homeId) {
+            $query->where('home_id', $homeId)
+                ->orderBy('start_date', 'desc');
+        }, 'shifts.client'])
+            ->where('home_id', $homeId)
+            ->where('status', 1)
+            ->get();
+
+        // Map shift UI attributes
+        $staffs->transform(function ($staff) {
+            $staff->shifts->transform(function ($shift) {
+                $startTime = \Carbon\Carbon::parse($shift->start_time);
+                $endTime = \Carbon\Carbon::parse($shift->end_time);
+
+                $shift->start_time_raw = $startTime->format('H:i');
+                $shift->end_time_raw = $endTime->format('H:i');
+                $shift->shift_type_raw = $shift->shift_type;
+                $shift->client_id = $shift->service_user_id;
+
+                return $shift;
+            });
+            return $staff;
+        });
+
+        return response()->json($staffs);
+    }
+
+    public function get90DaysData(Request $request)
+    {
+        $startDate = Carbon::parse($request->date ?? now());
+        $endDate = $startDate->copy()->addDays(90);
+
+        $shifts = ScheduledShift::whereBetween('start_date', [$startDate, $endDate])->get();
+
+        $total = $shifts->count();
+        $filled = $shifts->where('status', 'assigned')->count();
+        $unfilled = $shifts->where('status', 'unfilled')->count();
+        $completed = $shifts->where('status', 'completed')->count();
+
+        $fillRate = $total > 0 ? round(($filled / $total) * 100) : 0;
+
+        $weekly = $shifts->groupBy(function ($shift) {
+            return Carbon::parse($shift->shift_date)
+                ->startOfWeek()
+                ->format('Y-m-d');
+        });
+
+        $weeklyData = [];
+
+        foreach ($weekly as $weekStart => $weekShifts) {
+
+            $weekTotal = $weekShifts->count();
+            $weekFilled = $weekShifts->where('status', 'assigned')->count();
+            $weekUnfilled = $weekShifts->where('status', 'unfilled')->count();
+            $weekCompleted = $weekShifts->where('status', 'completed')->count();
+            $weekFillRate = $weekTotal > 0 ? round(($weekFilled / $weekTotal) * 100) : 0;
+
+            $weeklyData[] = [
+                'week_start' => $weekStart,
+                'week_end' => Carbon::parse($weekStart)->addDays(6)->format('Y-m-d'),
+                'total' => $weekTotal,
+                'filled' => $weekFilled,
+                'unfilled' => $weekUnfilled,
+                'completed' => $weekCompleted,
+                'fill_rate' => $weekFillRate
+            ];
+        }
+
+        return response()->json([
+            'summary' => [
+                'total' => $total,
+                'filled' => $filled,
+                'unfilled' => $unfilled,
+                'completed' => $completed,
+                'fill_rate' => $fillRate
+            ],
+            'weekly' => $weeklyData
+        ]);
+    }
+
+    public function getMonthlyShifts(Request $request)
+    {
+        $shifts = ScheduledShift::where('home_id', auth()->user()->home_id)
+            ->whereBetween('start_date', [$request->start, $request->end])
+            ->get();
+
+        $events = [];
+
+        foreach ($shifts as $shift) {
+
+            // Status color mapping (same as your legend)
+            switch (strtolower($shift->status)) {
+                case 'completed':
+                    $color = '#22c55e'; // green
+                    break;
+                case 'in progress':
+                    $color = '#eab308'; // yellow
+                    break;
+                case 'assigned':
+                case 'scheduled':
+                    $color = '#a855f7'; // purple
+                    break;
+                case 'published':
+                    $color = '#3b82f6'; // blue
+                    break;
+                case 'unfilled':
+                    $color = '#f97316'; // orange
+                    break;
+                case 'cancelled':
+                    $color = '#ef4444'; // red
+                    break;
+                default:
+                    $color = '#9ca3af'; // draft gray
+            }
+
+            $startTime = \Carbon\Carbon::parse($shift->start_time);
+            $endTime = \Carbon\Carbon::parse($shift->end_time);
+
+            $events[] = [
+                'title' => date('H:i', strtotime($shift->start_time)),
+                'start' => $shift->start_date,
+                'backgroundColor' => $color,
+                'borderColor' => $color,
+                'status' => strtolower($shift->status),
+                'shift_id' => $shift->id,
+                'shift_type_raw' => $shift->shift_type,
+                'start_time_raw' => $startTime->format('H:i'),
+                'end_time_raw' => $endTime->format('H:i'),
+                'staff_id' => $shift->staff_id,
+                'client_id' => $shift->service_user_id,
+                'property_id' => $shift->property_id,
+                'location_name' => $shift->location_name,
+                'location_address' => $shift->location_address,
+                'start_date' => $shift->start_date,
+                'care_type' => $shift->care_type_id,
+                'assignment' => $shift->assignment,
+                'notes' => $shift->notes,
+                'tasks' => $shift->tasks,
+            ];
+        }
+
+        return response()->json($events);
+    }
+
+    public function deleteShift(Request $request, $id)
+    {
+        $shift = ScheduledShift::where('home_id', Auth::user()->home_id)->find($id);
+
+        if (!$shift) {
+            return response()->json(['success' => false, 'message' => 'Shift not found'], 404);
+        }
+
+        $shift->delete();
+
+        return response()->json(['success' => true, 'message' => 'Shift deleted successfully']);
     }
 }

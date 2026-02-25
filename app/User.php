@@ -10,6 +10,7 @@ use App\Home, App\Admin, App\StaffSickLeave;
 use App\Models\PersonalManagement\TimeSheet;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
+use App\Models\ScheduledShift;
 
 class User extends Authenticatable
 {
@@ -351,6 +352,10 @@ class User extends Authenticatable
         );
     }
 
+    public function shifts()
+    {
+        return $this->hasMany(ScheduledShift::class, 'staff_id');
+    }
 
 
 

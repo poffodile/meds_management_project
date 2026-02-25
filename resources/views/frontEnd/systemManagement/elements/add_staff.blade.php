@@ -10,20 +10,20 @@
                 <div class="modal-body heightScrollModal">
                     <div class="row">
                         <div class="form-group col-md-6 col-sm-6 col-xs-12">
-                            <label>Name</label>
+                            <label>Name <span class="radStar">*</span></label>
                             <input type="hidden" name="staff_id" id="staff_id" value="">
                             <input type="text" name="staff_name" id="staff_name" placeholder="name" class="form-control" maxlength="255">
                         </div>
                         <div class="form-group col-md-6 col-sm-6 col-xs-12">
-                            <label>Username</label>
+                            <label>Username <span class="radStar">*</span></label>
                             <input type="text" id="staff_user_name" name="staff_user_name" placeholder="username" class="form-control" maxlength="255">
                         </div>
                         <div class="form-group col-md-6 col-sm-6 col-xs-12">
-                            <label>Phone Number</label>
+                            <label>Phone Number <span class="radStar">*</span></label>
                             <input type="text" name="staff_phone_no" id="staff_phone_no" required placeholder="phone number" class="form-control" maxlength="15">
                         </div>
                         <div class="form-group col-md-16 col-sm-6 col-xs-12">
-                            <label>Email</label>
+                            <label>Email <span class="radStar">*</span></label>
                             <input type="email" name="staff_email" id="staff_email" placeholder="email" class="form-control" maxlength="255">
                         </div>
                         <div class="form-group col-md-6 col-sm-6 col-xs-12">
@@ -34,7 +34,7 @@
                             <label>Department</label>
                             <select class="form-control" name="department" id="department">
                                 @foreach ($department as $dept)
-                                    <option value="{{ $dept['id'] }}">{{ $dept['name'] }}</option>
+                                <option value="{{ $dept['id'] }}">{{ $dept['name'] }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -58,7 +58,7 @@
                             <label>Access Level</label>
                             <select name="access_level" class="form-control" id="access_level">
                                 @foreach ($access_levels as $level)
-                                    <option value="{{ $level['id'] }}">{{ $level['name'] }}</option>
+                                <option value="{{ $level['id'] }}">{{ $level['name'] }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -147,27 +147,27 @@
                                 <div class="input_fields_wrap checkandUpload">
 
                                     @foreach ($courses as $key => $course)
-                                        <div class="form-group">
-                                            <label>
-                                                <input type="checkbox"
-                                                    name="qualifications[{{ $course['course_id'] }}][course_id]"
-                                                    value="{{ $course['course_id'] }}">
+                                    <div class="form-group">
+                                        <label>
+                                            <input type="checkbox"
+                                                name="qualifications[{{ $course['course_id'] }}][course_id]"
+                                                value="{{ $course['course_id'] }}">
 
-                                                {{ $course['title'] }}
+                                            {{ $course['title'] }}
 
-                                                <input type="hidden"
-                                                    name="qualifications[{{ $course['course_id'] }}][name]"
-                                                    value="{{ $course['title'] }}">
-                                            </label>
+                                            <input type="hidden"
+                                                name="qualifications[{{ $course['course_id'] }}][name]"
+                                                value="{{ $course['title'] }}">
+                                        </label>
 
-                                            <!-- certificate -->
-                                            <div class="btn-file p-0">
-                                                <span class="">
-                                                    <input type="file" name="qualifications[{{ $course['course_id'] }}][cert]" class="default qual_upload" accept="application/pdf,.pdf">
-                                                </span>
-                                                <div class="qual-preview" id="qual-preview-{{ $course['course_id'] }}" style="margin-top:8px;"></div>
-                                            </div>
+                                        <!-- certificate -->
+                                        <div class="btn-file p-0">
+                                            <span class="">
+                                                <input type="file" name="qualifications[{{ $course['course_id'] }}][cert]" class="default qual_upload" accept="application/pdf,.pdf">
+                                            </span>
+                                            <div class="qual-preview" id="qual-preview-{{ $course['course_id'] }}" style="margin-top:8px;"></div>
                                         </div>
+                                    </div>
                                     @endforeach
 
                                 </div>
@@ -271,7 +271,7 @@
             if (!currdate) return;
             var newFormat = String(currdate.getDate()).padStart(2, '0') + "-" + String(currdate.getMonth() + 1).padStart(2, '0') + "-" + currdate.getFullYear();
             $('.joining-date').val(newFormat);
-             // keep the picker UI in sync
+            // keep the picker UI in sync
             $('#joining-date').datetimepicker('update', newFormat);
 
             // Constraint: Leaving date must be after joining date
@@ -631,7 +631,7 @@
             $('#modalTitle').text('Edit Staff');
             const staffId = $btn.attr('data-id') || $btn.data('id');
             // set form action at runtime so staffId is appended correctly
-            $('#add_staff').attr('action', '{{ url('roster/carer-update') }}/' + staffId);
+            $('#add_staff').attr('action', '{{ url("roster/carer-update") }}/' + staffId);
 
             // qualifications may be passed as JSON in data-qualifications
             let qualifications = [];

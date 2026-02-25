@@ -248,4 +248,215 @@ class CarerController extends Controller
             'data'    => []
         ], 200);
     }
+
+    public function allShifts()
+    {
+        $shifts = \App\Models\ScheduledShift::all();
+
+        $events = $shifts->map(function ($shift) {
+            $startDate = $shift->start_date;
+            $endDate = $shift->end_date ?? $shift->start_date;
+
+            return [
+                'id' => (string) $shift->id,
+                'title' => $shift->client_name ?? ucfirst($shift->shift_type) ?? 'Shift',
+                'start' => $startDate . 'T' . $shift->start_time,
+                'end' => $endDate . 'T' . $shift->end_time,
+                'resourceId' => $shift->staff_id ? (string) $shift->staff_id : 'open',
+                'backgroundColor' => $shift->staff_id ? '#d1fae5' : '#fde68a',
+            ];
+        })->toArray();
+
+        return response()->json($events);
+    }
+
+    public function dayShifts(Request $request)
+    {
+        $date = $request->query('date', date('Y-m-d'));
+        $shifts = \App\Models\ScheduledShift::with(['staff', 'client'])
+            ->where('start_date', $date)
+            ->get();
+
+        $formatted = $shifts->map(function ($shift) {
+            $startTime = \Carbon\Carbon::parse($shift->start_time);
+            $endTime = \Carbon\Carbon::parse($shift->end_time);
+            $durationFormat = $startTime->diffInHours($endTime);
+
+            return [
+                'id' => $shift->id,
+                'shift_type' => ucfirst($shift->shift_type),
+                'shift_type_raw' => $shift->shift_type,
+                'start_time' => $startTime->format('H:i'),
+                'start_time_raw' => $startTime->format('H:i'),
+                'end_time' => $endTime->format('H:i'),
+                'end_time_raw' => $endTime->format('H:i'),
+                'duration' => $durationFormat . 'h',
+                'staff_name' => $shift->staff ? $shift->staff->name : 'Unassigned',
+                'staff_id' => $shift->staff_id,
+                'client_name' => $shift->client ? $shift->client->name : 'Unknown Location',
+                'client_id' => $shift->service_user_id,
+                'property_id' => $shift->property_id,
+                'location_name' => $shift->location_name,
+                'location_address' => $shift->location_address,
+                'start_date' => $shift->start_date,
+                'care_type' => $shift->care_type_id,
+                'assignment' => $shift->assignment,
+                'notes' => $shift->notes,
+                'tasks' => $shift->tasks,
+            ];
+        });
+
+        return response()->json([
+            'date' => \Carbon\Carbon::parse($date)->format('l, F j, Y'),
+            'total' => $shifts->count(),
+            'shifts' => $formatted
+        ]);
+    }
+    public function weekShifts(Request $request)
+    {
+        $dateStr = $request->query('date', date('Y-m-d'));
+        $date = \Carbon\Carbon::parse($dateStr);
+        // Assuming week starts on Monday
+        $startOfWeek = $date->copy()->startOfWeek(\Carbon\Carbon::MONDAY);
+        $endOfWeek = $date->copy()->endOfWeek(\Carbon\Carbon::SUNDAY);
+
+        $shifts = \App\Models\ScheduledShift::with(['staff', 'client'])
+            ->whereBetween('start_date', [$startOfWeek->format('Y-m-d'), $endOfWeek->format('Y-m-d')])
+            ->get();
+
+        $weekData = [];
+        $currentDate = $startOfWeek->copy();
+
+        while ($currentDate <= $endOfWeek) {
+            $dateKey = $currentDate->format('Y-m-d');
+
+            $dayShifts = $shifts->where('start_date', $dateKey)->map(function ($shift) {
+                $startTime = \Carbon\Carbon::parse($shift->start_time);
+                $endTime = \Carbon\Carbon::parse($shift->end_time);
+                $durationFormat = $startTime->diffInHours($endTime);
+
+                return [
+                    'id' => $shift->id,
+                    'shift_type' => ucfirst($shift->shift_type),
+                    'shift_type_raw' => $shift->shift_type,
+                    'start_time' => $startTime->format('H:i'),
+                    'start_time_raw' => $startTime->format('H:i'),
+                    'end_time' => $endTime->format('H:i'),
+                    'end_time_raw' => $endTime->format('H:i'),
+                    'duration' => $durationFormat . 'h',
+                    'staff_name' => $shift->staff ? $shift->staff->name : 'Unassigned',
+                    'staff_id' => $shift->staff_id,
+                    'client_name' => $shift->client ? $shift->client->name : 'Unknown Location',
+                    'client_id' => $shift->service_user_id,
+                    'property_id' => $shift->property_id,
+                    'location_name' => $shift->location_name,
+                    'location_address' => $shift->location_address,
+                    'start_date' => $shift->start_date,
+                    'care_type' => $shift->care_type_id,
+                    'assignment' => $shift->assignment,
+                    'notes' => $shift->notes,
+                    'tasks' => $shift->tasks,
+                ];
+            })->values();
+
+            $weekData[] = [
+                'date' => $dateKey,
+                'day_name' => $currentDate->format('D'),
+                'day_number' => $currentDate->format('d'),
+                'is_today' => $dateKey == date('Y-m-d'),
+                'shifts' => $dayShifts
+            ];
+
+            $currentDate->addDay();
+        }
+
+        return response()->json([
+            'week_label' => $startOfWeek->format('M j') . ' - ' . $endOfWeek->format('M j, Y'),
+            'days' => $weekData
+        ]);
+    }
+
+    public function ninetyDaysShifts(Request $request)
+    {
+        $dateStr = $request->query('date', date('Y-m-d'));
+        $startDate = \Carbon\Carbon::parse($dateStr);
+        $endDate = $startDate->copy()->addDays(90);
+
+        $shifts = \App\Models\ScheduledShift::whereBetween('start_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->get();
+
+        $totalShifts = $shifts->count();
+        $unfilledShifts = 0;
+        $filledShifts = 0;
+
+        foreach ($shifts as $shift) {
+            if ($shift->status == 'unfilled' || empty($shift->staff_id)) {
+                $unfilledShifts++;
+            } else {
+                $filledShifts++;
+            }
+        }
+
+        $fillRate = $totalShifts > 0 ? round(($filledShifts / $totalShifts) * 100) : 0;
+
+        $weeksData = [];
+        $currentDate = $startDate->copy()->startOfWeek(\Carbon\Carbon::MONDAY);
+        $weekNumber = 1;
+
+        while ($currentDate < $endDate) {
+            $weekStart = $currentDate->copy();
+            $weekEnd = $currentDate->copy()->endOfWeek(\Carbon\Carbon::SUNDAY);
+
+            $weekShifts = $shifts->filter(function ($shift) use ($weekStart, $weekEnd) {
+                $shiftDate = \Carbon\Carbon::parse($shift->start_date);
+                return $shiftDate->between($weekStart, $weekEnd);
+            });
+
+            $weekTotal = $weekShifts->count();
+            $weekUnfilled = 0;
+            $weekFilled = 0;
+            $weekCompleted = 0;
+
+            foreach ($weekShifts as $shift) {
+                if ($shift->status == 'unfilled' || empty($shift->staff_id)) {
+                    $weekUnfilled++;
+                } else {
+                    $weekFilled++;
+                }
+
+                if (strtolower($shift->status) == 'completed') {
+                    $weekCompleted++;
+                }
+            }
+
+            $weekFillRate = $weekTotal > 0 ? round(($weekFilled / $weekTotal) * 100) : 0;
+
+            $weeksData[] = [
+                'week_number' => $weekNumber,
+                'label' => 'Week ' . $weekNumber . ': ' . $weekStart->format('M j') . ' - ' . $weekEnd->format('M j, Y'),
+                'total' => $weekTotal,
+                'filled' => $weekFilled,
+                'unfilled' => $weekUnfilled,
+                'completed' => $weekCompleted,
+                'fill_rate' => $weekFillRate
+            ];
+
+            $currentDate->addWeek();
+            $weekNumber++;
+
+            if ($weekNumber > 13) {
+                break;
+            }
+        }
+
+        return response()->json([
+            'overview_date' => $startDate->format('l, F j, Y'),
+            'summary' => [
+                'total' => $totalShifts,
+                'filled' => $filledShifts,
+                'unfilled' => $unfilledShifts,
+                'fill_rate' => $fillRate
+            ],
+            'weeks' => $weeksData
+        ]);
+    }
 }

@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Android\AndroidApiController;
+use App\Http\Controllers\Api\Schedule\ScheduleController;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,7 +33,7 @@ Route::post('/get-home-data', 'App\Http\Controllers\Android\AndroidApiController
 Route::get('/courses-list', 'App\Http\Controllers\Api\Staff\UserController@cources_list');
 
 // Ram 19/08/2025
-Route::post('get-homes',[AndroidApiController::class,'get_homes']);
+Route::post('get-homes', [AndroidApiController::class, 'get_homes']);
 
 Route::group(['prefix' => '/service'], function () {
 	Route::post('/login', 'App\Http\Controllers\Api\ServiceUser\UserController@login');
@@ -155,5 +156,6 @@ Route::group(['prefix' => '/staff'], function () {
 	Route::post('/staff-note/add', 'App\Http\Controllers\Api\Staff\StaffNoteController@add_staff_note');
 	Route::delete('/staff-notes/{note_id}', 'App\Http\Controllers\Api\Staff\StaffNoteController@deleteNote');
 
+	Route::post('/dashboard', 'App\Http\Controllers\Api\Staff\UserController@dashboard');
+	Route::post('/schedule-shifts', [ScheduleController::class, 'schedule_shifts']);
 });
-

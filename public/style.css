@@ -78,7 +78,7 @@ h6 {
     height: 240px;
     background-color: #fff;
     box-shadow: rgb(0 0 0 / 25%) 0px 2px 8px;
-    cursor:  pointer;
+    cursor: pointer;
     display: none;
 }
 
@@ -87,7 +87,7 @@ h6 {
 }
 
 .customSelect .customSelectItem:hover {
-    background-color:#1f88b533;
+    background-color: #1f88b533;
 }
 
 .customSelect .customSelectItem .labelElement {
@@ -98,7 +98,7 @@ h6 {
     cursor: pointer;
 }
 
-.customSelect .customSelectItem .labelElement .firstLastLetter { 
+.customSelect .customSelectItem .labelElement .firstLastLetter {
     background-color: #1f88b5;
     color: #fff;
     font-weight: 500;
@@ -126,24 +126,25 @@ h6 {
     border-radius: 50%;
 }
 
-.customSelect .customSelectItem .labelElement .customRadio .dot { 
+.customSelect .customSelectItem .labelElement .customRadio .dot {
     height: 10px;
     width: 10px;
     /* background-color: #e10078; */
     border-radius: 50%;
 }
 
-.customSelectItem [type="radio"]:checked + .labelElement .dot {
+.customSelectItem [type="radio"]:checked+.labelElement .dot {
     background-color: #e10078;
 }
 
-.customSelectItem [type="radio"]:checked + .labelElement {
+.customSelectItem [type="radio"]:checked+.labelElement {
     background-color: #1f88b533;
 }
 
 .show_select {
     display: block;
 }
+
 /* custom select element css end */
 
 
@@ -301,8 +302,8 @@ Header Left Menu
 .nav-links nav ul li button:focus i {
     color: #1f88b5;
 }
-  
-.sidepanel  {
+
+.sidepanel {
     width: 0;
     position: fixed;
     z-index: 1;
@@ -313,50 +314,50 @@ Header Left Menu
     overflow-x: hidden;
     transition: all 0.5s ease-in-out;
     padding-top: 30px;
-  }
-  
-  .sidepanel ul {
+}
+
+.sidepanel ul {
     padding: 0px 10px 0px 20px !important;
     list-style: none;
-  }
-  
-  .sidepanel a {
+}
+
+.sidepanel a {
     padding: 8px 8px 8px 32px;
     text-decoration: none;
     font-size: 16px !important;
     color: #1f88b5 !important;
     display: block;
     transition: 0.3s;
-  }
-  
-  .sidepanel a:hover {
+}
+
+.sidepanel a:hover {
     color: #1f88b5d4 !important;
     background-color: unset !important;
-  }
-  
-  .sidepanel .closebtn {
+}
+
+.sidepanel .closebtn {
     font-size: 20px !important;
     color: #666 !important;
     font-weight: 500 !important;
-  }
-  
-  .sidepanel .svgColor {
+}
+
+.sidepanel .svgColor {
     fill: #1f88b5;
     margin-right: 12px;
-  }
-  
-  .openbtn {
+}
+
+.openbtn {
     font-size: 20px;
     cursor: pointer;
     /* background-color: #111; */
     color: white;
     padding: 10px 15px;
     border: none;
-  }
-  
-  .openbtn:hover {
-    background-color:#444;
-  }
+}
+
+.openbtn:hover {
+    background-color: #444;
+}
 
 .logo-text h3 {
     font-size: 28px;
@@ -884,7 +885,7 @@ p.next {
 }
 
 .publish_rota_content .no_of_rota_publish,
-.unpublish_rota_content .no_of_rota_publish  {
+.unpublish_rota_content .no_of_rota_publish {
     color: #fff;
     background: #1f88b5;
     height: 28px;
@@ -915,12 +916,12 @@ p.next {
     color: #1f88b5;
     transition: all 0.3s ease-in-out;
     font-weight: 500;
-} 
+}
 
 .parent_div .rota_shift_employee_name:hover {
     text-decoration: none;
     color: #276a87;
-} 
+}
 
 .parent_div .three_dot_btn {
     border: none;
@@ -933,7 +934,7 @@ p.next {
 }
 
 .parent_div .three_dot_btn:hover,
-.parent_div .three_dot_btn:focus { 
+.parent_div .three_dot_btn:focus {
     fill: #fff;
     background-color: #1f88b5;
 }
@@ -1058,7 +1059,7 @@ p.next {
     border-bottom: 2.5px solid #32323a;
     color: #106e97;
     font-size: 18px;
-    font-weight: 500;    
+    font-weight: 500;
 }
 
 .rotas .nav-link {
@@ -1067,7 +1068,8 @@ p.next {
     color: #1f88b5;
 }
 
-.nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-link.active {
+.nav-tabs .nav-item.show .nav-link,
+.nav-tabs .nav-link.active {
     border-color: unset;
 }
 
@@ -1213,24 +1215,24 @@ h2.unpublice-titel {
     cursor: pointer;
 }
 
-.select-rota .card-btn input:checked + .bg-color {
+.select-rota .card-btn input:checked+.bg-color {
     background-color: #1f88b533;
 }
 
 .select-rota .bg-color {
     padding: 20px;
-}    
-
-.select-rota .form-select ,
-.select-rota .form-control {
-    border: 2px solid #a1a9b3;
-    outline: none; 
 }
 
-.select-rota .form-select:focus ,
+.select-rota .form-select,
+.select-rota .form-control {
+    border: 2px solid #a1a9b3;
+    outline: none;
+}
+
+.select-rota .form-select:focus,
 .select-rota .form-control:focus {
     border: 2px solid #1f88b5;
-    box-shadow: rgb(0 0 0 / 25%) 0px 2px 8px; 
+    box-shadow: rgb(0 0 0 / 25%) 0px 2px 8px;
 }
 
 .create-a-rota-info h2 {
@@ -1277,7 +1279,7 @@ h2.unpublice-titel {
 .formTwo .select-rota .card-btn .custom-btn .bg-color-custom-btn {
     height: 13px;
     width: 13px;
-    border-radius:  50%;
+    border-radius: 50%;
 }
 
 .formTwo .select-rota .card-btn .change-color .bg-color {
@@ -1285,11 +1287,11 @@ h2.unpublice-titel {
     font-weight: 600;
 }
 
-.select-rota .card-btn input:checked + .change-color {
+.select-rota .card-btn input:checked+.change-color {
     background-color: #1f88b533;
 }
 
-.select-rota .card-btn input:checked + .change-color .bg-color-custom-btn {
+.select-rota .card-btn input:checked+.change-color .bg-color-custom-btn {
     background-color: #1c79a1;
 }
 
@@ -1910,7 +1912,7 @@ h2.unpublice-titel {
 .employment-details .cancel-btn {
     border: none;
     outline: none;
-    background-color:#fff;
+    background-color: #fff;
     border: 2px solid #ad005c;
     color: #ad005c;
     padding: 6px 18px;
@@ -2165,7 +2167,7 @@ h2.unpublice-titel {
     box-shadow: rgb(136 136 136) 1px 4px 8px -4px;
 }
 
-.working-time-pattern .third-content .cards .card-btn .radio_btn:checked + .direct-sibling {
+.working-time-pattern .third-content .cards .card-btn .radio_btn:checked+.direct-sibling {
     background-color: #1f88b51c;
     height: 100%;
 }
@@ -2213,6 +2215,7 @@ h2.unpublice-titel {
     border-radius: 3px;
     font-weight: 600;
 }
+
 /* Working Time Pattern css end here */
 
 /* Fixed employee setup css start from here */
@@ -2254,7 +2257,7 @@ h2.unpublice-titel {
 }
 
 #showDiv .folder-icon {
-    color:#a1a9b3;
+    color: #a1a9b3;
     font-size: 25px;
 }
 
@@ -2349,12 +2352,13 @@ h2.unpublice-titel {
 .tab-btn .nav-item .link-nav.active {
     border-bottom: 2.5px solid #32323a;
     font-size: 18px;
-    font-weight: 500;   
+    font-weight: 500;
 }
 
 .tab-btn .tab-content {
     font-size: 16px;
 }
+
 /* tabs css end here*/
 
 /* Follow Steps css start from here   */
@@ -2388,7 +2392,7 @@ h2.unpublice-titel {
 
 .tab-content #tabThree .search-team label {
     width: 80px;
-    align-self: center; 
+    align-self: center;
 }
 
 /* Tab three content css end here */
@@ -2515,7 +2519,7 @@ h2.unpublice-titel {
 }
 
 .accordion .card {
-    box-shadow:0 0px 2px 0 rgb(0 0 0 / 0%), 0 1px 6px 0 rgb(0 0 0 / 8%);
+    box-shadow: 0 0px 2px 0 rgb(0 0 0 / 0%), 0 1px 6px 0 rgb(0 0 0 / 8%);
     margin: 10px;
 }
 
@@ -2535,7 +2539,7 @@ h2.unpublice-titel {
     background-color: #fff !important;
     border: 2px solid #e10078 !important;
     color: #e10078 !important;
-    border-radius: 5px; 
+    border-radius: 5px;
     padding: 3px 10px;
     font-weight: 500;
     transition: 0.3s;
@@ -2571,7 +2575,7 @@ h2.unpublice-titel {
 }
 
 #form2 .address-detail .card-btn input {
-    height: 100%;       
+    height: 100%;
     width: 100%;
     inset: 0;
     position: absolute;
@@ -2579,7 +2583,7 @@ h2.unpublice-titel {
     cursor: pointer;
 }
 
-#form2 .address-detail .card-btn input:checked + .bg-color {
+#form2 .address-detail .card-btn input:checked+.bg-color {
     background-color: #1f88b533;
 }
 
@@ -2595,10 +2599,11 @@ h2.unpublice-titel {
 
 #form2 .address-detail .previous button:hover {
     background-color: #ad005c;
-    color: #fff;;
+    color: #fff;
+    ;
     border: 2px solid #ad005c;
 }
- 
+
 #form2 .address-detail .continue_save button {
     background-color: #e10078;
     color: #fff;
@@ -2734,7 +2739,7 @@ h2.unpublice-titel {
 }
 
 #form4 .Annual-leave-entitlement .card-btn input {
-    height: 100%;       
+    height: 100%;
     width: 100%;
     inset: 0;
     position: absolute;
@@ -2743,7 +2748,7 @@ h2.unpublice-titel {
     z-index: 1;
 }
 
-#form4 .Annual-leave-entitlement .card-btn input:checked + .bg-color {
+#form4 .Annual-leave-entitlement .card-btn input:checked+.bg-color {
     background-color: #1f88b533;
 }
 
@@ -2828,7 +2833,7 @@ h2.unpublice-titel {
 #form5 .summary .parent-border .B-bottom {
     border-bottom: 1px solid #99999982;
     padding: 15px;
-} 
+}
 
 #form5 .summary .parent-border .B-bottom b {
     font-weight: 500;
@@ -2883,6 +2888,7 @@ h2.unpublice-titel {
     transition: 0.3s;
     font-weight: 600;
 }
+
 /* Custom toggle button css end here */
 
 #form5 .summary .previous button:hover,
@@ -2926,7 +2932,8 @@ h2.unpublice-titel {
     background-color: #ad005c;
     color: #fff;
     border: 2px solid #ad005c;
-} 
+}
+
 /* Step Five Summry end here */
 
 
@@ -2996,7 +3003,7 @@ h2.unpublice-titel {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 5px;    
+    margin: 5px;
 }
 
 #tabThree .modal .modal-dialog .employee-name .name p {
@@ -3081,7 +3088,7 @@ h2.unpublice-titel {
 
 .annual-leave .dash-btn {
     background-color: #fff;
-    color:  #e10078;
+    color: #e10078;
     border: 2px solid #e10078;
     padding: 5px 10px;
     border-radius: 5px;
@@ -3093,7 +3100,7 @@ h2.unpublice-titel {
 
 .annual-leave .dash-btn:hover {
     background-color: #ad005c;
-    color:  #fff;
+    color: #fff;
     border: 2px solid #ad005c;
 }
 
@@ -3137,7 +3144,7 @@ h2.unpublice-titel {
     align-items: center;
 }
 
-.user-detail .mail-info  {
+.user-detail .mail-info {
     align-self: center;
 }
 
@@ -3180,7 +3187,7 @@ h2.unpublice-titel {
     padding: 5px 10px;
     transition: 0.3s;
     font-size: 14px;
-} 
+}
 
 .mail-info .mail-account .registraion-btn button:hover {
     background-color: #ad005c;
@@ -3220,7 +3227,7 @@ h2.unpublice-titel {
 
 .tab-parent .nav-item {
     margin: 20px 0px 0px 0px !important;
-} 
+}
 
 .tab-content .add-padding {
     padding: 15px;
@@ -3377,7 +3384,7 @@ h2.unpublice-titel {
 }
 
 #tabTwo .accordion .accordion-item {
-    border: 1px solid #1f88b54f; 
+    border: 1px solid #1f88b54f;
 }
 
 .accordion-button:not(.collapsed) {
@@ -3402,7 +3409,7 @@ h2.unpublice-titel {
     right: 20px;
     opacity: 0.7;
     font-weight: 600;
-}   
+}
 
 #tabTwo .accordion .employees-data .col-form-label {
     font-size: 16px;
@@ -3444,9 +3451,9 @@ h2.unpublice-titel {
     position: absolute;
     opacity: 0 !important;
     cursor: pointer;
-} 
+}
 
-#tabTwo .accordion .accordion-body .detail .card-btn input[type="radio"]:checked + .bg-color {
+#tabTwo .accordion .accordion-body .detail .card-btn input[type="radio"]:checked+.bg-color {
     background-color: #1f88b533;
 }
 
@@ -3534,6 +3541,7 @@ h2.unpublice-titel {
     padding: 18px 18px;
     background-position: center;
 }
+
 /* Tab three css end here */
 
 /* Tab four css start from here */
@@ -3730,6 +3738,7 @@ h2.unpublice-titel {
 #tabFive #show {
     display: none;
 }
+
 /* Tab five css end here */
 
 /* Personal detail Tabs end here */
@@ -3749,7 +3758,7 @@ h2.unpublice-titel {
 
 #timeline .shift-patern .label_custom {
     border: 2px solid #1f88b538;
-    padding: 8px 15px; 
+    padding: 8px 15px;
     color: #1f88b5;
     border-radius: 30px;
     font-weight: 600;
@@ -3759,7 +3768,7 @@ h2.unpublice-titel {
     background-color: #1f88b538;
 }
 
-#timeline .shift-patern .input_custom_btn:checked + .label .label_custom {
+#timeline .shift-patern .input_custom_btn:checked+.label .label_custom {
     background-color: #1f88b538;
 }
 
@@ -3881,12 +3890,12 @@ h2.unpublice-titel {
     display: none;
 }
 
-.addShift .modal-dialog .employee-name .custom_checkbox:checked + .name {
+.addShift .modal-dialog .employee-name .custom_checkbox:checked+.name {
     background-color: #1c79a114;
     border-color: #1c79a157;
 }
 
-.addShift .modal-dialog .employee-name .custom_checkbox:checked + .name .select_tick {
+.addShift .modal-dialog .employee-name .custom_checkbox:checked+.name .select_tick {
     display: block;
 }
 
@@ -3933,7 +3942,7 @@ h2.unpublice-titel {
     width: 100%;
     border: 1px solid #bbc0c36b;
     position: relative;
-    line-height: 11px; 
+    line-height: 11px;
     display: flex;
 }
 
@@ -3986,12 +3995,12 @@ h2.unpublice-titel {
 }
 
 #exampleModalShiftModal .modal-dialog {
-    max-width: 50rem; 
+    max-width: 50rem;
 }
 
 #exampleModalShiftModal .modal-dialog .modal-header {
     background-color: #1f88b5;
-    color: #fff; 
+    color: #fff;
 }
 
 #exampleModalShiftModal .modal-dialog .modal-header .btn_close {
@@ -4129,21 +4138,22 @@ h2.unpublice-titel {
     padding: 6px 12px;
     border-radius: 5px;
     margin-right: 10px;
-} 
+}
 
 #timeline .print_and_publish_button .modal-dialog .publish_btn_footer:hover {
     background-color: #ad005c;
     border-color: #ad005c;
 }
+
 /* timeline-view page css end here */
 
-.shrink_all > * {
+.shrink_all>* {
     flex: 1;
     font-weight: 600;
 }
 
 .view_detail_modal {
-    border-bottom: 2px solid  #d9d9d9;
+    border-bottom: 2px solid #d9d9d9;
 }
 
 .view_detail_modal .custom_checkbox {
@@ -4160,11 +4170,11 @@ h2.unpublice-titel {
     transition: all 0.3s ease-in-out;
 }
 
-.view_detail_modal #break_check:checked + .custom_checkbox span {
+.view_detail_modal #break_check:checked+.custom_checkbox span {
     background-color: #e10078;
-} 
+}
 
-.row_detail .shrink_all > * {
+.row_detail .shrink_all>* {
     font-weight: inherit;
     opacity: 0.7;
 }
@@ -4210,11 +4220,11 @@ h2.unpublice-titel {
     border-radius: 50%;
 }
 
-.custom_radio_input:checked + .custom_label {
+.custom_radio_input:checked+.custom_label {
     background: #1f88b51c;
 }
 
-.custom_radio_input:checked + .custom_label .parent_custom_radio .custom_radio {
+.custom_radio_input:checked+.custom_label .parent_custom_radio .custom_radio {
     background-color: #1f88b5;
 }
 
@@ -4244,4 +4254,5 @@ h2.unpublice-titel {
     top: 35px;
     left: 0px;
 }
+
 /* add lateness css end */

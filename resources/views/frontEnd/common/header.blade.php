@@ -31,21 +31,26 @@
         color: #fff;
         background: #1f88b5;
     }
+
     .top-nav img {
         border: 2px solid #d9d9d9;
         object-fit: cover;
     }
+
     .uploadPopImg img {
         width: 100%;
         margin-bottom: 10px;
     }
+
     .uploadPopImg {
         width: 120px;
     }
+
     label.col-lg-2.control-label.mrtp70 {
         margin-top: 40px;
     }
-    .mrtp80{
+
+    .mrtp80 {
         margin-top: 46px;
     }
 </style>
@@ -100,7 +105,7 @@
                                 $user_image = 'default_user.jpg';
                             }
                             $current_path = Request::path();
-                           
+
                             $user_id = Auth::user()->id;
                             ?>
                             <!-- <img alt="" src="{{ userProfileImagePath.'/'.$user_image }}"> -->
@@ -111,19 +116,20 @@
                         <ul class="dropdown-menu extended logout">
                             <li><a href="{{ url('/my-profile/'.$user_id) }}"> <i class="fa fa-user-circle"></i> My Profile </a></li>
                             {{-- <li><a href="#" class="add_user"> <i class=" fa fa-user"></i> Add Child </a></li> --}}
-                            {{-- <li><a href="{{ url('/forms') }}" data-toggle="modal"> <i class="fa fa-bolt"></i> Forms </a></li> --}}
-                            {{-- <li><a href="{{ url('/general-admin') }}"><i class="fa fa-cogs"></i> General Admin </a></li> --}}
-                            <li><a href="{{ url('/lock?path='.$current_path) }}"><i class="fa fa-lock"> </i> Lock</a></li>
-                            {{-- <li><a href="#" class="hndovr_logbk"><i class="fa fa-address-book-o"></i> Hand Over </a></li> --}}
-                            <li><a href="{{ url('/logout') }}"><i class="fa fa-key"></i> Log Out</a></li>
-                            <!-- Code given By Ethan start -->
-                            @if(Auth::user()->user_type == "A")
-                            <li id="switch_menu_itm"><a href="{{ url('/switch_home') }}"><i class="fa fa-home"></i> Switch Home</a></li>
-                            @endif
-                            <!-- Code given By Ethan End -->
-                        </ul>
-                    </li>
-                    <!-- user login dropdown end -->
+                            {{-- <li><a href="{{ url('/forms') }}" data-toggle="modal"> <i class="fa fa-bolt"></i> Forms </a>
+                    </li> --}}
+                    {{-- <li><a href="{{ url('/general-admin') }}"><i class="fa fa-cogs"></i> General Admin </a></li> --}}
+                    <li><a href="{{ url('/lock?path='.$current_path) }}"><i class="fa fa-lock"> </i> Lock</a></li>
+                    {{-- <li><a href="#" class="hndovr_logbk"><i class="fa fa-address-book-o"></i> Hand Over </a></li> --}}
+                    <li><a href="{{ url('/logout') }}"><i class="fa fa-key"></i> Log Out</a></li>
+                    <!-- Code given By Ethan start -->
+                    @if(Auth::user()->user_type == "A")
+                    <li id="switch_menu_itm"><a href="{{ url('/switch_home') }}"><i class="fa fa-home"></i> Switch Home</a></li>
+                    @endif
+                    <!-- Code given By Ethan End -->
+                </ul>
+                </li>
+                <!-- user login dropdown end -->
                 </ul>
             </div>
         </div>
@@ -148,7 +154,7 @@
             var design_layout_id = $('select[name=design_layout_id]').val();
             var normal_layout_id = "{{ url('/change-design-layout/0') }}";
             var dyslexia_layout_id = "{{ url('/change-design-layout/1') }}";
-            var no_layout_id = "{{ url('/') }}";
+            var no_layout_id = "{{ url('/roster') }}";
             if (design_layout_id == '0') {
                 location.href = normal_layout_id;
             } else if (design_layout_id == '1') {

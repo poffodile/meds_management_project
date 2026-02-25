@@ -124,8 +124,6 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 		Route::get('/', [RosterController::class, 'index'])->name('roster.index');
 		Route::get('/dashboard', [RosterController::class, 'dashboard'])->name('roster.dashboard');
 		Route::get('/manage-dashboard', [ManageDashboardController::class, 'index'])->name('roster.manage.dashboard');
-		Route::get('/schedule-shift', [ScheduleShiftController::class, 'index'])->name('roster.schedule.dashboard');
-		Route::post('/schedule-shift/store', [ScheduleShiftController::class, 'store'])->name('roster.schedule.store');
 		Route::get('/carer-availability', [CarerAvailabilityController::class, 'index'])->name('roster.carer.availability');
 		Route::get('/messaging-center', [MessagingCenterController::class, 'index'])->name('roster.carer.availability');
 		Route::get('/staff-task', [StaffTaskController::class, 'index'])->name('roster.staff.task');
@@ -143,8 +141,11 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 		Route::post('/carer/getStaffByStatus', [CarerController::class, 'getStaffByStatus']);
 		Route::post('/carer/delete', [CarerController::class, 'deleteCarer'])->name('carer.delete');
 		Route::get('/carer/shift-resources', [CarerController::class, 'shift_resources'])->name('carer.shift');
+		Route::get('/carer/shifts', [CarerController::class, 'allShifts'])->name('carer.shifts.all');
+		Route::get('/carer/shifts/day', [CarerController::class, 'dayShifts'])->name('carer.shifts.day');
+		Route::get('/carer/shifts/week', [CarerController::class, 'weekShifts'])->name('carer.shifts.week');
 		Route::get('/carer/get-shift-carer/{client_id}', [CarerController::class, 'getShiftStaff'])->name('carer.shift.staff');
-
+		Route::get('/carer/shifts/90days', [CarerController::class, 'ninetyDaysShifts'])->name('carer.shifts.90days');
 
 		Route::get('/carer-details/{carer_id}', [CarerDetailsController::class, 'carer_details'])->name('roster.staff.carer.details');
 		Route::post('/carer/save-documents', [CarerDetailsController::class, 'saveDouments'])->name('carer.save.documents');
@@ -153,6 +154,16 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 		Route::delete('/carer/delete-documents/{id}', [CarerDetailsController::class, 'destroy_documents'])->name('carer.documents.delete');
 		Route::post('/carer/qualifications/store', [StaffQualificationController::class, 'store'])->name('staff.qualifications.store');
 		// Carer Section End
+
+		Route::get('/schedule-shift/weekly-data', [ScheduleShiftController::class, 'getWeeklyData']);
+		Route::get('/schedule-shift', [ScheduleShiftController::class, 'index'])->name('roster.schedule.dashboard');
+		Route::post('/schedule-shift/store', [ScheduleShiftController::class, 'store'])->name('roster.schedule.store');
+		Route::post('/schedule-shift/update/{id}', [ScheduleShiftController::class, 'updateShift'])->name('roster.schedule.update');
+		Route::get('/schedule-shift-by-group', [ScheduleShiftController::class, 'scheduleShiftByGroup'])->name('roster.scheduleShiftByGroup');
+		Route::get('/90-days-data', [ScheduleShiftController::class, 'get90DaysData']);
+		Route::get('/get-monthly-shifts', [ScheduleShiftController::class, 'getMonthlyShifts'])->name('get.monthly.shifts');
+		Route::delete('/schedule-shift/delete/{id}', [ScheduleShiftController::class, 'deleteShift'])->name('roster.schedule.delete');
+
 
 
 		Route::get('/client', [ClientController::class, 'index'])->name('roster.client');
