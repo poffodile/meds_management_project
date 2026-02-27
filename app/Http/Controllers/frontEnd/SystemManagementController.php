@@ -15,7 +15,7 @@ class SystemManagementController extends Controller
 {
 
     protected StaffService $staffService;
- 
+
     public function __construct(StaffService $staffService)
     {
         $this->staffService = $staffService;
@@ -125,12 +125,12 @@ class SystemManagementController extends Controller
 
     public function add_service_user(Request $request)
     {
- 
+
         if ($request->isMethod('post')) {
             if (!$request->has('courses')) {
                 return redirect()->back()->with('error', 'Please checked preferred services');
             }
-            $data = $request->all();    
+            $data = $request->all();
             // echo "<pre>";print_r($data);
             // die;
             $home_ids = Auth::user()->home_id;
@@ -143,14 +143,14 @@ class SystemManagementController extends Controller
             // $home_id = Auth::user()->home_id;
             // echo '<pre>'; print_r($_FILES);die;
             $date_of_birth = date('Y-m-d', strtotime($data['date_of_birth']));
-            if($request->has('suClientId') && $request->suClientId != ''){
+            if ($request->has('suClientId') && $request->suClientId != '') {
                 $user              = ServiceUser::find($request->suClientId);
                 $successMessage = 'User updated successfully.';
-            }else{
+            } else {
                 $user              = new ServiceUser;
                 $successMessage = 'User added successfully.';
             }
-          
+
             $user->name             = $data['su_name'];
             $user->user_name        = $data['su_user_name'];
             $user->email            = $data['email'];
@@ -191,7 +191,7 @@ class SystemManagementController extends Controller
             $user->relationship      = $data['relationship'];
             $user->status            = $data['suStatus'] ?? 1;
             // $user->status        = $request->status;
- 
+
             $user->home_id               = $home_id;
             $user->personal_info         = '';
             $user->education_history     = '';
@@ -204,13 +204,13 @@ class SystemManagementController extends Controller
             /*$user->facebook    = '';
             $user->twitter    = '';
             $user->skype    = '';*/
- 
+
             if (!empty($_FILES['img_upload']['name'])) {
                 $tmp_image  =   $_FILES['img_upload']['tmp_name'];
                 $image_info =   pathinfo($_FILES['img_upload']['name']);
                 $ext        =   strtolower($image_info['extension']);
                 $new_name   =   time() . '.' . $ext;
- 
+
                 if ($ext == 'jpg' || $ext == 'jpeg' || $ext == 'png') {
                     $destination = base_path() . serviceUserProfileImageBasePath;
                     if (move_uploaded_file($tmp_image, $destination . '/' . $new_name)) {
@@ -221,7 +221,7 @@ class SystemManagementController extends Controller
             if (!isset($user->image) && $request->has('suClientId') && $request->suClientId == '') {
                 $user->image = '';
             }
-           
+
             if ($user->save()) {
                 if ($request->has('courses') && is_array($request->courses)) {
                     foreach ($request->courses as $course) {
@@ -236,15 +236,15 @@ class SystemManagementController extends Controller
                         //     $certificate_image = null;
                         // }
                         $certificate_image = null;
-                        $su_user_course=new suUserCourse;
-                        $su_user_course->su_user_id= $user->id;
-                        $su_user_course->course_id= $course['course_id'];
-                        $su_user_course->coursenumber= $course['coursenumber'];
-                        $su_user_course->title= $course['title'];
-                        $su_user_course->level= $course['level'];
-                        $su_user_course->image= $course['course_image'];
-                        $su_user_course->certificate= $certificate_image;
-                        $su_user_course->description= $course['description'];
+                        $su_user_course = new suUserCourse;
+                        $su_user_course->su_user_id = $user->id;
+                        $su_user_course->course_id = $course['course_id'];
+                        $su_user_course->coursenumber = $course['coursenumber'];
+                        $su_user_course->title = $course['title'];
+                        $su_user_course->level = $course['level'];
+                        $su_user_course->image = $course['course_image'];
+                        $su_user_course->certificate = $certificate_image;
+                        $su_user_course->description = $course['description'];
                         $su_user_course->save();
                     }
                 }
@@ -273,7 +273,7 @@ class SystemManagementController extends Controller
             $ex_home_ids = explode(',', $home_ids);
             $home_id = $ex_home_ids[0];
 
-            $address = $data['street'] . ' ' . $data['city'] . ' ' . $data['postcode'];
+            $address = $data['current_location'] ?? '';
             $staffLatLong = $this->staffService->getLatLongFromAddress($address);
 
             $user                   = new User;
@@ -282,9 +282,7 @@ class SystemManagementController extends Controller
             $user->phone_no         = $data['staff_phone_no'];
             $user->email            = $data['staff_email'];
             $user->job_title        = $data['job_title'];
-            $user->street           = $data['street'];
-            $user->city             = $data['city'];
-            $user->postcode         = $data['postcode'];
+            $user->current_location = $data['current_location'] ?? '';
             $user->latitude         = $staffLatLong['latitude'] ?? null;
             $user->longitude        = $staffLatLong['longitude'] ?? null;
             $user->department       = $data['department'];
@@ -297,8 +295,8 @@ class SystemManagementController extends Controller
             $user->employment_type  = $data['employment_type'];
             $user->dbs_certificate_number = $data['dbs_certificate_number'];
             $user->dbs_expiry_date  = !empty($data['dbs_expiry_date'])
-                                    ? Carbon::parse($data['dbs_expiry_date'])->format('Y-m-d')
-                                    : null;
+                ? Carbon::parse($data['dbs_expiry_date'])->format('Y-m-d')
+                : null;
             $user->date_of_joining  = $date_of_joining;
             $user->date_of_leaving  = $date_of_leaving;
             $user->holiday_entitlement = $data['holiday_entitlement'];
@@ -308,7 +306,6 @@ class SystemManagementController extends Controller
             $user->personal_info    = '';
             $user->banking_info     = '';
             $user->qualification_info = '';
-            $user->current_location   = '';
 
             if (!empty($_FILES['image']['name'])) {
                 $tmp_image  =   $_FILES['image']['tmp_name'];

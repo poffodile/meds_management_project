@@ -118,21 +118,21 @@ $('#add_user_form').formValidation({
                 }
             }
         },
-        // "access_level": 
-        // {
-        //     validators: 
-        //     {
-        //         notEmpty: 
-        //         {
-        //           message: 'This field is required'
-        //         }
-        //     },
-        //     regexp: 
-        //     {
-        //         regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
-        //         message: 'This field can only consist of alphanumeric characters'
-        //     }
-        // },
+        "access_level":
+        {
+            validators:
+            {
+                notEmpty:
+                {
+                    message: 'This field is required'
+                }
+            },
+            regexp:
+            {
+                regexp: /^[A-Z,a-z,0-9&+-.,:;?£/'" \n]+$/,
+                message: 'This field can only consist of alphanumeric characters'
+            }
+        },
         "phone_no":
         {
             validators:

@@ -294,9 +294,6 @@
                                             data-status="${carer.status ?? ''}"
 
                                             data-job-title="${carer.job_title ?? ''}"
-                                            data-street="${carer.street ?? ''}"
-                                            data-city="${carer.city ?? ''}"
-                                            data-postcode="${carer.postcode ?? ''}"
                                             data-department="${carer.department ?? ''}"
                                             data-description="${carer.description ?? ''}"
                                             data-employment-type="${carer.employment_type ?? ''}"

@@ -25,12 +25,12 @@
                 <div class="tabs p-1 ">
                     <button class="tab active" data-tab="clientDetailsTab"> Details </button>
                     <button class="tab" data-tab="clientOnboardingTab"> Onboarding </button>
-                    <button class="tab" data-tab="clientCareTasksTab"> Care Tasks </button>
+                    <button class="tab" data-tab="clientCareTasksTab" id="clientCareTasksTabBtn" onclick="getCareTask()"> Care Tasks </button>
                     <button class="tab" data-tab="clientAlertsTab"> Alerts </button>
                     <button class="tab" data-tab="clientAIInsightsTab"> AI Insights </button>
                     <button class="tab" data-tab="clientCarePlanTab"> Care Plan </button>
                     <button class="tab" data-tab="clientRiskAssessmentsTab"> Risk Assessments </button>
-                    <button class="tab" data-tab="clientMedicationTab"> Medication </button>
+                    <button class="tab" data-tab="clientMedicationTab" onclick="getMedication()"> Medication </button>
                     <button class="tab" data-tab="clientPEEPTab"> PEEP </button>
                     <button class="tab" data-tab="clientRepositioningTab"> Repositioning </button>
                     <button class="tab" data-tab="clientBehaviorTab"> Behavior </button>
@@ -1310,36 +1310,38 @@
                                 <div class="rota_dash-card bg-blue-50">
                                     <div class="rota_dash-left">
                                         <p class="rota_title">Total Tasks</p>
-                                        <h2 class="rota_count">37</h2>
+                                        <h2 class="rota_count" id="clientCareTaskTotalCount">0</h2>
                                     </div>
                                 </div>
 
                                 <div class="rota_dash-card bg-red-50">
                                     <div class="rota_dash-left">
                                         <p class="rota_title">Critical Priority</p>
-                                        <h2 class="rota_count">36</h2>
+                                        <h2 class="rota_count" id="clientCareTaskCriticalCount">0</h2>
                                     </div>
                                 </div>
 
                                 <div class="rota_dash-card bg-orange-50">
                                     <div class="rota_dash-left">
                                         <p class="rota_title">High Priority</p>
-                                        <h2 class="rota_count orangeText">0</h2>
+                                        <h2 class="rota_count orangeText" id="clientCareTaskHighCount">0</h2>
                                     </div>
                                 </div>
 
                                 <div class="rota_dash-card bg-purple-50">
                                     <div class="rota_dash-left">
                                         <p class="rota_title">Two Staff Required</p>
-                                        <h2 class="rota_count">1</h2>
+                                        <h2 class="rota_count" id="clientCareTaskTwoStaffCount">0</h2>
                                     </div>
                                 </div>
                             </div>
                         </div>
-
-                        <div class="p-20 p-t-0">
+                        <div class="p-20 p-t-0" id="renderHtmlClientCareTask">
+                            
+                        </div>
+                        <!-- <div class="p-20 p-t-0">
                             <div class="caretasknameandnumber m-b-10">
-                                <span>2</span>
+                                Personal Care <span>2</span>
                             </div>
                             <div class="row">
                                 <div class="col-md-6">
@@ -1347,8 +1349,8 @@
                                         <div class="card-header">
                                             <div class="user">
                                                 <div class="info">
-                                                    <div class="name"><a href="#!">Emotional support session with counselor</a></div>
-                                                    <!-- <div class="role">part time</div> -->
+                                                    <div class="name"><a href="#!">Static Data</a></div>
+                                                    
                                                 </div>
                                             </div>
                                         </div>
@@ -1366,9 +1368,9 @@
                                                 <i class='bx  bx-alert-circle'></i> <span>Alerts: Missed</span>
                                             </div>
                                         </div>
-                                        <div class="actions">
-                                            <button class="edit" data-id="120"> <i class="fa-regular fa-pen-to-square"></i> Edit </button>
-                                            <button class="delete" data-id="120"> <i class="fa-regular fa-trash-can"></i> </button>
+                                        <div class="dFlexGap">
+                                            <button class="borderBtn flex1" data-id="120"> <i class="fa-regular fa-pen-to-square"></i> Edit </button>
+                                            <button class="borderBtn deletewithBorder" data-id="120"> <i class="fa-regular fa-trash-can redText"></i> </button>
                                         </div>
                                     </div>
                                 </div>
@@ -1378,7 +1380,7 @@
                                             <div class="user">
                                                 <div class="info">
                                                     <div class="name"><a href="#!">Daily emotional support check-in</a></div>
-                                                    <!-- <div class="role">part time</div> -->
+                                                    
                                                 </div>
                                             </div>
                                         </div>
@@ -1403,8 +1405,9 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="p-20 p-t-0">
+                        </div> -->
+                        <div id="clientCareTaskPagination"></div>
+                        <!-- <div class="p-20 p-t-0">
                             <div class="caretasknameandnumber m-b-10">
                                 Nutrition
                                 <span>3</span>
@@ -1416,7 +1419,7 @@
                                             <div class="user">
                                                 <div class="info">
                                                     <div class="name"><a href="#!">Meal planning with nutrients focusing on balanced diet</a></div>
-                                                    <!-- <div class="role">part time</div> -->
+                                                    
                                                 </div>
                                             </div>
                                         </div>
@@ -1446,7 +1449,7 @@
                                             <div class="user">
                                                 <div class="info">
                                                     <div class="name"><a href="#!">Follow healthy diet plan</a></div>
-                                                    <!-- <div class="role">part time</div> -->
+                                                    
                                                 </div>
                                             </div>
                                         </div>
@@ -1476,7 +1479,7 @@
                                             <div class="user">
                                                 <div class="info">
                                                     <div class="name"><a href="#!">Follow healthy diet plan</a></div>
-                                                    <!-- <div class="role">part time</div> -->
+                                                    
                                                 </div>
                                             </div>
                                         </div>
@@ -1501,7 +1504,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
 
                     </div>
                 </div>
@@ -1509,7 +1512,15 @@
                     <div class="careTaskstbbg sectionWhiteBgAllUse p-0">
                         <header class="panel-heading headingCapitilize clntalertheader">
                             <div class="clientHeadung">
-                                <div class="onlyheadingmain radIconClr"><i class='bx  bx-alert-triangle'></i></i> Client Alerts </div>
+                                <div class="dFlexNoAlign mb-2">
+                                    <div class="onlyheadingmain radIconClr"><i class='bx  bx-alert-triangle'></i></i> Client Alerts </div>
+                                    <div>
+                                        <span class="careBadg redDarkBadges">11 Active</span>
+                                    </div>
+                                    <div>
+                                        <span class="careBadg redDarkBadgesAni">3 Critical</span>
+                                    </div>
+                                </div>
                                 <p>Manage important alerts and warnings for this client</p>
                             </div>
 
@@ -1610,9 +1621,16 @@
                                 </form>
                             </div>
 
-                            <div class="clientFilterform">
+                            <div class="clientFilterform p-3 mt-0">
                                 <div class="filtersSorting">
-                                    <i class='bx bx-filter'></i> Filters & Sorting
+                                    <div class="flexBw w100">
+                                        <div> <i class='bx bx-filter'></i> Filters & Sorting</div>
+                                        <div class="addDailyCheck">
+                                            <label for="selectAllAllert" class="lightBorderp fs13 py-2">
+                                                <input type="checkbox" id="selectAllAllert">
+                                                Select All</label>
+                                        </div>
+                                    </div>
                                 </div>
                                 <form action="">
                                     <div class="row">
@@ -1652,7 +1670,364 @@
                                 </form>
                             </div>
                         </div>
+                        <!-- pr alert box -->
+                        <div class="p-20 pt-0 ">
+                            <!-- blue suggestation -->
+                            <div class="bg-blue-50 p-3 mb-3  rounded8" id="actionBox" style="display:none">
+                                <div class="d-flex justify-content-between flexWrap ">
+                                    <div class="fs13">
+                                        <p class="mb-2 darkBlueTextp  font600"> 9 selected </p>
+                                        <p class="mb-0 blueText ">Critical & safeguarding/medication/allergy alerts require individual review</p>
+                                    </div>
+                                    <div>
+                                        <div class="d-flex flexWrap gap-2 align-items-center">
+                                            <div class="userMum">
+                                                <span class="title mt-0 bgWhite50"><i class="bx bx-check-circle f18 me-2"></i> Acknowledge</span>
+                                            </div>
+                                            <div>
+                                                <span class="careBadg darkGreenBadges">Resolve (9)</span>
+                                            </div>
+                                            <div>
+                                                <i class='bx bx-x-circle f18 ms-2' id="closeActionBox"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- red box for critical -->
+                            <div class="redBorder borderLeftThick  rounded8 urReqSec p-3 manageDSysAlrt">
+                                <div class="dFlexNoAlign">
+                                    <div>
+                                        <input class="checkBoxHW trans alertCheck" type="checkbox">
+                                    </div>
+                                    <div class="flex1">
+                                        <div class="dFlexNoAlign flexWrap">
+                                            <div>
+                                                <i class="bx bx-alert-circle redtext f18"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0 h6Head font600 blackText">Missed Medication - Dextromethorphan
+                                                </h6>
+                                            </div>
+                                            <div>
+                                                <span class="carebadg redBorderBadg">
+                                                    Critical
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <span class="careBadg greenbadges">
+                                                    active
+                                                </span>
+                                            </div>
+                                            <div class="userMum ">
+                                                <span class="title bgWhite50 mt-0 hoverBg">medication</span>
+                                            </div>
+                                        </div>
+                                        <p class="fs12 textGray">Dextromethorphan (500) was due at 10:24 and has not been administered.</p>
+                                        <div>
+                                            <span class="careBadg yellowBorderLight yellowHoverUnset">
+                                                Requires Individual Review
+                                            </span>
+                                        </div>
+                                        <div class="bg-blue-50 fs12 p-2 rounded8 mt-3 mb-2">
+                                            <p class=" font700 darkBlueTextp mb-1">Required Action: </p>
+                                            <p class=" darkBlueTextp mb-0">
+                                                Administer medication immediately if still within safe window, otherwise contact prescriber
+                                            </p>
+                                        </div>
+                                        <div class="dFlexNoAlign fs12 textGray">
 
+                                            <p class="mb-2">Created: <span class="font600 blackText me-3">Feb 17</span>by Unknown Staff</p>
+
+
+                                        </div>
+                                        <div>
+                                            <p class="mb-2 fs12 textGray verticalCenter"> <i class="bx bx-eye  me-1"></i>Shown on: <span class="font600 blackText ms-1"> dashboard, medication, all</span></p>
+                                        </div>
+                                        <div class="bg-yellow-50 P-2 rounded8">
+                                            <div class="flexBw">
+                                                <div>
+                                                    <p class="fs12 mb-0 darkOrangeTextp"><i class="bx bx-bell me-2"></i>Requires Acknowledgment
+                                                    </p>
+                                                </div>
+                                                <div class="userMum">
+                                                    <span class="title bgWhite50 hoverBg mt-0 "><i class="bx bx-check-circle f18 me-2"></i>Acknowledge</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="dFlexNoAlign mt-2 allertMsgBtn">
+                                            <div class="userMum">
+                                                <span class="title pgreenBtn hoverBg mt-0" style="color: #fff;"><i class="bx bx-check-circle f18 me-2"></i>Resolve</span>
+                                            </div>
+
+                                            <div class="userMum ">
+                                                <span class="title bgWhite50 hoverBg mt-0 "><i class="bx bx-archive-alt f18 me-2"></i>Archive</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- red for risk -->
+                            <div class="redBorder borderLeftThick  rounded8 urReqSec p-3 manageDSysAlrt">
+                                <div class="dFlexNoAlign">
+                                    <div>
+                                        <input class="checkBoxHW trans alertCheck" type="checkbox">
+                                    </div>
+                                    <div class="flex1">
+                                        <div class="dFlexNoAlign flexWrap">
+                                            <div>
+                                                <i class="bx bx-alert-triangle redtext f18"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0 h6Head font600 blackText">Missed Medication - Dextromethorphan
+                                                </h6>
+                                            </div>
+                                            <div>
+                                                <span class="carebadg redBorderBadg">
+                                                    Critical
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <span class="careBadg greenbadges">
+                                                    active
+                                                </span>
+                                            </div>
+                                            <div class="userMum ">
+                                                <span class="title bgWhite50 mt-0 hoverBg">medication</span>
+                                            </div>
+                                        </div>
+                                        <p class="fs12 textGray">Dextromethorphan (500) was due at 10:24 and has not been administered.</p>
+                                        <div class="mb-2">
+                                            <span class="careBadg yellowBorderLight yellowHoverUnset">
+                                                Requires Individual Review
+                                            </span>
+                                        </div>
+
+                                        <div class="dFlexNoAlign fs12 textGray">
+                                            <p class="mb-2">Created: <span class="font600 blackText me-3">Feb 17</span>by Unknown Staff</p>
+                                        </div>
+                                        <div>
+                                            <p class="mb-2 fs12 textGray verticalCenter"> <i class="bx bx-eye  me-1"></i>Shown on: <span class="font600 blackText ms-1"> dashboard, medication, all</span></p>
+                                        </div>
+
+                                        <div class="dFlexNoAlign mt-2 allertMsgBtn">
+                                            <div class="userMum">
+                                                <span class="title pgreenBtn hoverBg mt-0" style="color: #fff;"><i class="bx bx-check-circle f18 me-2"></i>Resolve</span>
+                                            </div>
+
+                                            <div class="userMum ">
+                                                <span class="title bgWhite50 hoverBg mt-0 "><i class="bx bx-archive-alt f18 me-2"></i>Archive</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- blue box for low -->
+                            <div class="blueBorder borderLeftThick rounded8 lightBlueBg p-3 manageDSysAlrt">
+                                <div class="dFlexNoAlign">
+                                    <div>
+                                        <input class="checkBoxHW trans alertCheck" type="checkbox">
+                                    </div>
+                                    <div class="flex1">
+                                        <div class="dFlexNoAlign flexWrap">
+                                            <div>
+                                                <i class="bx bx-alert-triangle blueText f18"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0 h6Head font600 blackText">Missed Medication - Dextromethorphan
+                                                </h6>
+                                            </div>
+                                            <div>
+                                                <span class="carebadg blueBorderBadg">
+                                                    Low
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <span class="careBadg greenBorderBadg">
+                                                    active
+                                                </span>
+                                            </div>
+                                            <div class="userMum ">
+                                                <span class="title bgWhite50 mt-0 hoverBg">medication</span>
+                                            </div>
+                                        </div>
+                                        <p class="fs12 textGray">It's testing data</p>
+                                        <div class="mb-2">
+                                            <span class="careBadg yellowBorderLight yellowHoverUnset">
+                                                Requires Individual Review
+                                            </span>
+                                        </div>
+                                        <!-- <div class="bg-blue-50 fs12 p-2 rounded8 mt-3 mb-2">
+                                            <p class=" font700 darkBlueTextp mb-1">Required Action: </p>
+                                            <p class=" darkBlueTextp mb-0">
+                                                Administer medication immediately if still within safe window, otherwise contact prescriber
+                                            </p>
+                                        </div> -->
+                                        <div class="dFlexNoAlign fs12 textGray">
+
+                                            <p class="mb-2">Created: <span class="font600 blackText me-3">Feb 17</span>by Unknown Staff</p>
+
+
+                                        </div>
+                                        <div>
+                                            <p class="mb-2 fs12 textGray verticalCenter"> <i class="bx bx-eye  me-1"></i>Shown on: <span class="font600 blackText ms-1"> dashboard, medication, all</span></p>
+                                        </div>
+                                        <!-- <div class="bg-yellow-50 P-2 rounded8">
+                                            <div class="flexBw">
+                                                <div>
+                                                    <p class="fs12 mb-0 darkOrangeTextp"><i class="bx bx-bell me-2"></i>Requires Acknowledgment
+                                                    </p>
+                                                </div>
+                                                <div class="userMum">
+                                                    <span class="title bgWhite50 hoverBg mt-0 "><i class="bx bx-check-circle f18 me-2"></i>Acknowledge</span>
+                                                </div>
+                                            </div>
+                                        </div> -->
+                                        <div class="dFlexNoAlign mt-2 allertMsgBtn">
+                                            <div class="userMum ">
+                                                <span class="title pgreenBtn hoverBg mt-0" style="color: #fff;"><i class="bx bx-check-circle f18 me-2"></i>Resolve</span>
+                                            </div>
+
+                                            <div class="userMum ">
+                                                <span class="title bgWhite50 hoverBg mt-0 "><i class="bx bx-archive-alt f18 me-2"></i>Archive</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--orange high -->
+                            <div class="orangeBorder borderLeftThick rounded8 bg-orange-50 p-3 manageDSysAlrt">
+                                <div class="dFlexNoAlign">
+                                    <div>
+                                        <input class="checkBoxHW trans alertCheck" type="checkbox">
+                                    </div>
+                                    <div class="flex1">
+                                        <div class="dFlexNoAlign flexWrap">
+                                            <div>
+                                                <i class="bx bx-bell orangeText f18"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0 h6Head font600 blackText">Missed Medication - Dextromethorphan
+                                                </h6>
+                                            </div>
+                                            <div>
+                                                <span class="carebadg orangeBorderBadg">
+                                                    High
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <span class="careBadg muteBadges">
+                                                    Resolve
+                                                </span>
+                                            </div>
+                                            <div class="userMum ">
+                                                <span class="title bgWhite50 mt-0 hoverBg">other</span>
+                                            </div>
+                                        </div>
+                                        <p class="fs12 textGray">Dextromethorphan (500) was due at 10:24 and has not been administered.</p>
+                                        <div>
+                                            <span class="careBadg yellowBorderLight yellowHoverUnset">
+                                                Requires Individual Review
+                                            </span>
+                                        </div>
+                                        <div class="bg-blue-50 fs12 p-2 rounded8 mt-3 mb-2">
+                                            <p class=" font700 darkBlueTextp mb-1">Required Action: </p>
+                                            <p class=" darkBlueTextp mb-0">
+                                                Administer medication immediately if still within safe window, otherwise contact prescriber
+                                            </p>
+                                        </div>
+                                        <div class="dFlexNoAlign fs12 textGray">
+
+                                            <p class="mb-2">Created: <span class="font600 blackText me-3">Feb 17</span>by Unknown Staff</p>
+
+
+                                        </div>
+                                        <div>
+                                            <p class="mb-2 fs12 textGray verticalCenter"> <i class="bx bx-eye  me-1"></i>Shown on:<span class="font600 blackText ms-1">dashboard, medication, all</span></p>
+                                        </div>
+                                        <div class="bg-yellow-50 P-2 rounded8">
+                                            <div class="flexBw">
+                                                <div>
+                                                    <p class="fs12 mb-0 darkOrangeTextp font600"><i class="bx bx-bell me-2"></i>Requires Acknowledgment
+                                                    </p>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                        <div class="bg-greenp-50 P-2 rounded8 mt-2">
+
+                                            <div>
+                                                <p class="fs12 mb-0 darkGreenTextp"><span class="font700 me-1">Resolved:</span> Jan 27, 17:33 by Unknown Staff
+                                                </p>
+                                            </div>
+
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--yellow medium -->
+                            <div class="yellowBorder borderLeftThick rounded8 bg-yellow-50 p-3 manageDSysAlrt">
+                                <div class="dFlexNoAlign">
+                                    <div>
+                                        <input class="checkBoxHW trans alertCheck" type="checkbox">
+                                    </div>
+                                    <div class="flex1">
+                                        <div class="dFlexNoAlign flexWrap">
+                                            <div>
+                                                <i class="bx bx-alert-triangle yellowText f18"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0 h6Head font600 blackText">Missed Medication - Dextromethorphan
+                                                </h6>
+                                            </div>
+                                            <div>
+                                                <span class="carebadg yellowBorderBadg">
+                                                    Medium
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <span class="careBadg muteBadges">
+                                                    Resolve
+                                                </span>
+                                            </div>
+                                            <div class="userMum ">
+                                                <span class="title bgWhite50 mt-0 hoverBg">Medical</span>
+                                            </div>
+                                        </div>
+                                        <p class="fs12 textGray">Immediate and ongoing actions are required to reduce the risk of falls and ensure the individual’s safety. Staff must closely monitor the individual at all times, particularly during mobility, transfers, and personal care activities. Assistance should be provided when standing, walking, or using stairs, and the individual should be encouraged to use prescribed mobility aids correctly at all times.</p>
+                                        <div>
+                                            <span class="careBadg yellowBorderLight yellowHoverUnset">
+                                                Requires Individual Review
+                                            </span>
+                                        </div>
+                                        <div class="bg-blue-50 fs12 p-2 rounded8 mt-3 mb-2">
+                                            <p class=" font700 darkBlueTextp mb-1">Required Action: </p>
+                                            <p class=" darkBlueTextp mb-0">
+                                                Administer medication immediately if still within safe window, otherwise contact prescriber
+                                            </p>
+                                        </div>
+                                        <div class="dFlexNoAlign fs12 textGray">
+
+                                            <p class="mb-2 w50">Created: <span class="font600 blackText me-3">Feb 17</span>by Unknown Staff</p>
+                                            <p class="mb-2">Expires: <span class="font600 blackText me-3">Jan 15</span></p>
+                                        </div>
+                                        <div>
+                                            <p class="mb-2 fs12 textGray verticalCenter"> <i class="bx bx-eye  me-1"></i>Shown on:<span class="font600 blackText ms-1">dashboard, medication, all</span></p>
+                                        </div>
+
+                                        <div class="bg-greenp-50 P-2 rounded8 mt-2">
+                                            <div class="darkGreenTextp">
+                                                <p class="fs12 mb-0"><span class="font700 me-1">Resolved:</span> Jan 27, 17:33 by Unknown Staff
+                                                </p>
+                                                <p class="fs12 mb-0">Resolved by manager</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- pr alert box end -->
 
 
 
@@ -2963,8 +3338,8 @@
                             <div class="medicationManagement" id="availabilityTab">
                                 <div class="availabilityTabs">
                                     <div class="availabilityTabs__nav">
-                                        <button class="availabilityTabs__tab borderBtn active" data-target="MARSheetsPanel">MAR Sheets <span>(2)</span> </button>
-                                        <button class="availabilityTabs__tab borderBtn" data-target="medicationLogsPanel">Medication Logs <span>(6)</span></button>
+                                        <button class="availabilityTabs__tab borderBtn active" data-target="MARSheetsPanel" id="marSheetBtn">MAR Sheets <span id="countMarSheet">(0)</span> </button>
+                                        <button class="availabilityTabs__tab borderBtn" data-target="medicationLogsPanel" id="medicationLogsBtn">Medication Logs <span id="countMedicationLogs">(0)</span></button>
                                     </div>
                                     <div class="availabilityTabs__content">
                                         <div class="availabilityTabs__panel active" id="MARSheetsPanel">
@@ -3038,104 +3413,75 @@
 
                                                         <div class="createNewAlert"><i class='bx  bx-link'></i> Add Medication Administration Log </div>
 
-                                                        <form action="" class="addAlertForm">
+                                                        <form id="medication_logsForm" class="addAlertForm">
                                                             <div class="row">
                                                                 <div class="col-md-6">
                                                                     <div class="form-group">
                                                                         <label>Medication Name *</label>
-                                                                        <input type="text" class="form-control" name="" placeholder="e.g., Paracetamol">
+                                                                        <input type="text" class="form-control checkMediLog" name="medication_name" id="medication_name" placeholder="e.g., Paracetamol">
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-md-6">
                                                                     <div class="form-group">
                                                                         <label>Dosage *</label>
-                                                                        <input type="text" class="form-control" name="" placeholder="e.g., 500mg">
+                                                                        <input type="text" class="form-control checkMediLog" name="dosage" id="dosage" placeholder="e.g., 500mg">
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-md-6">
                                                                     <div class="form-group">
                                                                         <label>Frequency</label>
-                                                                        <input type="text" class="form-control" name="" placeholder="e.g., Twice daily">
+                                                                        <input type="text" class="form-control" name="frequesncy" id="frequesncy" placeholder="e.g., Twice daily">
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-md-6">
                                                                     <div class="form-group">
                                                                         <label>Administration Time *</label>
-                                                                        <input type="date" class="form-control" name="" placeholder="">
+                                                                        <input type="datetime-local" class="form-control checkMediLog" name="administrator_date" id="administrator_date" placeholder="">
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-md-6">
                                                                     <div class="form-group">
                                                                         <label>Status *</label>
-                                                                        <select class="form-control">
-                                                                            <option>Single Day</option>
+                                                                        <select class="form-control checkMediLog" id="status" name="status">
+                                                                            <option value="1" selected>Administered</option>
+                                                                            <option value="2">Refused</option>
+                                                                            <option value="3">Missed</option>
+                                                                            <option value="4">Not Required</option>
                                                                         </select>
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-md-6">
                                                                     <div class="form-group">
                                                                         <label>Witnessed By (if required)</label>
-                                                                        <input type="text" class="form-control" name="" placeholder="">
+                                                                        <input type="text" class="form-control" name="witnessed_by" id="witnessed_by" placeholder="">
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-md-12">
                                                                     <div class="form-group">
-                                                                        <label> Notes *</label>
-                                                                        <textarea name="" class="form-control" rows="3" cols="20" placeholder="Any additional notes about administration"></textarea>
+                                                                        <label> Notes</label>
+                                                                        <textarea name="notes" id="medication_log_notes" class="form-control" rows="3" cols="20" placeholder="Any additional notes about administration"></textarea>
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-md-12">
                                                                     <div class="form-group">
                                                                         <label> Side Effects Observed</label>
-                                                                        <textarea name="" class="form-control" rows="3" cols="20" placeholder="Any observed side effects or reactions"></textarea>
+                                                                        <textarea name="side_effect" id="side_effect" class="form-control" rows="3" cols="20" placeholder="Any observed side effects or reactions"></textarea>
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-md-12">
                                                                     <div class="header-actions">
-                                                                        <button class="btn allbuttonDarkClr " type="submit">Save Log </button>
-                                                                        <button class="btn borderBtn" type="submit"> Cancel </button>
+                                                                        <button class="btn allbuttonDarkClr saveMedicationLogBtn" type="button">Save Log </button>
+                                                                        <button class="btn borderBtn cancelMedicationLogBtn" type="button"> Cancel </button>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </form>
                                                     </div>
 
-                                                    <div class="carePlanWrapper m-t-15">
-                                                        <div class="planCard borderleftPurple">
-                                                            <div class="planTop">
-                                                                <div class="planTitle">
-                                                                    DFVDF <span class="roundTag yellow"> missed</span>
-                                                                </div>
-                                                                <div class="planActions">
-                                                                    <button class="danger"><i class='bx  bx-info-circle'></i> </button>
-                                                                </div>
-                                                            </div>
-                                                            <div class="planFooter">
-                                                                <span>Dosage:<strong> DSFDS </strong> </span>
-                                                            </div>
-                                                            <div class="planFooter">
-                                                                <span>Frequency: DSF </span>
-                                                            </div>
+                                                    <div class="carePlanWrapper m-t-15" id="renderHtmlMedicalLogs">
 
-
-                                                            <div class="planMeta">
-                                                                <div class="aligniconMedication"><i class='bx  bx-clock-4'></i> Jan 6, 2026 at 18:28</div>
-                                                                <div class="aligniconMedication"><i class='bx  bx-user'></i> By: Unknown Staff</div>
-                                                            </div>
-                                                            <div class="witnessedBy">
-                                                                <span><strong>Witnessed by:</strong> DSFF </span>
-                                                            </div>
-
-                                                            <div class="witnessedBy witnessedByNotes">
-                                                                <span><strong>Notes:</strong> DSFDSFSAFSDF </span>
-                                                            </div>
-
-                                                            <div class="witnessedBy witnessedBySideEffects yellow">
-                                                                <strong class="aligniconMedication"><i class='bx  bx-info-circle'></i> Side Effects:</strong>
-                                                                <p>SDFSDF</p>
-                                                            </div>
-                                                        </div>
                                                     </div>
+                                                    <div id="medicationLogsPagination"></div>
                                                 </div>
                                             </div>
                                         </div>
@@ -7300,7 +7646,19 @@
         </div>
     </div>
     <!-- pratima modal end -->
-
+    <!-- script for URL's variables -->
+    <script>
+        var saveMedicationLogUrl = "{{url('roster/client/medication-log-save')}}";
+        var listMedicationLogUrl = "{{url('roster/client/medication-log-list')}}";
+        var token = "{{csrf_token()}}";
+        var listClientCareTaskUrl = "{{url('roster/client/care-task-list')}}";
+        var clientCareTaskEditUrl = "{{url('/roster/care-task-edit')}}";
+        var clientCareTaskDeleteUrl = "{{url('/roster/care-task-delete')}}";
+        var clientCareTaskAddUrl = "{{url('roster/care-task-add')}}";
+        var client_id = "{{$client_id}}";
+    </script>
+    <!-- end here -->
+    <script src="{{ url('public/js/roster/client/client_details.js')}}" defer></script>
     <script>
         const tabs = document.querySelectorAll(".tab");
         const contents = document.querySelectorAll(".content");
@@ -8234,6 +8592,7 @@
             $('.riskAssessmentSectionFirst').show();
         });
         $(document).on('click', '#logMedicationBtn', function() {
+            setDateTimeFormat();
             $(".medicationLogsForm").toggle();
         });
         $(document).on('click', '.marSheetDetails', function() {
@@ -8291,6 +8650,39 @@
         $(document).on('click', '.closeConsentRecordBtn', function() {
             $(".consentRecordSectionFirst").hide();
             $(".consentRecordSectionSecond").show();
+        });
+    </script>
+
+    <!-- for checkbox css -->
+    <script>
+        const selectAll = document.getElementById('selectAllAllert');
+        const actionBox = document.getElementById('actionBox');
+        const checks = document.querySelectorAll('.alertCheck');
+        const closeBtn = document.getElementById('closeActionBox');
+
+        function updateSytemAlert() {
+            const count = document.querySelectorAll('.alertCheck:checked').length;
+            actionBox.style.display = count > 0 ? 'block' : 'none';
+        }
+
+        selectAll.addEventListener('change', function() {
+            checks.forEach(cb => cb.checked = this.checked);
+            updateSytemAlert();
+        });
+
+        checks.forEach(cb => {
+            cb.addEventListener('change', function() {
+                const total = checks.length;
+                const checked = document.querySelectorAll('.alertCheck:checked').length;
+                selectAll.checked = total === checked;
+                updateSytemAlert();
+            });
+        });
+        closeBtn.addEventListener('click', function() {
+            actionBox.style.display = 'none';
+
+            checks.forEach(cb => cb.checked = false);
+            selectAll.checked = false;
         });
     </script>
 

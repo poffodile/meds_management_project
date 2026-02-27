@@ -84,10 +84,10 @@
                             <textarea name="description" id="description" class="form-control" rows="3" cols="20" placeholder="Short Description" maxlength="1000"></textarea>
                         </div>
 
-                        {{-- <div class="form-group col-md-6 col-sm-6 col-xs-12">
+                        <!-- <div class="form-group col-md-6 col-sm-6 col-xs-12">
                             <label>Payroll</label>
                             <input type="text" name="payroll" id="payroll" placeholder="payroll" class="form-control" maxlength="255">
-                        </div> --}}
+                        </div> -->
 
                         <div class="form-group col-md-16 col-sm-6 col-xs-12 datepicker-sttng date-sttng">
                             <label>Date of Joining</label>
@@ -117,6 +117,10 @@
                         <div class="form-group col-md-6 col-sm-6 col-xs-12">
                             <label>Holiday Entitlement</label>
                             <input type="text" name="holiday_entitlement" placeholder="holiday entitlement" class="form-control" maxlength="255">
+                        </div>
+                        <div class="form-group col-md-6 col-sm-6 col-xs-12">
+                            <label>Current Location</label>
+                            <input type="text" name="current_location" placeholder="current location" class="form-control" maxlength="255">
                         </div>
 
                         <div class="form-group col-md-12 col-sm-12 col-xs-12 m-0">
@@ -173,7 +177,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="form-group col-md-12 col-sm-12 col-xs-12 m-t-10">
+                        <!-- <div class="form-group col-md-12 col-sm-12 col-xs-12 m-t-10">
                             <label>Address</label>
                             <div class="row">
                                 <div class="col-md-4">
@@ -186,7 +190,7 @@
                                     <input type="text" class="form-control" name="postcode" id="postcode" placeholder="Postcode">
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
                         <div class="form-group col-md-12 col-sm-12 col-xs-12 m-t-10">
                             <label>Emergency Contact</label>
                             <div class="row">
@@ -703,9 +707,7 @@
             $('#staff_phone_no').val($btn.attr('data-phone') || $btn.data('phone'));
             $('#staff_email').val($btn.attr('data-email') || $btn.data('email'));
             $('#job_title').val($btn.attr('data-job-title') || $btn.data('jobTitle') || $btn.data('job-title'));
-            $('#street').val($btn.attr('data-street') || $btn.data('street'));
-            $('#city').val($btn.attr('data-city') || $btn.data('city'));
-            $('#postcode').val($btn.attr('data-postcode') || $btn.data('postcode'));
+            $('input[name="current_location"]').val($btn.attr('data-current-location') || $btn.data('current-location') || $btn.attr('data-current_location') || $btn.data('current_location'));
             $('#department').val($btn.attr('data-department') || $btn.data('department')).trigger('change');
             $('#employment_type').val($btn.attr('data-employment-type') || $btn.data('employmentType') || $btn.data('employment-type')).trigger('change');
             $('#status').val($btn.attr('data-status') || $btn.data('status')).trigger('change');

@@ -744,26 +744,47 @@
             <!-- TAB CONTENT -->
             <div class="tab-content">
                 <div class="content active" id="roster">
+                    @php
+                    $rosterTotalShifts = $scheduled_shifts->count();
+                    $rosterOpenShifts = 0;
+                    $rosterTotalHours = 0;
+
+                    foreach($scheduled_shifts as $shift) {
+                    // Check for unfilled condition logically exactly like we did in the API
+                    $is_unfilled = ($shift->status == 'unfilled' || $shift->status == 'open' || empty($shift->staff_id));
+                    if ($is_unfilled) {
+                    $rosterOpenShifts++;
+                    }
+
+                    if($shift->start_time && $shift->end_time) {
+                    $start_time = \Carbon\Carbon::parse($shift->start_time);
+                    $end_time = \Carbon\Carbon::parse($shift->end_time);
+                    $rosterTotalHours += $start_time->diffInHours($end_time);
+                    }
+                    }
+                    $rosterFilledShifts = $rosterTotalShifts - $rosterOpenShifts;
+                    @endphp
                     <!-- Top Blue Bar -->
                     <div class="roster-top">
                         <div class="title">
                             <h2 class="h2-color">Care Home</h2> <span>Shift Roster</span>
                         </div>
                         <div class="stats">
-                            <div class="stat"> <strong>12</strong> <small>Total Shifts</small> </div>
+                            <div class="stat"> <strong>{{ $rosterTotalShifts }}</strong> <small>Total Shifts</small> </div>
                             <div class="divider"></div>
-                            <div class="stat filled"> <strong>0</strong> <small>Filled</small> </div>
+                            <div class="stat filled"> <strong>{{ $rosterFilledShifts }}</strong> <small>Filled</small> </div>
                             <div class="divider"></div>
-                            <div class="stat open"> <strong>12</strong> <small>Open</small> </div>
+                            <div class="stat open"> <strong>{{ $rosterOpenShifts }}</strong> <small>Open</small> </div>
                             <div class="divider"></div>
-                            <div class="stat hours"> <strong>96h</strong> <small>Hours</small> </div>
+                            <div class="stat hours"> <strong>{{ round($rosterTotalHours) }}h</strong> <small>Hours</small> </div>
                         </div>
                     </div>
 
                     <!-- Filters Row -->
-                    <div class="roster-filters">
+                    <!-- <div class="roster-filters">
                         <div class="left">
                             <select>
+                                <option selected>Resources</option>
                                 <option>Runs</option>
                             </select>
                             <select>
@@ -781,7 +802,7 @@
                         </div>
 
                         <input type="text" class="search" placeholder="Search..." />
-                    </div>
+                    </div> -->
                     <!-- Date / Navigation Row -->
                     <div class="roster-nav">
                         <div class="left">
@@ -793,13 +814,13 @@
                             <button id="btnToday">Today</button>
                         </div>
 
-                        <div class="right">
+                        <!-- <div class="right">
                             <button class="outline">Bulk Actions</button>
                             <button class="primary">👥 Staff</button>
                             <button>📍 Locations</button>
                             <button>👤 Clients</button>
                             <button>⇄ Split</button>
-                        </div>
+                        </div> -->
                     </div>
 
 
@@ -2652,85 +2673,85 @@
                         });
 
                         html += `
-                <div class="byGroupContent">
-                    <div class="workHoursHeader">
-                        <div class="title radIconClr">
-                            ${user.name}
-                        </div>
-                        <div class="actions">
-                            ${user.shifts.length} shifts
-                            <div class="roundBtntag radShowbtn">
-                                ${totalHours}h
-                            </div>
-                        </div>
-                    </div>
+                                <div class="byGroupContent">
+                                    <div class="workHoursHeader">
+                                        <div class="title radIconClr">
+                                            ${user.name}
+                                        </div>
+                                        <div class="actions">
+                                            ${user.shifts.length} shifts
+                                            <div class="roundBtntag radShowbtn">
+                                                ${totalHours}h
+                                            </div>
+                                        </div>
+                                    </div>
 
-                    <div class="recent-activity sectionWhiteBgAllUse">
-            `;
+                                    <div class="recent-activity sectionWhiteBgAllUse">
+                            `;
 
                         user.shifts.forEach(function(shift) {
 
                             html += `
-                    <div class="activity-item">
-                        <div class="activity-icon">
-                            <i class='bx bx-apps'></i>
-                        </div>
+                                        <div class="activity-item">
+                                            <div class="activity-icon">
+                                                <i class='bx bx-apps'></i>
+                                            </div>
 
-                        <div class="activity-content">
-                            <div class="activity-title">
-                                ${shift.client_name ?? 'Unknown'}
-                            </div>
+                                            <div class="activity-content">
+                                                <div class="activity-title">
+                                                    ${shift.client_name ?? 'Unknown'}
+                                                </div>
 
-                            <div class="activity-description">
-                                <i class='bx bx-clock-4'></i>
-                                ${shift.start_time} - ${shift.end_time}
-                            </div>
+                                                <div class="activity-description">
+                                                    <i class='bx bx-clock-4'></i>
+                                                    ${shift.start_time} - ${shift.end_time}
+                                                </div>
 
-                            <div class="activity-time">
-                                <i class='bx bx-calendar'></i>
-                                ${shift.shift_date}
-                            </div>
+                                                <div class="activity-time">
+                                                    <i class='bx bx-calendar'></i>
+                                                    ${shift.shift_date}
+                                                </div>
 
-                            <div class="inactive roundTag">
-                                ${shift.shift_type ?? ''}
-                            </div>
+                                                <div class="inactive roundTag">
+                                                    ${shift.shift_type ?? ''}
+                                                </div>
 
-                            <div class="planActions" style="display:flex; gap: 8px;">
-                                <button class="day-shift-item" style="border: 1px solid #d1d5db; border-radius: 4px; padding: 4px 8px; background: transparent; cursor: pointer;"
-                                    data-id="${shift.id || ''}"
-                                    data-client="${shift.client_id || ''}"
-                                    data-property="${shift.property_id || ''}"
-                                    data-location="${shift.location_name || ''}"
-                                    data-address="${shift.location_address || ''}"
-                                    data-date="${shift.start_date || ''}"
-                                    data-start="${shift.start_time_raw || ''}"
-                                    data-end="${shift.end_time_raw || ''}"
-                                    data-staff="${shift.staff_id || ''}"
-                                    data-type="${shift.shift_type_raw || ''}"
-                                    data-care="${shift.care_type_id || ''}"
-                                    data-assignment="${shift.assignment || ''}"
-                                    data-notes="${shift.notes || ''}"
-                                    data-tasks="${shift.tasks || ''}">
-                                    <i class="bx bx-edit"></i> Edit
-                                </button>
+                                                <div class="planActions" style="display:flex; gap: 8px;">
+                                                    <button class="day-shift-item" style="border: 1px solid #d1d5db; border-radius: 4px; padding: 4px 8px; background: transparent; cursor: pointer;"
+                                                        data-id="${shift.id || ''}"
+                                                        data-client="${shift.client_id || ''}"
+                                                        data-property="${shift.property_id || ''}"
+                                                        data-location="${shift.location_name || ''}"
+                                                        data-address="${shift.location_address || ''}"
+                                                        data-date="${shift.start_date || ''}"
+                                                        data-start="${shift.start_time_raw || ''}"
+                                                        data-end="${shift.end_time_raw || ''}"
+                                                        data-staff="${shift.staff_id || ''}"
+                                                        data-type="${shift.shift_type_raw || ''}"
+                                                        data-care="${shift.care_type_id || ''}"
+                                                        data-assignment="${shift.assignment || ''}"
+                                                        data-notes="${shift.notes || ''}"
+                                                        data-tasks="${shift.tasks || ''}">
+                                                        <i class="bx bx-edit"></i> Edit
+                                                    </button>
 
-                                <button class="danger delete" style="border: 1px solid #ef4444; color: #ef4444; border-radius: 4px; padding: 4px 8px; background: transparent; cursor: pointer;" data-id="${shift.id}">
-                                    <i class="bx bx-trash"></i> Delete
-                                </button>
-                            </div>
-                        </div>
+                                                    <button class="danger delete" style="border: 1px solid #ef4444; color: #ef4444; border-radius: 4px; padding: 4px 8px; background: transparent; cursor: pointer;" data-id="${shift.id}">
+                                                        <i class="bx bx-trash"></i> Delete
+                                                    </button>
+                                                </div>
+                                            </div>
 
-                        <div class="roundBtntag greenShowbtn">
-                            ${shift.status ?? 'unfilled'}
-                        </div>
-                    </div>
-                `;
+                                            <div class="roundBtntag greenShowbtn">
+                                                ${shift.status ?? 'unfilled'}
+                                            </div>
+                                        </div>
+                                    `;
                         });
 
                         html += `
-                    </div>
-                </div>
-            `;
+                                </div>
+                            </div>
+                        `;
                     });
 
                     $('#bygroup').html(html);

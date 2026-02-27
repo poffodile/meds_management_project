@@ -1,7 +1,7 @@
 <?php
-    $department = App\Models\CompanyDepartment::getActiveCompanyDepartment();
+$department = App\Models\CompanyDepartment::getActiveCompanyDepartment();
 
-    $childSection = App\Models\ChildSection::where(['home_id' => Auth::user()->home_id,'status' => 1])->whereNull('deleted_at')->get();
+$childSection = App\Models\ChildSection::where(['home_id' => Auth::user()->home_id, 'status' => 1])->whereNull('deleted_at')->get();
 ?>
 
 <div class="modal fade leaveCommunStyle" id="addServiceUserModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
@@ -13,7 +13,7 @@
                     aria-hidden="true">&times;</button>
                 <h4 class="modal-title" id="ClientModalTitle">Add Client</h4>
             </div>
-        
+
             <form method="post" action="{{ url('add-service-user') }}" enctype="multipart/form-data" id='add_service_user'>
                 <input type="hidden" id="suClientId" name="suClientId">
                 <div class="modal-body heightScrollModal">
@@ -27,7 +27,7 @@
                             <input type="text" name="su_user_name" id="su_user_name" required placeholder="username" class="form-control">
                         </div>
                         <div class="form-group col-md-4 col-sm-6 col-xs-12 datepicker-sttng date-sttng">
-                            <label>Date of Birth</label>                   
+                            <label>Date of Birth</label>
 
                             <div class="col-md-12 col-sm-12 col-xs-12 p-0">
                                 <div data-date-viewmode="years" data-date-format="dd-mm-yyyy" data-date="" class="input-group date"> <!-- dpYears -->
@@ -39,11 +39,11 @@
                                 </div>
                             </div>
                         </div>
-                         <div class="form-group col-md-4 col-sm-4 col-xs-12">
+                        <div class="form-group col-md-4 col-sm-4 col-xs-12">
                             <label>Phone Number *</label>
                             <input type="text" name="phone_no" id="phone_no" required placeholder="phone number" class="form-control" onkeypress="return event.charCode >= 48 && event.charCode <= 57">
                         </div>
-                         <div class="form-group col-md-4 col-sm-4 col-xs-12">
+                        <div class="form-group col-md-4 col-sm-4 col-xs-12">
                             <label>Hair and Eyes *</label>
                             <input type="text" name="hair_and_eyes" id="hair_and_eyes" required placeholder="hair and eyes"
                                 class="form-control">
@@ -53,8 +53,8 @@
                             <input type="text" name="markings" id="markings" required placeholder="markings"
                                 class="form-control">
                         </div>
-                        
-                         <div class="form-group col-md-6 col-sm-64 col-xs-12">
+
+                        <div class="form-group col-md-6 col-sm-64 col-xs-12">
                             <label>Start Date</label>
                             <input type="text" name="start_date" id="start_date" class="form-control">
                         </div>
@@ -72,7 +72,7 @@
                             <div class="select-style">
                                 <select name="department" id="department" class="form-control" required>
                                     @foreach($department as $department)
-                                        <option value="{{ $department->id }}">{{ $department->name }}</option>
+                                    <option value="{{ $department->id }}">{{ $department->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -88,7 +88,7 @@
                             <input type="hidden" name="childCourseImage" id="childCourseImage">
                             <input type="hidden" name="childCourseDescription" id="childCourseDescription">
                         </div> -->
-                 
+
                         <!-- <div class="form-group col-md-4 col-sm-4 col-xs-12">
                             <label>Weekly Rate</label>
                             <input type="text" name="weekly_rate" id="weekly_rate" placeholder="Weekly Rate" class="form-control">
@@ -101,7 +101,7 @@
                             <label>Extra</label>
                             <input type="text" name="extra" id="extra" placeholder="Extra" class="form-control">
                         </div> -->
-                       
+
                         <!-- <div class="form-group col-md-6 col-sm-6 col-xs-12">
                             <label>Local Authority</label>
                             <input type="text" name="local_authority" id="local_authority" required placeholder="Local Authority"
@@ -148,7 +148,7 @@
                             <label>Section *</label>
                             <select class="form-control" name="section" id="section" required>
                                 @foreach($childSection as $sectionVal)
-                                    <option value="{{$sectionVal->id}}">{{$sectionVal->section}}</option>
+                                <option value="{{$sectionVal->id}}">{{$sectionVal->section}}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -161,11 +161,11 @@
                                 <select name="ethnicity_id" class="" id="ethnicity_id" required>
                                     <option value="0" disabled> Select Ethnicity </option>
                                     @foreach ($su_ethnicity as $key => $value)
-                                        <option value="{{ $value['id'] }}">{{ $value['name'] }}</option>
+                                    <option value="{{ $value['id'] }}">{{ $value['name'] }}</option>
                                     @endforeach
                                 </select>
                             </div>
-                        </div>                       
+                        </div>
 
                         <div class="form-group col-md-12 col-sm-12 col-xs-12">
                             <label>Short Description *</label>
@@ -185,7 +185,7 @@
                                 </div>
                             </div>
                         </div>
-                         <div class="form-group col-md-12 col-sm-12 col-xs-12">
+                        <div class="form-group col-md-12 col-sm-12 col-xs-12">
                             <label>Care Needs (comma separated)</label>
                             <textarea name="care_needs" id="care_needs" class="form-control" rows="3" cols="20" placeholder="e.g., Personal care, Medication management, Meal preparation"></textarea>
                         </div>
@@ -193,15 +193,15 @@
                         <div class="col-md-12">
                             <div class="carer-form">
                                 <div class="qualifications">
-                                    <h4>Preferred Carers (for continuity of care) *</h4>
+                                    <h4>Preferred Services (for continuity of care) *</h4>
                                     <div class="checkbox-grid su_usercheckbox-grid">
-                                       
+
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                         <div class="form-group col-md-12 col-sm-12 col-xs-12">
+                        <div class="form-group col-md-12 col-sm-12 col-xs-12">
                             <label>Medical Notes</label>
                             <textarea name="medical_notes" id="medical_notes" class="form-control" rows="3" cols="20" placeholder="Important medical information"></textarea>
                         </div>
@@ -239,7 +239,7 @@
                                             <option value="">Select</option>
                                             @for ($i = 0; $i < 12; $i++)
                                                 <option value="{{ $i }}">{{ $i }}</option>
-                                            @endfor
+                                                @endfor
                                         </select>
                                     </div>
                                 </div>
@@ -263,7 +263,7 @@
                                 </div>
                             </div>
                         </div>
-                       
+
                         <div class="form-group col-md-12 col-sm-12 col-xs-12 m-0">
                             <div class="col-md-12 p-0">
                                 <div class="fileupload fileupload-new" data-provides="fileupload">
@@ -271,7 +271,7 @@
                                         style="max-width: 200px; max-height: 150px; min-width: 150px; min-height: 100px; line-height: 100px; font-size: 40px;
     color: #c7c4c4;">
                                         <!-- <img src="" alt="No Image" /> -->
-                                         <i class="fa fa-upload"></i>
+                                        <i class="fa fa-upload"></i>
                                     </div>
                                     <div class="fileupload-preview fileupload-exists thumbnail"
                                         style="max-width: 200px; max-height: 150px; min-width: 150px; min-height: 100px; line-height: 20px;">
@@ -282,7 +282,7 @@
                                                 image</span>
                                             <span class="fileupload-exists"><i class="fa fa-undo"></i> Change</span>
                                             <input name="img_upload" type="file" class="default"
-                                                id="img_upload"/>
+                                                id="img_upload" />
                                         </span>
                                         <!-- <a href="#" class="btn btn-danger fileupload-exists" data-dismiss="fileupload"><i class="fa fa-trash"></i>Remove</a> -->
                                     </div>
@@ -294,7 +294,7 @@
                                 <label>
                                     <input type="checkbox" name="send_credentials" value="yes" id="sign-checkbox1" maxlength="255"> Send Credentials
                                 </label>
-                            </div>                          
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -302,8 +302,8 @@
                     <button class="btn btn-default cancel-user-btn" data-dismiss="modal" type="button"> Cancel
                     </button>
                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                    <button class="btn allBtnUseColor image_val" type="submit"> Create Client </button>
-                </div>        
+                    <button class="btn allBtnUseColor image_val" type="submit" id="clientFormSaveBtn"> Create Client </button>
+                </div>
             </form>
         </div>
     </div>
@@ -557,37 +557,37 @@
     weightUnit.addEventListener('change', () => {
         populateDropdownWeight(weightUnit.value);
     });
-    $(document).on('change','#childCourse', function(){
+    $(document).on('change', '#childCourse', function() {
         let selected = $(this).find(':selected');
         $("#chiledCoursenumber").val(selected.data('coursenumber'));
         $("#childCourseLevel").val(selected.data('level'));
         $("#childCourseImage").val(selected.data('image'));
         $("#childCourseDescription").val(selected.data('description'));
     });
-    $(document).on('change', '.course_qualifications', function () {
+    $(document).on('change', '.course_qualifications', function() {
 
-    let box = $(this).closest('.course-box');
+        let box = $(this).closest('.course-box');
 
-    if ($(this).is(':checked')) {
+        if ($(this).is(':checked')) {
 
-        box.find('[data-name]').each(function () {
-            $(this).attr('name', $(this).data('name'));
-        });
+            box.find('[data-name]').each(function() {
+                $(this).attr('name', $(this).data('name'));
+            });
 
-        // box.find('.qual_upload')
-        //     .prop('disabled', false)
-        //     .attr('required', true);
+            // box.find('.qual_upload')
+            //     .prop('disabled', false)
+            //     .attr('required', true);
 
-    } else {
+        } else {
 
-        box.find('[data-name]').each(function () {
-            $(this).removeAttr('name');
-        });
+            box.find('[data-name]').each(function() {
+                $(this).removeAttr('name');
+            });
 
-        // box.find('.qual_upload')
-        //     .prop('disabled', true)
-        //     .removeAttr('required')
-        //     .val('');
-    }
-});
+            // box.find('.qual_upload')
+            //     .prop('disabled', true)
+            //     .removeAttr('required')
+            //     .val('');
+        }
+    });
 </script>

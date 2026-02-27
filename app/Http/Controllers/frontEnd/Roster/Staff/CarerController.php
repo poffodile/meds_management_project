@@ -251,11 +251,16 @@ class CarerController extends Controller
 
     public function allShifts()
     {
-        $shifts = \App\Models\ScheduledShift::all();
+        // Add where('home_id', Auth::user()->home_id) optionally for security as seen elsewhere
+        $homeId = Auth::user()->home_id;
+        $shifts = \App\Models\ScheduledShift::where('home_id', $homeId)->get();
 
         $events = $shifts->map(function ($shift) {
             $startDate = $shift->start_date;
             $endDate = $shift->end_date ?? $shift->start_date;
+
+            $startTime = \Carbon\Carbon::parse($shift->start_time);
+            $endTime = \Carbon\Carbon::parse($shift->end_time);
 
             return [
                 'id' => (string) $shift->id,
@@ -264,6 +269,21 @@ class CarerController extends Controller
                 'end' => $endDate . 'T' . $shift->end_time,
                 'resourceId' => $shift->staff_id ? (string) $shift->staff_id : 'open',
                 'backgroundColor' => $shift->staff_id ? '#d1fae5' : '#fde68a',
+                // Extended props for editing:
+                'shift_id' => $shift->id,
+                'staff_id' => $shift->staff_id,
+                'client_id' => $shift->service_user_id,
+                'shift_type_raw' => $shift->shift_type,
+                'start_time_raw' => $startTime->format('H:i'),
+                'end_time_raw' => $endTime->format('H:i'),
+                'start_date' => $shift->start_date,
+                'care_type' => $shift->care_type_id,
+                'assignment' => $shift->assignment,
+                'property_id' => $shift->property_id,
+                'location_name' => $shift->location_name,
+                'location_address' => $shift->location_address,
+                'notes' => $shift->notes,
+                'tasks' => $shift->tasks,
             ];
         })->toArray();
 
@@ -273,8 +293,10 @@ class CarerController extends Controller
     public function dayShifts(Request $request)
     {
         $date = $request->query('date', date('Y-m-d'));
+        $homeId = Auth::user()->home_id;
         $shifts = \App\Models\ScheduledShift::with(['staff', 'client'])
             ->where('start_date', $date)
+            ->where('home_id', $homeId)
             ->get();
 
         $formatted = $shifts->map(function ($shift) {
@@ -320,8 +342,10 @@ class CarerController extends Controller
         $startOfWeek = $date->copy()->startOfWeek(\Carbon\Carbon::MONDAY);
         $endOfWeek = $date->copy()->endOfWeek(\Carbon\Carbon::SUNDAY);
 
+        $homeId = Auth::user()->home_id;
         $shifts = \App\Models\ScheduledShift::with(['staff', 'client'])
             ->whereBetween('start_date', [$startOfWeek->format('Y-m-d'), $endOfWeek->format('Y-m-d')])
+            ->where('home_id', $homeId)
             ->get();
 
         $weekData = [];
@@ -382,7 +406,8 @@ class CarerController extends Controller
         $startDate = \Carbon\Carbon::parse($dateStr);
         $endDate = $startDate->copy()->addDays(90);
 
-        $shifts = \App\Models\ScheduledShift::whereBetween('start_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->get();
+        $homeId = Auth::user()->home_id;
+        $shifts = \App\Models\ScheduledShift::whereBetween('start_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->where('home_id', $homeId)->get();
 
         $totalShifts = $shifts->count();
         $unfilledShifts = 0;

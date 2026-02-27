@@ -329,7 +329,8 @@ class ScheduleShiftController extends Controller
 
     public function getMonthlyShifts(Request $request)
     {
-        $shifts = ScheduledShift::where('home_id', auth()->user()->home_id)
+
+        $shifts = ScheduledShift::where('home_id', Auth::user()->home_id)
             ->whereBetween('start_date', [$request->start, $request->end])
             ->get();
 

@@ -1,7 +1,5 @@
 @extends('backEnd.layouts.master')
-
 @section('title', ':User Form')
-
 @section('content')
 
 <style type="text/css">
@@ -98,8 +96,8 @@ if (isset($user_info)) {
                                     <label class="col-lg-3 control-label">Access Level</label>
                                     <div class="col-lg-9">
                                         <!-- <input type="email" name="access_level" class="form-control" placeholder="access level" value="{{ isset($user_info->access_level) ? $user_info->access_level : '' }}"> -->
-                                        <select class="form-control" name="access_level" {{ isset($del_status) ? $disabled : '' }}>
-                                            <option value="">select level</option>
+                                        <select class="form-control" id="access_level" name="access_level" {{ isset($del_status) ? $disabled : '' }}>
+                                            <option value="">Select level</option>
 
                                             <?php foreach ($access_levels as $access_level) { ?>
                                                 <option value="{{ $access_level['id'] }}" <?php if (isset($user_info->access_level)) {
@@ -151,10 +149,16 @@ if (isset($user_info)) {
                                     </div>
                                 </div>
 
-                                <div class="form-group">
+                                <!-- <div class="form-group">
                                     <label class="col-lg-3 control-label">Payroll</label>
                                     <div class="col-lg-9">
                                         <input type="text" name="payroll" class="form-control" placeholder="payroll" value="{{ isset($user_info->payroll) ? $user_info->payroll : '' }}" maxlength="255" {{ isset($del_status) ? $disabled : '' }}>
+                                    </div>
+                                </div> -->
+                                <div class="form-group">
+                                    <label class="col-lg-3 control-label">Hourly Rate</label>
+                                    <div class="col-lg-9">
+                                        <input type="text" name="hourly_rate" id="hourly_rate" class="form-control" placeholder="hourly rate" value="{{ isset($user_info->hourly_rate) ? $user_info->hourly_rate : '' }}" maxlength="255" {{ isset($del_status) ? $disabled : '' }}>
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -164,20 +168,19 @@ if (isset($user_info)) {
                                     </div>
                                 </div>
 
-                                <!--                             <div class="form-group">
-                                                                            <label class="col-lg-2 control-label">Date of Joining</label>
-                                                                            <div class="col-lg-10">
-                                                                               <input class="form-control date-format" type="text" value="{{ isset($user_info->date_of_joining) ? date('d-m-Y', strtotime($user_info->date_of_joining)) : '' }}" placeholder="DD-MM-YYYY" name="date_of_joining" value="" maxlength="10" autocomplete="off" />
+                                <!-- <div class="form-group">
+                                        <label class="col-lg-2 control-label">Date of Joining</label>
+                                        <div class="col-lg-10">
+                                            <input class="form-control date-format" type="text" value="{{ isset($user_info->date_of_joining) ? date('d-m-Y', strtotime($user_info->date_of_joining)) : '' }}" placeholder="DD-MM-YYYY" name="date_of_joining" value="" maxlength="10" autocomplete="off" />
+                                        </div>
+                                    </div>
 
-                                                                            </div>
-                                                                        </div>
-
-                                                                        <div class="form-group">
-                                                                            <label class="col-lg-2 control-label">Date of Leaving</label>
-                                                                            <div class="col-lg-10">
-                                                                               <input class="form-control date-format" type="text" value="{{ isset($user_info->date_of_leaving) ? date('d-m-Y', strtotime($user_info->date_of_leaving)) : '' }}" placeholder="DD-MM-YYYY" name="date_of_leaving" value="" maxlength="10" autocomplete="off"/>
-                                                                            </div>
-                                                                        </div> -->
+                                    <div class="form-group">
+                                        <label class="col-lg-2 control-label">Date of Leaving</label>
+                                        <div class="col-lg-10">
+                                            <input class="form-control date-format" type="text" value="{{ isset($user_info->date_of_leaving) ? date('d-m-Y', strtotime($user_info->date_of_leaving)) : '' }}" placeholder="DD-MM-YYYY" name="date_of_leaving" value="" maxlength="10" autocomplete="off"/>
+                                        </div>
+                                    </div> -->
                                 <div class="form-group">
                                     <label class="col-lg-3 control-label">Date of Joining</label>
                                     <div class="col-lg-9">
@@ -193,11 +196,11 @@ if (isset($user_info)) {
                                 </div>
 
                                 <!--<div class="form-group">
-                                            <label for="inputEmail1" class="col-lg-2 control-label">Email</label>
-                                            <div class="col-lg-10">
-                                                <input type="email" name="name" class="form-control" id="inputEmail1" placeholder="Email">
-                                            </div>
-                                        </div> -->
+                                        <label for="inputEmail1" class="col-lg-2 control-label">Email</label>
+                                        <div class="col-lg-10">
+                                            <input type="email" name="name" class="form-control" id="inputEmail1" placeholder="Email">
+                                        </div>
+                                    </div> -->
 
                                 <?php
                                 $image = env('APP_URL') . userProfileImagePath . '/default_user.jpg';
@@ -269,7 +272,6 @@ if (isset($user_info)) {
                                         <textarea name="current_location" class="form-control" placeholder="Current location" rows="4" maxlength="2000" {{ isset($del_status) ? $disabled : '' }}>{{ isset($user_info->current_location) ? $user_info->current_location : '' }}</textarea>
                                     </div>
                                 </div>
-
                                 <label>More Info</label>
                                 <div class="form-group">
                                     <label class="col-lg-3 control-label">Personal Information</label>
@@ -284,11 +286,11 @@ if (isset($user_info)) {
                                     </div>
                                 </div>
                                 <!-- <div class="form-group">
-                                                                            <label class="col-lg-2 control-label">Qualification Information</label>
-                                                                            <div class="col-lg-10">
-                                                                                <textarea name="qualification_info" class="form-control" placeholder="Qualification information" rows="6" maxlength="2000">{{ isset($user_info->qualification_info) ? $user_info->qualification_info : '' }}</textarea>
-                                                                            </div>
-                                                                        </div> -->
+                                        <label class="col-lg-2 control-label">Qualification Information</label>
+                                        <div class="col-lg-10">
+                                            <textarea name="qualification_info" class="form-control" placeholder="Qualification information" rows="6" maxlength="2000">{{ isset($user_info->qualification_info) ? $user_info->qualification_info : '' }}</textarea>
+                                        </div>
+                                    </div> -->
 
                                 {{-- @if (isset($user_info->certificates))
                                                     <div class="form-group">
@@ -665,6 +667,36 @@ if (isset($user_info)) {
         $('#available_for_overtime').on('change', function() {
             toggleExtraHours();
         });
+
+        $('#access_level').on('change', function() {
+            fetchHourlyRate($(this).val());
+        });
+
+        function fetchHourlyRate(accessLevelId) {
+            if (!accessLevelId) {
+                $('#hourly_rate').val('');
+                return;
+            }
+
+            $.ajax({
+                url: "{{ url('/roster/carer/get-hourly-rate') }}",
+                type: "POST",
+                data: {
+                    access_level_id: accessLevelId,
+                    _token: "{{ csrf_token() }}"
+                },
+                success: function(response) {
+                    if (response.hourly_rate !== undefined) {
+                        $('#hourly_rate').val(response.hourly_rate);
+                    } else {
+                        $('#hourly_rate').val('');
+                    }
+                },
+                error: function() {
+                    $('#hourly_rate').val('');
+                }
+            });
+        }
     });
 </script>
 

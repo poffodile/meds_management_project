@@ -640,12 +640,14 @@ class UserController extends Controller
 		$today = $londonTime->toDateString();
 		// echo "<pre>";
 		// print_r($today);
+		// print_r($londonTime->format('H:i:s'));
 		// die;
-		// Today shift: next assigned shift after current time
+		$currentTime = $londonTime->format('H:i:s');
 		$todayShift = ScheduledShift::where('staff_id', $staffId)
 			->where('start_date', $today)
-			->where('status', 'in_progress')
-			// ->where('start_time', '>', $londonTime->format('H:i:s'))
+			->where('status', 'assigned')
+			->where('start_time', '<=', $currentTime)
+			->where('end_time', '>=', $currentTime)
 			->select('start_time', 'end_time', 'tasks', 'notes', 'id')
 			->first();
 		// dd($todayShift);

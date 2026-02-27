@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Schema;
 use App\ServiceUser;
+use App\Models\suUserCourse;
 
 
 class StaffService
@@ -177,6 +178,7 @@ class StaffService
             'city' => 'city',
             'postcode' => 'postcode',
             'department' => 'department',
+            'current_location' => 'current_location',
             'employment_type' => 'employment_type',
             'status' => 'status',
             'description' => 'description',
@@ -193,7 +195,7 @@ class StaffService
             }
         }
 
-        $address = $request->input('street') . ' ' . $request->input('city') . ' ' . $request->input('postcode');
+        $address = $request->input('current_location');
         $staffLatLong = $this->getLatLongFromAddress($address);
 
         // Save latitude and longitude if available
@@ -317,30 +319,44 @@ class StaffService
 
     public function getShiftUser($id)
     {
+        // 1. Get the courses for this service user
+        $clientCourses = suUserCourse::where('su_user_id', $id)->pluck('course_id')->toArray();
+
+        // 2. Fetch the client to get their latitude/longitude
         $client = ServiceUser::find($id);
 
-        // Check if service user has latitude and longitude
-        if (!$client || !$client->latitude || !$client->longitude) {
-            return collect(); // Return empty collection if no location data
+        if (!$client) {
+            return collect(); // Return empty collection if client not found
         }
 
         $clientLatitude = $client->latitude;
         $clientLongitude = $client->longitude;
 
-        $users = User::select('id', 'name', 'postcode', 'latitude', 'longitude')
+        // 3. Base query for users
+        $query = User::select('id', 'name', 'postcode', 'latitude', 'longitude')
             ->where('home_id', Auth::user()->home_id)
             ->where('status', 1)
-            ->get();
+            ->where('is_deleted', 0); // Exclude deleted users
 
-        // dd($users);
+        // 4. Filter users who have the matching course_id in user_qualification
+        if (!empty($clientCourses)) {
+            $userIdsWithCourses = DB::table('user_qualification')
+                ->whereIn('course_id', $clientCourses)
+                ->pluck('user_id')
+                ->toArray();
 
-        // Map staff to process distance logic for everyone
+            $query->whereIn('id', $userIdsWithCourses);
+        }
+
+        $users = $query->get();
+
+        // 5. Map staff to process distance logic
         $nearbyStaff = $users->map(function ($staff) use ($clientLatitude, $clientLongitude) {
 
             $distance = null;
 
-            // Check if staff has location data
-            if ($staff->latitude && $staff->longitude) {
+            // Check if both client and staff have location data
+            if ($clientLatitude && $clientLongitude && $staff->latitude && $staff->longitude) {
                 // Calculate distance
                 $distance = $this->calculateDistance($clientLatitude, $clientLongitude, $staff->latitude, $staff->longitude);
                 $staff->distance = $distance;

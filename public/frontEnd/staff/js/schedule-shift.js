@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function () {
             );
 
             updateDateRange(info.view);
-            updateStats(); // optional but recommended
+            // updateStats(); // optional but recommended
         },
 
         headerToolbar: false,
@@ -122,6 +122,57 @@ document.addEventListener('DOMContentLoaded', function () {
                 return true;
             }
             return true;
+        },
+
+        eventClick: function (info) {
+            const ev = info.event;
+            const props = ev.extendedProps;
+            const form = $('#createShiftForm');
+
+            // Change form action to update
+            form.attr('action', BASE_URL + '/roster/schedule-shift/update/' + props.shift_id);
+            form.closest('.modal-content').find('.modal-title').text('Edit Shift');
+            form.find('button[type="submit"]').html('Update Shift');
+
+            // Populate fields
+            form.find('[name="client_id"]').val(props.client_id).trigger('change');
+            form.find('[name="start_date"]').val(props.start_date);
+            form.find('[name="start_time"]').val(props.start_time_raw);
+            form.find('[name="end_time"]').val(props.end_time_raw);
+
+            if (props.staff_id) {
+                form.find('[name="carer_id"]').val(props.staff_id).trigger('change');
+            } else {
+                form.find('[name="carer_id"]').val('').trigger('change');
+            }
+
+            form.find('[name="shift_type"]').val(props.shift_type_raw).trigger('change');
+            form.find('[name="property_id"]').val(props.property_id).trigger('change');
+            form.find('[name="location_name"]').val(props.location_name);
+            form.find('[name="location_address"]').val(props.location_address);
+
+            if (props.care_type) {
+                form.find('[name="care_type"]').val(props.care_type).trigger('change');
+            }
+            if (props.assignment) {
+                form.find('[name="assignment"]').val(props.assignment).trigger('change');
+                let assignLower = props.assignment.toLowerCase();
+                if (assignLower === 'location') $('#locationTab').click();
+                else if (assignLower === 'client') $('#clientTab').click();
+                else if (assignLower === 'property') $('#propertyTab').click();
+            } else {
+                form.find('[name="assignment"]').val('Client').trigger('change');
+                $('#clientTab').click();
+            }
+            form.find('[name="notes"]').val(props.notes);
+
+            if (props.tasks) {
+                form.find('[name="tasks"]').val(props.tasks).trigger('change');
+            } else {
+                form.find('[name="tasks"]').val('').trigger('change');
+            }
+
+            $('#addShiftModal').modal('show');
         },
 
         /* ===== RESOURCE SETTINGS ===== */
@@ -223,6 +274,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function updateStats() {
+        /*
         const events = calendar.getEvents();
 
         const total = events.length;
@@ -232,6 +284,7 @@ document.addEventListener('DOMContentLoaded', function () {
         document.querySelector('.stat strong').innerText = total;
         document.querySelector('.stat.open strong').innerText = open;
         document.querySelector('.stat.filled strong').innerText = filled;
+        */
     }
 
     // Navigation

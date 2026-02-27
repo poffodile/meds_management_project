@@ -179,8 +179,10 @@
   // }
   function childCourseData(id = null, callback = null){
     $("#ClientModalTitle").text("Add Client");
+    $("#clientFormSaveBtn").text("Create Client");
     if (callback){
       $("#ClientModalTitle").text("Edit Client");
+      $("#clientFormSaveBtn").text("Update Client");
     }else{
       $("#add_service_user")[0].reset();
       var $fileupload = $('.fileupload');
@@ -211,6 +213,7 @@
                             <input type="hidden" data-name="courses[${key}][level]" value="${val.level}">
                             <input type="hidden" data-name="courses[${key}][course_image]" value="${val.image}">
                             <input type="hidden" data-name="courses[${key}][description]" value="${val.description}">
+                            <input type="hidden" data-name="courses[${key}][course_id]" value="${val.course_id}">
                             
                         </div>
                     `;
