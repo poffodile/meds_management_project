@@ -89,35 +89,35 @@ class checkUserAuth
             User::updateUserLastActivityTime();
 
             // ================= USER ACTIVE / EXPIRY CHECK =================
-            $user = Auth::user();
+            // $user = Auth::user();
 
-            // Auto deactivate if end date reached or passed
-            if (!empty($user->date_of_joining) && !empty($user->date_of_leaving)) {
-                $endDate = Carbon::parse($user->date_of_leaving)->startOfDay();
-                $today = Carbon::today();
+            // // Auto deactivate if end date reached or passed
+            // if (!empty($user->date_of_joining) && !empty($user->date_of_leaving)) {
+            //     $endDate = Carbon::parse($user->date_of_leaving)->startOfDay();
+            //     $today = Carbon::today();
 
-                if ($today->gte($endDate)) {
-                    if ($user->status != 0) {
-                        User::where('id', $user->id)->update(['status' => 0]);
-                        $user->status = 0;
-                    }
-                }
-            }
+            //     if ($today->gte($endDate)) {
+            //         if ($user->status != 0) {
+            //             User::where('id', $user->id)->update(['status' => 0]);
+            //             $user->status = 0;
+            //         }
+            //     }
+            // }
 
-            // Block inactive users
-            if ($user->status == 0) {
-                Auth::logout();
+            // // Block inactive users
+            // if ($user->status == 0) {
+            //     Auth::logout();
 
-                if ($request->ajax()) {
-                    return response()->json([
-                        'status' => false,
-                        'message' => 'Your account is inactive. Please contact admin.'
-                    ], 403);
-                }
+            //     if ($request->ajax()) {
+            //         return response()->json([
+            //             'status' => false,
+            //             'message' => 'Your account is inactive. Please contact admin.'
+            //         ], 403);
+            //     }
 
-                return redirect('/login')
-                    ->with('error', 'Your account is inactive. Please contact admin.');
-            }
+            //     return redirect('/login')
+            //         ->with('error', 'Your account is inactive. Please contact admin.');
+            // }
             // ================= END USER ACTIVE / EXPIRY CHECK =================
 
             //check if user has permission to access this page.
@@ -126,7 +126,7 @@ class checkUserAuth
                 // $path = preg_replace('/\d/', '', $path);
                 // print_r($path); die;
                 //paths that does not need permssions
-                $allowed_path = array('send-modify-request', 'bug-report', 'bug-report/add', 'notif/response', 'ajax.getCountriesList', 'bulk_delete', 'getAllSupplierPurchaseOrder', 'purchase/getSupplierData', 'purchase/purchase-daybook/data', 'getTaxRate', 'purchase/reclaimPercantage', 'purchase/purchase-day-book-reclaim-per', 'purchase/getPurchaseExpense', 'sales/get-sales-day-book/data', 'customers/getCustomerList', 'sales-finance/assets/asset-register-search', 'petty-cash/getAllExpendCash', 'petty-cash/cash_filter', 'find_project', 'expense_image_delete', 'find_job', 'find_appointment', 'searchExpenses', 'searchCustomerName', 'get_supplier_details', 'lead/getCountriesList', 'get_customer_details_front', 'getCustomerSiteDetails', 'result_product_calculation', 'vat_tax_details', 'item/searchProduct', 'getAllAttachmens', 'getAllNewTaskList', 'delete_po_attachment', 'searchPurchase_qoute_ref', 'searchPurchase_job_ref', 'getAllPurchaseInvoices', 'getAllPaymentPaids', 'paymentPaidDelete', 'savePurchaseOrderRecordPayment', 'item/get_product_categories', 'item/getProductCounts', 'item/getProductList', 'purchase-orders-search', 'purchase-order-invoices', 'purchase-order-statements', 'customers/getCustomerSiteDetails', 'getTags', 'invoices/getAllInvoiceNewTaskList', 'invoices/customer_visibleUpdate', '/invoices/delete_invoice_reminder', 'invoices/mobile_user_visibleUpdate', 'invoices/invoice_attachmentSave', 'invoices/getInvoiceAllAttachmens', 'invoices/new_task_save', 'item/ProductGroupProductsList', 'item/ProductCataloguePriceList', 'item/getProductFromId', 'item/ProductCataloguePriceDelete', 'lead/getUserList', 'my-profile/time-sheet', 'quote/getRegions', 'service/dynamic-form/view/pattern', 'service/patterndataformio', 'service/patterndataformiovaule', 'service/weekly-logs', 'service/monthly-logs', 'petty-cash/expand_card_filter', 'searchPurchaseOrders', 'searchDepartment', 'searchTag', 'searchSupplier', 'searchCreatedBy', 'searchProject', 'searchCreditNotes', 'add-leave', 'pending-request', 'get_all_rota_data', 'roster/child-courses/', 'roster/client-search', '/roster/carer/get-hourly-rate', 'roster/daily-log-loadData','roster/supervision-management/fetch_supervision_list','roster/incident-report-loadData');
+                $allowed_path = array('send-modify-request', 'bug-report', 'bug-report/add', 'notif/response', 'ajax.getCountriesList', 'bulk_delete', 'getAllSupplierPurchaseOrder', 'purchase/getSupplierData', 'purchase/purchase-daybook/data', 'getTaxRate', 'purchase/reclaimPercantage', 'purchase/purchase-day-book-reclaim-per', 'purchase/getPurchaseExpense', 'sales/get-sales-day-book/data', 'customers/getCustomerList', 'sales-finance/assets/asset-register-search', 'petty-cash/getAllExpendCash', 'petty-cash/cash_filter', 'find_project', 'expense_image_delete', 'find_job', 'find_appointment', 'searchExpenses', 'searchCustomerName', 'get_supplier_details', 'lead/getCountriesList', 'get_customer_details_front', 'getCustomerSiteDetails', 'result_product_calculation', 'vat_tax_details', 'item/searchProduct', 'getAllAttachmens', 'getAllNewTaskList', 'delete_po_attachment', 'searchPurchase_qoute_ref', 'searchPurchase_job_ref', 'getAllPurchaseInvoices', 'getAllPaymentPaids', 'paymentPaidDelete', 'savePurchaseOrderRecordPayment', 'item/get_product_categories', 'item/getProductCounts', 'item/getProductList', 'purchase-orders-search', 'purchase-order-invoices', 'purchase-order-statements', 'customers/getCustomerSiteDetails', 'getTags', 'invoices/getAllInvoiceNewTaskList', 'invoices/customer_visibleUpdate', '/invoices/delete_invoice_reminder', 'invoices/mobile_user_visibleUpdate', 'invoices/invoice_attachmentSave', 'invoices/getInvoiceAllAttachmens', 'invoices/new_task_save', 'item/ProductGroupProductsList', 'item/ProductCataloguePriceList', 'item/getProductFromId', 'item/ProductCataloguePriceDelete', 'lead/getUserList', 'my-profile/time-sheet', 'quote/getRegions', 'service/dynamic-form/view/pattern', 'service/patterndataformio', 'service/patterndataformiovaule', 'service/weekly-logs', 'service/monthly-logs', 'petty-cash/expand_card_filter', 'searchPurchaseOrders', 'searchDepartment', 'searchTag', 'searchSupplier', 'searchCreatedBy', 'searchProject', 'searchCreditNotes', 'add-leave', 'pending-request', 'get_all_rota_data', 'roster/child-courses/', 'roster/client-search', '/roster/carer/get-hourly-rate', 'roster/daily-log-loadData', 'roster/supervision-management/fetch_supervision_list', 'roster/incident-report-loadData');
                 //,'/general/petty_cash/check-balance'
                 //if requested path is not one of them that don't need permission. then check it for permission 
                 // Ram 10/06/2025 new array create to temprary for Rota Management by Abhishek sir when testing task done then we have to remove it.
@@ -193,5 +193,4 @@ class checkUserAuth
 
         return false;
     }
-
 }

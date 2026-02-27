@@ -266,8 +266,8 @@ class SystemManagementController extends Controller
             die;*/
             $data = $request->all();
             // echo "<pre>"; print_r($data); die;
-            $date_of_joining = date('Y-m-d', strtotime($data['date_of_joining']));
-            $date_of_leaving = date('Y-m-d', strtotime($data['date_of_leaving']));
+            $date_of_joining = !empty($data['date_of_joining']) ? date('Y-m-d', strtotime($data['date_of_joining'])) : null;
+            $date_of_leaving = !empty($data['date_of_leaving']) ? date('Y-m-d', strtotime($data['date_of_leaving'])) : null;
             // $home_id = Auth::user()->home_id;
             $home_ids = Auth::user()->home_id;
             $ex_home_ids = explode(',', $home_ids);

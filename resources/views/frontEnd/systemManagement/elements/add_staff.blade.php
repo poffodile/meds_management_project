@@ -90,7 +90,7 @@
                         </div> -->
 
                         <div class="form-group col-md-16 col-sm-6 col-xs-12 datepicker-sttng date-sttng">
-                            <label>Date of Joining</label>
+                            <label>Date of Joining <span class="radStar">*</span></label>
                             <div class="col-md-12 col-sm-12 col-xs-12 p-0">
                                 <div data-date-viewmode="years" data-date-format="dd-mm-yyyy" data-date="" class="input-group date"> <!-- dpYears -->
                                     <input name="date_of_joining" id="date_of_joining" type="text" value="" readonly="" size="16" class="form-control joining-date">
@@ -119,7 +119,7 @@
                             <input type="text" name="holiday_entitlement" placeholder="holiday entitlement" class="form-control" maxlength="255">
                         </div>
                         <div class="form-group col-md-6 col-sm-6 col-xs-12">
-                            <label>Current Location</label>
+                            <label>Current Location <span class="radStar">*</span></label>
                             <input type="text" name="current_location" placeholder="current location" class="form-control" maxlength="255">
                         </div>
 
@@ -279,7 +279,7 @@
             $('#joining-date').datetimepicker('update', newFormat);
 
             // Constraint: Leaving date must be after joining date
-            $('#leaving-date').datetimepicker('setStartDate', currdate);
+            // $('#leaving-date').datetimepicker('setStartDate', currdate);
 
             // If existing leaving date is invalid (before new joining date), clear it
             var leavingDate = $('#leaving-date').data("datetimepicker").getDate();
@@ -825,11 +825,16 @@
 
             // Convert format
             joiningDate = formatDateToDDMMYYYY(joiningDate);
-            leavingDate = formatDateToDDMMYYYY(leavingDate);
 
             // Set values in readonly inputs
             $('#date_of_joining').val(joiningDate);
-            $('#date_of_leaving').val(leavingDate);
+
+            if (leavingDate && leavingDate !== 'null' && leavingDate !== '0000-00-00 00:00:00' && leavingDate !== '1970-01-01') {
+                leavingDate = formatDateToDDMMYYYY(leavingDate);
+                $('#date_of_leaving').val(leavingDate);
+            } else {
+                $('#date_of_leaving').val('');
+            }
 
             // Use datepicker/datetimepicker update APIs so the pickers format dates consistently
             function setPickerDate(pickerSelector, readonlySelector, dateStr) {

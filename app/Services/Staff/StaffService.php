@@ -313,6 +313,9 @@ class StaffService
                 ['name' => $ec['name'] ?? null, 'phone_no' => $ec['phone_no'] ?? null, 'relationship' => $ec['relationship'] ?? null]
             );
         }
+        if ($request->has('send_credentials')) {
+            $response = User::sendCredentials($staff->id);
+        }
 
         return $staff;
     }

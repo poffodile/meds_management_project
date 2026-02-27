@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 use Validator;
-use Hash;
+use Hash,DB;
 use App\User, App\Admin, App\Home;
 use App\LeaveType, App\Staffleaves, App\LoginInActivity, App\ServiceUser;
 
@@ -295,24 +295,104 @@ class AndroidApiController extends Controller
         }
         return response()->json(['success' => true, 'message' => 'Record inserted successfully', 'Data' => $data], 200);
     }
+    public function user_leave_cancel(Request $request){
+        // echo "<pre>";print_r($request->all());die;
+        try{
+            $validator = Validator::make($request->all(), [
+                'leave_id'    => 'required|exists:staff_leaves,id',
+            ]);
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message'  => $validator->errors()->first(),
+                    'data'    => json_decode('{}')
+                ]);
+            }
+            DB::beginTransaction();
+            $leave = Staffleaves::find($request->leave_id);
+            $leave->is_deleted = 0;
+            $leave->save();
+            DB::commit();
+            return response()->json(['success' => true,'message'=>'Leave cancelled successfully','data'=>json_decode('{}')]);
+        }catch (\Exception $e) {
+            DB::rollBack();
+            return [
+                'success' => false,
+                'message' => 'Error leave cancel: ' . $e->getMessage(),
+            ];
+        }
+    }
 
+    // public function get_user_leave(Request $request)
+    // {
+    //     if ($request->user_id == null) {
+    //         return response()->json(['success' => false, 'message' => 'Please provide user id..!'], 200);
+    //     }
+    //     $recordArray = array();
+    //     $leaves = Staffleaves::where('user_id', $request->user_id)->where('is_deleted', 1)->orderBy('id', 'DESC')->get();
+
+    //     foreach ($leaves as $leave) {
+    //         $data['user_id'] = $leave->user_id;
+    //         $data['leave_type'] = $leave->leave_type;
+    //         $data['start_date'] = $leave->start_date;
+
+    //         if (is_null($leave->end_date)) {
+    //             $end_date = "";
+    //             $days = 0;
+    //         } else {
+    //             $end_date = $leave->end_date;
+    //             $to = \Carbon\Carbon::parse($leave->start_date);
+    //             $from = \Carbon\Carbon::parse($leave->end_date);
+    //             $days = $to->diffInDays($from) + 1;
+    //         }
+    //         $data['days'] = $days;
+    //         $data['end_date'] = $end_date;
+
+    //         if (is_null($leave->notes)) {
+    //             $notes = "";
+    //         } else {
+    //             $notes = $leave->notes;
+    //         }
+    //         $data['notes'] = $notes;
+
+    //         $data['leave_status'] = $leave->leave_status;
+    //         $data['created_at'] = \Carbon\Carbon::parse($leave->created_at)->format('d-m-Y');
+    //         array_push($recordArray, $data);
+    //     }
+
+    //     if (!$recordArray) {
+    //         return response()->json(['success' => false, 'message' => 'No data'], 200);
+    //     }
+    //     return response()->json(['success' => true, 'message' => '', 'Data' => $recordArray], 200);
+    // }
     public function get_user_leave(Request $request)
     {
         // Validate request
         $request->validate([
             'user_id' => 'required|integer|exists:user,id',
         ]);
-
-        $leaves = Staffleaves::select(
+        $filter_key = [0,1,2,3];
+        if($request->has('filter') && !in_array($request->filter,$filter_key)){
+            return response()->json(['success' => false, 'message' => 'Please provide correct filter!'], 200);
+        }
+        $leaves_query = Staffleaves::select(
             'staff_leaves.*',
             'leave_type.leave_name'
         )
             ->join('leave_type', 'leave_type.id', '=', 'staff_leaves.leave_type')
             ->where('staff_leaves.user_id', $request->user_id)
-            ->where('staff_leaves.is_deleted', 1)
-            ->orderByDesc('staff_leaves.id')
-            ->get();
+            ->where('staff_leaves.is_deleted', 1);
 
+        if($request->filter == 1){
+            $leaves_query->where('staff_leaves.leave_status',0);
+        }else if($request->filter == 2){
+            $leaves_query->where('staff_leaves.leave_status',1);
+        }else if($request->filter == 3){
+            $leaves_query->where('staff_leaves.leave_status',2);
+        }
+        $leaves= $leaves_query->orderByDesc('staff_leaves.id')
+        ->get();
+ 
         $leaveCounts = Staffleaves::where('user_id', $request->user_id)
             ->where('is_deleted', 1)
             ->selectRaw('
@@ -322,32 +402,37 @@ class AndroidApiController extends Controller
                         SUM(CASE WHEN leave_status = 2 THEN 1 ELSE 0 END) as rejected
                     ')
             ->first();
-
-
+ 
+ 
         if ($leaves->isEmpty()) {
             return response()->json([
                 'success' => false,
                 'message' => 'No leave records found',
+                'total'    => (int) $leaveCounts->total,
+                'pending'  => (int) $leaveCounts->pending,
+                'approved' => (int) $leaveCounts->approved,
+                'rejected' => (int) $leaveCounts->rejected,
                 'data'    => []
             ], 200);
         }
-
+ 
         $recordArray = $leaves->map(function ($leave) {
-
+ 
             $startDate = $leave->start_date ? \Carbon\Carbon::parse($leave->start_date)->format('d M Y') : '';
-
+ 
             $endDate = $leave->end_date ? \Carbon\Carbon::parse($leave->end_date)->format('d M Y') : '';
-
+ 
             $startDay = \Carbon\Carbon::parse($startDate)->format('D');
             $endDay   = \Carbon\Carbon::parse($endDate)->format('D');
-
+ 
             $leaveDays = $startDay . ' to ' . $endDay ?? '';
-
+ 
             $days = ($startDate && $endDate)
                 ? \Carbon\Carbon::parse($startDate)->diffInDays(\Carbon\Carbon::parse($endDate)) + 1
                 : 0;
-
+ 
             return [
+                'id'=>$leave->id,
                 'user_id'      => $leave->user_id,
                 'leave_type'   => $leave->leave_name,
                 'start_date'   => $startDate ?? '',
@@ -361,7 +446,7 @@ class AndroidApiController extends Controller
                 'created_at'   => \Carbon\Carbon::parse($leave->created_at)->format('d M Y'),
             ];
         });
-
+ 
         return response()->json([
             'success' => true,
             'message' => 'Leave records fetched successfully',
@@ -372,7 +457,6 @@ class AndroidApiController extends Controller
             'data'    => $recordArray
         ], 200);
     }
-
 
     public function add_login_activity(Request $request)
     {
@@ -499,49 +583,7 @@ class AndroidApiController extends Controller
         echo json_encode($details);
     }
 
-    // public function get_company_data(Request $request)
-    // {
-    //     if (empty($request->qr_id)) {
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => 'Please provide qr_id.'
-    //         ], 200);
-    //     }
-
-    //     $details = Admin::where('qr_code_id', $request->qr_id)->first();
-
-    //     // ❌ QR code not found
-    //     if (!$details) {
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => 'QR code not found.'
-    //         ], 404);
-    //     }
-
-    //     $data = [
-    //         'company_id'    => $details->id,
-    //         'name'          => $details->name,
-    //         'user_name'     => $details->user_name,
-    //         'email'         => $details->email,
-    //         'company'       => $details->company,
-    //         'access_type'   => $details->access_type,
-    //         'home_id'       => $details->home_id,
-    //         'image'         => $details->image,
-    //         'security_code' => $details->security_code,
-    //         'qr_code_id'    => $details->qr_code_id,
-    //         'address'       => $details->address,
-    //         'latitude'      => $details->latitude,
-    //         'longitude'     => $details->longitude,
-    //     ];
-
-    //     return response()->json([
-    //         'success' => true,
-    //         'message' => 'Company data fetched successfully.',
-    //         'data'    => $data
-    //     ], 200);
-    // }
-
-    public function get_home_data(Request $request)
+    public function get_company_data(Request $request)
     {
         if (empty($request->qr_id)) {
             return response()->json([
@@ -550,7 +592,7 @@ class AndroidApiController extends Controller
             ], 200);
         }
 
-        $details = Home::where('qr_code_id', $request->qr_id)->first();
+        $details = Admin::where('qr_code_id', $request->qr_id)->first();
 
         // ❌ QR code not found
         if (!$details) {
@@ -561,10 +603,15 @@ class AndroidApiController extends Controller
         }
 
         $data = [
-            'home_id'       => $details->id,
-            'company_id'    => $details->admin_id,
-            'name'          => $details->title,
-            'address'       => $details->address,
+            'company_id'    => $details->id,
+            'name'          => $details->name,
+            'user_name'     => $details->user_name,
+            'email'         => $details->email,
+            'company'       => $details->company,
+            'access_type'   => $details->access_type,
+            'home_id'       => $details->home_id,
+            'image'         => $details->image,
+            'security_code' => $details->security_code,
             'qr_code_id'    => $details->qr_code_id,
             'address'       => $details->address,
             'latitude'      => $details->latitude,
@@ -573,7 +620,7 @@ class AndroidApiController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Home data fetched successfully.',
+            'message' => 'Company data fetched successfully.',
             'data'    => $data
         ], 200);
     }

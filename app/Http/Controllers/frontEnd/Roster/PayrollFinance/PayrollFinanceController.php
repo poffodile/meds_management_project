@@ -11,4 +11,12 @@ class PayrollFinanceController extends Controller
     {
         return view('frontEnd.roster.payroll_finance.index');
     }
+    public function payrollprocessing()
+    {
+        return view('frontEnd/roster/payroll_finance/payroll_processing');
+    }
+    public function timesheetreconciliation()
+    {
+        return view('frontEnd/roster/payroll_finance/timesheetreconciliation');
+    }
 }

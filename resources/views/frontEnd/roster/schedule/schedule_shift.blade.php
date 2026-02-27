@@ -2305,9 +2305,6 @@
                     selectedCarerName.innerText = carerName;
                     selectedCarerCard.style.display = 'block';
 
-                    // Update assigned text
-                    assignedClientTo.innerText = carerName;
-
                     // Hide suggestions list
                     suggestionsWrapper.style.display = 'none';
                     toggleBtn.innerText = 'Show Suggestions';

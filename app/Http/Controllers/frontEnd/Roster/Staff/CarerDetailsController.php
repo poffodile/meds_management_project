@@ -8,6 +8,7 @@ use App\Services\Staff\StaffService;
 use App\Models\Staff\Documents;
 use App\Models\Staff\UserNote;
 use Illuminate\Support\Facades\Storage;
+use App\LoginInActivity;
 
 class CarerDetailsController extends Controller
 {
@@ -27,18 +28,23 @@ class CarerDetailsController extends Controller
         // dd($carer_id);
         $data['staffDetails'] = $this->staffService->getStaffDetails($carer_id);
         $data['selectedCourseIds'] = $data['staffDetails']->qualifications
-                            ->pluck('course_id')
-                            ->toArray();
+            ->pluck('course_id')
+            ->toArray();
         // dd($data['staffDetails']);
         $data['user_documents'] = Documents::where('user_id', $carer_id)->get()->toArray();
         $data['courses'] = $this->staffService->courses();
         $data['user_notes'] = UserNote::where('user_id', $carer_id)->where('deleted_at', null)->orderBy('created_at', 'DESC')->get()->toArray();
-
-        // dd($data['user_notes']);
+        // $data['user_logs'] = LoginInActivity::where('user_id', $carer_id)
+        //     ->orderBy('login_date', 'desc')
+        //     ->orderBy('check_in_time', 'asc')
+        //     ->get()
+        //     ->groupBy('login_date')
+        //     ->toArray();
+        // dd($data['user_logs']);
         return view('frontEnd.roster.staff.carer_details', $data);
     }
 
-      public function saveDouments(Request $request)
+    public function saveDouments(Request $request)
     {
         $request->validate([
             'user_id'        => 'required',
@@ -57,7 +63,7 @@ class CarerDetailsController extends Controller
         return response()->json(['success' => true]);
     }
 
-      public function destroy_documents($id)
+    public function destroy_documents($id)
     {
         $document = Documents::findOrFail($id);
 
