@@ -435,7 +435,20 @@ if (isset($user_info)) {
             <label class="col-lg-3 control-label"></label>
             <div class="col-lg-9">
                 <div class="checkbox">
-                    <label class="assign-access"><input type="checkbox" value="yes" name="assign_right_check" {{ isset($del_status) ? $disabled : '' }}>Assign access rights according to the access level
+                    <?php
+                    $is_right_assigned = '';
+                    if (isset($user_info->access_level) && isset($user_info->access_rights)) {
+                        foreach ($access_levels as $access_level) {
+                            if ($access_level['id'] == $user_info->access_level) {
+                                if ($access_level['access_rights'] == $user_info->access_rights) {
+                                    $is_right_assigned = 'checked';
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    ?>
+                    <label class="assign-access"><input type="checkbox" value="yes" name="assign_right_check" {{ $is_right_assigned }} {{ isset($del_status) ? $disabled : '' }}>Assign access rights according to the access level
                     </label>
                 </div>
             </div>
@@ -699,5 +712,4 @@ if (isset($user_info)) {
         }
     });
 </script>
-
 @endsection

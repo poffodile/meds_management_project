@@ -377,6 +377,7 @@ class ScheduleShiftController extends Controller
                 'start_time_raw' => $startTime->format('H:i'),
                 'end_time_raw' => $endTime->format('H:i'),
                 'staff_id' => $shift->staff_id,
+                'staff_name' => $shift->staff ? $shift->staff->first_name . ' ' . $shift->staff->last_name : '',
                 'client_id' => $shift->service_user_id,
                 'property_id' => $shift->property_id,
                 'location_name' => $shift->location_name,

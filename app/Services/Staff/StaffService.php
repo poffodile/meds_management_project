@@ -184,6 +184,7 @@ class StaffService
             'description' => 'description',
             // 'payroll' => 'payroll',
             'hourly_rate' => 'hourly_rate',
+            'access_level' => 'access_level',
             'holiday_entitlement' => 'holiday_entitlement',
             'dbs_certificate_number' => 'dbs_certificate_number',
             'max_extra_hours' => 'max_extra_hours',

@@ -292,6 +292,7 @@
                                             data-email="${carer.email ?? ''}"
                                             data-phone="${carer.phone_no ?? ''}"
                                             data-status="${carer.status ?? ''}"
+                                            data-access-level="${carer.access_level ?? ''}"
 
                                             data-job-title="${carer.job_title ?? ''}"
                                             data-department="${carer.department ?? ''}"

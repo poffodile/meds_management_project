@@ -735,6 +735,11 @@
             // ensure toggle runs after setting the checkbox
             initOvertimeToggle();
 
+            let accessLevel = $btn.data('access-level');
+            if (accessLevel !== undefined && accessLevel !== null && accessLevel !== '') {
+                $('#access_level').val(accessLevel);
+            }
+
             let hourlyRate = $btn.data('hourly-rate'); // preferred jQuery way
 
             if (hourlyRate !== undefined && hourlyRate !== null && hourlyRate !== '') {

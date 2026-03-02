@@ -180,7 +180,7 @@ class UserController extends Controller
             }
         }
 
-        $access_levels  = AccessLevel::select('id', 'name')->where('home_id', $home_id)->get()->toArray();
+        $access_levels  = AccessLevel::select('id', 'name', 'access_rights')->where('home_id', $home_id)->get()->toArray();
         $page = 'users';
         $company_departments = CompanyDepartment::getActiveCompanyDepartment();
         $courses =  $this->staffService->courses();
@@ -317,7 +317,7 @@ class UserController extends Controller
             return redirect('admin/')->with('error', 'Sorry, User does not exists');
         }
 
-        $access_levels  = AccessLevel::select('id', 'name')->where('home_id', $home_id)->get()->toArray();
+        $access_levels  = AccessLevel::select('id', 'name', 'access_rights')->where('home_id', $home_id)->get()->toArray();
         $page = 'users';
         $company_departments = CompanyDepartment::getActiveCompanyDepartment();
         $courses =  $this->staffService->courses();

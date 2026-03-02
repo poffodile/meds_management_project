@@ -34,12 +34,12 @@ class CarerDetailsController extends Controller
         $data['user_documents'] = Documents::where('user_id', $carer_id)->get()->toArray();
         $data['courses'] = $this->staffService->courses();
         $data['user_notes'] = UserNote::where('user_id', $carer_id)->where('deleted_at', null)->orderBy('created_at', 'DESC')->get()->toArray();
-        // $data['user_logs'] = LoginInActivity::where('user_id', $carer_id)
-        //     ->orderBy('login_date', 'desc')
-        //     ->orderBy('check_in_time', 'asc')
-        //     ->get()
-        //     ->groupBy('login_date')
-        //     ->toArray();
+        $data['user_logs'] = LoginInActivity::where('user_id', $carer_id)
+            ->orderBy('login_date', 'desc')
+            ->orderBy('check_in_time', 'asc')
+            ->get()
+            ->groupBy('login_date')
+            ->toArray();
         // dd($data['user_logs']);
         return view('frontEnd.roster.staff.carer_details', $data);
     }

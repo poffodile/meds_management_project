@@ -100,51 +100,65 @@
                                     Clocks with Shift Data (0)
                                     <i class="bx bx-chevron-down accIcon"></i>
                                 </a>
-
                             </h4>
-
                         </div>
+                        @if ($shifts->count() > 0)
                         <div id="collapse1" class="panel-collapse collapse in">
                             <div class="panel-body">
+                                @foreach ($shifts as $shift)
                                 <div class="bBorderCard mt-4 p-4">
                                     <div class="d-flex justify-content-between">
                                         <div>
                                             <div class="d-flex gap-3 mb-3 align-items-center">
-                                                <h5 class="h5Head mb-0">John Smith </h5>
-                                                <div><span class="careBadg greenbadges">Matched</span>
+                                                <h5 class="h5Head mb-0">{{ $shift->staff ? $shift->staff->first_name . ' ' . $shift->staff->last_name : 'Unknown Staff' }}</h5>
+                                                <div>
+                                                    @if ($shift->variance_minutes == 0)
+                                                    <span class="careBadg greenbadges">Matched</span>
+                                                    @elseif ($shift->variance_minutes > 0)
+                                                    <span class="careBadg orangeBages">Extra {{ number_format($shift->variance_minutes / 60, 2) }} Hour</span>
+                                                    @else
+                                                    <span class="careBadg redbadges">Short {{ number_format(abs($shift->variance_minutes) / 60, 2) }} Hour</span>
+                                                    @endif
                                                 </div>
                                             </div>
                                             <div class="mb-4">
-                                                <p class="muteText mb-2">
-                                                    Date
-                                                </p>
-                                                <h6 class="h6Head mb-0">
-                                                    Sun, Nov 23 </h6>
+                                                <p class="muteText mb-2">Date</p>
+                                                <h6 class="h6Head mb-0">{{ \Carbon\Carbon::parse($shift->start_date)->format('D, M d') }}</h6>
                                             </div>
-
                                         </div>
                                         <div>
-                                            <button class="borderBtn">
-                                                Adjust</button>
+                                            <button class="borderBtn">Adjust</button>
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-lg-3">
                                             <div>
                                                 <p class="textGray500 fs13 mb-2">Scheduled Shift</p>
-                                                <h6 class="h6Head">08:00 - 16:00</h6>
+                                                <h6 class="h6Head">{{ \Carbon\Carbon::parse($shift->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($shift->end_time)->format('H:i') }}</h6>
                                             </div>
                                         </div>
                                         <div class="col-lg-3">
                                             <div>
                                                 <p class="textGray500 fs13 mb-2">Clock Times</p>
-                                                <h6 class="h6Head">08:02 - 15:58</h6>
+                                                <h6 class="h6Head">
+                                                    @if (count($shift->login_activities) > 0)
+                                                    @foreach ($shift->login_activities as $activity)
+                                                    {{ \Carbon\Carbon::parse($activity->check_in_time)->format('H:i') }} -
+                                                    {{ $activity->check_out_time ? \Carbon\Carbon::parse($activity->check_out_time)->format('H:i') : 'In progress' }}
+                                                    @if (!$loop->last) <br> @endif
+                                                    @endforeach
+                                                    @else
+                                                    No Logs
+                                                    @endif
+                                                </h6>
                                             </div>
                                         </div>
                                         <div class="col-lg-3">
                                             <div>
                                                 <p class="textGray500 fs13 mb-2">Variance</p>
-                                                <h6 class="h6Head greenText">0.00h</h6>
+                                                <h6 class="h6Head {{ $shift->variance_minutes >= 0 ? 'greenText' : 'redtext' }}">
+                                                    {{ $shift->variance_minutes > 0 ? '+' : '' }}{{ number_format($shift->variance_minutes / 60, 2) }}h
+                                                </h6>
                                             </div>
                                         </div>
                                         <div class="col-lg-3">
@@ -155,11 +169,12 @@
                                         </div>
                                     </div>
                                 </div>
-
-                                <!-- <p class="textGray500 fs13 text-center">No matched timesheets </p> -->
-
+                                @endforeach
                             </div>
                         </div>
+                        @else
+                        <p class="textGray500 fs13 text-center">No matched timesheets </p>
+                        @endif
                     </div>
                     <!-- Panel 2-->
                     <div class="panel panel-default mt-4 payRollAcood p-0">
@@ -454,13 +469,10 @@
                                             </div>
                                         </div>
                                     </div>
-
-
                                 </div>
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>

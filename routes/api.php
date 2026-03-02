@@ -151,6 +151,12 @@ Route::group(['prefix' => '/staff'], function () {
 	Route::post('/add-staff-qualification', 'App\Http\Controllers\Api\Staff\UserController@addStaffQualification');
 	Route::post('/set-password', 'App\Http\Controllers\Api\Staff\UserController@setPassword');
 
+	// staff document
+	Route::post('/document-list', 'App\Http\Controllers\Api\Staff\StaffDocumentController@document_list');
+	Route::post('/save-document', 'App\Http\Controllers\Api\Staff\StaffDocumentController@saveDouments');
+	Route::post('/personal-details', 'App\Http\Controllers\Api\Staff\ServiceUserController@staffDetails');
+	Route::post('/wishUser', 'App\Http\Controllers\Api\Staff\StaffDocumentController@wishUser');
+
 	// Staff Notes
 	Route::get('/staff-notes/{staff_id}', 'App\Http\Controllers\Api\Staff\StaffNoteController@staff_notes');
 	Route::post('/staff-note/add', 'App\Http\Controllers\Api\Staff\StaffNoteController@add_staff_note');

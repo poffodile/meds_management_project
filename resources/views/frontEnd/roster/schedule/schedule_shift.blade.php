@@ -2376,8 +2376,6 @@
         });
     </script>
 
-
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const startTimeInput = document.querySelector('#recurringShiftModal [name="start_time"]');
@@ -2573,6 +2571,7 @@
                             block.dataset.assignment = sh.assignment || '';
                             block.dataset.notes = sh.notes || '';
                             block.dataset.tasks = sh.tasks || '';
+                            block.dataset.staffName = sh.staff_name || member.name || '';
 
                             const st = sh.start_time ? sh.start_time.substring(0, 5) : '?';
                             const et = sh.end_time ? sh.end_time.substring(0, 5) : '?';
@@ -2728,7 +2727,8 @@
                                                         data-care="${shift.care_type_id || ''}"
                                                         data-assignment="${shift.assignment || ''}"
                                                         data-notes="${shift.notes || ''}"
-                                                        data-tasks="${shift.tasks || ''}">
+                                                        data-tasks="${shift.tasks || ''}"
+                                                        data-staff-name="${shift.staff_name || ''}">
                                                         <i class="bx bx-edit"></i> Edit
                                                     </button>
 
@@ -2909,6 +2909,7 @@
                     const assignment = props.assignment;
                     const notes = props.notes;
                     const tasks = props.tasks;
+                    const staffName = props.staff_name || '';
 
                     const form = $('#createShiftForm');
 
@@ -2929,9 +2930,15 @@
                     form.find('[name="end_time"]').val(end);
 
                     if (staff) {
-                        form.find('[name="carer_id"]').val(staff).trigger('change');
+                        $('#selected_carer_id').val(staff);
+                        $('#selectedCarerName').text(staffName);
+                        $('#selectedCarerCard').show();
+                        $('#carerSuggestionsWrapper').hide();
+                        $('#toggleSuggestionsBtn').text('Show Suggestions');
                     } else {
-                        form.find('[name="carer_id"]').val('').trigger('change');
+                        $('#selected_carer_id').val('');
+                        $('#selectedCarerCard').hide();
+                        $('#carerSuggestionsWrapper').show();
                     }
 
                     form.find('[name="shift_type"]').val(type).trigger('change');
@@ -3027,7 +3034,8 @@
                                     data-care="${shift.care_type || ''}"
                                     data-assignment="${shift.assignment || ''}"
                                     data-notes="${shift.notes || ''}"
-                                    data-tasks="${shift.tasks || ''}">
+                                    data-tasks="${shift.tasks || ''}"
+                                    data-staff-name="${shift.staff_name || ''}">
                                     <div style="display:flex;gap:8px;margin-bottom:12px;">
                                         <span style="background:#f3e8ff;color:#9333ea;padding:4px 8px;border-radius:6px;font-size:12px;font-weight:600;">scheduled</span>
                                         <span style="border:1px solid #e5e7eb;color:#374151;padding:4px 8px;border-radius:6px;font-size:12px;font-weight:600;">${shift.shift_type}</span>
@@ -3097,6 +3105,7 @@
                 const assignment = $(this).data('assignment');
                 const notes = $(this).data('notes');
                 const tasks = $(this).data('tasks');
+                const staffName = $(this).data('staff-name') || '';
 
                 const form = $('#createShiftForm');
 
@@ -3113,9 +3122,15 @@
 
                 // Handle optional/empty selects
                 if (staff) {
-                    form.find('[name="carer_id"]').val(staff).trigger('change');
+                    $('#selected_carer_id').val(staff);
+                    $('#selectedCarerName').text(staffName);
+                    $('#selectedCarerCard').show();
+                    $('#carerSuggestionsWrapper').hide();
+                    $('#toggleSuggestionsBtn').text('Show Suggestions');
                 } else {
-                    form.find('[name="carer_id"]').val('').trigger('change');
+                    $('#selected_carer_id').val('');
+                    $('#selectedCarerCard').hide();
+                    $('#carerSuggestionsWrapper').show();
                 }
 
                 form.find('[name="shift_type"]').val(type).trigger('change');
@@ -3242,7 +3257,8 @@
                                         data-care="${shift.care_type || ''}"
                                         data-assignment="${shift.assignment || ''}"
                                         data-notes="${shift.notes || ''}"
-                                        data-tasks="${shift.tasks || ''}">
+                                        data-tasks="${shift.tasks || ''}"
+                                        data-staff-name="${shift.staff_name || ''}">
                                         <div style="display:flex;align-items:center;gap:6px;font-weight:600;color:#1f2937;font-size:13px;margin-bottom:6px;">
                                             <span style="width:6px;height:6px;background:#3b82f6;border-radius:50%;"></span>
                                             ${shift.start_time}
