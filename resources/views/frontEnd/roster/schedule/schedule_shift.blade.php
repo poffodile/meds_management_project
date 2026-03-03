@@ -2933,6 +2933,7 @@
                         $('#selected_carer_id').val(staff);
                         $('#selectedCarerName').text(staffName);
                         $('#selectedCarerCard').show();
+                        $('#assignedClientTo').text(staffName);
                         $('#carerSuggestionsWrapper').hide();
                         $('#toggleSuggestionsBtn').text('Show Suggestions');
                     } else {

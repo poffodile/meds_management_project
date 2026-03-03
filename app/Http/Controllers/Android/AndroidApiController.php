@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 use Validator;
-use Hash,DB;
+use Hash, DB;
 use App\User, App\Admin, App\Home;
 use App\LeaveType, App\Staffleaves, App\LoginInActivity, App\ServiceUser;
 
@@ -295,9 +295,10 @@ class AndroidApiController extends Controller
         }
         return response()->json(['success' => true, 'message' => 'Record inserted successfully', 'Data' => $data], 200);
     }
-    public function user_leave_cancel(Request $request){
+    public function user_leave_cancel(Request $request)
+    {
         // echo "<pre>";print_r($request->all());die;
-        try{
+        try {
             $validator = Validator::make($request->all(), [
                 'leave_id'    => 'required|exists:staff_leaves,id',
             ]);
@@ -313,8 +314,8 @@ class AndroidApiController extends Controller
             $leave->is_deleted = 0;
             $leave->save();
             DB::commit();
-            return response()->json(['success' => true,'message'=>'Leave cancelled successfully','data'=>json_decode('{}')]);
-        }catch (\Exception $e) {
+            return response()->json(['success' => true, 'message' => 'Leave cancelled successfully', 'data' => json_decode('{}')]);
+        } catch (\Exception $e) {
             DB::rollBack();
             return [
                 'success' => false,
@@ -371,8 +372,8 @@ class AndroidApiController extends Controller
         $request->validate([
             'user_id' => 'required|integer|exists:user,id',
         ]);
-        $filter_key = [0,1,2,3];
-        if($request->has('filter') && !in_array($request->filter,$filter_key)){
+        $filter_key = [0, 1, 2, 3];
+        if ($request->has('filter') && !in_array($request->filter, $filter_key)) {
             return response()->json(['success' => false, 'message' => 'Please provide correct filter!'], 200);
         }
         $leaves_query = Staffleaves::select(
@@ -383,16 +384,16 @@ class AndroidApiController extends Controller
             ->where('staff_leaves.user_id', $request->user_id)
             ->where('staff_leaves.is_deleted', 1);
 
-        if($request->filter == 1){
-            $leaves_query->where('staff_leaves.leave_status',0);
-        }else if($request->filter == 2){
-            $leaves_query->where('staff_leaves.leave_status',1);
-        }else if($request->filter == 3){
-            $leaves_query->where('staff_leaves.leave_status',2);
+        if ($request->filter == 1) {
+            $leaves_query->where('staff_leaves.leave_status', 0);
+        } else if ($request->filter == 2) {
+            $leaves_query->where('staff_leaves.leave_status', 1);
+        } else if ($request->filter == 3) {
+            $leaves_query->where('staff_leaves.leave_status', 2);
         }
-        $leaves= $leaves_query->orderByDesc('staff_leaves.id')
-        ->get();
- 
+        $leaves = $leaves_query->orderByDesc('staff_leaves.id')
+            ->get();
+
         $leaveCounts = Staffleaves::where('user_id', $request->user_id)
             ->where('is_deleted', 1)
             ->selectRaw('
@@ -402,8 +403,8 @@ class AndroidApiController extends Controller
                         SUM(CASE WHEN leave_status = 2 THEN 1 ELSE 0 END) as rejected
                     ')
             ->first();
- 
- 
+
+
         if ($leaves->isEmpty()) {
             return response()->json([
                 'success' => false,
@@ -415,24 +416,24 @@ class AndroidApiController extends Controller
                 'data'    => []
             ], 200);
         }
- 
+
         $recordArray = $leaves->map(function ($leave) {
- 
+
             $startDate = $leave->start_date ? \Carbon\Carbon::parse($leave->start_date)->format('d M Y') : '';
- 
+
             $endDate = $leave->end_date ? \Carbon\Carbon::parse($leave->end_date)->format('d M Y') : '';
- 
+
             $startDay = \Carbon\Carbon::parse($startDate)->format('D');
             $endDay   = \Carbon\Carbon::parse($endDate)->format('D');
- 
+
             $leaveDays = $startDay . ' to ' . $endDay ?? '';
- 
+
             $days = ($startDate && $endDate)
                 ? \Carbon\Carbon::parse($startDate)->diffInDays(\Carbon\Carbon::parse($endDate)) + 1
                 : 0;
- 
+
             return [
-                'id'=>$leave->id,
+                'id' => $leave->id,
                 'user_id'      => $leave->user_id,
                 'leave_type'   => $leave->leave_name,
                 'start_date'   => $startDate ?? '',
@@ -446,7 +447,7 @@ class AndroidApiController extends Controller
                 'created_at'   => \Carbon\Carbon::parse($leave->created_at)->format('d M Y'),
             ];
         });
- 
+
         return response()->json([
             'success' => true,
             'message' => 'Leave records fetched successfully',
@@ -480,6 +481,7 @@ class AndroidApiController extends Controller
                 $activity->check_in_time = date("Y-m-d H:i:s");
                 $activity->latitude_in = $request->latitude_in;
                 $activity->longitude_in = $request->longitude_in;
+                $activity->check_in_reason = $request->check_in_reason ?? '';
                 $activity->home_id = $request->home_id;
                 $activity->save();
 
@@ -518,7 +520,14 @@ class AndroidApiController extends Controller
         // if( $record->count() == 1 ){
         if ($record) {
             // $response = LoginInActivity::where('id', $request->activity_id)->where('user_id', $request->user_id)->where('company_id', $request->company_id)->update(['check_out_time'=>date("Y-m-d H:i:s"), 'latitude_out'=> $request->latitude_out, 'longitude_out'=>$request->longitude_out]);
-            $response = LoginInActivity::where('id', $request->activity_id)->where('user_id', $request->user_id)->update(['check_out_time' => date("Y-m-d H:i:s"), 'latitude_out' => $request->latitude_out, 'longitude_out' => $request->longitude_out, 'reason' => $request->reason]);
+            $response = LoginInActivity::where('id', $request->activity_id)
+                ->where('user_id', $request->user_id)
+                ->update([
+                    'check_out_time' => date("Y-m-d H:i:s"),
+                    'latitude_out' => $request->latitude_out,
+                    'longitude_out' => $request->longitude_out,
+                    'check_out_reason' => $request->check_out_reason ?? ''
+                ]);
 
             if ($response) {
                 return response()->json(['success' => true, 'message' => 'Checked out successfully..! ', 'Data' => $response, 'time' => date("Y-m-d H:i:s")], 200);

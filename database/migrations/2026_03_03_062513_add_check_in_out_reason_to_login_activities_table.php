@@ -11,13 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('child_sections', function (Blueprint $table) {
-            $table->id();
-            $table->string('home_id');
-            $table->string('section');
-            $table->boolean('status')->default(1);
-            $table->softDeletes();
-            $table->timestamps();
+        Schema::table('login_activities', function (Blueprint $table) {
+            $table->text('check_in_reason')->nullable()->after('longitude_in');
+            $table->text('check_out_reason')->nullable()->after('longitude_out');
         });
     }
 
@@ -26,6 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('child_sections');
+        Schema::table('login_activities', function (Blueprint $table) {
+            //
+        });
     }
 };
