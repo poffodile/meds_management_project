@@ -15,6 +15,7 @@ use Carbon\Carbon;
 use App\Services\Staff\StaffService;
 use App\UserQualification;
 use App\Models\ScheduledShift;
+use Illuminate\Support\Facades\Mail;
 
 class UserController extends Controller
 {
@@ -677,5 +678,100 @@ class UserController extends Controller
 			'data' => $data,
 			'message' => 'Shift schedule fetched successfully.'
 		], 200);
+	}
+
+	public function forget_password(Request $request)
+	{
+		$validator = Validator::make($request->all(), [
+			'email' => 'required|email',
+			'type' => 'required|in:staff,service_user',
+		]);
+		if ($validator->fails()) {
+			return [
+				'success' => false,
+				'errors' => $validator->errors()->first()
+			];
+		}
+		$email = $request->input('email');
+		$type = $request->input('type');
+		if ($type == 'staff') {
+			$user = User::where('email', $email)->first();
+			if (!$user) {
+				return [
+					'success' => false,
+					'errors' => 'User not found'
+				];
+			}
+			$home_security_policy = Home::where('id', $user->home_id)->value('security_policy');
+			$random_no            = rand(111111, 999999);
+			$security_code        = base64_encode(convert_uuencode($random_no));
+			$user_id              = base64_encode(convert_uuencode($user->id));
+			$email                = $user->email;
+			$name                 = $user->name;
+			$user->security_code  = $random_no;
+			$user_name            = $user->user_name;
+			$company_name         = PROJECT_NAME;
+
+			if ($user->save()) {
+				$set_password_url = url('/set-password' . '/' . $user_id . '/' . $security_code);
+				if (!filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
+					$arr = ['name' => $name, 'user_name' => $user_name, 'set_password_url' => $set_password_url, 'home_security_policy' => $home_security_policy];
+					Mail::send('emails.user_set_password_mail', $arr, function ($message) use ($arr, $email, $company_name) {
+
+						$message->to($email, $company_name)
+
+							->subject('SCITS set Password Mail');
+
+						$message->from('mobappssolutions153@gmail.com', $company_name);
+					});
+					return response()->json([
+						'success' => true,
+						'message' => 'Please check you email for password reset link.'
+					], 200);
+				}
+			}
+			return response()->json([
+				'success' => false,
+				'message' => 'Failed to reset password.'
+			], 500);
+		} else {
+			$user = ServiceUser::where('email', $email)->first();
+			if (!$user) {
+				return [
+					'success' => false,
+					'errors' => 'User not found'
+				];
+			}
+			$home_security_policy = Home::where('id', $user->home_id)->value('security_policy');
+
+			$random_no      = rand(111111, 999999);
+
+			$user->password = Hash::make($random_no);
+
+			$company_name = 'SCITS set Password Mail';
+			$email        = $user->email;
+			$name         = $user->name;
+			$user_name    = $user->user_name;
+			$password     = $random_no;
+
+			/*echo '$user_name = '.$user_name;
+        echo '$random_no = '.$random_no;
+        die;*/
+			if ($user->save()) {
+				if (!filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
+					Mail::send('emails.service_user_send_password_mail', ['name' => $name, 'user_name' => $user_name, 'password' => $password, 'home_security_policy' => $home_security_policy], function ($message) use ($email, $company_name) {
+						$message->to($email, $company_name)->subject('SCITS Welcome');
+					});
+					return response()->json([
+						'success' => true,
+						'message' => 'Please check you email for new password.'
+					], 200);
+				}
+			}
+			return response()->json([
+				'success' => false,
+				'message' => 'Failed to reset password.'
+			], 500);
+		}
 	}
 }

@@ -1337,7 +1337,7 @@
                             </div>
                         </div>
                         <div class="p-20 p-t-0" id="renderHtmlClientCareTask">
-                            
+
                         </div>
                         <!-- <div class="p-20 p-t-0">
                             <div class="caretasknameandnumber m-b-10">

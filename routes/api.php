@@ -132,8 +132,11 @@ Route::group(['prefix' => '/service'], function () {
 });
 
 
+Route::post('/forget-password', 'App\Http\Controllers\Api\Staff\UserController@forget_password');
 
 Route::group(['prefix' => '/staff'], function () {
+
+
 	Route::get('/service-users/{staff_id}', 'App\Http\Controllers\Api\Staff\ServiceUserController@listing_service_user');
 	Route::get('/daily-tasks/{staff_id}', 'App\Http\Controllers\Api\Staff\TaskAllocationController@index');
 	Route::get('/money-requests/{staff_id}', 'App\Http\Controllers\Api\Staff\MoneyRequestController@index');

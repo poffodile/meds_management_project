@@ -8,39 +8,43 @@ use Illuminate\Support\Facades\Http;
 use Carbon\Carbon;
 use App\ServiceUser;
 use App\Models\suUserCourse;
-use Auth,DB,Session;
+use Auth, DB, Session;
 use App\Services\Staff\ClientManagementService;
 use App\Services\Staff\StaffService;
 use App\Services\Staff\ClientCareTaskService;
+use App\Services\Client\ClientAlertService;
 use Illuminate\Support\Facades\Validator;
 use App\Models\clientTaskType;
 use App\Models\clientTaskCategory;
 use App\Models\ScheduledShift;
+use App\Models\AlertType;
 
 class ClientController extends Controller
 {
     protected $clientService;
     protected StaffService $staffService;
     protected $clientCareTaskService;
+    protected $clientAlertService;
 
-    public function __construct(ClientManagementService $clientService,StaffService $staffService,ClientCareTaskService $clientCareTaskService)
+    public function __construct(ClientManagementService $clientService, StaffService $staffService, ClientCareTaskService $clientCareTaskService, ClientAlertService $clientAlertService)
     {
         $this->clientService = $clientService;
         $this->staffService = $staffService;
         $this->clientCareTaskService = $clientCareTaskService;
+        $this->clientAlertService = $clientAlertService;
     }
     public function index()
     {
         $home_ids = Auth::user()->home_id;
-		$ex_home_ids = explode(',', $home_ids);
-		$home_id = $ex_home_ids[0];
-        $query = ServiceUser::select('id','home_id','earning_scheme_label_id','name','user_name','phone_no','date_of_birth','child_type','room_type','current_location','street','care_needs','suFundingType','status','is_deleted')
-        ->where(['home_id'=>$home_id,'is_deleted'=>0]);
+        $ex_home_ids = explode(',', $home_ids);
+        $home_id = $ex_home_ids[0];
+        $query = ServiceUser::select('id', 'home_id', 'earning_scheme_label_id', 'name', 'user_name', 'phone_no', 'date_of_birth', 'child_type', 'room_type', 'current_location', 'street', 'care_needs', 'suFundingType', 'status', 'is_deleted')
+            ->where(['home_id' => $home_id, 'is_deleted' => 0]);
         $data['child'] = $query->get();
-        $data['active_child_count']= (clone $query)->where('status',1)->get();
-        $data['inactive_child_count'] = (clone $query)->where('status',0)->get();
+        $data['active_child_count'] = (clone $query)->where('status', 1)->get();
+        $data['inactive_child_count'] = (clone $query)->where('status', 0)->get();
         // echo "<pre>";print_r($data['active_child_count']);die;
-        return view('frontEnd.roster.client.client',$data);
+        return view('frontEnd.roster.client.client', $data);
     }
 
     public function client_details($client_id)
@@ -48,28 +52,31 @@ class ClientController extends Controller
         $clientData = $this->child_courses($client_id);
         $responseData = $clientData->getData(true);
         $data['clientDetails'] = $responseData['data'];
-        if($data['clientDetails']['status'] == 1){
+        if ($data['clientDetails']['status'] == 1) {
             $status = 'Active';
-        }else if($data['clientDetails']['status'] == 0){
+        } else if ($data['clientDetails']['status'] == 0) {
             $status = 'Inactive';
-        }else{
+        } else {
             $status = 'Archived';
         }
         $data['status'] = $status;
         $requestData['user_id'] = Auth::user()->id;
         $data['client_id'] = $client_id;
+        $data['alert_type'] = AlertType::where('status', 1)->get();
         // echo "<pre>";print_r($data['clientCareTask']);die;
-        return view('frontEnd.roster.client.client_details',$data);
+        return view('frontEnd.roster.client.client_details', $data);
     }
-    public function child_courses($childId){
+    public function child_courses($childId)
+    {
         // $all_courses = suUserCourse::where('su_user_id',$childId)->get();
-        $all_courses = ServiceUser::with('courses')->where('id',$childId)->first();
-        return response()->json(['success'=>true,'data'=>$all_courses]);
+        $all_courses = ServiceUser::with('courses')->where('id', $childId)->first();
+        return response()->json(['success' => true, 'data' => $all_courses]);
     }
-    public function client_delete(Request $request){
+    public function client_delete(Request $request)
+    {
         // echo "<pre>";print_r($request->all());die;
         $validator = Validator::make($request->all(), [
-            'id'=>'required|exists:service_user,id',
+            'id' => 'required|exists:service_user,id',
         ]);
         if ($validator->fails()) {
             return [
@@ -80,60 +87,62 @@ class ClientController extends Controller
         $user = ServiceUser::find($request->id);
         $user->is_deleted = 1;
         $user->save();
-        Session::flash('success','Client deleted successfully done.');
+        Session::flash('success', 'Client deleted successfully done.');
         return [
-                'success' => true,
-                'message' => 'Client deleted successfully done.'
-            ];
+            'success' => true,
+            'message' => 'Client deleted successfully done.'
+        ];
     }
-    public function client_search(Request $request){
+    public function client_search(Request $request)
+    {
         // echo "<pre>";print_r($request->all());die;
         $home_ids = Auth::user()->home_id;
-		$ex_home_ids = explode(',', $home_ids);
-		$home_id = $ex_home_ids[0];
-        
-        $query = ServiceUser::select('id','home_id','earning_scheme_label_id','name','user_name','phone_no','date_of_birth','child_type','room_type','current_location','street','care_needs','suFundingType','status','is_deleted')
-         ->where(function ($q) use ($request) {
-            $q->where('name', 'like', '%' . $request->user_name . '%')
-            ->orWhere('user_name', 'like', '%' . $request->user_name . '%');
-        })
-        ->where(['home_id'=>$home_id,'is_deleted'=>0]);
-          $query_AllSql =  (clone $query)->get();
-          $query_ActiveSql =  (clone $query)->where('status',1)->get();
-          $query_InactiveSql = ( clone $query)->where('status',0)->get();
+        $ex_home_ids = explode(',', $home_ids);
+        $home_id = $ex_home_ids[0];
+
+        $query = ServiceUser::select('id', 'home_id', 'earning_scheme_label_id', 'name', 'user_name', 'phone_no', 'date_of_birth', 'child_type', 'room_type', 'current_location', 'street', 'care_needs', 'suFundingType', 'status', 'is_deleted')
+            ->where(function ($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->user_name . '%')
+                    ->orWhere('user_name', 'like', '%' . $request->user_name . '%');
+            })
+            ->where(['home_id' => $home_id, 'is_deleted' => 0]);
+        $query_AllSql =  (clone $query)->get();
+        $query_ActiveSql =  (clone $query)->where('status', 1)->get();
+        $query_InactiveSql = (clone $query)->where('status', 0)->get();
 
         $allHtml_data = $this->html_data_prepaire($query_AllSql);
         $activeHtml_data = $this->html_data_prepaire($query_ActiveSql);
         $InactiveHtml_data = $this->html_data_prepaire($query_InactiveSql);
-        return response()->json(['success'=>true,'allHtml_data'=>$allHtml_data,'activeHtml_data'=>$activeHtml_data,'InactiveHtml_data'=>$InactiveHtml_data,'query_AllSqlData'=>$query_AllSql,'query_ActiveSqlData'=>$query_ActiveSql,'query_InactiveSql'=>$query_InactiveSql]);
+        return response()->json(['success' => true, 'allHtml_data' => $allHtml_data, 'activeHtml_data' => $activeHtml_data, 'InactiveHtml_data' => $InactiveHtml_data, 'query_AllSqlData' => $query_AllSql, 'query_ActiveSqlData' => $query_ActiveSql, 'query_InactiveSql' => $query_InactiveSql]);
     }
-    public function html_data_prepaire($query){
-        $html_data='';
-        foreach($query as $childVal){
-            $html_data.= '
+    public function html_data_prepaire($query)
+    {
+        $html_data = '';
+        foreach ($query as $childVal) {
+            $html_data .= '
             <div class="col-md-4">                                 
                 <div class="profile-card">
                     <div class="card-header">
                         <div class="user">
-                            <div class="avatar">'.strtoupper(substr($childVal->name, 0, 1)).'</div>
+                            <div class="avatar">' . strtoupper(substr($childVal->name, 0, 1)) . '</div>
                             <div class="info">
-                                <div class="name"><a href="'.url("roster/client-details/".$childVal->id) .'"> '.$childVal->name.'</a></div>
-                                <div class="role">'.$childVal->suFundingType.'</div>
+                                <div class="name"><a href="' . url("roster/client-details/" . $childVal->id) . '"> ' . $childVal->name . '</a></div>
+                                <div class="role">' . $childVal->suFundingType . '</div>
                             </div>
                         </div>';
-                        if($childVal->status == 1){
-                        $html_data.= '<span class="status greenShowbtn">Active</span>';
-                        }else{
-                        $html_data.= '<span class="status radShowbtn">Inactive</span>';
-                        }
-                    $html_data.= '</div>
+            if ($childVal->status == 1) {
+                $html_data .= '<span class="status greenShowbtn">Active</span>';
+            } else {
+                $html_data .= '<span class="status radShowbtn">Inactive</span>';
+            }
+            $html_data .= '</div>
                     <div class="details">
                         <div class="item">
-                            <i class="fa-solid fa-phone"></i> <span>'.$childVal->phone_no.'</span>
+                            <i class="fa-solid fa-phone"></i> <span>' . $childVal->phone_no . '</span>
                         </div>
                         
                         <div class="item">
-                            <i class="fa-solid fa-location-dot"></i> <span>'.$childVal->street.'</span>
+                            <i class="fa-solid fa-location-dot"></i> <span>' . $childVal->street . '</span>
                         </div>
                     </div>
                     <div class="section care-needs">
@@ -145,32 +154,32 @@ class ClientController extends Controller
                         <div class="sectionCarer">
 
                             <div class="tags">';
-                            $moreNeeds=0;
-                            if(!empty($childVal->care_needs)){
-                                $ex=explode(',',$childVal->care_needs);
-                                $moreNeeds=count($ex)-5;
-                                for($i=0;$i<5;$i++){
-                                    if(!empty($ex[$i])){
-                                        $html_data.='<span>'.$ex[$i].'</span>';
-                                    }
-                                }
-                            }
-                            if($moreNeeds > 0){
-                                $html_data.='<button class="care-more">+'.$moreNeeds.' more</button>';
-                                }
-                            $html_data.='</div>
+            $moreNeeds = 0;
+            if (!empty($childVal->care_needs)) {
+                $ex = explode(',', $childVal->care_needs);
+                $moreNeeds = count($ex) - 5;
+                for ($i = 0; $i < 5; $i++) {
+                    if (!empty($ex[$i])) {
+                        $html_data .= '<span>' . $ex[$i] . '</span>';
+                    }
+                }
+            }
+            if ($moreNeeds > 0) {
+                $html_data .= '<button class="care-more">+' . $moreNeeds . ' more</button>';
+            }
+            $html_data .= '</div>
                         </div>
                     </div>
                     
                     <div class="actions">
-                        <button class="view" type="button" onclick="redirectLocation('.$childVal->id.')">
+                        <button class="view" type="button" onclick="redirectLocation(' . $childVal->id . ')">
                             <i class="fa-regular fa-eye"></i>
                             View Details
                         </button>
-                        <button class="edit" type="button" data-toggle="modal" data-target="#addServiceUserModal" data-child_id="'.$childVal->id.'">
+                        <button class="edit" type="button" data-toggle="modal" data-target="#addServiceUserModal" data-child_id="' . $childVal->id . '">
                             <i class="fa-regular fa-pen-to-square"></i>
                         </button>
-                        <button class="delete client_delete" type="button" data-child_id="'.$childVal->id.'">
+                        <button class="delete client_delete" type="button" data-child_id="' . $childVal->id . '">
                             <i class="fa-regular fa-trash-can"></i>
                         </button>
                     </div>
@@ -179,49 +188,51 @@ class ClientController extends Controller
         }
         return $html_data;
     }
-    public function care_task_add(Request $request){
+    public function care_task_add(Request $request)
+    {
         // echo "<pre>";print_r($request->all());die;
         $task_id = $request->task_id;
         $home_ids = Auth::user()->home_id;
-		$ex_home_ids = explode(',', $home_ids);
-		$home_id = $ex_home_ids[0];
-        $data['task_type'] = clientTaskType::where('status',1)->get();
-        $data['task_category'] = clientTaskCategory::where('status',1)->get();
-        $data['scheduled_shifts'] = ScheduledShift::where(['staff_id'=>Auth::user()->id,'home_id'=>$home_id])->orderBy('start_date', 'desc')->get();
-        $data['child'] = ServiceUser::select('id','home_id','earning_scheme_label_id','name','user_name','phone_no','date_of_birth','child_type','room_type','current_location','street','care_needs','suFundingType','status','is_deleted')
-        ->where(['home_id'=>$home_id,'is_deleted'=>0,'status'=>1])->get();
+        $ex_home_ids = explode(',', $home_ids);
+        $home_id = $ex_home_ids[0];
+        $data['task_type'] = clientTaskType::where('status', 1)->get();
+        $data['task_category'] = clientTaskCategory::where('status', 1)->get();
+        $data['scheduled_shifts'] = ScheduledShift::where(['staff_id' => Auth::user()->id, 'home_id' => $home_id])->orderBy('start_date', 'desc')->get();
+        $data['child'] = ServiceUser::select('id', 'home_id', 'earning_scheme_label_id', 'name', 'user_name', 'phone_no', 'date_of_birth', 'child_type', 'room_type', 'current_location', 'street', 'care_needs', 'suFundingType', 'status', 'is_deleted')
+            ->where(['home_id' => $home_id, 'is_deleted' => 0, 'status' => 1])->get();
         $data['carer'] = $this->staffService->activeStaff($home_id)->get();
         $clientCareTask = '';
-        if($task_id){
+        if ($task_id) {
             $clientCareTask = $this->clientCareTaskService->details($task_id);
         }
         $data['clientCareTask'] = $clientCareTask;
         // echo "<pre>";print_r($data['clientCareTask']);die;
-        return view('frontEnd.roster.client.care_task_form',$data);
+        return view('frontEnd.roster.client.care_task_form', $data);
     }
-    public function care_task_save(Request $request){
+    public function care_task_save(Request $request)
+    {
         // echo "<pre>";print_r($request->all());die;
-        if(!empty($request->id)){
+        if (!empty($request->id)) {
             $validator = Validator::make($request->all(), [
-                'id'=>'required|exists:client_care_tasks,id',
-                'task_title'=>'required',
-                'task_category_id'=>'required',
-                'priority'=>'required',
-                'client_id'=>'required',
-                'care_plan_id'=>'required',
-                'frequency'=>'required',
+                'id' => 'required|exists:client_care_tasks,id',
+                'task_title' => 'required',
+                'task_category_id' => 'required',
+                'priority' => 'required',
+                'client_id' => 'required',
+                'care_plan_id' => 'required',
+                'frequency' => 'required',
             ]);
-        }else{
+        } else {
             $validator = Validator::make($request->all(), [
-                'task_title'=>'required',
-                'task_category_id'=>'required',
-                'priority'=>'required',
-                'client_id'=>'required',
-                'care_plan_id'=>'required',
-                'frequency'=>'required',
+                'task_title' => 'required',
+                'task_category_id' => 'required',
+                'priority' => 'required',
+                'client_id' => 'required',
+                'care_plan_id' => 'required',
+                'frequency' => 'required',
             ]);
         }
-        
+
         if ($validator->fails()) {
             return [
                 'success' => false,
@@ -240,34 +251,34 @@ class ClientController extends Controller
             $requestData['ppe_required'] = $request->ppe_required ?? 0;
             // echo "<pre>";print_r($requestData);die;
             $clientCareTask = $this->clientCareTaskService->store($requestData);
-            Session::flash('success','Client Care Task save successfully done.');
-            return response()->json(['success'=>true,'message'=>"Client Care Task saved successfully",'data'=>$clientCareTask]);
-
+            Session::flash('success', 'Client Care Task save successfully done.');
+            return response()->json(['success' => true, 'message' => "Client Care Task saved successfully", 'data' => $clientCareTask]);
         } catch (Exception $e) {
-            return response()->json(['success'=>false,'message'=>"Something went wrong",'data'=>$e->getMessage()]);
+            return response()->json(['success' => false, 'message' => "Something went wrong", 'data' => $e->getMessage()]);
         }
-        
     }
-    public function care_task_list(Request $request){
+    public function care_task_list(Request $request)
+    {
         // echo "<pre>";print_r($request->all());die;
         $requestData = $request->all();
         $requestData['user_id'] = Auth::user()->id;
         $clientCareTask = $this->clientCareTaskService->list($requestData);
         // echo "<pre>";print_r($clientCareTask);die;
         return response()->json([
-            'success'=>true,
-            'message'=>'Client Care Task List',
-            'data'=>$clientCareTask->items(),
-            'total'=>$clientCareTask->total(),
+            'success' => true,
+            'message' => 'Client Care Task List',
+            'data' => $clientCareTask->items(),
+            'total' => $clientCareTask->total(),
             'pagination' => [
-                    'next_page_url' => $clientCareTask->nextPageUrl(),
-                    'prev_page_url' => $clientCareTask->previousPageUrl(),
-                ]
+                'next_page_url' => $clientCareTask->nextPageUrl(),
+                'prev_page_url' => $clientCareTask->previousPageUrl(),
+            ]
         ]);
     }
-    public function care_task_delete(Request $request){
+    public function care_task_delete(Request $request)
+    {
         $validator = Validator::make($request->all(), [
-            'id'=>'required|exists:client_care_tasks,id',
+            'id' => 'required|exists:client_care_tasks,id',
         ]);
         if ($validator->fails()) {
             return [
@@ -277,32 +288,32 @@ class ClientController extends Controller
         }
         try {
             $clientCareTask = $this->clientCareTaskService->delete($request->id);
-            Session::flash('success','Client Care Task deleted successfully done.');
-            return response()->json(['success'=>true,'message'=>"Client Care Task deleted successfully",'data'=>$clientCareTask]);
-
+            Session::flash('success', 'Client Care Task deleted successfully done.');
+            return response()->json(['success' => true, 'message' => "Client Care Task deleted successfully", 'data' => $clientCareTask]);
         } catch (Exception $e) {
-            return response()->json(['success'=>false,'message'=>"Something went wrong",'data'=>$e->getMessage()]);
+            return response()->json(['success' => false, 'message' => "Something went wrong", 'data' => $e->getMessage()]);
         }
     }
-    public function medication_log_save(Request $request){
+    public function medication_log_save(Request $request)
+    {
         // echo "<pre>";print_r($request->all());die;
-        if(!empty($request->id)){
+        if (!empty($request->id)) {
             $validator = Validator::make($request->all(), [
-                'id'=>'required|exists:medication_logs,id',
-                'medication_name'=>'required',
-                'dosage'=>'required',
-                'administrator_date'=>'required',
-                'status'=>'required',
+                'id' => 'required|exists:medication_logs,id',
+                'medication_name' => 'required',
+                'dosage' => 'required',
+                'administrator_date' => 'required',
+                'status' => 'required',
             ]);
-        }else{
+        } else {
             $validator = Validator::make($request->all(), [
-                'medication_name'=>'required',
-                'dosage'=>'required',
-                'administrator_date'=>'required',
-                'status'=>'required',
+                'medication_name' => 'required',
+                'dosage' => 'required',
+                'administrator_date' => 'required',
+                'status' => 'required',
             ]);
         }
-        
+
         if ($validator->fails()) {
             return [
                 'success' => false,
@@ -318,27 +329,146 @@ class ClientController extends Controller
             $requestData['user_id'] = Auth::user()->id;
             // echo "<pre>";print_r($requestData);die;
             $clientMediLog = $this->clientService->store($requestData);
-            return response()->json(['success'=>true,'message'=>"Medication Log saved successfully",'data'=>$clientMediLog]);
-
+            return response()->json(['success' => true, 'message' => "Medication Log saved successfully", 'data' => $clientMediLog]);
         } catch (Exception $e) {
-            return response()->json(['success'=>false,'message'=>"Something went wrong",'data'=>$e->getMessage()]);
+            return response()->json(['success' => false, 'message' => "Something went wrong", 'data' => $e->getMessage()]);
         }
     }
-    public function medication_log_list(Request $request){
+    public function medication_log_list(Request $request)
+    {
         // echo "<pre>";print_r($request->all());die;
         $requestData = $request->all();
         $requestData['user_id'] = Auth::user()->id;
         $medicationLogs = $this->clientService->list($requestData);
         return response()->json([
-            'success'=>true,
-            'message'=>'Medication Log List',
-            'data'=>$medicationLogs->items(),
-            'total'=>$medicationLogs->total(),
+            'success' => true,
+            'message' => 'Medication Log List',
+            'data' => $medicationLogs->items(),
+            'total' => $medicationLogs->total(),
             'pagination' => [
-                    'next_page_url' => $medicationLogs->nextPageUrl(),
-                    'prev_page_url' => $medicationLogs->previousPageUrl(),
-                ]
+                'next_page_url' => $medicationLogs->nextPageUrl(),
+                'prev_page_url' => $medicationLogs->previousPageUrl(),
+            ]
         ]);
     }
-   
+    public function client_alert_save(Request $request)
+    {
+        // echo "<pre>";print_r($request->all());die;
+        if (!empty($request->id)) {
+            $validator = Validator::make($request->all(), [
+                'id' => 'required|exists:client_alerts,id',
+                'alert_type_id' => 'required',
+                'severity' => 'required',
+                'alert_title' => 'required',
+                'description' => 'required',
+            ]);
+        } else {
+            $validator = Validator::make($request->all(), [
+                'alert_type_id' => 'required',
+                'severity' => 'required',
+                'alert_title' => 'required',
+                'description' => 'required',
+            ]);
+        }
+
+        if ($validator->fails()) {
+            return [
+                'success' => false,
+                'errors' => $validator->errors()->first()
+            ];
+        }
+        try {
+            // 
+            $home_ids = Auth::user()->home_id;
+            $ex_home_ids = explode(',', $home_ids);
+            $home_id = $ex_home_ids[0];
+            $requestData = $request->all();
+            $requestData['home_id'] = $home_id;
+            $requestData['user_id'] = Auth::user()->id;
+            if ($request->has('expiry_date') && !empty($data['expiry_date'])) {
+                $requestData['expiry_date'] = Carbon::parse($request->expiry_date)->format('Y-m-d');
+            }
+            // echo "<pre>";print_r($requestData);die;
+            $clientAlert = $this->clientAlertService->store($requestData);
+            return response()->json(['success' => true, 'message' => "Client Alert saved successfully", 'data' => $clientAlert]);
+        } catch (Exception $e) {
+            return response()->json(['success' => false, 'message' => "Something went wrong", 'data' => $e->getMessage()]);
+        }
+    }
+    public function client_alert_type(Request $request)
+    {
+        // echo "<pre>";print_r($request->all());die;
+        $requestData = $request->all();
+        $requestData['user_id'] = Auth::user()->id;
+        $alerts = $this->clientAlertService->list($requestData);
+        return response()->json([
+            'success' => true,
+            'message' => 'Alerts List',
+            'data' => $alerts->items(),
+            'total' => $alerts->total(),
+            'pagination' => [
+                'next_page_url' => $alerts->nextPageUrl(),
+                'prev_page_url' => $alerts->previousPageUrl(),
+            ]
+        ]);
+    }
+    public function alert_increase_acknowledge(Request $request)
+    {
+        // echo "<pre>";print_r($request->all());die;
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|exists:client_alerts,id',
+        ]);
+        if ($validator->fails()) {
+            return [
+                'success' => false,
+                'errors' => $validator->errors()->first()
+            ];
+        }
+        try {
+            $alert_increase_acknowledge = $this->clientAlertService->alert_increase_acknowledge($request->id);
+            return response()->json(['success' => true, 'message' => "Acknowledge Increased", 'data' => $alert_increase_acknowledge]);
+        } catch (Exception $e) {
+            return response()->json(['success' => false, 'message' => "Something went wrong", 'data' => $e->getMessage()]);
+        }
+    }
+    public function client_alert_resolve(Request $request)
+    {
+        // echo "<pre>";print_r($request->all());die;
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|exists:client_alerts,id',
+        ]);
+
+        if ($validator->fails()) {
+            return [
+                'success' => false,
+                'errors' => $validator->errors()->first()
+            ];
+        }
+        try {
+            $resolve = $this->clientAlertService->client_alert_resolve($request->id);
+            return response()->json(['success' => true, 'message' => "Alert Resolved", 'data' => $resolve]);
+        } catch (Exception $e) {
+            return response()->json(['success' => false, 'message' => "Something went wrong", 'data' => $e->getMessage()]);
+        }
+    }
+    public function client_alert_archived(Request $request)
+    {
+        // echo "<pre>";print_r($request->all());die;
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|exists:client_alerts,id',
+        ]);
+
+        if ($validator->fails()) {
+            return [
+                'success' => false,
+                'errors' => $validator->errors()->first()
+            ];
+        }
+        try {
+            $archived = $this->clientAlertService->client_alert_archived($request->id);
+            return response()->json(['success' => true, 'message' => "Alert archived successfully", 'data' => $archived]);
+        } catch (Exception $e) {
+            return response()->json(['success' => false, 'message' => "Something went wrong", 'data' => $e->getMessage()]);
+        }
+    }
 }
