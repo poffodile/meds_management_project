@@ -180,7 +180,89 @@ class ScheduleShiftController extends Controller
                 'shift_type'        => $request->shift_type,
                 'tasks'             => $request->tasks,
                 'notes'             => $request->notes,
+                'is_recurring'      => $request->has('is_recurring') ? 1 : 0,
             ]);
+
+            if ($request->has('is_recurring')) {
+                ShiftRecurrence::updateOrCreate(
+                    ['shift_id' => $shift->id],
+                    [
+                        'frequency'          => $request->frequency,
+                        'week_days'          => $request->week_days,
+                        'end_recurring_date' => $request->end_date,
+                    ]
+                );
+            } else {
+                ShiftRecurrence::where('shift_id', $shift->id)->delete();
+            }
+
+            // --- Document & Assessment Updates ---
+
+            // 1. Delete removed documents and assessments
+            $keptDocIds = $request->existing_document_ids ?? [];
+            ShiftDocument::where('shift_id', $shift->id)->whereNotIn('id', $keptDocIds)->delete();
+
+            $keptAssIds = $request->existing_assessment_ids ?? [];
+            ShiftAssessment::where('shift_id', $shift->id)->whereNotIn('id', $keptAssIds)->delete();
+
+            // 2. Update types for existing assessments
+            if ($request->has('existing_assessment_types')) {
+                foreach ($request->existing_assessment_types as $id => $type) {
+                    ShiftAssessment::where('id', $id)->update(['assessment_type' => $type]);
+                }
+            }
+
+            // 3. Handle NEW Multiple Assessment Documents
+            if ($request->hasFile('assessment_doc_files')) {
+                foreach ($request->file('assessment_doc_files') as $key => $file) {
+                    $filename = time() . '_' . $file->getClientOriginalName();
+                    $destinationPath = public_path('uploads/shifts/assessments');
+                    $file->move($destinationPath, $filename);
+                    $path = 'uploads/shifts/assessments/' . $filename;
+
+                    $type = $request->assessment_types[$key] ?? 'other';
+
+                    ShiftAssessment::create([
+                        'shift_id'        => $shift->id,
+                        'assessment_doc'  => $path,
+                        'assessment_type' => $type,
+                    ]);
+                }
+            }
+
+            // 4. Handle NEW Regular Attachment
+            if ($request->hasFile('doc_file')) {
+                $file = $request->file('doc_file');
+                $filename = time() . '_' . $file->getClientOriginalName();
+                $destinationPath = public_path('uploads/shifts/documents');
+                $file->move($destinationPath, $filename);
+                $doc_file_path = 'uploads/shifts/documents/' . $filename;
+
+                ShiftDocument::create([
+                    'shift_id'     => $shift->id,
+                    'doc_name'     => $request->doc_name,
+                    'doc_type'     => $request->doc_type,
+                    'doc_file'     => $doc_file_path,
+                    'doc_required' => $request->has('doc_required') ? 1 : 0,
+                ]);
+            }
+
+            // 5. Handle NEW System Forms
+            if ($request->has('form_ids') && is_array($request->form_ids)) {
+                foreach ($request->form_ids as $key => $formId) {
+                    ShiftDocument::create([
+                        'shift_id'   => $shift->id,
+                        'form_id'    => $formId,
+                        'doc_name'   => $request->form_names[$key] ?? 'System Form',
+                    ]);
+                }
+            } elseif ($request->form_id) {
+                ShiftDocument::create([
+                    'shift_id'   => $shift->id,
+                    'form_id'    => $request->form_id,
+                    'doc_name'   => $request->form_name ?? 'System Form',
+                ]);
+            }
 
             return redirect()->back()->with('success', 'Shift updated successfully');
         } catch (\Exception $e) {
@@ -203,7 +285,7 @@ class ScheduleShiftController extends Controller
             ->where('is_deleted', 0)
             ->get();
 
-        $shifts = ScheduledShift::where('home_id', $home_id)
+        $shifts = ScheduledShift::with(['recurrence', 'documents', 'assessments'])->where('home_id', $home_id)
             ->whereBetween('start_date', [
                 $startOfWeek->format('Y-m-d'),
                 $endOfWeek->format('Y-m-d')
@@ -232,6 +314,10 @@ class ScheduleShiftController extends Controller
                     'assignment'       => $shift->assignment,
                     'notes'            => $shift->notes,
                     'tasks'            => $shift->tasks,
+                    'is_recurring'     => $shift->is_recurring,
+                    'recurrence'       => $shift->recurrence,
+                    'documents'        => $shift->documents,
+                    'assessments'      => $shift->assessments,
                 ];
             });
 
@@ -250,7 +336,7 @@ class ScheduleShiftController extends Controller
         $staffs = User::with(['shifts' => function ($query) use ($homeId) {
             $query->where('home_id', $homeId)
                 ->orderBy('start_date', 'desc');
-        }, 'shifts.client'])
+        }, 'shifts.client', 'shifts.recurrence', 'shifts.documents', 'shifts.assessments'])
             ->where('home_id', $homeId)
             ->where('status', 1)
             ->get();
@@ -330,7 +416,7 @@ class ScheduleShiftController extends Controller
     public function getMonthlyShifts(Request $request)
     {
 
-        $shifts = ScheduledShift::where('home_id', Auth::user()->home_id)
+        $shifts = ScheduledShift::with(['recurrence', 'staff', 'documents', 'assessments'])->where('home_id', Auth::user()->home_id)
             ->whereBetween('start_date', [$request->start, $request->end])
             ->get();
 
@@ -387,6 +473,10 @@ class ScheduleShiftController extends Controller
                 'assignment' => $shift->assignment,
                 'notes' => $shift->notes,
                 'tasks' => $shift->tasks,
+                'is_recurring' => $shift->is_recurring,
+                'recurrence' => $shift->recurrence,
+                'documents' => $shift->documents,
+                'assessments' => $shift->assessments,
             ];
         }
 

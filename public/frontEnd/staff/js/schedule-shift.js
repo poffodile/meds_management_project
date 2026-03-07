@@ -135,15 +135,36 @@ document.addEventListener('DOMContentLoaded', function () {
             form.find('button[type="submit"]').html('Update Shift');
 
             // Populate fields
-            form.find('[name="client_id"]').val(props.client_id).trigger('change');
+            if (props.client_id) {
+                form.find('[name="client_id"]').val(props.client_id).trigger('change');
+                // Allow the change event a tick to resolve the option text
+                setTimeout(() => {
+                    $('#assignedClientTo').text(form.find('[name="client_id"] option:selected').text());
+                }, 10);
+            } else {
+                form.find('[name="client_id"]').val('').trigger('change');
+                $('#assignedClientTo').text('Not assigned');
+            }
+
             form.find('[name="start_date"]').val(props.start_date);
             form.find('[name="start_time"]').val(props.start_time_raw);
             form.find('[name="end_time"]').val(props.end_time_raw);
 
+            const staffName = props.staff_name || '';
+
             if (props.staff_id) {
                 form.find('[name="carer_id"]').val(props.staff_id).trigger('change');
+                $('#selected_carer_id').val(props.staff_id);
+                $('#selectedCarerName').text(staffName);
+                $('#selectedCarerCard').show();
+                $('#carerSuggestionsWrapper').hide();
+                $('#toggleSuggestionsBtn').show().text('Show Suggestions');
             } else {
                 form.find('[name="carer_id"]').val('').trigger('change');
+                $('#selected_carer_id').val('');
+                $('#selectedCarerCard').hide();
+                $('#carerSuggestionsWrapper').show();
+                $('#toggleSuggestionsBtn').hide();
             }
 
             form.find('[name="shift_type"]').val(props.shift_type_raw).trigger('change');
@@ -172,6 +193,154 @@ document.addEventListener('DOMContentLoaded', function () {
                 form.find('[name="tasks"]').val('').trigger('change');
             }
 
+            // Populate Recurrence
+            if (props.is_recurring == "1" || props.is_recurring === true) {
+                form.find('#recurringClientToggle').prop('checked', true);
+                if (props.recurrence) {
+                    form.find('[name="frequency"]').val(props.recurrence.frequency).trigger('change');
+                    form.find('[name="end_date"]').val(props.recurrence.end_recurring_date || '');
+
+                    const daysRow = form.find('.weeklyDaysSelect').closest('.col-md-12');
+                    if (props.recurrence.frequency === 'weekly') {
+                        daysRow.show();
+                        if (props.recurrence.week_days) {
+                            try {
+                                let days = [];
+                                if (props.recurrence.week_days.startsWith('[') || props.recurrence.week_days.startsWith('{')) {
+                                    days = JSON.parse(props.recurrence.week_days);
+                                } else {
+                                    days = props.recurrence.week_days.split(',').map(d => d.trim());
+                                }
+
+                                form.find('.weeklyDaysSelect span').removeClass('active');
+                                form.find('.weeklyDaysSelect span').each(function () {
+                                    if (days.includes($(this).text().trim())) {
+                                        $(this).addClass('active');
+                                    }
+                                });
+                                form.find('#week_days').val(Array.isArray(days) ? days.join(',') : props.recurrence.week_days);
+                            } catch (e) {
+                                console.error('Failed to parse week_days', e);
+                            }
+                        }
+                    } else {
+                        daysRow.hide();
+                        form.find('.weeklyDaysSelect span').removeClass('active');
+                        form.find('.weeklyDaysSelect span').first().addClass('active');
+                        form.find('#week_days').val('');
+                    }
+                }
+                $('#recurringClientDiv').slideDown();
+            } else {
+                form.find('#recurringClientToggle').prop('checked', false);
+                form.find('[name="frequency"]').val('daily').trigger('change');
+                form.find('[name="end_date"]').val('');
+                form.find('.weeklyDaysSelect span').removeClass('active');
+                form.find('.weeklyDaysSelect span').first().addClass('active');
+                form.find('#week_days').val('');
+                $('#recurringClientDiv').slideUp();
+            }
+
+            // Populate Documents
+            $('.pendingCard').remove();
+            let hasDocs = false;
+            if (props.documents && props.documents.length > 0) {
+                hasDocs = true;
+                props.documents.forEach(doc => {
+                    let isForm = doc.form_id ? true : false;
+                    let today = new Date().toISOString().split('T')[0];
+
+                    // Improved title logic: use doc_name, fallback to filename or form_id
+                    let title = doc.doc_name;
+                    if (!title) {
+                        if (isForm) {
+                            title = 'System Form #' + doc.form_id;
+                        } else if (doc.doc_file) {
+                            title = doc.doc_file.split('/').pop();
+                        } else {
+                            title = 'Unnamed Document';
+                        }
+                    }
+
+                    if (!isForm && doc.doc_file) {
+                        // Correct path: BASE_URL + '/' + doc_file
+                        title = `<a href="${BASE_URL}/${doc.doc_file}" target="_blank" style="color:var(--primary-color); text-decoration:underline;">${title}</a>`;
+                    }
+
+                    let newSection = `
+                        <div class="card pendingCard" data-doc-id="${doc.id}">
+                            <input type="hidden" name="existing_document_ids[]" value="${doc.id}">
+                            <div class="left">
+                                <div class="icon blueText"><i class='bx bx-file'></i></div>
+                                <div class="info">
+                                    <div class="title">${title}</div>
+                                    <div class="meta">
+                                        <div class="inactive roundTag">${isForm ? 'System Form' : 'Attachment'}</div>
+                                        ${doc.doc_required == 1 ? '<div class="inactive roundTag" style="background:#fee2e2;color:#991b1b;">Required</div>' : ''}
+                                        <span class="date">${today}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="actions">
+                                <span class="approve"><i class='bx bx-check-circle'></i></span>
+                                <span class="delete" onclick="$(this).closest('.pendingCard').remove(); $('#pendingHeader').text('Pending Completion (' + $('.pendingCard').length + ')');"><i class='bx bx-trash'></i></span>
+                            </div>
+                        </div>
+                    `;
+                    $('#pendingCompletion').append(newSection);
+                });
+            }
+
+            if (hasDocs) {
+                $('#pendingCompletionSection').show();
+                $('#attachDocumentSection').hide();
+                $('#pendingHeader').text('Pending Completion (' + $('.pendingCard').length + ')');
+                $('#close_document').hide();
+                $('#attach_document').show();
+            } else {
+                $('#pendingCompletionSection').hide();
+                $('#attachDocumentSection').show();
+            }
+
+            // Populate Assessments
+            $('#assessmentList').empty();
+            if (props.assessments && props.assessments.length > 0) {
+                props.assessments.forEach((ass, index) => {
+                    let itemId = 'assessment-item-edit-' + index;
+                    let fileNameRaw = ass.assessment_doc ? ass.assessment_doc.split('/').pop() : 'Assessment ' + ass.id;
+
+                    let fileNameHtml = fileNameRaw;
+                    if (ass.assessment_doc) {
+                        // Correct path: BASE_URL + '/' + ass.assessment_doc
+                        fileNameHtml = `<a href="${BASE_URL}/${ass.assessment_doc}" target="_blank" style="color:var(--primary-color); text-decoration:underline;">${fileNameRaw}</a>`;
+                    }
+
+                    let itemHtml = `
+                        <div class="assessment-item" id="${itemId}">
+                            <input type="hidden" name="existing_assessment_ids[]" value="${ass.id}">
+                            <div class="assessment-item-left">
+                                <i class="fa fa-file-text-o"></i>
+                                <span class="assessment-item-name" title="${fileNameRaw}">${fileNameHtml}</span>
+                            </div>
+                            <div class="assessment-item-right">
+                                <select class="assessment-type-select" name="existing_assessment_types[${ass.id}]">
+                                    <option value="other" ${ass.assessment_type === 'other' || !ass.assessment_type ? 'selected' : ''}>Other</option>
+                                    <option value="supervision" ${ass.assessment_type === 'supervision' ? 'selected' : ''}>Supervision Form</option>
+                                    <option value="care_plan" ${ass.assessment_type === 'care_plan' ? 'selected' : ''}>Care Plan</option>
+                                    <option value="risk" ${ass.assessment_type === 'risk' ? 'selected' : ''}>Risk Assessment</option>
+                                    <option value="medication" ${ass.assessment_type === 'medication' ? 'selected' : ''}>Medication Chart</option>
+                                </select>
+                                <button type="button" class="assessment-item-delete" title="Remove" onclick="$(this).closest('.assessment-item').remove()">
+                                    <i class="fa fa-trash-o"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    $('#assessmentList').append(itemHtml);
+                });
+            }
+
+            $('#assessment_card').show();
             $('#addShiftModal').modal('show');
         },
 

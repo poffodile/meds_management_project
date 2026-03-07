@@ -253,7 +253,7 @@ class CarerController extends Controller
     {
         // Add where('home_id', Auth::user()->home_id) optionally for security as seen elsewhere
         $homeId = Auth::user()->home_id;
-        $shifts = \App\Models\ScheduledShift::where('home_id', $homeId)->get();
+        $shifts = \App\Models\ScheduledShift::with(['staff', 'documents', 'assessments', 'recurrence'])->where('home_id', $homeId)->get();
 
         $events = $shifts->map(function ($shift) {
             $startDate = $shift->start_date;
@@ -272,6 +272,7 @@ class CarerController extends Controller
                 // Extended props for editing:
                 'shift_id' => $shift->id,
                 'staff_id' => $shift->staff_id,
+                'staff_name' => $shift->staff ? $shift->staff->name : null,
                 'client_id' => $shift->service_user_id,
                 'shift_type_raw' => $shift->shift_type,
                 'start_time_raw' => $startTime->format('H:i'),
@@ -284,6 +285,10 @@ class CarerController extends Controller
                 'location_address' => $shift->location_address,
                 'notes' => $shift->notes,
                 'tasks' => $shift->tasks,
+                'documents' => $shift->documents,
+                'assessments' => $shift->assessments,
+                'is_recurring' => $shift->is_recurring,
+                'recurrence' => $shift->recurrence,
             ];
         })->toArray();
 
@@ -294,7 +299,7 @@ class CarerController extends Controller
     {
         $date = $request->query('date', date('Y-m-d'));
         $homeId = Auth::user()->home_id;
-        $shifts = \App\Models\ScheduledShift::with(['staff', 'client'])
+        $shifts = \App\Models\ScheduledShift::with(['staff', 'client', 'recurrence', 'documents', 'assessments'])
             ->where('start_date', $date)
             ->where('home_id', $homeId)
             ->get();
@@ -325,6 +330,10 @@ class CarerController extends Controller
                 'assignment' => $shift->assignment,
                 'notes' => $shift->notes,
                 'tasks' => $shift->tasks,
+                'is_recurring' => $shift->is_recurring,
+                'recurrence' => $shift->recurrence,
+                'documents' => $shift->documents,
+                'assessments' => $shift->assessments,
             ];
         });
 
@@ -343,7 +352,7 @@ class CarerController extends Controller
         $endOfWeek = $date->copy()->endOfWeek(\Carbon\Carbon::SUNDAY);
 
         $homeId = Auth::user()->home_id;
-        $shifts = \App\Models\ScheduledShift::with(['staff', 'client'])
+        $shifts = \App\Models\ScheduledShift::with(['staff', 'client', 'recurrence', 'documents', 'assessments'])
             ->whereBetween('start_date', [$startOfWeek->format('Y-m-d'), $endOfWeek->format('Y-m-d')])
             ->where('home_id', $homeId)
             ->get();
@@ -380,6 +389,10 @@ class CarerController extends Controller
                     'assignment' => $shift->assignment,
                     'notes' => $shift->notes,
                     'tasks' => $shift->tasks,
+                    'is_recurring' => $shift->is_recurring,
+                    'recurrence' => $shift->recurrence,
+                    'documents' => $shift->documents,
+                    'assessments' => $shift->assessments,
                 ];
             })->values();
 

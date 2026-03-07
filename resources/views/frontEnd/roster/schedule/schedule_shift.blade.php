@@ -14,9 +14,9 @@
         display: none;
     }
 
-    .pendingCompletionSection {
+    /* .pendingCompletionSection {
         display: none;
-    }
+    } */
 
     @media print {
         #pendingCount {
@@ -37,7 +37,7 @@
         border-radius: 12px;
         padding: 20px;
         margin-bottom: 20px;
-        display: none;
+        /* display: none; */
     }
 
     .assessment-header {
@@ -2009,13 +2009,16 @@
                 let formId = clickedItem.getAttribute('data-form-id');
                 let title = clickedItem.querySelector('.helthcareText p').innerText;
 
-                document.getElementById('selected_form_id').value = formId;
-                document.getElementById('selected_form_name').value = title;
+                // Do not update the single hidden inputs anymore. We use arrays now inside the card.
+                // document.getElementById('selected_form_id').value = formId;
+                // document.getElementById('selected_form_name').value = title;
 
                 let today = new Date().toISOString().split('T')[0];
 
                 let newSection = `
                             <div class="card pendingCard">
+                                <input type="hidden" name="form_ids[]" value="${formId}">
+                                <input type="hidden" name="form_names[]" value="${title}">
                                 <div class="left">
                                     <div class="icon blueText"><i class='bx bx-file'></i></div>
                                     <div class="info">
@@ -2058,7 +2061,7 @@
                         document.querySelector('.upload-box').style.display = 'block';
                         document.getElementById('attach_document').style.display = 'none';
 
-                        // Clear hidden inputs
+                        // Clear hidden inputs for single selection case (legacy fallback)
                         document.getElementById('selected_form_id').value = '';
                         document.getElementById('selected_form_name').value = '';
                     }
@@ -2211,6 +2214,9 @@
             clientSelect.addEventListener('change', function() {
                 const clientId = this.value;
 
+                // Ensure the wrapper is visible so suggestions or blank section can be seen
+                suggestionsWrapper.style.display = 'block';
+
                 if (this.value === "") {
                     assignedClientTo.textContent = "Not assigned";
                     blankSection.style.display = 'block';
@@ -2330,6 +2336,10 @@
                     selectedCarerCard.style.display = 'none';
                     selectedCarerIdInput.value = "";
                     assignedClientTo.innerText = clientSelect.options[clientSelect.selectedIndex].text;
+
+                    if (suggestedCarerContainer.innerHTML.trim() === "" || suggestedCarerContainer.innerHTML.includes("Loading")) {
+                        clientSelect.dispatchEvent(new Event('change'));
+                    }
                 });
             }
 
@@ -2571,6 +2581,10 @@
                             block.dataset.assignment = sh.assignment || '';
                             block.dataset.notes = sh.notes || '';
                             block.dataset.tasks = sh.tasks || '';
+                            block.dataset.isRecurring = sh.is_recurring || '';
+                            block.dataset.recurrence = JSON.stringify(sh.recurrence || null);
+                            block.dataset.documents = JSON.stringify(sh.documents || null);
+                            block.dataset.assessments = JSON.stringify(sh.assessments || null);
                             block.dataset.staffName = sh.staff_name || member.name || '';
 
                             const st = sh.start_time ? sh.start_time.substring(0, 5) : '?';
@@ -2728,6 +2742,10 @@
                                                         data-assignment="${shift.assignment || ''}"
                                                         data-notes="${shift.notes || ''}"
                                                         data-tasks="${shift.tasks || ''}"
+                                                        data-is-recurring="${shift.is_recurring || ''}"
+                                                        data-recurrence='${JSON.stringify(shift.recurrence || null)}'
+                                                        data-documents='${JSON.stringify(shift.documents || null)}'
+                                                        data-assessments='${JSON.stringify(shift.assessments || null)}'
                                                         data-staff-name="${shift.staff_name || ''}">
                                                         <i class="bx bx-edit"></i> Edit
                                                     </button>
@@ -2913,6 +2931,8 @@
 
                     const form = $('#createShiftForm');
 
+
+
                     // Change form action to update
                     let updateUrl = '{{ url("roster/schedule-shift/update") }}/' + shiftId;
                     form.attr('action', updateUrl);
@@ -2922,8 +2942,10 @@
                     // Populate fields
                     if (client) {
                         form.find('[name="client_id"]').val(client).trigger('change');
+                        $('#assignedClientTo').text(form.find('[name="client_id"] option:selected').text());
                     } else {
                         form.find('[name="client_id"]').val('').trigger('change');
+                        $('#assignedClientTo').text('Not assigned');
                     }
                     form.find('[name="start_date"]').val(date);
                     form.find('[name="start_time"]').val(start);
@@ -2933,7 +2955,6 @@
                         $('#selected_carer_id').val(staff);
                         $('#selectedCarerName').text(staffName);
                         $('#selectedCarerCard').show();
-                        $('#assignedClientTo').text(staffName);
                         $('#carerSuggestionsWrapper').hide();
                         $('#toggleSuggestionsBtn').text('Show Suggestions');
                     } else {
@@ -2970,6 +2991,152 @@
                         form.find('[name="tasks"]').val('').trigger('change');
                     }
 
+                    // Populate Recurrence
+                    if (props.is_recurring == "1" || props.is_recurring === true) {
+                        form.find('#recurringClientToggle').prop('checked', true);
+                        if (props.recurrence) {
+                            form.find('[name="frequency"]').val(props.recurrence.frequency).trigger('change');
+                            form.find('[name="end_date"]').val(props.recurrence.end_recurring_date || '');
+
+                            const daysRow = form.find('.weeklyDaysSelect').closest('.col-md-12');
+                            if (props.recurrence.frequency === 'weekly') {
+                                daysRow.show();
+                                if (props.recurrence.week_days) {
+                                    try {
+                                        let days = [];
+                                        if (typeof props.recurrence.week_days === 'string' && (props.recurrence.week_days.startsWith('[') || props.recurrence.week_days.startsWith('{'))) {
+                                            days = JSON.parse(props.recurrence.week_days);
+                                        } else if (typeof props.recurrence.week_days === 'string') {
+                                            days = props.recurrence.week_days.split(',').map(d => d.trim());
+                                        } else {
+                                            days = props.recurrence.week_days;
+                                        }
+
+                                        form.find('.weeklyDaysSelect span').removeClass('active');
+                                        form.find('.weeklyDaysSelect span').each(function() {
+                                            if (days.includes($(this).text().trim())) {
+                                                $(this).addClass('active');
+                                            }
+                                        });
+                                        form.find('#week_days').val(Array.isArray(days) ? days.join(',') : props.recurrence.week_days);
+                                    } catch (e) {
+                                        console.error('Failed to parse week_days', e);
+                                    }
+                                }
+                            } else {
+                                daysRow.hide();
+                                form.find('.weeklyDaysSelect span').removeClass('active');
+                                form.find('.weeklyDaysSelect span').first().addClass('active');
+                                form.find('#week_days').val('');
+                            }
+                        }
+                        $('#recurringClientDiv').slideDown();
+                    } else {
+                        form.find('#recurringClientToggle').prop('checked', false);
+                        form.find('[name="frequency"]').val('daily').trigger('change');
+                        form.find('[name="end_date"]').val('');
+                        form.find('.weeklyDaysSelect span').removeClass('active');
+                        form.find('.weeklyDaysSelect span').first().addClass('active');
+                        form.find('#week_days').val('');
+                        $('#recurringClientDiv').slideUp();
+                    }
+
+                    // Populate Documents
+                    $('.pendingCard').remove();
+                    let hasDocs = false;
+                    let documentsData = props.documents;
+                    if (documentsData && documentsData.length > 0) {
+                        hasDocs = true;
+                        documentsData.forEach(doc => {
+                            let isForm = doc.form_id ? true : false;
+                            let today = new Date().toISOString().split('T')[0];
+
+                            // Improved title logic: use doc_name, fallback to filename or form_id
+                            let title = doc.doc_name;
+                            if (!title) {
+                                if (isForm) {
+                                    title = 'System Form #' + doc.form_id;
+                                } else if (doc.doc_file) {
+                                    title = doc.doc_file.split('/').pop();
+                                } else {
+                                    title = 'Unnamed Document';
+                                }
+                            }
+
+                            if (!isForm && doc.doc_file) {
+                                // Correct path: BASE_URL + '/' + doc_file
+                                title = `<a href="{{ url('/') }}/${doc.doc_file}" target="_blank" style="color:var(--primary-color); text-decoration:underline;">${title}</a>`;
+                            }
+
+                            let newSection = `
+                                <div class="card pendingCard" data-doc-id="${doc.id}">
+                                    <input type="hidden" name="existing_document_ids[]" value="${doc.id}">
+                                    <div class="left">
+                                        <div class="icon blueText"><i class='bx bx-file'></i></div>
+                                        <div class="info">
+                                            <div class="title">${title}</div>
+                                            <div class="meta">
+                                                <div class="inactive roundTag">${isForm ? 'System Form' : 'Attachment'}</div>
+                                                ${doc.doc_required == 1 ? '<div class="inactive roundTag" style="background:#fee2e2;color:#991b1b;">Required</div>' : ''}
+                                                <span class="date">${today}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="actions">
+                                        <span class="approve"><i class='bx bx-check-circle'></i></span>
+                                        <span class="delete" onclick="$(this).closest('.pendingCard').remove(); $('#pendingHeader').text('Pending Completion (' + $('.pendingCard').length + ')');"><i class='bx bx-trash'></i></span>
+                                    </div>
+                                </div>
+                            `;
+                            $('#pendingCompletion').append(newSection);
+                        });
+                    }
+
+                    if (hasDocs) {
+                        $('#pendingCompletionSection').show();
+                        $('#attachDocumentSection').hide();
+                        $('#pendingHeader').text('Pending Completion (' + $('.pendingCard').length + ')');
+                        $('#close_document').hide();
+                        $('#attach_document').show();
+                    } else {
+                        $('#pendingCompletionSection').hide();
+                        $('#attachDocumentSection').show();
+                    }
+
+                    // Populate Assessments
+                    $('#assessmentList').empty();
+                    let assessmentsData = props.assessments;
+                    if (assessmentsData && assessmentsData.length > 0) {
+                        assessmentsData.forEach((ass, index) => {
+                            let itemId = 'assessment-item-edit-' + index;
+                            let fileNameRaw = ass.assessment_doc ? ass.assessment_doc.split('/').pop() : 'Assessment ' + ass.id;
+                            let fileNameHtml = fileNameRaw;
+                            if (ass.assessment_doc) {
+                                fileNameHtml = `<a href="{{ url('/') }}/${ass.assessment_doc}" target="_blank" style="color:var(--primary-color); text-decoration:underline;">${fileNameRaw}</a>`;
+                            }
+
+                            let itemHtml = `
+                                <div class="assessment-item" id="${itemId}">
+                                    <input type="hidden" name="existing_assessment_ids[]" value="${ass.id}">
+                                    <div class="assessment-item-left">
+                                        <i class="fa fa-file-text-o"></i>
+                                        <span class="assessment-item-name" title="${fileNameRaw}">${fileNameHtml}</span>
+                                    </div>
+                                    <div class="assessment-item-right">
+                                        <select class="assessment-type-select" name="existing_assessment_types[${ass.id}]">
+                                            <option value="${ass.assessment_type || 'other'}" selected>${ass.assessment_type || 'Other'}</option>
+                                        </select>
+                                        <button type="button" class="assessment-item-delete" title="Remove" onclick="$(this).closest('.assessment-item').remove()">
+                                            <i class="fa fa-trash-o"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
+                            $('#assessmentList').append(itemHtml);
+                        });
+                    }
+
+                    $('#assessment_card').show();
                     $('#addShiftModal').modal('show');
                 }
             });
@@ -3036,6 +3203,10 @@
                                     data-assignment="${shift.assignment || ''}"
                                     data-notes="${shift.notes || ''}"
                                     data-tasks="${shift.tasks || ''}"
+                                    data-is-recurring="${shift.is_recurring || ''}"
+                                    data-recurrence='${JSON.stringify(shift.recurrence || null)}'
+                                    data-documents='${JSON.stringify(shift.documents || null)}'
+                                    data-assessments='${JSON.stringify(shift.assessments || null)}'
                                     data-staff-name="${shift.staff_name || ''}">
                                     <div style="display:flex;gap:8px;margin-bottom:12px;">
                                         <span style="background:#f3e8ff;color:#9333ea;padding:4px 8px;border-radius:6px;font-size:12px;font-weight:600;">scheduled</span>
@@ -3107,6 +3278,10 @@
                 const notes = $(this).data('notes');
                 const tasks = $(this).data('tasks');
                 const staffName = $(this).data('staff-name') || '';
+                const isRecurring = $(this).data('is-recurring');
+                const recurrenceData = $(this).data('recurrence');
+                const documentsData = $(this).data('documents');
+                const assessmentsData = $(this).data('assessments');
 
                 const form = $('#createShiftForm');
 
@@ -3116,7 +3291,13 @@
                 form.find('button[type="submit"]').html('Update Shift');
 
                 // Populate fields
-                form.find('[name="client_id"]').val(client).trigger('change');
+                if (client) {
+                    form.find('[name="client_id"]').val(client).trigger('change');
+                    $('#assignedClientTo').text(form.find('[name="client_id"] option:selected').text());
+                } else {
+                    form.find('[name="client_id"]').val('').trigger('change');
+                    $('#assignedClientTo').text('Not assigned');
+                }
                 form.find('[name="start_date"]').val(date);
                 form.find('[name="start_time"]').val(start);
                 form.find('[name="end_time"]').val(end);
@@ -3160,6 +3341,141 @@
                     form.find('[name="tasks"]').val('').trigger('change');
                 }
 
+                // Populate Recurrence
+                if (isRecurring == "1" || isRecurring === true) {
+                    form.find('#recurringClientToggle').prop('checked', true);
+                    if (recurrenceData) {
+                        form.find('[name="frequency"]').val(recurrenceData.frequency).trigger('change');
+                        form.find('[name="end_date"]').val(recurrenceData.end_recurring_date || '');
+
+                        const daysRow = form.find('.weeklyDaysSelect').closest('.col-md-12');
+                        if (recurrenceData.frequency === 'weekly') {
+                            daysRow.show();
+                            if (recurrenceData.week_days) {
+                                try {
+                                    let days = [];
+                                    if (typeof recurrenceData.week_days === 'string' && (recurrenceData.week_days.startsWith('[') || recurrenceData.week_days.startsWith('{'))) {
+                                        days = JSON.parse(recurrenceData.week_days);
+                                    } else if (typeof recurrenceData.week_days === 'string') {
+                                        days = recurrenceData.week_days.split(',').map(d => d.trim());
+                                    } else {
+                                        days = recurrenceData.week_days;
+                                    }
+
+                                    form.find('.weeklyDaysSelect span').removeClass('active');
+                                    form.find('.weeklyDaysSelect span').each(function() {
+                                        if (days.includes($(this).text().trim())) {
+                                            $(this).addClass('active');
+                                        }
+                                    });
+                                    form.find('#week_days').val(Array.isArray(days) ? days.join(',') : recurrenceData.week_days);
+                                } catch (e) {
+                                    console.error('Failed to parse week_days', e);
+                                }
+                            }
+                        } else {
+                            daysRow.hide();
+                            form.find('.weeklyDaysSelect span').removeClass('active');
+                            form.find('.weeklyDaysSelect span').first().addClass('active');
+                            form.find('#week_days').val('');
+                        }
+                    }
+                    $('#recurringClientDiv').slideDown();
+                } else {
+                    form.find('#recurringClientToggle').prop('checked', false);
+                    form.find('[name="frequency"]').val('daily').trigger('change');
+                    form.find('[name="end_date"]').val('');
+                    form.find('.weeklyDaysSelect span').removeClass('active');
+                    form.find('.weeklyDaysSelect span').first().addClass('active');
+                    form.find('#week_days').val('');
+                    $('#recurringClientDiv').slideUp();
+                }
+
+                // Populate Documents
+                $('.pendingCard').remove();
+                let hasDocs = false;
+                if (documentsData && documentsData.length > 0) {
+                    hasDocs = true;
+                    documentsData.forEach(doc => {
+                        let title = doc.doc_name || 'System Form ' + (doc.form_id || '');
+                        let today = new Date().toISOString().split('T')[0];
+                        let isForm = doc.form_id ? true : false;
+
+                        if (!isForm && doc.doc_file) {
+                            title = `<a href="{{ url('uploads/documents/') }}/${doc.doc_file}" target="_blank" style="color:var(--primary-color); text-decoration:underline;">${title}</a>`;
+                        }
+
+                        let newSection = `
+                            <div class="card pendingCard" data-doc-id="${doc.id}">
+                                <input type="hidden" name="existing_document_ids[]" value="${doc.id}">
+                                <div class="left">
+                                    <div class="icon blueText"><i class='bx bx-file'></i></div>
+                                    <div class="info">
+                                        <div class="title">${title}</div>
+                                        <div class="meta">
+                                            <div class="inactive roundTag">${isForm ? 'System Form' : 'Attachment'}</div>
+                                            <span class="date">${today}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="actions">
+                                    <span class="approve"><i class='bx bx-check-circle'></i></span>
+                                    <span class="delete" onclick="$(this).closest('.pendingCard').remove(); $('#pendingHeader').text('Pending Completion (' + $('.pendingCard').length + ')');"><i class='bx bx-trash'></i></span>
+                                </div>
+                            </div>
+                        `;
+                        $('#pendingCompletion').append(newSection);
+                    });
+                }
+
+                if (hasDocs) {
+                    $('#pendingCompletionSection').show();
+                    $('#attachDocumentSection').hide();
+                    $('#pendingHeader').text('Pending Completion (' + $('.pendingCard').length + ')');
+                    $('#close_document').hide();
+                    $('#attach_document').show();
+                } else {
+                    $('#pendingCompletionSection').hide();
+                    $('#attachDocumentSection').show();
+                }
+
+                // Populate Assessments
+                $('#assessmentList').empty();
+                if (assessmentsData && assessmentsData.length > 0) {
+                    assessmentsData.forEach((ass, index) => {
+                        let itemId = 'assessment-item-edit-' + index;
+                        let fileNameRaw = ass.assessment_doc ? ass.assessment_doc.split('/').pop() : 'Assessment ' + ass.id;
+                        let fileNameHtml = fileNameRaw;
+                        if (ass.assessment_doc) {
+                            fileNameHtml = `<a href="{{ url('/') }}/${ass.assessment_doc}" target="_blank" style="color:var(--primary-color); text-decoration:underline;">${fileNameRaw}</a>`;
+                        }
+
+                        let itemHtml = `
+                            <div class="assessment-item" id="${itemId}">
+                                <input type="hidden" name="existing_assessment_ids[]" value="${ass.id}">
+                                <div class="assessment-item-left">
+                                    <i class="fa fa-file-text-o"></i>
+                                    <span class="assessment-item-name" title="${fileNameRaw}">${fileNameHtml}</span>
+                                </div>
+                                <div class="assessment-item-right">
+                                <select class="assessment-type-select" name="existing_assessment_types[${ass.id}]">
+                                    <option value="other" ${ass.assessment_type === 'other' || !ass.assessment_type ? 'selected' : ''}>Other</option>
+                                    <option value="supervision" ${ass.assessment_type === 'supervision' ? 'selected' : ''}>Supervision Form</option>
+                                    <option value="care_plan" ${ass.assessment_type === 'care_plan' ? 'selected' : ''}>Care Plan</option>
+                                    <option value="risk" ${ass.assessment_type === 'risk' ? 'selected' : ''}>Risk Assessment</option>
+                                    <option value="medication" ${ass.assessment_type === 'medication' ? 'selected' : ''}>Medication Chart</option>
+                                </select>
+                                    <button type="button" class="assessment-item-delete" title="Remove" onclick="$(this).closest('.assessment-item').remove()">
+                                        <i class="fa fa-trash-o"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                        $('#assessmentList').append(itemHtml);
+                    });
+                }
+
+                $('#assessment_card').show();
                 $('#addShiftModal').modal('show');
             });
 
@@ -3202,6 +3518,13 @@
                 // Reset form fields
                 form[0].reset();
                 form.find('select').val('').trigger('change');
+
+                // Reset Documents & Assessments
+                $('.pendingCard').remove();
+                $('#assessmentList').empty();
+                $('#assessment_card').hide();
+                $('#pendingCompletionSection').hide();
+                $('#attachDocumentSection').show();
             });
 
             // --- WEEK VIEW LOGIC ---
@@ -3259,6 +3582,10 @@
                                         data-assignment="${shift.assignment || ''}"
                                         data-notes="${shift.notes || ''}"
                                         data-tasks="${shift.tasks || ''}"
+                                        data-is-recurring="${shift.is_recurring || ''}"
+                                        data-recurrence='${JSON.stringify(shift.recurrence || null)}'
+                                        data-documents='${JSON.stringify(shift.documents || null)}'
+                                        data-assessments='${JSON.stringify(shift.assessments || null)}'
                                         data-staff-name="${shift.staff_name || ''}">
                                         <div style="display:flex;align-items:center;gap:6px;font-weight:600;color:#1f2937;font-size:13px;margin-bottom:6px;">
                                             <span style="width:6px;height:6px;background:#3b82f6;border-radius:50%;"></span>
@@ -3321,6 +3648,8 @@
                     url: baseUrl + '/roster/carer/shifts/90days?date=' + targetDate,
                     type: 'GET',
                     success: function(res) {
+
+
                         $('#days90 .full-date').text(res.overview_date);
                         $('#days90 .day-text').text(res.overview_date.split(',')[0]);
                         $('#totalShifts').text(res.summary.total);
@@ -3399,6 +3728,52 @@
             });
 
             load90DaysShifts();
+        });
+
+        // Form Reset for New Shift
+        $('#addShiftModal').on('show.bs.modal', function(e) {
+            // e.relatedTarget is the button that triggered the modal (i.e. "+ Add Shift")
+            // If it's undefined, the modal was triggered via JS (e.g. "Edit Shift")
+            if (e.relatedTarget) {
+                const form = $('#createShiftForm');
+                form[0].reset();
+
+                // Reset custom inputs & layouts
+                form.find('[name="carer_id"]').val('');
+                form.attr('action', "{{ route('roster.schedule.store') }}"); // Assuming store
+                $(this).find('.modal-title').text('Create New Shift');
+                form.find('button[type="submit"]').html('Create Shift');
+
+                $('#selectedCarerName').text('');
+                $('#selectedCarerCard').hide();
+                $('#carerSuggestionsWrapper').show();
+                $('#toggleSuggestionsBtn').hide();
+                $('#assignedCarerBlankSection').show();
+                $('#suggested_carer_container').hide();
+                $('#assignedClientTo').text('Not assigned');
+
+                // Reset Documents & Assessments
+                $('.pendingCard').remove();
+                $('#pendingCompletionSection').hide();
+                $('#attachDocumentSection').show();
+                $('#close_document').hide();
+                $('#attach_document').show();
+
+                $('#assessment_card').hide();
+                $('#assessmentList').empty();
+
+                // Trigger select events
+                $('#clientSelect').val('').trigger('change');
+
+                // Reset Recurrence
+                form.find('#recurringClientToggle').prop('checked', false);
+                form.find('[name="frequency"]').val('daily').trigger('change');
+                form.find('[name="end_date"]').val('');
+                form.find('.weeklyDaysSelect span').removeClass('active');
+                form.find('.weeklyDaysSelect span').first().addClass('active');
+                form.find('#week_days').val('');
+                $('#recurringClientDiv').slideUp();
+            }
         });
     </script>
 

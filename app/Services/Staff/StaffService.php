@@ -342,20 +342,19 @@ class StaffService
             ->where('status', 1)
             ->where('is_deleted', 0); // Exclude deleted users
 
-        // 4. Filter users who have the matching course_id in user_qualification
+        // 4. Find users who have the matching course_id in user_qualification
+        $userIdsWithCourses = [];
         if (!empty($clientCourses)) {
             $userIdsWithCourses = DB::table('user_qualification')
                 ->whereIn('course_id', $clientCourses)
                 ->pluck('user_id')
                 ->toArray();
-
-            $query->whereIn('id', $userIdsWithCourses);
         }
 
         $users = $query->get();
 
-        // 5. Map staff to process distance logic
-        $nearbyStaff = $users->map(function ($staff) use ($clientLatitude, $clientLongitude) {
+        // 5. Map staff to process distance and matching logic
+        $nearbyStaff = $users->map(function ($staff) use ($clientLatitude, $clientLongitude, $clientCourses, $userIdsWithCourses) {
 
             $distance = null;
 
@@ -369,18 +368,29 @@ class StaffService
                 $staff->distance = 999999;
             }
 
-            // Assign Card Color & Tag based on distance
-            if ($distance !== null && $distance < 20) {
-                // $staff->card_color = 'greenCarerCard';
-                // $staff->tag = 'Best Match';
-
-            } elseif ($distance !== null && $distance == 20) {
-                $staff->card_color = 'muteCarerCard';
-                $staff->tag = 'Standard Match';
-            } else { // Greater than 20 or no location
-                $staff->card_color = 'red';
-                $staff->tag = 'Geographic Mismatch';
-                $staff->warning = 'Very far from client';
+            // Assign Card Color & Tag based on course match and distance
+            if (!empty($clientCourses)) {
+                if (in_array($staff->id, $userIdsWithCourses)) {
+                    $staff->card_color = 'greenCarerCard';
+                    $staff->tag = 'Course Match';
+                } else {
+                    $staff->card_color = 'red';
+                    $staff->tag = 'Course Mismatch';
+                    $staff->warning = 'Missing required courses';
+                }
+            } else {
+                // Fallback to original distance logic if no client courses are required
+                if ($distance !== null && $distance < 20) {
+                    $staff->card_color = 'greenCarerCard';
+                    $staff->tag = 'Best Match';
+                } elseif ($distance !== null && $distance == 20) {
+                    $staff->card_color = 'muteCarerCard';
+                    $staff->tag = 'Standard Match';
+                } else { // Greater than 20 or no location
+                    $staff->card_color = 'red';
+                    $staff->tag = 'Geographic Mismatch';
+                    $staff->warning = 'Very far from client';
+                }
             }
 
             return $staff;
