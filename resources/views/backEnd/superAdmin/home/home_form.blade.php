@@ -53,6 +53,13 @@ if (isset($system_admin_home)) {
 									</div>
 								</div>
 
+								<div class="form-group">
+									<label class="col-lg-3 control-label">Home Area</label>
+									<div class="col-lg-9">
+										<input type="text" name="home_area" class="form-control" placeholder="Home area" value="{{ (isset($system_admin_home->home_area)) ? $system_admin_home->home_area : '' }}" maxlength="255">
+									</div>
+								</div>
+
 								<!-- <div class="form-group">
 									<label class="col-lg-3 control-label">Location History Duration</label>
 									<div class="col-lg-9">
@@ -60,7 +67,7 @@ if (isset($system_admin_home)) {
 										<p>Days for which location history will be saved</p>
 									</div>
 								</div> -->
-								
+
 								<div class="form-group yes_no_btn">
 									<label class="col-lg-3 control-label">Registered with Ofsted or CIW</label>
 									<div class="col-lg-9 d-flex align-items-center gap-2">
@@ -89,7 +96,8 @@ if (isset($system_admin_home)) {
                                 </div>
                             </div> -->
 								<?php
-								$image = home . '/default_home.png';
+								// $image = home . '/default_home.png';
+								$image = env('APP_URL') . home . '/default_home.png';
 
 								if (isset($system_admin_home->image)) {
 									if (!empty($system_admin_home->image)) {
@@ -198,21 +206,20 @@ if (isset($system_admin_home)) {
 		});
 	});
 
-	$(document).ready(function () {
-        $('#home_type').change(function () {
-            var selectedType = $(this).val();
-            if (selectedType === 'residential') {
-                $('#residential_rooms').show();
-                $('#accommodation_rooms').hide();
-            } else if (selectedType === 'accommodation') {
-                $('#accommodation_rooms').show();
-                $('#residential_rooms').hide();
-            } else {
-                $('#residential_rooms, #accommodation_rooms').hide();
-            }
-        });
-    });
-
+	$(document).ready(function() {
+		$('#home_type').change(function() {
+			var selectedType = $(this).val();
+			if (selectedType === 'residential') {
+				$('#residential_rooms').show();
+				$('#accommodation_rooms').hide();
+			} else if (selectedType === 'accommodation') {
+				$('#accommodation_rooms').show();
+				$('#residential_rooms').hide();
+			} else {
+				$('#residential_rooms, #accommodation_rooms').hide();
+			}
+		});
+	});
 </script>
 
 

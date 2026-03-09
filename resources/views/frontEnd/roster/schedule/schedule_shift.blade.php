@@ -1419,6 +1419,7 @@
                                                     <option value="morning">Morning</option>
                                                     <option value="afternoon">Afternoon</option>
                                                     <option value="evening">Evening</option>
+                                                    <option value="day_shift">Day Shift</option>
                                                     <option value="night">Night</option>
                                                     <option value="supervision">Supervision</option>
                                                     <option value="shadowing">Shadowing</option>
@@ -2776,7 +2777,8 @@
 
         function load90DaysData(date = null) {
 
-            fetch(`/roster/90-days-data?date=${date ?? ''}`)
+            // fetch(`/roster/ninety-days-data?date=${date ?? ''}`)
+            fetch(`{{ route('ninety.days.data') }}?date=${date ?? ''}`)
                 .then(response => response.json())
                 .then(data => {
 
@@ -3645,7 +3647,7 @@
                 $('#weeklyContainer').html('<div style="text-align:center;padding:24px;color:#9ca3af;">Loading 90-day overview...</div>');
 
                 $.ajax({
-                    url: baseUrl + '/roster/carer/shifts/90days?date=' + targetDate,
+                    url: baseUrl + '/roster/carer/shifts/ninety-days?date=' + targetDate,
                     type: 'GET',
                     success: function(res) {
 

@@ -145,7 +145,7 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 		Route::get('/carer/shifts/day', [CarerController::class, 'dayShifts'])->name('carer.shifts.day');
 		Route::get('/carer/shifts/week', [CarerController::class, 'weekShifts'])->name('carer.shifts.week');
 		Route::get('/carer/get-shift-carer/{client_id}', [CarerController::class, 'getShiftStaff'])->name('carer.shift.staff');
-		Route::get('/carer/shifts/90days', [CarerController::class, 'ninetyDaysShifts'])->name('carer.shifts.90days');
+		Route::get('/carer/shifts/ninety-days', [CarerController::class, 'ninetyDaysShifts'])->name('carer.shifts.ninety-days');
 
 		Route::get('/carer-details/{carer_id}', [CarerDetailsController::class, 'carer_details'])->name('roster.staff.carer.details');
 		Route::post('/carer/save-documents', [CarerDetailsController::class, 'saveDouments'])->name('carer.save.documents');
@@ -160,11 +160,9 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 		Route::post('/schedule-shift/store', [ScheduleShiftController::class, 'store'])->name('roster.schedule.store');
 		Route::post('/schedule-shift/update/{id}', [ScheduleShiftController::class, 'updateShift'])->name('roster.schedule.update');
 		Route::get('/schedule-shift-by-group', [ScheduleShiftController::class, 'scheduleShiftByGroup'])->name('roster.scheduleShiftByGroup');
-		Route::get('/90-days-data', [ScheduleShiftController::class, 'get90DaysData']);
+		Route::get('/ninety-days-data', [ScheduleShiftController::class, 'get90DaysData'])->name('ninety.days.data');
 		Route::get('/get-monthly-shifts', [ScheduleShiftController::class, 'getMonthlyShifts'])->name('get.monthly.shifts');
 		Route::delete('/schedule-shift/delete/{id}', [ScheduleShiftController::class, 'deleteShift'])->name('roster.schedule.delete');
-
-
 
 		Route::get('/client', [ClientController::class, 'index'])->name('roster.client');
 		Route::get('/client-details/{client_id}', [ClientController::class, 'client_details'])->name('roster.client.details');
