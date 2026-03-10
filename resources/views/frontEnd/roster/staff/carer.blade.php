@@ -320,6 +320,10 @@
                                             data-max-extra-hours="${carer.max_extra_hours ?? ''}"
                                             data-current-location="${carer.current_location ?? ''}"
 
+                                            data-personal-info="${carer.personal_info ?? ''}"
+                                            data-banking-info="${carer.banking_info ?? ''}"
+                                            data-qualification-info="${carer.qualification_info ?? ''}"
+
                                             data-qualifications='${JSON.stringify(carer.qualifications ?? [])}'>
                                             <i class="fa-regular fa-pen-to-square"></i> Edit
                                         </button>

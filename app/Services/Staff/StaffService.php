@@ -186,6 +186,9 @@ class StaffService
             'hourly_rate' => 'hourly_rate',
             'access_level' => 'access_level',
             'holiday_entitlement' => 'holiday_entitlement',
+            'personal_info' => 'personal_info',
+            'banking_info' => 'banking_info',
+            'qualification_info' => 'qualification_info',
             'dbs_certificate_number' => 'dbs_certificate_number',
             'max_extra_hours' => 'max_extra_hours',
         ];

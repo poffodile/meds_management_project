@@ -2624,8 +2624,8 @@ ul.inbox-pagination li {
 }
 
 .modal-header h4.modal-title {
-    font-weight: 300;
     font-family: 'Open Sans', sans-serif;
+    font-size: 20px;
 }
 
 .modal-body label {
@@ -9400,7 +9400,7 @@ a.close.edit_dyn_form {
     --redGradient: linear-gradient(90deg, rgba(254, 242, 242, 1) 35%, rgba(255, 247, 238, 1) 99%);
     --lightblueGradient: linear-gradient(to right, #eff6ff, #faf5ff);
     --lightpurpulGradient: linear-gradient(to right, #faf5ff, #eff6ff);
-    --bxShadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+    --bxShadow: rgba(99, 99, 99, 0.2) 0px 2px 5px 0px;
     --radBgClr: #dc2626;
     --whiteBgBtncolor: #fff;
     --iconRadClr: #dc2626;
@@ -9473,6 +9473,8 @@ a.close.edit_dyn_form {
     --yellow70: #fef9c3;
     --skyBlue70: #cffafe;
     --darkGray: #4b5563;
+    --orangeReal: #f97316;
+    --lightPurpleClr: #faf5ff;
 }
 
 /* ******************Start Dashboard Css***************************** */
@@ -9664,13 +9666,7 @@ a.close.edit_dyn_form {
     border: 2px solid transparent;
     overflow: hidden;
     flex-grow: 1;
-    transition: all 0.3s ease;
-    cursor: pointer;
-}
-
-.rota_dash-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+    transition: 0.7s;
 }
 
 /* Background Blob */
@@ -9755,8 +9751,8 @@ a.close.edit_dyn_form {
 }
 
 .rota_dash-left .rota_title {
-    font-size: 15px;
-    color: #404040;
+    font-size: 13px;
+    color: var(--grayColor);
     margin-bottom: 4px;
     font-weight: 600;
 }
@@ -10019,13 +10015,14 @@ a.close.edit_dyn_form {
 
 header.panel-heading.headingCapitilize {
     text-transform: capitalize;
-    font-size: 17px;
+    font-size: 16px;
     font-weight: 500;
+    font-weight: 600;
     color: #0a0a0a;
     display: flex;
     justify-content: space-between;
-    align-items: anchor-center;
-    padding: 20px 15px;
+    align-items: center;
+    padding: 15px;
     border-radius: 8px 8px 0 0;
 }
 
@@ -10037,14 +10034,14 @@ header.panel-heading.headingCapitilize {
 
 .staffShifts div p {
     margin: 0;
-    font-size: 14px;
+    font-size: 12px;
     color: #666;
 }
 
 .staffShifts div h3 {
     margin-top: 5px;
-    font-size: 24px;
-    font-weight: 600;
+    font-size: 20px;
+    font-weight: 700;
 }
 
 .text-green {
@@ -10150,9 +10147,9 @@ header.panel-heading.headingCapitilize {
 
 .staffShifts_alert-title {
     margin: 0;
-    font-size: 14px;
-    font-weight: 600;
-    color: #d65a00;
+    font-size: 13px;
+    font-weight: 700;
+    color: #7c2d12;
 }
 
 .staffShifts_alert-subtitle {
@@ -10397,8 +10394,9 @@ header.panel-heading.headingCapitilize {
     border: 1px solid #ddd;
     border-radius: 4px;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 13px;
     transition: 0.2s;
+    font-weight: 600;
 }
 
 .calendarTabs .tab:hover {
@@ -10771,7 +10769,7 @@ header.panel-heading.headingCapitilize {
 }
 
 .leavebanktabCont h4 {
-    font-size: 18px;
+    font-size: 16px;
     color: var(--muteText);
 
 }
@@ -10869,8 +10867,8 @@ header.panel-heading.headingCapitilize {
 }
 
 .leaveCommunStyle .modal-header>h4 {
-    color: #374151;
-    font-size: 18px;
+    color: var(--black);
+    font-size: 15px;
     font-weight: 600;
     display: flex;
     line-height: 20px;
@@ -11219,7 +11217,7 @@ header.panel-heading.headingCapitilize {
     margin-top: 8px;
     max-height: 55px;
     overflow: auto;
-    min-height: 10px;
+    min-height: 70px;
 }
 
 
@@ -11688,8 +11686,8 @@ header.panel-heading.headingCapitilize {
 
 .roundBtntag {
     font-size: 12px;
-    padding: 4px 10px;
-    border-radius: 14px;
+    padding: 2px 10px;
+    border-radius: 5px;
 }
 
 .availabilityTabs__nav {
@@ -13066,10 +13064,6 @@ header.panel-heading.headingCapitilize {
     border-left: 6px solid var(--iconPurpul);
 }
 
-.purpleBgBtn {
-    background: var(--iconPurpul);
-    color: var(--whiteBgBtncolor);
-}
 
 .aligniconMedication {
     display: flex;
@@ -13411,6 +13405,11 @@ header.panel-heading.headingCapitilize {
 .bg-purple-50 {
     background: #faf5ff;
     border: 1px solid #dec5f7;
+}
+
+.bg-yellow-50 {
+    background: var(--lightyellowclr);
+    border: 1px solid var(--yellow70Border);
 }
 
 .bg-blue-50 .rota_title,
@@ -14657,7 +14656,7 @@ header.panel-heading.headingCapitilize {
 .bgBtn {
     background-color: var(--blueColor);
     padding: 6px 16px;
-    border-radius: 4px;
+    border-radius: 6px;
     cursor: pointer;
     font-size: 13px;
     transition: 0.2s;
@@ -14684,7 +14683,7 @@ header.panel-heading.headingCapitilize {
 }
 
 .orangeText {
-    color: #ff7417;
+    color: var(--orangeReal);
 }
 
 
@@ -14721,6 +14720,14 @@ header.panel-heading.headingCapitilize {
     color: var(--darkGray);
 }
 
+.textGray500 {
+    color: #6b7280;
+}
+
+.yellowText {
+    color: var(--yellowclrdark);
+}
+
 /* text color  pp*/
 
 .addnewicons .btn {
@@ -14755,7 +14762,7 @@ header.panel-heading.headingCapitilize {
     padding: 6px 16px;
     background: #fff;
     border: 1px solid var(--borderColor);
-    border-radius: 4px;
+    border-radius: 6px;
     cursor: pointer;
     font-size: 13px;
     transition: 0.2s;
@@ -14836,6 +14843,7 @@ header.panel-heading.headingCapitilize {
 .deleteIcon i {
     color: #dc2626;
     font-size: 17px;
+    vertical-align: baseline;
 }
 
 .deleteIcon {
@@ -15003,7 +15011,8 @@ header.panel-heading.headingCapitilize {
 
 .careIconButton div:nth-child(1) button:hover,
 .borderBtn:hover,
-.progress_history:hover {
+.progress_history:hover,
+.hoverBg:hover {
     background: #f5f5f5;
 }
 
@@ -15640,7 +15649,7 @@ header.panel-heading.headingCapitilize {
 }
 
 .bgIconStaffT i {
-    font-size: 23px;
+    font-size: 21px;
 }
 
 .AllStaffTabC h5 {
@@ -15649,7 +15658,7 @@ header.panel-heading.headingCapitilize {
 }
 
 .AllStaffTabC:hover {
-    box-shadow: rgba(17, 12, 46, 0.15) 0px 48px 100px 0px;
+    box-shadow: 0px 8px 12px -6px rgba(0, 0, 0, 0.15);
 }
 
 .AllStaffTabC .borderBtn i,
@@ -15774,6 +15783,11 @@ header.panel-heading.headingCapitilize {
     color: #fff;
 }
 
+.darkYellowBadg {
+    background-color: var(--yellowclrdark);
+    color: #fff;
+}
+
 .darkOrangeBadg {
     background-color: var(--darkOrangep);
     color: #fff;
@@ -15842,6 +15856,15 @@ header.panel-heading.headingCapitilize {
     font-size: 16px;
 }
 
+.fs14 {
+    font-size: 14px;
+}
+
+.fs12 {
+
+    font-size: 12px;
+}
+
 .f20 {
     font-size: 20px;
 }
@@ -15865,9 +15888,7 @@ header.panel-heading.headingCapitilize {
 .checkboxp {
     display: flex;
     align-items: center;
-    /* vertical center */
     gap: 10px;
-    /* space between checkbox and text */
     margin-bottom: 10px;
 }
 
@@ -15892,6 +15913,15 @@ header.panel-heading.headingCapitilize {
 
 .blackBtn {
     background-color: var(--blackBtnColor);
+}
+
+.purpleBgBtn {
+    background: var(--iconPurpul);
+    color: var(--whiteBgBtncolor);
+}
+
+.purpleBgBtn:hover {
+    background-color: #7e22ce;
 }
 
 .blackBtn:hover {
@@ -16252,9 +16282,7 @@ header.panel-heading.headingCapitilize {
     color: var(--purple);
 }
 
-i {
-    vertical-align: middle;
-}
+
 
 .redIColor {
     color: var(--redColor);
@@ -16311,6 +16339,14 @@ i {
 
 .rounded8 {
     border-radius: 8px;
+}
+
+.rounded5 {
+    border-radius: 5px;
+}
+
+.rounded12 {
+    border-radius: 12px;
 }
 
 .muteBg {
@@ -16509,6 +16545,10 @@ i {
     background: linear-gradient(132deg, #faf4ff, #f4eaff);
 }
 
+.gradp-yellow-50 {
+    background: linear-gradient(132deg, #fffbeb, #fefce8);
+}
+
 .h1Pay700 {
     font-size: 30px;
     font-weight: 700;
@@ -16534,6 +16574,14 @@ i {
 
 .lightBlueBg {
     background-color: var(--lightBlueClr);
+}
+
+.lightPurpleBg {
+    background-color: var(--lightbgPurple);
+}
+
+.lightRedBg {
+    background-color: var(--lightRedp);
 }
 
 .orderListpayPro li {
@@ -16662,10 +16710,8 @@ i {
     background-color: var(--lightGreenp);
 }
 
-
-
 .dailyLogList .bgIconStaffT i {
-    font-size: 20px !important;
+    font-size: 22px !important;
 }
 
 .blueDailyForm input,
@@ -16721,7 +16767,7 @@ i {
 }
 
 .borderLeftThick {
-    border-left-width: 4px;
+    border-left-width: 4px !important;
 }
 
 .bg-blue-70 {
@@ -16798,6 +16844,12 @@ i {
     color: var(--darkYellow);
     border: 1px solid var(--yellow70Border);
     background-color: var(--yellow70);
+}
+
+.yellowBorderLight {
+    background-color: #fffbeb;
+    color: var(--darkYellow);
+    border: 1px solid var(--yellow70Border);
 }
 
 .skyBorderBadg {
@@ -16900,14 +16952,18 @@ i {
     background-color: transparent;
 }
 
+/* 13/2/2026 */
+.flex1 {
+    flex: 1;
+}
+
 /* KOMAL SYS */
 .greenCarerCard {
     border-color: var(--darkbgGreen) !important;
     background-color: #f1fdf5 !important;
 }
 
-.greenCarerCard .avatar,
-.muteCarerCard .avatar {
+.greenCarerCard .avatar {
     background: var(--blueColor);
 }
 
@@ -16928,5 +16984,464 @@ i {
 .suggestedCarers .muteCarerCard .badge {
     background: #fff !important;
 
+}
 
+.cyanBadg {
+    background-color: var(--cyan70);
+    color: var(--cyanTextClr);
+}
+
+.renderVisitorHtmlData .rtcozCardInDe:first-child {
+    margin-top: 0px !important;
+}
+
+.bg-cyan-50 {
+    background-color: #ecfeff;
+}
+
+.redDarkGreenAni {
+    background-color: var(--lightbgGreen);
+    color: var(--darkGreenp);
+    animation: fadeBgOnlyGreen 2s ease-in-out infinite alternate;
+}
+
+@keyframes fadeBgOnlyGreen {
+    0% {
+        background-color: var(--lightbgGreen);
+        opacity: 0.7;
+    }
+
+    100% {
+        background-color: var(--green70Border);
+        opacity: 16;
+    }
+}
+
+.onSiteHov:hover {
+    animation: none !important;
+    background: var(--blackBtnColor);
+    opacity: 1;
+}
+
+.italicFont {
+    font-style: italic;
+}
+
+/* yellow animation */
+.yellowDarkAni {
+    background-color: var(--lightbgGligreen);
+    color: var(--darkYellow);
+    animation: fadeBgOnlyyellow 2s ease-in-out infinite alternate;
+}
+
+@keyframes fadeBgOnlyyellow {
+    0% {
+
+        opacity: 0.3;
+    }
+
+    100% {
+        background-color: #fde68a;
+        opacity: 1;
+    }
+}
+
+
+
+.verticalCenter {
+    display: flex;
+    align-items: center;
+}
+
+.flexBw {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dFlexGap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+}
+
+.downInfo {
+    transform: rotate(180deg);
+}
+
+.yellowHoverUnset:hover {
+    background-color: #fffbeb !important;
+    color: var(--darkYellow) !important;
+}
+
+.mb10 {
+    margin-bottom: 10px;
+}
+
+.notificationSysAllert .bg-red-50 {
+    border: 1px solid var(--red70Border);
+}
+
+.notificationSysAllert .bg-yellow-50 {
+    border: 1px solid var(--yellow70Border);
+}
+
+.notificationSysAllert .bg-orange-50 {
+    border: 1px solid var(--orange70Border);
+}
+
+.notificationSysAllert .bg-blue-50 {
+    border: 1px solid var(--blueMediumBorder);
+}
+
+.bgWhite50 {
+    background-color: #ffffff80;
+}
+
+.blackText {
+    color: var(--black);
+}
+
+.manageDSysAlrt+.manageDSysAlrt {
+    margin-top: 1rem;
+}
+
+.mdashCardMain .headingCapitilize {
+    justify-content: start !important;
+    gap: 1rem;
+}
+
+i {
+    vertical-align: middle;
+}
+
+.lightGreenGradient {
+    background: linear-gradient(81deg, rgba(240, 253, 244, 1) 30%, rgba(240, 253, 249, 1) 82%);
+}
+
+.lightredGradient {
+    background: var(--redGradient);
+}
+
+.staffShifts.financialSumDash {
+    display: flex !important;
+    justify-content: space-between;
+}
+
+.financialSumDash h3 {
+    font-size: 16px !important;
+}
+
+.dFlexNoAlign {
+    display: flex;
+    gap: 1rem;
+}
+
+.allertMsgBtn .userMum .title {
+    padding: 3px 10px !important;
+}
+
+.redBorder {
+    border: 1px solid var(--redColor);
+}
+
+.orangeBorder {
+    border: 1px solid var(--orangeReal);
+}
+
+.blueBorder {
+    border: 1px solid var(--blueColor);
+}
+
+.yellowBorder {
+    border: 1px solid var(--yellowclrdark);
+
+}
+
+.fileBoxSuper {
+    height: 36px;
+    width: 35px;
+    border-radius: 5px;
+    background: #eff6ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--blueColor)
+}
+
+.manageDashCard .rota_dash-icon i {
+    color: unset;
+}
+
+.deletewithBorder:hover {
+    background-color: var(--lightRedp);
+}
+
+.deletewithBorder {
+    height: 32px;
+}
+
+.HighBorderCare {
+    border-left-color: var(--orangeReal) !important;
+    border-left-width: 4px !important;
+}
+
+.manageDashCard .rota_dash-card:hover {
+    transform: scale(1.1);
+    cursor: pointer;
+}
+
+.manageDashCard .rota_dash-card {
+    box-shadow: var(--bxShadow) !important;
+}
+
+.leavebanktabCont .f18 {
+    font-size: 18px !important;
+}
+
+
+.shiftHeadIcon {
+    height: 50px;
+    width: 50px;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #ffffff2b;
+}
+
+.whiteText {
+    color: #ffff;
+}
+
+.bluePurpleDarkGrad {
+    background: linear-gradient(273deg, rgba(153, 92, 247, 1) 41%, rgba(84, 119, 246, 1) 82%);
+}
+
+.modal-header.bluePurpleDarkGrad {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-direction: row-reverse;
+}
+
+.sendShiftModal .modal-header h4 {
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.blueShadowLight {
+    /* box-shadow: 0px 2px 8px 0px #3b82f680; */
+    border: 2px solid #bfdbfe;
+    box-shadow: var(--bxShadow);
+}
+
+.darkBlueGrad {
+    background: linear-gradient(90deg, #60a5fa, #4289f7);
+
+}
+
+.orangeClrp {
+    background-color: #ffedd5;
+    color: var(--darkOrangep) !important;
+}
+
+.bgBtn.bluePurpleDarkGrad:hover {
+    background: linear-gradient(70deg, #2749d7, #7a24cf) !important;
+}
+
+.scrollDailyCheck {
+    min-height: 30vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: 60vh;
+}
+
+.sendShiftCheck label:hover {
+    cursor: pointer;
+}
+
+.sendShiftCheck .lightBorderp:has(input:checked) {
+    border-color: var(--blueColor);
+    background-color: var(--lightblue);
+}
+
+.shiftBlueBadg {
+    background-color: var(--lightblue);
+    color: var(--blueColor);
+}
+
+.priorityBtn.shiftBlueBadg:hover,
+.priorityBtn.muteBadges:hover,
+.priorityBtn.highBadges:hover,
+.priorityBtn.redBadges:hover {
+    background-color: var(--blackBtnColor);
+    color: #fff;
+}
+
+.blackActive {
+    background-color: var(--blackBtnColor);
+    color: #fff;
+}
+
+.dropModalShift .issuesDetectedDrop button {
+    background-color: unset !important;
+    border: unset !important;
+    padding: unset !important;
+}
+
+.modal:nth-of-type(2) {
+    z-index: 1060;
+}
+
+#firstModal .modal-dialog {
+    z-index: 1040;
+    top: 50px;
+
+    position: relative;
+
+}
+
+#firstModalOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.3);
+    z-index: 1045;
+    display: none;
+
+}
+
+
+#secondModal .modal-dialog {
+    z-index: 1050;
+}
+
+#secondModal .modal-content {
+    background-color: #ffffff;
+}
+
+.aiConflictMain .bg-orange-50 {
+    padding: 20px !important;
+    border: unset;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.aiConflictMain .rounded50 {
+    border-radius: 50% !important;
+}
+
+div#secondModal .modal-lg {
+    max-width: 770px !important;
+}
+
+.moreAllertsSec {
+    display: none;
+}
+
+.moreAllertsSec.active {
+    display: block;
+}
+
+.greenBox {
+    height: 30px;
+    width: 30px;
+    background-color: #22c55e;
+    border-radius: 50%;
+}
+
+.shadowp {
+    box-shadow: var(--bxShadow);
+}
+
+.virtGap {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.row-equal {
+    display: flex;
+    flex-wrap: wrap;
+    /* responsive ke liye */
+}
+
+.row-equal>[class*='col-lg-6'] {
+    display: flex;
+}
+
+.circleFill {
+    height: 30px;
+    width: 30px;
+    display: block;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-body,
+.modal-header {
+    padding: 24px !important;
+}
+
+.payRollAcood .bBorderCard+.bBorderCard {
+    margin-top: 10px !important;
+}
+
+@media (min-width: 992px) {
+    .modalMd {
+        width: 700px;
+        /* or whatever width you want */
+    }
+}
+
+.hoverBtn {
+    color: var(--blackBtnColor);
+    background: #fff;
+    padding: 7px 10px;
+    transition: 0.6s;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 6px;
+}
+
+.hoverBtn:hover {
+    background: #f1f1ef;
+}
+
+.uploadBox {
+    border: 2px dashed #d1d5db;
+    border-radius: 5px;
+    padding: 15px;
+
+    position: relative;
+    cursor: pointer;
+}
+
+.uploadBox i {
+    font-size: 25px;
+    color: #b5b5b5;
+}
+
+.uploadBox input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.recordingPart:hover {
+    border-color: var(--blueColor);
+}
+
+.muteHover:hover {
+    background-color: #f9fafb;
+}
+
+.preEmpMain .bg-blue-50:hover {
+    background-color: var(--blue70);
 }

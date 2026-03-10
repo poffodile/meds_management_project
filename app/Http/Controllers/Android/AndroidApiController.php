@@ -578,7 +578,7 @@ class AndroidApiController extends Controller
         if ($recordArray) {
             return response()->json(['success' => true, 'message' => ' ', 'Data' => $recordArray], 200);
         }
-        return response()->json(['success' => false, 'message' => 'No data'], 200);
+        return response()->json(['success' => false, 'message' => 'No data', 'Data' => []], 200);
     }
 
     public function QRCode(Request $request)

@@ -142,7 +142,9 @@ class SystemManagementController extends Controller
 
             // $home_id = Auth::user()->home_id;
             // echo '<pre>'; print_r($_FILES);die;
-            $date_of_birth = date('Y-m-d', strtotime($data['date_of_birth']));
+            $date_of_birth = ($data['date_of_birth']) ? date('Y-m-d', strtotime($data['date_of_birth'])) : "";
+            $start_date = ($data['start_date']) ? date('Y-m-d', strtotime($data['start_date'])) : null;
+            $end_date = ($data['end_date']) ? date('Y-m-d', strtotime($data['end_date'])) : null;
             if ($request->has('suClientId') && $request->suClientId != '') {
                 $user              = ServiceUser::find($request->suClientId);
                 $successMessage = 'User updated successfully.';
@@ -164,9 +166,9 @@ class SystemManagementController extends Controller
             // $user->weekly_rate      =  $data['weekly_rate'];
             // $user->subs             =  $data['subs'];
             // $user->extra            =  $data['extra'];
-            $user->start_date       =  date('Y-m-d', strtotime($data['start_date']));
+            $user->start_date       =  $start_date;
             // $user->local_authority  =  $data['local_authority'];
-            $user->end_date         =  date('Y-m-d', strtotime($data['end_date']));
+            $user->end_date         =  $end_date;
             $user->section          = $data['section'];
             $user->short_description = $data['short_description'];
             $user->height_unit       =  $data['height_unit'];
@@ -177,8 +179,8 @@ class SystemManagementController extends Controller
             $user->hair_and_eyes     = $data['hair_and_eyes'];
             $user->markings          = $data['markings'];
             $user->ethnicity_id      = $data['ethnicity_id'];
-            $user->suMobility        = $data['suMobility'];
-            $user->suFundingType     = $data['suFundingType'];
+            $user->suMobility        = $data['suMobility'] ?? "";
+            $user->suFundingType     = $data['suFundingType'] ?? "";
             $user->street            = $data['street'];
             $user->city              = $data['city'];
             $user->postcode          = $data['postcode'];
@@ -266,8 +268,8 @@ class SystemManagementController extends Controller
             die;*/
             $data = $request->all();
             // echo "<pre>"; print_r($data); die;
-            $date_of_joining = !empty($data['date_of_joining']) ? date('Y-m-d', strtotime($data['date_of_joining'])) : null;
-            $date_of_leaving = !empty($data['date_of_leaving']) ? date('Y-m-d', strtotime($data['date_of_leaving'])) : null;
+            $date_of_joining = date('Y-m-d', strtotime($data['date_of_joining']));
+            $date_of_leaving = date('Y-m-d', strtotime($data['date_of_leaving']));
             // $home_id = Auth::user()->home_id;
             $home_ids = Auth::user()->home_id;
             $ex_home_ids = explode(',', $home_ids);
@@ -303,9 +305,9 @@ class SystemManagementController extends Controller
             $user->password         = '';
             $user->status           = 1;
             $user->home_id          = $home_id;
-            $user->personal_info    = '';
-            $user->banking_info     = '';
-            $user->qualification_info = '';
+            $user->personal_info    = $data['personal_info'] ?? '';
+            $user->banking_info     = $data['banking_info'] ?? '';
+            $user->qualification_info = $data['qualification_info'] ?? '';
 
             if (!empty($_FILES['image']['name'])) {
                 $tmp_image  =   $_FILES['image']['tmp_name'];

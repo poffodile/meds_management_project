@@ -19,7 +19,7 @@ class UserController extends Controller
 		// echo "check";
 		// die();
 		if (Auth::check()) {
-			return redirect('/roster/');
+			return redirect('/roster');
 			// return redirect('/');
 		}
 		if ($request->isMethod('post')) {
@@ -260,7 +260,7 @@ class UserController extends Controller
 						$session_id_update->save();
 						User::setUserLogInStatus(1);
 						//echo csrf_token(); die;
-						return redirect('/roster/')->with('success', 'Welcome back ' . Auth::user()->user_name);
+						return redirect('/roster')->with('success', 'Welcome back ' . Auth::user()->user_name);
 						// return redirect('/')->with('success', 'Welcome back ' . Auth::user()->user_name);
 					} else {
 						return redirect()->back()->with('error', 'Incorrect email or password combination.');

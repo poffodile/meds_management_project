@@ -689,7 +689,7 @@ class UserController extends Controller
 		if ($validator->fails()) {
 			return [
 				'success' => false,
-				'errors' => $validator->errors()->first()
+				'message' => $validator->errors()->first()
 			];
 		}
 		$email = $request->input('email');
@@ -699,7 +699,7 @@ class UserController extends Controller
 			if (!$user) {
 				return [
 					'success' => false,
-					'errors' => 'User not found'
+					'message' => 'User not found'
 				];
 			}
 			$home_security_policy = Home::where('id', $user->home_id)->value('security_policy');
@@ -739,7 +739,7 @@ class UserController extends Controller
 			if (!$user) {
 				return [
 					'success' => false,
-					'errors' => 'User not found'
+					'message' => 'User not found'
 				];
 			}
 			$home_security_policy = Home::where('id', $user->home_id)->value('security_policy');

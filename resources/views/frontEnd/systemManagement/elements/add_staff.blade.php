@@ -1,5 +1,12 @@
+<style>
+    .add-on {
+        float: inherit;
+        padding: 0;
+    }
+</style>
+
 <!-- add staff model-->
-<div class="modal fade leaveCommunStyle" id="addStaffModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div class="modal fade leaveCommunStyle backdropModal" id="addStaffModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -77,6 +84,21 @@
                                     <input type="number" name="max_extra_hours" class="form-control">
                                 </div>
                             </div>
+                        </div>
+
+                        <div class="form-group col-md-6 col-sm-6 col-xs-12">
+                            <label>Personal information</label>
+                            <textarea name="personal_info" id="personal_info" class="form-control" rows="5" cols="20" placeholder="Personal Information" maxlength="1000"></textarea>
+                        </div>
+
+                        <div class="form-group col-md-6 col-sm-6 col-xs-12">
+                            <label>Bank Information</label>
+                            <textarea name="banking_info" id="bank_info" class="form-control" rows="5" cols="20" placeholder="Bank Information" maxlength="1000"></textarea>
+                        </div>
+
+                        <div class="form-group col-md-12 col-sm-12 col-xs-12">
+                            <label>Additional Qualification Information</label>
+                            <textarea name="qualification_info" id="qualification_info" class="form-control" rows="5" cols="20" placeholder="General Qualification Info (Optional)" maxlength="1000"></textarea>
                         </div>
 
                         <div class="form-group col-md-12 col-sm-12 col-xs-12">
@@ -220,7 +242,7 @@
                                         readonly
                                         size="16">
 
-                                    <span class="input-group-btn">
+                                    <span class="input-group-btn add-on">
                                         <input type="text"
                                             id="dbs-expiry-picker"
                                             class="form-control date-btn2">
@@ -759,6 +781,10 @@
             // $('input[name="payroll"]').val($btn.attr('data-payroll') || $btn.data('payroll'));
             $('input[name="holiday_entitlement"]').val($btn.attr('holiday-entitlement') || $btn.data('holiday_entitlement') || $btn.data('holidayEntitlement'));
 
+            $('#personal_info').val($btn.attr('data-personal-info') || $btn.data('personal-info') || '');
+            $('#bank_info').val($btn.attr('data-banking-info') || $btn.data('banking-info') || '');
+            $('#qualification_info').val($btn.attr('data-qualification-info') || $btn.data('qualification-info') || '');
+
             // Populate emergency contact fields (support multiple data-attribute naming conventions)
             $('input[name="emergency_contact[name]"]').val(
                 $btn.attr('data-emergency_contact_name') || $btn.data('emergency_contact_name') || $btn.data('emergencyContactName') || ''
@@ -955,6 +981,14 @@
         // 🔁 On access level change
         $('#access_level').on('change', function() {
             fetchHourlyRate($(this).val());
+        });
+    });
+
+    $(document).ready(function() {
+        $('.backdropModal').modal({
+            backdrop: false,
+            keyboard: true,
+            show: false
         });
     });
 
