@@ -9,6 +9,7 @@ use Validator;
 use Hash, DB;
 use App\User, App\Admin, App\Home;
 use App\LeaveType, App\Staffleaves, App\LoginInActivity, App\ServiceUser;
+use App\Models\ScheduledShift;
 
 
 
@@ -552,6 +553,52 @@ class AndroidApiController extends Controller
             $data['check_in_time'] = $activities[$i]['check_in_time'];
             $data['latitude_in'] = $activities[$i]['latitude_in'];
             $data['longitude_in'] = $activities[$i]['longitude_in'];
+
+            // Fetch matching shift data
+            $shift = ScheduledShift::with('client')->where('staff_id', $activities[$i]['user_id'])
+                ->where('start_date', $activities[$i]['login_date'])
+                ->orderByRaw("ABS(TIMESTAMPDIFF(SECOND, TIMESTAMP(CONCAT(start_date, ' ', start_time)), '{$activities[$i]['check_in_time']}'))")
+                ->first();
+
+            $shift_time = "";
+            $overtime = "00:00:00";
+            $client_name = "";
+
+            if ($shift) {
+                $client_name = $shift->client->name ?? '';
+                $shiftStart = \Carbon\Carbon::parse($shift->start_date . ' ' . $shift->start_time);
+                $shiftEnd = \Carbon\Carbon::parse($shift->start_date . ' ' . $shift->end_time);
+                $shift_time = $shiftStart->diff($shiftEnd)->format('%H:%I:%S');
+
+                if (!is_null($activities[$i]['check_out_time'])) {
+                    $actualStart = \Carbon\Carbon::parse($activities[$i]['check_in_time']);
+                    $actualEnd = \Carbon\Carbon::parse($activities[$i]['check_out_time']);
+
+                    $overtimeSeconds = 0;
+
+                    // Clock in earlier than shift start
+                    if ($actualStart->lt($shiftStart)) {
+                        $overtimeSeconds += $actualStart->diffInSeconds($shiftStart);
+                    }
+
+                    // Clock out later than shift end
+                    if ($actualEnd->gt($shiftEnd)) {
+                        $overtimeSeconds += $shiftEnd->diffInSeconds($actualEnd);
+                    }
+
+                    if ($overtimeSeconds > 0) {
+                        $hours = floor($overtimeSeconds / 3600);
+                        $minutes = floor(($overtimeSeconds / 60) % 60);
+                        $seconds = $overtimeSeconds % 60;
+                        $overtime = sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
+                    }
+                }
+            }
+
+            $data['client_name'] = $client_name;
+            $data['shift_time'] = $shift_time;
+            $data['overtime'] = $overtime;
+
             if (is_null($activities[$i]['check_out_time'])) {
                 $check_out = "";
                 $logged_time = "";
@@ -630,6 +677,44 @@ class AndroidApiController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Company data fetched successfully.',
+            'data'    => $data
+        ], 200);
+    }
+
+    public function get_home_data(Request $request)
+    {
+        if (empty($request->qr_id)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Please provide qr_id.'
+            ], 200);
+        }
+
+        $details = Home::where('qr_code_id', $request->qr_id)->first();
+
+        // ❌ QR code not found
+        if (!$details) {
+            return response()->json([
+                'success' => false,
+                'message' => 'QR code not found.'
+            ], 404);
+        }
+
+        $data = [
+            'home_id'       => $details->id,
+            'company_id'    => $details->admin_id,
+            'name'          => $details->title,
+            'address'       => $details->address,
+            'range'         => (int)$details->home_area,
+            'qr_code_id'    => $details->qr_code_id,
+            'address'       => $details->address,
+            'latitude'      => $details->latitude,
+            'longitude'     => $details->longitude,
+        ];
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Home data fetched successfully.',
             'data'    => $data
         ], 200);
     }

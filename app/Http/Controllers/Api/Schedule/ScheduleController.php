@@ -40,4 +40,43 @@ class ScheduleController extends Controller
             'message' => 'Shifts retrieved successfully.',
         ]);
     }
+
+    public function schedule_shifts_details(Request $request)
+    {
+        $validated = $request->validate([
+            'shift_id' => ['required', 'integer', 'exists:scheduled_shifts,id'],
+        ]);
+
+        $shiftId = $validated['shift_id'];
+
+        $shifts = ScheduledShift::with(['recurrence', 'assessments', 'documents'])
+            ->where('id', $shiftId)
+            ->get();
+
+        $data = $shifts->map(function ($shift) {
+            $shift->day = \Carbon\Carbon::parse($shift->start_date)->format('l');
+            $shift->start_time = \Carbon\Carbon::parse($shift->start_time)->format('H:i');
+            $shift->end_time   = \Carbon\Carbon::parse($shift->end_time)->format('H:i');
+
+            if ($shift->assessments) {
+                foreach ($shift->assessments as $assessment) {
+                    $assessment->assessment_doc_url = $assessment->assessment_doc ? asset($assessment->assessment_doc) : '';
+                }
+            }
+
+            if ($shift->documents) {
+                foreach ($shift->documents as $document) {
+                    $document->doc_file_url = $document->doc_file ? asset($document->doc_file) : '';
+                }
+            }
+
+            return $shift;
+        });
+
+        return response()->json([
+            'success' => true,
+            'data' => $data->first(),
+            'message' => 'Shift details retrieved successfully.',
+        ]);
+    }
 }
