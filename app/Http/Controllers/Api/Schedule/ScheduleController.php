@@ -18,14 +18,11 @@ class ScheduleController extends Controller
 
         $staffId = $validated['staff_id'];
 
-        // Retrieve all shifts for the staff member for the specific date
         $shifts = ScheduledShift::where('staff_id', $staffId)
             ->select('id', 'start_date', 'start_time', 'end_time', 'shift_type', 'notes', 'tasks')
             ->where('start_date', $validated['date'])
             ->orderBy('start_time')
             ->get();
-
-        // Transform each shift: add day name and format times to HH:mm (24-hour)
         $data = $shifts->map(function ($shift) {
             $shift->day = \Carbon\Carbon::parse($shift->start_date)->format('l');
             $shift->start_time = \Carbon\Carbon::parse($shift->start_time)->format('H:i');
@@ -35,9 +32,9 @@ class ScheduleController extends Controller
 
         return response()->json([
             'success' => true,
-            'total_shifts' => $data->count(),
-            'data' => $data,
             'message' => 'Shifts retrieved successfully.',
+            'Data' => $data,
+            'total_shifts' => $data->count(),
         ]);
     }
 
@@ -60,13 +57,17 @@ class ScheduleController extends Controller
 
             if ($shift->assessments) {
                 foreach ($shift->assessments as $assessment) {
-                    $assessment->assessment_doc_url = $assessment->assessment_doc ? asset($assessment->assessment_doc) : '';
+                    $assessment->assessment_doc_url = $assessment->assessment_doc ? url('public/' . $assessment->assessment_doc) : '';
                 }
             }
 
             if ($shift->documents) {
                 foreach ($shift->documents as $document) {
-                    $document->doc_file_url = $document->doc_file ? asset($document->doc_file) : '';
+                    $document->doc_file_url = $document->doc_file ? url('public/' . $document->doc_file) : '';
+                    $document->fileType = 'Document';
+                    if ($document->form_id) {
+                        $document->fileType = 'Form';
+                    }
                 }
             }
 
@@ -75,8 +76,50 @@ class ScheduleController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $data->first(),
             'message' => 'Shift details retrieved successfully.',
+            'Data' => $data->first(),
         ]);
+    }
+
+    public function schedule_shifts_update_status(Request $request)
+    {
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+            'shift_id' => ['required', 'integer', 'exists:scheduled_shifts,id'],
+            'status' => ['required', 'string', 'in:completed,in_progress'],
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first(),
+                'Data' => []
+            ], 200);
+        }
+
+        $validated = $validator->validated();
+        $shiftId = $validated['shift_id'];
+        $status = $validated['status'];
+
+        try {
+            $updated = ScheduledShift::where('id', $shiftId)
+                ->update(['status' => $status]);
+
+            if ($updated) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Shift status updated successfully.',
+                ], 200);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Shift status was not updated.',
+                ], 200);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error updating shift: ' . $e->getMessage(),
+            ], 200);
+        }
     }
 }

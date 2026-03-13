@@ -12,7 +12,6 @@ use App\LeaveType, App\Staffleaves, App\LoginInActivity, App\ServiceUser;
 use App\Models\ScheduledShift;
 
 
-
 class AndroidApiController extends Controller
 {
 
@@ -470,6 +469,8 @@ class AndroidApiController extends Controller
             return response()->json(['success' => false, 'message' => 'Please provide longitude..!'], 200);
         } else if ($request->home_id == null) {
             return response()->json(['success' => false, 'message' => 'Please provide home id..!'], 200);
+        } else if ($request->shift_id == null) {
+            return response()->json(['success' => false, 'message' => 'Please provide shift id..!'], 200);
         } else {
 
             // $record = ServiceUser::where('id', $request->user_id)->where('is_deleted', 0)->where('home_id', $request->home_id)->get();
@@ -512,6 +513,9 @@ class AndroidApiController extends Controller
         if ($request->home_id == null) {
             return response()->json(['success' => false, 'message' => 'Please provide us home id..!'], 200);
         }
+        if ($request->shift_id == null) {
+            return response()->json(['success' => false, 'message' => 'Please provide us shift id..!'], 200);
+        }
         // if($request->reason == null){
         //     return response()->json(['success'=> false, 'message'=>'Please provide us reason..!'], 200);
         // }
@@ -550,7 +554,7 @@ class AndroidApiController extends Controller
         for ($i = 0; $i < sizeof($activities); $i++) {
             $data['id'] = $activities[$i]['id'];
             $data['login_date'] = $activities[$i]['login_date'];
-            $data['check_in_time'] = $activities[$i]['check_in_time'];
+            $data['check_in_time'] = \Carbon\Carbon::parse($activities[$i]['check_in_time'])->format('H:i');
             $data['latitude_in'] = $activities[$i]['latitude_in'];
             $data['longitude_in'] = $activities[$i]['longitude_in'];
 
@@ -596,8 +600,8 @@ class AndroidApiController extends Controller
             }
 
             $data['client_name'] = $client_name;
-            $data['shift_time'] = $shift_time;
-            $data['overtime'] = $overtime;
+            $data['shift_time'] = \Carbon\Carbon::parse($shift_time)->format('H:i');
+            $data['overtime']   = \Carbon\Carbon::parse($overtime)->format('H:i');
 
             if (is_null($activities[$i]['check_out_time'])) {
                 $check_out = "";
@@ -608,8 +612,8 @@ class AndroidApiController extends Controller
                 $checkOut = \Carbon\Carbon::parse($activities[$i]['check_out_time']);
                 $logged_time = $checkIn->diff($checkOut)->format('%H:%I:%S');
             }
-            $data['check_out_time'] = $check_out;
-            $data['logged_time'] = $logged_time;
+            $data['check_out_time'] = \Carbon\Carbon::parse($check_out)->format('H:i');
+            $data['logged_time'] = \Carbon\Carbon::parse($logged_time)->format('H:i');
             if (is_null($activities[$i]['latitude_out']) || is_null($activities[$i]['longitude_out'])) {
                 $latitude_out = "";
                 $longitude_out = "";

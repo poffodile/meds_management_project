@@ -14,14 +14,17 @@ use App\Models\ShiftAssessment;
 use App\Models\ShiftDocument;
 use Carbon\Carbon;
 use App\User;
+use App\Services\Staff\StaffTaskService;
 
 class ScheduleShiftController extends Controller
 {
     protected $serviceUserService;
+    protected $stafftask;
 
-    public function __construct(ServiceUserServices $serviceUserService)
+    public function __construct(ServiceUserServices $serviceUserService, StaffTaskService $stafftask)
     {
         $this->serviceUserService = $serviceUserService;
+        $this->stafftask = $stafftask;
     }
 
     public function index()
@@ -81,6 +84,23 @@ class ScheduleShiftController extends Controller
             ]);
 
             $shiftId = $shift->id;
+
+            $reqData = array();
+            $reqData['user_id'] = Auth::user()->id;
+            $reqData['home_id'] = Auth::user()->home_id;
+            $reqData['task_type_id'] = $request->care_type;
+            $reqData['shift_id'] = $shiftId;
+            $reqData['title'] = $request->title;
+            $reqData['assign_to'] = $request->assign_to;
+            $reqData['staff_member'] = $request->staff_member;
+            $reqData['form_template_id'] = $request->form_template_id;
+            $reqData['due_date'] = $request->due_date;
+            $reqData['scheduled_date'] = $request->scheduled_date;
+            $reqData['scheduled_time'] = $request->scheduled_time;
+            $reqData['priority'] = $request->priority;
+            $reqData['description'] = $request->description;
+            $data = $this->stafftask->store($reqData);
+
 
             // 1.1 Insert into shift_recurrences if recurring
             if ($request->has('is_recurring')) {

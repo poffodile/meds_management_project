@@ -538,14 +538,15 @@ class UserController extends Controller
 	public function addStaffQualification(Request $request)
 	{
 		// echo "<pre>";print_r($request->all());die;
-		$qualifications = $request->input('qualification', []);
-		$flatQualifications = collect($qualifications)
-			->flatten(1)
-			->values()
-			->all();
+		// echo "<pre>";print_r($request->all());die;
+		// $qualifications = $request->input('qualification', []);
+		// $flatQualifications = collect($qualifications)
+		// 	->flatten(1)
+		// 	->values()
+		// 	->all();
 
 		$data = $request->all();
-		$data['qualification'] = $flatQualifications;
+		// $data['qualification'] = $flatQualifications;
 		$validator = Validator::make($data, [
 			'user_id' => 'required|exists:user,id',
 
@@ -563,7 +564,7 @@ class UserController extends Controller
 			], 422);
 		}
 
-		$result = UserQualification::saveQualification($flatQualifications, $request->user_id);
+		$result = UserQualification::saveQualification($request->qualification, $request->user_id);
 
 		if ($result === false) {
 			return response()->json([
@@ -592,11 +593,15 @@ class UserController extends Controller
 			->get();
 		$data = array();
 		foreach ($qualifications as $val) {
+			$image = "";
+			if($val->image){
+				$image = url('public/images/userQualification') . '/' .$val->image;
+			}
 			$data[] = [
 				'id' => $val->id,
 				'user_id' => $val->user_id,
 				'name' => $val->name,
-				'image' => url('public/images/userQualification') . '/' . $val->image,
+				'image' => $image,
 			];
 		}
 		return response()->json([

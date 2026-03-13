@@ -382,7 +382,7 @@
                         @endif
                     </div>
                 </div>
-                <div class="rota_alert-badge">New</div>
+                <div class="rota_alert-badge">high</div>
             </div>
             @empty
             <div class="rota_alert">

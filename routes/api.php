@@ -169,4 +169,5 @@ Route::group(['prefix' => '/staff'], function () {
 	Route::post('/schedule-shifts', [ScheduleController::class, 'schedule_shifts']);
 
 	Route::post('/schedule-shifts-details', [ScheduleController::class, 'schedule_shifts_details']);
+	Route::post('/schedule-shifts/update-status', [ScheduleController::class, 'schedule_shifts_update_status']);
 });
