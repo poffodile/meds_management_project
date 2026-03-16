@@ -33,7 +33,7 @@ class ScheduleController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Shifts retrieved successfully.',
-            'Data' => $data,
+            'data' => $data,
             'total_shifts' => $data->count(),
         ]);
     }
@@ -65,8 +65,10 @@ class ScheduleController extends Controller
                 foreach ($shift->documents as $document) {
                     $document->doc_file_url = $document->doc_file ? url('public/' . $document->doc_file) : '';
                     $document->fileType = 'Document';
+                    $document->form_url = '';
                     if ($document->form_id) {
                         $document->fileType = 'Form';
+                        $document->form_url = url('roster/schedule-shift/form_template/view/' . $document->id);
                     }
                 }
             }
@@ -77,7 +79,7 @@ class ScheduleController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Shift details retrieved successfully.',
-            'Data' => $data->first(),
+            'data' => $data->first(),
         ]);
     }
 
@@ -92,7 +94,6 @@ class ScheduleController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => $validator->errors()->first(),
-                'Data' => []
             ], 200);
         }
 

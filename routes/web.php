@@ -42,6 +42,10 @@ use App\Http\Controllers\frontEnd\Roster\MessagingCenterController;
 use App\Http\Controllers\frontEnd\Roster\LeaveRequestController;
 use App\Http\Controllers\frontEnd\Roster\IncidentManagementController;
 use App\Http\Controllers\frontEnd\Roster\PayrollFinance\PayrollFinanceController;
+use App\Http\Controllers\frontEnd\Roster\Staff\SupervisionController;
+use App\Http\Controllers\frontEnd\Roster\Staff\clientonboardingController;
+use App\Http\Controllers\frontEnd\Roster\Staff\notificationAlertController;
+use App\Http\Controllers\frontEnd\Roster\Staff\invoiceManagementController;
 
 
 // Backend Controllers
@@ -2414,3 +2418,17 @@ Route::group(['prefix' => 'super-admin', 'middleware' => 'CheckAdminAuth'], func
 	Route::match(['get', 'post'], '/ethnicity/edit/{ethnicity_id}', 'App\Http\Controllers\backEnd\superAdmin\EthnicityController@edit');
 	Route::match(['get', 'post'], '/ethnicity/delete/{ethnicity_id}', 'App\Http\Controllers\backEnd\superAdmin\EthnicityController@delete');
 });
+
+Route::post('web/service/patterndataformio', [StaffTaskController::class, 'patterndataformio']);
+Route::post('/staff-task/form_template/save', [StaffTaskController::class, 'staffTaskFormSave'])->name('web.roster.stafftask.form.save');
+Route::post('/staff-task/form_template/fetch', [StaffTaskController::class, 'staffTaskFormFetch'])->name('web.roster.stafftask.form.fetch');
+Route::get('/roster/staff-task/form_template/view/{staff_task_id}', [StaffTaskController::class, 'webview_form']);
+// Supervision Webview Form
+Route::get('/roster/supervision/form_template/view/{staff_supervision_form_id}', [SupervisionController::class, 'supervision_webview_form']);
+Route::post('/roster/supervision/form_template/save', [SupervisionController::class, 'supervisionFormSave'])->name('web.roster.supervision.form.save');
+Route::post('/roster/supervision/form_template/fetch', [SupervisionController::class, 'supervisionFormFetch'])->name('web.roster.supervision.form.fetch');
+
+// Dynamic Form for Schedule Shift
+Route::get('/roster/schedule-shift/form_template/view/{schedule_shift_id}', [ScheduleShiftController::class, 'schedule_shift_webview_form']);
+Route::post('/roster/schedule-shift/form_template/save', [ScheduleShiftController::class, 'scheduleShiftFormSave'])->name('web.roster.schedule_shift.form.save');
+Route::post('/roster/schedule-shift/form_template/fetch', [ScheduleShiftController::class, 'scheduleShiftFormFetch'])->name('web.roster.schedule_shift.form.fetch');

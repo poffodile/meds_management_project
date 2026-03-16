@@ -85,23 +85,6 @@ class ScheduleShiftController extends Controller
 
             $shiftId = $shift->id;
 
-            $reqData = array();
-            $reqData['user_id'] = Auth::user()->id;
-            $reqData['home_id'] = Auth::user()->home_id;
-            $reqData['task_type_id'] = $request->care_type;
-            $reqData['shift_id'] = $shiftId;
-            $reqData['title'] = $request->title;
-            $reqData['assign_to'] = $request->assign_to;
-            $reqData['staff_member'] = $request->staff_member;
-            $reqData['form_template_id'] = $request->form_template_id;
-            $reqData['due_date'] = $request->due_date;
-            $reqData['scheduled_date'] = $request->scheduled_date;
-            $reqData['scheduled_time'] = $request->scheduled_time;
-            $reqData['priority'] = $request->priority;
-            $reqData['description'] = $request->description;
-            $data = $this->stafftask->store($reqData);
-
-
             // 1.1 Insert into shift_recurrences if recurring
             if ($request->has('is_recurring')) {
                 ShiftRecurrence::create([
@@ -150,17 +133,21 @@ class ScheduleShiftController extends Controller
             // 4. Handle System Forms if selected
             if ($request->has('form_ids') && is_array($request->form_ids)) {
                 foreach ($request->form_ids as $key => $formId) {
+                    $form = DynamicFormBuilder::where('id', $formId)->first();
                     ShiftDocument::create([
                         'shift_id'   => $shiftId,
                         'form_id'    => $formId,
                         'doc_name'   => $request->form_names[$key] ?? 'System Form',
+                        'pattern'    => $form->pattern,
                     ]);
                 }
             } elseif ($request->form_id) {
+                $form = DynamicFormBuilder::where('id', $request->form_id)->first();
                 ShiftDocument::create([
                     'shift_id'   => $shiftId,
                     'form_id'    => $request->form_id,
                     'doc_name'   => $request->form_name ?? 'System Form',
+                    'pattern'    => $form->pattern,
                 ]);
             }
 
@@ -514,5 +501,34 @@ class ScheduleShiftController extends Controller
         $shift->delete();
 
         return response()->json(['success' => true, 'message' => 'Shift deleted successfully']);
+    }
+
+    public function schedule_shift_webview_form($schedule_shift_id)
+    {
+        $shift = ShiftDocument::where('id', $schedule_shift_id)->first();
+        if (!$shift || empty($shift->form_id)) {
+            return response(view('frontEnd.error_404'), 404);
+        }
+        $data['singleData'] = $shift;
+        $data['formTemplate'] = DynamicFormBuilder::where('id', $shift->form_id)->first();
+        return view('frontEnd.roster.schedule.schedule_shift_form', $data);
+    }
+
+    public function scheduleShiftFormSave(Request $req)
+    {
+        try {
+            $data = ShiftDocument::scheduleShiftFormSave($req);
+            if ($data) {
+                return response()->json(['status' => true, 'message' => 'Form Saved Successfully']);
+            }
+            return response()->json(['status' => false, 'message' => 'Form not Saved']);
+        } catch (\Throwable $e) {
+            return response()->json(['status' => false, 'message' => $e->getMessage() . ' on line ' . $e->getLine() . ' in ' . $e->getFile()]);
+        }
+    }
+
+    public function scheduleShiftFormFetch(Request $req)
+    {
+        return  ShiftDocument::scheduleShiftFormFetch($req);
     }
 }
