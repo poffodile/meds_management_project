@@ -23,9 +23,30 @@ body {
     border-color: #2563eb;
     color: #FFFFFF;
 }
-.btn-primary:hover{
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active{
     background-color: #1d54ca;
     border-color: #1d54ca;
+    color: #FFFFFF;
+}
+.btn-danger, .label-danger {
+    background-color: #ff0000;
+    border-color: #ff0000;
+    color: #FFFFFF;
+}
+.btn-danger:hover, .btn-danger:focus, .btn-danger:active{
+    background-color: #cc0000;
+    border-color: #cc0000;
+    color: #FFFFFF;
+}
+.btn-success {
+    background-color: #00a534;
+    border-color: #00a534;
+    color: #FFFFFF;
+}
+.btn-success:hover, .btn-success:focus, .btn-success:active {
+    background-color: #038d2e;
+    border-color: #038d2e;
+    color: #FFFFFF;
 }
 ul,
 .list-unstyled {
@@ -702,7 +723,7 @@ ul.top-menu>li>a:focus {
 }
 
 .dropdown-menu.extended.logout>li>a:hover i {
-    color: #1fb5ad;
+    color: #1f1f1f;
 }
 
 .dropdown-menu.extended.logout>li>a i {
@@ -855,7 +876,7 @@ ul.top-menu>li>a:focus {
 }
 
 .sidebar-toggle-box:hover .fa-bars {
-    color: #1fb5ad;
+    color: #1f88b5;
 }
 
 .hide-left-bar {
@@ -7040,7 +7061,7 @@ div.tagsinput span.tag {
 }
 
 .group-ico {
-    background-color: #1fb5ad;
+    background-color: #1f1f1f;
     /*background-color: #1fb5ad;*/
     border-radius: 4px;
     color: #fff;
@@ -7455,7 +7476,7 @@ canvas#canv1 {
 }
 
 .table-responsive::-webkit-scrollbar-thumb {
-    background: #1fb5ad;
+    background: #8d8d8d;
     border-radius: 10px;
 }
 
@@ -8078,8 +8099,8 @@ td.action-icn {
     height: 34px;
 }
 .dt-buttons button.dt-button {
-    background-color: #1ca59e !important;
-    border-color: #1ca59e !important;
+    background-color: #404040 !important;
+    border-color: #404040  !important;
     color: #FFFFFF !important;
     display: inline-block;
     margin-bottom: 0;
@@ -8098,8 +8119,8 @@ td.action-icn {
 }
 
 .dt-buttons button.dt-button:hover{
-    background-color: #1ca59e !important;
-    border-color: #1ca59e !important;
+    background-color: #1f1f1f !important;
+    border-color: #1f1f1f !important;
     color: #FFFFFF;
 }
 
@@ -8141,5 +8162,27 @@ header.panel-heading {
 }
 .allBtnUseColor{
     background-color: #2563eb;
+    color: #fff;
+}
+.cog-btn-main-area {
+    text-align: end;
+}
+.action-icn a .fa-trash-o {
+    color: #FF0000;
+}
+.cog-btn-main-area.open>.dropdown-menu {
+    padding: 0;
+}
+.pagination>.active>a, .pagination>.active>span, .pagination>.active>a:hover, .pagination>.active>span:hover, .pagination>.active>a:focus, .pagination>.active>span:focus {
+    z-index: 2;
+    color: #fff;
+    background-color: #1f1f1f;
+    border-color: #1f1f1f;
+    cursor: default;
+}
+
+.pagination > li > a:hover, .pagination > li > span:hover, .pagination > li > a:focus, .pagination > li > span:focus, .pagination > li.active > a, .pagination > li.active > a:hover {
+    background-color: #1f1f1f;
+    border-color: #1f1f1f;
     color: #fff;
 }

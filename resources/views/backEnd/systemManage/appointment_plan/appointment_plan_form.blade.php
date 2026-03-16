@@ -155,7 +155,7 @@ if (isset($form)) {
     }
 
     .btn.btn-danger {
-        background: #1ca59e;
+        background: #1f1f1f;
         color: #fff;
         border: none;
     }

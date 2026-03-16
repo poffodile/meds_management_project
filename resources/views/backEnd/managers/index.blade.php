@@ -24,9 +24,9 @@ if ($del_status == '0') { //regular users
         margin: 0px 0px 10px 0px;
     }
 
-    .action-icn a i {
+    /* .action-icn a i {
         color: #1fb5ad;
-    }
+    } */
 
     .action-icn a .fa-trash-o {
         color: #FF0000;

@@ -14,10 +14,10 @@
     }
 
     .re-generateQR {
-        border: 1px solid #1fb5ad;
+        background-color: #2563eb;
+        border-color: #2563eb;
         box-shadow: none;
         color: #fff;
-        background: #1fb5ad;
         padding: 6px 12px;
         text-align: center;
         border-radius: 3px;
@@ -52,10 +52,10 @@
     }
 
     .download-btn {
-        border: 1px solid #1fb5ad;
+        border: 1px solid #2563eb;
+        background-color: #2563eb;
         box-shadow: none;
         color: #fff;
-        background: #1fb5ad;
         padding: 6px 12px;
         text-align: center;
         border-radius: 3px;
@@ -124,7 +124,7 @@ if ($del_status == '0') { //regular users
                                     </div>
                                 </div>
                                 <div class="col-lg-6">
-                                    <div class="cog-btn-main-area">
+                                    <div class="cog-btn-main-area text-end">
                                         <a class="btn btn-primary" href="#" data-toggle="dropdown">
                                             <i class="fa fa-cog fa-fw"></i>
                                         </a>
@@ -197,7 +197,7 @@ if ($del_status == '0') { //regular users
                                                     <td><a href="{{ url('admin/system-admin/edit/'.$value->id) }}" class="edit">{{ $value->company }}</a></td>
                                                     <td>{{ $value->name }}</td>
                                                     <td class="transform-none">{{ $value->email }}</td>
-                                                    <td style="width: 25%;">@if($value->qr_code_id == NULL) <button class="re-generateQR" onclick="generateQR(<?= $value->id ?>);"><span>Generate QR</span></button> <button><i class="fa fa-qrcode" aria-hidden="true"></i></button> @else <button class="re-generateQR" onclick="generateQR(<?= $value->id ?>);"><span>Re-Generate QR</span></button> <button class="re-generateQR" onclick="ViewQR(<?= $value->id ?>);"><span>View</span></button> @endif </td>
+                                                    <td style="width: 25%;">@if($value->qr_code_id == NULL) <button class="re-generateQR" onclick="generateQR(<?= $value->id ?>);"><span>Generate QR</span></button> <button class="btn btn-primary"><i class="fa fa-qrcode" aria-hidden="true"></i></button> @else <button class="re-generateQR" onclick="generateQR(<?= $value->id ?>);"><span>Re-Generate QR</span></button> <button class="re-generateQR" onclick="ViewQR(<?= $value->id ?>);"><span>View</span></button> @endif </td>
                                                     <td class="action-icn">
                                                         @if($del_status == '0')
                                                         <a href="{{ url('admin/system-admin/homes/'.$value->id) }}"><i data-toggle="tooltip" title="Homes" class="fa fa-home"></i></a>
