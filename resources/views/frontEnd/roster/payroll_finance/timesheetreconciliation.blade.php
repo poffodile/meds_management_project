@@ -127,7 +127,9 @@
                                             </div>
                                         </div>
                                         <div>
-                                            <button class="borderBtn">Adjust</button>
+                                            <button class="borderBtn w100" data-toggle="modal" data-target="#adjustNodal"><i class="bx bx-eye me-2 f18"></i>
+                                                Adjust</button>
+                                            <!-- <button class="borderBtn" id="#ShiftDatadjustNodal" data-toggle="modal" data-target="#adjustNodal">Adjust</button> -->
                                         </div>
                                     </div>
                                     <div class="row">
@@ -139,14 +141,10 @@
                                         </div>
                                         <div class="col-lg-3">
                                             <div>
-                                                <p class="textGray500 fs13 mb-2">Clock Times</p>
+                                                <p class="textGray500 fs13 mb-2"> <i class="bx bx-eye me-1 fs16" style="cursor:pointer" type="button" data-toggle="modal" data-target="#clockDetails-{{ $shift->id }}"></i> Clock Times</p>
                                                 <h6 class="h6Head">
                                                     @if (count($shift->login_activities) > 0)
-                                                    @foreach ($shift->login_activities as $activity)
-                                                    {{ \Carbon\Carbon::parse($activity->check_in_time)->format('H:i') }} -
-                                                    {{ $activity->check_out_time ? \Carbon\Carbon::parse($activity->check_out_time)->format('H:i') : 'In progress' }}
-                                                    @if (!$loop->last) <br> @endif
-                                                    @endforeach
+                                                    {{ count($shift->login_activities) }} Log(s) Recorded
                                                     @else
                                                     No Logs
                                                     @endif
@@ -173,7 +171,7 @@
                             </div>
                         </div>
                         @else
-                        <p class="textGray500 fs13 text-center">No matched timesheets </p>
+                        <p class="textGray500 fs13 text-center py-5 mb-0">No matched timesheets </p>
                         @endif
                     </div>
                     <!-- Panel 2-->
@@ -246,11 +244,8 @@
                                             </div>
                                         </div>
                                     </div>
-
-
                                 </div>
-
-                                <p class="textGray500 fs13 text-center">No matched timesheets </p>
+                                <p class="textGray500 fs13 text-center py-5 mb-0">No matched timesheets </p>
                             </div>
                         </div>
                     </div>
@@ -295,10 +290,9 @@
                                                     <h6 class="h6Head blackText mb-0">08:00 - 16:00</h6>
                                                 </div>
                                             </div>
-
                                         </div>
                                         <div>
-                                            <button class="borderBtn w100"><i class="bx bx-eye me-2 f18"></i>
+                                            <button class="borderBtn w100" data-toggle="modal" data-target="#adjustNodal"><i class="bx bx-eye me-2 f18"></i>
                                                 Adjust</button>
                                         </div>
                                     </div>
@@ -311,7 +305,7 @@
                                         </div>
                                         <div class="col-lg-3">
                                             <div>
-                                                <p class="textGray500 fs13">Actual</p>
+                                                <p class="textGray500 fs13 mb-2">Actual</p>
                                                 <h6 class="h6Head">8.00h</h6>
                                             </div>
                                         </div>
@@ -329,8 +323,6 @@
                                             </div>
                                         </div>
                                     </div>
-
-
                                 </div>
                                 <div class="bBorderCard mt-4 p-4">
                                     <div class="d-flex justify-content-between">
@@ -376,7 +368,7 @@
                                         </div>
                                         <div class="col-lg-3">
                                             <div>
-                                                <p class="textGray500 fs13">Actual</p>
+                                                <p class="textGray500 fs13 mb-2">Actual</p>
                                                 <h6 class="h6Head">8.00h</h6>
                                             </div>
                                         </div>
@@ -446,7 +438,7 @@
                                         </div>
                                         <div class="col-lg-3">
                                             <div>
-                                                <p class="textGray500 fs13">Actual</p>
+                                                <p class="textGray500 fs13 mb-2">Actual</p>
                                                 <h6 class="h6Head">8.00h</h6>
                                             </div>
                                         </div>
@@ -477,6 +469,304 @@
             </div>
         </div>
     </div>
-</main>
 
+    <!-- modal Adjust reconciliation start -->
+
+    <div class="modal fade leaveCommunStyle" id="adjustNodal" tabindex="1" role="dialog"
+        aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog modalMd pModalScroll">
+            <div class="modal-content">
+                <div class="modal-header p24">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Pay Adjustments </h4>
+                </div>
+                <div class="modal-body heightScrollModal p24" style="height: unset;">
+                    <div class="d-flex muteBg rounded5 p-4">
+                        <div class="flex1">
+                            <p class="fs13 textGray mb-2">Planned Hours </p>
+                            <h5 class="h5Head font700">8.00h </h5>
+                        </div>
+                        <div class="flex1">
+                            <p class="fs13 textGray mb-2">Current Actual Hours </p>
+                            <h5 class="h5Head font700">8.00h </h5>
+                        </div>
+                    </div>
+                    <div class="mt20">
+                        <h6 class="h5Head">Clock Times</h6>
+                        <form action="">
+
+                            <div class="row">
+                                <div class="col-md-6  m-t-10">
+                                    <label>Clock In</label>
+                                    <input type="time" id="scheduled_time" name="scheduled_time" class="form-control">
+                                </div>
+                                <div class="col-md-6  m-t-10">
+                                    <label>Clock Out</label>
+                                    <input type="time" id="scheduled_time" name="scheduled_time" class="form-control">
+                                </div>
+
+                            </div>
+                            <div class="appendContainer">
+                                <div class="flexBw mt20">
+                                    <div>
+                                        <h5 class="h5Head">Pay Adjustments </h5>
+                                    </div>
+                                    <div>
+                                        <button class="borderBtn appendBtn"> <i class="bx  bx-plus me-2"></i> Add Row</button>
+                                    </div>
+                                </div>
+                                <div class="flexRow mt-3">
+                                    <div class="shadowp rounded8 p-4 lightBorderp appendRow" style="display: none;">
+                                        <div class="dFlexGap align-item-end">
+                                            <div class="flex1">
+                                                <label for="">Hours</label>
+                                                <input type="text" class="form-control">
+                                            </div>
+                                            <div class="flex1">
+                                                <label for="">Minutes
+                                                </label>
+                                                <input type="text" class="form-control">
+                                            </div>
+                                            <div class="flex1">
+                                                <label for="">Pay Bucket</label>
+                                                <select class="form-control">
+                                                    <option value="1">Standard</option>
+                                                    <option value="1">OverTime</option>
+                                                    <option value="1">Weekend</option>
+                                                </select>
+                                            </div>
+
+                                            <div>
+                                                <label for=" " style="visibility: hidden;">delete</label>
+                                                <div class="deleteIcon flex1 deleteAppend">
+                                                    <i class="fa fa-trash-o" aria-hidden="true"></i>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt20">
+                                <div>
+                                    <label>Adjustment Reason</label>
+                                    <textarea name="notes" id="" rows="3" cols="20" placeholder="Enter reason for adjustment..." class="form-control"></textarea>
+                                </div>
+                            </div>
+                            <div class="mt20 lightBorderp bg-blue-50 p-4 rounded8">
+                                <div class="flexBw">
+                                    <h5 class="h6Head darkBlueTextp mb-0">Total Adjusted Hours</h5>
+                                    <h3 class="darkBlueTextp my-0 font700">8.00h</h3>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="modal-footer d-flex gap-3">
+                    <div class="dFlexGap w100">
+                        <div class="flex1">
+                            <button class="borderBtn w100" class="close" data-dismiss="modal">Cancel </button>
+                        </div>
+                        <div class="flex1">
+                            <button class="bgBtn pgreenBtn w100"> <i class="bx bx-save f18 me-2"></i> Save Adjustment</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- modal Adjust reconciliation end -->
+
+    <!-- modal clock shift adjust  start -->
+
+    <!-- <div class="modal fade leaveCommunStyle" id="ShiftDatadjustNodal" tabindex="1" role="dialog"
+        aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog modalMd pModalScroll">
+            <div class="modal-content">
+                <div class="modal-header p24">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Pay Adjustments </h4>
+                </div>
+                <div class="modal-body heightScrollModal p24" style="height: unset;">
+                    <div class="d-flex muteBg rounded5 p-4">
+                        <div class="flex1">
+                            <p class="fs13 textGray mb-2">Planned Hours </p>
+                            <h5 class="h5Head font700">8.00h </h5>
+                        </div>
+                        <div class="flex1">
+                            <p class="fs13 textGray mb-2">Current Actual Hours </p>
+                            <h5 class="h5Head font700">8.00h </h5>
+                        </div>
+                    </div>
+                    <div class="mt20">
+                        <h6 class="h5Head">Clock Times</h6>
+                        <form action="">
+
+                            <div class="row">
+                                <div class="col-md-6  m-t-10">
+                                    <label>Clock In</label>
+                                    <input type="time" id="scheduled_time" name="scheduled_time" class="form-control">
+                                </div>
+                                <div class="col-md-6  m-t-10">
+                                    <label>Clock Out</label>
+                                    <input type="time" id="scheduled_time" name="scheduled_time" class="form-control">
+                                </div>
+
+                            </div>
+                            <div class="flexBw mt20">
+                                <div>
+                                    <h5 class="h5Head">Pay Adjustments </h5>
+                                </div>
+                                <div>
+                                    <button class="borderBtn appendBtn"> <i class="bx  bx-plus me-2"></i> Add Row</button>
+                                </div>
+                            </div>
+                            <div class="flexRow mt-3">
+                                <div class="shadowp rounded8 p-4 lightBorderp appendRow" style="display: none;">
+                                    <div class="dFlexGap align-item-end">
+                                        <div class="flex1">
+                                            <label for="">Hours</label>
+                                            <input type="text" class="form-control">
+                                        </div>
+                                        <div class="flex1">
+                                            <label for="">Minutes
+                                            </label>
+                                            <input type="text" class="form-control">
+                                        </div>
+                                        <div class="flex1">
+                                            <label for="">Pay Bucket</label>
+                                            <select class="form-control">
+                                                <option value="1">Standard</option>
+                                                <option value="1">OverTime</option>
+                                                <option value="1">Weekend</option>
+                                            </select>
+                                        </div>
+
+                                        <div>
+                                            <label for=" " style="visibility: hidden;">delete</label>
+                                            <div class="deleteIcon flex1 deleteAppend">
+                                                <i class="fa fa-trash-o" aria-hidden="true"></i>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt20">
+                                <div>
+                                    <label>Adjustment Reason</label>
+                                    <textarea name="notes" id="" rows="3" cols="20" placeholder="Enter reason for adjustment..." class="form-control"></textarea>
+                                </div>
+                            </div>
+                            <div class="mt20 lightBorderp bg-blue-50 p-4 rounded8">
+                                <div class="flexBw">
+                                    <h5 class="h6Head darkBlueTextp mb-0">Total Adjusted Hours</h5>
+                                    <h3 class="darkBlueTextp my-0 font700">8.00h</h3>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="modal-footer d-flex gap-3">
+                    <div class="dFlexGap w100">
+                        <div class="flex1">
+                            <button class="borderBtn w100" class="close" data-dismiss="modal">Cancel </button>
+                        </div>
+                        <div class="flex1">
+                            <button class="bgBtn pgreenBtn w100"> <i class="bx bx-save f18 me-2"></i> Save Adjustment</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> -->
+    <!-- modal clock shift adjust reconciliation end -->
+    <!-- clocl details -->
+    @foreach ($shifts as $shift)
+    <div class="modal fade leaveCommunStyle" id="clockDetails-{{ $shift->id }}" tabindex="1" role="dialog"
+        aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog  pModalScroll">
+            <div class="modal-content">
+                <div class="modal-header p24">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Clock Details </h4>
+                </div>
+                <div class="modal-body heightScrollModal p24" style="height: unset;">
+
+                    <div class="scrollDailyCheck pe-3">
+                        @if (count($shift->login_activities) > 0)
+                        @foreach ($shift->login_activities as $activity)
+                        <div class="lightBorderp mb-3 rounded8 p-3">
+                            <div class="dFlexGap gap-5">
+                                <div class="flex1">
+                                    <p class="fs13 textGray500 mb-2">Clock In:</p>
+                                    <p class="fs13 blackText font600">{{ \Carbon\Carbon::parse($activity->check_in_time)->format('g:i A') }}</p>
+                                </div>
+                                <div class="flex1">
+                                    <p class="fs13 textGray500 mb-2">Clock Out:</p>
+                                    <p class="fs13 blackText font600">{{ $activity->check_out_time ? \Carbon\Carbon::parse($activity->check_out_time)->format('g:i A') : 'In progress' }}</p>
+                                </div>
+                            </div>
+                            <div class="dFlexGap gap-5">
+                                <div class="flex1">
+                                    <p class="fs13 textGray500 mb-2">Clock In Reason:</p>
+                                    <p class="fs13 blackText font600">{{ $activity->check_in_reason ?: 'N/A' }}</p>
+                                </div>
+                                <div class="flex1">
+                                    <p class="fs13 textGray500 mb-2">Clock Out Reason:</p>
+                                    <p class="fs13 blackText font600">{{ $activity->check_out_reason ?: 'N/A' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        @endforeach
+                        @else
+                        <div class="lightBorderp mb-3 rounded8 p-3">
+                            <p class="textGray500 fs13 text-center mb-0">No Logs Recorded For This Shift</p>
+                        </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endforeach
+    <!-- end clock details -->
+</main>
+<!-- append section -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        document.querySelectorAll(".appendBtn").forEach(button => {
+            button.addEventListener("click", function(e) {
+                e.preventDefault();
+                const container = button.closest(".appendContainer");
+                if (!container) return;
+                const templateRow = container.querySelector(".appendRow");
+                if (!templateRow) return;
+
+                // clone the row
+                const newRow = templateRow.cloneNode(true);
+                newRow.style.display = "block"; // show the row
+
+                // reset inputs/selects
+                newRow.querySelectorAll("input").forEach(input => input.value = "");
+                newRow.querySelectorAll("select").forEach(select => select.selectedIndex = 0);
+                newRow.querySelectorAll("textarea").forEach(txt => txt.value = "");
+
+                // append new row to container
+                container.appendChild(newRow);
+            });
+        });
+
+        // Optional: delete row if you add delete icons
+        document.addEventListener("click", function(e) {
+            const del = e.target.closest(".deleteIcon");
+            if (del) {
+                const row = del.closest(".appendRow");
+                if (row) row.remove();
+            }
+        });
+    });
+</script>
 @endsection
