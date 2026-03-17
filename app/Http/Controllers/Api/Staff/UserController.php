@@ -16,6 +16,7 @@ use App\Services\Staff\StaffService;
 use App\UserQualification;
 use App\Models\ScheduledShift;
 use Illuminate\Support\Facades\Mail;
+use App\LoginInActivity;
 
 class UserController extends Controller
 {
@@ -594,8 +595,8 @@ class UserController extends Controller
 		$data = array();
 		foreach ($qualifications as $val) {
 			$image = "";
-			if($val->image){
-				$image = url('public/images/userQualification') . '/' .$val->image;
+			if ($val->image) {
+				$image = url('public/images/userQualification') . '/' . $val->image;
 			}
 			$data[] = [
 				'id' => $val->id,
@@ -652,18 +653,38 @@ class UserController extends Controller
 		$todayShift = ScheduledShift::where('staff_id', $staffId)
 			->where('start_date', $today)
 			->where('status', 'assigned')
-			->where('start_time', '<=', $currentTime)
-			->where('end_time', '>=', $currentTime)
+			->orderBy('start_time', 'asc')
 			->select('start_time', 'end_time', 'tasks', 'notes', 'id')
-			->first();
-		// dd($todayShift);
+			->get();
 
-		if ($todayShift) {
-			$todayShift->start_time = Carbon::parse($todayShift->start_time)->format('H:i');
-			$todayShift->end_time   = Carbon::parse($todayShift->end_time)->format('H:i');
-			$data['today_shift'] = $todayShift;
-		} else {
-			$data['today_shift'] = null;
+		$data['today_shift'] = null;
+
+		foreach ($todayShift as $shift) {
+			$shiftEnd = Carbon::parse($shift->end_time)->format('H:i:s');
+
+			$loginInActivity = LoginInActivity::where('user_id', $staffId)
+				->where('shift_id', $shift->id)
+				->where('login_date', $today)
+				->orderBy('id', 'desc')
+				->first();
+
+			if ($loginInActivity) {
+				// Second condition: check login activity if null on checkout time the shift show else show the next shift
+				if ($loginInActivity->check_out_time == null) {
+					$shift->start_time = Carbon::parse($shift->start_time)->format('H:i');
+					$shift->end_time   = Carbon::parse($shift->end_time)->format('H:i');
+					$data['today_shift'] = $shift;
+					break;
+				}
+			} else {
+				// First condition: check shift time is current time start time and time is passed
+				if ($shiftEnd >= $currentTime) {
+					$shift->start_time = Carbon::parse($shift->start_time)->format('H:i');
+					$shift->end_time   = Carbon::parse($shift->end_time)->format('H:i');
+					$data['today_shift'] = $shift;
+					break;
+				}
+			}
 		}
 
 		// Tomorrow shift: first shift after today

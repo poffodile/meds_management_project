@@ -56,7 +56,8 @@ if (isset($system_admin_home)) {
 								<div class="form-group">
 									<label class="col-lg-3 control-label">Home Area</label>
 									<div class="col-lg-9">
-										<input type="text" name="home_area" class="form-control" placeholder="Home area" value="{{ (isset($system_admin_home->home_area)) ? $system_admin_home->home_area : '' }}" maxlength="255">
+										<input type="text" name="home_area" id="home_area" class="form-control" placeholder="Home area" value="{{ (isset($system_admin_home->home_area)) ? $system_admin_home->home_area : '' }}" maxlength="255">
+										<span class="help-block">(In meters or min 10 meters)</span>
 									</div>
 								</div>
 
@@ -67,7 +68,7 @@ if (isset($system_admin_home)) {
 										<p>Days for which location history will be saved</p>
 									</div>
 								</div> -->
-
+								<!-- 
 								<div class="form-group yes_no_btn">
 									<label class="col-lg-3 control-label">Registered with Ofsted or CIW</label>
 									<div class="col-lg-9 d-flex align-items-center gap-2">
@@ -76,7 +77,7 @@ if (isset($system_admin_home)) {
 										<input type="radio" name="is_registered" id="is_registered2" value="0" {{ isset($system_admin_home->is_registered) && $system_admin_home->is_registered == 0 ? 'checked' : '' }}>
 										<label for="is_registered2" class=" control-label">No </label>
 									</div>
-								</div>
+								</div> -->
 								<?php $rota_time_format = (isset($system_admin_home->rota_time_format)) ? $system_admin_home->rota_time_format : ''; ?>
 								<!-- <div class="form-group has-feedback">
 									<label class="col-lg-3 control-label">Rota Time Format</label>

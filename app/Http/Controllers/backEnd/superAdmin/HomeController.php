@@ -114,7 +114,7 @@ class HomeController extends Controller
             $system_admin_home->home_area                   = $data['home_area'];
             $system_admin_home->latitude                    = $latitude;
             $system_admin_home->longitude                   = $longitude;
-            $system_admin_home->is_registered               = $data['is_registered'];
+            $system_admin_home->is_registered               = $data['is_registered'] ?? 0;
 
             if (!empty($_FILES['image']['name'])) {
                 $tmp_image  =   $_FILES['image']['tmp_name'];

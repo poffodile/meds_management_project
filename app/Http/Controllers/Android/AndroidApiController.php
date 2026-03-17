@@ -479,6 +479,7 @@ class AndroidApiController extends Controller
             if ($record) {
                 $activity = new LoginInActivity();
                 $activity->user_id = $request->user_id;
+                $activity->shift_id = $request->shift_id;
                 $activity->login_date = date('Y-m-d');
                 $activity->check_in_time = date("Y-m-d H:i:s");
                 $activity->latitude_in = $request->latitude_in;

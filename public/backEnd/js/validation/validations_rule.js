@@ -2857,6 +2857,26 @@ $('#add_homelist_form').formValidation({
                     message: 'This field can only consist of characters'
                 }
             }
+        },
+        "home_area":
+        {
+            validators:
+            {
+                notEmpty:
+                {
+                    message: 'This field is required'
+                },
+                regexp:
+                {
+                    regexp: /^[0-9]+$/,
+                    message: 'This field should contain integer numbers only'
+                },
+                greaterThan:
+                {
+                    value: 10,
+                    message: 'The value must be greater than or equal to 10'
+                }
+            }
         }/*,
         "security_policy":
         {
@@ -2941,6 +2961,26 @@ $('#edit_homelist_form').formValidation({
                 {
                     regexp: /^[A-Z,a-z,0-9&#+-.,:;?£/'" \n]+$/,
                     message: 'This field can only consist of characters'
+                }
+            }
+        },
+        "home_area":
+        {
+            validators:
+            {
+                notEmpty:
+                {
+                    message: 'This field is required'
+                },
+                regexp:
+                {
+                    regexp: /^[0-9]+$/,
+                    message: 'This field should contain integer numbers only'
+                },
+                greaterThan:
+                {
+                    value: 10,
+                    message: 'The value must be greater than or equal to 10'
                 }
             }
         }/*,
