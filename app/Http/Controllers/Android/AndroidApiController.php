@@ -607,14 +607,16 @@ class AndroidApiController extends Controller
             if (is_null($activities[$i]['check_out_time'])) {
                 $check_out = "";
                 $logged_time = "";
+                $data['check_out_time'] = "";
+                $data['logged_time'] = "";
             } else {
                 $check_out = $activities[$i]['check_out_time'];
                 $checkIn  = \Carbon\Carbon::parse($activities[$i]['check_in_time']);
                 $checkOut = \Carbon\Carbon::parse($activities[$i]['check_out_time']);
                 $logged_time = $checkIn->diff($checkOut)->format('%H:%I:%S');
+                $data['check_out_time'] = \Carbon\Carbon::parse($check_out)->format('H:i');
+                $data['logged_time'] = \Carbon\Carbon::parse($logged_time)->format('H:i');
             }
-            $data['check_out_time'] = \Carbon\Carbon::parse($check_out)->format('H:i');
-            $data['logged_time'] = \Carbon\Carbon::parse($logged_time)->format('H:i');
             if (is_null($activities[$i]['latitude_out']) || is_null($activities[$i]['longitude_out'])) {
                 $latitude_out = "";
                 $longitude_out = "";

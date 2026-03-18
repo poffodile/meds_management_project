@@ -326,6 +326,11 @@ class StaffService
 
     public function getShiftUser($id)
     {
+        $request = request();
+        $startDate = $request->input('start_date');
+        $startTime = $request->input('start_time');
+        $endTime = $request->input('end_time');
+
         // 1. Get the courses for this service user
         $clientCourses = suUserCourse::where('su_user_id', $id)->pluck('course_id')->toArray();
 
@@ -339,13 +344,30 @@ class StaffService
         $clientLatitude = $client->latitude;
         $clientLongitude = $client->longitude;
 
-        // 3. Base query for users
+        // 3. Find staff with overlapping shifts
+        $overlappingStaffIds = [];
+        if ($startDate && $startTime && $endTime) {
+            $formattedStart = date('H:i:s', strtotime($startTime));
+            $formattedEnd = date('H:i:s', strtotime($endTime));
+
+            $overlappingStaffIds = \App\Models\ScheduledShift::where('start_date', $startDate)
+                ->where(function ($query) use ($formattedStart, $formattedEnd) {
+                    $query->whereTime('start_time', '<', $formattedEnd)
+                        ->whereTime('end_time', '>', $formattedStart);
+                })
+                ->whereNotNull('staff_id')
+                ->pluck('staff_id')
+                ->toArray();
+        }
+
+        // 4. Base query for users
         $query = User::select('id', 'name', 'postcode', 'latitude', 'longitude')
             ->where('home_id', Auth::user()->home_id)
             ->where('status', 1)
+            ->whereNotIn('id', $overlappingStaffIds)
             ->where('is_deleted', 0); // Exclude deleted users
 
-        // 4. Find users who have the matching course_id in user_qualification
+        // 5. Find users who have the matching course_id in user_qualification
         $userIdsWithCourses = [];
         if (!empty($clientCourses)) {
             $userIdsWithCourses = DB::table('user_qualification')

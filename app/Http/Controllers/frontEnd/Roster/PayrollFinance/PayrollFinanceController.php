@@ -24,6 +24,7 @@ class PayrollFinanceController extends Controller
         $shifts = \App\Models\ScheduledShift::where('home_id', $homeId)
             ->where('staff_id', $userId)
             ->get()
+            ->sortByDesc('start_date')
             ->map(function ($shift) use ($userId) {
 
                 $shiftStart = \Carbon\Carbon::parse($shift->start_date . ' ' . $shift->start_time);
@@ -38,6 +39,7 @@ class PayrollFinanceController extends Controller
                 $bufferEnd = $shiftEnd->copy()->addHours(2);
 
                 $shift->login_activities = \App\LoginInActivity::where('user_id', $userId)
+                    ->where('shift_id', $shift->id)
                     ->where(function ($query) use ($bufferStart, $bufferEnd) {
                         $query->whereBetween('check_in_time', [$bufferStart->toDateTimeString(), $bufferEnd->toDateTimeString()])
                             ->orWhereBetween('check_out_time', [$bufferStart->toDateTimeString(), $bufferEnd->toDateTimeString()]);

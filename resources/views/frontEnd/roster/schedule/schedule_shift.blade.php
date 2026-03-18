@@ -2212,13 +2212,28 @@
             const assignedClientTo = document.getElementById('assignedClientTo');
             const changeCarerBtn = document.getElementById('changeCarerBtn');
 
-            clientSelect.addEventListener('change', function() {
-                const clientId = this.value;
+            clientSelect.addEventListener('change', fetchSuggestedCarers);
+
+            // Fetch whenever date or time inputs change
+            const form = clientSelect.closest('form');
+            if (form) {
+                const sDate = form.querySelector('input[name="start_date"]');
+                const sTime = form.querySelector('input[name="start_time"]');
+                const eTime = form.querySelector('input[name="end_time"]');
+
+                if (sDate) sDate.addEventListener('change', fetchSuggestedCarers);
+                if (sTime) sTime.addEventListener('change', fetchSuggestedCarers);
+                if (eTime) eTime.addEventListener('change', fetchSuggestedCarers);
+            }
+
+            function fetchSuggestedCarers() {
+                const clientId = clientSelect.value;
+                const form = clientSelect.closest('form');
 
                 // Ensure the wrapper is visible so suggestions or blank section can be seen
                 suggestionsWrapper.style.display = 'block';
 
-                if (this.value === "") {
+                if (clientId === "") {
                     assignedClientTo.textContent = "Not assigned";
                     blankSection.style.display = 'block';
                     suggestionsContainer.style.display = 'none';
@@ -2227,7 +2242,7 @@
                     return;
                 }
 
-                let selectedText = this.options[this.selectedIndex].text;
+                let selectedText = clientSelect.options[clientSelect.selectedIndex].text;
                 assignedClientTo.textContent = selectedText;
 
                 suggestedCarerContainer.innerHTML = "Loading carers...";
@@ -2236,7 +2251,16 @@
                 if (selectedCarerCard) selectedCarerCard.style.display = 'none';
                 selectedCarerIdInput.value = ""; // Reset hidden ID
 
-                fetch("{{ route('carer.shift.staff', ':id') }}".replace(':id', clientId))
+                let startDate = form ? form.querySelector('input[name="start_date"]').value : '';
+                let startTime = form ? form.querySelector('input[name="start_time"]').value : '';
+                let endTime = form ? form.querySelector('input[name="end_time"]').value : '';
+
+                let fetchUrl = "{{ route('carer.shift.staff', ':id') }}".replace(':id', clientId);
+                if (startDate && startTime && endTime) {
+                    fetchUrl += `?start_date=${startDate}&start_time=${startTime}&end_time=${endTime}`;
+                }
+
+                fetch(fetchUrl)
                     .then(response => response.json())
                     .then(res => {
                         suggestedCarerContainer.innerHTML = "";
@@ -2266,7 +2290,7 @@
                                                         <p class="mb-0 m-l-10"><i class='bx bx-check-circle'></i> ${carer.qualifications_count ?? '0'} Qualifications</p>
                                                     </div>
                                                 </div>
-                                                <button type="button" class="assignBtn" data-id="${carer.id}" data-name="${carer.name}">Assign</button>
+                                                <button type="button" id="assignBtn_${carer.id}" class="assignBtn" data-id="${carer.id}" data-name="${carer.name}">Assign</button>
                                             </div>`;
                                 } else {
                                     let mismatchClass = dist > 50 ? 'geographic-mismatch' : '';
@@ -2283,7 +2307,7 @@
                                                         <p class="mb-0 m-l-10"><i class='bx bx-check-circle'></i> ${carer.qualifications_count ?? '0'} Qualifications</p>
                                                     </div>
                                                 </div>
-                                                <button type="button" class="assignBtn" data-id="${carer.id}" data-name="${carer.name}">Assign</button>
+                                                <button type="button" id="assignBtn_${carer.id}" class="assignBtn" data-id="${carer.id}" data-name="${carer.name}">Assign</button>
                                             </div>`;
                                 }
                                 suggestedCarerContainer.insertAdjacentHTML('beforeend', cardHtml);
@@ -2295,7 +2319,7 @@
                     .catch(() => {
                         suggestedCarerContainer.innerHTML = '<p>Failed to load carers</p>';
                     });
-            });
+            }
 
             // Handle Assign Button Click
             suggestedCarerContainer.addEventListener('click', function(e) {
