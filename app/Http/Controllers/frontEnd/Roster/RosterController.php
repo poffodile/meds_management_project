@@ -57,7 +57,7 @@ class RosterController extends Controller
         $data['userCount'] = User::getstaffByResidentialId();
 
         $data['scheduled_shifts'] = ScheduledShift::with(['client', 'staff'])
-            ->where('home_id', Auth::user()->home_id)
+            ->homeId()
             ->orderBy('start_date', 'desc')
             ->limit(10)
             ->get()
@@ -68,8 +68,8 @@ class RosterController extends Controller
             });
 
         $data['today_shifts'] = ScheduledShift::with(['client', 'staff'])
-            ->where('home_id', Auth::user()->home_id)
-            ->whereDate('start_date', date('Y-m-d'))
+            ->homeId()
+            ->todayShifts()
             ->orderBy('start_time', 'asc')
             ->get()
             ->map(function ($shift) {
@@ -78,13 +78,9 @@ class RosterController extends Controller
                 return $shift;
             });
 
-        $data['today_shifts_count'] = ScheduledShift::where('home_id', Auth::user()->home_id)
-            ->whereDate('start_date', date('Y-m-d'))
-            ->count();
+        $data['today_shifts_count'] = ScheduledShift::homeId()->todayShifts()->count();
 
-        $data['unfilled_shifts_count'] = ScheduledShift::where('home_id', Auth::user()->home_id)
-            ->whereNull('staff_id')
-            ->count();
+        $data['unfilled_shifts_count'] = ScheduledShift::homeId()->todayShifts()->unfilledShifts()->count();
 
         return view('frontEnd.roster.dashboard', $data);
     }

@@ -531,4 +531,22 @@ class ScheduleShiftController extends Controller
     {
         return  ShiftDocument::scheduleShiftFormFetch($req);
     }
+
+    public function assignShift(Request $request)
+    {
+        $request->validate([
+            'shift_id' => 'required|exists:scheduled_shifts,id',
+            'staff_id' => 'required'
+        ]);
+
+        $shift = ScheduledShift::find($request->shift_id);
+
+        $shift->staff_id = $request->staff_id == 'open' ? null : $request->staff_id;
+        $shift->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Shift assigned successfully'
+        ]);
+    }
 }

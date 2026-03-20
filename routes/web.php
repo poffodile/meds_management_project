@@ -167,6 +167,7 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 		Route::get('/ninety-days-data', [ScheduleShiftController::class, 'get90DaysData'])->name('ninety.days.data');
 		Route::get('/get-monthly-shifts', [ScheduleShiftController::class, 'getMonthlyShifts'])->name('get.monthly.shifts');
 		Route::delete('/schedule-shift/delete/{id}', [ScheduleShiftController::class, 'deleteShift'])->name('roster.schedule.delete');
+		Route::post('/schedule-shift/assign-shift', [ScheduleShiftController::class, 'assignShift'])->name('roster.schedule.assign.shift');
 
 		Route::get('/client', [ClientController::class, 'index'])->name('roster.client');
 		Route::get('/client-details/{client_id}', [ClientController::class, 'client_details'])->name('roster.client.details');

@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Android;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-use Validator;
+use Illuminate\Support\Facades\Validator;
 use Hash, DB;
 use App\User, App\Admin, App\Home;
 use App\LeaveType, App\Staffleaves, App\LoginInActivity, App\ServiceUser;
@@ -536,12 +536,34 @@ class AndroidApiController extends Controller
                 ]);
 
             if ($response) {
-                return response()->json(['success' => true, 'message' => 'Checked out successfully..! ', 'Data' => $response, 'time' => date("Y-m-d H:i:s")], 200);
+                return response()->json(['success' => true, 'message' => 'Checked out successfully..! ', 'Data' => $response, 'activity_id' => $request->activity_id, 'time' => date("Y-m-d H:i:s")], 200);
             }
             return response()->json(['success' => false, 'message' => 'Error in record update'], 200);
         } else {
             return response()->json(['success' => false, 'message' => 'Invalid QR code'], 200);
         }
+    }
+
+    public function check_out_activity_update_reason(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'activity_id' => 'required|exists:login_activities,id',
+            'check_out_reason' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'message' => $validator->errors()->first()], 200);
+        }
+
+        $response = LoginInActivity::where('id', $request->activity_id)
+            ->update([
+                'check_out_reason' => $request->check_out_reason
+            ]);
+
+        if ($response) {
+            return response()->json(['success' => true, 'message' => 'Reason updated successfully..! '], 200);
+        }
+        return response()->json(['success' => false, 'message' => 'Error in record update'], 200);
     }
 
     public function get_user_activity(request $request)

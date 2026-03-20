@@ -1314,6 +1314,7 @@
                     <div class="carer-form createNewShiftTabBtn">
                         <form id="createShiftForm" action="{{ route('roster.schedule.store') }}" method="POST" enctype="multipart/form-data">
                             @csrf
+                            <input type="hidden" name="shift_id" id="edit_shift_id">
                             <input type="hidden" name="carer_id" id="selected_carer_id">
                             <input type="hidden" name="form_id" id="selected_form_id">
                             <input type="hidden" name="form_name" id="selected_form_name">
@@ -2212,6 +2213,24 @@
             const assignedClientTo = document.getElementById('assignedClientTo');
             const changeCarerBtn = document.getElementById('changeCarerBtn');
 
+            // Reset form when modal opens via data-toggle (new shift)
+            $('#addShiftModal').on('show.bs.modal', function(event) {
+                var button = $(event.relatedTarget);
+                if (button.length > 0) {
+                    const form = $(this).find('#createShiftForm');
+                    form.find('#edit_shift_id').val('');
+                    $(this).find('.modal-title').text('Create New Shift');
+                    form.find('button[type="submit"]').html('Create Shift');
+                    form.attr('action', "{{ route('roster.schedule.store') }}");
+
+                    // Reset other fields as needed
+                    form.find('[name="client_id"]').val('').trigger('change');
+                    $('#selected_carer_id').val('');
+                    $('#selectedCarerCard').hide();
+                    $('#carerSuggestionsWrapper').show();
+                }
+            });
+
             clientSelect.addEventListener('change', fetchSuggestedCarers);
 
             // Fetch whenever date or time inputs change
@@ -2254,10 +2273,16 @@
                 let startDate = form ? form.querySelector('input[name="start_date"]').value : '';
                 let startTime = form ? form.querySelector('input[name="start_time"]').value : '';
                 let endTime = form ? form.querySelector('input[name="end_time"]').value : '';
+                let shiftId = form ? form.querySelector('#edit_shift_id').value : '';
+
+                console.log('shiftId1', shiftId);
 
                 let fetchUrl = "{{ route('carer.shift.staff', ':id') }}".replace(':id', clientId);
                 if (startDate && startTime && endTime) {
                     fetchUrl += `?start_date=${startDate}&start_time=${startTime}&end_time=${endTime}`;
+                    if (shiftId) {
+                        fetchUrl += `&shift_id=${shiftId}`;
+                    }
                 }
 
                 fetch(fetchUrl)
@@ -2962,10 +2987,21 @@
                     // Change form action to update
                     let updateUrl = '{{ url("roster/schedule-shift/update") }}/' + shiftId;
                     form.attr('action', updateUrl);
+                    form.find('#edit_shift_id').val(shiftId);
+                    console.log('shiftId2', shiftId);
                     form.closest('.modal-content').find('.modal-title').text('Edit Shift');
                     form.find('button[type="submit"]').html('Update Shift');
 
                     // Populate fields
+
+                    form.find('#edit_shift_id').val(shiftId);
+                    console.log('shiftId', shiftId);
+
+                    // Set Date/Time FIRST (to avoid incorrect initial suggestion API call)
+                    form.find('[name="start_date"]').val(date);
+                    form.find('[name="start_time"]').val(start);
+                    form.find('[name="end_time"]').val(end);
+
                     if (client) {
                         form.find('[name="client_id"]').val(client).trigger('change');
                         $('#assignedClientTo').text(form.find('[name="client_id"] option:selected').text());
@@ -2973,9 +3009,6 @@
                         form.find('[name="client_id"]').val('').trigger('change');
                         $('#assignedClientTo').text('Not assigned');
                     }
-                    form.find('[name="start_date"]').val(date);
-                    form.find('[name="start_time"]').val(start);
-                    form.find('[name="end_time"]').val(end);
 
                     if (staff) {
                         $('#selected_carer_id').val(staff);

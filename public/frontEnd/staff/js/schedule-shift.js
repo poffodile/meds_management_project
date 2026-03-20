@@ -1,8 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
     const calendarEl = document.getElementById('calendar');
-    const BASE_URL = document
-        .querySelector('meta[name="base-url"]')
-        .getAttribute('content');
+    const BASE_URL = document.querySelector('meta[name="base-url"]').getAttribute('content');
+    const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
     const calendar = new FullCalendar.Calendar(calendarEl, {
 
         schedulerLicenseKey: 'GPL-My-Project-Is-Open-Source',
@@ -133,7 +132,8 @@ document.addEventListener('DOMContentLoaded', function () {
             form.attr('action', BASE_URL + '/roster/schedule-shift/update/' + props.shift_id);
             form.closest('.modal-content').find('.modal-title').text('Edit Shift');
             form.find('button[type="submit"]').html('Update Shift');
-
+            form.find('#edit_shift_id').val(props.shift_id);
+            console.log('shiftId3', props.shift_id);
             // Populate fields
             if (props.client_id) {
                 form.find('[name="client_id"]').val(props.client_id).trigger('change');
@@ -423,10 +423,68 @@ document.addEventListener('DOMContentLoaded', function () {
                 console.error("❌ Failed to load shifts!");
                 alert('Failed to load shifts');
             }
-        }
+        },
+
+        /* ================= DRAG & DROP ================= */
+        eventDrop: function (info) {
+
+            const event = info.event;
+            const shiftId = event.extendedProps.shift_id;
+
+            const oldResource = info.oldResource?.id;
+            const newResource = event.getResources()[0]?.id;
+
+            console.log('Old:', oldResource, 'New:', newResource);
+
+            // 🚫 Prevent staff → open
+            if (oldResource !== 'open' && newResource === 'open') {
+                alert('Cannot move assigned shift back to open');
+                info.revert();
+                return;
+            }
+
+            // ✅ Assign OR Reassign
+            assignShift(shiftId, newResource, info);
+        },
+
     });
 
     calendar.render();
+
+
+    /* ================= FUNCTION ================= */
+    function assignShift(shiftId, staffId, info) {
+
+        fetch(`${BASE_URL}/roster/schedule-shift/assign-shift`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': CSRF_TOKEN
+            },
+            body: JSON.stringify({
+                shift_id: shiftId,
+                staff_id: staffId
+            })
+        })
+            .then(res => res.json())
+            .then(data => {
+
+                if (!data.success) {
+                    alert(data.message || 'Assignment failed');
+                    info.revert();
+                    return;
+                }
+
+                // ✅ Optional: refresh calendar
+                calendar.refetchEvents();
+
+            })
+            .catch(err => {
+                console.error(err);
+                info.revert();
+            });
+    }
+
 
 
     function formatDateRange(view) {

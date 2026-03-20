@@ -26,6 +26,8 @@ Route::post('/add-user-leave', 'App\Http\Controllers\Android\AndroidApiControlle
 Route::post('/get-user-leave', 'App\Http\Controllers\Android\AndroidApiController@get_user_leave');
 Route::post('/add-login-activity', 'App\Http\Controllers\Android\AndroidApiController@add_login_activity');
 Route::post('/check-out-activity', 'App\Http\Controllers\Android\AndroidApiController@check_out_activity');
+Route::post('/check-out-activity/update-reason', 'App\Http\Controllers\Android\AndroidApiController@check_out_activity_update_reason');
+
 Route::post('/get-user-activity', 'App\Http\Controllers\Android\AndroidApiController@get_user_activity');
 // Route::post('/qrcode', 'Android\AndroidApiController@QRCode');
 Route::post('/get-company-data', 'App\Http\Controllers\Android\AndroidApiController@get_company_data');

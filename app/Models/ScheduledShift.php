@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Auth;
 
 class ScheduledShift extends Model
 {
@@ -40,5 +41,17 @@ class ScheduledShift extends Model
     public function user()
     {
         return $this->belongsTo(\App\User::class, 'staff_id');
+    }
+    public function todayShifts()
+    {
+        return $this->whereDate('start_date', date('Y-m-d'));
+    }
+    public function unfilledShifts()
+    {
+        return $this->where('status', 'unfilled');
+    }
+    public function scopeHomeId($query)
+    {
+        return $query->where('home_id', Auth::user()->home_id);
     }
 }

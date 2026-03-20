@@ -330,6 +330,7 @@ class StaffService
         $startDate = $request->input('start_date');
         $startTime = $request->input('start_time');
         $endTime = $request->input('end_time');
+        $shiftId = $request->input('shift_id');
 
         // 1. Get the courses for this service user
         $clientCourses = suUserCourse::where('su_user_id', $id)->pluck('course_id')->toArray();
@@ -339,6 +340,11 @@ class StaffService
 
         if (!$client) {
             return collect(); // Return empty collection if client not found
+        }
+        $originalStaffId = null;
+        if ($shiftId) {
+            $shift = \App\Models\ScheduledShift::find($shiftId);
+            $originalStaffId = $shift ? $shift->staff_id : null;
         }
 
         $clientLatitude = $client->latitude;
@@ -356,7 +362,22 @@ class StaffService
                         ->whereTime('end_time', '>', $formattedStart);
                 })
                 ->whereNotNull('staff_id')
+                ->when($shiftId, function ($query) use ($shiftId) {
+                    return $query->where('id', '!=', $shiftId);
+                })
                 ->pluck('staff_id')
+                ->toArray();
+        }
+
+        // Find staff on approved leave for this date
+        $onLeaveStaffIds = [];
+        if ($startDate) {
+            $onLeaveStaffIds = DB::table('staff_leaves')
+                ->where('leave_status', 1) // Approved leave
+                ->where('is_deleted', 1) // Active leave record
+                ->whereDate('start_date', '<=', $startDate)
+                ->whereDate('end_date', '>=', $startDate)
+                ->pluck('user_id')
                 ->toArray();
         }
 
@@ -365,6 +386,7 @@ class StaffService
             ->where('home_id', Auth::user()->home_id)
             ->where('status', 1)
             ->whereNotIn('id', $overlappingStaffIds)
+            ->whereNotIn('id', $onLeaveStaffIds)
             ->where('is_deleted', 0); // Exclude deleted users
 
         // 5. Find users who have the matching course_id in user_qualification

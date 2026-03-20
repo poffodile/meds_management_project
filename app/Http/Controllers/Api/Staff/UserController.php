@@ -612,6 +612,94 @@ class UserController extends Controller
 		], 200);
 	}
 
+	// public function dashboard(Request $request)
+	// {
+	// 	// Validate the incoming request
+	// 	$validator = Validator::make($request->all(), [
+	// 		'staff_id' => 'required',
+	// 	]);
+	// 	if ($validator->fails()) {
+	// 		return [
+	// 			'success' => false,
+	// 			'errors' => $validator->errors()->first()
+	// 		];
+	// 	}
+
+	// 	// Fetch scheduled shifts for the given staff member
+	// 	$staffId = $request->input('staff_id');
+	// 	$londonTime = Carbon::now('Europe/London');
+	// 	$data['date_time'] = $londonTime->format('D d M Y');
+	// 	$hour = $londonTime->hour;
+
+	// 	if ($hour >= 5 && $hour < 12) {
+	// 		$greeting = "Good Morning";
+	// 	} elseif ($hour >= 12 && $hour < 17) {
+	// 		$greeting = "Good Afternoon";
+	// 	} elseif ($hour >= 17 && $hour < 21) {
+	// 		$greeting = "Good Evening";
+	// 	} else {
+	// 		$greeting = "Good Night";
+	// 	}
+	// 	$user = User::where('id', $staffId)->select('name')->first();
+	// 	$data['greeting'] = $greeting . ", " . $user->name;
+	// 	$today = $londonTime->toDateString();
+	// 	$currentTime = $londonTime->format('H:i:s');
+	// 	$todayShift = ScheduledShift::where('staff_id', $staffId)
+	// 		->where('start_date', $today)
+	// 		->where('status', 'assigned')
+	// 		->orderBy('start_time', 'asc')
+	// 		->select('start_time', 'end_time', 'tasks', 'notes', 'id')
+	// 		->get();
+
+	// 	$data['today_shift'] = null;
+
+	// 	foreach ($todayShift as $shift) {
+	// 		$shiftEnd = Carbon::parse($shift->end_time)->format('H:i:s');
+
+	// 		$loginInActivity = LoginInActivity::where('user_id', $staffId)
+	// 			->where('shift_id', $shift->id)
+	// 			->where('login_date', $today)
+	// 			->orderBy('id', 'desc')
+	// 			->first();
+
+	// 		if ($loginInActivity) {
+	// 			// Second condition: check login activity if null on checkout time the shift show else show the next shift
+	// 			if ($loginInActivity->check_out_time == null) {
+	// 				$shift->start_time = Carbon::parse($shift->start_time)->format('H:i');
+	// 				$shift->end_time   = Carbon::parse($shift->end_time)->format('H:i');
+	// 				$data['today_shift'] = $shift;
+	// 				break;
+	// 			} elseif ($shiftEnd >= $currentTime) {
+	// 				$shift->start_time = Carbon::parse($shift->start_time)->format('H:i');
+	// 				$shift->end_time   = Carbon::parse($shift->end_time)->format('H:i');
+	// 				$data['today_shift'] = $shift;
+	// 				break;
+	// 			}
+	// 		} else {
+	// 			$data['today_shift'] = $shift;
+	// 			break;
+	// 		}
+	// 	}
+
+	// 	// Tomorrow shift: first shift after today
+	// 	$tomorrowShift = ScheduledShift::where('staff_id', $staffId)
+	// 		->select('start_time', 'end_time', 'tasks', 'id')
+	// 		->where('start_date', '>', $today)
+	// 		->first();
+	// 	if ($tomorrowShift) {
+	// 		$tomorrowShift->start_time = Carbon::parse($tomorrowShift->start_time)->format('H:i');
+	// 		$tomorrowShift->end_time   = Carbon::parse($tomorrowShift->end_time)->format('H:i');
+	// 		$data['tommorrow_shift'] = $tomorrowShift;
+	// 	} else {
+	// 		$data['tommorrow_shift'] = null;
+	// 	}
+	// 	return response()->json([
+	// 		'success' => true,
+	// 		'data' => $data,
+	// 		'message' => 'Shift schedule fetched successfully.'
+	// 	], 200);
+	// }
+
 	public function dashboard(Request $request)
 	{
 		// Validate the incoming request
@@ -658,9 +746,12 @@ class UserController extends Controller
 			->get();
 
 		$data['today_shift'] = null;
+		$nextShift = null;
 
 		foreach ($todayShift as $shift) {
-			$shiftEnd = Carbon::parse($shift->end_time)->format('H:i:s');
+
+			$shiftStart = Carbon::parse($shift->start_time)->format('H:i:s');
+			$shiftEnd   = Carbon::parse($shift->end_time)->format('H:i:s');
 
 			$loginInActivity = LoginInActivity::where('user_id', $staffId)
 				->where('shift_id', $shift->id)
@@ -668,23 +759,32 @@ class UserController extends Controller
 				->orderBy('id', 'desc')
 				->first();
 
-			if ($loginInActivity) {
-				// Second condition: check login activity if null on checkout time the shift show else show the next shift
-				if ($loginInActivity->check_out_time == null) {
-					$shift->start_time = Carbon::parse($shift->start_time)->format('H:i');
-					$shift->end_time   = Carbon::parse($shift->end_time)->format('H:i');
-					$data['today_shift'] = $shift;
-					break;
-				}
-			} else {
-				// First condition: check shift time is current time start time and time is passed
-				if ($shiftEnd >= $currentTime) {
-					$shift->start_time = Carbon::parse($shift->start_time)->format('H:i');
-					$shift->end_time   = Carbon::parse($shift->end_time)->format('H:i');
-					$data['today_shift'] = $shift;
-					break;
-				}
+			// ✅ 1. Highest Priority → Active shift (checkout NULL)
+			if ($loginInActivity && $loginInActivity->check_out_time == null) {
+				$shift->start_time = Carbon::parse($shift->start_time)->format('H:i');
+				$shift->end_time   = Carbon::parse($shift->end_time)->format('H:i');
+
+				$data['today_shift'] = $shift;
+				break;
 			}
+
+			// ✅ 2. Skip expired shifts (IMPORTANT FIX)
+			if ($shiftEnd < $currentTime) {
+				continue;
+			}
+
+			// ✅ 3. Store next valid shift (if no active found)
+			if (!$nextShift) {
+				$shift->start_time = Carbon::parse($shift->start_time)->format('H:i');
+				$shift->end_time   = Carbon::parse($shift->end_time)->format('H:i');
+
+				$nextShift = $shift;
+			}
+		}
+
+		// ✅ Final assignment if no active shift found
+		if (!$data['today_shift']) {
+			$data['today_shift'] = $nextShift;
 		}
 
 		// Tomorrow shift: first shift after today

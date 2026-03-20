@@ -2,10 +2,16 @@
 @section('title','Manage Dashboard')
 @section('content')
 
-
 @include('frontEnd.roster.common.roster_header')
 
-
+<style>
+    .rota_dash-card a {
+        display: flex;
+        width: 100%;
+        justify-content: space-between;
+        align-items: center;
+    }
+</style>
 <main class="page-content">
     <div class="container-fluid">
 
@@ -23,43 +29,57 @@
         <div class="rota_dashboard-cards simpleCard manageDashCard">
 
             <div class="rota_dash-card">
-                <div class="rota_dash-left">
-                    <p class="rota_title fs12">Active Carers</p>
-                    <h2 class="rota_count mt-2">11</h2>
-                </div>
-                <div>
-                    <i class="bx bx-user-circle blueText fs30"></i>
-                </div>
+                <a href="{{ url('roster/carer') }}">
+                    <div class="rota_dash-left">
+                        <p class="rota_title fs12">Active Carers</p>
+                        <h2 class="rota_count mt-2">{{ $userCount['activeCarers'] }}</h2>
+                    </div>
+                    <div>
+                        <i class="bx bx-user-circle blueText fs30"></i>
+                    </div>
+                </a>
             </div>
 
-            <div class="rota_dash-card">
-                <div class="rota_dash-left">
-                    <p class="rota_title">Active Clients</p>
-                    <h2 class="rota_count mt-2">9</h2>
-                </div>
-                <div>
-                    <i class="bx bx-group greenTextp fs30"></i>
-                </div>
-            </div>
+
 
             <div class="rota_dash-card">
-                <div class="rota_dash-left">
-                    <p class="rota_title">Today's Shifts</p>
-                    <h2 class="rota_count mt-2">3</h2>
-                </div>
-                <div>
-                    <i class="bx bx-calendar-week purpleTextp fs30"></i>
-                </div>
+                <a href="{{ url('roster/client') }}">
+                    <div class="rota_dash-left">
+                        <p class="rota_title">Active Clients</p>
+                        <h2 class="rota_count mt-2">{{ $userCount['activeClients'] }}</h2>
+                    </div>
+                    <div>
+                        <i class="bx bx-group greenTextp fs30"></i>
+                    </div>
+                </a>
             </div>
 
+
+
             <div class="rota_dash-card">
-                <div class="rota_dash-left">
-                    <p class="rota_title">Unfilled Shifts</p>
-                    <h2 class="rota_count mt-2 orangeText">307</h2>
-                </div>
-                <div>
-                    <i class="bx bx-alert-triangle orangeText fs30"></i>
-                </div>
+                <a href="{{ url('roster/schedule-shift') }}">
+                    <div class="rota_dash-left">
+                        <p class="rota_title">Today's Shifts</p>
+                        <h2 class="rota_count mt-2">{{ $userCount['todayShifts'] }}</h2>
+                    </div>
+                    <div>
+                        <i class="bx bx-calendar-week purpleTextp fs30"></i>
+                    </div>
+                </a>
+            </div>
+
+
+
+            <div class="rota_dash-card">
+                <a href="{{ url('roster/schedule-shift') }}">
+                    <div class="rota_dash-left">
+                        <p class="rota_title">Unfilled Shifts</p>
+                        <h2 class="rota_count mt-2 orangeText">{{ $userCount['unfilledShifts'] }}</h2>
+                    </div>
+                    <div>
+                        <i class="bx bx-alert-triangle orangeText fs30"></i>
+                    </div>
+                </a>
             </div>
 
         </div>
@@ -404,22 +424,22 @@
                         <div class="staffShifts">
                             <div class="todayNumber">
                                 <p class="fs12">Today's Shifts</p>
-                                <h3>3</h3>
+                                <h3>{{ $userCount['todayShifts'] }}</h3>
                             </div>
                             <div class="fillPersent">
                                 <p class="fs12">Fill Rate</p>
-                                <h3 class="text-green font">33.3%</h3>
+                                <h3 class="text-green font">{{ $userCount['fillRate'] }}%</h3>
                             </div>
                         </div>
                         <div class="staffShifts_alert-box p-3">
                             <div class="staffShifts_alert-icon">⚠</div>
                             <div class="staffShifts_alert-content">
-                                <p class="staffShifts_alert-title">300 Unfilled Shifts</p>
+                                <p class="staffShifts_alert-title">{{ $userCount['unfilledShifts'] }} Unfilled Shifts</p>
                                 <p class="staffShifts_alert-subtitle">Needs attention</p>
                             </div>
                         </div>
                         <div class="text-center">
-                            <a href="#!" class="borderBtn"><i class="fa fa-calendar-o f18 me-2"></i> Full view Schedule</a>
+                            <a href="{{ url('roster/schedule-shift') }}" class="borderBtn"><i class="fa fa-calendar-o f18 me-2"></i> Full view Schedule</a>
                         </div>
                     </div>
                 </div>
