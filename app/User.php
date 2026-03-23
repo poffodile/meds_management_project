@@ -11,6 +11,10 @@ use App\Models\PersonalManagement\TimeSheet;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 use App\Models\ScheduledShift;
+use App\Models\ClientCareScheduleDate;
+use App\Models\ClientCareScheduleDay;
+use App\Models\ClientCareWorkPrefer;
+use App\Models\ClientCareUnavailableDate;
 
 class User extends Authenticatable
 {
@@ -65,6 +69,23 @@ class User extends Authenticatable
     public function certificates()
     {
         return $this->hasMany('App\UserQualification', 'user_id', 'id')->where('is_deleted', 0);
+    }
+
+    public function working_hours()
+    {
+        return $this->hasMany(ClientCareScheduleDay::class, 'carer_id');
+    }
+    public function specific_working_hours()
+    {
+        return $this->hasMany(ClientCareScheduleDate::class, 'carer_id');
+    }
+    public function work_preferences()
+    {
+        return $this->hasOne(ClientCareWorkPrefer::class, 'carer_id');
+    }
+    public function work_unavailability()
+    {
+        return $this->hasMany(ClientCareUnavailableDate::class, 'carer_id');
     }
 
     //send set password link to user

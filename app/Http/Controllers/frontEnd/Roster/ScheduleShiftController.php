@@ -46,6 +46,7 @@ class ScheduleShiftController extends Controller
                 $shift->staff_name = $shift->staff->name ?? 'Unassigned';
                 return $shift;
             });
+        $data['home_title'] = \App\Home::getHomeById(Auth::user()->home_id);
 
         return view('frontEnd.roster.schedule.schedule_shift', $data);
     }
@@ -54,7 +55,7 @@ class ScheduleShiftController extends Controller
     {
         // Basic validation
         $request->validate([
-            'client_id'  => 'required',
+            'client_id'  => 'nullable',
             'start_date' => 'required',
             'carer_id'   => 'nullable',
             'start_time' => 'required',
@@ -162,7 +163,7 @@ class ScheduleShiftController extends Controller
         $shift = ScheduledShift::findOrFail($id);
 
         $request->validate([
-            'client_id'  => 'required',
+            'client_id'  => 'nullable',
             'start_date' => 'required',
             'carer_id'   => 'nullable',
             'start_time' => 'required',
@@ -542,6 +543,7 @@ class ScheduleShiftController extends Controller
         $shift = ScheduledShift::find($request->shift_id);
 
         $shift->staff_id = $request->staff_id == 'open' ? null : $request->staff_id;
+        $shift->status = 'assigned';
         $shift->save();
 
         return response()->json([

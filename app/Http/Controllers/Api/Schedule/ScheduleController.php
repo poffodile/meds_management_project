@@ -123,4 +123,77 @@ class ScheduleController extends Controller
             ], 200);
         }
     }
+    public function get_unassigned_shifts(Request $request)
+    {
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+            'home_id' => ['required', 'integer', 'exists:home,id'],
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first(),
+            ], 200);
+        }
+
+        $validated = $validator->validated();
+        $homeId = $validated['home_id'];
+
+        $shifts = ScheduledShift::whereNull('service_user_id')
+            ->whereNull('staff_id')
+            ->where('home_id', $homeId)
+            ->select('id', 'start_date', 'start_time', 'end_time', 'shift_type', 'notes', 'tasks')
+            ->orderBy('start_date')
+            ->orderBy('start_time')
+            ->get();
+
+        if ($shifts->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No unassigned shifts found.',
+                'data'    => [],
+                'total_shifts' => 0,
+            ], 200);
+        }
+
+        $data = $shifts->map(function ($shift) {
+            $shift->day = \Carbon\Carbon::parse($shift->start_date)->format('l');
+            $shift->start_time = \Carbon\Carbon::parse($shift->start_time)->format('H:i');
+            $shift->end_time   = \Carbon\Carbon::parse($shift->end_time)->format('H:i');
+            return $shift;
+        });
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Unassigned shifts retrieved successfully.',
+            'data' => $data,
+            'total_shifts' => $data->count(),
+        ]);
+    }
+
+    public function assignShift(Request $request)
+    {
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+            'shift_id' => ['required', 'integer', 'exists:scheduled_shifts,id'],
+            'staff_id' => ['nullable', 'integer', 'exists:user,id'],
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first(),
+            ], 200);
+        }
+
+        $shift = ScheduledShift::find($request->shift_id);
+
+        $shift->staff_id = $request->staff_id;
+        $shift->status   = 'assigned';
+        $shift->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Shift assigned successfully.',
+        ], 200);
+    }
 }

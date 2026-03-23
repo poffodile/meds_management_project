@@ -129,6 +129,16 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 		Route::get('/dashboard', [RosterController::class, 'dashboard'])->name('roster.dashboard');
 		Route::get('/manage-dashboard', [ManageDashboardController::class, 'index'])->name('roster.manage.dashboard');
 		Route::get('/carer-availability', [CarerAvailabilityController::class, 'index'])->name('roster.carer.availability');
+
+		Route::get('/carer-availability/loadData', [CarerAvailabilityController::class, 'loadUserData'])->name('roster.carer.availability.loadUserData');
+		Route::post('/carer-availability/details', [CarerAvailabilityController::class, 'details'])->name('roster.carer.availability.details');
+		Route::post('/carer-availability/load-working-hours', [CarerAvailabilityController::class, 'loadworkinghours'])->name('roster.carer.availability.loadworkinghours');
+		Route::post('/carer-availability/working-hours/save', [CarerAvailabilityController::class, 'save_working_hrs'])->name('roster.carer.availability.save_working_hrs');
+		Route::post('/carer-availability/work-preferences/save', [CarerAvailabilityController::class, 'save_work_preferences'])->name('roster.carer.availability.save_work_preferences');
+		Route::post('/carer-availability/unavailability/save', [CarerAvailabilityController::class, 'save_unavailability'])->name('roster.carer.availability.save_unavailability');
+		Route::post('/carer-availability/unavailability/loadData', [CarerAvailabilityController::class, 'load_unavailability_data'])->name('roster.carer.availability.load_unavailability_data');
+		Route::post('/carer-availability/unavailability/delete', [CarerAvailabilityController::class, 'delete_unavailability'])->name('roster.carer.availability.delete_unavailability');
+		Route::post('/carer-availability/overview', [CarerAvailabilityController::class, 'load_overview_data'])->name('roster.carer.availability.load_overview_data');
 		Route::get('/messaging-center', [MessagingCenterController::class, 'index'])->name('roster.carer.availability');
 		Route::get('/staff-task', [StaffTaskController::class, 'index'])->name('roster.staff.task');
 		Route::get('/care-document', [CareDocumentController::class, 'index'])->name('roster.care.document');
@@ -168,6 +178,13 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 		Route::get('/get-monthly-shifts', [ScheduleShiftController::class, 'getMonthlyShifts'])->name('get.monthly.shifts');
 		Route::delete('/schedule-shift/delete/{id}', [ScheduleShiftController::class, 'deleteShift'])->name('roster.schedule.delete');
 		Route::post('/schedule-shift/assign-shift', [ScheduleShiftController::class, 'assignShift'])->name('roster.schedule.assign.shift');
+
+		// Staff Supervisions
+		Route::get('supervision-management', [SupervisionController::class, 'index']);
+		Route::post('supervision-management/record/save', [SupervisionController::class, 'record_saved'])->name('roster.supervision.save');
+		Route::get('supervision-management/fetch_supervision_list', [SupervisionController::class, 'fetch_supervision'])->name('roster.fetch_supervision.list');
+		Route::post('supervision-management/supervision_list/delete', [SupervisionController::class, 'supervision_delete'])->name('roster.supervision.delete');
+		Route::post('supervision-management/supervision_list/details', [SupervisionController::class, 'supervision_details'])->name('roster.supervision.details');
 
 		Route::get('/client', [ClientController::class, 'index'])->name('roster.client');
 		Route::get('/client-details/{client_id}', [ClientController::class, 'client_details'])->name('roster.client.details');

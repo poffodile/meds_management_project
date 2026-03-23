@@ -9,7 +9,7 @@ use App\Models\Staff\Documents;
 use App\Models\Staff\UserNote;
 use Illuminate\Support\Facades\Storage;
 use App\LoginInActivity;
-
+use App\Models\Staff\StaffSupervision;
 class CarerDetailsController extends Controller
 {
 
@@ -20,27 +20,37 @@ class CarerDetailsController extends Controller
         $this->staffService = $staffService;
     }
 
-    public function carer_details($carer_id)
+     public function carer_details($carer_id)
     {
         if (!$carer_id) {
             abort(400, 'User ID is required.');
         }
         // dd($carer_id);
-        $data['staffDetails'] = $this->staffService->getStaffDetails($carer_id);
+        $staffDetails = $this->staffService->getStaffDetails($carer_id);
+        $staffDetails->load([
+            'working_hours',
+            'work_preferences',
+            'specific_working_hours'
+        ]);
+
+        $type = $staffDetails->working_hours->pluck('type')->unique()->implode(',');
+
+        if (empty($type) && count($staffDetails->specific_working_hours) > 0) {
+            $type = "specific";
+        }
+
+        $staffDetails->working_hours_type = $type;
+        $data['staffDetails'] = $staffDetails;
+        $data['superVisionCount'] = StaffSupervision::where('member_id', $carer_id)->count();
         $data['selectedCourseIds'] = $data['staffDetails']->qualifications
             ->pluck('course_id')
             ->toArray();
         // dd($data['staffDetails']);
         $data['user_documents'] = Documents::where('user_id', $carer_id)->get()->toArray();
         $data['courses'] = $this->staffService->courses();
-        $data['user_notes'] = UserNote::where('user_id', $carer_id)->where('deleted_at', null)->orderBy('created_at', 'DESC')->get()->toArray();
-        $data['user_logs'] = LoginInActivity::where('user_id', $carer_id)
-            ->orderBy('login_date', 'desc')
-            ->orderBy('check_in_time', 'asc')
-            ->get()
-            ->groupBy('login_date')
-            ->toArray();
-        // dd($data['user_logs']);
+        $data['user_notes'] = UserNote::where('user_id', $carer_id)->orderBy('created_at', 'DESC')->get()->toArray();
+
+        // dd($data['user_notes']);
         return view('frontEnd.roster.staff.carer_details', $data);
     }
 

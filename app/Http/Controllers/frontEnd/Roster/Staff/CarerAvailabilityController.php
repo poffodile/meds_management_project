@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\frontEnd\Roster\Staff;
 
 use App\Http\Controllers\Controller;
+use App\Models\ClientCareWorkPrefer;
 use App\Services\Staff\CarerWorkingHourService;
 use App\Services\Staff\StaffService;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class CarerAvailabilityController extends Controller
@@ -42,13 +44,20 @@ class CarerAvailabilityController extends Controller
         if (!empty($search)) {
             $staff->where('name', 'LIKE', "%{$search}%");
         }
-
+        $staff->withCount('working_hours as total_working_hours')
+            ->withCount('work_unavailability')
+            ->withSum(
+                ['working_hours as total_working_hours_sum' => function ($q) {
+                    $q->select(DB::raw('SUM(TIMESTAMPDIFF(MINUTE, start_time, end_time)/60)'));
+                }],
+                DB::raw('0')
+            );
         /**
          * ----------------------------------
          * Fetch staff
          * ----------------------------------
          */
-        $staff = $staff->latest()->paginate(6);
+        $staff = $staff->latest()->paginate(10);
 
         // dd($staff);
 
@@ -96,6 +105,45 @@ class CarerAvailabilityController extends Controller
         return response()->json([
             'status' => true,
             'data'   => $staff,
+        ]);
+    }
+    public function loadworkinghours(Request $req)
+    {
+        $user_id = $req->userId;
+
+        if (!$user_id) {
+            return response()->json([
+                'status' => false,
+                'message' => 'User ID not found'
+            ]);
+        }
+        $reqData = ['carer_id' => $user_id, 'type' => $req->type];
+
+
+        if ($req->type == 'specific') {
+            $load_overview_data =  $this->carerWorkingHourService->load_specific_working_data($reqData)->map(function ($wh) {
+                return [
+                    'id' => $wh->id,
+                    'type' => 'specific',
+                    'start_date' => Carbon::parse($wh->start_date)->format('Y-m-d'),
+                    'end_date' => Carbon::parse($wh->end_date)->format('Y-m-d'),
+                    'start_time' => Carbon::parse($wh->start_date)->format('H:i'),
+                    'end_time' => Carbon::parse($wh->end_date)->format('H:i'),
+                    'is_working' => $wh->is_working,
+                ];
+            })->values();
+        } else {
+            $load_overview_data = $this->carerWorkingHourService->load_overview_data($reqData);
+        }
+        // $load_specific_working_data = ;
+        $work_preferences = ClientCareWorkPrefer::where('carer_id', $user_id)->first();
+        return response()->json([
+            'status' => true,
+            'data'   => [
+                'working_hours' => $load_overview_data,
+                'work_preferences' => $work_preferences,
+                'staff' => $this->staffService->getCarerAvailabilityDetails($user_id)
+            ],
         ]);
     }
 
@@ -204,7 +252,7 @@ class CarerAvailabilityController extends Controller
                 'unavailability_id' => 'nullable',
                 'unavailability_type' => 'required|in:single,range',
                 'start_date' => 'required|date|after_or_equal:today',
-                'end_date' => 'nullable|date|after:start_date',
+                'end_date' => 'nullable|date|after:start_date|required_if:unavailability_type,range',
                 'unavailability_start_time' => 'nullable',
                 'unavailability_end_time' => 'nullable',
                 'unavailability_reason' => 'nullable',
@@ -214,6 +262,7 @@ class CarerAvailabilityController extends Controller
                 'start_date.required' => 'Start date is required',
                 'start_date.date' => 'Start date must be a valid date',
                 'start_date.after_or_equal' => 'Start date must be today or a future date',
+                'end_date.required_if' => 'End date is required.',
                 'end_date.date' => 'End date must be a valid date',
                 'end_date.after' => 'End date must be after start date',
             ]);
@@ -270,9 +319,35 @@ class CarerAvailabilityController extends Controller
                 ]);
             }
             $reqData = $req->all();
-            $reqData['home_id'] = $homeId;
-            $reqData['user_id'] = $user_id;
+            // $reqData['home_id'] = $homeId;
+            // $reqData['user_id'] = $user_id;
             $data = $this->carerWorkingHourService->get_unavailability_data($reqData);
+            $load_staff_leaves = $this->carerWorkingHourService->load_staff_leaves($reqData)
+                ->select(
+                    'id',
+                    'home_id',
+                    'user_id',
+                    'leave_type',
+                    'start_date',
+                    'end_date',
+                    'end_time',
+                    'start_time'
+                )
+                ->with('leave_types:id,leave_name')
+                ->latest()->get()->map(function ($q) {
+                    $start_date = date('F j, Y', strtotime($q->start_date));
+                    $start_time = date('H:i', strtotime($q->start_time));
+                    $end_date = date('F j, Y', strtotime($q->end_date));
+                    $end_time = date('H:i', strtotime($q->end_time));
+                    $formatted_date = $start_date . ' - ' . $end_date;
+                    return [
+                        'id' => $q->id,
+                        'home_id' => $q->home_id,
+                        'user_id' => $q->user_id,
+                        'leave_name' => $q->leave_types ? $q->leave_types->leave_name : "",
+                        'formatted_date' => $formatted_date,
+                    ];
+                });
             $ar = [];
             foreach ($data as $item) {
 
@@ -326,6 +401,7 @@ class CarerAvailabilityController extends Controller
             return response()->json([
                 'status' => true,
                 'data'   => $ar,
+                'leave_data' => $load_staff_leaves
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -348,8 +424,8 @@ class CarerAvailabilityController extends Controller
                 ]);
             }
             $reqData = $req->all();
-            $reqData['home_id'] = $homeId;
-            $reqData['user_id'] = $user_id;
+            // $reqData['home_id'] = $homeId;
+            // $reqData['user_id'] = $user_id;
             $data = $this->carerWorkingHourService->load_overview_data($reqData);
             $type = 'standard';
             if ($data->count() == 0) {
@@ -360,7 +436,21 @@ class CarerAvailabilityController extends Controller
 
             // return $data;
             $get_unavailability_data = $this->carerWorkingHourService->get_unavailability_data($reqData);
+            $get_staff_leaves = $this->carerWorkingHourService->load_staff_leaves($reqData)
+                ->select(
+                    'id',
+                    'home_id',
+                    'user_id',
+                    'leave_type',
+                    'start_date',
+                    'end_date',
+                    'end_time',
+                    'start_time'
+                )
+                ->with('leave_types:id,leave_name')
+                ->latest()->get();
             $ar = [];
+            $leave_arr = [];
             $unavailability_ar = [];
             foreach ($data as $item) {
                 if ($type == 'specific') {
@@ -416,12 +506,24 @@ class CarerAvailabilityController extends Controller
                         $start->format('Y-m-d');
                 }
             }
+            foreach ($get_staff_leaves as $item) {
+
+                $start = Carbon::parse($item->start_date);
+                $end = Carbon::parse($item->end_date);
+
+                $period = CarbonPeriod::create($start, $end);
+
+                foreach ($period as $date) {
+                    $leave_arr[] = $date->format('Y-m-d');
+                }
+            }
             sort($unavailability_ar);
             return response()->json([
                 'status' => true,
                 'data'   => [
                     'availability' => $ar,
                     'unavailability'   => $unavailability_ar,
+                    'leave_arr' => $leave_arr,
                 ],
             ]);
         } catch (\Exception $e) {

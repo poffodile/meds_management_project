@@ -330,7 +330,6 @@ class StaffService
         $startDate = $request->input('start_date');
         $startTime = $request->input('start_time');
         $endTime = $request->input('end_time');
-        $shiftId = $request->input('shift_id');
 
         // 1. Get the courses for this service user
         $clientCourses = suUserCourse::where('su_user_id', $id)->pluck('course_id')->toArray();
@@ -340,11 +339,6 @@ class StaffService
 
         if (!$client) {
             return collect(); // Return empty collection if client not found
-        }
-        $originalStaffId = null;
-        if ($shiftId) {
-            $shift = \App\Models\ScheduledShift::find($shiftId);
-            $originalStaffId = $shift ? $shift->staff_id : null;
         }
 
         $clientLatitude = $client->latitude;
@@ -362,22 +356,7 @@ class StaffService
                         ->whereTime('end_time', '>', $formattedStart);
                 })
                 ->whereNotNull('staff_id')
-                ->when($shiftId, function ($query) use ($shiftId) {
-                    return $query->where('id', '!=', $shiftId);
-                })
                 ->pluck('staff_id')
-                ->toArray();
-        }
-
-        // Find staff on approved leave for this date
-        $onLeaveStaffIds = [];
-        if ($startDate) {
-            $onLeaveStaffIds = DB::table('staff_leaves')
-                ->where('leave_status', 1) // Approved leave
-                ->where('is_deleted', 1) // Active leave record
-                ->whereDate('start_date', '<=', $startDate)
-                ->whereDate('end_date', '>=', $startDate)
-                ->pluck('user_id')
                 ->toArray();
         }
 
@@ -386,7 +365,6 @@ class StaffService
             ->where('home_id', Auth::user()->home_id)
             ->where('status', 1)
             ->whereNotIn('id', $overlappingStaffIds)
-            ->whereNotIn('id', $onLeaveStaffIds)
             ->where('is_deleted', 0); // Exclude deleted users
 
         // 5. Find users who have the matching course_id in user_qualification
@@ -500,5 +478,105 @@ class StaffService
         $distance = $earthRadius * $c;
 
         return round($distance, 2); // Distance in KM (2 decimal points)
+    }
+    public function getCarerAvailabilityDetails($userId)
+    {
+        // $payRateTypeId = $this->getPayRateTypeId();
+        $hasWeek1 = DB::table('client_care_schedule_days')
+            ->where('carer_id', $userId)
+            ->where('week_number', 1)
+            ->exists();
+        $weekNumber = $hasWeek1 ? 1 : 2;
+        $user = User::select('id', 'home_id', 'name', 'email')
+            ->withCount([
+                'working_hours as total_working_hours' => function ($q) use ($weekNumber) {
+                    $q->where(function ($query) use ($weekNumber) {
+                        $query->whereNull('week_number')
+                            ->orWhere('week_number', $weekNumber);
+                    });
+                }
+            ])
+            ->withCount([
+                'working_hours as week_1_counts' => function ($q) use ($weekNumber) {
+                    $q->where(function ($query) use ($weekNumber) {
+                        $query->whereNotNull('week_number')->where('week_number', 1);
+                    });
+                }
+            ])
+            ->withCount([
+                'working_hours as week_2_counts' => function ($q) use ($weekNumber) {
+                    $q->where(function ($query) use ($weekNumber) {
+                        $query->whereNotNull('week_number')->where('week_number', 2);
+                    });
+                }
+            ])
+            ->withSum(
+                ['working_hours as week_1_sum' => function ($q) use ($weekNumber) {
+                    $q->select(DB::raw('SUM(TIMESTAMPDIFF(MINUTE,start_time,end_time)/60)'))
+                        ->where(function ($query) use ($weekNumber) {
+                            $query->whereNotNull('week_number')
+                                ->where('week_number', 1);
+                        });
+                }],
+                DB::raw('0')
+            )
+            ->withSum(
+                ['working_hours as week_2_sum' => function ($q) use ($weekNumber) {
+                    $q->select(DB::raw('SUM(TIMESTAMPDIFF(MINUTE,start_time,end_time)/60)'))
+                        ->where(function ($query) use ($weekNumber) {
+                            $query->whereNotNull('week_number')
+                                ->where('week_number', 2);
+                        });
+                }],
+                DB::raw('0')
+            )
+            ->withSum(
+                ['working_hours as total_working_hours_sum' => function ($q) use ($weekNumber) {
+                    $q->select(DB::raw('SUM(TIMESTAMPDIFF(MINUTE,start_time,end_time)/60)'))
+                        ->where(function ($query) use ($weekNumber) {
+                            $query->whereNull('week_number')
+                                ->orWhere('week_number', $weekNumber);
+                        });
+                }],
+                DB::raw('0')
+            )
+            ->withSum(
+                ['specific_working_hours as specific_total_working_hours_sum' => function ($q) {
+                    $q->select(DB::raw('SUM(TIMESTAMPDIFF(MINUTE, start_date, end_date)/60)'));
+                }],
+                DB::raw('0')
+            )
+            ->with([
+                'working_hours',
+                'work_preferences',
+                'specific_working_hours'
+            ])
+            ->where('user.id', $userId)
+            ->where('user.is_deleted', 0)
+            ->first();
+
+        if (!$user) {
+            return null;
+        }
+
+        $arr = $user->specific_working_hours->map(function ($wh) {
+            return [
+                'id' => $wh->id,
+                'type' => 'specific',
+                'start_date' => Carbon::parse($wh->start_date)->format('Y-m-d'),
+                'end_date' => Carbon::parse($wh->end_date)->format('Y-m-d'),
+                'start_time' => Carbon::parse($wh->start_date)->format('H:i'),
+                'end_time' => Carbon::parse($wh->end_date)->format('H:i'),
+                'is_working' => $wh->is_working,
+            ];
+        })->values();
+        unset($user->specific_working_hours);
+        $user->specific_working_hours = $arr;
+        $user->working_hrs_per_week = ($user->total_working_hours . ' days • ') . (number_format(($user->total_working_hours_sum ? $user->total_working_hours_sum : $user->specific_total_working_hours_sum), 0) . ' hrs/week');
+        // // Attach related data
+        // $user->emergencyContact = UserEmergencyContact::where('user_id', $userId)->first();
+        // $user->qualifications   = UserQualification::where('user_id', $userId)->get();
+
+        return $user;
     }
 }

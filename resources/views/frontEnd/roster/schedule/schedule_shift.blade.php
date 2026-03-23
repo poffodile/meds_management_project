@@ -1342,9 +1342,9 @@
                                                 <i class='bx  bx-user'></i> Client
                                             </button>
 
-                                            <button type="button" class="tab" id="propertyTab" data-tab="scheduleProperty">
+                                            <!-- <button type="button" class="tab" id="propertyTab" data-tab="scheduleProperty">
                                                 <i class="fa fa-building-o"></i> Property
-                                            </button>
+                                            </button> -->
                                         </div>
 
                                         <!-- TAB CONTENT -->
@@ -1352,7 +1352,7 @@
                                             {{-- Locaton Section --}}
                                             <div class="content" id="scheduleLocation">
                                                 <div class="row">
-                                                    <div class="col-md-12">
+                                                    <!-- <div class="col-md-12">
                                                         <select class="form-control" name="location_id">
                                                             <option value="">Select location</option>
                                                             <option>Inactive</option>
@@ -1361,10 +1361,10 @@
                                                     <div class="col-md-12 m-t-10">
                                                         <input type="text" name="location_name" id="" class="form-control"
                                                             placeholder="Enter custom location name">
-                                                    </div>
-                                                    <div class="col-md-12 m-t-10">
-                                                        <input type="text" name="location_address" id="" class="form-control"
-                                                            placeholder="Address (optional)">
+                                                    </div> -->
+                                                    <!-- <div class="col-md-12 m-t-10"> -->
+                                                    <div class="col-md-12">
+                                                        <input type="text" name="location_address" value="{{ $home_title }}" id="" class="form-control" placeholder="Address">
                                                     </div>
 
                                                 </div>
@@ -1878,7 +1878,7 @@
         });
     </script>
 
-    <script>
+    <!-- <script>
         document.addEventListener('DOMContentLoaded', function() {
 
             const careType = document.getElementById('careType');
@@ -1912,7 +1912,7 @@
             // Run on change
             careType.addEventListener('change', toggleTabs);
         });
-    </script>
+    </script> -->
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -2395,19 +2395,15 @@
 
             // Form Validation
             document.getElementById('createShiftForm').addEventListener('submit', function(e) {
-                const clientId = document.getElementById('clientSelect').value;
-                if (!clientId) {
-                    e.preventDefault();
-                    alert('Please select a client before creating the shift.');
-                    return;
+                const clientTab = document.getElementById('clientTab');
+                if (clientTab && clientTab.classList.contains('active')) {
+                    const clientId = document.getElementById('clientSelect').value;
+                    if (!clientId) {
+                        e.preventDefault();
+                        alert('Please select a client before creating the shift.');
+                        return;
+                    }
                 }
-
-                // let carerId = selectedCarerIdInput.value;
-                // if (!carerId) {
-                //     e.preventDefault();
-                //     alert('Please assign a carer before creating the shift.');
-                //     return;
-                // }
 
                 // Time Validation
                 const startTime = document.querySelector('input[name="start_time"]').value;

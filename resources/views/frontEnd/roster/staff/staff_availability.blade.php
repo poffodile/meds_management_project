@@ -14,8 +14,8 @@
         }
 
         /* .sideTabs {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    width: 100%;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                } */
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            width: 100%;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        } */
         .sideTabs .tab {
             width: 100%;
             text-align: left;
@@ -107,6 +107,11 @@
             display: inline-flex;
             flex-grow: 4;
             width: 100%;
+        }
+
+        .purpleOnLeave {
+            background: #a855f7;
+            color: #fff
         }
     </style>
 
@@ -237,7 +242,7 @@
                     <div class="col-md-9">
                         {{-- FOR blank career --}}
                         <div class="blankCarer" id="defaultBlankCarerWrapper">
-                            <div class=" leave-card"
+                            <div class="leave-card"
                                 style="height: 400px; margin-top:0px; display:flex; justify-content:center; align-items:center;">
                                 <div class="leavebanktabCont blankdesign">
                                     <i class="bx bx-user"></i>
@@ -275,7 +280,6 @@
                                         </div>
                                     </div>
                                 </div>
-
                                 <div class="content" id="reportsTab">
                                     <div class="carertabcontent">
                                         <div class="userNameAndDetails">
@@ -495,7 +499,7 @@
                                                 <button class="btn" type="button" id="applyMondayToWeek"> <i
                                                         class='bx  bx-copy'></i> Apply Mon to
                                                     Weekdays</button>
-                                                <button class="btn-outline" id="resetWorkingHrsBtn"><i
+                                                <button class="btn-outline" type="button" id="resetWorkingHrsBtn"><i
                                                         class='bx  bx-rotate-ccw'></i>
                                                     Reset</button>
                                             </div>
@@ -587,148 +591,13 @@
                                                     <span class="notWorking" style="display:none;">Not working</span>
                                                 </div>
                                             @endforeach
-                                            {{-- <div class="dayRow">
-                                                <span class="day">Tuesday</span>
-
-                                                <label class="switch">
-                                                    <input type="checkbox" data-daysname="tuesday" class="dayToggle">
-                                                    <span class="slider"></span>
-                                                </label>
-
-                                                <div class="workingFields" style="display:none;">
-                                                    <input type="time" value="09:00"
-                                                        class="dayTime form-control startTime">
-                                                    <span>to</span>
-                                                    <input type="time" value="17:00"
-                                                        class="dayTime form-control endTime">
-                                                    <span class="hours" data-hrsdiffval='8'>8.0 hrs</span>
-                                                </div>
-
-                                                <span class="notWorking">Not working</span>
-                                            </div>
-                                            <div class="dayRow">
-                                                <span class="day">Wednesday</span>
-
-                                                <label class="switch">
-                                                    <input type="checkbox" data-daysname="wednesday" class="dayToggle">
-                                                    <span class="slider"></span>
-                                                </label>
-
-                                                <div class="workingFields" style="display:none;">
-                                                    <input type="time" value="09:00"
-                                                        class="dayTime form-control startTime">
-                                                    <span>to</span>
-                                                    <input type="time" value="17:00"
-                                                        class="dayTime form-control endTime">
-                                                    <span class="hours" data-hrsdiffval='8'>8.0 hrs</span>
-                                                </div>
-
-                                                <span class="notWorking">Not working</span>
-                                            </div>
-                                            <div class="dayRow">
-                                                <span class="day">Thursday</span>
-
-                                                <label class="switch">
-                                                    <input type="checkbox" data-daysname="thursday" class="dayToggle">
-                                                    <span class="slider"></span>
-                                                </label>
-
-                                                <div class="workingFields" style="display:none;">
-                                                    <input type="time" value="09:00"
-                                                        class="dayTime form-control startTime">
-                                                    <span>to</span>
-                                                    <input type="time" value="17:00"
-                                                        class="dayTime form-control endTime">
-                                                    <span class="hours" data-hrsdiffval='8'>8.0 hrs</span>
-                                                </div>
-
-                                                <span class="notWorking">Not working</span>
-                                            </div>
-                                            <div class="dayRow">
-                                                <span class="day">Friday</span>
-
-                                                <label class="switch">
-                                                    <input type="checkbox" data-daysname="friday" class="dayToggle">
-                                                    <span class="slider"></span>
-                                                </label>
-
-                                                <div class="workingFields" style="display:none;">
-                                                    <input type="time" value="09:00"
-                                                        class="dayTime form-control startTime">
-                                                    <span>to</span>
-                                                    <input type="time" value="17:00"
-                                                        class="dayTime form-control endTime">
-                                                    <span class="hours" data-hrsdiffval='8'>8.0 hrs</span>
-                                                </div>
-
-                                                <span class="notWorking">Not working</span>
-                                            </div>
-                                            <div class="dayRow weekend">
-                                                <span class="day">Saturday</span>
-
-                                                <label class="switch">
-                                                    <input type="checkbox" data-daysname="saturday" class="dayToggle">
-                                                    <span class="slider"></span>
-                                                </label>
-
-                                                <div class="workingFields" style="display:none;">
-                                                    <input type="time" value="09:00"
-                                                        class="dayTime form-control startTime">
-                                                    <span>to</span>
-                                                    <input type="time" value="17:00"
-                                                        class="dayTime form-control endTime">
-                                                    <span class="hours" data-hrsdiffval='8'>8.0 hrs</span>
-                                                </div>
-
-                                                <span class="notWorking">Not working</span>
-                                            </div>
-                                            <div class="dayRow weekend">
-                                                <span class="day">Sunday</span>
-
-                                                <label class="switch">
-                                                    <input type="checkbox" data-daysname="sunday" class="dayToggle">
-                                                    <span class="slider"></span>
-                                                </label>
-
-                                                <div class="workingFields" style="display:none;">
-                                                    <input type="time" value="09:00"
-                                                        class="dayTime form-control startTime">
-                                                    <span>to</span>
-                                                    <input type="time" value="17:00"
-                                                        class="dayTime form-control endTime">
-                                                    <span class="hours" data-hrsdiffval='8'>8.0 hrs</span>
-                                                </div>
-
-                                                <span class="notWorking">Not working</span>
-                                            </div> --}}
                                         </div>
                                         <!-- Alternate Weeks -->
                                         <div id="tab-alternate">
                                             <div class="workingHoursDifferentSchedules careItem  bg-orange-50">
-                                                <p>You are editing <strong> Week 1</strong> of the alternating schedule.
-                                                    These
-                                                    hours will repeat every other week. Switch between Week 1 and Week 2
-                                                    above
-                                                    to set different schedules.</p>
-                                                <div class="debugWeek mt-2">Debug: Week1 enabled days: 2 | Week2 enabled
-                                                    days:
-                                                    2 | Current enabled days: 2</div>
                                             </div>
-                                            {{-- <div class="alternateInfoBox">
-                                                <div class="alternateInfoText">
-                                                    <strong>You are editing <span class="highlight">Week 1</span> of the
-                                                        alternating schedule.</strong>
-                                                    These hours will repeat every other week.
-                                                    Switch between <strong>Week 1</strong> and <strong>Week 2</strong> above
-                                                    to set different schedules.
-                                                </div>
-                                                <div class="alternateDebug">
-                                                    Debug: Week1 enabled days: <strong>7</strong> |
-                                                    Week2 enabled days: <strong>7</strong> |
-                                                    Current enabled days: <strong>7</strong>
-                                                </div>
-                                            </div> --}}
                                             <div class="week_1">
+                                                <input type="hidden"id="total_working_week_1">
                                                 @foreach ($week_days as $item)
                                                     <div class="dayRow {{ $item['is_weekend'] == 1 ? 'weekend' : '' }}">
                                                         <span class="day">{{ $item['value'] }}</span>
@@ -753,6 +622,7 @@
                                                 @endforeach
                                             </div>
                                             <div class="week_2 d-none">
+                                                <input type="hidden"id="total_working_week_2">
                                                 @foreach ($week_days as $item)
                                                     <div class="dayRow {{ $item['is_weekend'] == 1 ? 'weekend' : '' }}">
                                                         <span class="day">{{ $item['value'] }}</span>
@@ -817,6 +687,24 @@
                                 </div>
 
                                 <div class="content" id="unavailabilityTab">
+                                    <div class="shadowp bg-purple-50 rounded8 p24" style="margin-bottom:20px"
+                                        id="leave_request_main_wrapper">
+                                        <p class="fs13 font600 darkPurpleTextp"> <i
+                                                class="bx bx-calendar-week f18 me-2"></i> Approved Leave Requests </p>
+                                        <div id="leave_request_wrapper">
+                                            {{-- <div class="bg-purple-50 bgWhite rounded5 p-3">
+                                                <div class="flexBw">
+                                                    <div>
+                                                        <h5 class="h5Head mb-2">Nov 7 - Nov 7, 2025</h5>
+                                                        <p class="textGray500 fs13 mb-0">holiday</p>
+                                                    </div>
+                                                    <div>
+                                                        <span class="careBadg purpleBadges">Via Leave System</span>
+                                                    </div>
+                                                </div>
+                                            </div> --}}
+                                        </div>
+                                    </div>
                                     <div class="workHoursCard">
                                         <div class="workHoursHeader">
                                             <div class="title"><i class="bx  bx-calendar-x"></i> Unavailability Periods
@@ -825,10 +713,8 @@
                                                 <button class="allbuttonDarkClr  addUnavailabilityBtnFormShow"> <i
                                                         class='bx  bx-plus'></i> Add Unavailability</button>
                                             </div>
-
                                         </div>
-                                        <div class="alert alert-danger d-none" id="unavailabilityFormError">
-                                        </div>
+                                        <div class="alert alert-danger d-none" id="unavailabilityFormError"></div>
                                         <div class="carer-form addUnavailabilityForm">
                                             <form id="unavailabilityForm">
                                                 <input type="hidden" id="unavailability_id" name="unavailability_id">
@@ -884,57 +770,21 @@
                                                         </div>
                                                     </div>
                                                 </div>
-
                                             </form>
                                         </div>
 
                                         <div class="addUnavailabilityList">
-                                            <div class="certifiedList">
-                                                <span class="unavailabilityDateAndTime">
-                                                    <span class="caldrIcon">
-                                                        <i class="bx  bx-calendar-x"></i>
-                                                    </span>
-                                                    <div class="">
-                                                        <div><strong> Wed, Dec 10, 2025</strong></div>
-                                                        <small>09:00 - 17:00 • 8hrs</small>
+                                            <div class="blankCarer" id="defaultBlankCarerWrapper">
+                                                <div class="leave-card"
+                                                    style="height: 400px; margin-top:0px; display:flex; justify-content:center; align-items:center;">
+                                                    <div class="leavebanktabCont blankdesign">
+                                                        <i class="bx bx-calendar-x"></i>
+                                                        <h4 class="font600">No unavailability periods set</h4>
+                                                        <p class="textGray500">Add periods when this carer is not available
+                                                            for shifts</p>
                                                     </div>
-                                                </span>
-                                                <div class="planActions">
-                                                    <span class="cornorTags yellow"> Active </span>
-                                                    <button class="danger"><i class="bx  bx-trash"></i> </button>
                                                 </div>
                                             </div>
-                                            <div class="certifiedList">
-                                                <span class="unavailabilityDateAndTime">
-                                                    <span class="caldrIcon">
-                                                        <i class="bx  bx-calendar-x"></i>
-                                                    </span>
-                                                    <div class="">
-                                                        <div><strong> Wed, Dec 10, 2025</strong></div>
-                                                        <small>09:00 - 17:00 • 8hrs</small>
-                                                    </div>
-                                                </span>
-                                                <div class="planActions">
-                                                    <span class="cornorTags inactive"> Inactive </span>
-                                                    <button class="danger"><i class="bx  bx-trash"></i> </button>
-                                                </div>
-                                            </div>
-                                            <div class="certifiedList">
-                                                <span class="unavailabilityDateAndTime">
-                                                    <span class="caldrIcon">
-                                                        <i class="bx  bx-calendar-x"></i>
-                                                    </span>
-                                                    <div class="">
-                                                        <div><strong> Wed, Dec 10, 2025</strong></div>
-                                                        <small>09:00 - 17:00 • 8hrs</small>
-                                                    </div>
-                                                </span>
-                                                <div class="planActions">
-                                                    <span class="cornorTags yellow"> Active </span>
-                                                    <button class="danger"><i class="bx  bx-trash"></i> </button>
-                                                </div>
-                                            </div>
-
                                         </div>
 
                                     </div>
@@ -1000,13 +850,26 @@
             function loadUnavailability() {
                 let carer_id = $("#carer_id").val();
                 $.ajax({
-                    url: "{{ route('roster.carer.availability.load_unavailability_data') }}", // URL to send the request to
-                    type: 'POST', // or 'POST'
+                    url: "{{ route('roster.carer.availability.load_unavailability_data') }}",
+                    type: 'POST',
                     data: {
                         carer_id: carer_id,
                         _token: "{{ @csrf_token() }}"
                     },
-                    beforeSend: function() {},
+                    beforeSend: function() {
+                        $(".addUnavailabilityList").html(`<div class="blankCarer" id="defaultBlankCarerWrapper">
+                                                <div class="leave-card"
+                                                    style="height: 400px; margin-top:0px; display:flex; justify-content:center; align-items:center;">
+                                                    <div class="leavebanktabCont blankdesign">
+                                                        <i class="bx bx-calendar-x"></i>
+                                                        <h4 class="font600">No unavailability periods set</h4>
+                                                        <p class="textGray500">Add periods when this carer is not available for shifts</p>
+                                                    </div>
+                                                </div>
+                                            </div>`);
+                        $("#leave_request_main_wrapper").addClass('d-none');
+                        $("#leave_request_wrapper").empty();
+                    },
                     success: function(res) {
                         if (typeof isAuthenticated === "function") {
                             if (isAuthenticated(res) == false) {
@@ -1015,17 +878,30 @@
                         }
                         if (res.status) {
                             unavailabilityHtml(res.data);
+                            leaveDataHtml(res.leave_data);
 
                         }
                     },
                     error: function(xhr, ajaxOptions, thrownError) {
                         // Code to run if the request fails
                     }
-
                 });
             }
 
             function unavailabilityHtml(data) {
+                if (data.length == 0) {
+                    $(".addUnavailabilityList").html(`<div class="blankCarer" id="defaultBlankCarerWrapper">
+                                                <div class="leave-card"
+                                                    style="height: 400px; margin-top:0px; display:flex; justify-content:center; align-items:center;">
+                                                    <div class="leavebanktabCont blankdesign">
+                                                        <i class="bx bx-calendar-x"></i>
+                                                        <h4 class="font600">No unavailability periods set</h4>
+                                                        <p class="textGray500">Add periods when this carer is not available for shifts</p>
+                                                    </div>
+                                                </div>
+                                            </div>`);
+                    return;
+                }
                 let htm = '';
                 $(".addUnavailabilityList").empty();
                 $.each(data, function(key, value) {
@@ -1050,6 +926,31 @@
                                     `;
                 });
                 $(".addUnavailabilityList").html(htm);
+            }
+
+            function leaveDataHtml(data) {
+
+                if (data.length == 0) {
+                    $("#leave_request_main_wrapper").addClass('d-none');
+                    $("#leave_request_wrapper").empty();
+                    return;
+                }
+                let htm = '';
+                $("#leave_request_main_wrapper").removeClass('d-none');
+                $.each(data, function(key, value) {
+                    htm += `<div class="bg-purple-50 bgWhite rounded5 p-3 mt-2">
+                                                <div class="flexBw">
+                                                    <div>
+                                                        <h5 class="h5Head mb-2">${value.formatted_date}</h5>
+                                                        <p class="textGray500 fs13 mb-0">${value.leave_name}</p>
+                                                    </div>
+                                                    <div>
+                                                        <span class="careBadg purpleBadges">Via Leave System</span>
+                                                    </div>
+                                                </div>
+                                            </div>`;
+                });
+                $("#leave_request_wrapper").html(htm);
             }
             const tabs1 = document.querySelectorAll(".tab");
 
@@ -1103,10 +1004,11 @@
             function renderMonth(date, workingHrs = null) {
                 current = new Date();
                 track.innerHTML = '';
-                console.log(workingHrs);
                 let availabilityHrs = workingHrs.availability;
                 let unavailabilityHrs = workingHrs.unavailability;
+                let leave_arr = workingHrs.leave_arr;
                 const unavailableSet = new Set(unavailabilityHrs);
+                const leaveSet = new Set(leave_arr);
                 const year = date.getFullYear();
                 const month = date.getMonth();
 
@@ -1140,13 +1042,28 @@
                 }
                 let selectTabs = 'standard';
                 let availableWorkingHrsDay = availabilityHrs ? availabilityHrs.reduce((acc, curr) => {
-                    if (curr.day) {
+                    if (curr.day && curr.week_number == null) {
                         selectTabs = curr.type;
                         acc[curr.day.toLowerCase()] = {
                             startTime: curr.start_time,
                             endTime: curr.end_time,
-                            week_number: curr.week_number || null
+                            week_number: null,
                         };
+                    } else if (curr.day && curr.week_number != null) {
+                        selectTabs = curr.type;
+
+                        const dayKey = curr.day.toLowerCase();
+
+                        if (!acc[dayKey]) {
+                            acc[dayKey] = [];
+                        }
+
+                        acc[dayKey].push({
+                            startTime: curr.start_time,
+                            endTime: curr.end_time,
+                            week_number: curr.week_number,
+                            weekDaysName: dayKey,
+                        });
                     } else {
                         selectTabs = 'specific';
                         acc[curr.start_date] = {
@@ -1156,7 +1073,6 @@
                     }
                     return acc;
                 }, {}) : {};
-                console.log(availableWorkingHrsDay);
 
                 const today = new Date();
                 const todayDate = today.getDate();
@@ -1164,7 +1080,9 @@
                 const todayYear = today.getFullYear();
                 for (let d = 1; d <= totalDays; d++) {
                     const dateObj = new Date(year, month, d);
-                    const weekNumber = getWeekNumber(dateObj);
+                    // const weekNumber = getWeekNumber(dateObj);
+
+
                     const formattedDate =
                         year + '-' +
                         String(month + 1).padStart(2, '0') + '-' +
@@ -1180,7 +1098,14 @@
                     ) {
                         cell.classList.add("active");
                     }
-                    if (unavailabilityHrs.length > 0 && unavailableSet.has(formattedDate)) {
+                    if (leave_arr.length > 0 && leaveSet.has(formattedDate)) {
+
+                        cell.classList.remove("workingDateCle");
+                        cell.classList.add("unavailableDateCle");
+
+                        cell.innerHTML = `${d}<div class="pill purpleOnLeave">On Leave</div>`;
+
+                    } else if (unavailabilityHrs.length > 0 && unavailableSet.has(formattedDate)) {
 
                         cell.classList.remove("workingDateCle");
                         cell.classList.add("unavailableDateCle");
@@ -1203,28 +1128,37 @@
 
 
                     } else if (availableWorkingHrsDay[weekDayName] && selectTabs == 'alternate') {
-                        let startTime = availableWorkingHrsDay[weekDayName].startTime;
-                        let endTime = availableWorkingHrsDay[weekDayName].endTime;
-                        let weekNum = availableWorkingHrsDay[weekDayName].week_number;
-                        let isValidWeek =
-                            (weekNum == 1 && weekNumber % 2 !== 0) || // odd week
-                            (weekNum == 2 && weekNumber % 2 === 0); // even week
+                        let weekDaysNameList = availableWorkingHrsDay[weekDayName];
+                        let isWorkingFound = false;
+                        let firstDays = new Date(year, month, 1);
+                        let weekNumber = Math.ceil((d + firstDays.getDay()) / 7);
+                        $.each(weekDaysNameList, function(key1, val1) {
+                            let weekDaysName = val1.weekDaysName;
+                            if (weekDaysName == weekDayName) {
+                                let startTime = val1.startTime;
+                                let endTime = val1.endTime;
+                                let weekNum = val1.week_number;
 
-                        if (isValidWeek) {
 
-                            cell.classList.add("workingDateCle");
 
+                                let isValidWeek =
+                                    (weekNum == 1 && weekNumber % 2 != 0) || // odd week
+                                    (weekNum == 2 && weekNumber % 2 == 0); // even week
+
+                                if (isValidWeek) {
+                                    isWorkingFound = true;
+                                    cell.classList.add("workingDateCle");
+
+                                    cell.innerHTML =
+                                        `${d}<div class="pill working">Working</div><div class="pill">${startTime} - ${endTime}</div>`;
+                                }
+
+                            }
+                        });
+                        if (!isWorkingFound) {
                             cell.innerHTML =
-                                `${d}
-                            <div class="pill working">Working</div>
-                            <div class="pill">${startTime} - ${endTime}</div>`;
-                        } else {
-                            cell.innerHTML = `${d}<div class="pill dayoff ">Day Off</div>`;
+                                `${d}<div class="pill dayoff">Day Off</div>`;
                         }
-                        // cell.classList.add("workingDateCle");
-                        // cell.innerHTML =
-                        //     `${d}<div class="pill working">Working ${weekType}</div><div class="pill">${startTime} - ${endTime}</div>`;
-
                     } else {
                         cell.innerHTML = `${d}<div class="pill dayoff ">Day Off</div>`;
 
@@ -1417,7 +1351,7 @@
                         let startDate = new Date(`1970-01-01T${start_time}`);
                         let endDate = new Date(`1970-01-01T${end_time}`);
                         let selectedHoursRow = selected_tab_standard.find(`.hourRow[data-date="${start_date}"]`);
-                        console.log(selectedHoursRow);
+                        // console.log(selectedHoursRow);
 
                         selectedHoursRow.attr("data-specificid", item.id);
                         selectedHoursRow.find(".startTime").val(start_time);
@@ -1448,6 +1382,7 @@
                         search: search
                     },
                     success: function(res) {
+                        $(".addUnavailabilityList").empty();
                         if (typeof isAuthenticated === "function") {
                             if (isAuthenticated(res) == false) {
                                 return false;
@@ -1478,7 +1413,11 @@
                 // $("#usersListWrapper").empty();
                 let html = '';
 
+
                 $.each(res.data, function(index, user) {
+                    let isPartial = user.work_unavailability_count > 0 ? true : false;
+                    let partialColor = isPartial ? 'partial' : 'available';
+                    let partialText = isPartial ? 'Partial' : 'Available';
                     let username = user.name
                         .toLowerCase()
                         .split(' ')
@@ -1492,7 +1431,7 @@
                                     <div class="topRow">
                                         <span class="name">${username}</span>
                                     </div>
-                                    <span class="tag partial">Partial</span>
+                                    <span class="tag ${partialColor}">${partialText}</span>
                                 </div>
                             </div>
                         </button>`;
@@ -1503,9 +1442,6 @@
                 nextPageUrl = res.next_page;
             }
             $(document).ready(function() {
-
-
-
                 // first load
                 loadUsers();
                 // 🔥 infinite scroll
@@ -1540,6 +1476,16 @@
                                     return false;
                                 }
                             }
+                            $(".addUnavailabilityList").html(`<div class="blankCarer" id="defaultBlankCarerWrapper">
+                                                <div class="leave-card"
+                                                    style="height: 400px; margin-top:0px; display:flex; justify-content:center; align-items:center;">
+                                                    <div class="leavebanktabCont blankdesign">
+                                                        <i class="bx bx-calendar-x"></i>
+                                                        <h4 class="font600">No unavailability periods set</h4>
+                                                        <p class="textGray500">Add periods when this carer is not available for shifts</p>
+                                                    </div>
+                                                </div>
+                                            </div>`);
                             setAvailabilityData(res.data);
                             $("#carerUserDataWrapper").addClass('d-none');
                             $("#carerUserProfileWrapper").addClass('d-none');
@@ -1548,11 +1494,29 @@
 
                                 $("#defaultBlankCarerWrapper").addClass('d-none');
                                 $("#carerUserDataWrapper").removeClass('d-none');
+                                let wrapper = $("#carerUserDataWrapper");
+
+                                wrapper.find('.tab, .content').removeClass('active');
+
+                                wrapper.find(".tab[data-tab='overviewTab']").addClass('active');
+                                wrapper.find("#overviewTab").addClass('active');
                                 $("#carerUserProfileWrapper").removeClass('d-none');
                                 $("#resetWorkingHrsBtn").trigger('click');
                                 loadOverviewData();
                                 let array1 = [];
                                 let selectTabs = 'standard';
+                                $('.workingHoursDifferentSchedules').html(
+                                    `<p>You are editing <strong> Week 1</strong> of the alternating schedule. These
+                                                hours will repeat every other week. Switch between Week 1 and Week 2 above
+                                                to set different schedules.</p>
+                                            <div class="debugWeek mt-2">Debug: Week1 enabled days: ${res.data.week_1_counts} | Week2 enabled days:
+                                                 ${res.data.week_2_counts} | Current enabled days: ${res.data.week_1_counts}</div>`
+                                );
+
+                                $("#total_working_week_2").val(parseFloat(res.data.week_2_sum)
+                                    .toFixed(2))
+                                $("#total_working_week_1").val(parseFloat(res.data.week_1_sum)
+                                    .toFixed(2))
                                 workingPreferences = {
                                     max_per_day: res.data.work_preferences ? res.data
                                         .work_preferences.max_per_day : 8,
@@ -1565,6 +1529,7 @@
                                     array1 = res.data.working_hours;
                                     selectTabs1 = '#tab-' + array1[0].type;
                                     selectTabs = array1[0].type;
+
                                 } else if (res.data.specific_working_hours.length > 0) {
                                     array1 = res.data.specific_working_hours;
                                     selectTabs1 = '#tab-specific';
@@ -1599,17 +1564,19 @@
                     let working_hrs_per_week = res.working_hrs_per_week;
 
                     $(".userNameAndDetails").html(`<div class="card-header">
-                                                <div class="user">
-                                                    <div class="avatar">${username[0]}</div>
-                                                    <div class="info">
-                                                        <div class="name"><a href="#!">${username}</a></div>
-                                                        <div class="role">${email}</div>
-                                                    </div>
-                                                </div>
-                                                <span class="status greenShowbtn">
-                                                    <i class='bx  bx-clock-4'></i> ${working_hrs_per_week}
-                                                </span>
-                                            </div>`);
+                                        <div class="user">
+                                            <div class="avatar">${username[0]}</div>
+                                            <div class="info">
+                                                <div class="name"><a href="#!">${username}</a></div>
+                                                <div class="role">${email}</div>
+                                            </div>
+                                        </div>
+                                        <div class="dFlexGap">
+                                        <span class="status greenShowbtn">
+                                            <i class='bx  bx-clock-4'></i> ${working_hrs_per_week}
+                                        </span>
+                                        ${res.specific_total_working_hours_sum ? `<span class="careBadg muteBadges">No working hours set</span>`:''}
+                                    </div></div>`);
 
                     $("#max_per_day").val(res.work_preferences ? res.work_preferences.max_per_day : '');
                     $("#max_per_week").val(res.work_preferences ? res.work_preferences.max_per_week : '');
@@ -1746,7 +1713,7 @@
 
                         });
                     }
-                    if (totalHrs > maxPerDay) {
+                    if (schedule_pattern !== "specific" && totalHrs > maxPerDay) {
 
                         errMsg =
                             `Total hours (${totalHrs.toFixed(1)}) exceed the weekly limit (${maxPerDay.toFixed(1)} hrs).`
@@ -1974,11 +1941,71 @@
                     let val = $(this).val();
                     let userId = $("#carer_id").val();
 
+                    // $.ajax({
+                    //     url: "{{ route('roster.carer.availability.details') }}",
+                    //     type: 'POST',
+                    //     data: {
+                    //         userId: userId,
+                    //         _token: "{{ @csrf_token() }}"
+                    //     },
+                    //     beforeSend: function() {},
+                    //     success: function(res) {
+                    //         if (typeof isAuthenticated === "function") {
+                    //             if (isAuthenticated(res) == false) {
+                    //                 return false;
+                    //             }
+                    //         }
+                    //         setAvailabilityData(res.data);
+                    //         $("#carerUserDataWrapper").addClass('d-none');
+                    //         $("#carerUserProfileWrapper").addClass('d-none');
+                    //         $("#defaultBlankCarerWrapper").removeClass('d-none');
+                    //         if (res.status) {
+                    //             $("#defaultBlankCarerWrapper").addClass('d-none');
+                    //             $("#carerUserDataWrapper").removeClass('d-none');
+                    //             $("#carerUserProfileWrapper").removeClass('d-none');
+                    //             $("#resetWorkingHrsBtn").trigger('click');
+                    //             // loadOverviewData();
+                    //             let array1 = [];
+                    //             let selectTabs = val;
+                    //             workingPreferences = {
+                    //                 max_per_day: res.data.work_preferences ? res.data
+                    //                     .work_preferences.max_per_day : 8,
+                    //                 max_per_week: res.data.work_preferences ? res.data
+                    //                     .work_preferences.max_per_week : 40,
+                    //                 postcode: res.data.work_preferences ? res.data
+                    //                     .work_preferences.postcode : ''
+                    //             };
+                    //             if (res.data.working_hours.length > 0 && (val == 'standard' ||
+                    //                     val == 'alternate')) {
+                    //                 array1 = res.data.working_hours;
+                    //                 selectTabs1 = '#tab-' + array1[0].type;
+                    //                 selectTabs = val;
+
+
+                    //             } else if (res.data.specific_working_hours.length > 0 && val ==
+                    //                 'specific') {
+                    //                 array1 = res.data.specific_working_hours;
+                    //                 selectTabs1 = '#tab-specific';
+                    //                 selectTabs = 'specific';
+                    //             }
+
+                    //             setWorkingHours = array1;
+                    //             // console.log(selectTabs, array1);
+                    //             loadWorkingHrsData(array1, selectTabs);
+                    //             // track.appendChild(renderMonth(new Date(), res.data
+                    //             //     .working_hours));
+                    //         }
+                    //     },
+                    //     error: function(xhr, ajaxOptions, thrownError) {
+                    //         // Code to run if the request fails
+                    //     }
+                    // });
                     $.ajax({
-                        url: "{{ route('roster.carer.availability.details') }}",
+                        url: "{{ route('roster.carer.availability.loadworkinghours') }}",
                         type: 'POST',
                         data: {
                             userId: userId,
+                            type: val,
                             _token: "{{ @csrf_token() }}"
                         },
                         beforeSend: function() {},
@@ -1988,18 +2015,12 @@
                                     return false;
                                 }
                             }
-                            setAvailabilityData(res.data);
-                            $("#carerUserDataWrapper").addClass('d-none');
-                            $("#carerUserProfileWrapper").addClass('d-none');
-                            $("#defaultBlankCarerWrapper").removeClass('d-none');
+                            // console.log(res.data);
+
                             if (res.status) {
-                                $("#defaultBlankCarerWrapper").addClass('d-none');
-                                $("#carerUserDataWrapper").removeClass('d-none');
-                                $("#carerUserProfileWrapper").removeClass('d-none');
                                 $("#resetWorkingHrsBtn").trigger('click');
                                 // loadOverviewData();
                                 let array1 = [];
-                                let selectTabs = val;
                                 workingPreferences = {
                                     max_per_day: res.data.work_preferences ? res.data
                                         .work_preferences.max_per_day : 8,
@@ -2008,20 +2029,24 @@
                                     postcode: res.data.work_preferences ? res.data
                                         .work_preferences.postcode : ''
                                 };
-                                if (res.data.working_hours.length > 0 && (val == 'standard' ||
-                                        val == 'alternate')) {
-                                    array1 = res.data.working_hours;
-                                    selectTabs1 = '#tab-' + array1[0].type;
-                                    selectTabs = array1[0].type;
-                                } else if (res.data.specific_working_hours.length > 0 && val ==
-                                    'specific') {
-                                    array1 = res.data.specific_working_hours;
-                                    selectTabs1 = '#tab-specific';
-                                    selectTabs = 'specific';
-                                }
+                                array1 = res.data.working_hours;
+                                staffDetails = res.data.staff;
+                                console.log(staffDetails);
+                                total_working_week_1 = staffDetails.week_1_sum != null ?
+                                    Number(staffDetails.week_1_sum).toFixed(2) :
+                                    "0.00";
 
+                                total_working_week_2 = staffDetails.week_2_sum != null ?
+                                    Number(staffDetails.week_2_sum).toFixed(2) :
+                                    "0.00";
+                                $("#total_working_week_1").val(total_working_week_1);
+                                $("#total_working_week_2").val(total_working_week_2);
+                                // $("#summaryCard").html(
+                                //     `<button class="greenShowbtn"><i class='bx  bx-history'></i>${staffDetails.working_hrs_per_week}</button>
+                                //                 ${staffDetails.specific_total_working_hours_sum ? `<span class="careBadg muteBadges">No working hours set</span>`:''}`
+                                //     );
                                 setWorkingHours = array1;
-                                loadWorkingHrsData(array1, selectTabs);
+                                loadWorkingHrsData(array1, val);
                                 // track.appendChild(renderMonth(new Date(), res.data
                                 //     .working_hours));
                             }
@@ -2031,7 +2056,6 @@
                         }
                     });
 
-
                     // if (val == 'standard') {
                     //     loadWorkingHrsData(userWorkingHours, val);
                     // }
@@ -2039,16 +2063,37 @@
 
                 $("#schedule_pattern_2").change(function() {
                     let val = $(this).val();
+                    // let totalAlternate = "0.0";
+                    let weekLabel = "Week 1";
                     if (val == '1') {
                         $(".week_1").removeClass('d-none');
                         $(".week_2").addClass('d-none');
+                        totalAlternate = $("#total_working_week_1").val() || "0.0";
+                        current_week_counts = $(".week_1 .dayRow.active").length;
+
+                        weekLabel = "Week 1";
                     } else {
                         $(".week_2").removeClass('d-none');
                         $(".week_1").addClass('d-none');
+                        totalAlternate = $("#total_working_week_2").val() || "0.0";
+                        current_week_counts = $(".week_2 .dayRow.active").length;
+                        weekLabel = "Week 2";
                     }
+                    week_1_counts = $(".week_1 .dayRow.active").length;
+
+                    week_2_counts = $(".week_2 .dayRow.active").length;
+
+                    $("#workHoursPerWeekText")
+                        .css("color", "#2563eb")
+                        .text(totalAlternate + " hrs/week");
+                    $('.workingHoursDifferentSchedules').html(
+                        `<p>You are editing <strong> ${weekLabel}</strong> of the alternating schedule. These
+                                                hours will repeat every other week. Switch between Week 1 and Week 2 above
+                                                to set different schedules.</p>
+                                            <div class="debugWeek mt-2">Debug: Week1 enabled days: ${week_1_counts} | Week2 enabled days:
+                                                 ${week_2_counts} | Current enabled days: ${current_week_counts}</div>`
+                    );
                 });
-
-
             });
         </script>
         <!-- **************End availabilityCalendar****************** -->

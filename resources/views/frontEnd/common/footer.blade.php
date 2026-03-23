@@ -206,7 +206,7 @@
                     courseHtml += `
                         <div class="course-box" data-index="${key}">
                             <label>
-                                <input type="checkbox" class="course_qualifications" data-coursenumber="${val.coursenumber}">${val.title}
+                                <input type="checkbox" class="course_qualifications" data-coursenumber="${val.coursenumber}" data-title="${val.title}">${val.title}
                             </label>
                             <input type="hidden" data-name="courses[${key}][coursenumber]" value="${val.coursenumber}">
                             <input type="hidden" data-name="courses[${key}][title]" value="${val.title}">
