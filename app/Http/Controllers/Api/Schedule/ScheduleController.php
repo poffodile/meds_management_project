@@ -149,7 +149,7 @@ class ScheduleController extends Controller
 
         if ($shifts->isEmpty()) {
             return response()->json([
-                'success' => false,
+                'success' => true,
                 'message' => 'No unassigned shifts found.',
                 'data'    => [],
                 'total_shifts' => 0,
