@@ -220,9 +220,6 @@ if ($company_package != '') {
                                                     <td style="width: 25%;">@if($value->qr_code_id == NULL) <button class="re-generateQR" onclick="generateQR(<?= $value->id ?>);"><span>Generate QR</span></button> <button><i class="fa fa-qrcode" aria-hidden="true"></i></button> @else <button class="re-generateQR" onclick="generateQR(<?= $value->id ?>);"><span>Re-Generate QR</span></button> <button class="re-generateQR" onclick="ViewQR(<?= $value->id ?>);"><span>View</span></button> @endif </td>
                                                     <td class="action-icn">
                                                         <a href="{{ url('super-admin/home-admin/'.$value->id) }}" class="user"><i data-toggle="tooltip" title="Add Home admins" class="fa fa-user-o "></i></a>
-                                                        @if($value->is_home_area == 1)
-                                                        <a href="{{ url('admin/system-admin/home/home_area/'.$value->id) }}" class="edit"><i data-toggle="tooltip" title="Edit" class="fa fa-location-arrow"></i></a>
-                                                        @endif
                                                         <a href="{{ url('admin/system-admin/home/edit/'.$value->id) }}" class="edit"><i data-toggle="tooltip" title="Edit" class="fa fa-edit"></i></a>
                                                         <a href="{{ url('admin/system-admin/home/delete/'.$value->id) }}" class="delete"><i data-toggle="tooltip" title="Delete" class="fa fa-trash-o"></i></a>
                                                     </td>

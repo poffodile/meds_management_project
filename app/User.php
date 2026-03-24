@@ -5,7 +5,7 @@ namespace App;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Facades\Mail;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 use App\Home, App\Admin, App\StaffSickLeave;
 use App\Models\PersonalManagement\TimeSheet;
 use Illuminate\Support\Facades\Log;
@@ -53,6 +53,32 @@ class User extends Authenticatable
     {
         return User::where('home_id', $home_id)->select('id', 'name')->where('is_deleted', 0)->get();
     }
+
+    public function scopeByHome($query)
+    {
+        return $query->where('home_id', Auth::user()->home_id);
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('status', 1);
+    }
+    public function scopeNotDeleted($query)
+    {
+        return $query->where('is_deleted', 0);
+    }
+
+    public function scopeSelectBasic($query)
+    {
+        return $query->select('id', 'name');
+    }
+
+    public static function getHomeActiveUsers()
+    {
+        return User::byHome()->active()->notDeleted()->selectBasic()->get();
+    }
+
+
 
     // protected static function booted()
     // {

@@ -138,6 +138,20 @@ class HomeController extends Controller
             }
 
             if ($system_admin_home->save()) {
+                // Save Home Areas
+                if ($request->has('is_home_area') && $request->is_home_area == 1) {
+                    if ($request->has('home_area_names')) {
+                        foreach ($request->home_area_names as $area_name) {
+                            if (!empty($area_name)) {
+                                HomeArea::create([
+                                    'home_id' => $system_admin_home->id,
+                                    'name'    => $area_name
+                                ]);
+                            }
+                        }
+                    }
+                }
+
                 $update_company_payment = CompanyPayment::where('admin_id', $system_admin_id)
                     ->increment('homes_added');
                 if ($update_company_payment) {
@@ -214,6 +228,25 @@ class HomeController extends Controller
                 }
 
                 if ($system_admin_home->save()) {
+                    // Save Home Areas
+                    if ($request->has('is_home_area') && $request->is_home_area == 1) {
+                        if ($request->has('home_area_names')) {
+                            // First, mark existing ones as deleted or keep track? 
+                            // Simple approach: delete existing ones that are not in the list, or just wipe and recreate if simple.
+                            // Better: Only add new ones and maybe delete those not present?
+                            // For simplicity in a single form:
+                            HomeArea::where('home_id', $system_admin_home->id)->update(['is_deleted' => 1]);
+                            foreach ($request->home_area_names as $area_name) {
+                                if (!empty($area_name)) {
+                                    HomeArea::create([
+                                        'home_id' => $system_admin_home->id,
+                                        'name'    => $area_name
+                                    ]);
+                                }
+                            }
+                        }
+                    }
+
                     return redirect('admin/system-admin/homes/' . $system_admin_id)->with('success', 'Home Updated successfully.');
                 } else {
                     return redirect()->back()->with('error', 'Home could not be Updated.');
@@ -221,12 +254,13 @@ class HomeController extends Controller
             }
         }
 
-        $system_admin_home = DB::table('home')
-            ->where('id', $id)
+        $system_admin_home = Home::where('id', $id)
             ->where('is_deleted', '0')
             ->first();
+        $home_areas = HomeArea::where('home_id', $id)->where('is_deleted', 0)->get();
+
         $page = 'system-admins';
-        return view('backEnd/superAdmin/home/home_form', compact('system_admin_home', 'page', 'system_admin_id'));
+        return view('backEnd/superAdmin/home/home_form', compact('system_admin_home', 'page', 'system_admin_id', 'home_areas'));
     }
 
     public function delete($home_id)
@@ -546,41 +580,5 @@ class HomeController extends Controller
         $details['qr_code_id'] = Home::where('id', $request->id)->value('qr_code_id');
 
         echo json_encode($details);
-    }
-    public function home_area_list($home_id)
-    {
-        $data['home_id']    = $home_id;
-        $data['home_areas'] = HomeArea::where('home_id', $home_id)->where('is_deleted', 0)->get();
-        $data['page']       = 'system-admins';
-        return view('backEnd.superAdmin.home.home_area', $data);
-    }
-
-    public function home_area_add(Request $request, $home_id)
-    {
-        $data = $request->all();
-        HomeArea::create([
-            'home_id' => $home_id,
-            'name'    => $data['area_name']
-        ]);
-        return redirect()->back()->with('success', 'Home area added successfully.');
-    }
-
-    public function home_area_edit(Request $request, $area_id)
-    {
-        $area = HomeArea::find($area_id);
-        if ($request->isMethod('post')) {
-            $area->name = $request->area_name;
-            $area->save();
-            return redirect()->back()->with('success', 'Home area updated successfully.');
-        }
-        return response()->json($area);
-    }
-
-    public function home_area_delete($area_id)
-    {
-        $area = HomeArea::find($area_id);
-        $area->is_deleted = 1;
-        $area->save();
-        return redirect()->back()->with('success', 'Home area deleted successfully.');
     }
 }

@@ -89,4 +89,9 @@ class Home extends Model
     {
         return self::where('id', $home_id)->pluck('title')->first();
     }
+
+    public function homeAreas()
+    {
+        return $this->hasMany(\App\Models\HomeArea::class, 'home_id');
+    }
 }

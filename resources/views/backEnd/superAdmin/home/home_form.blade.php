@@ -58,9 +58,33 @@ if (isset($system_admin_home)) {
 									<div class="col-lg-9">
 										<div class="checkbox">
 											<label>
-												<input type="checkbox" name="is_home_area" value="1" {{ (isset($system_admin_home->is_home_area) && $system_admin_home->is_home_area == 1) ? 'checked' : '' }}>
+												<input type="checkbox" name="is_home_area" id="is_home_area_checkbox" value="1" {{ (isset($system_admin_home->is_home_area) && $system_admin_home->is_home_area == 1) ? 'checked' : '' }}>
 												(Check if this home have home area list)
 											</label>
+										</div>
+									</div>
+								</div>
+
+								<div id="home_area_list_section" style="display: {{ (isset($system_admin_home->is_home_area) && $system_admin_home->is_home_area == 1) ? 'block' : 'none' }};">
+									<div class="form-group">
+										<label class="col-lg-3 control-label">Home Area List</label>
+										<div class="col-lg-9">
+											<div id="home_area_inputs">
+												@if(isset($home_areas) && count($home_areas) > 0)
+												@foreach($home_areas as $area)
+												<div class="d-flex mb-2 area-input-group" style="display:flex; margin-bottom:10px;">
+													<input type="text" name="home_area_names[]" class="form-control" placeholder="Area name" value="{{ $area->name }}">
+													<button type="button" class="btn btn-danger btn-sm remove-area-btn" style="margin-left:10px;"><i class="fa fa-trash"></i></button>
+												</div>
+												@endforeach
+												@else
+												<div class="d-flex mb-2 area-input-group" style="display:flex; margin-bottom:10px;">
+													<input type="text" name="home_area_names[]" class="form-control" placeholder="Area name">
+													<button type="button" class="btn btn-danger btn-sm remove-area-btn" style="margin-left:10px;"><i class="fa fa-trash"></i></button>
+												</div>
+												@endif
+											</div>
+											<button type="button" id="add_area_btn" class="btn btn-success btn-sm" style="margin-top:10px;"><i class="fa fa-plus"></i> Add Area</button>
 										</div>
 									</div>
 								</div>
@@ -230,6 +254,26 @@ if (isset($system_admin_home)) {
 				$('#residential_rooms').hide();
 			} else {
 				$('#residential_rooms, #accommodation_rooms').hide();
+			}
+		});
+
+		$('#add_area_btn').click(function() {
+			var areaInputHtml = '<div class="d-flex mb-2 area-input-group" style="display:flex; margin-bottom:10px;">' +
+				'<input type="text" name="home_area_names[]" class="form-control" placeholder="Area name">' +
+				'<button type="button" class="btn btn-danger btn-sm remove-area-btn" style="margin-left:10px;"><i class="fa fa-trash"></i></button>' +
+				'</div>';
+			$('#home_area_inputs').append(areaInputHtml);
+		});
+
+		$(document).on('click', '.remove-area-btn', function() {
+			$(this).closest('.area-input-group').remove();
+		});
+
+		$('#is_home_area_checkbox').change(function() {
+			if ($(this).is(':checked')) {
+				$('#home_area_list_section').show();
+			} else {
+				$('#home_area_list_section').hide();
 			}
 		});
 	});
