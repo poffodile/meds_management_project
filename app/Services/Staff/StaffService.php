@@ -331,18 +331,19 @@ class StaffService
         $startTime = $request->input('start_time');
         $endTime = $request->input('end_time');
 
-        // 1. Get the courses for this service user
-        $clientCourses = suUserCourse::where('su_user_id', $id)->pluck('course_id')->toArray();
+        // 1. Get the courses for this service user (if client ID is provided)
+        $clientCourses = [];
+        $clientLatitude = null;
+        $clientLongitude = null;
 
-        // 2. Fetch the client to get their latitude/longitude
-        $client = ServiceUser::find($id);
-
-        if (!$client) {
-            return collect(); // Return empty collection if client not found
+        if (!empty($id)) {
+            $clientCourses = suUserCourse::where('su_user_id', $id)->pluck('course_id')->toArray();
+            $client = ServiceUser::find($id);
+            if ($client) {
+                $clientLatitude = $client->latitude;
+                $clientLongitude = $client->longitude;
+            }
         }
-
-        $clientLatitude = $client->latitude;
-        $clientLongitude = $client->longitude;
 
         // 3. Find staff with overlapping shifts
         $overlappingStaffIds = [];
@@ -414,12 +415,19 @@ class StaffService
                 } else { // Greater than 20 or no location
                     $staff->card_color = 'red';
                     $staff->tag = 'Geographic Mismatch';
-                    $staff->warning = 'Very far from client';
+                    $staff->warning = 'Very far from source';
                 }
             }
 
             return $staff;
-        })->sortBy('distance'); // Sort by closest distance first
+        });
+
+        // If no distance information is available (e.g. location shift), sort by name
+        if ($clientLatitude === null) {
+            $nearbyStaff = $nearbyStaff->sortBy('name');
+        } else {
+            $nearbyStaff = $nearbyStaff->sortBy('distance');
+        }
 
         return $nearbyStaff->values(); // Reset collection keys
     }

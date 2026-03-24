@@ -54,6 +54,18 @@ if (isset($system_admin_home)) {
 								</div>
 
 								<div class="form-group">
+									<label class="col-lg-3 control-label">Enable For Home Area</label>
+									<div class="col-lg-9">
+										<div class="checkbox">
+											<label>
+												<input type="checkbox" name="is_home_area" value="1" {{ (isset($system_admin_home->is_home_area) && $system_admin_home->is_home_area == 1) ? 'checked' : '' }}>
+												(Check if this home have home area list)
+											</label>
+										</div>
+									</div>
+								</div>
+
+								<div class="form-group">
 									<label class="col-lg-3 control-label">Home Area</label>
 									<div class="col-lg-9">
 										<input type="text" name="home_area" id="home_area" class="form-control" placeholder="Home area" value="{{ (isset($system_admin_home->home_area)) ? $system_admin_home->home_area : '' }}" maxlength="255">

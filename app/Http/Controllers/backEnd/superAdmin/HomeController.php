@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Session;
 use App\Home, App\CompanyCharges, App\CompanyPayment, App\Admin, App\CompanyPaymentInformation, App\AdminCardDetail, App\States;
+use App\Models\HomeArea;
 use DB;
 use Hash;
 use Illuminate\Support\Facades\Mail;
@@ -55,7 +56,7 @@ class HomeController extends Controller
         }
         // echo "<pre>"; print_r($disable_btn); die;
         $current_date   = Carbon::now();
-        $sa_home_query  = DB::table('home')->where('admin_id', $system_admin_id)->select('id', 'admin_id', 'title', 'image', 'qr_code_id')->where('is_deleted', '0');
+        $sa_home_query  = DB::table('home')->where('admin_id', $system_admin_id)->select('id', 'admin_id', 'title', 'image', 'qr_code_id', 'is_home_area')->where('is_deleted', '0');
         $search = '';
 
         if (isset($request->limit)) {
@@ -114,6 +115,7 @@ class HomeController extends Controller
             $system_admin_home->home_area                   = $data['home_area'];
             $system_admin_home->latitude                    = $latitude;
             $system_admin_home->longitude                   = $longitude;
+            $system_admin_home->is_home_area               = $request->is_home_area ?? 0;
             $system_admin_home->is_registered               = $data['is_registered'] ?? 0;
 
             if (!empty($_FILES['image']['name'])) {
@@ -180,9 +182,10 @@ class HomeController extends Controller
                 $system_admin_home->title                     = $request->title;
                 $system_admin_home->address                   = $request->address;
                 $system_admin_home->home_area                 = $request->home_area;
-                $system_admin_home->location_history_duration = $request->location_history_duration;
-                $system_admin_home->rota_time_format          = $request->rota_time_format;
+                // $system_admin_home->location_history_duration = $request->location_history_duration;
+                // $system_admin_home->rota_time_format          = $request->rota_time_format;
                 $system_admin_home->is_registered             = $request->is_registered;
+                $system_admin_home->is_home_area             = $request->is_home_area ?? 0;
                 $system_admin_home->latitude                  = $latitude;
                 $system_admin_home->longitude                 = $longitude;
                 //$system_admin_home->image            = $request->image;
@@ -543,5 +546,41 @@ class HomeController extends Controller
         $details['qr_code_id'] = Home::where('id', $request->id)->value('qr_code_id');
 
         echo json_encode($details);
+    }
+    public function home_area_list($home_id)
+    {
+        $data['home_id']    = $home_id;
+        $data['home_areas'] = HomeArea::where('home_id', $home_id)->where('is_deleted', 0)->get();
+        $data['page']       = 'system-admins';
+        return view('backEnd.superAdmin.home.home_area', $data);
+    }
+
+    public function home_area_add(Request $request, $home_id)
+    {
+        $data = $request->all();
+        HomeArea::create([
+            'home_id' => $home_id,
+            'name'    => $data['area_name']
+        ]);
+        return redirect()->back()->with('success', 'Home area added successfully.');
+    }
+
+    public function home_area_edit(Request $request, $area_id)
+    {
+        $area = HomeArea::find($area_id);
+        if ($request->isMethod('post')) {
+            $area->name = $request->area_name;
+            $area->save();
+            return redirect()->back()->with('success', 'Home area updated successfully.');
+        }
+        return response()->json($area);
+    }
+
+    public function home_area_delete($area_id)
+    {
+        $area = HomeArea::find($area_id);
+        $area->is_deleted = 1;
+        $area->save();
+        return redirect()->back()->with('success', 'Home area deleted successfully.');
     }
 }

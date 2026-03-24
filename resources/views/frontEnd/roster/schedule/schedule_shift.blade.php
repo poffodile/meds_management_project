@@ -1226,6 +1226,7 @@
                                             data-type="{{ $shift->shift_type ?? '' }}"
                                             data-care="{{ $shift->care_type_id ?? '' }}"
                                             data-assignment="{{ $shift->assignment ?? '' }}"
+                                            data-homearea="{{ $shift->home_area_id ?? '' }}"
                                             data-notes="{{ $shift->notes ?? '' }}"
                                             data-tasks="{{ $shift->tasks ?? '' }}">
                                             <i class='bx bx-edit'></i> Edit
@@ -1318,7 +1319,6 @@
                             <input type="hidden" name="carer_id" id="selected_carer_id">
                             <input type="hidden" name="form_id" id="selected_form_id">
                             <input type="hidden" name="form_name" id="selected_form_name">
-                            <input type="hidden" name="assignment" id="selected_assignment" value="Client">
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="">
@@ -1341,10 +1341,6 @@
                                             <button type="button" class="tab active" id="clientTab" data-tab="scheduleClient">
                                                 <i class='bx  bx-user'></i> Client
                                             </button>
-
-                                            <!-- <button type="button" class="tab" id="propertyTab" data-tab="scheduleProperty">
-                                                <i class="fa fa-building-o"></i> Property
-                                            </button> -->
                                         </div>
 
                                         <!-- TAB CONTENT -->
@@ -1352,19 +1348,16 @@
                                             {{-- Locaton Section --}}
                                             <div class="content" id="scheduleLocation">
                                                 <div class="row">
-                                                    <!-- <div class="col-md-12">
-                                                        <select class="form-control" name="location_id">
-                                                            <option value="">Select location</option>
-                                                            <option>Inactive</option>
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-md-12 m-t-10">
-                                                        <input type="text" name="location_name" id="" class="form-control"
-                                                            placeholder="Enter custom location name">
-                                                    </div> -->
-                                                    <!-- <div class="col-md-12 m-t-10"> -->
                                                     <div class="col-md-12">
                                                         <input type="text" name="location_address" value="{{ $home_title }}" id="" class="form-control" placeholder="Address">
+                                                    </div>
+                                                    <div class="col-md-12 m-t-10">
+                                                        <select class="form-control" id="homeAreaSelect" name="home_area_id">
+                                                            <option value="">Select Home Area</option>
+                                                            @foreach ($home_areas as $area)
+                                                            <option value="{{ $area->id }}"> {{ $area->name }} </option>
+                                                            @endforeach
+                                                        </select>
                                                     </div>
 
                                                 </div>
@@ -1386,18 +1379,6 @@
                                             </div>
                                             {{-- Client Section --}}
 
-                                            {{-- Property Section --}}
-                                            <div class="content" id="scheduleProperty">
-                                                <div class="row">
-                                                    <div class="col-md-12">
-                                                        <select class="form-control" name="property_id">
-                                                            <option value="">Select Property</option>
-                                                        </select>
-                                                    </div>
-
-                                                </div>
-                                            </div>
-                                            {{-- Property Section --}}
                                         </div>
                                         <div class="row m-t-10">
                                             <div class="col-md-12">
@@ -2232,6 +2213,16 @@
             });
 
             clientSelect.addEventListener('change', fetchSuggestedCarers);
+            
+            const locationTab = document.getElementById('locationTab');
+            const propertyTab = document.getElementById('propertyTab');
+            const homeAreaSelect = document.getElementById('homeAreaSelect');
+            const propertySelect = document.querySelector('[name="property_id"]');
+
+            if (locationTab) locationTab.addEventListener('click', fetchSuggestedCarers);
+            if (propertyTab) propertyTab.addEventListener('click', fetchSuggestedCarers);
+            if (homeAreaSelect) homeAreaSelect.addEventListener('change', fetchSuggestedCarers);
+            if (propertySelect) propertySelect.addEventListener('change', fetchSuggestedCarers);
 
             // Fetch whenever date or time inputs change
             const form = clientSelect.closest('form');
@@ -2246,36 +2237,52 @@
             }
 
             function fetchSuggestedCarers() {
-                const clientId = clientSelect.value;
+                const assignment = document.getElementById("selected_assignment").value;
+                let clientId = clientSelect.value;
                 const form = clientSelect.closest('form');
 
                 // Ensure the wrapper is visible so suggestions or blank section can be seen
                 suggestionsWrapper.style.display = 'block';
 
-                if (clientId === "") {
-                    assignedClientTo.textContent = "Not assigned";
-                    blankSection.style.display = 'block';
-                    suggestionsContainer.style.display = 'none';
-                    toggleBtn.style.display = 'none';
-                    if (selectedCarerCard) selectedCarerCard.style.display = 'none';
-                    return;
+                if (assignment === 'Client') {
+                    if (clientId === "") {
+                        assignedClientTo.textContent = "Not assigned";
+                        blankSection.style.display = 'block';
+                        suggestionsContainer.style.display = 'none';
+                        toggleBtn.style.display = 'none';
+                        if (selectedCarerCard) selectedCarerCard.style.display = 'none';
+                        return;
+                    }
+                    let selectedText = clientSelect.options[clientSelect.selectedIndex].text;
+                    assignedClientTo.textContent = selectedText;
+                } else if (assignment === 'Location') {
+                    clientId = '0';
+                    const homeAreaVal = homeAreaSelect.value;
+                    if (homeAreaVal) {
+                        assignedClientTo.textContent = homeAreaSelect.options[homeAreaSelect.selectedIndex].text;
+                    } else {
+                        assignedClientTo.textContent = "Location (General)";
+                    }
+                } else if (assignment === 'Property') {
+                    clientId = '0';
+                    const propertyVal = propertySelect.value;
+                    if (propertyVal) {
+                        assignedClientTo.textContent = propertySelect.options[propertySelect.selectedIndex].text;
+                    } else {
+                        assignedClientTo.textContent = "Property (General)";
+                    }
                 }
-
-                let selectedText = clientSelect.options[clientSelect.selectedIndex].text;
-                assignedClientTo.textContent = selectedText;
 
                 suggestedCarerContainer.innerHTML = "Loading carers...";
                 blankSection.style.display = 'none';
                 suggestionsContainer.style.display = 'block';
-                if (selectedCarerCard) selectedCarerCard.style.display = 'none';
-                selectedCarerIdInput.value = ""; // Reset hidden ID
+                // if (selectedCarerCard) selectedCarerCard.style.display = 'none';
+                // selectedCarerIdInput.value = ""; // Don't reset if already editing/assigned
 
                 let startDate = form ? form.querySelector('input[name="start_date"]').value : '';
                 let startTime = form ? form.querySelector('input[name="start_time"]').value : '';
                 let endTime = form ? form.querySelector('input[name="end_time"]').value : '';
-                let shiftId = form ? form.querySelector('#edit_shift_id').value : '';
-
-                console.log('shiftId1', shiftId);
+                let shiftId = form ? form.querySelector('#edit_shift_id').value || form.querySelector('[name="shift_id"]')?.value : '';
 
                 let fetchUrl = "{{ route('carer.shift.staff', ':id') }}".replace(':id', clientId);
                 if (startDate && startTime && endTime) {
@@ -2299,42 +2306,45 @@
                                 let firstLetter = carer.name.charAt(0).toUpperCase();
                                 let dist = parseFloat(carer.distance);
                                 let cardHtml = '';
+                                
+                                // Matching logic depends on whether we have distance (Client shift) or not (Location/Property shift)
+                                let isClientShift = (assignment === 'Client');
+                                let distanceHtml = (isClientShift && dist < 1000) ? `<p class="mb-0"><i class='bx bx-check-circle'></i> Within ${dist.toFixed(1)} km</p>` : '';
+                                let matchLabel = '';
+                                let cardClass = 'carerCard';
 
-                                if (dist < 20) {
-                                    cardHtml = `
-                                            <div class="carerCard greenCarerCard best-match">
-                                                <div class="avatar">${firstLetter}</div>
-                                                <div class="details">
-                                                    <div class="topRow">
-                                                        <div><span class="name">${carer.name}</span> <span class="badge" style="background:#f1f5f9;color:#475569;margin-left:5px">${carer.postcode ?? ''}</span></div>
-                                                        <div><span class="badge darkGreenBadges">Best Match</span></div>
-                                                    </div>
-                                                    <div class="m-t-5"><span class="badge">Score: ${carer.score ?? '100'}</span></div>
-                                                    <div class="d-flex gap-2 mt-2" style="color:#166534; font-size:12px;">
-                                                        <p class="mb-0"><i class='bx bx-check-circle'></i> Within ${dist.toFixed(1)} km</p>
-                                                        <p class="mb-0 m-l-10"><i class='bx bx-check-circle'></i> ${carer.qualifications_count ?? '0'} Qualifications</p>
-                                                    </div>
-                                                </div>
-                                                <button type="button" id="assignBtn_${carer.id}" class="assignBtn" data-id="${carer.id}" data-name="${carer.name}">Assign</button>
-                                            </div>`;
+                                if (isClientShift) {
+                                    if (carer.tag === 'Course Match') {
+                                        cardClass = 'carerCard greenCarerCard best-match';
+                                        matchLabel = 'Course Match';
+                                    } else if (carer.tag === 'Best Match' || dist < 20) {
+                                        cardClass = 'carerCard greenCarerCard best-match';
+                                        matchLabel = 'Best Match';
+                                    } else if (dist > 50) {
+                                        cardClass = 'carerCard geographic-mismatch';
+                                        matchLabel = 'Geographic Mismatch';
+                                    }
                                 } else {
-                                    let mismatchClass = dist > 50 ? 'geographic-mismatch' : '';
-                                    cardHtml = `
-                                            <div class="carerCard ${mismatchClass}">
-                                                <div class="avatar">${firstLetter}</div>
-                                                <div class="details">
-                                                    <div class="topRow">
-                                                        <div><span class="name">${carer.name}</span> <span class="badge" style="background:#f1f5f9;color:#475569;margin-left:5px">${carer.postcode ?? ''}</span></div>
-                                                    </div>
-                                                    <div class="m-t-5"><span class="badge">Score: ${carer.score ?? '80'}</span></div>
-                                                    <div class="d-flex gap-2 mt-2" style="color:#64748b; font-size:12px;">
-                                                        <p class="mb-0"><i class='bx bx-check-circle'></i> Within ${dist.toFixed(1)} km</p>
-                                                        <p class="mb-0 m-l-10"><i class='bx bx-check-circle'></i> ${carer.qualifications_count ?? '0'} Qualifications</p>
-                                                    </div>
-                                                </div>
-                                                <button type="button" id="assignBtn_${carer.id}" class="assignBtn" data-id="${carer.id}" data-name="${carer.name}">Assign</button>
-                                            </div>`;
+                                    // Location/Property shifts
+                                    cardClass = 'carerCard greenCarerCard';
+                                    matchLabel = 'Available';
                                 }
+
+                                cardHtml = `
+                                        <div class="${cardClass}">
+                                            <div class="avatar">${firstLetter}</div>
+                                            <div class="details">
+                                                <div class="topRow">
+                                                    <div><span class="name">${carer.name}</span> <span class="badge" style="background:#f1f5f9;color:#475569;margin-left:5px">${carer.postcode ?? ''}</span></div>
+                                                    ${matchLabel ? `<div><span class="badge ${matchLabel.includes('Mismatch') ? 'redBadges' : 'darkGreenBadges'}">${matchLabel}</span></div>` : ''}
+                                                </div>
+                                                <div class="d-flex gap-2 mt-2" style="color:#166534; font-size:12px;">
+                                                    ${distanceHtml}
+                                                    <p class="mb-0 ${distanceHtml ? 'm-l-10' : ''}"><i class='bx bx-check-circle'></i> ${carer.qualifications_count ?? '0'} Qualifications</p>
+                                                </div>
+                                            </div>
+                                            <button type="button" id="assignBtn_${carer.id}" class="assignBtn" data-id="${carer.id}" data-name="${carer.name}">Assign</button>
+                                        </div>`;
                                 suggestedCarerContainer.insertAdjacentHTML('beforeend', cardHtml);
                             });
                         } else {
@@ -3019,6 +3029,7 @@
                     }
 
                     form.find('[name="shift_type"]').val(type).trigger('change');
+                    if (homeAreaId) form.find('[name="home_area_id"]').val(homeAreaId).trigger('change');
                     if (property) form.find('[name="property_id"]').val(property).trigger('change');
                     form.find('[name="location_name"]').val(locationName || '');
                     form.find('[name="location_address"]').val(locationAddress || '');
@@ -3030,9 +3041,8 @@
                     if (assignment) {
                         form.find('[name="assignment"]').val(assignment).trigger('change');
                         let assignLower = assignment.toLowerCase();
-                        if (assignLower === 'location') $('#locationTab').click();
+                        if (assignLower === 'location' || assignLower === 'home area') $('#locationTab').click();
                         else if (assignLower === 'client') $('#clientTab').click();
-                        else if (assignLower === 'property') $('#propertyTab').click();
                     } else {
                         form.find('[name="assignment"]').val('Client').trigger('change');
                         $('#clientTab').click();
@@ -3255,6 +3265,7 @@
                                     data-staff="${shift.staff_id || ''}"
                                     data-type="${shift.shift_type_raw || ''}"
                                     data-care="${shift.care_type || ''}"
+                                    data-homearea="${shift.home_area_id || ''}"
                                     data-assignment="${shift.assignment || ''}"
                                     data-notes="${shift.notes || ''}"
                                     data-tasks="${shift.tasks || ''}"
@@ -3329,6 +3340,7 @@
                 const locationName = $(this).data('location');
                 const locationAddress = $(this).data('address');
                 const careType = $(this).data('care');
+                const homeAreaId = $(this).data('homearea');
                 const assignment = $(this).data('assignment');
                 const notes = $(this).data('notes');
                 const tasks = $(this).data('tasks');
@@ -3371,6 +3383,7 @@
                 }
 
                 form.find('[name="shift_type"]').val(type).trigger('change');
+                form.find('[name="home_area_id"]').val(homeAreaId).trigger('change');
                 form.find('[name="property_id"]').val(property).trigger('change');
                 form.find('[name="location_name"]').val(locationName);
                 form.find('[name="location_address"]').val(locationAddress);
@@ -3381,12 +3394,14 @@
                 if (assignment) {
                     form.find('[name="assignment"]').val(assignment).trigger('change');
                     let assignLower = assignment.toLowerCase();
-                    if (assignLower === 'location') $('#locationTab').click();
+                    if (assignLower === 'location' || assignLower === 'home area') $('#locationTab').click();
                     else if (assignLower === 'client') $('#clientTab').click();
-                    else if (assignLower === 'property') $('#propertyTab').click();
                 } else {
                     form.find('[name="assignment"]').val('Client').trigger('change');
                     $('#clientTab').click();
+                }
+                if (homeAreaId) {
+                    form.find('#homeAreaSelect').val(homeAreaId).trigger('change');
                 }
                 form.find('[name="notes"]').val(notes);
 
@@ -3634,6 +3649,7 @@
                                         data-staff="${shift.staff_id || ''}"
                                         data-type="${shift.shift_type_raw || ''}"
                                         data-care="${shift.care_type || ''}"
+                                        data-homearea="${shift.home_area_id || ''}"
                                         data-assignment="${shift.assignment || ''}"
                                         data-notes="${shift.notes || ''}"
                                         data-tasks="${shift.tasks || ''}"

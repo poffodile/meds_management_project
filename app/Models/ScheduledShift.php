@@ -38,6 +38,11 @@ class ScheduledShift extends Model
     {
         return $this->hasMany(ShiftDocument::class, 'shift_id');
     }
+
+    public function homeArea()
+    {
+        return $this->belongsTo(HomeArea::class, 'home_area_id');
+    }
     public function user()
     {
         return $this->belongsTo(\App\User::class, 'staff_id');

@@ -14,6 +14,7 @@ use App\Models\ShiftAssessment;
 use App\Models\ShiftDocument;
 use Carbon\Carbon;
 use App\User;
+use App\Models\HomeArea;
 use App\Services\Staff\StaffTaskService;
 
 class ScheduleShiftController extends Controller
@@ -47,6 +48,7 @@ class ScheduleShiftController extends Controller
                 return $shift;
             });
         $data['home_title'] = \App\Home::getHomeById(Auth::user()->home_id);
+        $data['home_areas'] = HomeArea::where('home_id', Auth::user()->home_id)->where('is_deleted', 0)->get();
 
         return view('frontEnd.roster.schedule.schedule_shift', $data);
     }
@@ -63,6 +65,12 @@ class ScheduleShiftController extends Controller
         ]);
         // Determine shift status based on staff assignment
         $status = isset($request->carer_id) ? 'assigned' : 'unfilled';
+
+        $locationName = $request->location_name;
+        if ($request->home_area_id) {
+            $locationName = \App\Models\HomeArea::where('id', $request->home_area_id)->value('name');
+        }
+
         try {
             // 1. Create the main shift record using Eloquent
             $shift = ScheduledShift::create([
@@ -70,8 +78,9 @@ class ScheduleShiftController extends Controller
                 'care_type_id'      => $request->care_type,
                 'assignment'        => $request->assignment ?? 'Client',
                 'service_user_id'   => $request->client_id,
+                'home_area_id'      => $request->home_area_id,
                 'property_id'       => $request->property_id,
-                'location_name'     => $request->location_name,
+                'location_name'     => $locationName,
                 'location_address'  => $request->location_address,
                 'staff_id'          => $request->carer_id,
                 'start_date'        => $request->start_date,
@@ -172,13 +181,19 @@ class ScheduleShiftController extends Controller
 
         $status = isset($request->carer_id) ? 'assigned' : 'unfilled';
 
+        $locationName = $request->location_name;
+        if ($request->home_area_id) {
+            $locationName = \App\Models\HomeArea::where('id', $request->home_area_id)->value('name');
+        }
+
         try {
             $shift->update([
                 'care_type_id'      => $request->care_type,
                 'assignment'        => $request->assignment ?? 'Client',
                 'service_user_id'   => $request->client_id,
+                'home_area_id'      => $request->home_area_id,
                 'property_id'       => $request->property_id,
-                'location_name'     => $request->location_name,
+                'location_name'     => $locationName,
                 'location_address'  => $request->location_address,
                 'staff_id'          => $request->carer_id,
                 'start_date'        => $request->start_date,
@@ -312,6 +327,7 @@ class ScheduleShiftController extends Controller
                     'shift_type'       => $shift->shift_type,
                     'location'         => $shift->location_name,
                     'client_id'        => $shift->service_user_id,
+                    'home_area_id'    => $shift->home_area_id,
                     'property_id'      => $shift->property_id,
                     'location_name'    => $shift->location_name,
                     'location_address' => $shift->location_address,
@@ -473,6 +489,7 @@ class ScheduleShiftController extends Controller
                 'staff_id' => $shift->staff_id,
                 'staff_name' => $shift->staff ? $shift->staff->first_name . ' ' . $shift->staff->last_name : '',
                 'client_id' => $shift->service_user_id,
+                'home_area_id' => $shift->home_area_id,
                 'property_id' => $shift->property_id,
                 'location_name' => $shift->location_name,
                 'location_address' => $shift->location_address,
