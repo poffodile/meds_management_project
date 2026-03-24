@@ -46,10 +46,10 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             const initials = arg.resource.title.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-            // Try to extract hours or default
-            const hoursLogged = 0;
+
+            const hoursLogged = arg.resource.extendedProps.hours_scheduled || 0;
             const hoursTotal = 40;
-            const progress = (hoursLogged / hoursTotal) * 100;
+            const progress = Math.min((hoursLogged / hoursTotal) * 100, 100);
 
             return {
                 html: `
@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     <div style="flex:1;">
                         <div style="font-weight:600;color:#1f2937;font-size:13px;">${arg.resource.title}</div>
                         <div style="display:flex;align-items:center;gap:6px;margin-top:2px;">
-                            <small style="color:#6b7280;font-size:11px;">0.0h / 40h</small>
+                            <small style="color:#6b7280;font-size:11px;">${hoursLogged.toFixed(1)}h / ${hoursTotal}h</small>
                             <div style="flex:1;height:4px;background:#e5e7eb;border-radius:2px;position:relative;">
                                 <div style="width:${progress}%;height:100%;background:#3b82f6;border-radius:2px;"></div>
                             </div>
@@ -90,26 +90,38 @@ document.addEventListener('DOMContentLoaded', function () {
             const endStr = arg.event.end ? arg.event.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) : '';
             const timeStr = startStr && endStr ? `${startStr} - ${endStr}` : '';
 
+            // Calculate duration
+            let durationStr = '';
+            if (arg.event.start && arg.event.end) {
+                const diffMs = arg.event.end - arg.event.start;
+                const hours = diffMs / (1000 * 60 * 60);
+                durationStr = hours.toFixed(1) + 'h';
+            }
+
             if (!isAssigned) {
-                // Open shift styling (yellow bg implies brownish text)
+                // Open shift styling
                 return {
                     html: `
                     <div style="padding: 4px; color: #92400e; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 13px; font-weight: 500; line-height: 1.2;">
-                        <div style="display:flex; align-items:center; gap: 4px;">
-                            ${title}
+                        <div style="display:flex; align-items:center; gap: 4px; justify-content: space-between;">
+                            <span>${title}</span>
+                            ${durationStr ? `<span style="font-size: 10px; background: rgba(251, 191, 36, 0.2); padding: 1px 4px; border-radius: 4px;">${durationStr}</span>` : ''}
                         </div>
                         ${timeStr ? `<div style="font-size: 11px; opacity: 0.8; margin-top: 2px; font-weight: normal;">${timeStr}</div>` : ''}
                     </div>`
                 };
             }
 
-            // Assigned shift styling (green bg implies dark green text)
+            // Assigned shift styling
             return {
                 html: `
                 <div style="padding: 4px; color: #065f46; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 13px; font-weight: 500; line-height: 1.2;">
-                    <div style="display:flex; align-items:center; gap: 4px;">
-                        <span style="height: 6px; width: 6px; background-color: #059669; border-radius: 50%; display: inline-block; flex-shrink: 0;"></span>
-                        <span style="overflow: hidden; text-overflow: ellipsis;">${title}</span>
+                    <div style="display:flex; align-items:center; gap: 4px; justify-content: space-between;">
+                        <div style="display:flex; align-items:center; gap: 4px; overflow: hidden;">
+                            <span style="height: 6px; width: 6px; background-color: #059669; border-radius: 50%; display: inline-block; flex-shrink: 0;"></span>
+                            <span style="overflow: hidden; text-overflow: ellipsis;">${title}</span>
+                        </div>
+                        ${durationStr ? `<span style="font-size: 10px; background: rgba(16, 185, 129, 0.1); padding: 1px 4px; border-radius: 4px;">${durationStr}</span>` : ''}
                     </div>
                     ${timeStr ? `<div style="font-size: 11px; opacity: 0.8; margin-top: 2px; font-weight: normal;">${timeStr}</div>` : ''}
                 </div>`
@@ -418,7 +430,50 @@ document.addEventListener('DOMContentLoaded', function () {
             url: `${BASE_URL}/roster/carer/shifts`,
             method: 'GET',
             success: function (data) {
-                console.log("🔥 Successfully fetched shifts data: ", data);
+                // Get current view's visible range
+                const view = calendar.view;
+                const viewStart = view.activeStart;
+                const viewEnd = view.activeEnd;
+
+                // Initialize/Reset hours per resource
+                const hoursByResource = {};
+                let totalVisibleHours = 0;
+                let openShifts = 0;
+                let filledShifts = 0;
+
+                data.forEach(ev => {
+                    const start = new Date(ev.start);
+                    const end = new Date(ev.end);
+
+                    // Only count if it's within the currently visible timeframe
+                    if (start >= viewStart && start < viewEnd) {
+                        const hours = (end - start) / (1000 * 60 * 60);
+
+                        if (ev.resourceId && ev.resourceId !== 'open') {
+                            hoursByResource[ev.resourceId] = (hoursByResource[ev.resourceId] || 0) + hours;
+                            totalVisibleHours += hours;
+                            filledShifts++;
+                        } else {
+                            openShifts++;
+                        }
+                    }
+                });
+
+                // Update resource props
+                calendar.getResources().forEach(res => {
+                    if (res.id !== 'open') {
+                        const hours = hoursByResource[res.id] || 0;
+                        res.setExtendedProp('hours_scheduled', hours);
+                    }
+                });
+
+                // Update dashboard stats
+                $('.stat strong').first().text(filledShifts + openShifts);
+                $('.stat.filled strong').text(filledShifts);
+                $('.stat.open strong').text(openShifts);
+                $('.stat.hours strong').text(Math.round(totalVisibleHours) + 'h');
+
+                console.log(`🔥 Updated for ${view.type}:`, totalVisibleHours, "hours");
             },
             failure: function () {
                 console.error("❌ Failed to load shifts!");
