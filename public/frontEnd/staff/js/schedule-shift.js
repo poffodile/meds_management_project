@@ -180,6 +180,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             form.find('[name="shift_type"]').val(props.shift_type_raw).trigger('change');
+            form.find('[name="shift_category"]').val(props.shift_category_id).trigger('change');
             form.find('[name="home_area_id"]').val(props.home_area_id).trigger('change');
             form.find('[name="property_id"]').val(props.property_id).trigger('change');
             form.find('[name="location_name"]').val(props.location_name);

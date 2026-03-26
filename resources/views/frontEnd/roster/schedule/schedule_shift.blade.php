@@ -1224,6 +1224,7 @@
                                             data-end="{{ \Carbon\Carbon::parse($shift->end_time)->format('H:i') }}"
                                             data-staff="{{ $shift->staff_id ?? '' }}"
                                             data-type="{{ $shift->shift_type ?? '' }}"
+                                            data-shiftcategory="{{ $shift->shift_category_id ?? '' }}"
                                             data-care="{{ $shift->care_type_id ?? '' }}"
                                             data-assignment="{{ $shift->assignment ?? '' }}"
                                             data-homearea="{{ $shift->home_area_id ?? '' }}"
@@ -1410,20 +1411,14 @@
                                                 </select>
                                             </div>
 
-                                            <!-- <div class="col-md-12  m-t-10">
+                                            <div class="col-md-12  m-t-10">
                                                 <label>Shift Category</label>
                                                 <select class="form-control" name="shift_category">
-                                                    <option value="morning">Morning</option>
-                                                    <option value="afternoon">Afternoon</option>
-                                                    <option value="evening">Evening</option>
-                                                    <option value="day_shift">Day Shift</option>
-                                                    <option value="night">Night</option>
-                                                    <option value="supervision">Supervision</option>
-                                                    <option value="shadowing">Shadowing</option>
-                                                    <option value="sleep_in">Sleep In</option>
-                                                    <option value="waking_night">Waking Night</option>
+                                                    @foreach ($shift_categories as $shift_category)
+                                                    <option value="{{ $shift_category->id }}">{{ $shift_category->name }}</option>
+                                                    @endforeach
                                                 </select>
-                                            </div> -->
+                                            </div>
 
                                             <div class="col-md-12  m-t-10">
                                                 <label>Tasks (comma separated)</label>
@@ -3004,8 +2999,6 @@
 
                     const form = $('#createShiftForm');
 
-
-
                     // Change form action to update
                     let updateUrl = '{{ url("roster/schedule-shift/update") }}/' + shiftId;
                     form.attr('action', updateUrl);
@@ -3045,6 +3038,7 @@
                     }
 
                     form.find('[name="shift_type"]').val(type).trigger('change');
+                    form.find('[name="shift_category"]').val(shiftCategory).trigger('change');
                     if (homeAreaId) form.find('[name="home_area_id"]').val(homeAreaId).trigger('change');
                     if (property) form.find('[name="property_id"]').val(property).trigger('change');
                     form.find('[name="location_name"]').val(locationName || '');
@@ -3352,6 +3346,7 @@
                 const end = $(this).data('end');
                 const staff = $(this).data('staff');
                 const type = $(this).data('type');
+                const shiftCategory = $(this).data('shiftcategory');
                 const property = $(this).data('property');
                 const locationName = $(this).data('location');
                 const locationAddress = $(this).data('address');
@@ -3399,6 +3394,7 @@
                 }
 
                 form.find('[name="shift_type"]').val(type).trigger('change');
+                form.find('[name="shift_category"]').val(shiftCategory).trigger('change');
                 form.find('[name="home_area_id"]').val(homeAreaId).trigger('change');
                 form.find('[name="property_id"]').val(property).trigger('change');
                 form.find('[name="location_name"]').val(locationName);
@@ -3664,6 +3660,7 @@
                                         data-end="${shift.end_time_raw || ''}"
                                         data-staff="${shift.staff_id || ''}"
                                         data-type="${shift.shift_type_raw || ''}"
+                                        data-shiftcategory="${shift.shift_category_id || ''}"
                                         data-care="${shift.care_type || ''}"
                                         data-homearea="${shift.home_area_id || ''}"
                                         data-assignment="${shift.assignment || ''}"

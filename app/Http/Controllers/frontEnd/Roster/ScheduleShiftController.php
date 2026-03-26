@@ -12,6 +12,7 @@ use App\Models\ScheduledShift;
 use App\Models\ShiftRecurrence;
 use App\Models\ShiftAssessment;
 use App\Models\ShiftDocument;
+use App\Models\ShiftCategory;
 use Carbon\Carbon;
 use App\User;
 use App\Models\HomeArea;
@@ -49,6 +50,8 @@ class ScheduleShiftController extends Controller
             });
         $data['home_title'] = \App\Home::getHomeById(Auth::user()->home_id);
         $data['home_areas'] = HomeArea::where('home_id', Auth::user()->home_id)->where('is_deleted', 0)->get();
+
+        $data['shift_categories'] = ShiftCategory::where('home_id', Auth::user()->home_id)->where('is_deleted', 0)->get();
 
         return view('frontEnd.roster.schedule.schedule_shift', $data);
     }
@@ -88,6 +91,7 @@ class ScheduleShiftController extends Controller
                 'end_time'          => $request->end_time,
                 'status'            => $status,
                 'shift_type'        => $request->shift_type,
+                'shift_category_id' => $request->shift_category,
                 'tasks'             => $request->tasks,
                 'notes'             => $request->notes,
                 'is_recurring'      => $request->has('is_recurring') ? 1 : 0,
@@ -201,6 +205,7 @@ class ScheduleShiftController extends Controller
                 'end_time'          => $request->end_time,
                 'status'            => $status,
                 'shift_type'        => $request->shift_type,
+                'shift_category_id' => $request->shift_category,
                 'tasks'             => $request->tasks,
                 'notes'             => $request->notes,
                 'is_recurring'      => $request->has('is_recurring') ? 1 : 0,
@@ -334,6 +339,7 @@ class ScheduleShiftController extends Controller
                     'start_time_raw'   => $startTime->format('H:i'),
                     'end_time_raw'     => $endTime->format('H:i'),
                     'shift_type_raw'   => $shift->shift_type,
+                    'shift_category_id'=> $shift->shift_category_id,
                     'care_type_id'     => $shift->care_type_id,
                     'assignment'       => $shift->assignment,
                     'notes'            => $shift->notes,
@@ -484,6 +490,7 @@ class ScheduleShiftController extends Controller
                 'status' => strtolower($shift->status),
                 'shift_id' => $shift->id,
                 'shift_type_raw' => $shift->shift_type,
+                'shift_category_id' => $shift->shift_category_id,
                 'start_time_raw' => $startTime->format('H:i'),
                 'end_time_raw' => $endTime->format('H:i'),
                 'staff_id' => $shift->staff_id,
