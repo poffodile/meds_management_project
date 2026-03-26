@@ -518,7 +518,7 @@
           <li> <a href="{{url('/roster/staffonboarding')}}"><i class='bx  bx-file-report'></i> <span>Staff Onboarding</span> </a></li>
           <li> <a href="{{url('/roster/clientonboarding')}}"><i class='bx  bx-file-report'></i> <span>Client Onboarding</span> </a></li>
           <li> <a href="#!"><i class='bx  bx-shield'></i> <span>Compliance Hub</span> </a></li>
-          <li> <a href="#!"><i class='bx  bx-clipboard-detail'></i> <span>Task Center</span> </a></li>
+          <li> <a href="{{url('/roster/task-center')}}"><i class='bx  bx-clipboard-detail'></i> <span>Task Center</span> </a></li>
           <li> <a href="#!"><i class='bx  bx-clipboard-detail'></i> <span>Action Plan Progress</span> </a></li>
           <li> <a href="#!"><i class='bx bx-file-detail'></i> <span>Reporting Engine</span> </a></li>
           <li> <a href="#!"><i class='bx bx-file-detail'></i> <span>Audit Templates</span> </a></li>

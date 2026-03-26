@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const initials = arg.resource.title.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
 
             const hoursLogged = arg.resource.extendedProps.hours_scheduled || 0;
-            const hoursTotal = 40;
+            const hoursTotal = arg.resource.extendedProps.max_hours || 40;
             const progress = Math.min((hoursLogged / hoursTotal) * 100, 100);
 
             return {

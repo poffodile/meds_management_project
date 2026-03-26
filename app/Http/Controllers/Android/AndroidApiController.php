@@ -571,20 +571,27 @@ class AndroidApiController extends Controller
         if ($request->user_id == null) {
             return response()->json(['success' => false, 'message' => 'Please provide us user id..!'], 200);
         }
-        $recordArray = array();
-        $activities = LoginInActivity::where('user_id', $request->user_id)->orderBy('id', 'DESC')->where('is_deleted', 0)->get();
 
-        for ($i = 0; $i < sizeof($activities); $i++) {
-            $data['id'] = $activities[$i]['id'];
-            $data['login_date'] = $activities[$i]['login_date'];
-            $data['check_in_time'] = \Carbon\Carbon::parse($activities[$i]['check_in_time'])->format('H:i');
-            $data['latitude_in'] = $activities[$i]['latitude_in'];
-            $data['longitude_in'] = $activities[$i]['longitude_in'];
+        $limit = $request->limit ? $request->limit : 10;
+        $page = $request->page ? $request->page : 1;
+        
+        $recordArray = array();
+        $activities = LoginInActivity::where('user_id', $request->user_id)
+            ->orderBy('id', 'DESC')
+            ->where('is_deleted', 0)
+            ->paginate($limit, ['*'], 'page', $page);
+
+        foreach ($activities as $activity) {
+            $data['id'] = $activity->id;
+            $data['login_date'] = $activity->login_date;
+            $data['check_in_time'] = \Carbon\Carbon::parse($activity->check_in_time)->format('H:i');
+            $data['latitude_in'] = $activity->latitude_in;
+            $data['longitude_in'] = $activity->longitude_in;
 
             // Fetch matching shift data
-            $shift = ScheduledShift::with('client')->where('staff_id', $activities[$i]['user_id'])
-                ->where('start_date', $activities[$i]['login_date'])
-                ->orderByRaw("ABS(TIMESTAMPDIFF(SECOND, TIMESTAMP(CONCAT(start_date, ' ', start_time)), '{$activities[$i]['check_in_time']}'))")
+            $shift = ScheduledShift::with('client')->where('staff_id', $activity->user_id)
+                ->where('start_date', $activity->login_date)
+                ->orderByRaw("ABS(TIMESTAMPDIFF(SECOND, TIMESTAMP(CONCAT(start_date, ' ', start_time)), '{$activity->check_in_time}'))")
                 ->first();
 
             $shift_time = "";
@@ -597,9 +604,9 @@ class AndroidApiController extends Controller
                 $shiftEnd = \Carbon\Carbon::parse($shift->start_date . ' ' . $shift->end_time);
                 $shift_time = $shiftStart->diff($shiftEnd)->format('%H:%I:%S');
 
-                if (!is_null($activities[$i]['check_out_time'])) {
-                    $actualStart = \Carbon\Carbon::parse($activities[$i]['check_in_time']);
-                    $actualEnd = \Carbon\Carbon::parse($activities[$i]['check_out_time']);
+                if (!is_null($activity->check_out_time)) {
+                    $actualStart = \Carbon\Carbon::parse($activity->check_in_time);
+                    $actualEnd = \Carbon\Carbon::parse($activity->check_out_time);
 
                     $overtimeSeconds = 0;
 
@@ -623,38 +630,54 @@ class AndroidApiController extends Controller
             }
 
             $data['client_name'] = $client_name;
-            $data['shift_time'] = \Carbon\Carbon::parse($shift_time)->format('H:i');
-            $data['overtime']   = \Carbon\Carbon::parse($overtime)->format('H:i');
+            $data['shift_time'] = !empty($shift_time) ? \Carbon\Carbon::parse($shift_time)->format('H:i') : "";
+            $data['overtime']   = !empty($overtime) ? \Carbon\Carbon::parse($overtime)->format('H:i') : "00:00";
 
-            if (is_null($activities[$i]['check_out_time'])) {
+            if (is_null($activity->check_out_time)) {
                 $check_out = "";
                 $logged_time = "";
                 $data['check_out_time'] = "";
                 $data['logged_time'] = "";
             } else {
-                $check_out = $activities[$i]['check_out_time'];
-                $checkIn  = \Carbon\Carbon::parse($activities[$i]['check_in_time']);
-                $checkOut = \Carbon\Carbon::parse($activities[$i]['check_out_time']);
+                $check_out = $activity->check_out_time;
+                $checkIn  = \Carbon\Carbon::parse($activity->check_in_time);
+                $checkOut = \Carbon\Carbon::parse($activity->check_out_time);
                 $logged_time = $checkIn->diff($checkOut)->format('%H:%I:%S');
                 $data['check_out_time'] = \Carbon\Carbon::parse($check_out)->format('H:i');
                 $data['logged_time'] = \Carbon\Carbon::parse($logged_time)->format('H:i');
             }
-            if (is_null($activities[$i]['latitude_out']) || is_null($activities[$i]['longitude_out'])) {
+            if (is_null($activity->latitude_out) || is_null($activity->longitude_out)) {
                 $latitude_out = "";
                 $longitude_out = "";
             } else {
-                $latitude_out = $activities[$i]['latitude_out'];
-                $longitude_out = $activities[$i]['longitude_out'];
+                $latitude_out = $activity->latitude_out;
+                $longitude_out = $activity->longitude_out;
             }
             $data['latitude_out'] = $latitude_out;
             $data['longitude_out'] = $longitude_out;
             array_push($recordArray, $data);
         }
 
-        if ($recordArray) {
-            return response()->json(['success' => true, 'message' => ' ', 'Data' => $recordArray], 200);
+        if ($activities->count() > 0) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Fetched successfully',
+                'total' => $activities->total(),
+                'current_page' => $activities->currentPage(),
+                'last_page' => $activities->lastPage(),
+                'limit' => $activities->perPage(),
+                'Data' => $recordArray
+            ], 200);
         }
-        return response()->json(['success' => false, 'message' => 'No data', 'Data' => []], 200);
+        return response()->json([
+            'success' => false, 
+            'message' => 'No data', 
+            'total' => $activities->total(),
+            'current_page' => $activities->currentPage(),
+            'last_page' => $activities->lastPage(),
+            'limit' => $activities->perPage(),
+            'Data' => []
+        ], 200);
     }
 
     public function QRCode(Request $request)

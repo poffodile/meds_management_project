@@ -209,7 +209,12 @@ class CarerController extends Controller
 
     public function shift_resources()
     {
-        $staff = User::where('home_id', Auth::user()->home_id)->select('id', 'name')->where('is_deleted', 0)->where('status', 1)->get();
+        $homeId = Auth::user()->home_id;
+        $staff = User::where('home_id', $homeId)->select('id', 'name')->where('is_deleted', 0)->where('status', 1)->get();
+
+        $preferences = \App\Models\ClientCareWorkPrefer::where('home_id', $homeId)
+            ->get()
+            ->groupBy('carer_id');
 
         $resources = [];
 
@@ -221,10 +226,12 @@ class CarerController extends Controller
         ];
 
         foreach ($staff as $index => $member) {
+            $max_hours = isset($preferences[$member->id]) ? $preferences[$member->id]->first()->max_per_week : 40;
             $resources[] = [
                 'id'    => (string) $member->id,
                 'title' => $member->name,
-                'order' => $index + 1
+                'order' => $index + 1,
+                'max_hours' => (float)$max_hours
             ];
         }
 

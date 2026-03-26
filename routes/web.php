@@ -46,6 +46,7 @@ use App\Http\Controllers\frontEnd\Roster\Staff\SupervisionController;
 use App\Http\Controllers\frontEnd\Roster\Staff\clientonboardingController;
 use App\Http\Controllers\frontEnd\Roster\Staff\notificationAlertController;
 use App\Http\Controllers\frontEnd\Roster\Staff\invoiceManagementController;
+use App\Http\Controllers\frontEnd\Roster\TaskCenter\TaskCenterController;
 
 
 // Backend Controllers
@@ -73,6 +74,7 @@ use App\Http\Controllers\Rota\RotaController;
 use App\Http\Controllers\backEnd\user\PayRatesTypeController;
 use App\Http\Controllers\backEnd\user\PayRatesController;
 use App\Http\Controllers\backEnd\homeManage\LeaveTypeController;
+use App\Http\Controllers\backEnd\scheduleShift\ShiftCategoryController;
 
 
 Route::get('clear', function () {
@@ -201,6 +203,9 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 		Route::get('/payroll-finance', [PayrollFinanceController::class, 'index'])->name('roster.payroll.finance');
 		Route::get('/payroll-processing', [PayrollFinanceController::class, 'payrollprocessing']);
 		Route::get('/timesheet-reconciliation', [PayrollFinanceController::class, 'timesheetreconciliation']);
+
+
+		Route::get('/task-center', [TaskCenterController::class, 'index'])->name('roster.task.center');
 	});
 
 	// Report Section
@@ -1761,6 +1766,16 @@ Route::group(['prefix' => 'admin', 'middleware' => 'CheckAdminAuth'], function (
 		Route::get('pay-rate-type/edit/{id}', [PayRatesTypeController::class, 'edit'])->name('payrates.types.edit');
 		Route::post('pay-rate-type/update/{id}', [PayRatesTypeController::class, 'update'])->name('payrates.types.update');
 		Route::get('pay-rate-type/delete/{id}', [PayRatesTypeController::class, 'destroy'])->name('payrates.types.destroy');
+	});
+
+	// Backend User Shift Category
+	Route::prefix('user')->group(function () {
+		Route::get('shift-category', [ShiftCategoryController::class, 'index'])->name('shiftcategory.index');
+		Route::get('shift-category/add', [ShiftCategoryController::class, 'create'])->name('shiftcategory.create');
+		Route::post('shift-category/save', [ShiftCategoryController::class, 'store'])->name('shiftcategory.store');
+		Route::get('shift-category/edit/{id}', [ShiftCategoryController::class, 'edit'])->name('shiftcategory.edit');
+		Route::post('shift-category/update/{id}', [ShiftCategoryController::class, 'update'])->name('shiftcategory.update');
+		Route::get('shift-category/delete/{id}', [ShiftCategoryController::class, 'destroy'])->name('shiftcategory.destroy');
 	});
 
 

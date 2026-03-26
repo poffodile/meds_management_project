@@ -1409,6 +1409,22 @@
                                                     <option value="waking_night">Waking Night</option>
                                                 </select>
                                             </div>
+
+                                            <!-- <div class="col-md-12  m-t-10">
+                                                <label>Shift Category</label>
+                                                <select class="form-control" name="shift_category">
+                                                    <option value="morning">Morning</option>
+                                                    <option value="afternoon">Afternoon</option>
+                                                    <option value="evening">Evening</option>
+                                                    <option value="day_shift">Day Shift</option>
+                                                    <option value="night">Night</option>
+                                                    <option value="supervision">Supervision</option>
+                                                    <option value="shadowing">Shadowing</option>
+                                                    <option value="sleep_in">Sleep In</option>
+                                                    <option value="waking_night">Waking Night</option>
+                                                </select>
+                                            </div> -->
+
                                             <div class="col-md-12  m-t-10">
                                                 <label>Tasks (comma separated)</label>
                                                 <textarea class="form-control" rows="3"
@@ -2213,7 +2229,7 @@
             });
 
             clientSelect.addEventListener('change', fetchSuggestedCarers);
-            
+
             const locationTab = document.getElementById('locationTab');
             const propertyTab = document.getElementById('propertyTab');
             const homeAreaSelect = document.getElementById('homeAreaSelect');
@@ -2306,7 +2322,7 @@
                                 let firstLetter = carer.name.charAt(0).toUpperCase();
                                 let dist = parseFloat(carer.distance);
                                 let cardHtml = '';
-                                
+
                                 // Matching logic depends on whether we have distance (Client shift) or not (Location/Property shift)
                                 let isClientShift = (assignment === 'Client');
                                 let distanceHtml = (isClientShift && dist < 1000) ? `<p class="mb-0"><i class='bx bx-check-circle'></i> Within ${dist.toFixed(1)} km</p>` : '';

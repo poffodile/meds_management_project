@@ -69,6 +69,33 @@ class PayrollFinanceController extends Controller
                 $shift->actual_duration_minutes = $actualDuration;
                 $shift->variance_minutes = $actualDuration - $shift->scheduled_duration_minutes;
 
+                // Calculate shift start/end for late/early comparison
+                $shiftStartFull = \Carbon\Carbon::parse($shift->start_date . ' ' . $shift->start_time);
+                $shiftEndFull = \Carbon\Carbon::parse($shift->start_date . ' ' . $shift->end_time);
+                if ($shiftEndFull->lessThan($shiftStartFull)) {
+                    $shiftEndFull->addDay();
+                }
+
+                $shift->is_late = false;
+                $shift->late_minutes = 0;
+                $shift->is_early = false;
+                $shift->early_minutes = 0;
+
+                if ($shift->login_activities->count() > 0) {
+                    $firstCheckIn = \Carbon\Carbon::parse($shift->login_activities->min('check_in_time'));
+                    $lastCheckOut = $shift->login_activities->max('check_out_time') ? \Carbon\Carbon::parse($shift->login_activities->max('check_out_time')) : null;
+
+                    if ($firstCheckIn->greaterThan($shiftStartFull->copy()->addMinutes(5))) {
+                        $shift->is_late = true;
+                        $shift->late_minutes = $shiftStartFull->diffInMinutes($firstCheckIn);
+                    }
+
+                    if ($lastCheckOut && $lastCheckOut->lessThan($shiftEndFull->copy()->subMinutes(5))) {
+                        $shift->is_early = true;
+                        $shift->early_minutes = $lastCheckOut->diffInMinutes($shiftEndFull);
+                    }
+                }
+
                 // Assign reconciliation status
                 $status = strtolower($shift->status);
                 if ($status == 'approved') {
@@ -78,7 +105,8 @@ class PayrollFinanceController extends Controller
                 } elseif (empty($shift->staff_id)) {
                     $shift->reconciliation_status = 'Unscheduled';
                 } else {
-                    if ($shift->actual_duration_minutes > 0 && $shift->variance_minutes == 0) {
+                    // Rule: variance > 60 mins -> Needs Adjustment, otherwise Matched
+                    if (abs($shift->variance_minutes) <= 60) {
                         $shift->reconciliation_status = 'Matched';
                     } else {
                         $shift->reconciliation_status = 'Needs Adjustment';
