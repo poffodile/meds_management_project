@@ -200,9 +200,14 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 		Route::get('/incident-report-details/{id}', [IncidentManagementController::class, 'incident_report_details']);
 		Route::post('/incident-report-save', [IncidentManagementController::class, 'incident_report_save']);
 		Route::post('/incident-report-loadData', [IncidentManagementController::class, 'incidentReportLoadData']);
+		// Payroll Finance
 		Route::get('/payroll-finance', [PayrollFinanceController::class, 'index'])->name('roster.payroll.finance');
 		Route::get('/payroll-processing', [PayrollFinanceController::class, 'payrollprocessing']);
+
+		// Timesheet Reconciliation
 		Route::get('/timesheet-reconciliation', [PayrollFinanceController::class, 'timesheetreconciliation']);
+		Route::post('/timesheet-reconciliation/save', [PayrollFinanceController::class, 'saveTimesheet'])->name('timesheet.save');
+		Route::post('/timesheet-reconciliation/approve', [PayrollFinanceController::class, 'approveShift'])->name('timesheet.approve');
 
 
 		Route::get('/task-center', [TaskCenterController::class, 'index'])->name('roster.task.center');

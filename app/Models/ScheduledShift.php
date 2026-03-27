@@ -43,6 +43,11 @@ class ScheduledShift extends Model
     {
         return $this->belongsTo(HomeArea::class, 'home_area_id');
     }
+
+    public function shiftCategory()
+    {
+        return $this->belongsTo(ShiftCategory::class, 'shift_category_id');
+    }
     public function user()
     {
         return $this->belongsTo(\App\User::class, 'staff_id');
@@ -58,5 +63,10 @@ class ScheduledShift extends Model
     public function scopeHomeId($query)
     {
         return $query->where('home_id', Auth::user()->home_id);
+    }
+
+    public function timesheet()
+    {
+        return $this->hasOne(Timesheet::class, 'shift_id');
     }
 }

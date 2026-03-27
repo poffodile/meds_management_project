@@ -3,6 +3,8 @@
 @section('content')
 
 @include('frontEnd.roster.common.roster_header')
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 <style>
     :root {
         --primary-blue: #2563eb;
@@ -95,11 +97,11 @@
         margin-bottom: 24px;
     }
 
-    .filter-bar .form-control {
+    /* .filter-bar .form-control {
         border-radius: 8px;
         height: 42px;
         border-color: #e5e7eb;
-    }
+    } */
 
     /* Accordion Panels */
     .payRollAcood {
@@ -166,7 +168,7 @@
     }
 
     .recon-card.needs-adj {
-        border-color: #fed7aa;
+        /* border-color: #fed7aa;  -- Removed to allow category color precedence */
     }
 
     .staff-name {
@@ -298,11 +300,89 @@
     .btn-approve-all {
         background: #10b981;
         color: white;
-        padding: 10px 20px;
-        border-radius: 8px;
-        font-weight: 600;
-        margin-bottom: 20px;
         border: none;
+        padding: 10px 24px;
+        border-radius: 12px;
+        font-weight: 700;
+        margin-bottom: 24px;
+        transition: all 0.2s;
+        box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2);
+    }
+
+    .btn-approve-all:hover {
+        background: #059669;
+        transform: translateY(-1px);
+        box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.3);
+    }
+
+    /* Modal Styling Classes */
+    .modal-body-unset {
+        height: unset !important;
+    }
+
+    .bg-muted-box {
+        background: #f9fafb;
+        border-radius: 8px;
+    }
+
+    .text-blue-dark {
+        color: #1e40af !important;
+    }
+
+    .btn-save-records {
+        padding: 10px 30px;
+        font-weight: 700;
+        border-radius: 10px;
+    }
+
+    .delete-btn-trash {
+        cursor: pointer;
+        color: #ef4444;
+        padding: 10px;
+    }
+
+    .p24 {
+        padding: 24px !important;
+    }
+
+    .gap-3 {
+        gap: 12px !important;
+    }
+
+    /* Manual Entry Styles */
+    .calc-hours-box {
+        margin-top: 20px;
+        background: #eff6ff;
+        border: 1px solid #dbeafe;
+        padding: 20px;
+        border-radius: 8px;
+    }
+
+    .calc-hours-label {
+        color: #1e40af;
+        font-weight: 600;
+        margin-bottom: 0;
+    }
+
+    .calc-hours-value {
+        color: #1e40af;
+        font-weight: 700;
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+
+    .btn-save-records {
+        background: #2563eb;
+        border: none;
+        padding: 10px 24px;
+        border-radius: 8px;
+        color: white;
+        font-weight: 600;
+    }
+
+    .btn-save-records:hover {
+        background: #1d4ed8;
+        color: white;
     }
 </style>
 
@@ -311,10 +391,13 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-lg-12">
-                <div class="staffHeaderp">
+                <div class="staffHeaderp d-flex justify-content-between align-items-center">
                     <div>
                         <h1 class="mainTitlep">Timesheet & Shift Reconciliation</h1>
                         <p class="header-subtitle mb-0">Review actual vs planned hours and approve timesheets</p>
+                    </div>
+                    <div class="header-btn">
+                        <button class="btn allBtnUseColor" data-toggle="modal" data-target="#addTimesheetModal">+ Add Timesheet</button>
                     </div>
                 </div>
             </div>
@@ -376,6 +459,7 @@
                 </div>
             </div>
         </div>
+
         <div class="row mt20">
             <div class="col-lg-12">
                 <div class="panel-group" id="accordion">
@@ -393,24 +477,26 @@
                         <div id="collapse1" class="panel-collapse collapse in">
                             <div class="panel-body">
                                 @if ($matchedCount > 0)
-                                <button class="btn-approve-all">
+                                <button class="btn-approve-all" id="approve-all-matched">
                                     <i class="bx bx-check-double me-2"></i> Approve All Matched
                                 </button>
                                 @foreach ($shifts->where('reconciliation_status', 'Matched') as $shift)
-                                <div class="recon-card">
+                                <div class="recon-card" style="border-color: {{ $shift->shiftCategory->color ?? '#e2e8f0' }};">
                                     <div class="d-flex justify-content-between align-items-start mb-4">
                                         <div class="d-flex flex-column gap-2">
                                             <div class="d-flex align-items-center gap-2">
                                                 <span class="staff-name">{{ $shift->staff ? $shift->staff->name : 'Unknown Staff' }}</span>
                                                 <span class="badge-soft badge-pending">pending</span>
-                                                <span class="badge-soft badge-standard">standard</span>
+                                                @if($shift->shiftCategory)
+                                                <span class="badge-soft" style="background-color: {{ $shift->shiftCategory->color }}20; color: {{ $shift->shiftCategory->color }};">{{ $shift->shiftCategory->name }}</span>
+                                                @endif
                                             </div>
                                         </div>
                                         <div class="d-flex gap-2">
                                             <button class="btn-adjust" data-toggle="modal" data-target="#adjustNodal-{{ $shift->id }}">
                                                 <i class="bx bx-show"></i> Adjust
                                             </button>
-                                            <button class="btn-approve">
+                                            <button class="btn-approve approve-shift-btn" data-id="{{ $shift->id }}">
                                                 <i class="bx bx-check-circle"></i> Approve
                                             </button>
                                         </div>
@@ -475,20 +561,22 @@
                             <div class="panel-body">
                                 @if ($needsAdjustmentCount > 0)
                                 @foreach ($shifts->where('reconciliation_status', 'Needs Adjustment') as $shift)
-                                <div class="recon-card needs-adj">
+                                <div class="recon-card needs-adj" style="border-color: {{ $shift->shiftCategory->color ?? '#e2e8f0' }};">
                                     <div class="d-flex justify-content-between align-items-start mb-4">
                                         <div class="d-flex flex-column gap-2">
                                             <div class="d-flex align-items-center gap-2">
                                                 <span class="staff-name">{{ $shift->staff ? $shift->staff->name : 'Unknown Staff' }}</span>
                                                 <span class="badge-soft badge-adj">requires adjustment</span>
-                                                <span class="badge-soft badge-standard">standard</span>
+                                                @if($shift->shiftCategory)
+                                                <span class="badge-soft" style="background-color: {{ $shift->shiftCategory->color }}20; color: {{ $shift->shiftCategory->color }};">{{ $shift->shiftCategory->name }}</span>
+                                                @endif
                                             </div>
                                         </div>
                                         <div class="d-flex gap-2">
                                             <button class="btn-adjust" data-toggle="modal" data-target="#adjustNodal-{{ $shift->id }}">
                                                 <i class="bx bx-show"></i> Adjust
                                             </button>
-                                            <button class="btn-approve">
+                                            <button class="btn-approve approve-shift-btn" data-id="{{ $shift->id }}">
                                                 <i class="bx bx-check-circle"></i> Approve
                                             </button>
                                         </div>
@@ -572,18 +660,20 @@
                             <div class="panel-body">
                                 @if ($approvedCount > 0)
                                 @foreach ($shifts->where('reconciliation_status', 'Approved') as $shift)
-                                <div class="recon-card">
+                                <div class="recon-card" style="border-color: {{ $shift->shiftCategory->color ?? '#e2e8f0' }};">
                                     <div class="d-flex justify-content-between align-items-start mb-4">
                                         <div class="d-flex flex-column gap-2">
                                             <div class="d-flex align-items-center gap-2">
                                                 <span class="staff-name">{{ $shift->staff ? $shift->staff->name : 'Unknown Staff' }}</span>
                                                 <span class="badge-soft badge-approved">approved</span>
-                                                <span class="badge-soft badge-standard">standard</span>
+                                                @if($shift->shiftCategory)
+                                                <span class="badge-soft" style="background-color: {{ $shift->shiftCategory->color }}20; color: {{ $shift->shiftCategory->color }};">{{ $shift->shiftCategory->name }}</span>
+                                                @endif
                                             </div>
                                         </div>
                                         <div class="d-flex gap-2">
                                             <button class="btn-adjust" data-toggle="modal" data-target="#adjustNodal-{{ $shift->id }}">
-                                                <i class="bx bx-show"></i> View Details
+                                                <i class="bx bx-edit"></i> Adjust
                                             </button>
                                         </div>
                                     </div>
@@ -597,7 +687,9 @@
                                             <div class="d-flex align-items-center gap-2">
                                                 <i class="bx bx-eye fs18" style="cursor:pointer; color: var(--primary-blue);" data-toggle="modal" data-target="#clockDetails-{{ $shift->id }}"></i>
                                                 <p class="data-value mb-0">
-                                                    @if($shift->login_activities->count() > 0)
+                                                    @if($shift->timesheet)
+                                                    {{ $shift->timesheet->clock_in }} - {{ $shift->timesheet->clock_out }}
+                                                    @elseif($shift->login_activities->count() > 0)
                                                     @php
                                                     $firstIn = \Carbon\Carbon::parse($shift->login_activities->min('check_in_time'));
                                                     $lastOut = $shift->login_activities->max('check_out_time') ? \Carbon\Carbon::parse($shift->login_activities->max('check_out_time')) : null;
@@ -626,99 +718,64 @@
                                     </div>
                                 </div>
                                 @endforeach
+
+                                @foreach ($manual_timesheets as $m)
+                                <div class="recon-card" style="border-color: {{ $m->category->color ?? '#e2e8f0' }};">
+                                    <div class="d-flex justify-content-between align-items-start mb-4">
+                                        <div class="d-flex flex-column gap-2">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span class="staff-name">{{ $m->staff ? $m->staff->name : 'Unknown Staff' }}</span>
+                                                <span class="badge-soft badge-approved">manual record (approved)</span>
+                                                @if($m->category)
+                                                <span class="badge-soft" style="background-color: {{ $m->category->color }}20; color: {{ $m->category->color }};">{{ $m->category->name }}</span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                        <div class="d-flex gap-2">
+                                            <button class="btn-adjust" data-toggle="modal" data-target="#adjustManualModal-{{ $m->id }}">
+                                                <i class="bx bx-edit"></i> Adjust
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-2">
+                                            <p class="data-label">Created Date</p>
+                                            <p class="data-value">{{ $m->created_at->format('D, M d') }}</p>
+                                        </div>
+                                        <div class="col-lg-3">
+                                            <p class="data-label">Clock Times</p>
+                                            <p class="data-value">{{ $m->clock_in }} - {{ $m->clock_out }}</p>
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <p class="data-label">Planned</p>
+                                            <p class="data-value">N/A</p>
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <p class="data-label">Actual</p>
+                                            @php
+                                            $duration = 0;
+                                            if ($m->clock_in && $m->clock_out) {
+                                            $in = \Carbon\Carbon::parse($m->clock_in);
+                                            $out = \Carbon\Carbon::parse($m->clock_out);
+                                            if ($out < $in) $out->addDay();
+                                                $duration = $in->diffInMinutes($out);
+                                                }
+                                                @endphp
+                                                <p class="data-value">{{ number_format($duration / 60, 2) }}h</p>
+                                        </div>
+                                        <div class="col-lg-3">
+                                            <p class="data-label">Variance</p>
+                                            <p class="data-value">N/A</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                @endforeach
                                 @else
                                 <p class="textGray500 fs13 text-center py-5 mb-0">No approved timesheets found. </p>
                                 @endif
                             </div>
                         </div>
                     </div>
-                    <!-- Panel 4 (Unscheduled) -->
-                    <!-- <div class="panel panel-default mt-4 payRollAcood p-0">
-                        <div class="panel-heading">
-                            <h4 class="panel-title">
-                                <a data-toggle="collapse" data-parent="#accordion" href="#collapse4" class="lightBlueBg">
-                                    <i class="bx bx-help-circle f20 purpleTextp me-2"></i>
-                                    Unscheduled ({{ $unscheduledCount }})
-                                    <i class="bx bx-chevron-down accIcon"></i>
-                                </a>
-                            </h4>
-                        </div>
-                        <div id="collapse4" class="panel-collapse collapse">
-                            <div class="panel-body">
-                                @if ($unscheduledCount > 0)
-                                @foreach ($shifts->where('reconciliation_status', 'Unscheduled') as $shift)
-                                <div class="bBorderCard mt-4 p-4">
-                                    <div class="d-flex justify-content-between">
-                                        <div class="flex1">
-                                            <div class="d-flex gap-3 mb-3 align-items-center">
-                                                <h5 class="h5Head mb-0">Unassigned Shift</h5>
-                                                <div><span class="careBadg purpleBages">Unfilled</span></div>
-                                            </div>
-                                            <div class="d-flex mb-4">
-                                                <div class="flex1">
-                                                    <p class="mb-2 fs13 textGray500">Date </p>
-                                                    <h6 class="h6Head blackText mb-0">{{ \Carbon\Carbon::parse($shift->start_date)->format('D, M d') }}</h6>
-                                                </div>
-                                                <div class="flex1">
-                                                    <p class="mb-2 fs13 textGray500">Scheduled Time</p>
-                                                    <h6 class="h6Head blackText mb-0">{{ \Carbon\Carbon::parse($shift->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($shift->end_time)->format('H:i') }}</h6>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <button class="borderBtn w100"><i class="bx bx-user-plus me-2 f18"></i> Assign Staff</button>
-                                        </div>
-                                    </div>
-                                </div>
-                                @endforeach
-                                @else
-                                <p class="textGray500 fs13 text-center py-5 mb-0">No unassigned shifts found.</p>
-                                @endif
-                            </div>
-                        </div>
-                    </div> -->
-
-                    <!-- Panel 5 (Rejected) -->
-                    <!-- <div class="panel panel-default mt-4 payRollAcood p-0">
-                        <div class="panel-heading">
-                            <h4 class="panel-title">
-                                <a data-toggle="collapse" data-parent="#accordion" href="#collapse5" class="lightRedBg">
-                                    <i class="bx bx-x-circle f20 redtext me-2"></i>
-                                    Rejected ({{ $rejectedCount }})
-                                    <i class="bx bx-chevron-down accIcon"></i>
-                                </a>
-                            </h4>
-                        </div>
-                        <div id="collapse5" class="panel-collapse collapse">
-                            <div class="panel-body">
-                                @if ($rejectedCount > 0)
-                                @foreach ($shifts->where('reconciliation_status', 'Rejected') as $shift)
-                                <div class="bBorderCard mt-4 p-4">
-                                    <div class="d-flex justify-content-between">
-                                        <div class="flex1">
-                                            <div class="d-flex gap-3 mb-3 align-items-center">
-                                                <h5 class="h5Head mb-0">{{ $shift->staff ? $shift->staff->name : 'Unknown Staff' }}</h5>
-                                                <div><span class="careBadg redbadges">Rejected</span></div>
-                                            </div>
-                                            <div class="d-flex mb-4">
-                                                <div class="flex1">
-                                                    <p class="mb-2 fs13 textGray500">Date </p>
-                                                    <h6 class="h6Head blackText mb-0">{{ \Carbon\Carbon::parse($shift->start_date)->format('D, M d') }}</h6>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <button class="borderBtn w100"><i class="bx bx-refresh me-2 f18"></i> Re-assign</button>
-                                        </div>
-                                    </div>
-                                </div>
-                                @endforeach
-                                @else
-                                <p class="textGray500 fs13 text-center py-5 mb-0">No rejected shifts found.</p>
-                                @endif
-                            </div>
-                        </div>
-                    </div> -->
                 </div>
             </div>
         </div>
@@ -734,8 +791,8 @@
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                     <h4 class="modal-title">Pay Adjustments - {{ $shift->staff ? $shift->staff->name : 'Unknown' }}</h4>
                 </div>
-                <div class="modal-body heightScrollModal p24" style="height: unset;">
-                    <div class="d-flex muteBg rounded5 p-4" style="background: #f9fafb; border-radius: 8px;">
+                <div class="modal-body heightScrollModal p24 modal-body-unset">
+                    <div class="d-flex muteBg rounded5 p-4 bg-muted-box">
                         <div class="flex1">
                             <p class="fs13 textGray mb-2">Planned Hours </p>
                             <h5 class="h5Head font700">{{ number_format($shift->scheduled_duration_minutes / 60, 2) }}h </h5>
@@ -747,29 +804,36 @@
                     </div>
                     <div class="mt20">
                         <h6 class="h5Head">Clock Times</h6>
-                        <form action="">
+                        <form action="{{ route('timesheet.save') }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="shift_id" value="{{ $shift->id }}">
                             <div class="row">
                                 <div class="col-md-6 m-t-10">
                                     <label>Clock In</label>
                                     @php
+                                    if ($shift->timesheet) {
+                                    $firstIn = $shift->timesheet->clock_in;
+                                    $lastOut = $shift->timesheet->clock_out;
+                                    } else {
                                     $firstIn = $shift->login_activities->count() > 0 ? \Carbon\Carbon::parse($shift->login_activities->min('check_in_time'))->format('H:i') : '';
                                     $lastOut = ($shift->login_activities->count() > 0 && $shift->login_activities->max('check_out_time')) ? \Carbon\Carbon::parse($shift->login_activities->max('check_out_time'))->format('H:i') : '';
+                                    }
                                     @endphp
-                                    <input type="time" name="clock_in" value="{{ $firstIn }}" class="form-control">
+                                    <input type="time" id="clock-in-{{ $shift->id }}" name="clock_in" value="{{ $firstIn }}" class="form-control" onchange="calculateAdjustedHours('{{ $shift->id }}')">
                                 </div>
                                 <div class="col-md-6 m-t-10">
                                     <label>Clock Out</label>
-                                    <input type="time" name="clock_out" value="{{ $lastOut }}" class="form-control">
+                                    <input type="time" id="clock-out-{{ $shift->id }}" name="clock_out" value="{{ $lastOut }}" class="form-control" onchange="calculateAdjustedHours('{{ $shift->id }}')">
                                 </div>
                             </div>
                             <div class="appendContainer-{{ $shift->id }}">
                                 <div class="flexBw mt20">
-                                    <div>
+                                    <!-- <div>
                                         <h5 class="h5Head">Pay Adjustments </h5>
                                     </div>
                                     <div>
                                         <button class="borderBtn appendBtn" data-target=".appendContainer-{{ $shift->id }}"> <i class="bx bx-plus me-2"></i> Add Row</button>
-                                    </div>
+                                    </div> -->
                                 </div>
                                 <div class="flexRow mt-3">
                                     <div class="shadowp rounded8 p-4 lightBorderp appendRow" style="display: none; border: 1px solid #e5e7eb; margin-bottom: 10px;">
@@ -792,7 +856,7 @@
                                             </div>
                                             <div>
                                                 <label for=" " style="visibility: hidden;">delete</label>
-                                                <div class="deleteIcon flex1 deleteAppend" style="cursor: pointer; color: #ef4444; padding: 10px;">
+                                                <div class="deleteIcon flex1 deleteAppend delete-btn-trash">
                                                     <i class="fa fa-trash-o" aria-hidden="true"></i>
                                                 </div>
                                             </div>
@@ -800,31 +864,31 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="mt20">
-                                <div>
-                                    <label>Adjustment Reason</label>
-                                    <textarea name="notes" rows="3" placeholder="Enter reason for adjustment..." class="form-control"></textarea>
-                                </div>
+                            <!-- <div class="mt20"> -->
+                            <div>
+                                <label>Adjustment Reason</label>
+                                <textarea name="notes" rows="3" placeholder="Enter reason for adjustment..." class="form-control">{{ $shift->timesheet ? $shift->timesheet->notes : '' }}</textarea>
                             </div>
-                            <div class="mt20 lightBorderp bg-blue-50 p-4 rounded8" style="background: #eff6ff; border: 1px solid #dbeafe;">
+                            <!-- </div> -->
+                            <div class="mt20 lightBorderp rounded8 calc-hours-box">
                                 <div class="flexBw d-flex justify-content-between align-items-center">
-                                    <h5 class="h6Head mb-0" style="color: #1e40af;">Total Adjusted Hours</h5>
-                                    <h3 class="my-0 font700" style="color: #1e40af;">{{ number_format($shift->actual_duration_minutes / 60, 2) }}h</h3>
+                                    <h5 class="h6Head mb-0 text-blue-dark">Total Adjusted Hours</h5>
+                                    <h3 class="my-0 font700 text-blue-dark" id="total-adjusted-{{ $shift->id }}">{{ number_format($shift->actual_duration_minutes / 60, 2) }}h</h3>
                                 </div>
                             </div>
-                        </form>
                     </div>
                 </div>
                 <div class="modal-footer d-flex gap-3">
                     <div class="dFlexGap w100 d-flex gap-3">
                         <div class="flex1 w-50">
-                            <button class="btn-adjust w100" data-dismiss="modal">Cancel </button>
+                            <button type="button" class="btn-adjust w100" data-dismiss="modal">Cancel </button>
                         </div>
                         <div class="flex1 w-50">
-                            <button class="btn-approve w100"> <i class="bx bx-save f18 me-2"></i> Save Adjustment</button>
+                            <button type="submit" class="btn-approve w100"> <i class="bx bx-save f18 me-2"></i> Save Adjustment</button>
                         </div>
                     </div>
                 </div>
+                </form>
             </div>
         </div>
     </div>
@@ -842,7 +906,6 @@
                     <h4 class="modal-title">Clock Details </h4>
                 </div>
                 <div class="modal-body heightScrollModal p24" style="height: unset;">
-
                     <div class="scrollDailyCheck pe-3">
                         @if (count($shift->login_activities) > 0)
                         @foreach ($shift->login_activities as $activity)
@@ -916,6 +979,285 @@
                 if (row) row.remove();
             }
         });
+    });
+
+    window.calculateAdjustedHours = function(shiftId) {
+        let elClockIn = document.getElementById('clock-in-' + shiftId);
+        let elClockOut = document.getElementById('clock-out-' + shiftId);
+        let elTotal = document.getElementById('total-adjusted-' + shiftId);
+
+        if (elClockIn && elClockOut && elTotal) {
+            let clockIn = elClockIn.value;
+            let clockOut = elClockOut.value;
+
+            if (clockIn && clockOut) {
+                let clockInTime = new Date('1970-01-01T' + clockIn + 'Z');
+                let clockOutTime = new Date('1970-01-01T' + clockOut + 'Z');
+
+                if (clockOutTime < clockInTime) {
+                    clockOutTime.setDate(clockOutTime.getDate() + 1);
+                }
+
+                let diffMs = clockOutTime - clockInTime;
+                let diffHrs = diffMs / (1000 * 60 * 60);
+
+                let roundedHours = isNaN(diffHrs) ? '0.00' : diffHrs.toFixed(2);
+                elTotal.innerText = roundedHours + 'h';
+            } else {
+                elTotal.innerText = '0.00h';
+            }
+        }
+    };
+
+    const addShiftOptions = @json($shift_options);
+
+    window.filterAddShiftsByStaff = function(staffId) {
+        const select = document.getElementById('add-shift-select');
+        select.innerHTML = '<option value="">Select Shift</option>';
+
+        const filtered = addShiftOptions.filter(s => s.staff_id === parseInt(staffId));
+        filtered.forEach(s => {
+            const opt = document.createElement('option');
+            opt.value = s.id;
+            opt.textContent = `${s.date} (${s.time}) — ${s.category}`;
+            select.appendChild(opt);
+        });
+    };
+</script>
+
+<div class="modal fade leaveCommunStyle" id="addTimesheetModal" tabindex="1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modalMd pModalScroll">
+        <div class="modal-content">
+            <div class="modal-header p24">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Create Manual Timesheet</h4>
+            </div>
+            <form action="{{ route('timesheet.save') }}" method="POST">
+                @csrf
+                <div class="modal-body heightScrollModal p24 modal-body-unset">
+                    <div class="mb-3">
+                        <label>Select Staff Member</label>
+                        <select class="form-control" name="staff_id" required>
+                            <option value="">Choose Staff...</option>
+                            @foreach($users as $user)
+                            <option value="{{ $user->id }}">{{ $user->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Shift Category</label>
+                        <select class="form-control" name="category_id" required>
+                            <option value="">Choose Category...</option>
+                            @foreach($categories as $cat)
+                            <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <label>Clock In</label>
+                            <input type="time" name="clock_in" id="clock-in-manual" class="form-control" required onchange="calculateAdjustedHours('manual')">
+                        </div>
+                        <div class="col-md-6">
+                            <label>Clock Out</label>
+                            <input type="time" name="clock_out" id="clock-out-manual" class="form-control" required onchange="calculateAdjustedHours('manual')">
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <label>Reason / Notes</label>
+                        <textarea name="notes" class="form-control" rows="3" placeholder="Explain the manual entry..."></textarea>
+                    </div>
+
+                    <div class="calc-hours-box">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="calc-hours-label">Calculated Hours</h5>
+                            <h3 class="calc-hours-value" id="total-adjusted-manual">0.00h</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer p24">
+                    <button type="submit" class="btn btn-primary btn-save-records">Save Records</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Manual Adjustment Modals -->
+@foreach ($manual_timesheets as $m)
+<div class="modal fade leaveCommunStyle" id="adjustManualModal-{{ $m->id }}" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modalMd pModalScroll">
+        <div class="modal-content">
+            <div class="modal-header p24">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Adjust Manual Timesheet</h4>
+            </div>
+            <form action="{{ route('timesheet.save') }}" method="POST">
+                @csrf
+                <input type="hidden" name="timesheet_id" value="{{ $m->id }}">
+                <div class="modal-body heightScrollModal p24 modal-body-unset">
+                    <div class="mb-3">
+                        <label>Select Staff Member</label>
+                        <select class="form-control" name="staff_id" required>
+                            @foreach($users as $user)
+                            <option value="{{ $user->id }}" {{ $m->staff_id == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label>Shift Category</label>
+                        <select class="form-control" name="category_id" required>
+                            @foreach($categories as $cat)
+                            <option value="{{ $cat->id }}" {{ $m->category_id == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <label>Clock In</label>
+                            <input type="time" name="clock_in" value="{{ $m->clock_in }}" class="form-control" required onchange="calculateAdjustedHours('manual-{{ $m->id }}')">
+                        </div>
+                        <div class="col-md-6">
+                            <label>Clock Out</label>
+                            <input type="time" name="clock_out" value="{{ $m->clock_out }}" class="form-control" required onchange="calculateAdjustedHours('manual-{{ $m->id }}')">
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <label>Adjustment Reason / Notes</label>
+                        <textarea name="notes" class="form-control" rows="3">{{ $m->notes }}</textarea>
+                    </div>
+
+                    <div class="calc-hours-box">
+                        <div class="d-flex justify-content-between align-items-center">
+                            @php
+                            $in = \Carbon\Carbon::parse($m->clock_in);
+                            $out = \Carbon\Carbon::parse($m->clock_out);
+                            if ($out < $in) $out->addDay();
+                                $currentDuration = $in->diffInMinutes($out);
+                                @endphp
+                                <h5 class="calc-hours-label">Calculated Hours</h5>
+                                <h3 class="calc-hours-value" id="total-adjusted-manual-{{ $m->id }}">{{ number_format($currentDuration / 60, 2) }}h</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer p24">
+                    <button type="submit" class="btn btn-primary btn-save-records">Update Record</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endforeach
+
+<script>
+    function calculateAdjustedHours(id) {
+        let clockIn, clockOut, targetId;
+
+        if (id === 'manual') {
+            clockIn = document.getElementById('clock-in-manual').value;
+            clockOut = document.getElementById('clock-out-manual').value;
+            targetId = 'total-adjusted-manual';
+        } else if (id.startsWith('manual-')) {
+            // For adjusted manual records
+            const form = event.target.closest('form');
+            clockIn = form.querySelector('input[name="clock_in"]').value;
+            clockOut = form.querySelector('input[name="clock_out"]').value;
+            targetId = 'total-adjusted-' + id;
+        } else {
+            clockIn = document.getElementById('clock-in-' + id).value;
+            clockOut = document.getElementById('clock-out-' + id).value;
+            targetId = 'total-adjusted-' + id;
+        }
+
+        if (clockIn && clockOut) {
+            let start = new Date("2000-01-01 " + clockIn);
+            let end = new Date("2000-01-01 " + clockOut);
+
+            if (end < start) {
+                end.setDate(end.getDate() + 1);
+            }
+
+            let diff = (end - start) / (1000 * 60 * 60);
+            document.getElementById(targetId).innerText = diff.toFixed(2) + "h";
+        }
+    }
+    $(document).on('click', '.approve-shift-btn', function() {
+        const shiftId = $(this).data('id');
+        const btn = $(this);
+
+        if (confirm('Are you sure you want to approve this shift?')) {
+            btn.prop('disabled', true).html('<i class="bx bx-loader fs-18 bx-spin"></i>');
+
+            $.ajax({
+                url: "{{ route('timesheet.approve') }}",
+                method: 'POST',
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    shift_id: shiftId
+                },
+                success: function(response) {
+                    if (response.success) {
+                        toastr.success(response.message);
+                        setTimeout(() => location.reload(), 1000);
+                    } else {
+                        toastr.error(response.message || 'Something went wrong');
+                        console.error('Approve Error:', response);
+                        btn.prop('disabled', false).html('<i class="bx bx-check-circle"></i> Approve');
+                    }
+                },
+                error: function(xhr) {
+                    let msg = 'Error approving shift';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        msg = xhr.responseJSON.message;
+                    }
+                    toastr.error(msg);
+                    console.error('AJAX Error:', xhr);
+                    btn.prop('disabled', false).html('<i class="bx bx-check-circle"></i> Approve');
+                }
+            });
+        }
+    });
+
+    $('#approve-all-matched').on('click', function() {
+        const btn = $(this);
+        const shiftIds = [];
+        $('.approve-shift-btn').each(function() {
+            shiftIds.push($(this).data('id'));
+        });
+
+        if (shiftIds.length === 0) {
+            toastr.info('No shifts to approve');
+            return;
+        }
+
+        if (confirm(`Are you sure you want to approve all ${shiftIds.length} matched shifts?`)) {
+            btn.prop('disabled', true).html('<i class="bx bx-loader fs-18 bx-spin"></i> Approving All...');
+
+            // We can either loop or send all IDs. Let's add a bulk method or just loop for now.
+            // For simplicity and to avoid complexity in controller, I'll just use the same endpoint in a loop or send all.
+            // Sending all is better.
+
+            $.ajax({
+                url: "{{ route('timesheet.approve') }}",
+                method: 'POST',
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    shift_id: shiftIds // Send array
+                },
+                success: function(response) {
+                    toastr.success('Bulk approval processed');
+                    setTimeout(() => location.reload(), 1500);
+                },
+                error: function() {
+                    toastr.error('Error in bulk approval');
+                    btn.prop('disabled', false).html('<i class="bx bx-check-double me-2"></i> Approve All Matched');
+                }
+            });
+        }
     });
 </script>
 @endsection
