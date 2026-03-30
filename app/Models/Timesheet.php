@@ -29,4 +29,9 @@ class Timesheet extends Model
     {
         return $this->belongsTo(\App\Models\ShiftCategory::class, 'category_id');
     }
+
+    public function shift()
+    {
+        return $this->belongsTo(\App\Models\ScheduledShift::class, 'shift_id');
+    }
 }

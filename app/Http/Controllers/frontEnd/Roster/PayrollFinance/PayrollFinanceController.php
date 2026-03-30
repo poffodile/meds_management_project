@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\ScheduledShift;
 use Illuminate\Http\Request;
 use App\User;
+use App\Models\HomeManagement\PayRate;
+use App\Models\HomeManagement\PayRateType;
 use Illuminate\Support\Facades\Log;
 use Exception;
 
@@ -15,28 +17,196 @@ class PayrollFinanceController extends Controller
     {
         return view('frontEnd.roster.payroll_finance.index');
     }
-    public function payrollprocessing()
+    public function payrollprocessing(Request $request)
     {
-        return view('frontEnd/roster/payroll_finance/payroll_processing');
+        $homeId = \Illuminate\Support\Facades\Auth::user()->home_id;
+
+        // Fetch Approved/Processed Timesheets
+        $timesheets = \App\Models\Timesheet::where('home_id', $homeId)
+            ->whereIn('status', ['approved', 'processed'])
+            ->with(['staff', 'category', 'shift.shiftCategory'])
+            ->get()
+            ->map(function ($t) use ($homeId) {
+                $date = $t->shift ? $t->shift->start_date : $t->created_at->format('Y-m-d');
+                $start = \Carbon\Carbon::parse($date . ' ' . $t->clock_in);
+                $end = \Carbon\Carbon::parse($date . ' ' . $t->clock_out);
+
+                if ($end->lessThan($start)) {
+                    $end->addDay();
+                }
+
+                $t->duration_hours = $start->diffInMinutes($end) / 60;
+                $t->week_key = $start->startOfWeek()->format('Y-m-d');
+                $t->week_label = "Week " . $start->format('W') . " - " . $start->format('F Y');
+                $t->week_range = $start->startOfWeek()->format('M d') . " - " . $start->endOfWeek()->format('M d, Y');
+
+                // Get category name for rate calculation
+                $categoryName = '';
+                if ($t->category_id && $t->category) {
+                    $categoryName = $t->category->name;
+                } elseif ($t->shift_id && $t->shift && $t->shift->shiftCategory) {
+                    $categoryName = $t->shift->shiftCategory->name;
+                }
+
+                $rate = 0;
+                $normalizedCategory = strtolower(trim($categoryName));
+
+                if ($t->staff) {
+                    if ($normalizedCategory == 'General' || empty($normalizedCategory)) {
+                        $rate = $t->staff->hourly_rate ?? 0;
+                    } else {
+                        // Try to match the category name with pay_rate_types
+                        $payRateType = PayRateType::where('type_name', $categoryName)
+                            ->where('home_id', $homeId)
+                            ->where('is_deleted', 0)
+                            ->first();
+
+                        if ($payRateType) {
+                            // Match with pay_rates using the rate_type_id and user's access level
+                            $payRate = PayRate::where('rate_type_id', $payRateType->id)
+                                ->where('access_level_id', $t->staff->access_level) // 'access_level' is the ID field on user table
+                                ->where('home_id', $homeId)
+                                ->where('is_deleted', 0)
+                                ->first();
+
+                            $rate = $payRate ? $payRate->pay_rate : ($t->staff->hourly_rate ?? 0);
+                        } else {
+                            // Fallback to staff's standard hourly rate if no special rate type found
+                            $rate = $t->staff->hourly_rate ?? 0;
+                        }
+                    }
+                }
+
+                $t->gross_pay = $t->duration_hours * $rate;
+                return $t;
+            });
+
+        // Fetch Unapproved Scheduled Shifts for Pending Hours
+        $pendingShifts = \App\Models\ScheduledShift::where('home_id', $homeId)
+            ->where('status', '!=', 'approved')
+            ->get()
+            ->map(function ($s) {
+                $start = \Carbon\Carbon::parse($s->start_date . ' ' . $s->start_time);
+                $end = \Carbon\Carbon::parse($s->start_date . ' ' . $s->end_time);
+                if ($end->lessThan($start)) $end->addDay();
+
+                $s->duration_hours = $start->diffInMinutes($end) / 60;
+                $s->week_key = $start->startOfWeek()->format('Y-m-d');
+                return $s;
+            });
+
+        $allWeekKeys = $timesheets->pluck('week_key')->merge($pendingShifts->pluck('week_key'))->unique();
+
+        $payrollGroups = $allWeekKeys->map(function ($key) use ($timesheets, $pendingShifts) {
+            $weekItems = $timesheets->where('week_key', $key);
+            $weekPending = $pendingShifts->where('week_key', $key);
+
+            if ($weekItems->isEmpty() && $weekPending->isEmpty()) return null;
+
+            $ref = $weekItems->first() ?? $weekPending->first();
+            // Since $pendingShifts map doesn't add labels to every item if empty labels, let's fix that
+            $start = \Carbon\Carbon::parse($key);
+            $label = "Week " . $start->format('W') . " - " . $start->format('F Y');
+            $range = $start->startOfWeek()->format('M d') . " - " . $start->endOfWeek()->format('M d, Y');
+
+            $hasApproved = $weekItems->where('status', 'approved')->count() > 0;
+            $weekStatus = ($weekItems->count() > 0 && !$hasApproved) ? 'processed' : 'pending';
+
+            $staffBreakdown = $weekItems->groupBy('staff_id')->map(function ($staffItems) {
+                $staff = $staffItems->first()->staff;
+                $hours = $staffItems->sum('duration_hours');
+                $gross = $staffItems->sum('gross_pay');
+                return [
+                    'id'    => $staff ? $staff->id : 0,
+                    'name'  => $staff ? $staff->name : 'Unknown',
+                    'hours' => number_format($hours, 1),
+                    'gross' => number_format($gross, 2),
+                    'categories' => $staffItems->pluck('category.name')->unique()->filter()->implode(', ')
+                ];
+            })->values();
+
+            return [
+                'week_label' => $label,
+                'week_range' => $range,
+                'total_gross' => $weekItems->sum('gross_pay'),
+                'total_hours' => $weekItems->sum('duration_hours'),
+                'pending_hours' => $weekPending->sum('duration_hours'),
+                'staff_count' => $weekItems->pluck('staff_id')->unique()->count(),
+                'timesheet_count' => $weekItems->count(),
+                'status' => $weekStatus,
+                'pay_date' => \Carbon\Carbon::parse($key)->endOfWeek()->addDays(5)->format('l, M d, Y'),
+                'week_key' => $key,
+                'categories' => $weekItems->pluck('category.name')->unique()->filter()->implode(', '),
+                'staff_breakdown' => $staffBreakdown
+            ];
+        })->filter()->sortByDesc('week_key');
+
+        return view('frontEnd/roster/payroll_finance/payroll_processing', compact('payrollGroups'));
     }
-    public function timesheetreconciliation()
+
+    public function processPayrollWeek(Request $request)
+    {
+        $week_start = $request->week_start;
+        $homeId = \Illuminate\Support\Facades\Auth::user()->home_id;
+
+        $start = \Carbon\Carbon::parse($week_start)->startOfWeek();
+        $end = \Carbon\Carbon::parse($week_start)->endOfWeek();
+
+        $timesheets = \App\Models\Timesheet::where('home_id', $homeId)
+            ->where('status', 'approved')
+            ->with('shift')
+            ->get();
+
+        $processedIds = [];
+
+        foreach ($timesheets as $t) {
+            $date = $t->shift ? $t->shift->start_date : $t->created_at->format('Y-m-d');
+            $shiftCarbon = \Carbon\Carbon::parse($date);
+
+            if ($shiftCarbon->between($start, $end)) {
+                $processedIds[] = $t->id;
+            }
+        }
+
+        if (count($processedIds) > 0) {
+            \App\Models\Timesheet::whereIn('id', $processedIds)->update(['status' => 'processed']);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Processed ' . count($processedIds) . ' timesheets for this period.'
+        ]);
+    }
+    public function timesheetreconciliation(Request $request)
     {
         $users = User::getHomeActiveUsers();
         $userId = \Illuminate\Support\Facades\Auth::user()->id;
         $homeId = \Illuminate\Support\Facades\Auth::user()->home_id;
         $categories = \App\Models\ShiftCategory::orderBy('name')->get();
 
+        $status_filter = $request->status;
+        $date_filter = $request->date;
+        $staff_filter = $request->staff_id;
+
         // Default to current week
         $startOfWeek = \Carbon\Carbon::now()->startOfWeek();
         $endOfWeek = \Carbon\Carbon::now()->endOfWeek();
 
         // Fetch all shifts for the home to provide a comprehensive reconciliation view
-        $shifts = \App\Models\ScheduledShift::where('home_id', $homeId)
-            ->with(['staff', 'shiftCategory', 'timesheet'])
-            ->get()
+        $shiftsQuery = \App\Models\ScheduledShift::where('home_id', $homeId)
+            ->with(['staff', 'shiftCategory', 'timesheet']);
+
+        if ($date_filter) {
+            $shiftsQuery->where('start_date', $date_filter);
+        }
+
+        if ($staff_filter) {
+            $shiftsQuery->where('staff_id', $staff_filter);
+        }
+
+        $shifts = $shiftsQuery->get()
             ->sortByDesc('start_date')
             ->map(function ($shift) {
-
                 $shiftStart = \Carbon\Carbon::parse($shift->start_date . ' ' . $shift->start_time);
                 $shiftEnd = \Carbon\Carbon::parse($shift->start_date . ' ' . $shift->end_time);
 
@@ -81,33 +251,6 @@ class PayrollFinanceController extends Controller
                 $shift->actual_duration_minutes = $actualDuration;
                 $shift->variance_minutes = $actualDuration - $shift->scheduled_duration_minutes;
 
-                // Calculate shift start/end for late/early comparison
-                $shiftStartFull = \Carbon\Carbon::parse($shift->start_date . ' ' . $shift->start_time);
-                $shiftEndFull = \Carbon\Carbon::parse($shift->start_date . ' ' . $shift->end_time);
-                if ($shiftEndFull->lessThan($shiftStartFull)) {
-                    $shiftEndFull->addDay();
-                }
-
-                $shift->is_late = false;
-                $shift->late_minutes = 0;
-                $shift->is_early = false;
-                $shift->early_minutes = 0;
-
-                if ($shift->login_activities->count() > 0) {
-                    $firstCheckIn = \Carbon\Carbon::parse($shift->login_activities->min('check_in_time'));
-                    $lastCheckOut = $shift->login_activities->max('check_out_time') ? \Carbon\Carbon::parse($shift->login_activities->max('check_out_time')) : null;
-
-                    if ($firstCheckIn->greaterThan($shiftStartFull->copy()->addMinutes(5))) {
-                        $shift->is_late = true;
-                        $shift->late_minutes = $shiftStartFull->diffInMinutes($firstCheckIn);
-                    }
-
-                    if ($lastCheckOut && $lastCheckOut->lessThan($shiftEndFull->copy()->subMinutes(5))) {
-                        $shift->is_early = true;
-                        $shift->early_minutes = $lastCheckOut->diffInMinutes($shiftEndFull);
-                    }
-                }
-
                 // Assign reconciliation status
                 $status = strtolower($shift->status);
                 if ($status == 'approved') {
@@ -128,17 +271,41 @@ class PayrollFinanceController extends Controller
                 return $shift;
             });
 
-        // Calculate aggregate counts
-        $manual_timesheets = \App\Models\Timesheet::whereNull('shift_id')
-            ->where('home_id', $homeId)
-            ->whereBetween('created_at', [$startOfWeek, $endOfWeek])
-            ->get();
+        // Filter manual records by date and staff if filters are set
+        $manualQuery = \App\Models\Timesheet::whereNull('shift_id')->where('home_id', $homeId);
 
+        if ($date_filter) {
+            $manualQuery->whereDate('created_at', $date_filter);
+        }
+        if ($staff_filter) {
+            $manualQuery->where('staff_id', $staff_filter);
+        }
+
+        $manual_timesheets = $manualQuery->whereBetween('created_at', [$startOfWeek, $endOfWeek])->get();
+
+        // Calculate aggregate counts for the TOP SUMMARY CARDS (Full set for current filters)
         $matchedCount = $shifts->where('reconciliation_status', 'Matched')->count();
         $needsAdjustmentCount = $shifts->where('reconciliation_status', 'Needs Adjustment')->count();
         $unscheduledCount = $shifts->where('reconciliation_status', 'Unscheduled')->count();
-        $approvedCount = $shifts->where('reconciliation_status', 'Approved')->count() + $manual_timesheets->count();
+        $approvedCount = $shifts->where('reconciliation_status', 'Approved')->count() + $manual_timesheets->count(); // Already filtered manual
         $rejectedCount = $shifts->where('reconciliation_status', 'Rejected')->count();
+
+        // Apply Status Filter for final display
+        if ($status_filter) {
+            $shifts = $shifts->where('reconciliation_status', $status_filter);
+
+            // If status filter is NOT 'Approved', hide manual records from the view
+            if ($status_filter !== 'Approved') {
+                $manual_timesheets = collect();
+            }
+
+            // Recalculate section counts to reflect what is actually visible
+            $matchedCount = $shifts->where('reconciliation_status', 'Matched')->count();
+            $needsAdjustmentCount = $shifts->where('reconciliation_status', 'Needs Adjustment')->count();
+            $unscheduledCount = $shifts->where('reconciliation_status', 'Unscheduled')->count();
+            $approvedCount = $shifts->where('reconciliation_status', 'Approved')->count() + $manual_timesheets->count();
+            $rejectedCount = $shifts->where('reconciliation_status', 'Rejected')->count();
+        }
 
         $shift_options = $shifts->values()->map(function ($s) {
             return [
@@ -288,7 +455,7 @@ class PayrollFinanceController extends Controller
                 'message' => $approvedCount > 1 ? "$approvedCount shifts approved successfully." : "Shift approved successfully."
             ]);
         } catch (\Exception $e) {
-            \Log::error('Approve Shift Error: ' . $e->getMessage());
+            Log::error('Approve Shift Error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Error: ' . $e->getMessage()

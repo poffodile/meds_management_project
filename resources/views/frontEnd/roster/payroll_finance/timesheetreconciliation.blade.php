@@ -1,5 +1,5 @@
 @extends('frontEnd.layouts.master')
-@section('title', 'Payroll Process')
+@section('title', 'Timesheet Reconciliation')
 @section('content')
 
 @include('frontEnd.roster.common.roster_header')
@@ -63,8 +63,8 @@
     }
 
     .summary-value {
-        font-size: 28px;
-        font-weight: 800;
+        /* font-size: 28px; */
+        font-weight: 700;
         margin: 0;
     }
 
@@ -264,7 +264,7 @@
 
     /* Buttons */
     .btn-approve {
-        background: #10b981;
+        background: rgb(23 165 75);
         color: white;
         border: none;
         padding: 8px 16px;
@@ -298,7 +298,7 @@
     }
 
     .btn-approve-all {
-        background: #10b981;
+        background: rgb(45 168 85);
         color: white;
         border: none;
         padding: 10px 24px;
@@ -431,31 +431,34 @@
         <div class="row mt10">
             <div class="col-lg-12">
                 <div class="filter-bar">
-                    <div class="row">
-                        <div class="col-lg-3">
-                            <select class="form-control">
-                                <option>All Status</option>
-                                <option>Pending</option>
-                                <option>Requires Adjustment</option>
-                                <option>Approved</option>
-                                <option>Rejected</option>
-                            </select>
+                    <form action="{{ route('roster.payroll.finance.reconciliation') }}" method="GET" id="filter-form">
+                        <div class="row">
+                            <div class="col-lg-3">
+                                <select class="form-control" name="status" onchange="this.form.submit()">
+                                    <option value="">All Status</option>
+                                    <option value="Pending" {{ request('status') == 'Pending' ? 'selected' : '' }}>Pending</option>
+                                    <option value="Matched" {{ request('status') == 'Matched' ? 'selected' : '' }}>Matched</option>
+                                    <option value="Needs Adjustment" {{ request('status') == 'Needs Adjustment' ? 'selected' : '' }}>Needs Adjustment</option>
+                                    <option value="Approved" {{ request('status') == 'Approved' ? 'selected' : '' }}>Approved</option>
+                                    <option value="Rejected" {{ request('status') == 'Rejected' ? 'selected' : '' }}>Rejected</option>
+                                </select>
+                            </div>
+                            <div class="col-lg-3">
+                                <input type="date" class="form-control" name="date" value="{{ request('date') }}" onchange="this.form.submit()">
+                            </div>
+                            <div class="col-lg-3">
+                                <select class="form-control" name="staff_id" onchange="this.form.submit()">
+                                    <option value="">All Staff</option>
+                                    @foreach ($users as $user)
+                                    <option value="{{ $user->id }}" {{ request('staff_id') == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-lg-3">
+                                <a href="{{ route('roster.payroll.finance.reconciliation') }}" class="borderBtn w100 text-center" style="display: block; line-height: 34px;"><i class="bx bx-filter f18 me-2"></i> Reset Filters</a>
+                            </div>
                         </div>
-                        <div class="col-lg-3">
-                            <input type="date" class="form-control">
-                        </div>
-                        <div class="col-lg-3">
-                            <select class="form-control">
-                                <option>All Staff</option>
-                                @foreach ($users as $user)
-                                <option value="{{ $user->id }}">{{ $user->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="col-lg-3">
-                            <button class="borderBtn w100"><i class="bx bx-filter f18 me-2"></i> Reset Filters</button>
-                        </div>
-                    </div>
+                    </form>
                 </div>
             </div>
         </div>

@@ -203,9 +203,10 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 		// Payroll Finance
 		Route::get('/payroll-finance', [PayrollFinanceController::class, 'index'])->name('roster.payroll.finance');
 		Route::get('/payroll-processing', [PayrollFinanceController::class, 'payrollprocessing']);
+		Route::post('/payroll-processing/process', [PayrollFinanceController::class, 'processPayrollWeek'])->name('payroll.process.week');
 
 		// Timesheet Reconciliation
-		Route::get('/timesheet-reconciliation', [PayrollFinanceController::class, 'timesheetreconciliation']);
+		Route::get('/timesheet-reconciliation', [PayrollFinanceController::class, 'timesheetreconciliation'])->name('roster.payroll.finance.reconciliation');
 		Route::post('/timesheet-reconciliation/save', [PayrollFinanceController::class, 'saveTimesheet'])->name('timesheet.save');
 		Route::post('/timesheet-reconciliation/approve', [PayrollFinanceController::class, 'approveShift'])->name('timesheet.approve');
 
