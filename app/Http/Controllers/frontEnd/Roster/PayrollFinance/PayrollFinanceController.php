@@ -586,6 +586,7 @@ class PayrollFinanceController extends Controller
             'total_gross' => $timesheets->sum('gross_pay'),
             'pay_date' => $start->endOfWeek()->addDays(5)->format('l, M d, Y'),
             'home_name' => \App\Home::getHomeById($homeId),
+            'generated_by' => \Illuminate\Support\Facades\Auth::user()->name ?? 'Administrator',
             'staff_breakdown' => $timesheets->groupBy('staff_id')->map(function ($items) {
                 $staff = $items->first()->staff;
                 return [
@@ -633,6 +634,7 @@ class PayrollFinanceController extends Controller
             'total_gross' => $timesheets->sum('gross_pay'),
             'pay_date' => $start->endOfWeek()->addDays(5)->format('l, M d, Y'),
             'home_name' => \App\Home::getHomeById($timesheets->first()->staff->home_id ?? null),
+            'generated_by' => $timesheets->first()->staff->name ?? 'Staff Member',
             'staff_breakdown' => [
                 [
                     'name'  => $timesheets->first()->staff->name ?? 'Unknown',

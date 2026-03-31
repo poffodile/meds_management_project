@@ -297,9 +297,9 @@
                         <li class="{{ $page == 'staff_training' ? 'active' : '' }}">
                             <a href="{{ url('admin/general-admin/staff/training') }}">Staff Training </a>
                         </li>
-                        <li class="{{ $page == 'home_costing' ? 'active' : '' }}">
+                        <!-- <li class="{{ $page == 'home_costing' ? 'active' : '' }}">
                             <a href="{{ url('admin/general-admin/home-costing') }}">Home Costing </a>
-                        </li>
+                        </li> -->
                         <li class="{{ $page == 'department' ? 'active' : '' }}">
                             <a href="{{ url('admin/general-admin/department') }}">Department </a>
                         </li>

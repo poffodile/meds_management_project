@@ -1112,6 +1112,7 @@ class UserController extends Controller
 			'total_gross' => $timesheets->sum('gross_pay'),
 			'pay_date' => $start->endOfWeek()->addDays(5)->format('l, M d, Y'),
 			'home_name' => Home::getHomeById($timesheets->first()->staff->home_id ?? null),
+			'generated_by' => $timesheets->first()->staff->name ?? 'Staff Member',
 			'staff_breakdown' => [
 				[
 					'name'  => $timesheets->first()->staff->name ?? 'Unknown',
