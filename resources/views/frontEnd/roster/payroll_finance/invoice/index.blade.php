@@ -548,8 +548,8 @@
             <tr>
               <td class="w-full align-top">
                 <div>
-                  <!-- <img src="{{ asset('assets/images/ewm_logo.png') }}" class="h-12" /> -->
-                  <img src="http://localhost/socialcareitsolutions/public/images/ewm_logo.png" class="h-12" />
+                  <img src="{{ url('public/images/ewm_logo.png') }}" class="h-12" />
+                  <!-- <img src="http://localhost/socialcareitsolutions/public/images/ewm_logo.png" class="h-12" /> -->
                 </div>
               </td>
 

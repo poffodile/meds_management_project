@@ -132,7 +132,9 @@
                                     <button class="borderBtn"> <i class="bx bx-arrow-to-bottom-stroke f18 me-3"></i>Export to CSV</button>
                                 </div>
                                 <div>
-                                    <button class="borderBtn"> <i class="bx bx-file-detail f18 me-3"></i>View Payslips</button>
+                                    <a href="{{ url('roster/payroll-report/' . $group['week_key']) }}" target="_blank" class="borderBtn"> 
+                                        <i class="bx bx-file-detail f18 me-3"></i>View Payslips
+                                    </a>
                                 </div>
                                 @else
                                 <div>

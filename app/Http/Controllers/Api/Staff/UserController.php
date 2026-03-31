@@ -1046,7 +1046,7 @@ class UserController extends Controller
 			});
 
 		// 4. Summarize for Output (Mapping only the requested 10 week keys)
-		$payrollGroups = $paginatedWeekKeys->map(function ($key) use ($timesheets, $pendingShifts) {
+		$payrollGroups = $paginatedWeekKeys->map(function ($key) use ($timesheets, $pendingShifts, $staffId) {
 			$weekT = $timesheets->where('week_key', $key);
 			$weekS = $pendingShifts->where('week_key', $key);
 
@@ -1061,7 +1061,8 @@ class UserController extends Controller
 				'pending_hours' => number_format($weekS->sum('duration_hours'), 1),
 				'shift_count'   => $weekT->count() + $weekS->count(),
 				'status'        => ($weekT->count() > 0 && $weekT->where('status', 'approved')->count() == 0) ? 'processed' : 'pending',
-				'week_key'      => $key
+				'week_key'      => $key,
+				'payslip_url'   => url('api/staff/staff-payslip/' . $staffId . '/' . $key)
 			];
 		})->values();
 
@@ -1076,5 +1077,50 @@ class UserController extends Controller
 			],
 			'message' => 'Payroll data fetched successfully.'
 		], 200);
+	}
+
+	public function staffPayslip($staff_id, $week_key)
+	{
+		// This fetches a single user's data for a specific week.
+		$timesheets = Timesheet::where('staff_id', $staff_id)
+			->where('status', 'processed')
+			->whereHas('shift', function ($query) use ($week_key) {
+				$query->whereBetween('start_date', [
+					Carbon::parse($week_key)->startOfWeek(),
+					Carbon::parse($week_key)->endOfWeek()
+				]);
+			})
+			->with(['staff', 'category', 'shift.shiftCategory'])
+			->get()
+			->map(function ($t) {
+				$date = $t->shift ? $t->shift->start_date : $t->created_at->format('Y-m-d');
+				$start = Carbon::parse($date . ' ' . $t->clock_in);
+				$end = Carbon::parse($date . ' ' . $t->clock_out);
+				if ($end->lessThan($start)) $end->addDay();
+				$t->duration_hours = $start->diffInMinutes($end) / 60;
+				$t->gross_pay = $t->duration_hours * ($t->staff->hourly_rate ?? 0);
+				return $t;
+			});
+
+		if ($timesheets->isEmpty()) abort(404, 'Payslip not found.');
+
+		$start = Carbon::parse($week_key);
+		$group = [
+			'week_label' => "Week " . $start->format('W') . " - " . $start->format('F Y'),
+			'week_range' => $start->startOfWeek()->format('M d') . " - " . $start->endOfWeek()->format('M d, Y'),
+			'week_key' => $week_key,
+			'total_gross' => $timesheets->sum('gross_pay'),
+			'pay_date' => $start->endOfWeek()->addDays(5)->format('l, M d, Y'),
+			'home_name' => Home::getHomeById($timesheets->first()->staff->home_id ?? null),
+			'staff_breakdown' => [
+				[
+					'name'  => $timesheets->first()->staff->name ?? 'Unknown',
+					'hours' => number_format($timesheets->sum('duration_hours'), 1),
+					'gross' => number_format($timesheets->sum('gross_pay'), 2)
+				]
+			]
+		];
+
+		return view('frontEnd.roster.payroll_finance.payroll_report', compact('group'));
 	}
 }

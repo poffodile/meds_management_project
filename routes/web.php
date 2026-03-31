@@ -210,6 +210,9 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 		Route::post('/timesheet-reconciliation/save', [PayrollFinanceController::class, 'saveTimesheet'])->name('timesheet.save');
 		Route::post('/timesheet-reconciliation/approve', [PayrollFinanceController::class, 'approveShift'])->name('timesheet.approve');
 
+        Route::get('/payroll-report/{week_key}', [PayrollFinanceController::class, 'weeklyReport'])->name('roster.payroll.report');
+        Route::get('/staff-payslip/{staff_id}/{week_key}', [PayrollFinanceController::class, 'staffPayslip'])->name('roster.staff.payslip');
+
 
 		Route::get('/task-center', [TaskCenterController::class, 'index'])->name('roster.task.center');
 
