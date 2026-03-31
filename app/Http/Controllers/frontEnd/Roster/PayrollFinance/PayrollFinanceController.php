@@ -15,7 +15,90 @@ class PayrollFinanceController extends Controller
 {
     public function index()
     {
-        return view('frontEnd.roster.payroll_finance.index');
+        $homeId = \Illuminate\Support\Facades\Auth::user()->home_id;
+
+        // 1. Current Week Summary Header
+        $now = \Carbon\Carbon::now();
+        $startOfWeek = $now->copy()->startOfWeek();
+        $endOfWeek = $now->copy()->endOfWeek();
+        $weekLabel = "Week " . $now->format('W') . " - " . $now->format('F Y');
+        $weekRange = $startOfWeek->format('M d') . " - " . $endOfWeek->format('M d, Y');
+        $payDate = $endOfWeek->copy()->addDays(5)->format('M d, Y');
+        
+        // 2. Fetch Dashboard stats (v3: expanded to include all metrics)
+        $timesheets = \App\Models\Timesheet::where('home_id', $homeId)
+            ->whereIn('status', ['approved', 'processed'])
+            ->with(['staff', 'category', 'shift.shiftCategory'])
+            ->get();
+
+        $totalMinutes = 0;
+        $totalGross = 0;
+
+        foreach ($timesheets as $t) {
+            $date = $t->shift ? $t->shift->start_date : $t->created_at->format('Y-m-d');
+            $start = \Carbon\Carbon::parse($date . ' ' . $t->clock_in);
+            $end = \Carbon\Carbon::parse($date . ' ' . $t->clock_out);
+            
+            if ($end->lessThan($start)) {
+                $end->addDay();
+            }
+            
+            $itemMinutes = $start->diffInMinutes($end);
+            $totalMinutes += $itemMinutes;
+
+            // Rate logic (standardized)
+            $categoryName = ($t->category->name ?? $t->shift->shiftCategory->name ?? 'general');
+            $rate = 0;
+            $normalizedCategory = strtolower(trim($categoryName));
+            
+            if ($t->staff) {
+                if ($normalizedCategory == 'General' || empty($normalizedCategory) || $normalizedCategory == 'general') {
+                    $rate = $t->staff->hourly_rate ?? 0;
+                } else {
+                    $payRateType = PayRateType::where('type_name', $categoryName)
+                        ->where('home_id', $homeId)
+                        ->where('is_deleted', 0)
+                        ->first();
+
+                    if ($payRateType) {
+                        $payRate = PayRate::where('rate_type_id', $payRateType->id)
+                            ->where('access_level_id', $t->staff->access_level)
+                            ->where('home_id', $homeId)
+                            ->where('is_deleted', 0)
+                            ->first();
+                        $rate = $payRate ? $payRate->pay_rate : ($t->staff->hourly_rate ?? 0);
+                    } else {
+                        $rate = $t->staff->hourly_rate ?? 0;
+                    }
+                }
+            }
+            $t->item_gross = ($itemMinutes / 60) * $rate;
+            $totalGross += $t->item_gross;
+        }
+
+        $totalHours = number_format($totalMinutes / 60, 1);
+        $staffCount = $timesheets->pluck('staff_id')->unique()->count();
+        $totalGross = number_format($totalGross, 2);
+
+        // 3. Pending & Invoicing
+        $pendingCount = \App\Models\Timesheet::where('home_id', $homeId)->where('status', 'pending')->count();
+        $weekStatus = ($timesheets->where('status', 'approved')->count() > 0) ? 'draft' : 'processed';
+
+        $invoices = \App\Models\Invoice\Invoice::where('home_id', $homeId)->where('status', '!=', 'paid')->get();
+        $outstandingAmount = number_format($invoices->sum('outstanding'), 0);
+        $outstandingCount = $invoices->count();
+
+        // 4. Recent Activity
+        $recentActivity = $timesheets->where('status', 'processed')
+            ->sortByDesc('updated_at')
+            ->take(5)
+            ->values();
+
+        return view('frontEnd.roster.payroll_finance.index', compact(
+            'totalHours', 'staffCount', 'pendingCount', 'totalGross',
+            'weekLabel', 'weekRange', 'payDate', 'weekStatus',
+            'outstandingAmount', 'outstandingCount', 'recentActivity'
+        ));
     }
     public function payrollprocessing(Request $request)
     {

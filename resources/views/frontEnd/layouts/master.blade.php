@@ -45,14 +45,14 @@
     <link href="{{ url('public/frontEnd/css/bootstrap-datetimepicker.css') }}" rel="stylesheet">
 
     @if (Auth::user()->design_layout == 0)
-        <link href="{{ url('public/frontEnd/css/style.css') }}" rel="stylesheet">
-        <link href="{{ url('public/frontEnd/css/style-responsive.css') }}" rel="stylesheet">
-        <link rel="stylesheet" type="text/css" href="{{ url('public/frontEnd/jobs/css/custom.css') }}" />
-        <link href="{{ url('public/frontEnd/css/developer.css') }}" rel="stylesheet">
+    <link href="{{ url('public/frontEnd/css/style.css') }}" rel="stylesheet">
+    <link href="{{ url('public/frontEnd/css/style-responsive.css') }}" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{{ url('public/frontEnd/jobs/css/custom.css') }}" />
+    <link href="{{ url('public/frontEnd/css/developer.css') }}" rel="stylesheet">
     @else
-        <link href="{{ url('public/frontEnd/css/dyslexia/dyslexia_style.css') }}" rel="stylesheet">
-        <link href="{{ url('public/frontEnd/css/dyslexia/dyslexia_style-responsive.css') }}" rel="stylesheet">
-        <link href="{{ url('public/frontEnd/css/dyslexia/dyslexia_developer.css') }}" rel="stylesheet">
+    <link href="{{ url('public/frontEnd/css/dyslexia/dyslexia_style.css') }}" rel="stylesheet">
+    <link href="{{ url('public/frontEnd/css/dyslexia/dyslexia_style-responsive.css') }}" rel="stylesheet">
+    <link href="{{ url('public/frontEnd/css/dyslexia/dyslexia_developer.css') }}" rel="stylesheet">
     @endif
 
     <!-- Datatable css -->
@@ -65,6 +65,10 @@
     <!-- For stylish select box -->
     <link href="{{ url('public/frontEnd/css/bootstrap-select.css') }}" rel="stylesheet">
     <link href="{{ url('public/frontEnd/js/selectize/selectize.default.css') }}" rel="stylesheet">
+
+    <!-- Toastr for modern notifications -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+
 
     <!-- For body Map-->
     <!-- <link href="{{ url('public/backEnd/css/amarjeet.css') }}" rel="stylesheet" type="text/css"> -->
@@ -306,7 +310,9 @@
 
     <!--common script init for all pages-->
     <script src="{{ url('public/frontEnd/js/scripts.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="{{ url('public/frontEnd/js/developer.js') }}"></script>
+
     <script src="{{ url('public/frontEnd/js/advanced-form.js') }}"></script>
 
     <!-- VALIDATION FILES -->
@@ -342,8 +348,10 @@
             printWindow.document.write('<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">');
             printWindow.document.write('<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">');
             printWindow.document.write('<link rel="stylesheet" href="https://cdn.form.io/formiojs/formio.full.min.css">');
-            printWindow.document.write('<link href="{{ url('public/backEnd/css/amarjeet.css') }}" rel="stylesheet" type="text/css" >');
-            printWindow.document.write('<link href="{{ url(' public/backEnd/css/pdfstyle.css') }}" rel="stylesheet" type="text/css" >');
+            printWindow.document.write('<link href="{{ url('
+                public / backEnd / css / amarjeet.css ') }}" rel="stylesheet" type="text/css" >');
+            printWindow.document.write('<link href="{{ url('
+                public / backEnd / css / pdfstyle.css ') }}" rel="stylesheet" type="text/css" >');
             printWindow.document.write('</head><body > <div class="masterprintmainarea">');
             printWindow.document.write('<div class="header">');
             printWindow.document.write('<img src="' + finalpath + '" style="height:80px;">');
@@ -354,7 +362,8 @@
             printWindow.document.write('</div>');
             printWindow.document.write('<div class="footer">');
             printWindow.document.write('<div class="footer-section-area">');
-            printWindow.document.write('© {{ date(' Y ') }} Omega Care Group (SCITS). All Rights Reserved | www.socialcareitsolutions.co.uk ');
+            printWindow.document.write('© {{ date('
+                Y ') }} Omega Care Group (SCITS). All Rights Reserved | www.socialcareitsolutions.co.uk ');
             printWindow.document.write('</div>');
             printWindow.document.write('</div>');
             printWindow.document.write('</div> </body></html>');
@@ -388,19 +397,23 @@
             printWindow.document.write('<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">');
             printWindow.document.write('<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">');
             printWindow.document.write('<link rel="stylesheet" href="https://cdn.form.io/formiojs/formio.full.min.css">');
-            printWindow.document.write('<link href="{{ url('public/backEnd/css/amarjeet.css') }}" rel="stylesheet" type="text/css" >');
-            printWindow.document.write('<link href="{{ url('public/backEnd/css/pdfstyle.css') }}" rel="stylesheet" type="text/css" >');
+            printWindow.document.write('<link href="{{ url('
+                public / backEnd / css / amarjeet.css ') }}" rel="stylesheet" type="text/css" >');
+            printWindow.document.write('<link href="{{ url('
+                public / backEnd / css / pdfstyle.css ') }}" rel="stylesheet" type="text/css" >');
             printWindow.document.write('</head><body ><div class="masterprintmainarea">');
             printWindow.document.write('<div class="header">');
             printWindow.document.write('<img src="' + imageUrl + '" style="height:80px;">');
-            printWindow.document.write('<img src="{{ url('public/images/scits.png') }}" style="float:right;height:80px;">');
+            printWindow.document.write('<img src="{{ url('
+                public / images / scits.png ') }}" style="float:right;height:80px;">');
             printWindow.document.write('</div>');
             printWindow.document.write(divContentImage);
             printWindow.document.write(divContents);
             printWindow.document.write('</div>');
             printWindow.document.write('<div class="footer">');
             printWindow.document.write('<div class="footer-section-area">');
-            printWindow.document.write('© {{ date(' Y ') }} Omega Care Group (SCITS). All Rights Reserved | www.socialcareitsolutions.co.uk ');
+            printWindow.document.write('© {{ date('
+                Y ') }} Omega Care Group (SCITS). All Rights Reserved | www.socialcareitsolutions.co.uk ');
             printWindow.document.write('</div>');
             printWindow.document.write('</div>');
             printWindow.document.write('</div></body></html>');
@@ -435,19 +448,23 @@
             printWindow.document.write('<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">');
             printWindow.document.write('<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">');
             printWindow.document.write('<link rel="stylesheet" href="https://cdn.form.io/formiojs/formio.full.min.css">');
-            printWindow.document.write('<link href="{{ url('public/backEnd/css/amarjeet.css') }}" rel="stylesheet" type="text/css" >');
-            printWindow.document.write('<link href="{{ url('public/backEnd/css/pdfstyle.css') }}" rel="stylesheet" type="text/css" >');
+            printWindow.document.write('<link href="{{ url('
+                public / backEnd / css / amarjeet.css ') }}" rel="stylesheet" type="text/css" >');
+            printWindow.document.write('<link href="{{ url('
+                public / backEnd / css / pdfstyle.css ') }}" rel="stylesheet" type="text/css" >');
             printWindow.document.write('</head><body > <div class="masterprintmainarea">');
             printWindow.document.write('<div class="header">');
             printWindow.document.write('<img src="' + imageUrl + '" style="height:80px;">');
-            printWindow.document.write('<img src="{{ url('public/images/scits.png') }}" style="float:right;height:80px;">');
+            printWindow.document.write('<img src="{{ url('
+                public / images / scits.png ') }}" style="float:right;height:80px;">');
             printWindow.document.write('</div>');
             printWindow.document.write(divContentImage);
             printWindow.document.write(divContents);
             printWindow.document.write('</div>');
             printWindow.document.write('<div class="footer">');
             printWindow.document.write('<div class="footer-section-area">');
-            printWindow.document.write('© {{ date(' Y ') }} Omega Care Group (SCITS). All Rights Reserved | www.socialcareitsolutions.co.uk ');
+            printWindow.document.write('© {{ date('
+                Y ') }} Omega Care Group (SCITS). All Rights Reserved | www.socialcareitsolutions.co.uk ');
             printWindow.document.write('</div>');
             printWindow.document.write('</div>');
             printWindow.document.write('</div> </body></html>');
@@ -483,19 +500,23 @@
             printWindow.document.write('<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">');
             printWindow.document.write('<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">');
             printWindow.document.write('<link rel="stylesheet" href="https://cdn.form.io/formiojs/formio.full.min.css">');
-            printWindow.document.write('<link href="{{ url('public/backEnd/css/amarjeet.css') }}" rel="stylesheet" type="text/css" >');
-            printWindow.document.write('<link href="{{ url('public/backEnd/css/pdfstyle.css') }}" rel="stylesheet" type="text/css" >');
+            printWindow.document.write('<link href="{{ url('
+                public / backEnd / css / amarjeet.css ') }}" rel="stylesheet" type="text/css" >');
+            printWindow.document.write('<link href="{{ url('
+                public / backEnd / css / pdfstyle.css ') }}" rel="stylesheet" type="text/css" >');
             printWindow.document.write('</head><body ><div class="masterprintmainarea">');
             printWindow.document.write('<div class="header">');
             printWindow.document.write('<img src="' + imageUrl + '" style="height:80px;">');
-            printWindow.document.write('<img src="{{ url('public/images/scits.png') }}" style="float:right;height:80px;">');
+            printWindow.document.write('<img src="{{ url('
+                public / images / scits.png ') }}" style="float:right;height:80px;">');
             printWindow.document.write('</div>');
             printWindow.document.write(divContentImage);
             printWindow.document.write(divContents);
             printWindow.document.write('</div>');
             printWindow.document.write('<div class="footer">');
             printWindow.document.write('<div class="footer-section-area">');
-            printWindow.document.write('© {{ date(' Y ') }} Omega Care Group (SCITS). All Rights Reserved | www.socialcareitsolutions.co.uk ');
+            printWindow.document.write('© {{ date('
+                Y ') }} Omega Care Group (SCITS). All Rights Reserved | www.socialcareitsolutions.co.uk ');
             printWindow.document.write('</div>');
             printWindow.document.write('</div>');
             printWindow.document.write('</div></body></html>');

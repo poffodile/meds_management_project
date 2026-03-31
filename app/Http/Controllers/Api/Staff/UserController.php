@@ -17,6 +17,10 @@ use App\UserQualification;
 use App\Models\ScheduledShift;
 use Illuminate\Support\Facades\Mail;
 use App\LoginInActivity;
+use App\Models\Timesheet;
+use App\Models\HomeManagement\PayRate;
+use App\Models\HomeManagement\PayRateType;
+use App\Models\ShiftCategory;
 
 class UserController extends Controller
 {
@@ -715,8 +719,6 @@ class UserController extends Controller
 
 		// Fetch scheduled shifts for the given staff member
 		$staffId = $request->input('staff_id');
-		$shifts = ScheduledShift::where('staff_id', $staffId);
-		// echo "<pre>"; print_r($shifts); die;
 		$londonTime = Carbon::now('Europe/London');
 		$data['date_time'] = $londonTime->format('D d M Y');
 		$hour = $londonTime->hour;
@@ -733,10 +735,36 @@ class UserController extends Controller
 		$user = User::where('id', $staffId)->select('name')->first();
 		$data['greeting'] = $greeting . ", " . $user->name;
 		$today = $londonTime->toDateString();
-		// echo "<pre>";
-		// print_r($today);
-		// print_r($londonTime->format('H:i:s'));
-		// die;
+
+		// Check for previous shift status
+		$lastPreviousShift = ScheduledShift::where('staff_id', $staffId)
+			->where('start_date', '<', $today)
+			->where('status', 'assigned')
+			->orderBy('start_date', 'desc')
+			->orderBy('start_time', 'desc')
+			->select('start_time', 'end_time', 'tasks', 'notes', 'id', 'start_date', 'status')
+			->first();
+
+		$data['is_previous_shift_logged_out'] = 0;
+		$data['previous_shift_id'] = $lastPreviousShift ? $lastPreviousShift->id : null;
+		$data['previous_shift'] = null;
+		$data['status_of_shift'] = $lastPreviousShift ? $lastPreviousShift->status : null;
+
+		if ($lastPreviousShift) {
+			$lastActivity = LoginInActivity::where('user_id', $staffId)
+				->where('shift_id', $lastPreviousShift->id)
+				->orderBy('id', 'desc')
+				->first();
+
+			if ($lastActivity && $lastActivity->check_out_time == null) {
+				$data['is_previous_shift_logged_out'] = 1;
+				// $data['status_of_shift'] = $lastPreviousShift->status;
+				$lastPreviousShift->start_time = Carbon::parse($lastPreviousShift->start_time)->format('H:i');
+				$lastPreviousShift->end_time   = Carbon::parse($lastPreviousShift->end_time)->format('H:i');
+				$data['previous_shift'] = $lastPreviousShift;
+			}
+		}
+
 		$currentTime = $londonTime->format('H:i:s');
 		$todayShift = ScheduledShift::where('staff_id', $staffId)
 			->where('start_date', $today)
@@ -899,5 +927,154 @@ class UserController extends Controller
 				'message' => 'Failed to reset password.'
 			], 500);
 		}
+	}
+	public function payroll(Request $request)
+	{
+		// Validate the incoming request
+		$validator = Validator::make($request->all(), [
+			'staff_id' => 'required|exists:user,id',
+			'page'     => 'integer|min:1',
+			'limit'    => 'integer|min:1|max:100',
+		]);
+		if ($validator->fails()) {
+			return response()->json([
+				'success' => false,
+				'errors' => $validator->errors()->first()
+			], 400);
+		}
+
+		$staffId = $request->input('staff_id');
+		$limit   = $request->input('limit', 10);
+		$page    = $request->input('page', 1);
+		$staff   = User::find($staffId);
+		$homeId  = $staff->home_id;
+
+		// 1. Efficiently find unique week start dates (Mondays) from both tables first
+		// This avoids loading thousands of full records into memory at once
+		$weekKeysShifts = ScheduledShift::where('staff_id', $staffId)
+			->selectRaw("DISTINCT DATE_SUB(start_date, INTERVAL WEEKDAY(start_date) DAY) as week_key")
+			->pluck('week_key');
+
+		$weekKeysManual = Timesheet::where('staff_id', $staffId)
+			->whereNull('shift_id')
+			->selectRaw("DISTINCT DATE_SUB(created_at, INTERVAL WEEKDAY(created_at) DAY) as week_key")
+			->pluck('week_key');
+
+		$allUniqueWeeks = $weekKeysShifts->merge($weekKeysManual)
+			->map(fn($date) => Carbon::parse($date)->format('Y-m-d'))
+			->unique()
+			->sortDesc()
+			->values();
+
+		$total = $allUniqueWeeks->count();
+		$paginatedWeekKeys = $allUniqueWeeks->forPage($page, $limit);
+
+		if ($paginatedWeekKeys->isEmpty()) {
+			return response()->json([
+				'success' => true,
+				'data'    => [],
+				'pagination' => [
+					'total'        => $total,
+					'current_page' => (int)$page,
+					'per_page'     => (int)$limit,
+					'last_page'    => (int)ceil($total / $limit),
+				],
+				'message' => 'No more payroll data found.'
+			], 200);
+		}
+
+		// Identify the precise date range to load only the 10 weeks needed from DB
+		$maxDateRange = Carbon::parse($paginatedWeekKeys->first())->endOfWeek()->format('Y-m-d H:i:s');
+		$minDateRange = Carbon::parse($paginatedWeekKeys->last())->startOfWeek()->format('Y-m-d H:i:s');
+
+		// 2. Load Timesheets for the target 10 weeks
+		$timesheets = Timesheet::where('staff_id', $staffId)
+			->whereIn('status', ['approved', 'processed'])
+			->where(function ($q) use ($minDateRange, $maxDateRange) {
+				$q->whereBetween('created_at', [$minDateRange, $maxDateRange])
+					->orWhereHas('shift', fn($sq) => $sq->whereBetween('start_date', [substr($minDateRange, 0, 10), substr($maxDateRange, 0, 10)]));
+			})
+			->with(['category', 'shift.shiftCategory'])
+			->get()
+			->map(function ($t) use ($homeId, $staff) {
+				$date = $t->shift ? $t->shift->start_date : $t->created_at->format('Y-m-d');
+				$start = Carbon::parse($date . ' ' . $t->clock_in);
+				$end = Carbon::parse($date . ' ' . $t->clock_out);
+
+				if ($end->lessThan($start)) {
+					$end->addDay();
+				}
+
+				$t->duration_hours = $start->diffInMinutes($end) / 60;
+				$t->week_key = $start->startOfWeek()->format('Y-m-d');
+				$t->week_label = "Week " . $start->format('W') . " - " . $start->format('F Y');
+				$t->week_range = $start->startOfWeek()->format('M d') . " - " . $start->endOfWeek()->format('M d, Y');
+
+				// Rate logic
+				$categoryName = ($t->category->name ?? ($t->shift->shiftCategory->name ?? ''));
+				$normalizedCategory = strtolower(trim($categoryName));
+				$rate = 0;
+
+				if ($normalizedCategory == 'general' || empty($normalizedCategory)) {
+					$rate = $staff->hourly_rate ?? 0;
+				} else {
+					$payRateType = PayRateType::where('type_name', $categoryName)->where('home_id', $homeId)->where('is_deleted', 0)->first();
+					if ($payRateType) {
+						$payRate = PayRate::where('rate_type_id', $payRateType->id)->where('access_level_id', $staff->access_level)->where('home_id', $homeId)->where('is_deleted', 0)->first();
+						$rate = $payRate ? $payRate->pay_rate : ($staff->hourly_rate ?? 0);
+					} else {
+						$rate = $staff->hourly_rate ?? 0;
+					}
+				}
+
+				$t->gross_pay = $t->duration_hours * $rate;
+				return $t;
+			});
+
+		// 3. Load Pending Shifts for the target 10 weeks
+		$pendingShifts = ScheduledShift::where('staff_id', $staffId)
+			->where('status', '!=', 'approved')
+			->whereBetween('start_date', [substr($minDateRange, 0, 10), substr($maxDateRange, 0, 10)])
+			->get()
+			->map(function ($s) {
+				$start = Carbon::parse($s->start_date . ' ' . $s->start_time);
+				$end = Carbon::parse($s->start_date . ' ' . $s->end_time);
+				if ($end->lessThan($start)) $end->addDay();
+				$s->duration_hours = $start->diffInMinutes($end) / 60;
+				$s->week_key = $start->startOfWeek()->format('Y-m-d');
+				return $s;
+			});
+
+		// 4. Summarize for Output (Mapping only the requested 10 week keys)
+		$payrollGroups = $paginatedWeekKeys->map(function ($key) use ($timesheets, $pendingShifts) {
+			$weekT = $timesheets->where('week_key', $key);
+			$weekS = $pendingShifts->where('week_key', $key);
+
+			$start = Carbon::parse($key);
+			return [
+				'week_label'    => "Week " . $start->format('W') . " - " . $start->format('F Y'),
+				'week_range'    => $start->startOfWeek()->format('M d') . " - " . $start->endOfWeek()->format('M d, Y'),
+				'pay_date'      => $start->endOfWeek()->addDays(5)->format('l, M d, Y'),
+				'total_gross'   => number_format($weekT->sum('gross_pay'), 2),
+				'total_hours'   => number_format($weekT->sum('duration_hours'), 1),
+				'approved_hours' => number_format($weekT->where('status', 'approved')->sum('duration_hours'), 1),
+				'pending_hours' => number_format($weekS->sum('duration_hours'), 1),
+				'shift_count'   => $weekT->count() + $weekS->count(),
+				'status'        => ($weekT->count() > 0 && $weekT->where('status', 'approved')->count() == 0) ? 'processed' : 'pending',
+				'week_key'      => $key
+			];
+		})->values();
+
+		return response()->json([
+			'success' => true,
+			'data'    => $payrollGroups,
+			'pagination' => [
+				'total'        => $total,
+				'current_page' => (int)$page,
+				'per_page'     => (int)$limit,
+				'last_page'    => (int)ceil($total / $limit),
+			],
+			'message' => 'Payroll data fetched successfully.'
+		], 200);
 	}
 }

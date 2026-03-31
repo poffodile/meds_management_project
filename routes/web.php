@@ -212,6 +212,10 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 
 
 		Route::get('/task-center', [TaskCenterController::class, 'index'])->name('roster.task.center');
+
+
+		// invoicemanagement
+		Route::get('invoice-management', [invoiceManagementController::class, 'index']);
 	});
 
 	// Report Section

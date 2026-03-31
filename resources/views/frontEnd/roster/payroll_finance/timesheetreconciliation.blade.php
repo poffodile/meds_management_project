@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 <style>
-    :root {
+    /* :root {
         --primary-blue: #2563eb;
         --soft-blue-bg: #eff6ff;
         --border-blue: #dbeafe;
@@ -16,7 +16,7 @@
         --orange-warning: #f59e0b;
         --red-danger: #ef4444;
         --purple-accent: #8b5cf6;
-    }
+    } */
 
     .mainTitlep {
         font-size: 24px;
@@ -97,17 +97,18 @@
         margin-bottom: 24px;
     }
 
-    /* .filter-bar .form-control {
+    .filter-bar .form-control {
         border-radius: 8px;
         height: 42px;
         border-color: #e5e7eb;
-    } */
+    }
 
     /* Accordion Panels */
     .payRollAcood {
         border: none !important;
         margin-bottom: 20px !important;
-        box-shadow: none !important;
+        /* box-shadow: none !important; */
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
 
     .payRollAcood .panel-heading {
@@ -297,24 +298,6 @@
         border-color: #d1d5db;
     }
 
-    .btn-approve-all {
-        background: rgb(45 168 85);
-        color: white;
-        border: none;
-        padding: 10px 24px;
-        border-radius: 12px;
-        font-weight: 700;
-        margin-bottom: 24px;
-        transition: all 0.2s;
-        box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2);
-    }
-
-    .btn-approve-all:hover {
-        background: #059669;
-        transform: translateY(-1px);
-        box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.3);
-    }
-
     /* Modal Styling Classes */
     .modal-body-unset {
         height: unset !important;
@@ -327,12 +310,6 @@
 
     .text-blue-dark {
         color: #1e40af !important;
-    }
-
-    .btn-save-records {
-        padding: 10px 30px;
-        font-weight: 700;
-        border-radius: 10px;
     }
 
     .delete-btn-trash {
@@ -369,20 +346,6 @@
         font-weight: 700;
         margin-top: 0;
         margin-bottom: 0;
-    }
-
-    .btn-save-records {
-        background: #2563eb;
-        border: none;
-        padding: 10px 24px;
-        border-radius: 8px;
-        color: white;
-        font-weight: 600;
-    }
-
-    .btn-save-records:hover {
-        background: #1d4ed8;
-        color: white;
     }
 </style>
 
@@ -480,7 +443,7 @@
                         <div id="collapse1" class="panel-collapse collapse in">
                             <div class="panel-body">
                                 @if ($matchedCount > 0)
-                                <button class="btn-approve-all" id="approve-all-matched">
+                                <button class="bgBtn pgreenBtn" id="approve-all-matched">
                                     <i class="bx bx-check-double me-2"></i> Approve All Matched
                                 </button>
                                 @foreach ($shifts->where('reconciliation_status', 'Matched') as $shift)
@@ -499,7 +462,7 @@
                                             <button class="btn-adjust" data-toggle="modal" data-target="#adjustNodal-{{ $shift->id }}">
                                                 <i class="bx bx-show"></i> Adjust
                                             </button>
-                                            <button class="btn-approve approve-shift-btn" data-id="{{ $shift->id }}">
+                                            <button class="bgBtn pgreenBtn approve-shift-btn" data-id="{{ $shift->id }}">
                                                 <i class="bx bx-check-circle"></i> Approve
                                             </button>
                                         </div>
@@ -554,7 +517,7 @@
                         <div class="panel-heading">
                             <h4 class="panel-title">
                                 <a data-toggle="collapse" data-parent="#accordion" href="#collapse2" class="lighOrangeBg">
-                                    <i class="bx bx-error-circle f20 me-2" style="color: #f59e0b;"></i>
+                                    <i class="bx bx-alert-triangle f20 me-2" style="color: #f59e0b;"></i>
                                     Requires Adjustment ({{ $needsAdjustmentCount }})
                                     <i class="bx bx-chevron-down accIcon"></i>
                                 </a>
@@ -579,7 +542,7 @@
                                             <button class="btn-adjust" data-toggle="modal" data-target="#adjustNodal-{{ $shift->id }}">
                                                 <i class="bx bx-show"></i> Adjust
                                             </button>
-                                            <button class="btn-approve approve-shift-btn" data-id="{{ $shift->id }}">
+                                            <button class="bgBtn pgreenBtn approve-shift-btn" data-id="{{ $shift->id }}">
                                                 <i class="bx bx-check-circle"></i> Approve
                                             </button>
                                         </div>
@@ -1082,7 +1045,8 @@
                     </div>
                 </div>
                 <div class="modal-footer p24">
-                    <button type="submit" class="btn btn-primary btn-save-records">Save Records</button>
+                    <!-- <button type="submit" class="btn btn-primary btn-save-records">Save Records</button> -->
+                    <button type="submit" class="btn allBtnUseColor btn-save-records">Save Records</button>
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                 </div>
             </form>

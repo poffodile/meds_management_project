@@ -168,6 +168,7 @@ Route::group(['prefix' => '/staff'], function () {
 	Route::delete('/staff-notes/{note_id}', 'App\Http\Controllers\Api\Staff\StaffNoteController@deleteNote');
 
 	Route::post('/dashboard', 'App\Http\Controllers\Api\Staff\UserController@dashboard');
+	Route::post('/payroll', 'App\Http\Controllers\Api\Staff\UserController@payroll');
 	Route::post('/schedule-shifts', [ScheduleController::class, 'schedule_shifts']);
 
 	Route::post('/schedule-shifts-details', [ScheduleController::class, 'schedule_shifts_details']);
