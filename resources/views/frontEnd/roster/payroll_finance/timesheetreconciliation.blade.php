@@ -42,6 +42,10 @@
         flex: 1;
     }
 
+    .flex-grow-1 {
+        flex-grow: 1;
+    }
+
     .summary-card {
         background: #fff;
         border-radius: 12px;
@@ -166,16 +170,6 @@
 
     .recon-card:hover {
         box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.1), 0 2px 4px -1px rgba(37, 99, 235, 0.06);
-    }
-
-    .recon-card.needs-adj {
-        /* border-color: #fed7aa;  -- Removed to allow category color precedence */
-    }
-
-    .staff-name {
-        font-size: 16px;
-        font-weight: 700;
-        color: #111827;
     }
 
     .badge-soft {
@@ -451,7 +445,7 @@
                                     <div class="d-flex justify-content-between align-items-start mb-4">
                                         <div class="d-flex flex-column gap-2">
                                             <div class="d-flex align-items-center gap-2">
-                                                <span class="staff-name">{{ $shift->staff ? $shift->staff->name : 'Unknown Staff' }}</span>
+                                                <span class="h5Head">{{ $shift->staff ? $shift->staff->name : 'Unknown Staff' }}</span>
                                                 <span class="badge-soft badge-pending">pending</span>
                                                 @if($shift->shiftCategory)
                                                 <span class="badge-soft" style="background-color: {{ $shift->shiftCategory->color }}20; color: {{ $shift->shiftCategory->color }};">{{ $shift->shiftCategory->name }}</span>
@@ -531,7 +525,7 @@
                                     <div class="d-flex justify-content-between align-items-start mb-4">
                                         <div class="d-flex flex-column gap-2">
                                             <div class="d-flex align-items-center gap-2">
-                                                <span class="staff-name">{{ $shift->staff ? $shift->staff->name : 'Unknown Staff' }}</span>
+                                                <span class="h5Head">{{ $shift->staff ? $shift->staff->name : 'Unknown Staff' }}</span>
                                                 <span class="badge-soft badge-adj">requires adjustment</span>
                                                 @if($shift->shiftCategory)
                                                 <span class="badge-soft" style="background-color: {{ $shift->shiftCategory->color }}20; color: {{ $shift->shiftCategory->color }};">{{ $shift->shiftCategory->name }}</span>
@@ -630,7 +624,7 @@
                                     <div class="d-flex justify-content-between align-items-start mb-4">
                                         <div class="d-flex flex-column gap-2">
                                             <div class="d-flex align-items-center gap-2">
-                                                <span class="staff-name">{{ $shift->staff ? $shift->staff->name : 'Unknown Staff' }}</span>
+                                                <span class="h5Head">{{ $shift->staff ? $shift->staff->name : 'Unknown Staff' }}</span>
                                                 <span class="badge-soft badge-approved">approved</span>
                                                 @if($shift->shiftCategory)
                                                 <span class="badge-soft" style="background-color: {{ $shift->shiftCategory->color }}20; color: {{ $shift->shiftCategory->color }};">{{ $shift->shiftCategory->name }}</span>
@@ -690,7 +684,7 @@
                                     <div class="d-flex justify-content-between align-items-start mb-4">
                                         <div class="d-flex flex-column gap-2">
                                             <div class="d-flex align-items-center gap-2">
-                                                <span class="staff-name">{{ $m->staff ? $m->staff->name : 'Unknown Staff' }}</span>
+                                                <span class="h5Head">{{ $m->staff ? $m->staff->name : 'Unknown Staff' }}</span>
                                                 <span class="badge-soft badge-approved">manual record (approved)</span>
                                                 @if($m->category)
                                                 <span class="badge-soft" style="background-color: {{ $m->category->color }}20; color: {{ $m->category->color }};">{{ $m->category->name }}</span>

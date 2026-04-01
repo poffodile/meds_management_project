@@ -210,8 +210,11 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 		Route::post('/timesheet-reconciliation/save', [PayrollFinanceController::class, 'saveTimesheet'])->name('timesheet.save');
 		Route::post('/timesheet-reconciliation/approve', [PayrollFinanceController::class, 'approveShift'])->name('timesheet.approve');
 
-        Route::get('/payroll-report/{week_key}', [PayrollFinanceController::class, 'weeklyReport'])->name('roster.payroll.report');
-        Route::get('/staff-payslip/{staff_id}/{week_key}', [PayrollFinanceController::class, 'staffPayslip'])->name('roster.staff.payslip');
+		// Payroll Report
+		Route::get('/payroll-report/{week_key}', [PayrollFinanceController::class, 'weeklyReport'])->name('roster.payroll.report');
+		Route::get('/payroll-report-download/{week_key}', [PayrollFinanceController::class, 'downloadReport'])->name('roster.payroll.report.download');
+		Route::get('/staff-payslip/{staff_id}/{week_key}', [PayrollFinanceController::class, 'staffPayslip'])->name('roster.staff.payslip');
+		Route::get('/staff-payslip-download/{staff_id}/{week_key}', [PayrollFinanceController::class, 'downloadPayslip'])->name('roster.staff.payslip.download');
 
 
 		Route::get('/task-center', [TaskCenterController::class, 'index'])->name('roster.task.center');

@@ -103,11 +103,32 @@
         .py-4 {
             padding-top: 1rem;
             padding-bottom: 1rem;
-            width: 900px;
+            width: 100%;
+            max-width: 1000px;
             margin: 2rem auto;
             border-radius: 12px;
             background: #fff;
             box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .no-print-btn {
+            background: #1c1c1c;
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .no-print-btn:hover {
+            background: #333;
+            transform: translateY(-1px);
         }
 
         .py-6 {
@@ -192,19 +213,77 @@
         @media print {
             body {
                 background: #fff;
+                margin: 0;
+                padding: 0;
             }
 
             .py-4 {
                 margin: 0;
                 box-shadow: none;
                 width: 100%;
+                max-width: 100%;
+                border-radius: 0;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+        }
+
+        @media screen and (max-width: 1000px) {
+            .py-4 {
+                margin: 0;
+                border-radius: 0;
+                box-shadow: none;
+            }
+
+            .px-14 {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+
+            .py-10 {
+                padding-top: 1.5rem;
+                padding-bottom: 1.5rem;
             }
         }
     </style>
 </head>
 
 <body>
-    <div class="py-4">
+    <div class="py-4" id="payroll-content">
+        <div class="no-print" style="padding: 10px 20px; display: flex; justify-content: flex-end; border-bottom: 1px solid #eee; margin-bottom: 10px; gap: 10px;">
+            @php
+                $path = trim(request()->path(), '/');
+                $isApi = request()->is('api/*');
+                $isPayslip = str_contains($path, 'staff-payslip');
+                $segments = explode('/', $path);
+
+                if ($isPayslip) {
+                    $staff_id = $segments[count($segments) - 2];
+                    $routeName = $isApi ? 'api.staff.payslip.download' : 'roster.staff.payslip.download';
+                    $downloadUrl = route($routeName, [$staff_id, $group['week_key']]);
+                } else {
+                    $downloadUrl = route('roster.payroll.report.download', $group['week_key']);
+                }
+            @endphp
+
+            <button onclick="window.print()" class="no-print-btn" style="background: #64748b;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M2.5 8a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z" />
+                    <path d="M5 1a2 2 0 0 0-2 2v2H2a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h1v1a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-1h1a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-1V3a2 2 0 0 0-2-2H5zM4 3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2H4V3zm1 5a.5.5 0 0 0 0 1h6a.5.5 0 0 0 0-1H5zm0 2a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1H5z" />
+                </svg>
+                Print
+            </button>
+
+            <a href="{{ $downloadUrl }}" class="no-print-btn" target="_blank">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z" />
+                    <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z" />
+                </svg>
+                Download PDF
+            </a>
+        </div>
         <div class="px-14 py-6">
             <table class="w-full border-collapse border-spacing-0">
                 <tbody>
@@ -264,7 +343,7 @@
             </table>
         </div>
 
-        <div class="px-14 py-10 text-sm text-neutral-700">
+        <div class="px-14 py-10 text-sm text-neutral-700" style="overflow-x: auto;">
             <table class="w-full border-collapse border-spacing-0">
                 <thead>
                     <tr>
@@ -347,7 +426,6 @@
                 </tbody>
             </table>
         </div>
-
         <div class="px-14 py-6 text-xs text-neutral-500 italic text-center">
             <p>This is a computer generated document. For inquiries, please contact the finance department.</p>
         </div>

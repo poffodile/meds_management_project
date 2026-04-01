@@ -170,6 +170,7 @@ Route::group(['prefix' => '/staff'], function () {
 	Route::post('/dashboard', 'App\Http\Controllers\Api\Staff\UserController@dashboard');
 	Route::post('/payroll', 'App\Http\Controllers\Api\Staff\UserController@payroll');
 	Route::get('/staff-payslip/{staff_id}/{week_key}', 'App\Http\Controllers\Api\Staff\UserController@staffPayslip');
+	Route::get('/staff-payslip-download/{staff_id}/{week_key}', 'App\Http\Controllers\Api\Staff\UserController@downloadPayslip');
 	Route::post('/schedule-shifts', [ScheduleController::class, 'schedule_shifts']);
 
 	Route::post('/schedule-shifts-details', [ScheduleController::class, 'schedule_shifts_details']);

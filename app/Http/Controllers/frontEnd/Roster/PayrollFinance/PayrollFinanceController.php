@@ -24,7 +24,7 @@ class PayrollFinanceController extends Controller
         $weekLabel = "Week " . $now->format('W') . " - " . $now->format('F Y');
         $weekRange = $startOfWeek->format('M d') . " - " . $endOfWeek->format('M d, Y');
         $payDate = $endOfWeek->copy()->addDays(5)->format('M d, Y');
-        
+
         // 2. Fetch Dashboard stats (v3: expanded to include all metrics)
         $timesheets = \App\Models\Timesheet::where('home_id', $homeId)
             ->whereIn('status', ['approved', 'processed'])
@@ -38,11 +38,11 @@ class PayrollFinanceController extends Controller
             $date = $t->shift ? $t->shift->start_date : $t->created_at->format('Y-m-d');
             $start = \Carbon\Carbon::parse($date . ' ' . $t->clock_in);
             $end = \Carbon\Carbon::parse($date . ' ' . $t->clock_out);
-            
+
             if ($end->lessThan($start)) {
                 $end->addDay();
             }
-            
+
             $itemMinutes = $start->diffInMinutes($end);
             $totalMinutes += $itemMinutes;
 
@@ -50,7 +50,7 @@ class PayrollFinanceController extends Controller
             $categoryName = ($t->category->name ?? $t->shift->shiftCategory->name ?? 'general');
             $rate = 0;
             $normalizedCategory = strtolower(trim($categoryName));
-            
+
             if ($t->staff) {
                 if ($normalizedCategory == 'General' || empty($normalizedCategory) || $normalizedCategory == 'general') {
                     $rate = $t->staff->hourly_rate ?? 0;
@@ -95,9 +95,17 @@ class PayrollFinanceController extends Controller
             ->values();
 
         return view('frontEnd.roster.payroll_finance.index', compact(
-            'totalHours', 'staffCount', 'pendingCount', 'totalGross',
-            'weekLabel', 'weekRange', 'payDate', 'weekStatus',
-            'outstandingAmount', 'outstandingCount', 'recentActivity'
+            'totalHours',
+            'staffCount',
+            'pendingCount',
+            'totalGross',
+            'weekLabel',
+            'weekRange',
+            'payDate',
+            'weekStatus',
+            'outstandingAmount',
+            'outstandingCount',
+            'recentActivity'
         ));
     }
     public function payrollprocessing(Request $request)
@@ -545,14 +553,65 @@ class PayrollFinanceController extends Controller
             ], 500);
         }
     }
+    public function downloadReport(Request $request, $week_key)
+    {
+        $homeId = \Illuminate\Support\Facades\Auth::user()->home_id;
+        $timesheets = \App\Models\Timesheet::where('home_id', $homeId)
+            ->where('status', 'processed')
+            ->whereHas('shift', function ($query) use ($week_key) {
+                $query->whereBetween('start_date', [
+                    \Carbon\Carbon::parse($week_key)->startOfWeek(),
+                    \Carbon\Carbon::parse($week_key)->endOfWeek()
+                ]);
+            })
+            ->with(['staff', 'category', 'shift.shiftCategory'])
+            ->get()
+            ->map(function ($t) {
+                $date = $t->shift ? $t->shift->start_date : $t->created_at->format('Y-m-d');
+                $start = \Carbon\Carbon::parse($date . ' ' . $t->clock_in);
+                $end = \Carbon\Carbon::parse($date . ' ' . $t->clock_out);
+                if ($end->lessThan($start)) $end->addDay();
+                $t->duration_hours = $start->diffInMinutes($end) / 60;
+                $t->gross_pay = $t->duration_hours * ($t->staff->hourly_rate ?? 0);
+                return $t;
+            });
+
+        if ($timesheets->isEmpty()) {
+            return back()->with('error', 'No processed timesheets found for this week.');
+        }
+
+        $start = \Carbon\Carbon::parse($week_key);
+        $group = [
+            'week_label' => "Week " . $start->format('W') . " - " . $start->format('F Y'),
+            'week_range' => $start->startOfWeek()->format('M d') . " - " . $start->endOfWeek()->format('M d, Y'),
+            'week_key' => $week_key,
+            'total_gross' => $timesheets->sum('gross_pay'),
+            'pay_date' => $start->endOfWeek()->addDays(5)->format('l, M d, Y'),
+            'home_name' => \App\Home::getHomeById($homeId),
+            'generated_by' => \Illuminate\Support\Facades\Auth::user()->name ?? 'Administrator',
+            'staff_breakdown' => $timesheets->groupBy('staff_id')->map(function ($items) {
+                $staff = $items->first()->staff;
+                return [
+                    'name'  => $staff ? $staff->name : 'Unknown',
+                    'hours' => number_format($items->sum('duration_hours'), 1),
+                    'gross' => number_format($items->sum('gross_pay'), 2)
+                ];
+            })->values()
+        ];
+
+        // Passing a flag to ensure the download template is rendered without buttons
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('frontEnd.roster.payroll_finance.payroll_report', compact('group'));
+        return $pdf->download('Payroll-Report-' . $week_key . '.pdf');
+    }
+
     public function weeklyReport(Request $request, $week_key)
     {
         $homeId = \Illuminate\Support\Facades\Auth::user()->home_id;
-        
+
         // This logic is copied from payrollprocessing and filtered for one week
         $timesheets = \App\Models\Timesheet::where('home_id', $homeId)
             ->where('status', 'processed')
-            ->whereHas('shift', function($query) use ($week_key) {
+            ->whereHas('shift', function ($query) use ($week_key) {
                 $query->whereBetween('start_date', [
                     \Carbon\Carbon::parse($week_key)->startOfWeek(),
                     \Carbon\Carbon::parse($week_key)->endOfWeek()
@@ -567,7 +626,7 @@ class PayrollFinanceController extends Controller
                 if ($end->lessThan($start)) $end->addDay();
 
                 $t->duration_hours = $start->diffInMinutes($end) / 60;
-                
+
                 // Simplified rate lookup (we already have gross calculated in most cases or can calc here)
                 $rate = $t->staff->hourly_rate ?? 0;
                 $t->gross_pay = $t->duration_hours * $rate;
@@ -575,7 +634,7 @@ class PayrollFinanceController extends Controller
             });
 
         if ($timesheets->isEmpty()) {
-             return back()->with('error', 'No processed timesheets found for this week.');
+            return back()->with('error', 'No processed timesheets found for this week.');
         }
 
         $start = \Carbon\Carbon::parse($week_key);
@@ -606,7 +665,7 @@ class PayrollFinanceController extends Controller
         // It fetches a single user's data for a specific week.
         $timesheets = \App\Models\Timesheet::where('staff_id', $staff_id)
             ->where('status', 'processed')
-            ->whereHas('shift', function($query) use ($week_key) {
+            ->whereHas('shift', function ($query) use ($week_key) {
                 $query->whereBetween('start_date', [
                     \Carbon\Carbon::parse($week_key)->startOfWeek(),
                     \Carbon\Carbon::parse($week_key)->endOfWeek()
@@ -645,5 +704,51 @@ class PayrollFinanceController extends Controller
         ];
 
         return view('frontEnd.roster.payroll_finance.payroll_report', compact('group'));
+    }
+
+    public function downloadPayslip($staff_id, $week_key)
+    {
+        $timesheets = \App\Models\Timesheet::where('staff_id', $staff_id)
+            ->where('status', 'processed')
+            ->whereHas('shift', function ($query) use ($week_key) {
+                $query->whereBetween('start_date', [
+                    \Carbon\Carbon::parse($week_key)->startOfWeek(),
+                    \Carbon\Carbon::parse($week_key)->endOfWeek()
+                ]);
+            })
+            ->with(['staff', 'category', 'shift.shiftCategory'])
+            ->get()
+            ->map(function ($t) {
+                $date = $t->shift ? $t->shift->start_date : $t->created_at->format('Y-m-d');
+                $start = \Carbon\Carbon::parse($date . ' ' . $t->clock_in);
+                $end = \Carbon\Carbon::parse($date . ' ' . $t->clock_out);
+                if ($end->lessThan($start)) $end->addDay();
+                $t->duration_hours = $start->diffInMinutes($end) / 60;
+                $t->gross_pay = $t->duration_hours * ($t->staff->hourly_rate ?? 0);
+                return $t;
+            });
+
+        if ($timesheets->isEmpty()) abort(404, 'Payslip not found.');
+
+        $start = \Carbon\Carbon::parse($week_key);
+        $group = [
+            'week_label' => "Week " . $start->format('W') . " - " . $start->format('F Y'),
+            'week_range' => $start->startOfWeek()->format('M d') . " - " . $start->endOfWeek()->format('M d, Y'),
+            'week_key' => $week_key,
+            'total_gross' => $timesheets->sum('gross_pay'),
+            'pay_date' => $start->endOfWeek()->addDays(5)->format('l, M d, Y'),
+            'home_name' => \App\Home::getHomeById($timesheets->first()->staff->home_id ?? null),
+            'generated_by' => $timesheets->first()->staff->name ?? 'Staff Member',
+            'staff_breakdown' => [
+                [
+                    'name'  => $timesheets->first()->staff->name ?? 'Unknown',
+                    'hours' => number_format($timesheets->sum('duration_hours'), 1),
+                    'gross' => number_format($timesheets->sum('gross_pay'), 2)
+                ]
+            ]
+        ];
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('frontEnd.roster.payroll_finance.payroll_report', compact('group'));
+        return $pdf->download('Payslip-' . $week_key . '.pdf');
     }
 }

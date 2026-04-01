@@ -143,6 +143,12 @@ if (isset($system_admin_home)) {
 								}
 								?>
 								<div class="form-group">
+									<label class="col-lg-3 control-label">Weekly Allowance (Service Users)</label>
+									<div class="col-lg-9">
+										<input type="number" step="0.01" name="weekly_allowance_service_users" class="form-control" placeholder="Weekly allowance" value="{{ (isset($system_admin_home->weekly_allowance_service_users)) ? $system_admin_home->weekly_allowance_service_users : '' }}">
+									</div>
+								</div>
+								<div class="form-group">
 									<label class="col-lg-3 control-label"></label>
 									<div class="col-lg-9">
 										<img src="{{ $image }}" id="old_image" alt="No image" style="max-width: 200px; max-height: 150px; min-width: 150px; min-height: 100px; line-height: 100px;">

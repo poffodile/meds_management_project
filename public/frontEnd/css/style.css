@@ -2630,10 +2630,11 @@ ul.inbox-pagination li {
 }
 
 .modal-body label {
-    font-weight: 400;
+    font-weight: 600;
     font-family: 'Open Sans', sans-serif;
     font-size: 13px;
     color: #171717;
+    text-align: left;
 }
 
 .modal-body .form-control {
@@ -3731,7 +3732,8 @@ ul.amounts li {
     color: #fff;
 }
 
-.close-sm {
+.close-sm,
+.reportTabMain .tabs button i {
     font-size: 14px;
 }
 
@@ -12815,9 +12817,9 @@ header.panel-heading.headingCapitilize {
 }
 
 .careDetailsWrapper .statusBadge {
-    font-size: 11px;
+    font-size: 12px;
     padding: 3px 8px;
-    border-radius: 999px;
+    border-radius: 5px;
 }
 
 .careDetailsWrapper .statusBadge.gray {
@@ -14954,10 +14956,11 @@ header.panel-heading.headingCapitilize {
     padding: 2px 10px;
     font-size: 12px;
     border-radius: 5px;
-    color: #002b89;
+    color: #1d4ed8;
     box-shadow: var(--bxShadow);
     font-weight: 600;
     transition: 0.4s;
+    display: inline-block;
 }
 
 .userMum .title {
@@ -15692,6 +15695,11 @@ header.panel-heading.headingCapitilize {
 .orangeBages {
     background-color: #ffedd5;
     color: var(--darkOrangep);
+}
+
+.mediumOrangeBadg {
+    background-color: #fed7aa;
+    color: #7c2d12;
 }
 
 .blueAllTabCard .bgIconStaffT i {
@@ -16642,9 +16650,7 @@ header.panel-heading.headingCapitilize {
     display: flex;
 }
 
-.emergencyMain {
-    flex: 1;
-}
+
 
 @media (max-width: 992px) {
 
@@ -17868,6 +17874,7 @@ div#secondModal .modal-lg {
 
 .form-control {
     font-size: 13px;
+    box-shadow: var(--lightShadow);
 }
 
 .inidgoBtn {
@@ -17910,4 +17917,90 @@ input[type="checkbox"] {
     height: 6px;
     width: 6px;
     background: #343333;
+}
+
+.indegoText {
+    color: var(--purpleBlueCle);
+}
+
+.auditLogRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.auditLogRow>div {
+    flex: 1 1 auto;
+
+}
+
+.noWrap {
+    white-space: nowrap;
+}
+
+.viewDetailsCon pre {
+    margin: unset !important;
+    padding: unset;
+    border: unset;
+    background: unset;
+}
+
+.viewDetailsCon {
+    margin-top: 10px;
+}
+
+
+.viewDetailsBtn.active i {
+    transform: rotate(90deg);
+    /* rotate when active */
+}
+
+.card-col>div {
+    flex: 1;
+}
+
+.orangeText700 {
+    color: #c2410c;
+}
+
+#generateReportBtn:disabled {
+    opacity: 0.85;
+    cursor: not-allowed;
+}
+
+#generateReportBtn i.bx-spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.reportTabMain .tabs button {
+    color: #000;
+    display: flex;
+    align-items: center;
+    gap: 10px
+}
+
+.greenBorder {
+    border: 1px solid var(--darkbgGreen);
+}
+
+.purpleBorder {
+    border: 1px solid var(--purple);
+}
+
+.select2-container--default .select2-selection--single {
+    background-color: #fff !important;
+    border: 1px solid #dcdcdc !important;
+    border-radius: 4px;
+    height: 34px !important;
+    font-size: 13px !important;
 }

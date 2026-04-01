@@ -1124,4 +1124,50 @@ class UserController extends Controller
 
 		return view('frontEnd.roster.payroll_finance.payroll_report', compact('group'));
 	}
+
+	public function downloadPayslip($staff_id, $week_key)
+	{
+		$timesheets = Timesheet::where('staff_id', $staff_id)
+			->where('status', 'processed')
+			->whereHas('shift', function ($query) use ($week_key) {
+				$query->whereBetween('start_date', [
+					Carbon::parse($week_key)->startOfWeek(),
+					Carbon::parse($week_key)->endOfWeek()
+				]);
+			})
+			->with(['staff', 'category', 'shift.shiftCategory'])
+			->get()
+			->map(function ($t) {
+				$date = $t->shift ? $t->shift->start_date : $t->created_at->format('Y-m-d');
+				$start = Carbon::parse($date . ' ' . $t->clock_in);
+				$end = Carbon::parse($date . ' ' . $t->clock_out);
+				if ($end->lessThan($start)) $end->addDay();
+				$t->duration_hours = $start->diffInMinutes($end) / 60;
+				$t->gross_pay = $t->duration_hours * ($t->staff->hourly_rate ?? 0);
+				return $t;
+			});
+
+		if ($timesheets->isEmpty()) abort(404, 'Payslip not found.');
+
+		$start = Carbon::parse($week_key);
+		$group = [
+			'week_label' => "Week " . $start->format('W') . " - " . $start->format('F Y'),
+			'week_range' => $start->startOfWeek()->format('M d') . " - " . $start->endOfWeek()->format('M d, Y'),
+			'week_key' => $week_key,
+			'total_gross' => $timesheets->sum('gross_pay'),
+			'pay_date' => $start->endOfWeek()->addDays(5)->format('l, M d, Y'),
+			'home_name' => Home::getHomeById($timesheets->first()->staff->home_id ?? null),
+			'generated_by' => $timesheets->first()->staff->name ?? 'Staff Member',
+			'staff_breakdown' => [
+				[
+					'name'  => $timesheets->first()->staff->name ?? 'Unknown',
+					'hours' => number_format($timesheets->sum('duration_hours'), 1),
+					'gross' => number_format($timesheets->sum('gross_pay'), 2)
+				]
+			]
+		];
+
+		$pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('frontEnd.roster.payroll_finance.payroll_report', compact('group'));
+		return $pdf->download('Payslip-' . $week_key . '.pdf');
+	}
 }
