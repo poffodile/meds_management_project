@@ -47,6 +47,8 @@ use App\Http\Controllers\frontEnd\Roster\Staff\clientonboardingController;
 use App\Http\Controllers\frontEnd\Roster\Staff\notificationAlertController;
 use App\Http\Controllers\frontEnd\Roster\Staff\invoiceManagementController;
 use App\Http\Controllers\frontEnd\Roster\TaskCenter\TaskCenterController;
+use App\Http\Controllers\frontEnd\Roster\Staff\OnboardingConfigurationController;
+use App\Http\Controllers\frontEnd\Roster\Staff\AuditLogController;
 
 
 // Backend Controllers
@@ -222,6 +224,18 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 
 		// invoicemanagement
 		Route::get('invoice-management', [invoiceManagementController::class, 'index']);
+
+		// Onboarding Configuration
+		Route::get('onboarding-configuration', [OnboardingConfigurationController::class, 'index']);
+		Route::post('onboarding-configuration/workflow/create', [OnboardingConfigurationController::class, 'create_workflow'])->name('roster.onboarding-config.add');
+		Route::post('onboarding-configuration/workflow/loadData', [OnboardingConfigurationController::class, 'load_workflow'])->name('roster.onboarding.workflow.loadData');
+		Route::post('onboarding-configuration/workflow/delete', [OnboardingConfigurationController::class, 'delete_workflow'])->name('roster.onboarding.workflow.delete');
+		Route::post('onboarding-configuration/workflow/status', [OnboardingConfigurationController::class, 'status_workflow'])->name('roster.onboarding.workflow.status');
+		Route::post('onboarding-configuration/stages/create', [OnboardingConfigurationController::class, 'create_stages'])->name('roster.onboarding.stage.add');
+		Route::post('onboarding-configuration/stages/loadData', [OnboardingConfigurationController::class, 'load_stages'])->name('roster.onboarding.stages.loadData');
+		Route::post('onboarding-configuration/stages/delete', [OnboardingConfigurationController::class, 'delete_stages'])->name('roster.onboarding.stages.delete');
+		Route::post('onboarding-configuration/stages/ordering', [OnboardingConfigurationController::class, 'ordering_stages'])->name('roster.onboarding.stages.ordering');
+		Route::post('onboarding-configuration/stages/details', [OnboardingConfigurationController::class, 'details_stages'])->name('roster.onboarding.stages.details');
 	});
 
 	// Report Section

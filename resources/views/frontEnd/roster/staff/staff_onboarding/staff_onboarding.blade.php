@@ -6,7 +6,7 @@
 <main class="page-content">
     <div class="container-fluid">
         <div class="row">
-            <div class="col-lg-12">
+            <div class="col-md-12">
                 <div class="staffHeaderp">
                     <div>
                         <div class="d-flex gap-2 mb-3">
@@ -23,7 +23,7 @@
         </div>
         <!-- card -->
         <div class="row mt20">
-            <div class="col-lg-12">
+            <div class="col-md-12">
                 <div class="card-row">
                     <div class="card-col">
                         <div class="emergencyMain p-4">
@@ -80,7 +80,7 @@
         </div>
         <!-- search bar -->
         <div class="row mt20">
-            <div class="col-lg-12">
+            <div class="col-md-12">
                 <div class="dFlexGap">
                     <div class="input-group searchWithtabs flex1 shadowp">
                         <span class="input-group-addon btn-white"><i class="fa fa-search"></i></span>
@@ -98,20 +98,19 @@
         </div>
         <!--  all staff stripe  -->
         <div class="row mt20">
-            <div class="col-lg-12">
+            <div class="col-md-12">
                 <div class="virtGap">
                     <div class="emergencyMain p-3 AllStaffTabC ">
-                        <div class="flexBw align-items-center">
-                            <div class="dFlexGap flex1">
-
+                        <div class="flexBw align-items-center flexWrap">
+                            <div class="dFlexGap">
                                 <i class="bx bx-lock fs23 orangeText"> </i>
                                 <div>
                                     <h6 class="h6Head mb-2">Jane Wakefield </h6>
                                     <p class="mb-0 textGray500 fs13 mt-2">jwake@gmail.co.uk</p>
                                 </div>
                             </div>
-                            <div class="dFlexGap flex1">
-                                <div class="flex1">
+                            <div class="dFlexGap">
+                                <div>
                                     <div class="progressBar" style="width:150px; margin-left:auto;">
                                         <div class="progressFill" style="width:16%; background:#3376f2"></div>
                                     </div>
@@ -135,17 +134,16 @@
                         </div>
                     </div>
                     <div class="emergencyMain p-3 AllStaffTabC ">
-                        <div class="flexBw align-items-center">
-                            <div class="dFlexGap flex1">
-
+                        <div class="flexBw align-items-center flexWrap">
+                            <div class="dFlexGap">
                                 <i class="bx bx-lock fs23 orangeText"> </i>
                                 <div>
                                     <h6 class="h6Head mb-2">Jane Wakefield </h6>
                                     <p class="mb-0 textGray500 fs13 mt-2">jwake@gmail.co.uk</p>
                                 </div>
                             </div>
-                            <div class="dFlexGap flex1">
-                                <div class="flex1">
+                            <div class="dFlexGap">
+                                <div>
                                     <div class="progressBar" style="width:150px; margin-left:auto;">
                                         <div class="progressFill" style="width:16%; background:#3376f2"></div>
                                     </div>
@@ -169,17 +167,16 @@
                         </div>
                     </div>
                     <div class="emergencyMain p-3 AllStaffTabC ">
-                        <div class="flexBw align-items-center">
-                            <div class="dFlexGap flex1">
-
+                        <div class="flexBw align-items-center flexWrap">
+                            <div class="dFlexGap">
                                 <i class="bx bx-lock fs23 orangeText"> </i>
                                 <div>
                                     <h6 class="h6Head mb-2">Jane Wakefield </h6>
                                     <p class="mb-0 textGray500 fs13 mt-2">jwake@gmail.co.uk</p>
                                 </div>
                             </div>
-                            <div class="dFlexGap flex1">
-                                <div class="flex1">
+                            <div class="dFlexGap">
+                                <div>
                                     <div class="progressBar" style="width:150px; margin-left:auto;">
                                         <div class="progressFill" style="width:16%; background:#3376f2"></div>
                                     </div>
@@ -203,17 +200,16 @@
                         </div>
                     </div>
                     <div class="emergencyMain p-3 AllStaffTabC ">
-                        <div class="flexBw align-items-center">
-                            <div class="dFlexGap flex1">
-
+                        <div class="flexBw align-items-center flexWrap">
+                            <div class="dFlexGap">
                                 <i class="bx bx-lock fs23 orangeText"> </i>
                                 <div>
                                     <h6 class="h6Head mb-2">Jane Wakefield </h6>
                                     <p class="mb-0 textGray500 fs13 mt-2">jwake@gmail.co.uk</p>
                                 </div>
                             </div>
-                            <div class="dFlexGap flex1">
-                                <div class="flex1">
+                            <div class="dFlexGap">
+                                <div>
                                     <div class="progressBar" style="width:150px; margin-left:auto;">
                                         <div class="progressFill" style="width:16%; background:#3376f2"></div>
                                     </div>
@@ -237,8 +233,8 @@
                         </div>
                     </div>
                     <div class="emergencyMain p-3 AllStaffTabC ">
-                        <div class="flexBw align-items-center">
-                            <div class="dFlexGap flex1">
+                        <div class="flexBw align-items-center flexWrap">
+                            <div class="dFlexGap">
 
                                 <i class="bx bx-lock fs23 orangeText"> </i>
                                 <div>
@@ -246,8 +242,8 @@
                                     <p class="mb-0 textGray500 fs13 mt-2">jwake@gmail.co.uk</p>
                                 </div>
                             </div>
-                            <div class="dFlexGap flex1">
-                                <div class="flex1">
+                            <div class="dFlexGap">
+                                <div>
                                     <div class="progressBar" style="width:150px; margin-left:auto;">
                                         <div class="progressFill" style="width:16%; background:#3376f2"></div>
                                     </div>
@@ -283,7 +279,7 @@
                                     <!-- main modal content-->
                                     <div class="staffOnBoardMain" style="display: block;">
                                         <div class="row row-equal">
-                                            <div class="col-lg-6">
+                                            <div class="col-md-6 col-sm-6">
                                                 <div class="shadowp p-5 lightBorderp rounded8" style="border-color: #9333ea33;">
                                                     <h5 class="h5Head purpleTextp mb-4"> <i class="bx bx-sparkles me-2 f20"></i>AI Personalized Onboarding Plan
                                                     </h5>
@@ -291,7 +287,7 @@
                                                     <button class="bgBtn purpleBgBtn w100"><i class="bx bx-sparkles me-2 f18 "></i> Generate Personalized Plan</button>
                                                 </div>
                                             </div>
-                                            <div class="col-lg-6">
+                                            <div class="col-md-6 col-sm-6">
                                                 <div class="shadowp p-5 lightBorderp rounded8" style="border-color: #bfdbfe;">
                                                     <h5 class="h5Head blueText mb-4"> <i class="bx bx-file-detail me-2 f20"></i> AI Welcome Packet</h5>
                                                     <p class="fs13 textGray">Generate a personalized welcome packet with company info, team introductions, and first-week tasks for Jane Wakefield.</p>
@@ -300,7 +296,7 @@
                                             </div>
                                         </div>
                                         <div class="row">
-                                            <div class="col-lg-12 mt20">
+                                            <div class="col-md-12 mt20">
                                                 <div class="bg-blue-50 rounded8 shadowp p-4">
                                                     <div class="occupancyBox">
                                                         <div class="topRow">
@@ -318,7 +314,7 @@
                                                     </p>
                                                 </div>
                                             </div>
-                                            <div class="col-lg-12 mt20">
+                                            <div class="col-md-12 mt20">
                                                 <div class="bg-yellow-50 rounded8 shadowp p-4">
                                                     <div class="dFlexGap">
                                                         <div>
@@ -332,7 +328,7 @@
 
                                                 </div>
                                             </div>
-                                            <div class="col-lg-12 mt-5">
+                                            <div class="col-md-12 mt-5">
                                                 <p class="font700 fs13 textGray">Complete these stages in order:</p>
                                                 <div class="flexRow mt-3">
                                                     <div class="shadowp rounded8 p-4 lightBorderp pt-5 ">
@@ -415,7 +411,6 @@
                                     <!-- main modal content end -->
                                     <!-- continue part -->
                                     <div class="interViewMain" style="display: none;">
-
                                         <button class="hoverBtn backToOriginal" style="border: unset;"><i class="bx bx-arrow-left-stroke f18 me-2"></i> Back to Overview</button>
                                         <div>
                                             <form action="">
@@ -559,7 +554,7 @@
                                                         </h6>
 
                                                         <div class="row">
-                                                            <div class="col-lg-6">
+                                                            <div class="col-md-6 col-sm-6">
                                                                 <label for="">DBS Level *</label>
                                                                 <select name="" id="" class="form-control">
                                                                     <option value="">Basic </option>
@@ -568,7 +563,7 @@
 
                                                                 </select>
                                                             </div>
-                                                            <div class="col-lg-6">
+                                                            <div class="col-md-6 col-sm-6">
                                                                 <label for="">DBS Status *</label>
                                                                 <select name="" id="" class="form-control">
                                                                     <option value="">Pending </option>
@@ -577,19 +572,19 @@
 
                                                                 </select>
                                                             </div>
-                                                            <div class="col-lg-6 m-t-10">
+                                                            <div class="col-md-6 col-sm-6 m-t-10">
                                                                 <label for="">DBS Certificate Number</label>
                                                                 <input type="number" class="form-control" placeholder="001234567890">
                                                             </div>
-                                                            <div class="col-lg-6 m-t-10">
+                                                            <div class="col-md-6 col-sm-6 m-t-10">
                                                                 <label for="">DBS Issue Date</label>
                                                                 <input type="date" class="form-control">
                                                             </div>
-                                                            <div class="col-lg-6 m-t-10">
+                                                            <div class="col-md-6 col-sm-6 m-t-10">
                                                                 <label for="">DBS Review Date (Auto: +3 years)</label>
                                                                 <input type="date" class="form-control">
                                                             </div>
-                                                            <div class="col-lg-6 m-t-10">
+                                                            <div class="col-md-6 col-sm-6 m-t-10">
                                                                 <label for="" style="visibility: hidden;">DBS Review Date (Auto: +3 years)</label>
                                                                 <div class="dFlexGap">
                                                                     <div>
@@ -598,7 +593,7 @@
                                                                     <p class="fs13 mb-0  font600">Subscribed to DBS Update Service</p>
                                                                 </div>
                                                             </div>
-                                                            <div class="col-lg-12 m-t-10">
+                                                            <div class="col-md-12 m-t-10">
                                                                 <label for="">DBS Certificate (Upload Scan)</label>
                                                                 <div class="uploadBox mb-2 text-center">
                                                                     <i class="bx bx-arrow-from-bottom"></i>
@@ -612,64 +607,64 @@
                                                         <h6 class="h6Head">Employment References (Minimum 2 Required)</h6>
                                                         <p class="fs13 textGray500 mb-0">Enter referee details and send automated requests, or manually upload reference documents.</p>
                                                         <div class="row mt-4">
-                                                            <div class="col-lg-4">
+                                                            <div class="col-md-4">
                                                                 <label for="">Referee Name *</label>
                                                                 <input type="text" class="form-control" placeholder=" Full Name">
                                                             </div>
-                                                            <div class="col-lg-4">
+                                                            <div class="col-md-4">
                                                                 <label for="">Organisation</label>
                                                                 <input type="text" class="form-control" placeholder="Company Name">
                                                             </div>
-                                                            <div class="col-lg-4">
+                                                            <div class="col-md-4">
                                                                 <label for="">Email Address</label>
                                                                 <input type="email" class="form-control" placeholder="referee@email.com">
                                                             </div>
-                                                            <div class="col-lg-12 m-t-10">
+                                                            <div class="col-md-12 m-t-10">
                                                                 <div class="shadowp rounded8 p24 lightBorderp">
                                                                     <p class="fs13 font600">Reference 2 * </p>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                         <div class="row mt-4">
-                                                            <div class="col-lg-4">
+                                                            <div class="col-md-4">
                                                                 <label for="">Referee Name *</label>
                                                                 <input type="text" class="form-control" placeholder=" Full Name">
                                                             </div>
-                                                            <div class="col-lg-4">
+                                                            <div class="col-md-4">
                                                                 <label for="">Organisation</label>
                                                                 <input type="text" class="form-control" placeholder="Company Name">
                                                             </div>
-                                                            <div class="col-lg-4">
+                                                            <div class="col-md-4">
                                                                 <label for="">Email Address</label>
                                                                 <input type="email" class="form-control" placeholder="referee@email.com">
                                                             </div>
-                                                            <div class="col-lg-12 m-t-10">
+                                                            <div class="col-md-12 m-t-10">
                                                                 <div class="shadowp rounded8  p24 lightBorderp">
                                                                     <p class="fs13 font600">Reference 2 * </p>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                         <div class="row mt-4">
-                                                            <div class="col-lg-4">
+                                                            <div class="col-md-4">
                                                                 <label for="">Referee Name *</label>
                                                                 <input type="text" class="form-control" placeholder=" Full Name">
                                                             </div>
-                                                            <div class="col-lg-4">
+                                                            <div class="col-md-4">
                                                                 <label for="">Organisation</label>
                                                                 <input type="text" class="form-control" placeholder="Company Name">
                                                             </div>
-                                                            <div class="col-lg-4">
+                                                            <div class="col-md-4">
                                                                 <label for="">Email Address</label>
                                                                 <input type="email" class="form-control" placeholder="referee@email.com">
                                                             </div>
-                                                            <div class="col-lg-12 m-t-10">
+                                                            <div class="col-md-12 m-t-10">
                                                                 <div class="shadowp rounded8  p24 lightBorderp">
                                                                     <p class="fs13 font600">Reference 2 * </p>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                         <div class="row mt-4">
-                                                            <div class="col-lg-12">
+                                                            <div class="col-md-12">
                                                                 <div class="bg-greenp-50 p-3" style="border: none;">
                                                                     <div class="dFlexGap">
                                                                         <div>
@@ -681,13 +676,13 @@
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                            <div class="col-lg-12 mt20">
+                                                            <div class="col-md-12 mt20">
                                                                 <label for="">Verification Notes</label>
                                                                 <textarea name="notes" class="form-control" rows="3" cols="15" placeholder="Any additional notes or comments..."></textarea>
                                                             </div>
                                                         </div>
                                                         <div class="row">
-                                                            <div class="col-lg-12">
+                                                            <div class="col-md-12">
                                                                 <button class="bgBtn w100 mt-4 pgreenBtn"><i class="bx bx-check-circle f18"></i>Save DBS & References</button>
                                                             </div>
                                                         </div>
@@ -721,15 +716,15 @@
 
                                                         <div class="shadowp lightBorderp p-3 appendRow rounded5">
                                                             <div class="row">
-                                                                <div class="col-lg-4">
+                                                                <div class="col-md-4">
                                                                     <label for="">Shift Date</label>
                                                                     <input type="date" class="form-control">
                                                                 </div>
-                                                                <div class="col-lg-4">
+                                                                <div class="col-md-4">
                                                                     <label for="">Shadowed Staff</label>
                                                                     <input type="text" class="form-control" placeholder="Staff Name">
                                                                 </div>
-                                                                <div class="col-lg-4">
+                                                                <div class="col-md-4">
                                                                     <label for="">Performance</label>
                                                                     <select name="" id="" class="form-control">
                                                                         <option value="">Excellent</option>
@@ -737,7 +732,7 @@
                                                                         <option value="">Satisfactory</option>
                                                                     </select>
                                                                 </div>
-                                                                <div class="col-lg-12 m-t-10">
+                                                                <div class="col-md-12 m-t-10">
                                                                     <textarea name="notes" class="form-control" rows="3" cols="15" placeholder="Feedback from shadow shift..."></textarea>
                                                                 </div>
                                                             </div>
@@ -829,7 +824,7 @@
                                                         <h6 class="h6Head">Competency Assessment</h6>
 
                                                         <div class="row mt-4">
-                                                            <div class="col-lg-6">
+                                                            <div class="col-md-6 col-sm-6">
                                                                 <label for="">Assessment Result *</label>
                                                                 <select name="" id="" class="form-control">
                                                                     <option value="">Pending </option>
@@ -837,11 +832,11 @@
                                                                     <option value="">Fail </option>
                                                                 </select>
                                                             </div>
-                                                            <div class="col-lg-6">
+                                                            <div class="col-md-6 col-sm-6">
                                                                 <label for="">Assessment Date</label>
                                                                 <input type="date" class="form-control">
                                                             </div>
-                                                            <div class="col-lg-12 m-t-10">
+                                                            <div class="col-md-12 m-t-10">
                                                                 <label for="">Assessed By (Supervisor)</label>
                                                                 <input type="date" class="form-control">
                                                             </div>

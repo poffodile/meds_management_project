@@ -471,7 +471,7 @@
           <li> <a href="#"><i class='bx bx-group'></i> <span>Staff</span></a></li>
           <li> <a href="#"><i class='bx bx-user-circle'></i> <span>Clients</span></a></li>
           <li> <a href="#"><i class='bx bx-send'></i> <span>Runs</span></a></li>
-          <li> <a href="{{ url('/roster/reports') }}"><i class='bx  bx-file-report'></i> <span>Reports</span></a></li>
+          <li> <a href="#"><i class='bx  bx-file-report'></i> <span>Reports</span></a></li>
           <li> <a href="#"><i class='bx bx-message'></i> <span>Communications</span></a></li>
           <li> <a href="#"><i class='bx bx-message'></i> <span>Client Feedback</span></a></li>
 
@@ -514,14 +514,16 @@
           <li> <a href="{{url('/roster/notifications')}}"><i class='bx  bx-bell'></i> <span>Notifications</span> </a></li>
           <li> <a href="{{ url('/roster/leave-request') }}"><i class='bx  bx-clipboard-detail'></i> <span>Leave Requests</span> </a></li>
           <li> <a href="{{ url('/roster/payroll-finance') }}"><i class='bx bx-file-detail'></i> <span>Payroll & Finance</span> </a></li>
-          <li> <a href="#!"><i class='bx  bx-file-report'></i> <span>Reports</span> </a></li>
+          <li> <a href="{{ url('/roster/reports') }}"><i class='bx  bx-file-report'></i> <span>Reports</span> </a></li>
+          <li> <a href="{{ url('/roster/onboarding-configuration') }}"><i
+                class='bx bx-cog'></i><span>Onboarding Configuration</span></a></li>
           <li> <a href="{{url('/roster/staffonboarding')}}"><i class='bx  bx-file-report'></i> <span>Staff Onboarding</span> </a></li>
           <li> <a href="{{url('/roster/clientonboarding')}}"><i class='bx  bx-file-report'></i> <span>Client Onboarding</span> </a></li>
           <li> <a href="#!"><i class='bx  bx-shield'></i> <span>Compliance Hub</span> </a></li>
           <li> <a href="{{url('/roster/task-center')}}"><i class='bx  bx-clipboard-detail'></i> <span>Task Center</span> </a></li>
           <li> <a href="#!"><i class='bx  bx-clipboard-detail'></i> <span>Action Plan Progress</span> </a></li>
           <li> <a href="#!"><i class='bx bx-file-detail'></i> <span>Reporting Engine</span> </a></li>
-          <li> <a href="#!"><i class='bx bx-file-detail'></i> <span>Audit Templates</span> </a></li>
+          <li> <a href="{{url('/roster/audit-log')}}"><i class='bx bx-file-detail'></i> <span>Audit Log</span> </a></li>
           <li> <a href="#!"><i class='bx bx-file-detail'></i> <span>Form Builder</span> </a></li>
           <li> <a href="#!"><i class='bx bx-group'></i> <span>CRM Dashboard</span> </a></li>
           <li> <a href="#!"><i class='bx  bx-message'></i> <span>Client Comms Hub</span> </a></li>
