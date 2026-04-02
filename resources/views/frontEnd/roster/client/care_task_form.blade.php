@@ -72,7 +72,7 @@
                                             <label>Client*</label>
                                             <select class="form-control checkCareTask" id="client_id" name="client_id">
                                             @foreach($child as $childVal)
-                                                <option value="{{$childVal->id}}" <?php if(!empty($clientCareTask) && $clientCareTask->client_id == $childVal->id){echo 'selected';}else{if($childVal->id == Auth::user()->id){echo 'selected';}}?>>{{$childVal->name}}</option>
+                                                <option value="{{$childVal->id}}" <?php if(!empty($clientCareTask) && $clientCareTask->client_id == $childVal->id){echo 'selected';}else{if($childVal->id == $client_id){echo 'selected';}}?>>{{$childVal->name}}</option>
                                             @endforeach
                                             </select>
                                         </div>
@@ -140,6 +140,7 @@
 
                                             <label>Assigned Carer</label>
                                             <select class="form-control" id="carer_id" name="carer_id">
+                                                <option value="0" selected disabled>Please select Carer</option>
                                                 @foreach($carer as $carerVal)
                                                 <option value="{{$carerVal->id}}" <?php if(!empty($clientCareTask) && $clientCareTask->carer_id == $carerVal->id){echo 'selected';}?>>{{$carerVal->name}}</option>
                                                 @endforeach
@@ -148,7 +149,7 @@
 
 
                                         </div>
-                                        <div class="col-lg-12  m-t-10">
+                                        <!-- <div class="col-lg-12  m-t-10">
 
                                             <label>Link to Visit (Time-Specific)</label>
                                             <select class="form-control" id="visit_id" name="visit_id">
@@ -157,24 +158,22 @@
                                             </select>
                                             <small class="formIns">Task will appear for carer during this visit </small>
 
-                                        </div>
+                                        </div> -->
                                         <div class="col-lg-12  m-t-10">
 
                                             <label>Link to Shift</label>
                                             <select class="form-control" id="shift_id" name="shift_id">
-                                            @foreach($scheduled_shifts as $shiftVal)
-                                                <option value="{{$shiftVal->id}}" <?php if(!empty($clientCareTask) && $clientCareTask->shift_id == $shiftVal->id){echo 'selected';}?>>{{ date('M d, Y', strtotime($shiftVal->start_date)) }} - {{ date('h:i A', strtotime($shiftVal->start_time)) }} - {{ date('h:i A', strtotime($shiftVal->end_time)) }}</option>
-                                            @endforeach
+                                            
                                             </select>
                                             <small class="formIns">Task will appear for carer during this shift </small>
-
                                         </div>
+                                        <a href="{{url('/roster/schedule-shift')}}" class="btn blackBtn" style="color:fff; float: right; margin-inline-end: 15px;" target="_blank">Add Shift</a>
                                     </div>
 
                                 </div>
 
                             </div>
-                            <div class="emergencyMain p-4 mb25">
+                            <!-- <div class="emergencyMain p-4 mb25">
                                 <h5 class="h5Head"> <i class="careRiskIcon bx  bx-alert-triangle me-2"></i> Risk & Safeguarding</h5>
                                 <div class="carer-form">
                                     <div class="row mb-4 mt20">
@@ -218,7 +217,7 @@
 
                                 </div>
 
-                            </div>
+                            </div> -->
                             <div class="emergencyMain p-4 mb25">
                                 <h5 class="h5Head">Task Details</h5>
                                 <div class="carer-form">
@@ -249,6 +248,58 @@
 <script src="{{ url('public/js/roster/client/client_details.js')}}" defer></script>
 <script>
     var careTaskFormSaveUrl = "{{url('roster/care-task-save')}}";
+</script>
+<script>
+    $(document).ready(function(){
+        var taskcarer_id = $("#carer_id option:selected").val();
+        var selctedShift_id = 0;
+        <?php if(!empty($clientCareTask) && $clientCareTask->shift_id !=''){?>
+            selctedShift_id = '{{$clientCareTask->shift_id}}';
+        <?php }?>
+        if(taskcarer_id != 0){
+            show_shift(taskcarer_id,selctedShift_id);
+        }
+    });
+    $(document).on('change',"#carer_id",function(){
+        show_shift($("#carer_id option:selected").val());
+    });
+    function show_shift(carer_id,selctedShift_id){
+        $.ajax({
+            type: "POST",
+            url: "{{url('roster/get-carer-shifts')}}",
+            data: {carer_id:carer_id,_token:'{{csrf_token()}}'},
+            success: function (response) {
+                console.log(response);
+                if (typeof isAuthenticated === "function") {
+                    if (isAuthenticated(response) == false) {
+                        return false;
+                    }
+                } 
+                if(response.success === true){
+                    var data = response.data;
+                    $("#shift_id").html('');
+                    data.forEach(function(val){
+                        let start_date = moment(val.start_date).format('MMM DD, YYYY');
+
+                        let start_time = moment(val.start_time, "HH:mm:ss").format('HH:mm');
+
+                        let end_time = moment(val.end_time, "HH:mm:ss").format('HH:mm');
+                        var selected = '';
+                        if(selctedShift_id){
+                            selected = 'selected';
+                        }
+                        $("#shift_id").append(
+                            `<option value="${val.id}" ${selected}>${start_date} - ${start_time} - ${end_time}</option>`
+                        );
+                    });
+                }
+            },
+            error: function (xhr, status, error) {
+                var errorMessage = xhr.status + ': ' + xhr.statusText;
+                alert('Error - ' + errorMessage + "\nMessage: " + error);
+            }
+        });
+    }
 </script>
     @endsection
 

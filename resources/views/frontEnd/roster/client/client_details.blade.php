@@ -11,31 +11,61 @@
         <div class="topHeaderCont">
             <div>
                 <h1>{{$clientDetails['name']}}</h1>
-                <p class="header-subtitle"><span>{{$status}}</span> local authority</p>
+                <p class="header-subtitle"><span class="careBadg greenBadges me-2">active</span>
+                    <span>{{$status}}</span> local authority
+                </p>
             </div>
             <div class="header-actions addnewicons">
                 <button class="btn borderBtn editClient" data-toggle="modal" data-target="#addServiceUserModal" data-child_id="{{$clientDetails['id']}}"><i class='bx  bx-edit'></i> Edit Client</button>
-                <button class="btn borderBtn"><i class='bx  bx-arrow-in-up-square-half'></i> Import Documents</button>
+                <!-- <button class="btn borderBtn"><i class='bx  bx-arrow-in-up-square-half'></i> Import Documents</button> -->
+                <button class="btn borderBtn" type="button" data-toggle="modal" data-target="#importDoc"><i class='bx  bx-arrow-in-up-square-half'></i> Import Documents</button>
                 <button class="btn allBtnUseColor"><i class='bx  bx-sparkles'></i> Generate Care Plan</button>
 
             </div>
         </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <!-- yellow  medium  risk-->
+                <div id="headerAlertHtml"></div>
+
+
+
+
+                <div class="moreAllertsSec mt-3">
+
+                </div>
+                <div class="text-center mt-3">
+                    <button class="borderBtn showMoreBtn w100" style="display:none">
+                        <i class="bx bx-chevron-down me-2 fs23"></i>
+                        <span></span>
+                    </button>
+                    <div class="mt-3 headerAlertCounting" style="display:none">
+                        <span class="fs12 redtext font600 me-3" id="headerCriticalAlertsCount">0 Critical</span>
+                        <span class="fs12 orangeText font600 me-3" id="headerHighAlertsCount">.0 High</span>
+                        <span class="fs12 muteText font600" id="headerOtherAlertsCount">. 0 Other</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- above part of tab -->
         <div class="calendarTabs leaveRequesttabs employeeDetailsTabs  m-t-20">
             <div class="clientOverTabs">
                 <div class="tabs p-1 ">
                     <button class="tab active" data-tab="clientDetailsTab"> Details </button>
                     <button class="tab" data-tab="clientOnboardingTab"> Onboarding </button>
                     <button class="tab" data-tab="clientCareTasksTab" id="clientCareTasksTabBtn" onclick="getCareTask()"> Care Tasks </button>
+                    <!-- onclick="getAlerts()" -->
                     <button class="tab" data-tab="clientAlertsTab"> Alerts </button>
                     <button class="tab" data-tab="clientAIInsightsTab"> AI Insights </button>
-                    <button class="tab" data-tab="clientCarePlanTab"> Care Plan </button>
+                    <button class="tab" data-tab="clientCarePlanTab" onclick="getCarePlan()"> Care Plan </button>
                     <button class="tab" data-tab="clientRiskAssessmentsTab"> Risk Assessments </button>
                     <button class="tab" data-tab="clientMedicationTab" onclick="getMedication()"> Medication </button>
                     <button class="tab" data-tab="clientPEEPTab"> PEEP </button>
                     <button class="tab" data-tab="clientRepositioningTab"> Repositioning </button>
                     <button class="tab" data-tab="clientBehaviorTab"> Behavior </button>
                     <button class="tab" data-tab="clientMentalCapacityTab"> Mental Capacity </button>
-                    <button class="tab" data-tab="clientDoLSTab"> DoLS </button>
+                    <button class="tab" data-tab="clientDoLSTab" onclick="showDolsList()"> DoLS </button>
                     <button class="tab" data-tab="clientDNACPRTab"> DNACPR </button>
                     <button class="tab" data-tab="clientSafeguardingTab"> Safeguarding </button>
                     <button class="tab" data-tab="clientConsentTab"> Consent </button>
@@ -248,7 +278,6 @@
                                                         </div>
                                                     </div>
 
-
                                                     <div class="col-md-12">
                                                         <div class="header-actions">
                                                             <button class="btn allbuttonDarkClr " type="submit"> Save Consent </button>
@@ -349,7 +378,6 @@
                                         </div>
                                     </div>
 
-
                                 </div>
                             </div>
                             <!-- boarding click  Consent & Capacity end -->
@@ -364,7 +392,6 @@
                                                 <h6 class="m-0">Care Assessment</h6>
                                                 <p class="header-subtitle mb-0">Completed: 09/01/2026</p>
                                             </div>
-
                                         </div>
                                     </div>
                                     <div class="d-flex gap-4 align-items-center">
@@ -1302,7 +1329,7 @@
                             </div>
                             <div class="actions mt-0">
                                 <button class="btn borderBtn"> <i class="bx  bx-sparkles"></i> AI Generate from Care Needs</button>
-                                <button class="allBtnUseColor" type="button" onclick="window.location.href='{{url('roster/care-task-add')}}'"> <i class='bx  bx-plus'></i> Add Task</button>
+                                <button class="allBtnUseColor" type="button" onclick="window.location.href='{{url('roster/care-task-add?client_id=')}}{{$client_id}}'"> <i class='bx  bx-plus'></i> Add Task</button>
                             </div>
                         </header>
                         <div class="p-20 p-b-0">
@@ -1515,10 +1542,10 @@
                                 <div class="dFlexNoAlign mb-2">
                                     <div class="onlyheadingmain radIconClr"><i class='bx  bx-alert-triangle'></i></i> Client Alerts </div>
                                     <div>
-                                        <span class="careBadg redDarkBadges">11 Active</span>
+                                        <span class="careBadg redDarkBadges" id="activeAlertsCount">0 Active</span>
                                     </div>
                                     <div>
-                                        <span class="careBadg redDarkBadgesAni">3 Critical</span>
+                                        <span class="careBadg redDarkBadgesAni" id="criticalAlertsCount">0 Critical</span>
                                     </div>
                                 </div>
                                 <p>Manage important alerts and warnings for this client</p>
@@ -1534,53 +1561,58 @@
 
                                 <div class="createNewAlert"><i class='bx  bx-alert-triangle'></i></i> Create New Alert </div>
 
-                                <form action="" class="addAlertForm">
+                                <form id="clientAlertForm" class="addAlertForm">
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label>Alert Type *</label>
-                                                <select class="form-control">
-                                                    <option>Single Day</option>
+                                                <select class="form-control checkClientAlert" id="alert_type_id" name="alert_type_id">
+                                                    @foreach($alert_type as $alertVal)
+                                                    <option value="{{$alertVal->id}}">{{$alertVal->title}}</option>
+                                                    @endforeach
                                                 </select>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label>Severity *</label>
-                                                <select class="form-control">
-                                                    <option>Single Day</option>
+                                                <select class="form-control checkClientAlert" id="severity" name="severity">
+                                                    <option value="Low">Low</option>
+                                                    <option value="Medium">Medium</option>
+                                                    <option value="High">High</option>
+                                                    <option value="Critical">Critical</option>
                                                 </select>
                                             </div>
                                         </div>
                                         <div class="col-md-12">
                                             <div class="form-group">
                                                 <label>Alert Title *</label>
-                                                <input type="text" class="form-control" name="" placeholder="e.g., High Fall Risk - Use Walking Frame">
+                                                <input type="text" class="form-control checkClientAlert" name="alert_title" id="alert_title" placeholder="e.g., High Fall Risk - Use Walking Frame">
                                             </div>
                                         </div>
 
                                         <div class="col-md-12">
                                             <div class="form-group">
                                                 <label>Detailed Description *</label>
-                                                <textarea name="short_description" required="" class="form-control" rows="3" cols="20" placeholder="Provide detailed information about this alert..."></textarea>
+                                                <textarea name="description" id="alert_description" class="form-control checkClientAlert" rows="3" cols="20" placeholder="Provide detailed information about this alert..."></textarea>
                                             </div>
                                         </div>
                                         <div class="col-md-12">
                                             <div class="form-group">
                                                 <label>Action Required (Optional)</label>
-                                                <textarea name="short_description" required="" class="form-control" rows="2" cols="20" placeholder="Specific actions staff should take..."></textarea>
+                                                <textarea name="action_required" id="action_required" class="form-control" rows="2" cols="20" placeholder="Specific actions staff should take..."></textarea>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label>Expiry Date (Optional)</label>
-                                                <input type="date" class="form-control" name="" placeholder="e.g., High Fall Risk - Use Walking Frame">
+                                                <input type="date" class="form-control" name="expiry_date" id="expiry_date">
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="requiresStaff checkbox">
                                                 <label>
-                                                    <input type="checkbox"> Requires Staff Acknowledgment
+                                                    <input type="checkbox" id="requires_staff_acknowledgment" name="requires_staff_acknowledgment" value="0"> Requires Staff Acknowledgment
                                                 </label>
                                             </div>
                                         </div>
@@ -1589,32 +1621,32 @@
                                                 <label>Display Alert On (select sections):</label>
                                                 <div class="col-md-4">
                                                     <div class="checkbox">
-                                                        <label><input type="checkbox" checked style="pointer-events: none;"> All </label>
+                                                        <label><input type="checkbox" checked style="pointer-events: none;" id="all" name="all" value="1"> All </label>
                                                     </div>
                                                     <div class="checkbox">
-                                                        <label><input type="checkbox" checked disabled> medication </label>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-4">
-                                                    <div class="checkbox">
-                                                        <label><input type="checkbox" checked disabled> dashboard </label>
-                                                    </div>
-                                                    <div class="checkbox">
-                                                        <label><input type="checkbox" checked disabled> visits </label>
+                                                        <label><input type="checkbox" checked disabled value="1" id="medication" name="medication"> medication </label>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-4">
                                                     <div class="checkbox">
-                                                        <label><input type="checkbox" checked disabled> care plan </label>
+                                                        <label><input type="checkbox" checked disabled value="1" id="dashboard" name="dashboard"> dashboard </label>
                                                     </div>
                                                     <div class="checkbox">
-                                                        <label><input type="checkbox" checked disabled> schedule </label>
+                                                        <label><input type="checkbox" checked disabled value="1" id="visits" name="visits"> visits </label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="checkbox">
+                                                        <label><input type="checkbox" checked disabled value="1" id="care_plan" name="care_plan"> care plan </label>
+                                                    </div>
+                                                    <div class="checkbox">
+                                                        <label><input type="checkbox" checked disabled value="1" id="schedule" name="schedule"> schedule </label>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="col-md-12">
-                                            <button class="btn addAssessmentBtn " type="submit"> Create Alert </button>
+                                            <button class="btn addAssessmentBtn saveClientAlert" type="button"> Create Alert </button>
                                             <button class="btn whiteBgBtncolor" type="submit"> Cancel </button>
                                         </div>
                                     </div>
@@ -1632,42 +1664,58 @@
                                         </div>
                                     </div>
                                 </div>
-                                <form action="">
-                                    <div class="row">
-                                        <div class="col-md-3">
-                                            <div class="form-group">
-                                                <label>Severity</label>
-                                                <select class="form-control">
-                                                    <option>All Severities</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="form-group">
-                                                <label>Status</label>
-                                                <select class="form-control">
-                                                    <option>All Status</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="form-group">
-                                                <label>Type</label>
-                                                <select class="form-control">
-                                                    <option>All Type</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="form-group">
-                                                <label>Sort By</label>
-                                                <select class="form-control">
-                                                    <option>Severity</option>
-                                                </select>
-                                            </div>
+                                <!-- <form action=""> -->
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label>Severity</label>
+                                            <select class="form-control severity_AlertFilter">
+                                                <option value="1">All Severities</option>
+                                                <option value="Critical">Critical</option>
+                                                <option value="High">High</option>
+                                                <option value="Medium">Medium</option>
+                                                <option value="Low">Low</option>
+                                            </select>
                                         </div>
                                     </div>
-                                </form>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label>Status</label>
+                                            <select class="form-control status_alertFilter">
+                                                <option value="0">All Status</option>
+                                                <option value="1">Active</option>
+                                                <option value="2">Resolved</option>
+                                                <option value="3">Archived</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label>Type</label>
+                                            <select class="form-control type_alertFilter">
+                                                <option value="0">All Type</option>
+                                                <option value="1">Fall Risk</option>
+                                                <option value="2">Dietary</option>
+                                                <option value="3">Behavioral</option>
+                                                <option value="4">Medical</option>
+                                                <option value="5">Medication</option>
+                                                <option value="8">Safeguarding</option>
+                                                <option value="9">Allergy</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label>Sort By</label>
+                                            <select class="form-control sortby_alertFilter">
+                                                <option value="1">Severity</option>
+                                                <option value="2">Date Created</option>
+                                                <option value="3">Alert Type</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- </form> -->
                             </div>
                         </div>
                         <!-- pr alert box -->
@@ -1676,16 +1724,17 @@
                             <div class="bg-blue-50 p-3 mb-3  rounded8" id="actionBox" style="display:none">
                                 <div class="d-flex justify-content-between flexWrap ">
                                     <div class="fs13">
-                                        <p class="mb-2 darkBlueTextp  font600"> 9 selected </p>
+                                        <p class="mb-2 darkBlueTextp  font600" id="selectedCheckCount"> 9 selected </p>
                                         <p class="mb-0 blueText ">Critical & safeguarding/medication/allergy alerts require individual review</p>
                                     </div>
                                     <div>
                                         <div class="d-flex flexWrap gap-2 align-items-center">
-                                            <div class="userMum">
+                                            <div class="userMum all_acknowledgement">
                                                 <span class="title mt-0 bgWhite50"><i class="bx bx-check-circle f18 me-2"></i> Acknowledge</span>
                                             </div>
                                             <div>
-                                                <span class="careBadg darkGreenBadges">Resolve (9)</span>
+                                                <span class="careBadg darkGreenBadges" id="rosolveAlertCount">Resolve (9)</span>
+                                                <input type="hidden" id="actualRosolveAlertCount">
                                             </div>
                                             <div>
                                                 <i class='bx bx-x-circle f18 ms-2' id="closeActionBox"></i>
@@ -1695,80 +1744,83 @@
                                 </div>
                             </div>
                             <!-- red box for critical -->
-                            <div class="redBorder borderLeftThick  rounded8 urReqSec p-3 manageDSysAlrt">
-                                <div class="dFlexNoAlign">
-                                    <div>
-                                        <input class="checkBoxHW trans alertCheck" type="checkbox">
-                                    </div>
-                                    <div class="flex1">
-                                        <div class="dFlexNoAlign flexWrap">
-                                            <div>
-                                                <i class="bx bx-alert-circle redtext f18"></i>
-                                            </div>
-                                            <div>
-                                                <h6 class="mb-0 h6Head font600 blackText">Missed Medication - Dextromethorphan
-                                                </h6>
-                                            </div>
-                                            <div>
-                                                <span class="carebadg redBorderBadg">
-                                                    Critical
-                                                </span>
-                                            </div>
-                                            <div>
-                                                <span class="careBadg greenbadges">
-                                                    active
-                                                </span>
-                                            </div>
-                                            <div class="userMum ">
-                                                <span class="title bgWhite50 mt-0 hoverBg">medication</span>
-                                            </div>
-                                        </div>
-                                        <p class="fs12 textGray">Dextromethorphan (500) was due at 10:24 and has not been administered.</p>
+                            <div id="renderHtmlClientAlert">
+                                <!-- <div class="redBorder borderLeftThick  rounded8 urReqSec p-3 manageDSysAlrt mt-2 mb-2">
+                                    <div class="dFlexNoAlign">
                                         <div>
-                                            <span class="careBadg yellowBorderLight yellowHoverUnset">
-                                                Requires Individual Review
-                                            </span>
+                                            <input class="checkBoxHW trans alertCheck" type="checkbox">
                                         </div>
-                                        <div class="bg-blue-50 fs12 p-2 rounded8 mt-3 mb-2">
-                                            <p class=" font700 darkBlueTextp mb-1">Required Action: </p>
-                                            <p class=" darkBlueTextp mb-0">
-                                                Administer medication immediately if still within safe window, otherwise contact prescriber
-                                            </p>
-                                        </div>
-                                        <div class="dFlexNoAlign fs12 textGray">
-
-                                            <p class="mb-2">Created: <span class="font600 blackText me-3">Feb 17</span>by Unknown Staff</p>
-
-
-                                        </div>
-                                        <div>
-                                            <p class="mb-2 fs12 textGray verticalCenter"> <i class="bx bx-eye  me-1"></i>Shown on: <span class="font600 blackText ms-1"> dashboard, medication, all</span></p>
-                                        </div>
-                                        <div class="bg-yellow-50 P-2 rounded8">
-                                            <div class="flexBw">
+                                        <div class="flex1">
+                                            <div class="dFlexNoAlign flexWrap">
                                                 <div>
-                                                    <p class="fs12 mb-0 darkOrangeTextp"><i class="bx bx-bell me-2"></i>Requires Acknowledgment
-                                                    </p>
+                                                    <i class="bx bx-alert-circle redtext f18"></i>
                                                 </div>
-                                                <div class="userMum">
-                                                    <span class="title bgWhite50 hoverBg mt-0 "><i class="bx bx-check-circle f18 me-2"></i>Acknowledge</span>
+                                                <div>
+                                                    <h6 class="mb-0 h6Head font600 blackText">Missed Medication - Dextromethorphan
+                                                    </h6>
+                                                </div>
+                                                <div>
+                                                    <span class="carebadg redBorderBadg">
+                                                        Critical
+                                                    </span>
+                                                </div>
+                                                <div>
+                                                    <span class="careBadg greenbadges">
+                                                        active
+                                                    </span>
+                                                </div>
+                                                <div class="userMum ">
+                                                    <span class="title bgWhite50 mt-0 hoverBg">medication</span>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="dFlexNoAlign mt-2 allertMsgBtn">
-                                            <div class="userMum">
-                                                <span class="title pgreenBtn hoverBg mt-0" style="color: #fff;"><i class="bx bx-check-circle f18 me-2"></i>Resolve</span>
+                                            <p class="fs12 textGray">Dextromethorphan (500) was due at 10:24 and has not been administered.</p>
+                                            <div>
+                                                <span class="careBadg yellowBorderLight yellowHoverUnset">
+                                                    Requires Individual Review
+                                                </span>
                                             </div>
+                                            <div class="bg-blue-50 fs12 p-2 rounded8 mt-3 mb-2">
+                                                <p class=" font700 darkBlueTextp mb-1">Required Action: </p>
+                                                <p class=" darkBlueTextp mb-0">
+                                                    Administer medication immediately if still within safe window, otherwise contact prescriber
+                                                </p>
+                                            </div>
+                                            <div class="dFlexNoAlign fs12 textGray">
 
-                                            <div class="userMum ">
-                                                <span class="title bgWhite50 hoverBg mt-0 "><i class="bx bx-archive-alt f18 me-2"></i>Archive</span>
+                                                <p class="mb-2">Created: <span class="font600 blackText me-3">Feb 17</span>by Unknown Staff</p>
+
+
+                                            </div>
+                                            <div>
+                                                <p class="mb-2 fs12 textGray verticalCenter"> <i class="bx bx-eye  me-1"></i>Shown on: <span class="font600 blackText ms-1"> dashboard, medication, all</span></p>
+                                            </div>
+                                            <div class="bg-yellow-50 P-2 rounded8">
+                                                <div class="flexBw">
+                                                    <div>
+                                                        <p class="fs12 mb-0 darkOrangeTextp"><i class="bx bx-bell me-2"></i>Requires Acknowledgment
+                                                        </p>
+                                                    </div>
+                                                    <div class="userMum">
+                                                        <span class="title bgWhite50 hoverBg mt-0 "><i class="bx bx-check-circle f18 me-2"></i>Acknowledge</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="dFlexNoAlign mt-2 allertMsgBtn">
+                                                <div class="userMum">
+                                                    <span class="title pgreenBtn hoverBg mt-0" style="color: #fff;"><i class="bx bx-check-circle f18 me-2"></i>Resolve</span>
+                                                </div>
+
+                                                <div class="userMum ">
+                                                    <span class="title bgWhite50 hoverBg mt-0 "><i class="bx bx-archive-alt f18 me-2"></i>Archive</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                </div> -->
                             </div>
+                            <div id="clientAlertPagination"></div>
                             <!-- red for risk -->
-                            <div class="redBorder borderLeftThick  rounded8 urReqSec p-3 manageDSysAlrt">
+                            <!-- <div class="redBorder borderLeftThick  rounded8 urReqSec p-3 manageDSysAlrt">
                                 <div class="dFlexNoAlign">
                                     <div>
                                         <input class="checkBoxHW trans alertCheck" type="checkbox">
@@ -1821,9 +1873,9 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
                             <!-- blue box for low -->
-                            <div class="blueBorder borderLeftThick rounded8 lightBlueBg p-3 manageDSysAlrt">
+                            <!-- <div class="blueBorder borderLeftThick rounded8 lightBlueBg p-3 manageDSysAlrt">
                                 <div class="dFlexNoAlign">
                                     <div>
                                         <input class="checkBoxHW trans alertCheck" type="checkbox">
@@ -1857,12 +1909,6 @@
                                                 Requires Individual Review
                                             </span>
                                         </div>
-                                        <!-- <div class="bg-blue-50 fs12 p-2 rounded8 mt-3 mb-2">
-                                            <p class=" font700 darkBlueTextp mb-1">Required Action: </p>
-                                            <p class=" darkBlueTextp mb-0">
-                                                Administer medication immediately if still within safe window, otherwise contact prescriber
-                                            </p>
-                                        </div> -->
                                         <div class="dFlexNoAlign fs12 textGray">
 
                                             <p class="mb-2">Created: <span class="font600 blackText me-3">Feb 17</span>by Unknown Staff</p>
@@ -1872,17 +1918,7 @@
                                         <div>
                                             <p class="mb-2 fs12 textGray verticalCenter"> <i class="bx bx-eye  me-1"></i>Shown on: <span class="font600 blackText ms-1"> dashboard, medication, all</span></p>
                                         </div>
-                                        <!-- <div class="bg-yellow-50 P-2 rounded8">
-                                            <div class="flexBw">
-                                                <div>
-                                                    <p class="fs12 mb-0 darkOrangeTextp"><i class="bx bx-bell me-2"></i>Requires Acknowledgment
-                                                    </p>
-                                                </div>
-                                                <div class="userMum">
-                                                    <span class="title bgWhite50 hoverBg mt-0 "><i class="bx bx-check-circle f18 me-2"></i>Acknowledge</span>
-                                                </div>
-                                            </div>
-                                        </div> -->
+                                        
                                         <div class="dFlexNoAlign mt-2 allertMsgBtn">
                                             <div class="userMum ">
                                                 <span class="title pgreenBtn hoverBg mt-0" style="color: #fff;"><i class="bx bx-check-circle f18 me-2"></i>Resolve</span>
@@ -1894,9 +1930,9 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
                             <!--orange high -->
-                            <div class="orangeBorder borderLeftThick rounded8 bg-orange-50 p-3 manageDSysAlrt">
+                            <!-- <div class="orangeBorder borderLeftThick rounded8 bg-orange-50 p-3 manageDSysAlrt">
                                 <div class="dFlexNoAlign">
                                     <div>
                                         <input class="checkBoxHW trans alertCheck" type="checkbox">
@@ -1965,9 +2001,9 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
                             <!--yellow medium -->
-                            <div class="yellowBorder borderLeftThick rounded8 bg-yellow-50 p-3 manageDSysAlrt">
+                            <!-- <div class="yellowBorder borderLeftThick rounded8 bg-yellow-50 p-3 manageDSysAlrt">
                                 <div class="dFlexNoAlign">
                                     <div>
                                         <input class="checkBoxHW trans alertCheck" type="checkbox">
@@ -2025,16 +2061,16 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
                         </div>
                         <!-- pr alert box end -->
 
 
 
-                        <div class="leavebanktabCont">
+                        <!-- <div class="leavebanktabCont">
                             <i class='bx  bx-alert-triangle'></i>
                             <p>No alerts match the selected filters</p>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
                 <div class="content" id="clientAIInsightsTab">
@@ -2525,179 +2561,12 @@
                             </div>
 
                             <!-- Care Plan Card -->
-                            <div class="planCard">
-                                <div class="planTop">
-                                    <div class="planTitle">
-                                        <span class="heartIcon"><i class='bx  bx-heart'></i></span>
-                                        Initial Care Plan
-                                        <span class="draftBadge">draft</span>
-                                    </div>
-                                    <div class="planActions">
-                                        <button class="viewPlanBtn"><i class='bx  bx-eye'></i> </button>
-                                        <button><i class='bx  bx-pencil'></i> </button>
-                                        <button class="danger"><i class='bx  bx-trash'></i> </button>
-                                    </div>
-                                </div>
+                            <div class="carePlanRenderHtmlData">
 
-                                <div class="planMeta">
-                                    <div><strong>Setting:</strong> residential</div>
-                                    <div><strong>Assessed:</strong> Jan 3, 2026</div>
-                                    <div><strong>By:</strong> Pratima Pathak</div>
-                                    <div><strong>Review:</strong> Apr 3, 2026</div>
-                                </div>
-
-                                <div class="planFooter">
-                                    <span><i class='bx  bx-radio-circle-marked'></i> 5 objectives</span>
-                                    <span><i class='bx  bx-list'></i> 0 tasks</span>
-                                    <span><i class='bx  bx-pill'></i> 6 medications</span>
-                                </div>
                             </div>
+                            <div class="clientCarePlanPagnation">
 
-                            <div class="planCard">
-                                <div class="planTop">
-                                    <div class="planTitle">
-                                        <span class="heartIcon"><i class='bx  bx-heart'></i></span>
-                                        Initial Care Plan
-                                        <span class="draftBadge">draft</span>
-                                    </div>
-
-                                    <div class="planActions">
-                                        <button class="viewPlanBtn"><i class='bx  bx-eye'></i> </button>
-                                        <button><i class='bx  bx-pencil'></i> </button>
-                                        <button class="danger"><i class='bx  bx-trash'></i> </button>
-                                    </div>
-                                </div>
-
-                                <div class="planMeta">
-                                    <div><strong>Setting:</strong> residential</div>
-                                    <div><strong>Assessed:</strong> Jan 3, 2026</div>
-                                    <div><strong>By:</strong> Pratima Pathak</div>
-                                    <div><strong>Review:</strong> Apr 3, 2026</div>
-                                </div>
-
-                                <div class="planFooter">
-                                    <span><i class='bx  bx-radio-circle-marked'></i> 5 objectives</span>
-                                    <span><i class='bx  bx-list'></i> 0 tasks</span>
-                                    <span><i class='bx  bx-pill'></i> 6 medications</span>
-                                </div>
                             </div>
-
-                            <div class="planCard">
-                                <div class="planTop">
-                                    <div class="planTitle">
-                                        <span class="heartIcon"><i class='bx  bx-heart'></i></span>
-                                        Initial Care Plan
-                                        <span class="draftBadge">draft</span>
-                                    </div>
-
-                                    <div class="planActions">
-                                        <button class="viewPlanBtn"><i class='bx  bx-eye'></i> </button>
-                                        <button><i class='bx  bx-pencil'></i> </button>
-                                        <button class="danger"><i class='bx  bx-trash'></i> </button>
-                                    </div>
-                                </div>
-
-                                <div class="planMeta">
-                                    <div><strong>Setting:</strong> residential</div>
-                                    <div><strong>Assessed:</strong> Jan 3, 2026</div>
-                                    <div><strong>By:</strong> Pratima Pathak</div>
-                                    <div><strong>Review:</strong> Apr 3, 2026</div>
-                                </div>
-
-                                <div class="planFooter">
-                                    <span><i class='bx  bx-radio-circle-marked'></i> 5 objectives</span>
-                                    <span><i class='bx  bx-list'></i> 0 tasks</span>
-                                    <span><i class='bx  bx-pill'></i> 6 medications</span>
-                                </div>
-                            </div>
-
-                            <div class="planCard">
-                                <div class="planTop">
-                                    <div class="planTitle">
-                                        <span class="heartIcon"><i class='bx  bx-heart'></i></span>
-                                        Initial Care Plan
-                                        <span class="draftBadge">draft</span>
-                                    </div>
-
-                                    <div class="planActions">
-                                        <button><i class='bx  bx-eye'></i> </button>
-                                        <button><i class='bx  bx-pencil'></i> </button>
-                                        <button class="danger"><i class='bx  bx-trash'></i> </button>
-                                    </div>
-                                </div>
-
-                                <div class="planMeta">
-                                    <div><strong>Setting:</strong> residential</div>
-                                    <div><strong>Assessed:</strong> Jan 3, 2026</div>
-                                    <div><strong>By:</strong> Pratima Pathak</div>
-                                    <div><strong>Review:</strong> Apr 3, 2026</div>
-                                </div>
-
-                                <div class="planFooter">
-                                    <span><i class='bx  bx-radio-circle-marked'></i> 5 objectives</span>
-                                    <span><i class='bx  bx-list'></i> 0 tasks</span>
-                                    <span><i class='bx  bx-pill'></i> 6 medications</span>
-                                </div>
-                            </div>
-
-                            <div class="planCard">
-                                <div class="planTop">
-                                    <div class="planTitle">
-                                        <span class="heartIcon"><i class='bx  bx-heart'></i></span>
-                                        Initial Care Plan
-                                        <span class="draftBadge">draft</span>
-                                    </div>
-
-                                    <div class="planActions">
-                                        <button><i class='bx  bx-eye'></i> </button>
-                                        <button><i class='bx  bx-pencil'></i> </button>
-                                        <button class="danger"><i class='bx  bx-trash'></i> </button>
-                                    </div>
-                                </div>
-
-                                <div class="planMeta">
-                                    <div><strong>Setting:</strong> residential</div>
-                                    <div><strong>Assessed:</strong> Jan 3, 2026</div>
-                                    <div><strong>By:</strong> Pratima Pathak</div>
-                                    <div><strong>Review:</strong> Apr 3, 2026</div>
-                                </div>
-
-                                <div class="planFooter">
-                                    <span><i class='bx  bx-radio-circle-marked'></i> 5 objectives</span>
-                                    <span><i class='bx  bx-list'></i> 0 tasks</span>
-                                    <span><i class='bx  bx-pill'></i> 6 medications</span>
-                                </div>
-                            </div>
-
-                            <div class="planCard">
-                                <div class="planTop">
-                                    <div class="planTitle">
-                                        <span class="heartIcon"><i class='bx  bx-heart'></i></span>
-                                        Initial Care Plan
-                                        <span class="draftBadge">draft</span>
-                                    </div>
-
-                                    <div class="planActions">
-                                        <button><i class='bx  bx-eye'></i> </button>
-                                        <button><i class='bx  bx-pencil'></i> </button>
-                                        <button class="danger"><i class='bx  bx-trash'></i> </button>
-                                    </div>
-                                </div>
-
-                                <div class="planMeta">
-                                    <div><strong>Setting:</strong> residential</div>
-                                    <div><strong>Assessed:</strong> Jan 3, 2026</div>
-                                    <div><strong>By:</strong> Pratima Pathak</div>
-                                    <div><strong>Review:</strong> Apr 3, 2026</div>
-                                </div>
-
-                                <div class="planFooter">
-                                    <span><i class='bx  bx-radio-circle-marked'></i> 5 objectives</span>
-                                    <span><i class='bx  bx-list'></i> 0 tasks</span>
-                                    <span><i class='bx  bx-pill'></i> 6 medications</span>
-                                </div>
-                            </div>
-
                         </div>
 
                     </div>
@@ -2720,11 +2589,11 @@
                             <div class="assessmentDetails leave-card p-0">
                                 <header class="panel-heading headingCapitilize careTaskheader">
                                     <div class="clientHeadung">
-                                        <div class="onlyheadingmain blueIconClr"><i class='bx  bx-heart'></i> Care Plan - Logan Jones </div>
+                                        <div class="onlyheadingmain blueIconClr"><i class='bx  bx-heart'></i> Care Plan - {{$clientDetails['name']}} </div>
                                         <p>initial Assessment • residential care</p>
                                     </div>
                                     <div class="actions mt-0">
-                                        <span class="roundBtntag greenShowbtn"> Active </span>
+                                        <span class="careBadg badgeCarePlanDetail"> </span>
                                     </div>
                                 </header>
                                 <div class="assessmentDateAndVersion carePlanWrapper">
@@ -2732,19 +2601,19 @@
                                         <div class="statItem">
                                             <div>
                                                 <div class="statLabel">Assessment Date</div>
-                                                <div class="statValue">December 19th, 2025</div>
+                                                <div class="statValue carePlanAssessmentDate"></div>
                                             </div>
                                         </div>
                                         <div class="statItem">
                                             <div>
                                                 <div class="statLabel">Assessed By</div>
-                                                <div class="statValue">m.carter</div>
+                                                <div class="statValue carePlanAssessedBy"></div>
                                             </div>
                                         </div>
-                                        <div class="statItem">
+                                        <div class="statItem carePlanReviewDateSection">
                                             <div>
                                                 <div class="statLabel">Next Review</div>
-                                                <div class="statValue">March 19th, 2026</div>
+                                                <div class="statValue carePlanReviewDate"></div>
                                             </div>
                                         </div>
                                         <div class="statItem">
@@ -2754,8 +2623,84 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <!-- personal details p -->
+                                    <div class="mt20">
+                                        <h5 class="h5Head mb-0"> Personal Details </h5>
+                                        <div class="activePlanStats mt-4">
+                                            <div class="statItem carePlanPreferedNameSection">
+                                                <div>
+                                                    <div class="statLabel">Preferred Name</div>
+                                                    <div class="statValue carePlanPreferedName">
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="statItem carePlanLanguageSection">
+                                                <div>
+                                                    <div class="statLabel">Language</div>
+                                                    <div class="statValue carePlanLanguage"></div>
+                                                </div>
+                                            </div>
+                                            <div class="statItem carePlanReligionSection">
+                                                <div>
+                                                    <div class="statLabel">Religion</div>
+                                                    <div class="statValue carePlanReligion"></div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <div class="mt20">
+                                        <div class="statItem carePlanCulturalNeedsSection">
+                                            <div>
+                                                <div class="statLabel">Cultural Needs</div>
+                                                <div class="statValue carePlanCulturalNeeds">Cultural Needs</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- end personal details p-->
                                 </div>
                             </div> <!-- ****************************************************** -->
+                            <!-- physical health p -->
+
+                            <div class="emergencyMain carePlanWrapper careDetailsWrapper p24">
+                                <div class="sectionHeader">
+                                    <span class="icon blue"><i class="bx bx-pulse fs23 redtext"></i></span>
+                                    <h3>Physical Health</h3>
+                                </div>
+                                <div class="activePlanStats row" style="gap: 0px;">
+                                    <div class="col-md-4 col-sm-6">
+                                        <div class="statItem" style="flex-grow: unset;">
+                                            <div>
+                                                <div class="statLabel">Mobility</div>
+                                                <div class="statValue ">independent</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-sm-6">
+                                        <div class="statItem">
+                                            <div>
+                                                <div class="statLabel">Continence</div>
+                                                <div class="statValue ">continent</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- end physical health p -->
+                            <!-- Mental Health & Communication p  -->
+                            <div class="emergencyMain carePlanWrapper careDetailsWrapper p24">
+                                <div class="sectionHeader">
+                                    <span class="icon blue"><i class="bx bx-brain fs23 purpleTextp"></i></span>
+                                    <h3>Mental Health & Communication</h3>
+                                </div>
+
+                            </div>
+
+                            <!--end Mental Health & Communication p  -->
+
+
 
                             <div class="careDetailsWrapper">
                                 <!-- Care Objectives -->
@@ -2765,35 +2710,8 @@
                                         <h3>Care Objectives</h3>
                                     </div>
 
-                                    <div class="objectiveCard">
-                                        <div class="objectiveTop">
-                                            <strong>Objective 1</strong>
-                                            <span class="statusBadge gray">not started</span>
-                                        </div>
-                                        <p class="objectiveText">
-                                            Increase school attendance to 80% by attending at least 4 out of 5 school days weekly.
-                                        </p>
-                                        <p class="metaLine">
-                                            <strong>Success measures:</strong> School attendance records, feedback from school.
-                                        </p>
-                                        <p class="metaLine">
-                                            <strong>Target:</strong> Jan 31, 2024
-                                        </p>
-                                    </div>
-                                    <div class="objectiveCard">
-                                        <div class="objectiveTop">
-                                            <strong>Objective 2</strong>
-                                            <span class="statusBadge gray">not started</span>
-                                        </div>
-                                        <p class="objectiveText">
-                                            Increase school attendance to 80% by attending at least 4 out of 5 school days weekly.
-                                        </p>
-                                        <p class="metaLine">
-                                            <strong>Success measures:</strong> School attendance records, feedback from school.
-                                        </p>
-                                        <p class="metaLine">
-                                            <strong>Target:</strong> Jan 31, 2024
-                                        </p>
+                                    <div class="carePlanObjectiveHtmlRender">
+
                                     </div>
                                 </div>
 
@@ -2803,31 +2721,200 @@
                                         <span class="icon purple">≡</span>
                                         <h3>Care Tasks & Interventions</h3>
                                     </div>
-                                    <div class="taskCard">
-                                        <div class="taskHeader">
-                                            <span class="pill blue">Emotional Support</span>
-                                            <span class="taskTime">🕒 weekly · 60 mins</span>
-                                        </div>
-                                        <h4>Emotional support session with counselor</h4>
-                                        <div class="instructionBox">
-                                            <strong>Special Instructions:</strong>
-                                            Ensure Logan feels comfortable and safe to express feelings.
-                                        </div>
-                                        <p class="preferredTime"> Preferred time: Monday 3 PM </p>
-                                    </div>
-                                    <div class="taskCard">
-                                        <div class="taskHeader">
-                                            <span class="pill blue">Emotional Support</span>
-                                            <span class="taskTime">🕒 weekly · 60 mins</span>
-                                        </div>
-                                        <h4>Emotional support session with counselor</h4>
-                                        <div class="instructionBox">
-                                            <strong>Special Instructions:</strong>
-                                            Ensure Logan feels comfortable and safe to express feelings.
-                                        </div>
-                                        <p class="preferredTime"> Preferred time: Monday 3 PM </p>
+
+                                    <div class="carePlanTaskHtmlRender">
+
                                     </div>
                                 </div>
+                                <!-- Medication Management p -->
+                                <div class="emergencyMain carePlanWrapper careDetailsWrapper p24">
+                                    <div class="sectionHeader">
+                                        <span class="icon blue"><i class="bx bx-pill fs23 pinkText"></i></span>
+                                        <h3>Medication Management
+                                        </h3>
+                                    </div>
+                                    <div class="muteBg rounded8 p-4">
+                                        <div class="row activePlanStats" style="gap:0;">
+
+                                            <div class="col-md-4 col-sm-6">
+                                                <div class="statItem">
+                                                    <div>
+                                                        <p class="fs13 textGray500 mb-2">Self Administers</p>
+                                                        <h6 class="h6Head mb-0 carePlanSelfAdministers"></h6>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-4 col-sm-6">
+                                                <div class="statItem">
+                                                    <div>
+                                                        <p class="fs13 textGray500 mb-2">Support Level</p>
+                                                        <h6 class="h6Head mb-0 carePlanSupportLevel"></h6>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-4 col-sm-6 carePlanPharmacyDetailsSection">
+                                                <div class="statItem">
+                                                    <div>
+                                                        <p class="fs13 textGray500 mb-2">Pharmacy</p>
+                                                        <h6 class="h6Head mb-0 carePlanPharmacyDetails"></h6>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-4 col-sm-6 carePlanGPDetailsSection">
+                                                <div class="statItem">
+                                                    <div>
+                                                        <p class="fs13 textGray500 mb-2">GP</p>
+                                                        <h6 class="h6Head mb-0 carePlanGPDetails"></h6>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <div class="mt-4">
+                                        <div class="bg-red-50 rounded8 p-4 carePlanAllergiesSection">
+                                            <div class="dFlexGap mb-2">
+                                                <p class="mb-0 fs13 font600 darkRedText">
+                                                    ⚠️ Allergies & Sensitivities
+                                                </p>
+                                            </div>
+                                            <p class="fs14 redText mb-0 carePlanAllergies"></p>
+                                        </div>
+                                        <div class="mt-4">
+                                            <h5 class="h5Head">Current Medications</h5>
+                                        </div>
+                                        <div class="carePlanMedicalHtmlRender">
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--end Medication Management p -->
+
+                                <!-- Daily Routine p -->
+                                <div class="emergencyMain carePlanWrapper careDetailsWrapper p24">
+                                    <div class="sectionHeader">
+                                        <span class="icon blue"><i class="bx bx-clock fs23 cyanText"></i></span>
+                                        <h3>Daily Routine </h3>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 carePlan_m_RoutineSection">
+                                            <div class="bg-yellow-50 p-4 rounded8" style="border: unset;">
+                                                <div class="dFlexGap">
+                                                    <h5 class="h6Head"><i class="bx bx-sun f20 yellowText"></i>
+                                                        <span>Morning</span>
+                                                    </h5>
+
+                                                </div>
+                                                <p class="mb-0 fs14 textGray600 carePlan_m_Routine">
+
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="bg-orange-50 p-4 rounded8 carePlan_a_RoutineSection" style="border: unset;">
+                                                <div class="dFlexGap">
+                                                    <h5 class="h6Head"><i class="bx bx-sun-rise f20 orangeText"></i>
+                                                        <span>Afternoon</span>
+                                                    </h5>
+
+                                                </div>
+                                                <p class="mb-0 fs14 textGray600 carePlan_a_Routine">
+
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 m-t-10 carePlan_e_RoutineSection">
+                                            <div class="bg-purple-50 p-4 rounded8" style="border: unset;">
+                                                <div class="dFlexGap">
+                                                    <h5 class="h6Head"><i class="bx bx-moon f20 purpleTextp"></i>
+                                                        <span>Evening</span>
+                                                    </h5>
+                                                </div>
+                                                <p class="mb-0 fs14 textGray600 carePlan_e_Routine">
+
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6 m-t-10 carePlan_n_RoutineSection">
+                                            <div class="muteBg p-4 rounded8" style="border: unset;">
+                                                <div class="dFlexGap">
+                                                    <h5 class="h6Head"><i class="bx bx-cloud-moon f20 textGray"></i>
+                                                        <span>Night</span>
+                                                    </h5>
+                                                </div>
+                                                <p class="mb-0 fs14 textGray600 carePlan_n_Routine">
+
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- end daily rountine p  -->
+                                <!--Preferences & Special Requirements p  -->
+                                <div class="emergencyMain carePlanWrapper careDetailsWrapper p24">
+                                    <div class="sectionHeader">
+                                        <span class="icon blue"><i class="bx bx-star fs23 yellowText"></i></span>
+                                        <h3>Preferences & Special Requirements </h3>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 carePlanLikeSection">
+                                            <div class="bg-greenp-50 p-4 rounded8" style="border: unset;">
+                                                <div class="dFlexGap">
+                                                    <h5 class="h6Head"><i class="bx bx-thumb-up f20 greenText"></i>
+                                                        <span>Likes</span>
+                                                    </h5>
+
+                                                </div>
+                                                <div class="mb-0 fs14 textGray600 dFlexGap">
+                                                    <span class="dotC thickDotC"></span>
+                                                    <span class="carePlanLike"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 carePlanDislikeSection">
+                                            <div class="bg-red-50 p-4 rounded8" style="border: unset;">
+                                                <div class="dFlexGap">
+                                                    <h5 class="h6Head"><i class="bx bx-thumb-down f20 redtext"></i>
+                                                        <span>Dislikes</span>
+                                                    </h5>
+
+                                                </div>
+                                                <div class="mb-0 fs14 dFlexGap textGray600">
+                                                    <span class="dotC thickDotC"></span>
+                                                    <span class="carePlanDislike"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4">
+                                        <h5 class="h5Head carePlanHobbySection">Hobbies & Interests</h5>
+                                        <span class="borderBadg carePlanHobby"></span>
+                                        <div class="row mt-4">
+                                            <div class="col-md-6 carePlanfoodSection">
+                                                <h6 class="h6Head mb-2">Food Preferences</h6>
+                                                <p class="textGray500 fs14 mb-0 carePlanFood"></p>
+                                            </div>
+                                            <div class="col-md-6 carePlanPersonalSection">
+                                                <h6 class="h6Head mb-2">Personal Care Preferences</h6>
+                                                <p class="textGray500 fs14 mb-0 carePlanPersonal"></p>
+                                            </div>
+                                            <div class="col-md-6 m-t-10 carePlanCommunicationSection">
+                                                <h6 class="h6Head mb-2">Communication Preferences</h6>
+                                                <p class="textGray500 fs14 carePlanCommunication"></p>
+                                            </div>
+                                            <div class="col-md-6 m-t-10 carePlanSocialSection">
+                                                <h6 class="h6Head mb-2">Social Preferences</h6>
+                                                <p class="textGray500 fs14 carePlanSocial"></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Preferences & Special Requirements p -->
+
 
                                 <!-- Risk Factors -->
                                 <div class="careSection">
@@ -2835,39 +2922,35 @@
                                         <span class="icon orange">⚠</span>
                                         <h3>Risk Factors</h3>
                                     </div>
+                                    <div class="carePlanRiskHtmlRender">
 
-                                    <div class="riskCard">
-                                        <div class="riskTop">
-                                            <strong>Increased anxiety about dental visits</strong>
-
-                                            <div class="riskBadges">
-                                                <span class="riskBadge danger">Likelihood: high</span>
-                                                <span class="riskBadge danger">Impact: high</span>
-                                            </div>
-                                        </div>
-
-                                        <div class="controlBox">
-                                            <strong>Control Measures:</strong>
-                                            Prepare Logan ahead of appointments, use relaxation techniques prior to visits.
+                                    </div>
+                                </div>
+                                <!-- Emergency Information p -->
+                                <div class="emergencyMain carePlanWrapper careDetailsWrapper">
+                                    <div class="emergencyHeader">
+                                        <div class="dFlexGap darkRedText">
+                                            <i class="bx bx-alert-triangle fs23"></i>
+                                            <h5 class="h5Head darkRedText mb-0">Emergency Information </h5>
                                         </div>
                                     </div>
-                                    <div class="riskCard">
-                                        <div class="riskTop">
-                                            <strong>Increased anxiety about dental visits</strong>
-
-                                            <div class="riskBadges">
-                                                <span class="riskBadge danger">Likelihood: high</span>
-                                                <span class="riskBadge danger">Impact: high</span>
-                                            </div>
+                                    <div class="p24">
+                                        <div class="carePlanPreferedHospSection">
+                                            <p class="fs13 textGray500 mb-2">Preferred Hospital</p>
+                                            <h6 class="h6Head mb-0 carePlanPreferedHosp"></h6>
                                         </div>
-
-                                        <div class="controlBox">
-                                            <strong>Control Measures:</strong>
-                                            Prepare Logan ahead of appointments, use relaxation techniques prior to visits.
+                                        <div class="mt-4 carePlanPreferedDnacprSection">
+                                            <span class="careBadg redBadges">DNACPR in Place - See DNACPR Section Above
+                                            </span>
+                                        </div>
+                                        <div class="mt-4 carePlanPreferedProtocolSection">
+                                            <p class="fs13 textGray500 mb-2">Emergency Protocol</p>
+                                            <p class="fs14 textGay500 mb-0 carePlanPreferedProtocol"></p>
                                         </div>
                                     </div>
                                 </div>
 
+                                <!--end Emergency Information p -->
                             </div>
                         </div>
 
@@ -4172,77 +4255,85 @@
                         </header>
                         <div class="p-20">
                             <div class="carer-form dolsSectionFirst" style="display:none">
-                                <form>
+                                <form id="clientDolsForm">
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <label>DoLS Status *</label>
-                                            <select class="form-control">
-                                                <option>Screening Required</option>
-                                                <option>Inactive</option>
+                                            <label>DoLS Status <span class="radStar">*</span></label>
+                                            <select class="form-control" name="dols_status" id="dols_status">
+                                                <option value="Not Applicable">Not Applicable</option>
+                                                <option value="Screening Required">Screening Required</option>
+                                                <option value="Application Submitted">Application Submitted</option>
+                                                <option value="Standard Authorisation Granted">Standard Authorisation Granted</option>
+                                                <option value="Urgent Authorisation Granted">Urgent Authorisation Granted</option>
+                                                <option value="Not Authorised">Not Authorised</option>
+                                                <option value="Expired">Expired</option>
+                                                <option value="Under Review">Under Review</option>
                                             </select>
                                         </div>
                                         <div class="col-md-6">
                                             <label>Authorisation Type</label>
-                                            <select class="form-control">
-                                                <option>Standard</option>
-                                                <option>Part Time</option>
+                                            <select class="form-control" name="authorisation_type" id="authorisation_type">
+                                                <option value="Standard">Standard</option>
+                                                <option value="Urgent">Urgent</option>
+                                                <option value="Not Applicable">Not Applicable</option>
                                             </select>
                                         </div>
                                         <div class="col-md-6 m-t-10">
                                             <label>Referral Date </label>
-                                            <input type="date" name="" id="" class="form-control">
+                                            <input type="date" name="referral_date" id="referral_date" class="form-control">
                                         </div>
                                         <div class="col-md-6 m-t-10">
                                             <label>Authorisation Start Date</label>
-                                            <input type="date" name="" id="" class="form-control">
+                                            <input type="date" name="authorisation_start_date" id="authorisation_start_date" class="form-control">
                                         </div>
 
                                         <div class="col-md-6  m-t-10">
                                             <label>Authorisation End Date</label>
-                                            <input type="date" name="" id="" class="form-control">
+                                            <input type="date" name="authorisation_end_date" id="authorisation_end_date" class="form-control">
                                         </div>
                                         <div class="col-md-6  m-t-10">
                                             <label>Review Date</label>
-                                            <input type="date" name="" id="" class="form-control">
+                                            <input type="date" name="review_date" id="review_date" class="form-control">
                                         </div>
                                         <div class="col-md-6  m-t-10">
                                             <label>Supervisory Body</label>
-                                            <input type="number" name="" id="" class="form-control">
+                                            <input type="text" name="supervisory_body" id="supervisory_body" class="form-control">
                                         </div>
                                         <div class="col-md-6  m-t-10">
                                             <label>Case Reference</label>
-                                            <input type="number" name="" id="" class="form-control">
+                                            <input type="text" name="case_reference" id="case_reference" class="form-control">
                                         </div>
                                         <div class="col-md-6  m-t-10">
                                             <label>Best Interests Assessor</label>
-                                            <input type="number" name="" id="" class="form-control">
+                                            <input type="text" name="best_interests_assessor" id="best_interests_assessor" class="form-control">
                                         </div>
                                         <div class="col-md-6  m-t-10">
                                             <label>Mental Health Assessor</label>
-                                            <input type="number" name="" id="" class="form-control">
+                                            <input type="text" name="mental_health_assessor" id="mental_health_assessor" class="form-control">
                                         </div>
                                         <div class="col-md-12  m-t-10">
                                             <label>Reason for DoLS</label>
-                                            <textarea name="reason" required="" class="form-control" rows="3" cols="20" placeholder="How is this risk being managed?"></textarea>
+                                            <textarea name="reason_for_dols" id="reason_for_dols" class="form-control" rows="3" cols="20" placeholder="How is this risk being managed?"></textarea>
                                         </div>
                                         <div class="col-md-12 mt-3">
                                             <div class="DoLSCheckList">
-                                                <label><input type="checkbox"> IMCA Appointed</label>
-                                                <label><input type="checkbox"> Mental Capacity Assessment Completed</label>
-                                                <label><input type="checkbox"> Appeal Rights Explained</label>
-                                                <label><input type="checkbox"> Care Plan Updated</label>
-                                                <label><input type="checkbox"> Family/Next of Kin Notified</label>
+                                                <label><input type="checkbox" value="0" name="imca_appointed" id="imca_appointed" class="dolsCheckbox"> IMCA Appointed</label>
+                                                <label><input type="checkbox" value="0" name="mental_capacity_assessment" id="mental_capacity_assessment" class="dolsCheckbox"> Mental Capacity Assessment Completed</label>
+                                                <label><input type="checkbox" value="0" name="appeal_rights" id="appeal_rights" class="dolsCheckbox"> Appeal Rights Explained</label>
+                                                <label><input type="checkbox" value="0" name="care_plan_updated" id="care_plan_updated" class="dolsCheckbox"> Care Plan Updated</label>
+                                                <label><input type="checkbox" value="0" name="family_notified" id="family_notified" class="dolsCheckbox"> Family/Next of Kin Notified</label>
                                             </div>
                                         </div>
 
                                         <div class="col-md-12  m-t-10">
-                                            <label>Reason for DoLS</label>
-                                            <textarea name="reason" required="" class="form-control" rows="3" cols="20" placeholder="How is this risk being managed?"></textarea>
+                                            <label>Additional Notes</label>
+                                            <textarea name="additional_notes" id="additional_notes" class="form-control" rows="3" cols="20" placeholder="How is this risk being managed?"></textarea>
                                         </div>
                                         <div class="col-md-12  m-t-10">
                                             <div class="header-actions addnewicons">
-                                                <button class="btn allbuttonDarkClr"> Save DoLS Record</button>
-                                                <button class="btn borderBtn" id="closeDolsformBtn"> Cancel</button>
+                                                <input type="hidden" id="dols_id" name="dols_id">
+                                                <button class="btn allbuttonDarkClr" id="saveClientDols" type="button"> Save DoLS Record</button>
+                                                <button class="btn borderBtn" id="closeDolsformBtn" type="button"> Cancel</button>
                                             </div>
                                             <!-- <div class="actions mt-0">
                                                 <button class="btn allbuttonDarkClr "> Save DoLS Record </button>
@@ -4250,50 +4341,13 @@
                                             </div> -->
                                         </div>
                                     </div>
-
-
-
-
-
-
                                 </form>
                             </div>
 
-                            <div class="carePlanWrapper dolsSectionSecond">
-                                <div class="planCard borderleftPurple">
-                                    <div class="planTop">
-                                        <div class="planTitle">
-                                            <span class="roundTag yellow">SCREENING REQUIRED</span>
-                                            <span class="inactive roundTag">urgent authorisation</span>
-                                        </div>
-                                        <div class="planActions">
-                                            <button class="addDolsRecordBtn" data-formType="edit"><i class='bx  bx-edit'></i> </button>
-                                            <!-- <button class="danger"><i class="bx  bx-trash"></i> </button> -->
-                                        </div>
-                                    </div>
+                            <div class="carePlanWrapper dolsSectionSecond" id="dolsRenderList">
 
-                                    <div class="planMeta">
-                                        <div><strong>Referral Date: </strong> January 5th, 2026</div>
-                                        <div><strong>Start Date: </strong> January 14th, 2026</div>
-                                    </div>
-                                    <div class="planMeta">
-                                        <div><strong>End Date: </strong> January 14th, 2026</div>
-                                        <div><strong>Supervisory Body: </strong> Jugnu</div>
-                                    </div>
-                                    <div class="planFooter">
-                                        <span><strong> Case Reference: </strong> Taken for one week during August to delay period whilst on holiday.</span>
-                                    </div>
-                                    <div class="medicationSheet">
-                                        <div class="reasonBox">
-                                            <strong>Reason:</strong>
-                                            Taken for one week during August to delay period whilst on holiday.
-                                        </div>
-                                    </div>
-                                    <!-- <div class="planFooter">
-                                        <span><strong> Reason: </strong> Taken for one week during August to delay period whilst on holiday.</span>
-                                    </div> -->
-                                </div>
                             </div>
+                            <div id="dolsPagination"></div>
                         </div>
                     </div>
                 </div>
@@ -5441,64 +5495,72 @@
     <div class="modal fade leaveCommunStyle" id="addcreateCarePlanModal" tabindex="1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title"> <i class="bx  bx-heart"></i> Create Care Plan - Logan Jones</h4>
-                </div>
-                <div class="modal-body heightScrollModal">
-                    <div class="carer-form">
+                <form id="clientCarePlanForm">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title"> <i class="bx  bx-heart"></i> Create Care Plan - {{$clientDetails['name']}}</h4>
+                    </div>
+                    <div class="modal-body heightScrollModal">
+                        <div class="carer-form">
 
-                        <div class="availabilityTabs createCarePlanTabs">
-                            <!-- TAB HEADER -->
-                            <div class="availabilityTabs__nav">
-                                <button class="availabilityTabs__tab active" data-target="carePlanOverview"><i class="bx  bx-file-report"></i> Overview</button>
-                                <button class="availabilityTabs__tab" data-target="carePlanObjectives"><i class='bx  bx-radio-circle-marked'></i> Objectives</button>
-                                <button class="availabilityTabs__tab" data-target="carePlanCareTasks"><i class='bx  bx-checklist'></i> Care Tasks</button>
-                                <button class="availabilityTabs__tab" data-target="carePlanMedication"><i class='bx  bx-pill'></i> Medication</button>
-                                <button class="availabilityTabs__tab" data-target="carePlanPreferences"><i class='bx  bx-user'></i> Preferences</button>
-                                <button class="availabilityTabs__tab" data-target="carePlanRisk"><i class='bx  bx-alert-triangle'></i> Risk</button>
-                            </div>
+                            <div class="availabilityTabs createCarePlanTabs">
+                                <!-- TAB HEADER -->
+                                <div class="availabilityTabs__nav">
+                                    <button type="button" class="availabilityTabs__tab active" data-target="carePlanOverview"><i class="bx  bx-file-report"></i> Overview</button>
+                                    <button type="button" class="availabilityTabs__tab" data-target="carePlanObjectives"><i class='bx  bx-radio-circle-marked'></i> Objectives</button>
+                                    <button type="button" class="availabilityTabs__tab" data-target="carePlanCareTasks"><i class='bx  bx-checklist'></i> Care Tasks</button>
+                                    <button type="button" class="availabilityTabs__tab" data-target="carePlanMedication"><i class='bx  bx-pill'></i> Medication</button>
+                                    <button type="button" class="availabilityTabs__tab" data-target="carePlanPreferences"><i class='bx  bx-user'></i> Preferences</button>
+                                    <button type="button" class="availabilityTabs__tab" data-target="carePlanRisk"><i class='bx  bx-alert-triangle'></i> Risk</button>
+                                </div>
 
-                            <!-- TAB CONTENT -->
-                            <div class="availabilityTabs__content">
+                                <!-- TAB CONTENT -->
 
-                                <div class="availabilityTabs__panel active" id="carePlanOverview">
-                                    <div class="">
-                                        <form>
+                                <div class="availabilityTabs__content">
+
+                                    <div class="availabilityTabs__panel active" id="carePlanOverview">
+                                        <div class="">
+
                                             <div class="row">
                                                 <div class="col-md-6">
-                                                    <label>Care Setting *</label>
-                                                    <select class="form-control">
-                                                        <option>Domiciliary Care</option>
-                                                        <option>Inactive</option>
+                                                    <label>Care Setting <span class="radStar">*</span></label>
+                                                    <select class="form-control checkClientCarePlan" name="care_setting" id="care_setting">
+                                                        <option value="Domiciliary Care">Domiciliary Care</option>
+                                                        <option value="Residential Care">Residential Care</option>
+                                                        <option value="Supported Living">Supported Living</option>
+                                                        <option value="Day Centre">Day Centre</option>
                                                     </select>
                                                 </div>
                                                 <div class="col-md-6">
                                                     <label>Plan Type </label>
-                                                    <select class="form-control">
-                                                        <option>Initial Assessment</option>
-                                                        <option>Part Time</option>
+                                                    <select class="form-control" name="plan_type" id="plan_type">
+                                                        <option value="Initial Assessment">Initial Assessment</option>
+                                                        <option value="Review">Review</option>
+                                                        <option value="Interim">Interim</option>
+                                                        <option value="Discharge">Discharge</option>
                                                     </select>
                                                 </div>
 
                                                 <div class="col-md-4  m-t-10">
-                                                    <label>Assessment Date *</label>
-                                                    <input type="text" class="form-control">
+                                                    <label>Assessment Date <span class="radStar">*</span></label>
+                                                    <input type="date" name="assessment_date" id="assessment_date" class="form-control checkClientCarePlan">
                                                 </div>
                                                 <div class="col-md-4  m-t-10">
-                                                    <label>Status</label>
-                                                    <input type="text" class="form-control">
+                                                    <label>Review Date</label>
+                                                    <input type="date" name="review_date" id="carePlanreview_date" class="form-control">
                                                 </div>
 
                                                 <div class="col-md-4  m-t-10">
-                                                    <label>Assessed By</label>
-                                                    <input type="text" class="form-control" placeholder="Staff member name">
+                                                    <label>Assessed By <span class="radStar">*</span></label>
+                                                    <input type="text" name="assessed_by" id="assessed_by" class="form-control checkClientCarePlan" placeholder="Staff member name">
                                                 </div>
                                                 <div class="col-md-6  m-t-10">
                                                     <label>Status</label>
-                                                    <select class="form-control">
-                                                        <option>Full Time</option>
-                                                        <option>Part Time</option>
+                                                    <select class="form-control" name="status" id="carePlanStatus">
+                                                        <option value="0">Draft</option>
+                                                        <option value="1">Active</option>
+                                                        <option value="2">Under Review</option>
+                                                        <option value="3">Archived</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -5512,19 +5574,19 @@
                                             <div class="row">
                                                 <div class="col-md-6">
                                                     <label>Preferred Name</label>
-                                                    <input type="text" class="form-control" value="Logan">
+                                                    <input type="text" name="preferred_name" id="preferred_name" class="form-control" value="{{$clientDetails['name']}}">
                                                 </div>
                                                 <div class="col-md-6">
                                                     <label>Language </label>
-                                                    <input type="text" class="form-control" value="English">
+                                                    <input type="text" name="language" id="language" class="form-control" value="English">
                                                 </div>
                                                 <div class="col-md-6  m-t-10">
                                                     <label>Religion</label>
-                                                    <input type="text" class="form-control" placeholder="Staff member name">
+                                                    <input type="text" name="religion" id="religion" class="form-control" placeholder="Staff member name">
                                                 </div>
                                                 <div class="col-md-6  m-t-10">
                                                     <label>Cultural Needs </label>
-                                                    <input type="text" class="form-control" placeholder="Staff member name">
+                                                    <input type="text" name="cultural_needs" id="cultural_needs" class="form-control" placeholder="Staff member name">
                                                 </div>
                                             </div>
 
@@ -5537,209 +5599,108 @@
                                             <div class="row">
                                                 <div class="col-md-6">
                                                     <label>Morning</label>
-                                                    <textarea name="morning" required="" class="form-control" rows="3" cols="20" placeholder="Describe morning routine..."></textarea>
+                                                    <textarea name="morning" id="morning" class="form-control" rows="3" cols="20" placeholder="Describe morning routine..."></textarea>
                                                 </div>
                                                 <div class="col-md-6">
                                                     <label>Afternoon </label>
-                                                    <textarea name="afternoon" required="" class="form-control" rows="3" cols="20" placeholder="Describe morning routine..."></textarea>
+                                                    <textarea name="afternoon" id="afternoon" class="form-control" rows="3" cols="20" placeholder="Describe afternoon routine..."></textarea>
                                                 </div>
                                                 <div class="col-md-6  m-t-10">
                                                     <label>Evening</label>
-                                                    <textarea name="evening" required="" class="form-control" rows="3" cols="20" placeholder="Describe morning routine..."></textarea>
+                                                    <textarea name="evening" id="evening" class="form-control" rows="3" cols="20" placeholder="Describe evening routine..."></textarea>
                                                 </div>
                                                 <div class="col-md-6  m-t-10">
                                                     <label>Night </label>
-                                                    <textarea name="night" required="" class="form-control" rows="3" cols="20" placeholder="Describe morning routine..."></textarea>
+                                                    <textarea name="night" id="night" class="form-control" rows="3" cols="20" placeholder="Describe night routine..."></textarea>
                                                 </div>
-                                            </div>
-
-                                            <div class="actions">
-                                                <button type="button" class="cancel">Cancel</button>
-                                                <button type="submit" class="submit">Create Care Plan</button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                                <div class="availabilityTabs__panel" id="carePlanObjectives">
-                                    <div class="">
-                                        <div class="workHoursHeader">
-                                            <div class="title"> Care Objectives</div>
-                                            <div class="actions mt-0">
-                                                <button class="borderBtn"> <i class="bx  bx-plus"></i> Add Objective</button>
+                                                <input type="hidden" id="overview_id" name="id">
                                             </div>
                                         </div>
-                                        <form>
-                                            <div class="leave-card">
-                                                <div class="row">
-                                                    <div class="col-md-12">
-                                                        <div class="ObjectiveEndDelete planActions">
-                                                            <button class="objectiveNumber">Objective 1</button>
-                                                            <button class="danger"><i class="bx  bx-trash"></i> </button>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-12">
-                                                        <label>Morning</label>
-                                                        <textarea name="morning" required="" class="form-control" rows="3" cols="20" placeholder="Describe morning routine..."></textarea>
-                                                    </div>
-                                                    <div class="col-md-4  m-t-10">
-                                                        <label>Target Date</label>
-                                                        <input type="date" class="form-control">
-                                                    </div>
-                                                    <div class="col-md-4  m-t-10">
-                                                        <label>Status</label>
-                                                        <select class="form-control">
-                                                            <option>Not Started</option>
-                                                            <option>Part Time</option>
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-md-4  m-t-10">
-                                                        <label>Outcome Measures</label>
-                                                        <input type="text" class="form-control" placeholder="How will success be measured?">
-                                                    </div>
+                                    </div>
+                                    <div class="availabilityTabs__panel" id="carePlanObjectives">
+                                        <div class="">
+                                            <div class="workHoursHeader">
+                                                <div class="title"> Care Objectives</div>
+                                                <div class="actions mt-0">
+                                                    <button type="button" class="borderBtn addMoreObjective"> <i class="bx bx-plus"></i> Add Objective</button>
                                                 </div>
                                             </div>
-                                            <div class="leave-card">
-                                                <div class="row">
-                                                    <div class="col-md-12">
-                                                        <div class="ObjectiveEndDelete planActions">
-                                                            <button class="objectiveNumber">Objective 1</button>
-                                                            <button class="danger"><i class="bx  bx-trash"></i> </button>
+                                            <div id="renderLeaveCard">
+                                                <div class="no-data-card">
+                                                    <div class="noData" style="text-align:center">
+                                                        <div>
+                                                            <i class="bx bx-bullseye"></i>
+                                                            <p>No Objective defined yet</p>
+                                                            <button type="button" class="borderBtn addMoreObjective" style="display:unset !important">
+                                                                Add First Objective
+                                                            </button>
                                                         </div>
-                                                    </div>
-                                                    <div class="col-md-12">
-                                                        <label>Morning</label>
-                                                        <textarea name="morning" required="" class="form-control" rows="3" cols="20" placeholder="Describe morning routine..."></textarea>
-                                                    </div>
-                                                    <div class="col-md-4  m-t-10">
-                                                        <label>Target Date</label>
-                                                        <input type="date" class="form-control">
-                                                    </div>
-                                                    <div class="col-md-4  m-t-10">
-                                                        <label>Status</label>
-                                                        <select class="form-control">
-                                                            <option>Not Started</option>
-                                                            <option>Part Time</option>
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-md-4  m-t-10">
-                                                        <label>Outcome Measures</label>
-                                                        <input type="text" class="form-control" placeholder="How will success be measured?">
                                                     </div>
                                                 </div>
                                             </div>
 
-                                            <div class="actions">
-                                                <button type="button" class="cancel">Cancel</button>
-                                                <button type="submit" class="submit">Create Care Plan</button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                                <div class="availabilityTabs__panel" id="carePlanCareTasks">
-                                    <div class="">
-                                        <div class="workHoursHeader">
-                                            <div class="title"> Care Tasks & Interventions</div>
-                                            <div class="actions mt-0">
-                                                <button class="borderBtn"> <i class="bx  bx-plus"></i> Add Task</button>
-                                            </div>
                                         </div>
-                                        <form>
-                                            <div class="leave-card">
-                                                <div class="row">
-                                                    <div class="col-md-12">
-                                                        <div class="ObjectiveEndDelete planActions workHoursHeader">
-                                                            <span class="badge">Personal Care</span>
+                                    </div>
+                                    <div class="availabilityTabs__panel" id="carePlanCareTasks">
+                                        <div class="">
+                                            <div class="workHoursHeader">
+                                                <div class="title"> Care Tasks & Interventions</div>
+                                                <div class="actions mt-0">
+                                                    <button class="borderBtn addMoreTask" type="button"> <i class="bx  bx-plus"></i> Add Task</button>
+                                                </div>
+                                            </div>
 
-                                                            <div class="activeCheck">
-                                                                <label><input type="checkbox"> Active</label>
-                                                                <button class="danger"><i class="bx  bx-trash"></i> </button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="col-md-6">
-                                                        <label>Task Name</label>
-                                                        <input type="date" class="form-control">
-                                                    </div>
-
-                                                    <div class="col-md-6">
-                                                        <label>Category</label>
-                                                        <select class="form-control">
-                                                            <option>Not Started</option>
-                                                            <option>Part Time</option>
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-md-12  m-t-10">
-                                                        <label>Description</label>
-                                                        <textarea name="Description" required="" class="form-control" rows="3" cols="20" placeholder="Describe what needs to be done..."></textarea>
-                                                    </div>
-
-                                                    <div class="col-md-4  m-t-10">
-                                                        <label>Frequency</label>
-                                                        <select class="form-control">
-                                                            <option>Not Started</option>
-                                                            <option>Part Time</option>
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-md-4  m-t-10">
-                                                        <label>Preferred Time</label>
-                                                        <input type="time" class="form-control" placeholder="">
-                                                    </div>
-                                                    <div class="col-md-4  m-t-10">
-                                                        <label>Duration (mins)</label>
-                                                        <input type="number" class="form-control" value="15">
-                                                    </div>
-
-                                                    <div class="col-md-12  m-t-10">
-                                                        <label>Special Instructions</label>
-                                                        <textarea name="Description" required="" class="form-control" rows="3" cols="20" placeholder="Any special instructions for carers..."></textarea>
-                                                    </div>
-                                                    <div class="col-md-12 m-t-10">
-                                                        <div class="requiresLable">
-                                                            <input type="checkbox" id="vehicle1" name="vehicle1" value="Bike">
-                                                            <label for="vehicle1"> Requires two carers</label>
+                                            <div id="renderClientCarePlanTask">
+                                                <div class="no-data-card-task">
+                                                    <div class="noData" style="text-align:center">
+                                                        <div>
+                                                            <i class="bx bx-checklist"></i>
+                                                            <p>No tasks defined yet</p>
+                                                            <button type="button" class="borderBtn addMoreTask" style="display:unset !important">
+                                                                Add First Task
+                                                            </button>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
 
-                                            <div class="actions">
-                                                <button type="button" class="cancel">Cancel</button>
-                                                <button type="submit" class="submit">Create Care Plan</button>
-                                            </div>
-                                        </form>
+
+
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="availabilityTabs__panel" id="carePlanMedication">
-                                    <div class="">
-                                        <form>
+                                    <div class="availabilityTabs__panel" id="carePlanMedication">
+                                        <div class="">
+
                                             <div class="row">
                                                 <div class="col-md-6">
                                                     <div class="requiresLable">
-                                                        <input type="checkbox" id="self-administers" name="self-administers" value="Bike">
-                                                        <label for="self-administers">Client self-administers medication</label>
+                                                        <input type="checkbox" class="self_administers" id="self_administers" name="self_administers" value="0">
+                                                        <label for="self_administers">Client self-administers medication</label>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6">
                                                     <label>Administration Support Level</label>
-                                                    <select class="form-control">
-                                                        <option>Prompting Only</option>
-                                                        <option>Part Time</option>
+                                                    <select class="form-control" name="administration_support_level" id="administration_support_level">
+                                                        <option value="None Required">None Required</option>
+                                                        <option value="Prompting Only">Prompting Only</option>
+                                                        <option value="Assistance Required">Assistance Required</option>
+                                                        <option value="Full Administration">Full Administration</option>
                                                     </select>
                                                 </div>
                                                 <div class="col-md-6 m-t-10">
                                                     <label>Pharmacy Details</label>
-                                                    <input type="text" class="form-control" placeholder="Pharmacy name & contact">
+                                                    <input type="text" class="form-control" placeholder="Pharmacy name & contact" id="pharmacy_details" name="pharmacy_details">
                                                 </div>
                                                 <div class="col-md-6 m-t-10">
                                                     <label>GP Details</label>
-                                                    <input type="text" class="form-control" placeholder="GP surgery & contact">
+                                                    <input type="text" class="form-control" placeholder="GP surgery & contact" id="gp_details" name="gp_details">
                                                 </div>
 
                                                 <div class="col-md-12 m-t-10">
                                                     <label>Allergies & Sensitivities</label>
-                                                    <textarea name="Sensitivities" required="" class="form-control sensitivitiesTextarea" rows="3" cols="20" placeholder="List any known allergies or sensitivities..."></textarea>
+                                                    <textarea name="allergies" id="allergies" class="form-control sensitivitiesTextarea" rows="3" cols="20" placeholder="List any known allergies or sensitivities..."></textarea>
                                                 </div>
+                                                <input type="hidden" id="pharmacy_id" name="pharmacy_id">
                                             </div>
 
 
@@ -5747,137 +5708,80 @@
                                             <div class="workHoursHeader m-t-15">
                                                 <div class="title"> Medications</div>
                                                 <div class="actions mt-0">
-                                                    <button class="borderBtn"> <i class="bx  bx-plus"></i> Add Medication</button>
+                                                    <button class="borderBtn addMoreMedication" type="button"> <i class="bx  bx-plus"></i> Add Medication</button>
                                                 </div>
                                             </div>
-                                            <div class="leave-card">
-                                                <div class="row">
-                                                    <div class="col-md-12">
-                                                        <div class="ObjectiveEndDelete planActions workHoursHeader">
-                                                            <span class="badge"><i class='bx  bx-link'></i> </span>
-                                                            <div class="activeCheck">
-                                                                <button class="danger"><i class="bx  bx-trash"></i> </button>
-                                                            </div>
+                                            <div id="renderClientCarePlanMedical">
+                                                <div class="no-data-card-medication">
+                                                    <div class="noData" style="text-align:center">
+                                                        <div>
+                                                            <i class="bx bx-pill"></i>
+                                                            <p>No medications recorded</p>
                                                         </div>
-                                                    </div>
-                                                    <div class="col-md-4">
-                                                        <label>Medication Name</label>
-                                                        <input type="date" class="form-control" placeholder="e.g., Paracetamol">
-                                                    </div>
-
-                                                    <div class="col-md-4">
-                                                        <label>Dose</label>
-                                                        <input type="text" class="form-control" placeholder="e.g., 500mg">
-                                                    </div>
-                                                    <div class="col-md-4">
-                                                        <label>Frequency</label>
-                                                        <input type="text" class="form-control" placeholder="e.g., 500mg">
-                                                    </div>
-
-                                                    <div class="col-md-6  m-t-10">
-                                                        <label>Purpose</label>
-                                                        <input type="text" name="purpose" required="" class="form-control" placeholder="What is this medication for?">
-                                                    </div>
-                                                    <div class="col-md-6 m-t-10">
-                                                        <div class="requiresLable">
-                                                            <input type="checkbox" id="PRN" name="PRN" value="Bike">
-                                                            <label for="PRN">PRN (as needed)</label>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-12  m-t-10">
-                                                        <label>Special Instructions</label>
-                                                        <input type="text" class="form-control" placeholder="e.g., Take with food">
                                                     </div>
                                                 </div>
                                             </div>
 
-                                            <div class="actions">
-                                                <button type="button" class="cancel">Cancel</button>
-                                                <button type="submit" class="submit">Create Care Plan</button>
-                                            </div>
-                                        </form>
+
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="availabilityTabs__panel" id="carePlanPreferences">
-                                    <div class="">
-                                        <form>
+                                    <div class="availabilityTabs__panel" id="carePlanPreferences">
+                                        <div class="">
+
                                             <div class="row">
                                                 <div class="col-md-6">
                                                     <label>Likes</label>
-                                                    <textarea name="likes" required="" class="form-control" rows="3" cols="20" placeholder="Enter likes (one per line)"></textarea>
+                                                    <textarea name="preferences[likes]" id="likes" class="form-control" rows="3" cols="20" placeholder="Enter likes (one per line)"></textarea>
                                                 </div>
                                                 <div class="col-md-6">
                                                     <label>Dislikes</label>
-                                                    <textarea name="dislikes" required="" class="form-control" rows="3" cols="20" placeholder="Enter dislikes (one per line)"></textarea>
+                                                    <textarea name="preferences[dislikes]" id="dislikes" class="form-control" rows="3" cols="20" placeholder="Enter dislikes (one per line)"></textarea>
                                                 </div>
                                                 <div class="col-md-12 m-t-10">
                                                     <label>Hobbies & Interests</label>
-                                                    <textarea name="hobbies&Interests" required="" class="form-control" rows="3" cols="20" placeholder="Enter hobbies (one per line)"></textarea>
+                                                    <textarea name="preferences[hobbies_interests]" id="hobbies_interests" class="form-control" rows="3" cols="20" placeholder="Enter hobbies (one per line)"></textarea>
                                                 </div>
                                                 <div class="col-md-6 m-t-10">
                                                     <label>Food Preferences</label>
-                                                    <textarea name="foodPreferences" required="" class="form-control" rows="3" cols="20" placeholder="Dietary requirements, favourite foods, etc."></textarea>
+                                                    <textarea name="preferences[food_preferences]" id="food_preferences" class="form-control" rows="3" cols="20" placeholder="Dietary requirements, favourite foods, etc."></textarea>
                                                 </div>
                                                 <div class="col-md-6 m-t-10">
                                                     <label>Personal Care Preferences</label>
-                                                    <textarea name="personalCarePreferences" required="" class="form-control" rows="3" cols="20" placeholder="How they like to be supported with personal care..."></textarea>
+                                                    <textarea name="preferences[personal_care_preferences]" id="personal_care_preferences" class="form-control" rows="3" cols="20" placeholder="How they like to be supported with personal care..."></textarea>
                                                 </div>
                                                 <div class="col-md-12 m-t-10">
                                                     <label>Communication Preferences</label>
-                                                    <textarea name="communicationPreferences" required="" class="form-control" rows="2" cols="20" placeholder="How they prefer to communicate, any aids needed..."></textarea>
+                                                    <textarea name="preferences[communication_preferences]" id="communication_preferences" class="form-control" rows="2" cols="20" placeholder="How they prefer to communicate, any aids needed..."></textarea>
                                                 </div>
                                                 <div class="col-md-12 m-t-10">
                                                     <label>Social Preferences</label>
-                                                    <textarea name="socialPreferences" required="" class="form-control" rows="2" cols="20" placeholder="Social activities, visitors, alone time preferences..."></textarea>
+                                                    <textarea name="preferences[social_preferences]" id="social_preferences" class="form-control" rows="2" cols="20" placeholder="Social activities, visitors, alone time preferences..."></textarea>
+                                                    <input type="hidden" name="preferences[preferences_id]" id="preferences_id">
                                                 </div>
                                             </div>
-                                            <div class="actions">
+                                            <!-- <div class="actions">
                                                 <button type="button" class="cancel">Cancel</button>
                                                 <button type="submit" class="submit">Create Care Plan</button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                                <div class="availabilityTabs__panel" id="carePlanRisk">
-                                    <div class="">
-                                        <div class="workHoursHeader">
-                                            <div class="title"> Risk Factors</div>
-                                            <div class="actions mt-0">
-                                                <button class="borderBtn"> <i class="bx  bx-plus"></i> Add Risk</button>
-                                            </div>
+                                            </div> -->
+
                                         </div>
-                                        <form>
-                                            <div class="leave-card">
-                                                <div class="row">
-                                                    <div class="col-md-12">
-                                                        <div class="ObjectiveEndDelete planActions">
-                                                            <button class="objectiveNumber">Risk 1</button>
-                                                            <button class="danger"><i class="bx  bx-trash"></i> </button>
+                                    </div>
+                                    <div class="availabilityTabs__panel" id="carePlanRisk">
+                                        <div class="">
+                                            <div class="workHoursHeader">
+                                                <div class="title"> Risk Factors</div>
+                                                <div class="actions mt-0">
+                                                    <button type="button" class="borderBtn addMoreClientPlanRisk"> <i class="bx  bx-plus"></i> Add Risk</button>
+                                                </div>
+                                            </div>
+
+                                            <div id="renderClientCarePlanRisk">
+                                                <div class="no-data-card-risk">
+                                                    <div class="noData" style="text-align:center">
+                                                        <div>
+                                                            <i class="bx  bx-alert-triangle"></i>
+                                                            <p>No risk factors identified</p>
                                                         </div>
-                                                    </div>
-                                                    <div class="col-md-12 ">
-                                                        <label>Target Date</label>
-                                                        <input type="date" class="form-control">
-                                                    </div>
-                                                    <div class="col-md-6 m-t-10">
-                                                        <label>Likelihood</label>
-                                                        <select class="form-control">
-                                                            <option>Low</option>
-                                                            <option>Medium</option>
-                                                            <option>Heigh</option>
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-md-6 m-t-10">
-                                                        <label>Impact</label>
-                                                        <select class="form-control">
-                                                            <option>Low</option>
-                                                            <option>Medium</option>
-                                                            <option>Heigh</option>
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-md-12 m-t-10">
-                                                        <label>Control Measures</label>
-                                                        <textarea name="Measures" required="" class="form-control" rows="3" cols="20" placeholder="How is this risk being managed?"></textarea>
                                                     </div>
                                                 </div>
                                             </div>
@@ -5892,34 +5796,40 @@
                                                 </div>
                                                 <div class="col-md-6 ">
                                                     <label>Hospital Preference</label>
-                                                    <input type="text" class="form-control" placeholder="Preferred hospital">
+                                                    <input type="text" class="form-control" placeholder="Preferred hospital" name="emergency_information" id="emergency_information">
                                                 </div>
                                                 <div class="col-md-6">
                                                     <div class="requiresLable">
-                                                        <input type="checkbox" id="DNACPR" name="DNACPR" value="Bike">
-                                                        <label for="DNACPR">DNACPR in place</label>
+                                                        <input type="checkbox" id="dnacpr" class="dnacprCheckbox" name="dnacpr" value="0">
+                                                        <label for="dnacpr">DNACPR in place</label>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-12 m-t-10">
                                                     <label>Emergency Protocol</label>
-                                                    <textarea name="Emergency" required="" class="form-control" rows="3" cols="20" placeholder="What to do in an emergency..."></textarea>
+                                                    <textarea name="emergency_protocol" id="emergency_protocol" class="form-control" rows="3" cols="20" placeholder="What to do in an emergency..."></textarea>
+                                                    <input type="hidden" name="emergency_id" id="emergency_id">
                                                 </div>
                                             </div>
 
 
-                                            <div class="actions">
-                                                <button type="button" class="cancel">Cancel</button>
-                                                <button type="submit" class="submit">Create Care Plan</button>
-                                            </div>
-                                        </form>
+
+
+                                        </div>
                                     </div>
+
                                 </div>
 
                             </div>
-                        </div>
 
+                        </div>
                     </div>
-                </div>
+                    <div class="modal-footer">
+                        <div class="actions dFlexGap justify-content-end">
+                            <button type="button" class="cancel borderBtn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+                            <button type="button" class="submit bgBtn" id="saveClientCarePlanBtn">Create Care Plan</button>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -7645,6 +7555,73 @@
             </div>
         </div>
     </div>
+    <div class="modal fade leaveCommunStyle" id="importDoc" tabindex="1" role="dialog"
+        aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog pModalScroll modalMd">
+            <div class="modal-content">
+                <div class="modal-header p24">
+                    <div class="flexBw mb-3">
+                        <div class="dFlexGap">
+                            <div>
+                                <i class="bx bx-sparkles fs23 purpleTextp"></i>
+                            </div>
+                            <div>
+                                <h4 class="modal-title">AI Document Importer</h4>
+                            </div>
+                        </div>
+                        <button class="close" type="button" data-dismiss="modal" aria-hidden="true">×</button>
+                    </div>
+                    <p class="fs13 textGray500 mb-0">Upload documentation for <strong>{{$clientDetails['name']}}</strong> to automatically extract and create care records</p>
+                </div>
+                <div class="modal-body heightScrollModal" style="height: unset;">
+                    <form id="import_documentForm">
+                        <div class="uploadBox mb-2 text-center" id="uploadBox" style="padding:20px;">
+                            <i class="bx bx-arrow-from-bottom" style="font-size:40px"></i>
+                            <div class="mt-4">
+                                <p class="fs15 mb-3 textGray600 font700">Click to upload documentation</p>
+                                <p class="fs13 mb-2 textGray500">PDF, Word, or Image files</p>
+                            </div>
+                            <input type="file" id="fileInput" style="display:none;" name="import_document">
+                        </div>
+                        <div id="filePreview" style="display:none; border:1px dashed #ccc; padding:20px; text-align:center;">
+                            <i class="bx bx-file" style="font-size:40px; color:#4c6ef5;"></i>
+                            <p id="fileName" class="mt-2"></p>
+                            <p id="fileSize" class="textGray500"></p>
+                            <button type="button" id="removeFile" class="borderBtn m-auto">Remove</button>
+                        </div>
+                        <div class="mt-4">
+                            <label for="">What should we extract?</label>
+                            <div class="dFlexGap flexWrap document_type_badgeSection">
+                                <div>
+                                    <span class="careBadg muteBadges" onclick="document_type(this)">Care Plan</span>
+                                </div>
+                                <div>
+                                    <span class="careBadg muteBadges" onclick="document_type(this,'greenbadges')">Medication / MAR Sheet</span>
+                                </div>
+                                <div>
+                                    <span class="careBadg muteBadges" onclick="document_type(this,'yellowBorderBadg')">Risk Assessment</span>
+                                </div>
+                                <div>
+                                    <span class="careBadg muteBadges" onclick="document_type(this,'purpleBadges')">Behaviour Support Plan</span>
+                                </div>
+                                <div>
+                                    <span class="careBadg muteBadges" onclick="document_type(this)">Mental Capacity Assessment</span>
+                                </div>
+                                <div>
+                                    <span class="careBadg muteBadges" onclick="document_type(this,'redBorderBadg')">PEEP (Emergency Evacuation)</span>
+                                </div>
+
+                            </div>
+                            <div class="mt-4" style="display:none" id="document_typeBtnSection">
+                                <button class="bgBtn w100 purpleBgBtn saveDocument" type="button"> <i class="bx bx-sparkles"></i> Extract Data</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
     <!-- pratima modal end -->
     <!-- script for URL's variables -->
     <script>
@@ -7654,11 +7631,33 @@
         var listClientCareTaskUrl = "{{url('roster/client/care-task-list')}}";
         var clientCareTaskEditUrl = "{{url('/roster/care-task-edit')}}";
         var clientCareTaskDeleteUrl = "{{url('/roster/care-task-delete')}}";
-        var clientCareTaskAddUrl = "{{url('roster/care-task-add')}}";
         var client_id = "{{$client_id}}";
+        var clientCareTaskAddUrl = "{{url('roster/care-task-add?client_id=')}}" + client_id;
+        var saveClientAlertUrl = "{{url('roster/client-alert-save')}}";
+        var editClientAlertUrl = "{{url('roster/client-alert-edit')}}";
+        var listAlertTypeUrl = "{{url('roster/client/alert-type')}}";
+        var increaseAcknowledgeUrl = "{{url('roster/client/alert-increase-acknowledge')}}";
+        var alert_resolveUrl = "{{url('roster/client/alert-resolve')}}";
+        var alert_archivedUrl = "{{url('roster/client/alert-archived')}}";
+        var increaseAllAcknowledgeUrl = "{{url('roster/client/alert-increase-all-acknowledge')}}";
+        var saveDolsUrl = "{{url('roster/client/save-dols')}}";
+        var dolsListUrl = "{{url('roster/client/dols-list')}}";
+        var clientCarePlanSaveUrl = "{{url('roster/client/care-plan-save')}}";
+        var clientCarePlanListUrl = "{{url('roster/client/care-plan-get-list')}}";
+        var clientCarePlanDeleteUrl = "{{url('roster/client/care-plan-delete')}}";
+        var clientCarePlanDetailsUrl = "{{url('roster/client/care-plan-details')}}";
+
+        var clientCarePlanObjectiveDeleteUrl = "{{url('roster/client/care-plan-objective-delete')}}";
+        var clientCarePlanTaskDeleteUrl = "{{url('roster/client/care-plan-task-delete')}}";
+        var clientCarePlanMedicalDeleteUrl = "{{url('roster/client/care-plan-medical-delete')}}";
+        var clientCarePlanRiskDeleteUrl = "{{url('roster/client/care-plan-risk-delete')}}";
+        var get_document_ai_response = "{{url('roster/get-document-ai-response')}}";
     </script>
     <!-- end here -->
     <script src="{{ url('public/js/roster/client/client_details.js')}}" defer></script>
+    <script src="{{ url('public/js/roster/client/client_alert.js')}}" defer></script>
+    <script src="{{ url('public/js/roster/client/client_dols.js')}}" defer></script>
+    <script src="{{ url('public/js/roster/client/care_plan.js')}}" defer></script>
     <script>
         const tabs = document.querySelectorAll(".tab");
         const contents = document.querySelectorAll(".content");
@@ -8471,7 +8470,8 @@
     <!-- pratima js end -->
     <script>
         var clientDetails = @json($clientDetails);
-        // console.log(clientDetails);
+        var task_category = @json($task_category);
+        // console.log(task_category);
     </script>
     <script>
         $(document).on('click', '.editClient', function() {
@@ -8630,6 +8630,28 @@
         $(document).on('click', '.addDolsRecordBtn', function() {
             $(".dolsSectionFirst").show();
             $(".dolsSectionSecond").hide();
+            if ($(this).data('formtype') == 'add') {
+                $("#clientDolsForm")[0].reset();
+            } else {
+                $("#dols_status").val($(this).data('dols_status'));
+                $("#authorisation_type").val($(this).data('authorisation_type'));
+                $("#referral_date").val($(this).data('referral_date'));
+                $("#authorisation_start_date").val($(this).data('authorisation_start_date'));
+                $("#authorisation_end_date").val($(this).data('authorisation_end_date'));
+                $("#review_date").val($(this).data('review_date'));
+                $("#supervisory_body").val($(this).data('supervisory_body'));
+                $("#case_reference").val($(this).data('case_reference'));
+                $("#best_interests_assessor").val($(this).data('best_interests_assessor'));
+                $("#mental_health_assessor").val($(this).data('mental_health_assessor'));
+                $("#reason_for_dols").text($(this).data('reason_for_dols') || '');
+                $("#imca_appointed").val($(this).data('imca_appointed')).prop('checked', $(this).data('imca_appointed') == 1);
+                $("#mental_capacity_assessment").val($(this).data('mental_capacity_assessment')).prop('checked', $(this).data('mental_capacity_assessment') == 1);
+                $("#appeal_rights").val($(this).data('appeal_rights')).prop('checked', $(this).data('appeal_rights') == 1);
+                $("#care_plan_updated").val($(this).data('care_plan_updated')).prop('checked', $(this).data('care_plan_updated') == 1);
+                $("#family_notified").val($(this).data('family_notified')).prop('checked', $(this).data('family_notified') == 1);
+                $("#additional_notes").text($(this).data('additional_notes') || '');
+                $("#dols_id").val($(this).data('id'));
+            }
         });
         $(document).on('click', '#closeDolsformBtn', function() {
             $(".dolsSectionFirst").hide();
@@ -8654,37 +8676,39 @@
     </script>
 
     <!-- for checkbox css -->
-    <script>
-        const selectAll = document.getElementById('selectAllAllert');
-        const actionBox = document.getElementById('actionBox');
-        const checks = document.querySelectorAll('.alertCheck');
-        const closeBtn = document.getElementById('closeActionBox');
+    <!-- <script>
+        $(document).on('click','#selectAllAllert',function(){
+            const selectAll = document.getElementById('selectAllAllert');
+            const actionBox = document.getElementById('actionBox');
+            const checks = document.querySelectorAll('.alertCheck');
+            const closeBtn = document.getElementById('closeActionBox');
 
-        function updateSytemAlert() {
-            const count = document.querySelectorAll('.alertCheck:checked').length;
-            actionBox.style.display = count > 0 ? 'block' : 'none';
-        }
+            function updateSytemAlert() {
+                const count = document.querySelectorAll('.alertCheck:checked').length;
+                actionBox.style.display = count > 0 ? 'block' : 'none';
+                document.getElementById('selectedCheckCount').textContent = count + " selected";
+            }
 
-        selectAll.addEventListener('change', function() {
-            checks.forEach(cb => cb.checked = this.checked);
-            updateSytemAlert();
-        });
-
-        checks.forEach(cb => {
-            cb.addEventListener('change', function() {
-                const total = checks.length;
-                const checked = document.querySelectorAll('.alertCheck:checked').length;
-                selectAll.checked = total === checked;
+            selectAll.addEventListener('change', function() {
+                checks.forEach(cb => cb.checked = this.checked);
                 updateSytemAlert();
             });
-        });
-        closeBtn.addEventListener('click', function() {
-            actionBox.style.display = 'none';
 
-            checks.forEach(cb => cb.checked = false);
-            selectAll.checked = false;
-        });
-    </script>
+            checks.forEach(cb => {
+                cb.addEventListener('change', function() {
+                    const total = checks.length;
+                    const checked = document.querySelectorAll('.alertCheck:checked').length;
+                    selectAll.checked = total === checked;
+                    updateSytemAlert();
+                });
+            });
+            closeBtn.addEventListener('click', function() {
+                actionBox.style.display = 'none';
 
+                checks.forEach(cb => cb.checked = false);
+                selectAll.checked = false;
+            });
+        });
+    </script> -->
     @endsection
 </main>
