@@ -234,6 +234,8 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 			Route::post('/update', [invoiceManagementController::class, 'updateInvoice'])->name('roster.invoice.update');
 			Route::post('/update-status', [invoiceManagementController::class, 'updateInvoiceStatus'])->name('roster.invoice.update-status');
 			Route::get('/download-pdf/{id}', [invoiceManagementController::class, 'downloadPdf'])->name('roster.invoice.download-pdf');
+			Route::get('/get-billing-info', [invoiceManagementController::class, 'getClientBillingInfo'])->name('roster.invoice.get-billing-info');
+			Route::post('/bulk-generate', [invoiceManagementController::class, 'bulkGenerate'])->name('roster.invoice.bulk-generate');
 		});
 
 		// Onboarding Configuration

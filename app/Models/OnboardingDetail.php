@@ -11,7 +11,7 @@ class OnboardingDetail extends Model
     use HasFactory;
     use SoftDeletes;
     
-    protected $fillable = ['home_id','client_id','name','type','vat','frequency','deleted_at'];
+    protected $fillable = ['home_id','client_id','name','type','vat','frequency','frequency_rate','deleted_at'];
 
     public static function saveOnboardingDetail($data){
         self::updateOrCreate(['id' => $data['id'] ?? null],$data);

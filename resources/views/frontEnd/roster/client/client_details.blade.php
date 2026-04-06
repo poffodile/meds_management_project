@@ -28,11 +28,7 @@
                 <!-- yellow  medium  risk-->
                 <div id="headerAlertHtml"></div>
 
-
-
-
                 <div class="moreAllertsSec mt-3">
-
                 </div>
                 <div class="text-center mt-3">
                     <button class="borderBtn showMoreBtn w100" style="display:none">
@@ -114,7 +110,6 @@
                                     <div class="item carertabcontent">
                                         <span class="label">Care Needs</span>
                                         <div class="sectionCarer">
-
                                             <div class="tags">
                                                 <?php
                                                 if (!empty($clientDetails['care_needs'])) {
@@ -134,9 +129,7 @@
                                     </div>
                                 </div>
                             </div>
-
                         </div>
-
                     </div>
                 </div>
 
@@ -144,8 +137,6 @@
                     <!-- onboardinf start -->
                     <div class="onboardingMain">
                         <div class="leave-card">
-
-
                             <div class="">
                                 <div class="medicationManagement" id="availabilityTab">
                                     <div class="availabilityTabs">
@@ -388,8 +379,6 @@
                                                                 </div>
                                                             </div>
                                                         </div>
-
-
                                                     </div>
                                                 </div>
                                                 <!-- boarding click  Consent & Capacity end -->
@@ -404,7 +393,6 @@
                                                                     <h6 class="m-0">Care Assessment</h6>
                                                                     <p class="header-subtitle mb-0">Completed: 09/01/2026</p>
                                                                 </div>
-
                                                             </div>
                                                         </div>
                                                         <div class="d-flex gap-4 align-items-center">
@@ -1325,8 +1313,8 @@
                                                         <div class="row">
                                                             <div class="col-md-12">
                                                                 <div class="flexBw">
-                                                                    <label>Add Details</label>
-                                                                    <button type="button" class="bgBtn onboardingDetailsBtn" data-type="add"><i class="bx bx-plus"></i> Add </button>
+                                                                    <label>Billing Details</label>
+                                                                    <button type="button" class="bgBtn onboardingDetailsBtn" data-type="manage"><i class="bx bx-edit"></i> Manage Funding </button>
 
                                                                 </div>
                                                             </div>
@@ -1338,8 +1326,6 @@
                                                                         <th>Name</th>
                                                                         <th>Funding Type</th>
                                                                         <th>Percentage</th>
-                                                                        <th>Frequency</th>
-                                                                        <th>Action</th>
                                                                     </tr>
                                                                 </thead>
                                                                 <tbody id="onboardingDetailsListHtml">
@@ -1354,20 +1340,11 @@
                                                     </div>
                                                     <div id="dolsPagination"></div>
                                                 </div>
-
-
-
-
-
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-
-
-
-
                         </div>
                     </div>
 
@@ -7684,7 +7661,7 @@
                     <div class="flexBw">
                         <div class="dFlexGap">
                             <div>
-                                <h4 class="modal-title" id="onboardingDetailModalTitle">Add Detail</h4>
+                                <h4 class="modal-title" id="onboardingDetailModalTitle">Billing Details</h4>
                             </div>
                         </div>
                         <button class="close" type="button" data-dismiss="modal" aria-hidden="true">×</button>
@@ -7694,42 +7671,36 @@
                     <div class="modal-body heightScrollModal" style="height: unset;">
                         <div class="row">
                             <div class="col-md-12 col-sm-12">
-                                <div class="mb-3">
-                                    <label for="onboardingDetailName" class="form-label">Name <span class="radStar">*</span></label>
-                                    <input type="text" class="form-control checkOnboardingDetail" id="onboardingDetailName" name="name">
-                                </div>
-                                <div class="mb-3">
-                                    <div class="row">
-                                        <div class="col-md-6 col-sm-6">
-                                            <label for="onboardingDetailperc_amount" class="form-label">Percentage/Amount <span class="radStar">*</span></label>
-                                            <select name="type" id="onboardingDetailperc_amount" class="form-control checkOnboardingDetail">
-                                                <option value="1">Percentage</option>
-                                                <option value="2">Amount</option>
-                                            </select>
+                                <div class="mb-4 onboardingDetailsRow">
+                                    <div class="row align-items-center mb-3">
+                                        <div class="col-md-4">
+                                            <label class="form-label mb-0">Billing Type <span class="radStar">*</span></label>
                                         </div>
-                                        <div class="col-md-6 col-sm-6">
-                                            <label for="onboardingDetailVat" style="visibility:hidden" class="form-label">Vat <span class="radStar">*</span></label>
-                                            <input type="text" class="form-control checkOnboardingDetail" id="onboardingDetailVat" name="vat" onkeypress="return event.charCode>=48&&event.charCode<=57">
+                                        <div class="col-md-8">
+                                            <div class="d-flex align-items-center gap-4">
+                                                <div class="form-check form-check-inline">
+                                                    <input type="radio" class="form-check-input" id="weeklyfrequency" name="frequency" value="1" {{ ($clientDetails['billing_frequency'] == 1 || empty($clientDetails['billing_frequency'])) ? 'checked' : '' }}>
+                                                    <label for="weeklyfrequency" class="form-check-label ms-1">Weekly</label>
+                                                </div>
+                                                <div class="form-check form-check-inline">
+                                                    <input type="radio" class="form-check-input" id="monthlyfrequency" name="frequency" value="2" {{ ($clientDetails['billing_frequency'] == 2) ? 'checked' : '' }}>
+                                                    <label for="monthlyfrequency" class="form-check-label ms-1">Monthly</label>
+                                                </div>
+                                                <input type="text" name="frequency_rate" id="onboardingDetailFrequencyRate" class="form-control checkOnboardingDetail ms-auto" style="width: 150px;" placeholder="Frequency Rate" value="{{ $clientDetails['billing_rate'] ?? ($home_details->weekly_allowance_service_users ?? '') }}">
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="mb-3">
-                                    <div class="row">
-                                        <div class="col-md-6 col-sm-6">
-                                            <label class="form-label">Invoice Frequency <span class="radStar">*</span></label>
-                                        </div>
-                                        <div cold-md-6 col-sm-6>
-                                            <div class="col-md-3 col-sm-3">
-                                                <div class="dFlexGap">
-                                                    <label for="weeklyfrequency" class="form-label mb-0">Weekly</label>
-                                                    <input type="radio" class="form-check-input mt-0" id="weeklyfrequency" name="frequency" value="1" checked>
-                                                </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-md-4">
+                                            <div class="d-flex align-items-center justify-content-between">
+                                                <label class="form-label mb-0">Funding Type <span class="radStar">*</span></label>
+                                                <button type="button" class="btn btn-outline-primary btn-sm addFundingRow"><i class="bx bx-plus"></i></button>
                                             </div>
-                                            <div class="col-md-3 col-sm-3">
-                                                <div class="dFlexGap">
-                                                    <label for="monthlyfrequency" class="form-label mb-0">Monthly</label>
-                                                    <input type="radio" class="form-check-input mt-0" id="monthlyfrequency" name="frequency" value="2">
-                                                </div>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <div id="fundingTypeContainer">
+                                                <!-- Dynamic rows will be loaded here -->
                                             </div>
                                         </div>
                                     </div>
@@ -7742,7 +7713,6 @@
                             <input type="hidden" id="onboardingDetail_id" name="id">
                             <button class="borderBtn" type="button" data-dismiss="modal" aria-hidden="true">Cancel</button>
                             <button type="button" class="bgBtn" id="onboardingDetailSaveBtn"> <i class="bx bx-save"></i> Save</button>
-
                         </div>
                     </div>
                 </form>
@@ -8839,29 +8809,124 @@
         });
     </script> -->
     <script>
+        var globalBillingInfo = {
+            frequency: "{{ $clientDetails['billing_frequency'] ?? '' }}",
+            rate: "{{ $clientDetails['billing_rate'] ?? '' }}"
+        };
+        var currentOnboardingDetails = [];
+
         $(document).on('click', '#onboardingForm', function() {
             onboardingDetailsList();
         });
+
+        $(document).on('click', '.addFundingRow', function() {
+            var newRow = `
+                <div class="row funding-row mb-2">
+                    <div class="col-md-5">
+                        <input type="text" class="form-control checkOnboardingDetail" name="name[]" placeholder="Funding Name">
+                    </div>
+                    <div class="col-md-3">
+                        <select name="type[]" class="form-control checkOnboardingDetail">
+                            <option value="1">Percentage</option>
+                            <option value="2" selected>Amount</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control checkOnboardingDetail" name="vat[]" placeholder="Value">
+                    </div>
+                    <div class="col-md-1">
+                        <button type="button" class="btn btn-outline-danger btn-sm removeFundingRow"><i class="bx bx-minus"></i></button>
+                    </div>
+                </div>`;
+            $('#fundingTypeContainer').append(newRow);
+        });
+
+        $(document).on('click', '.removeFundingRow', function() {
+            // Check if it's the last row, maybe keep it but empty? OR just remove if there's at least one left.
+            // For now, simple remove.
+            $(this).closest('.funding-row').remove();
+        });
+
+        $(document).on('click', '.removeFundingRow', function() {
+            $(this).closest('.funding-row').remove();
+        });
+
         $(document).on('click', '.onboardingDetailsBtn', function() {
             var type = $(this).data('type');
             $("#onboardingDetails").modal('show');
             $("#onboardingDetailForm")[0].reset();
-            $("#onboardingDetailModalTitle").text("Add Detail");
-            if (type == 'edit') {
-                $("#onboardingDetailModalTitle").text("Edit Detail");
-                $("#onboardingDetail_id").val($(this).data('id'));
-                $("#onboardingDetailName").val($(this).data('name'));
-                $("#onboardingDetailperc_amount").val($(this).data('db_type'));
-                $("#onboardingDetailVat").val($(this).data('vat'));
-                if ($(this).data('frequency') == 1) {
-                    $("#weeklyfrequency").prop('checked', true);
-                    $("#monthlyfrequency").prop('checked', false);
-                } else {
-                    $("#weeklyfrequency").prop('checked', false);
-                    $("#monthlyfrequency").prop('checked', true);
-                }
+            $("#onboardingDetailModalTitle").text("Manage Billing Details");
+
+            // Clear existing rows
+            $('#fundingTypeContainer').empty();
+
+            if (currentOnboardingDetails.length > 0) {
+                currentOnboardingDetails.forEach((val, index) => {
+                    var newRow = `
+                        <div class="row funding-row mb-2">
+                            <input type="hidden" name="detail_ids[]" value="${val.id}">
+                            <div class="col-md-5">
+                                <input type="text" class="form-control checkOnboardingDetail" name="name[]" placeholder="Funding Name" value="${val.name}">
+                            </div>
+                            <div class="col-md-3">
+                                <select name="type[]" class="form-control checkOnboardingDetail">
+                                    <option value="1" ${val.type == 1 ? 'selected' : ''}>Percentage</option>
+                                    <option value="2" ${val.type == 2 ? 'selected' : ''}>Amount</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <input type="text" class="form-control checkOnboardingDetail" name="vat[]" placeholder="Value" value="${val.vat}">
+                            </div>
+                            <div class="col-md-1">
+                                <button type="button" class="btn btn-outline-danger btn-sm removeFundingRow"><i class="bx bx-minus"></i></button>
+                            </div>
+                        </div>`;
+                    $('#fundingTypeContainer').append(newRow);
+                });
+            } else {
+                // Add one empty row if no data exists
+                var emptyRow = `
+                    <div class="row funding-row mb-2">
+                        <div class="col-md-5">
+                            <input type="text" class="form-control checkOnboardingDetail" name="name[]" placeholder="Funding Name">
+                        </div>
+                        <div class="col-md-3">
+                            <select name="type[]" class="form-control checkOnboardingDetail">
+                                <option value="1">Percentage</option>
+                                <option value="2" selected>Amount</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <input type="text" class="form-control checkOnboardingDetail" name="vat[]" placeholder="Value">
+                        </div>
+                        <div class="col-md-1">
+                            <button type="button" class="btn btn-outline-danger btn-sm removeFundingRow"><i class="bx bx-minus"></i></button>
+                        </div>
+                    </div>`;
+                $('#fundingTypeContainer').append(emptyRow);
             }
 
+            // Always use global settings for frequency and rate
+            var currentFreq = globalBillingInfo.frequency;
+            var currentRate = globalBillingInfo.rate;
+
+            if (currentFreq == 1 || currentFreq == '') {
+                $("#weeklyfrequency").prop('checked', true);
+                if (currentRate == '') currentRate = "{{ $home_details->weekly_allowance_service_users ?? '' }}";
+            } else if (currentFreq == 2) {
+                $("#monthlyfrequency").prop('checked', true);
+                if (currentRate == '') currentRate = "{{ $home_details->monthly_allowance_service_users ?? '' }}";
+            }
+            $("#onboardingDetailFrequencyRate").val(currentRate);
+        });
+
+        $(document).on('change', '#onboardingDetailForm input[name="frequency"]', function() {
+            var frequency = $(this).val();
+            if (frequency == 1) { // Weekly
+                $("#onboardingDetailFrequencyRate").val("{{ $home_details->weekly_allowance_service_users ?? '' }}");
+            } else if (frequency == 2) { // Monthly
+                $("#onboardingDetailFrequencyRate").val("{{ $home_details->monthly_allowance_service_users ?? '' }}");
+            }
         });
         $(document).on('click', '#onboardingDetailSaveBtn', function() {
             var checkError = 0;
@@ -8880,6 +8945,10 @@
             } else {
                 var data = new FormData($("#onboardingDetailForm")[0]);
                 data.append('client_id', client_id);
+                // In edit mode, the detail_ids array needs to be present
+                if ($("#onboardingDetail_id").val() != '') {
+                    data.append('detail_ids[]', $("#onboardingDetail_id").val());
+                }
                 $.ajax({
                     type: "POST",
                     url: "{{url('roster/onboarding-detail-save')}}",
@@ -8936,6 +9005,8 @@
                     }
                     if (response.success === true) {
                         var db_data = response.data;
+                        var billing = response.billing;
+                        globalBillingInfo = billing; // Update global billing info
                         $("#onboardingDetailsListHtml").empty();
                         if (db_data.length > 0) {
                             db_data.forEach(val => {
@@ -8944,24 +9015,19 @@
                                     type = 'Amount';
                                 }
                                 var frequency = 'Weekly';
-                                if (val.frequency == 2) {
+                                if (billing.frequency == 2) {
                                     frequency = 'Monthly';
                                 }
                                 var htmlData = `<tr>
                                                 <td>${val.name}</td>
                                                 <td>${type}</td>
                                                 <td>${val.vat}</td>
-                                                <td>${frequency}</td>
-                                                <td>
-                                                    <div class="planActions">
-                                                        <button type="button" class="onboardingDetailsBtn" data-type="edit" data-id="${val.id}" data-name="${val.name}" data-db_type="${val.type}" data-vat="${val.vat}" data-frequency="${val.frequency}"><i class="bx  bx-pencil"></i> </button>
-                                                        <button class="danger onboardingDetailDelete" type="button" data-id="${val.id}"><i class="bx  bx-trash"></i> </button>
-                                                    </div>
-                                                </td>
                                             </tr>`;
                                 $("#onboardingDetailsListHtml").append(htmlData);
                             });
+                            currentOnboardingDetails = db_data; // Store globally
                         } else {
+                            currentOnboardingDetails = [];
                             var noOnboardingData = `<tr><td colspan="5">
                                                         <div class="noData" style="text-align:center">
                                                         <div>
