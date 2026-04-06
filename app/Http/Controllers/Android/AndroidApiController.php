@@ -480,8 +480,8 @@ class AndroidApiController extends Controller
                 $activity = new LoginInActivity();
                 $activity->user_id = $request->user_id;
                 $activity->shift_id = $request->shift_id;
-                $activity->login_date = date('Y-m-d');
-                $activity->check_in_time = date("Y-m-d H:i:s");
+                $activity->login_date = \Carbon\Carbon::now()->toDateString();
+                $activity->check_in_time = \Carbon\Carbon::now();
                 $activity->latitude_in = $request->latitude_in;
                 $activity->longitude_in = $request->longitude_in;
                 $activity->check_in_reason = $request->check_in_reason ?? '';
@@ -489,6 +489,7 @@ class AndroidApiController extends Controller
                 $activity->save();
 
                 if ($activity->id) {
+                    ScheduledShift::where('id', $request->shift_id)->update(['status' => 'in_progress']);
                     return response()->json(['success' => true, 'message' => 'Checked in successfully..! ', 'Data' => $activity->id], 200);
                 }
                 return response()->json(['success' => false, 'message' => 'Error in record insert'], 200);
@@ -529,14 +530,40 @@ class AndroidApiController extends Controller
             $response = LoginInActivity::where('id', $request->activity_id)
                 ->where('user_id', $request->user_id)
                 ->update([
-                    'check_out_time' => date("Y-m-d H:i:s"),
+                    'check_out_time' => \Carbon\Carbon::now(),
                     'latitude_out' => $request->latitude_out,
                     'longitude_out' => $request->longitude_out,
                     'check_out_reason' => $request->check_out_reason ?? ''
                 ]);
-
+            // dd($response);
             if ($response) {
-                return response()->json(['success' => true, 'message' => 'Checked out successfully..! ', 'Data' => $response, 'activity_id' => $request->activity_id, 'time' => date("Y-m-d H:i:s")], 200);
+                // Determine shift status
+                $hasActiveClockIn = LoginInActivity::where('shift_id', $request->shift_id)
+                    ->whereNull('check_out_time')
+                    ->where('is_deleted', 0)
+                    ->exists();
+
+                $shift = ScheduledShift::find($request->shift_id);
+                $status = 'assigned';
+
+                if ($hasActiveClockIn) {
+                    $status = 'in_progress';
+                } elseif ($shift) {
+                    $shiftEndTime = \Carbon\Carbon::parse($shift->start_date . ' ' . $shift->end_time);
+                    if ($shift->end_time < $shift->start_time) {
+                        $shiftEndTime->addDay();
+                    }
+
+                    if (\Carbon\Carbon::now()->greaterThanOrEqualTo($shiftEndTime)) {
+                        $status = 'completed';
+                    }
+                }
+
+                if ($shift) {
+                    $shift->update(['status' => $status]);
+                }
+
+                return response()->json(['success' => true, 'message' => 'Checked out successfully..! ', 'Data' => $response, 'activity_id' => $request->activity_id, 'time' => \Carbon\Carbon::now()->toDateTimeString()], 200);
             }
             return response()->json(['success' => false, 'message' => 'Error in record update'], 200);
         } else {
@@ -574,7 +601,7 @@ class AndroidApiController extends Controller
 
         $limit = $request->limit ? $request->limit : 10;
         $page = $request->page ? $request->page : 1;
-        
+
         $recordArray = array();
         $activities = LoginInActivity::where('user_id', $request->user_id)
             ->orderBy('id', 'DESC')
@@ -670,8 +697,8 @@ class AndroidApiController extends Controller
             ], 200);
         }
         return response()->json([
-            'success' => false, 
-            'message' => 'No data', 
+            'success' => false,
+            'message' => 'No data',
             'total' => $activities->total(),
             'current_page' => $activities->currentPage(),
             'last_page' => $activities->lastPage(),

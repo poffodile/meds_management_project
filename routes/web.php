@@ -49,6 +49,7 @@ use App\Http\Controllers\frontEnd\Roster\Staff\invoiceManagementController;
 use App\Http\Controllers\frontEnd\Roster\TaskCenter\TaskCenterController;
 use App\Http\Controllers\frontEnd\Roster\Staff\OnboardingConfigurationController;
 use App\Http\Controllers\frontEnd\Roster\Staff\AuditLogController;
+use App\Http\Controllers\frontEnd\Roster\OnboardingDetailController;
 
 
 // Backend Controllers
@@ -183,6 +184,10 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 		Route::delete('/schedule-shift/delete/{id}', [ScheduleShiftController::class, 'deleteShift'])->name('roster.schedule.delete');
 		Route::post('/schedule-shift/assign-shift', [ScheduleShiftController::class, 'assignShift'])->name('roster.schedule.assign.shift');
 
+		// Schedule Shift Acknowledge
+		Route::post('/schedule-shift/acknowledge/status_change', [ScheduleShiftController::class, 'update_acknowledge'])->name('roster.schedule.acknowledge');
+		Route::get('/schedule-shift/load-past-shift', [ScheduleShiftController::class, 'load_past_shift'])->name('roster.schedule.load_past_shift');
+
 		// Staff Supervisions
 		Route::get('supervision-management', [SupervisionController::class, 'index']);
 		Route::post('supervision-management/record/save', [SupervisionController::class, 'record_saved'])->name('roster.supervision.save');
@@ -223,7 +228,13 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 
 
 		// invoicemanagement
-		Route::get('invoice-management', [invoiceManagementController::class, 'index']);
+		Route::prefix('invoice-management')->group(function () {
+			Route::get('/', [invoiceManagementController::class, 'index'])->name('roster.invoice.management');
+			Route::post('/create', [invoiceManagementController::class, 'createInvoice'])->name('roster.invoice.create');
+			Route::post('/update', [invoiceManagementController::class, 'updateInvoice'])->name('roster.invoice.update');
+			Route::post('/update-status', [invoiceManagementController::class, 'updateInvoiceStatus'])->name('roster.invoice.update-status');
+			Route::get('/download-pdf/{id}', [invoiceManagementController::class, 'downloadPdf'])->name('roster.invoice.download-pdf');
+		});
 
 		// Onboarding Configuration
 		Route::get('onboarding-configuration', [OnboardingConfigurationController::class, 'index']);
@@ -236,6 +247,11 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 		Route::post('onboarding-configuration/stages/delete', [OnboardingConfigurationController::class, 'delete_stages'])->name('roster.onboarding.stages.delete');
 		Route::post('onboarding-configuration/stages/ordering', [OnboardingConfigurationController::class, 'ordering_stages'])->name('roster.onboarding.stages.ordering');
 		Route::post('onboarding-configuration/stages/details', [OnboardingConfigurationController::class, 'details_stages'])->name('roster.onboarding.stages.details');
+
+		// Onboarding detail
+		Route::post('/onboarding-detail-save', [OnboardingDetailController::class, 'onboarding_detail_save']);
+		Route::post('/onboarding-detail-list', [OnboardingDetailController::class, 'onboarding_detail_list']);
+		Route::post('/onboarding-detail-delete', [OnboardingDetailController::class, 'onboarding_detail_delete']);
 	});
 
 	// Report Section

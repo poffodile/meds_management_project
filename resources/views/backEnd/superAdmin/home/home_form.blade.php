@@ -148,6 +148,13 @@ if (isset($system_admin_home)) {
 										<input type="number" step="0.01" name="weekly_allowance_service_users" class="form-control" placeholder="Weekly allowance" value="{{ (isset($system_admin_home->weekly_allowance_service_users)) ? $system_admin_home->weekly_allowance_service_users : '' }}">
 									</div>
 								</div>
+
+								<div class="form-group">
+									<label class="col-lg-3 control-label">Monthly Allowance (Service Users)</label>
+									<div class="col-lg-9">
+										<input type="number" step="0.01" name="monthly_allowance_service_users" class="form-control" placeholder="Monthly allowance" value="{{ (isset($system_admin_home->monthly_allowance_service_users)) ? $system_admin_home->monthly_allowance_service_users : '' }}">
+									</div>
+								</div>
 								<div class="form-group">
 									<label class="col-lg-3 control-label"></label>
 									<div class="col-lg-9">

@@ -52,14 +52,16 @@ class ScheduledShift extends Model
     {
         return $this->belongsTo(\App\User::class, 'staff_id');
     }
-    public function todayShifts()
+    public function scopeTodayShifts($query)
     {
-        return $this->whereDate('start_date', date('Y-m-d'));
+        return $query->whereDate('start_date', date('Y-m-d'));
     }
-    public function unfilledShifts()
+
+    public function scopeUnfilledShifts($query)
     {
-        return $this->where('status', 'unfilled');
+        return $query->where('status', 'unfilled');
     }
+
     public function scopeHomeId($query)
     {
         return $query->where('home_id', Auth::user()->home_id);

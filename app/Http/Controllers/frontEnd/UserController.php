@@ -394,7 +394,7 @@ class UserController extends Controller
 		$user = User::where('id', $user_id)
 			->where('security_code', $security_code)
 			->first();
-		$user->security_code = '';
+		// $user->security_code = '';
 		$user->password =	Hash::make($data['password']);
 		//echo $data['password']; die;
 		if ($user->save()) {

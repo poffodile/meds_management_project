@@ -17,6 +17,7 @@ use Carbon\Carbon;
 use App\User;
 use App\Models\HomeArea;
 use App\Services\Staff\StaffTaskService;
+use Illuminate\Support\Facades\Validator;
 
 class ScheduleShiftController extends Controller
 {
@@ -339,7 +340,7 @@ class ScheduleShiftController extends Controller
                     'start_time_raw'   => $startTime->format('H:i'),
                     'end_time_raw'     => $endTime->format('H:i'),
                     'shift_type_raw'   => $shift->shift_type,
-                    'shift_category_id'=> $shift->shift_category_id,
+                    'shift_category_id' => $shift->shift_category_id,
                     'care_type_id'     => $shift->care_type_id,
                     'assignment'       => $shift->assignment,
                     'notes'            => $shift->notes,
@@ -573,6 +574,66 @@ class ScheduleShiftController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Shift assigned successfully'
+        ]);
+    }
+
+    public function update_acknowledge(Request $req)
+    {
+        try {
+            $validator = Validator::make($req->all(), [
+                'shift_id' => 'required',
+            ]);
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => $validator->errors()->first()
+                ], 422);
+            }
+            $isArray = is_array($req->shift_id);
+            if ($isArray) {
+                foreach ($req->shift_id as $id) {
+                    $d = ScheduledShift::find($id);
+                    $d->acknowledge = 1;
+                    $d->save();
+                }
+            } else {
+                $d = ScheduledShift::find($req->shift_id);
+                $d->acknowledge = 1;
+                $d->save();
+            }
+            return response()->json([
+                'status' => true,
+                'message' => 'Success'
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage() . ' on line ' . $e->getLine() . ' in ' . $e->getFile()
+            ], 500);
+        }
+    }
+    public function load_past_shift()
+    {
+        $now = Carbon::now();
+        $alertScheduledShift = ScheduledShift::homeId()
+            ->with(['client:id,name', 'staff:id,name'])
+            ->where(function ($q) use ($now) {
+                $q->whereDate('start_date', '<', $now->toDateString())
+                    ->orWhere(function ($q2) use ($now) {
+                        $q2->whereDate('start_date', $now->toDateString()) // today
+                            ->where('start_time', '<', $now->toTimeString()); // time bhi nikal gaya
+                    });
+            })
+            ->whereIn('status', ['unfilled', 'assigned', 'in_progress'])
+            ->latest()
+            ->paginate(5);
+        return response()->json([
+            'status' => true,
+            'data' => $alertScheduledShift->items(),
+            'pagination' => [
+                'next_page_url' => $alertScheduledShift->nextPageUrl(),
+                'prev_page_url' => $alertScheduledShift->previousPageUrl()
+            ],
         ]);
     }
 }

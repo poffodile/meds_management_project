@@ -5,9 +5,9 @@ namespace App\Http\Controllers\Api\Staff;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Auth, DB;
+use Illuminate\Support\Facades\DB;
 use App\User, App\ServiceUser, App\Admin, App\Home, App\LogBook;
-use Session;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Hash;
 use App\Services\Staff\AddStaffService;
 use App\Http\Requests\Staff\StoreStaffRequest;
@@ -21,6 +21,8 @@ use App\Models\Timesheet;
 use App\Models\HomeManagement\PayRate;
 use App\Models\HomeManagement\PayRateType;
 use App\Models\ShiftCategory;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -1127,6 +1129,10 @@ class UserController extends Controller
 
 	public function downloadPayslip($staff_id, $week_key)
 	{
+		Log::info('downloadPayslip', [
+			'staff_id' => $staff_id,
+			'week_key' => $week_key
+		]);
 		$timesheets = Timesheet::where('staff_id', $staff_id)
 			->where('status', 'processed')
 			->whereHas('shift', function ($query) use ($week_key) {
@@ -1166,8 +1172,13 @@ class UserController extends Controller
 				]
 			]
 		];
-
+		Log::info('downloadPayslip Group', [
+			'group' => $group
+		]);
 		$pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('frontEnd.roster.payroll_finance.payroll_report', compact('group'));
+		Log::info('downloadPayslip PDF', [
+			'pdf' => $pdf->output()
+		]);
 		return $pdf->download('Payslip-' . $week_key . '.pdf');
 	}
 }

@@ -197,6 +197,7 @@ if ($company_package != '') {
                                         <tr>
                                             <th>Title</th>
                                             <th>Weekly Allowance</th>
+                                            <th>Monthly Allowance</th>
                                             <th>image</th>
                                             <th>QR Code</th>
                                             <th>Actions</th>
@@ -206,7 +207,7 @@ if ($company_package != '') {
                                         <?php
                                         if ($system_admins->isEmpty()) {
                                             echo '<tr style="text-align:center">
-                                                    <td colspan="5">No home found.</td>
+                                                    <td colspan="6">No home found.</td>
                                                   </tr>';
                                         } else {
                                             foreach ($system_admins as $key => $value) {
@@ -218,6 +219,7 @@ if ($company_package != '') {
                                                 <tr class="">
                                                     <td>{{ $value->title }}</td>
                                                     <td>£{{ number_format($value->weekly_allowance_service_users ?? 0, 2) }}</td>
+                                                    <td>£{{ number_format($value->monthly_allowance_service_users ?? 0, 2) }}</td>
                                                     <td><img src="{{ $image }}" height="50px" width="auto"></td>
                                                     <td style="width: 25%;">@if($value->qr_code_id == NULL) <button class="re-generateQR" onclick="generateQR(<?= $value->id ?>);"><span>Generate QR</span></button> <button><i class="fa fa-qrcode" aria-hidden="true"></i></button> @else <button class="re-generateQR" onclick="generateQR(<?= $value->id ?>);"><span>Re-Generate QR</span></button> <button class="re-generateQR" onclick="ViewQR(<?= $value->id ?>);"><span>View</span></button> @endif </td>
                                                     <td class="action-icn">

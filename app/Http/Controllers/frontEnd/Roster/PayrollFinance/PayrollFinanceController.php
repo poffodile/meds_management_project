@@ -10,9 +10,17 @@ use App\Models\HomeManagement\PayRate;
 use App\Models\HomeManagement\PayRateType;
 use Illuminate\Support\Facades\Log;
 use Exception;
+use App\Services\Invoice\InvoiceService;
 
 class PayrollFinanceController extends Controller
 {
+    protected $invoiceService;
+
+    public function __construct(InvoiceService $invoiceService)
+    {
+        $this->invoiceService = $invoiceService;
+    }
+
     public function index()
     {
         $homeId = \Illuminate\Support\Facades\Auth::user()->home_id;
@@ -261,11 +269,18 @@ class PayrollFinanceController extends Controller
 
         if (count($processedIds) > 0) {
             \App\Models\Timesheet::whereIn('id', $processedIds)->update(['status' => 'processed']);
+            
+            // AUTOMATED INVOICE GENERATION
+            try {
+                $this->invoiceService->generateInvoicesFromProcessedTimesheets($week_start, $homeId);
+            } catch (\Exception $e) {
+                Log::error('Automated Invoice Error: ' . $e->getMessage());
+            }
         }
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Processed ' . count($processedIds) . ' timesheets for this period.'
+            'message' => 'Processed ' . count($processedIds) . ' timesheets and generated client invoices.'
         ]);
     }
     public function timesheetreconciliation(Request $request)

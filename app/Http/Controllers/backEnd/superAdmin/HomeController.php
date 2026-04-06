@@ -5,10 +5,10 @@ namespace App\Http\Controllers\backEnd\superAdmin;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Session;
+use Illuminate\Support\Facades\Session;
 use App\Home, App\CompanyCharges, App\CompanyPayment, App\Admin, App\CompanyPaymentInformation, App\AdminCardDetail, App\States;
 use App\Models\HomeArea;
-use DB;
+use Illuminate\Support\Facades\DB;
 use Hash;
 use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
@@ -56,7 +56,7 @@ class HomeController extends Controller
         }
         // echo "<pre>"; print_r($disable_btn); die;
         $current_date   = Carbon::now();
-        $sa_home_query  = DB::table('home')->where('admin_id', $system_admin_id)->select('id', 'admin_id', 'title', 'image', 'qr_code_id', 'is_home_area')->where('is_deleted', '0');
+        $sa_home_query  = DB::table('home')->where('admin_id', $system_admin_id)->select('id', 'admin_id', 'title', 'image', 'qr_code_id', 'is_home_area', 'weekly_allowance_service_users', 'monthly_allowance_service_users')->where('is_deleted', '0');
         $search = '';
 
         if (isset($request->limit)) {
@@ -118,6 +118,7 @@ class HomeController extends Controller
             $system_admin_home->is_home_area               = $request->is_home_area ?? 0;
             $system_admin_home->is_registered               = $data['is_registered'] ?? 0;
             $system_admin_home->weekly_allowance_service_users = $data['weekly_allowance_service_users'] ?? 0;
+            $system_admin_home->monthly_allowance_service_users = $data['monthly_allowance_service_users'] ?? 0;
 
             if (!empty($_FILES['image']['name'])) {
                 $tmp_image  =   $_FILES['image']['tmp_name'];
@@ -202,6 +203,7 @@ class HomeController extends Controller
                 $system_admin_home->is_registered             = $request->is_registered;
                 $system_admin_home->is_home_area             = $request->is_home_area ?? 0;
                 $system_admin_home->weekly_allowance_service_users = $request->weekly_allowance_service_users ?? 0;
+                $system_admin_home->monthly_allowance_service_users = $request->monthly_allowance_service_users ?? 0;
                 $system_admin_home->latitude                  = $latitude;
                 $system_admin_home->longitude                 = $longitude;
                 //$system_admin_home->image            = $request->image;

@@ -254,21 +254,21 @@
     <div class="py-4" id="payroll-content">
         <div class="no-print" style="padding: 10px 20px; display: flex; justify-content: flex-end; border-bottom: 1px solid #eee; margin-bottom: 10px; gap: 10px;">
             @php
-                $path = trim(request()->path(), '/');
-                $isApi = request()->is('api/*');
-                $isPayslip = str_contains($path, 'staff-payslip');
-                $segments = explode('/', $path);
+            $path = trim(request()->path(), '/');
+            $isApi = request()->is('api/*');
+            $isPayslip = str_contains($path, 'staff-payslip');
+            $segments = explode('/', $path);
 
-                if ($isPayslip) {
-                    $staff_id = $segments[count($segments) - 2];
-                    $routeName = $isApi ? 'api.staff.payslip.download' : 'roster.staff.payslip.download';
-                    $downloadUrl = route($routeName, [$staff_id, $group['week_key']]);
-                } else {
-                    $downloadUrl = route('roster.payroll.report.download', $group['week_key']);
-                }
+            if ($isPayslip) {
+            $staff_id = $segments[count($segments) - 2];
+            $routeName = $isApi ? 'api.staff.payslip.download' : 'roster.staff.payslip.download';
+            $downloadUrl = route($routeName, [$staff_id, $group['week_key']]);
+            } else {
+            $downloadUrl = route('roster.payroll.report.download', $group['week_key']);
+            }
             @endphp
 
-            <button onclick="window.print()" class="no-print-btn" style="background: #64748b;">
+            <button type="button" onclick="window.print()" class="no-print-btn" style="background: #64748b;">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                     <path d="M2.5 8a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z" />
                     <path d="M5 1a2 2 0 0 0-2 2v2H2a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h1v1a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-1h1a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-1V3a2 2 0 0 0-2-2H5zM4 3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2H4V3zm1 5a.5.5 0 0 0 0 1h6a.5.5 0 0 0 0-1H5zm0 2a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1H5z" />
