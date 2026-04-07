@@ -1064,7 +1064,7 @@ class UserController extends Controller
 				'shift_count'   => $weekT->count() + $weekS->count(),
 				'status'        => ($weekT->count() > 0 && $weekT->where('status', 'approved')->count() == 0) ? 'processed' : 'pending',
 				'week_key'      => $key,
-				'payslip_url'   => url('api/staff/staff-payslip/' . $staffId . '/' . $key)
+				'payslip_url'   => $weekT->where('status', 'processed')->isNotEmpty() ? url('api/staff/staff-payslip/' . $staffId . '/' . $key) : ""
 			];
 		})->values();
 
@@ -1104,7 +1104,13 @@ class UserController extends Controller
 				return $t;
 			});
 
-		if ($timesheets->isEmpty()) abort(404, 'Payslip not found.');
+		if ($timesheets->isEmpty()) {
+			return response()->json([
+				'success' => false,
+				'message' => 'Payslip not found.',
+				'url' => ''
+			]);
+		}
 
 		$start = Carbon::parse($week_key);
 		$group = [
@@ -1153,7 +1159,14 @@ class UserController extends Controller
 				return $t;
 			});
 
-		if ($timesheets->isEmpty()) abort(404, 'Payslip not found.');
+		if ($timesheets->isEmpty()) {
+			return response()->json([
+				'success' => false,
+				'message' => 'Payslip not found.',
+				'url' => ''
+			]);
+		}
+
 
 		$start = Carbon::parse($week_key);
 		$group = [

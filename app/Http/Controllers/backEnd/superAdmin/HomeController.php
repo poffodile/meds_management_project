@@ -200,8 +200,8 @@ class HomeController extends Controller
                 $system_admin_home->home_area                 = $request->home_area;
                 // $system_admin_home->location_history_duration = $request->location_history_duration;
                 // $system_admin_home->rota_time_format          = $request->rota_time_format;
-                $system_admin_home->is_registered             = $request->is_registered;
                 $system_admin_home->is_home_area             = $request->is_home_area ?? 0;
+                $system_admin_home->is_registered             = $request->is_registered;
                 $system_admin_home->weekly_allowance_service_users = $request->weekly_allowance_service_users ?? 0;
                 $system_admin_home->monthly_allowance_service_users = $request->monthly_allowance_service_users ?? 0;
                 $system_admin_home->latitude                  = $latitude;
