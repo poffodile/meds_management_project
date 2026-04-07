@@ -22,7 +22,7 @@ class OnboardingDetailController extends Controller
             $names = $request->input('name');
             $types = $request->input('type');
             $vats = $request->input('vat');
-            $ids = $request->input('detail_ids');
+            $ids = $request->input('detail_ids') ?? [];
             $frequency = $request->input('frequency');
             $frequency_rate = $request->input('frequency_rate');
             $client_id = $request->input('client_id');
@@ -70,22 +70,77 @@ class OnboardingDetailController extends Controller
             return response()->json(['success' => false, 'message' => $e->getMessage()]);
         }
     }
+    // public function onboarding_detail_list(Request $request)
+    // {
+    //     // echo "<pre>";print_r($request->all());die;
+    //     $list = OnboardingDetail::onboardingDetailList($request->all());
+    //     $serviceUser = ServiceUser::find($request->client_id);
+
+    //     return response()->json([
+    //         'success' => true,
+    //         'message' => 'onboarding list',
+    //         'data' => $list,
+    //         'billing' => [
+    //             'frequency' => $serviceUser->billing_frequency ?? '',
+    //             'rate' => $serviceUser->billing_rate ?? ''
+    //         ]
+    //     ]);
+    // }
+
     public function onboarding_detail_list(Request $request)
     {
-        // echo "<pre>";print_r($request->all());die;
-        $list = OnboardingDetail::onboardingDetailList($request->all());
-        $serviceUser = ServiceUser::find($request->client_id);
+        try {
+            // 🔹 Log incoming request
+            Log::info('onboarding_detail_list - Request Data', [
+                'request' => $request->all()
+            ]);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'onboarding list',
-            'data' => $list,
-            'billing' => [
-                'frequency' => $serviceUser->billing_frequency ?? '',
-                'rate' => $serviceUser->billing_rate ?? ''
-            ]
-        ]);
+            // 🔹 Fetch onboarding list
+            $list = OnboardingDetail::onboardingDetailList($request->all());
+
+            Log::info('onboarding_detail_list - List Data', [
+                'list' => $list
+            ]);
+
+            // 🔹 Fetch service user
+            $serviceUser = ServiceUser::find($request->client_id);
+
+            Log::info('onboarding_detail_list - Service User', [
+                'client_id' => $request->client_id,
+                'serviceUser' => $serviceUser
+            ]);
+
+            // 🔹 Response log
+            $response = [
+                'success' => true,
+                'message' => 'onboarding list',
+                'data' => $list,
+                'billing' => [
+                    'frequency' => $serviceUser->billing_frequency ?? '',
+                    'rate' => $serviceUser->billing_rate ?? ''
+                ]
+            ];
+
+            Log::info('onboarding_detail_list - Response', $response);
+
+            return response()->json($response);
+        } catch (\Exception $e) {
+
+            // 🔥 Error log (MOST IMPORTANT)
+            Log::error('onboarding_detail_list - ERROR', [
+                'message' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong'
+            ], 500);
+        }
     }
+
     public function onboarding_detail_delete(Request $request)
     {
         // echo "<pre>";print_r($request->all());die;

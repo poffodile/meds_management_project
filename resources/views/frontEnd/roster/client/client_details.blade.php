@@ -20,7 +20,6 @@
                 <!-- <button class="btn borderBtn"><i class='bx  bx-arrow-in-up-square-half'></i> Import Documents</button> -->
                 <button class="btn borderBtn" type="button" data-toggle="modal" data-target="#importDoc"><i class='bx  bx-arrow-in-up-square-half'></i> Import Documents</button>
                 <button class="btn allBtnUseColor"><i class='bx  bx-sparkles'></i> Generate Care Plan</button>
-
             </div>
         </div>
         <div class="row">
@@ -4024,12 +4023,9 @@
                                             <p class="metaLine"> <strong>Alternative:</strong> School attendance records, feedback from school. </p>
                                         </div>
                                     </div>
-
                                 </div>
                             </div>
-
                         </div>
-
                     </div>
 
 
@@ -7652,10 +7648,24 @@
 
     </div>
     <!-- pratima modal end -->
+    <style>
+        .monthlyWeekly input[type=radio] {
+            margin: -6px 0 0;
+        }
+
+        .basicTable .table>thead>tr>th {
+            font-size: 14px;
+        }
+
+        .basicTable .table>tbody>tr>td {
+            font-size: 14px;
+            color: #3b3b3b;
+        }
+    </style>
     <!-- Ram Modal start -->
     <div class="modal fade leaveCommunStyle" id="onboardingDetails" tabindex="1" role="dialog"
         aria-labelledby="myModalLabel" aria-hidden="true">
-        <div class="modal-dialog pModalScroll">
+        <div class="modal-dialog pModalScroll modal-lg">
             <div class="modal-content">
                 <div class="modal-header p24">
                     <div class="flexBw">
@@ -7673,32 +7683,32 @@
                             <div class="col-md-12 col-sm-12">
                                 <div class="mb-4 onboardingDetailsRow">
                                     <div class="row align-items-center mb-3">
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <label class="form-label mb-0">Billing Type <span class="radStar">*</span></label>
                                         </div>
-                                        <div class="col-md-8">
+                                        <div class="col-md-9">
                                             <div class="d-flex align-items-center gap-4">
-                                                <div class="form-check form-check-inline">
+                                                <div class="monthlyWeekly form-check form-check-inline d-flex align-items-center gap-2">
                                                     <input type="radio" class="form-check-input" id="weeklyfrequency" name="frequency" value="1" {{ ($clientDetails['billing_frequency'] == 1 || empty($clientDetails['billing_frequency'])) ? 'checked' : '' }}>
                                                     <label for="weeklyfrequency" class="form-check-label ms-1">Weekly</label>
                                                 </div>
-                                                <div class="form-check form-check-inline">
+                                                <div class="monthlyWeekly form-check form-check-inline d-flex align-items-center gap-2">
                                                     <input type="radio" class="form-check-input" id="monthlyfrequency" name="frequency" value="2" {{ ($clientDetails['billing_frequency'] == 2) ? 'checked' : '' }}>
                                                     <label for="monthlyfrequency" class="form-check-label ms-1">Monthly</label>
                                                 </div>
-                                                <input type="text" name="frequency_rate" id="onboardingDetailFrequencyRate" class="form-control checkOnboardingDetail ms-auto" style="width: 150px;" placeholder="Frequency Rate" value="{{ $clientDetails['billing_rate'] ?? ($home_details->weekly_allowance_service_users ?? '') }}">
+                                                <input type="text" name="frequency_rate" id="onboardingDetailFrequencyRate" class="form-control checkOnboardingDetail ms-auto" placeholder="Frequency Rate" value="{{ $clientDetails['billing_rate'] ?? ($home_details->weekly_allowance_service_users ?? '') }}">
                                             </div>
                                         </div>
                                     </div>
 
                                     <div class="row mb-2">
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <div class="d-flex align-items-center justify-content-between">
                                                 <label class="form-label mb-0">Funding Type <span class="radStar">*</span></label>
                                                 <button type="button" class="btn btn-outline-primary btn-sm addFundingRow"><i class="bx bx-plus"></i></button>
                                             </div>
                                         </div>
-                                        <div class="col-md-8">
+                                        <div class="col-md-9">
                                             <div id="fundingTypeContainer">
                                                 <!-- Dynamic rows will be loaded here -->
                                             </div>
