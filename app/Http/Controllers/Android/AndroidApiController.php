@@ -629,7 +629,14 @@ class AndroidApiController extends Controller
                 $client_name = $shift->client->name ?? '';
                 $shiftStart = \Carbon\Carbon::parse($shift->start_date . ' ' . $shift->start_time);
                 $shiftEnd = \Carbon\Carbon::parse($shift->start_date . ' ' . $shift->end_time);
-                $shift_time = $shiftStart->diff($shiftEnd)->format('%H:%I:%S');
+
+                // Handle shifts that span across midnight
+                if ($shiftEnd->lt($shiftStart)) {
+                    $shiftEnd->addDay();
+                }
+
+                $totalShiftMinutes = $shiftStart->diffInMinutes($shiftEnd);
+                $shift_time = sprintf('%02d:%02d', floor($totalShiftMinutes / 60), $totalShiftMinutes % 60);
 
                 if (!is_null($activity->check_out_time)) {
                     $actualStart = \Carbon\Carbon::parse($activity->check_in_time);
@@ -650,15 +657,14 @@ class AndroidApiController extends Controller
                     if ($overtimeSeconds > 0) {
                         $hours = floor($overtimeSeconds / 3600);
                         $minutes = floor(($overtimeSeconds / 60) % 60);
-                        $seconds = $overtimeSeconds % 60;
-                        $overtime = sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
+                        $overtime = sprintf('%02d:%02d', $hours, $minutes);
                     }
                 }
             }
 
             $data['client_name'] = $client_name;
-            $data['shift_time'] = !empty($shift_time) ? \Carbon\Carbon::parse($shift_time)->format('H:i') : "";
-            $data['overtime']   = !empty($overtime) ? \Carbon\Carbon::parse($overtime)->format('H:i') : "00:00";
+            $data['shift_time'] = $shift_time;
+            $data['overtime']   = $overtime;
 
             if (is_null($activity->check_out_time)) {
                 $check_out = "";
@@ -666,12 +672,15 @@ class AndroidApiController extends Controller
                 $data['check_out_time'] = "";
                 $data['logged_time'] = "";
             } else {
-                $check_out = $activity->check_out_time;
                 $checkIn  = \Carbon\Carbon::parse($activity->check_in_time);
                 $checkOut = \Carbon\Carbon::parse($activity->check_out_time);
-                $logged_time = $checkIn->diff($checkOut)->format('%H:%I:%S');
-                $data['check_out_time'] = \Carbon\Carbon::parse($check_out)->format('H:i');
-                $data['logged_time'] = \Carbon\Carbon::parse($logged_time)->format('H:i');
+                
+                $totalLoggedMinutes = $checkIn->diffInMinutes($checkOut);
+                $hours = floor($totalLoggedMinutes / 60);
+                $minutes = $totalLoggedMinutes % 60;
+
+                $data['check_out_time'] = $checkOut->format('H:i');
+                $data['logged_time'] = sprintf('%02d:%02d', $hours, $minutes);
             }
             if (is_null($activity->latitude_out) || is_null($activity->longitude_out)) {
                 $latitude_out = "";
