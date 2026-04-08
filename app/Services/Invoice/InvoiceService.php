@@ -3,12 +3,7 @@
 namespace App\Services\Invoice;
 
 use App\Models\Invoice\Invoice;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Carbon;
-
-// use App\Models\QuoteCallBack;
-
-
 
 class InvoiceService
 {
@@ -87,9 +82,9 @@ class InvoiceService
             'home_id' => $home_id,
             'customer_ref' => $clientId,
         ])
-        ->whereIn('status', ['Draft', 'Invoiced', 'Outstanding', 'Paid'])
-        ->where('invoice_date', now()->format('Y-m-d')) // Basic check for same generation day
-        ->first();
+            ->whereIn('status', ['Draft', 'Invoiced', 'Outstanding', 'Paid'])
+            ->where('invoice_date', now()->format('Y-m-d')) // Basic check for same generation day
+            ->first();
 
         // Optional: More advanced check based on period string in product description could be added
         // but for now, we'll block multiple generations for the same client on the same day.
@@ -238,16 +233,16 @@ class InvoiceService
 
         foreach ($clientTimesheets as $clientId => $items) {
             if (!$clientId) continue;
-            
+
             // Check if client has billing rate set
             $client = \App\ServiceUser::find($clientId);
             if (!$client || !$client->billing_rate) continue;
 
             $invoice = $this->generateInvoiceForClientPeriod(
-                $clientId, 
-                $start, 
-                $end, 
-                $home_id, 
+                $clientId,
+                $start,
+                $end,
+                $home_id,
                 null, // PeriodType handled by client preference
                 $items
             );

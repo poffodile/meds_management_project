@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
+use App\LoginInActivity;
 
 class ScheduledShift extends Model
 {
@@ -70,5 +71,10 @@ class ScheduledShift extends Model
     public function timesheet()
     {
         return $this->hasOne(Timesheet::class, 'shift_id');
+    }
+
+    public function loginActivities()
+    {
+        return $this->hasMany(LoginInActivity::class, 'shift_id');
     }
 }
