@@ -27,7 +27,7 @@ class invoiceManagementController extends Controller
 
     public function downloadPdf($id)
     {
-        $invoice = Invoice::with(['customers', 'invoiceProducts'])->find($id);
+        $invoice = Invoice::with(['serviceUser', 'invoiceProducts'])->find($id);
         if (!$invoice) return abort(404);
 
         $home = \App\Home::find($invoice->home_id);
@@ -35,7 +35,7 @@ class invoiceManagementController extends Controller
         $data = [
             'invoice' => $invoice,
             'home' => $home,
-            'customer' => $invoice->customers,
+            'customer' => $invoice->serviceUser,
             'products' => $invoice->invoiceProducts
         ];
 
@@ -46,7 +46,7 @@ class invoiceManagementController extends Controller
     public function index(Request $request)
     {
         $home_id = Auth::user()->home_id;
-        $query = Invoice::with('customers')
+        $query = Invoice::with('serviceUser')
             ->where('home_id', $home_id)
             ->whereNull('deleted_at');
 
@@ -58,7 +58,7 @@ class invoiceManagementController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('invoice_ref', 'like', "%$search%")
-                    ->orWhereHas('customers', function ($q2) use ($search) {
+                    ->orWhereHas('serviceUser', function ($q2) use ($search) {
                         $q2->where('name', 'like', "%$search%");
                     });
             });
@@ -67,7 +67,7 @@ class invoiceManagementController extends Controller
         $invoices = $query->orderBy('created_at', 'desc')->get();
 
         $clients = ServiceUser::where(['home_id' => $home_id, 'is_deleted' => 0])->get();
-        $payers = Customer::where(['home_id' => $home_id, 'status' => 1])->get();
+        $payers = $clients; // All payers are now clients (service users)
 
         // Summary stats always based on all non-deleted invoices for this home
         $allInvoices = Invoice::where('home_id', $home_id)->whereNull('deleted_at')->get();

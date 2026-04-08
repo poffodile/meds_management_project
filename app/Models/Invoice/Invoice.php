@@ -68,8 +68,8 @@ class Invoice extends Model
     public static function getAllInvoices($home_id){
         return self::where('home_id',$home_id)->whereNull('deleted_at');
     }
-    public function customers(){
-        return $this->belongsTo(Customer::class, 'customer_id','id');
+    public function serviceUser(){
+        return $this->belongsTo(\App\ServiceUser::class, 'customer_ref','id');
     }
     public function sites(){
         return $this->belongsTo(Constructor_customer_site::class, 'site_delivery_add_id','id');

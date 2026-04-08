@@ -121,13 +121,11 @@ class InvoiceService
         $finalAmount = $baseAmount - $totalDeductions;
         if ($finalAmount < 0) $finalAmount = 0;
 
-        // 3. Find or Create Customer
-        $customer = $this->findOrCreateCustomerForClient($client, $home_id);
-
         // 4. Create Invoice
         $invoice = Invoice::create([
             'home_id' => $home_id,
-            'customer_id' => $customer->id,
+            'customer_id' => 0, // Decoupled from legacy customers table
+            'customer_ref' => $clientId, // Direct link to service_user table
             'invoice_ref' => $this->generateInvoiceRef(),
             'invoice_date' => now()->format('Y-m-d'),
             'due_date' => now()->addDays(14)->format('Y-m-d'),
@@ -141,11 +139,6 @@ class InvoiceService
             'site_delivery_add_id' => 0,
             'invoice_type' => 1,
             'deposit_percentage' => 0,
-        ]);
-
-        // Store client and period info for regeneration if needed
-        $invoice->update([
-            'customer_ref' => $clientId, // Using customer_ref to store client link for roster invoices
         ]);
 
         // 5. Create Product Line Item
@@ -165,7 +158,7 @@ class InvoiceService
         \App\Models\Invoice\InvoiceProduct::create([
             'home_id' => $home_id,
             'invoice_id' => $invoice->id,
-            'customer_id' => $customer->id,
+            'customer_id' => 0, // Decoupled
             'product_id' => 0,
             'description' => ucfirst($periodType) . " Care Services for " . $client->name . " ($periodStr). Total shifts hours: " . number_format($totalHours, 1),
             'qty' => 1,
@@ -263,22 +256,5 @@ class InvoiceService
         }
 
         return $count;
-    }
-
-    public function findOrCreateCustomerForClient($client, $home_id)
-    {
-        $customer = \App\Models\Customer::where('name', $client->name)->where('home_id', $home_id)->first();
-        if (!$customer) {
-            $customer = \App\Models\Customer::create([
-                'home_id' => $home_id,
-                'name' => $client->name,
-                'contact_name' => $client->name,
-                'email' => $client->email,
-                'telephone' => $client->phone_no,
-                'status' => 1,
-                'is_converted' => 1
-            ]);
-        }
-        return $customer;
     }
 }

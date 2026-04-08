@@ -741,7 +741,7 @@ class UserController extends Controller
 		// Check for previous shift status
 		$lastPreviousShift = ScheduledShift::where('staff_id', $staffId)
 			->where('start_date', '<', $today)
-			->where('status', 'assigned')
+			->whereIn('status', ['assigned', 'in_progress'])
 			->orderBy('start_date', 'desc')
 			->orderBy('start_time', 'desc')
 			->select('start_time', 'end_time', 'tasks', 'notes', 'id', 'start_date', 'status')
@@ -770,7 +770,7 @@ class UserController extends Controller
 		$currentTime = $londonTime->format('H:i:s');
 		$todayShift = ScheduledShift::where('staff_id', $staffId)
 			->where('start_date', $today)
-			->where('status', 'assigned')
+			->whereIn('status', ['assigned', 'in_progress'])
 			->orderBy('start_time', 'asc')
 			->select('start_time', 'end_time', 'tasks', 'notes', 'id')
 			->get();
