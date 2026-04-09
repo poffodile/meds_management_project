@@ -67,6 +67,7 @@
                     <button class="tab" data-tab="clientEmergencyTab"> Emergency </button>
                     <button class="tab" data-tab="clientDocumentsTab"> Documents </button>
                     <button class="tab" data-tab="clientProgressReportTab"> Progress Report </button>
+                    <button class="tab" data-tab="clientExpensesTab" onclick="getExpenses()"> Expenses </button>
                 </div>
             </div>
 
@@ -5372,7 +5373,6 @@
                                         </div>
                                         <div>
                                             <div class="emergencyMain p-4">
-
                                                 <div class="detail_chart_doc">
                                                     <div class=" d-flex justify-content-between align-items-center mb-4">
                                                         <div class="d-flex gap-3 align-items-center">
@@ -5397,7 +5397,6 @@
                                                         <div class="progressBar">
                                                             <div class="progressFill" style="width:30%;background:#2563eb"></div>
                                                         </div>
-
                                                         <div>
                                                             <span class="careBadg">3/10</span>
                                                         </div>
@@ -5408,13 +5407,10 @@
                                         </div>
                                         <div>
                                             <div class="emergencyMain p-4">
-
                                                 <div class="detail_chart_doc">
                                                     <div class=" d-flex justify-content-between align-items-center mb-4">
-
                                                         <div class="d-flex gap-3 align-items-center">
                                                             <div>
-
                                                                 <div style="display: inline-block; background-color: rgba(99, 102, 241, 0.125); padding: 5px; border-radius: 6px; text-align: center; line-height: 18px;">
                                                                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: rgb(99, 102, 241);">
                                                                         <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path>
@@ -5422,8 +5418,7 @@
                                                                 </div>
                                                             </div>
                                                             <div>
-                                                                <h5>Activities & Engagement
-                                                                </h5>
+                                                                <h5>Activities & Engagement</h5>
                                                             </div>
                                                         </div>
                                                         <div>
@@ -5503,18 +5498,93 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Expenses Tab -->
+                <div class="content" id="clientExpensesTab">
+                    <div class="topHeaderCont">
+                        <div>
+                            <h1 style="font-size:18px;">Client Expenses</h1>
+                            <p class="header-subtitle">Manage and track expenses for {{$clientDetails['name']}}</p>
+                        </div>
+                        <div class="header-actions">
+                            <button class="btn bgBtn" data-toggle="modal" data-target="#addExpenseModal">
+                                <i class='bx bx-plus me-2'></i> Add Expense
+                            </button>
+                        </div>
+                    </div>
+                    <div class="sectionWhiteBgAllUse p24">
+                        <div class="table-responsive">
+                            <table class="table custom-table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Title</th>
+                                        <th>Amount</th>
+                                        <th>Notes</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="clientExpensesListHtml">
+                                    <!-- Data will be loaded via AJAX -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
             <!-- END TAB CONTENT -->
         </div>
 
     </div>
 
-
+    <!-- Add Expense Modal -->
+    <div class="modal fade leaveCommunStyle" id="addExpenseModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title"><i class="bx bx-plus"></i> Add Expense</h4>
+                </div>
+                <form id="clientExpenseForm">
+                    @csrf
+                    <input type="hidden" name="id" id="expense_id">
+                    <input type="hidden" name="service_user_id" value="{{$clientDetails['id']}}">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Date <span class="text-danger">*</span></label>
+                                    <input type="date" name="expense_date" id="expense_date" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Title <span class="text-danger">*</span></label>
+                                    <input type="text" name="title" id="expense_title" class="form-control" placeholder="Expense Title" required>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Amount <span class="text-danger">*</span></label>
+                                    <input type="number" step="0.01" name="amount" id="expense_amount" class="form-control" placeholder="0.00" required>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Notes</label>
+                                    <textarea name="notes" id="expense_notes" class="form-control" rows="3" placeholder="Additional details..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn borderBtn" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn allbuttonDarkClr">Save Expense</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
-
-
-
-
 
     <!-- add Carer Modal -->
     <div class="modal fade leaveCommunStyle" id="addcreateCarePlanModal" tabindex="1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -7557,11 +7627,9 @@
                                                                 <li class="trendClass-option" data-value="2"> Stable</li>
                                                                 <li class="trendClass-option" data-value="2">Slight Decline</li>
                                                                 <li class="trendClass-option" data-value="2">Significant Decline</li>
-
                                                             </ul>
                                                         </div>
                                                     </div>
-
                                                 </div>
                                             </div>
                                         </div>
@@ -9108,6 +9176,115 @@
                     }
                 });
             }
+        });
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            const parts = dateStr.split('-');
+            if (parts.length !== 3) return dateStr;
+            return `${parts[2]}-${parts[1]}-${parts[0]}`;
+        }
+
+        function getExpenses() {
+            $.ajax({
+                type: "POST",
+                url: "{{url('roster/client-expense-list')}}",
+                data: {
+                    service_user_id: "{{$clientDetails['id']}}",
+                    _token: "{{csrf_token()}}"
+                },
+                success: function(response) {
+                    if (response.success) {
+                        var html = '';
+                        if (response.data.length > 0) {
+                            response.data.forEach(function(expense) {
+                                html += `<tr>
+                                    <td>${formatDate(expense.expense_date)}</td>
+                                    <td>${expense.title}</td>
+                                    <td>£${parseFloat(expense.amount).toFixed(2)}</td>
+                                    <td>${expense.notes || ''}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-info editExpense" data-id="${expense.id}" data-date="${expense.expense_date}" data-title="${expense.title}" data-amount="${expense.amount}" data-notes="${expense.notes || ''}">
+                                            <i class="bx bx-edit"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-danger deleteExpense" data-id="${expense.id}">
+                                            <i class="bx bx-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>`;
+                            });
+                        } else {
+                            html = '<tr><td colspan="5" class="text-center">No expenses found</td></tr>';
+                        }
+                        $('#clientExpensesListHtml').html(html);
+                    }
+                }
+            });
+        }
+
+        $('#clientExpenseForm').on('submit', function(e) {
+            e.preventDefault();
+            $.ajax({
+                type: "POST",
+                url: "{{url('roster/client-expense-save')}}",
+                data: $(this).serialize(),
+                success: function(response) {
+                    if (response.success) {
+                        $('#addExpenseModal').modal('hide');
+                        $('#clientExpenseForm')[0].reset();
+                        $('#expense_id').val('');
+                        getExpenses();
+                        toastr.success(response.message);
+                    } else {
+                        toastr.error(response.message);
+                    }
+                }
+            });
+        });
+
+        $(document).on('click', '.editExpense', function() {
+            var id = $(this).data('id');
+            var date = $(this).data('date');
+            var title = $(this).data('title');
+            var amount = $(this).data('amount');
+            var notes = $(this).data('notes');
+
+            $('#expense_id').val(id);
+            $('#expense_date').val(date);
+            $('#expense_title').val(title);
+            $('#expense_amount').val(amount);
+            $('#expense_notes').val(notes);
+            $('#addExpenseModal').modal('show');
+            $('.modal-title').html('<i class="bx bx-edit"></i> Edit Expense');
+        });
+
+        $(document).on('click', '.deleteExpense', function() {
+            if (confirm('Are you sure you want to delete this expense?')) {
+                var id = $(this).data('id');
+                $.ajax({
+                    type: "POST",
+                    url: "{{url('roster/client-expense-delete')}}",
+                    data: {
+                        id: id,
+                        _token: "{{csrf_token()}}"
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            getExpenses();
+                            toastr.success(response.message);
+                        } else {
+                            toastr.error(response.message);
+                        }
+                    }
+                });
+            }
+        });
+
+        // Reset modal title when adding new
+        $(document).on('click', '[data-target="#addExpenseModal"]', function() {
+            $('#clientExpenseForm')[0].reset();
+            $('#expense_id').val('');
+            $('.modal-title').html('<i class="bx bx-plus"></i> Add Expense');
         });
     </script>
     @endsection

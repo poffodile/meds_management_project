@@ -224,4 +224,19 @@ class invoiceManagementController extends Controller
             return response()->json(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
         }
     }
+
+    public function getInvoiceDetails(Request $request)
+    {
+        $id = $request->id;
+        $invoice = Invoice::find($id);
+        if (!$invoice) return response()->json(['success' => false]);
+
+        $products = \App\Models\Invoice\InvoiceProduct::where('invoice_id', $id)->get();
+
+        return response()->json([
+            'success' => true,
+            'invoice' => $invoice,
+            'products' => $products
+        ]);
+    }
 }

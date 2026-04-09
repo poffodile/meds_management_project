@@ -20,15 +20,11 @@ class InvoiceService
         $invoice = [
             'home_id' => $home_id,
             'customer_id' =>  $request->customer_id,
-            'project_id' =>  $data->project_id ?? 0,
-            'site_delivery_add_id' =>  $data->site_delivery_add_id ?? null,
             'invoice_ref' => $this->generateInvoiceRef(),
             'invoice_type' => 1,
-            'customer_ref' => $data->customer_ref ?? null,
             'invoice_date' => Carbon::now()->format('Y-m-d'),
             'due_date' => Carbon::now()->addDays(14)->format('Y-m-d'),
             'status' => 'Draft',
-            'deposit_percentage' => $request->deposit_percentage ?? 0,
             'sub_total' => $request->sub_total ?? 0,
             'VAT_id' => $request->VAT_id ?? 0,
             'VAT_amount' => $request->VAT_amount ?? 0,
@@ -113,30 +109,37 @@ class InvoiceService
             }
         }
 
-        $finalAmount = $baseAmount - $totalDeductions;
+        // 3. Fetch Unbilled Expenses for the client within the period
+        $expenses = \App\Models\ServiceUserManagement\ServiceUserExpense::where('service_user_id', $clientId)
+            ->whereBetween('expense_date', [$start->format('Y-m-d'), $end->format('Y-m-d')])
+            ->whereNull('invoice_id')
+            ->get();
+        $totalExpenses = $expenses->sum('amount');
+
+        $finalAmount = ($baseAmount - $totalDeductions) + $totalExpenses;
         if ($finalAmount < 0) $finalAmount = 0;
 
         // 4. Create Invoice
         $invoice = Invoice::create([
             'home_id' => $home_id,
-            'customer_id' => 0, // Decoupled from legacy customers table
-            'customer_ref' => $clientId, // Direct link to service_user table
+            'customer_id' => $clientId, // Decoupled from legacy customers table
             'invoice_ref' => $this->generateInvoiceRef(),
             'invoice_date' => now()->format('Y-m-d'),
             'due_date' => now()->addDays(14)->format('Y-m-d'),
             'sub_total' => $finalAmount,
-            'VAT_id' => 0,
-            'VAT_amount' => 0,
             'Total' => $finalAmount,
             'outstanding' => $finalAmount,
             'status' => 'Draft',
-            'project_id' => 0,
-            'site_delivery_add_id' => 0,
             'invoice_type' => 1,
-            'deposit_percentage' => 0,
         ]);
 
-        // 5. Create Product Line Item
+        // Mark expenses as invoiced
+        foreach ($expenses as $expense) {
+            $expense->invoice_id = $invoice->id;
+            $expense->save();
+        }
+
+        // 5. Create Care Service Line Item
         $periodStr = $start->format('d M') . ' to ' . $end->format('d M Y');
         $totalHours = 0;
         if ($timesheets) {
@@ -150,19 +153,37 @@ class InvoiceService
             }
         }
 
+        $baseServiceAmount = ($baseAmount - $totalDeductions);
         \App\Models\Invoice\InvoiceProduct::create([
             'home_id' => $home_id,
             'invoice_id' => $invoice->id,
-            'customer_id' => 0, // Decoupled
+            'customer_id' => 0,
             'product_id' => 0,
             'description' => ucfirst($periodType) . " Care Services for " . $client->name . " ($periodStr). Total shifts hours: " . number_format($totalHours, 1),
             'qty' => 1,
-            'price' => $finalAmount,
+            'price' => $baseServiceAmount,
             'discount' => 0,
             'discount_type' => 'fixed',
             'vat_id' => 0,
             'vat' => 0,
         ]);
+
+        // 6. Create Line Items for each Expense
+        foreach ($expenses as $expense) {
+            \App\Models\Invoice\InvoiceProduct::create([
+                'home_id' => $home_id,
+                'invoice_id' => $invoice->id,
+                'customer_id' => 0,
+                'product_id' => 0,
+                'description' => "Expense: " . $expense->title . " (" . Carbon::parse($expense->expense_date)->format('d M Y') . ")",
+                'qty' => 1,
+                'price' => $expense->amount,
+                'discount' => 0,
+                'discount_type' => 'fixed',
+                'vat_id' => 0,
+                'vat' => 0,
+            ]);
+        }
 
         return $invoice;
     }
@@ -191,20 +212,29 @@ class InvoiceService
             }
         }
 
-        $finalAmount = $billingRate - $totalDeductions;
+        // Fetch Unbilled Expenses for the client
+        $totalExpenses = \App\Models\ServiceUserManagement\ServiceUserExpense::where('invoice_id', $invoiceId)->sum('amount');
+
+        $finalAmount = ($billingRate - $totalDeductions) + $totalExpenses;
         if ($finalAmount < 0) $finalAmount = 0;
 
         $invoice->update([
             'sub_total' => $finalAmount,
             'Total' => $finalAmount,
-            'outstanding' => $finalAmount
+            'outstanding' => $finalAmount,
         ]);
 
-        // Update main product line item too
-        $product = \App\Models\Invoice\InvoiceProduct::where('invoice_id', $invoice->id)->first();
-        if ($product) {
-            $product->update(['price' => $finalAmount]);
+        // Update product line item for care services
+        $careProduct = \App\Models\Invoice\InvoiceProduct::where('invoice_id', $invoiceId)
+            ->where('description', 'like', '%' . ucfirst($client->billing_frequency == 2 ? 'monthly' : 'weekly') . ' Care Services%')
+            ->first();
+
+        if ($careProduct) {
+            $careProduct->update(['price' => ($billingRate - $totalDeductions)]);
         }
+
+        // Expenses are already listed as separate line items and their cost is fixed (not based on client rate)
+        // so we just ensure the totals are correct.
 
         return true;
     }

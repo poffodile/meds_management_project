@@ -33,6 +33,7 @@ use App\Http\Controllers\frontEnd\Roster\ScheduleShiftController;
 use App\Http\Controllers\frontEnd\Roster\Staff\CarerAvailabilityController;
 use App\Http\Controllers\frontEnd\Roster\Staff\StaffTaskController;
 use App\Http\Controllers\frontEnd\Roster\Client\ClientController;
+use App\Http\Controllers\frontEnd\Roster\Client\ClientExpenseController;
 use App\Http\Controllers\frontEnd\Roster\Staff\CarerController;
 use App\Http\Controllers\frontEnd\Roster\Staff\CarerDetailsController;
 use App\Http\Controllers\frontEnd\Roster\Staff\StaffQualificationController;
@@ -202,6 +203,11 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 		Route::post('/client-search', [ClientController::class, 'client_search']);
 		Route::get('/care-task-add', [ClientController::class, 'care_task_add']);
 
+		// Client Controller Expenses
+		Route::post('/client-expense-save', [ClientExpenseController::class, 'save']);
+		Route::post('/client-expense-list', [ClientExpenseController::class, 'list']);
+		Route::post('/client-expense-delete', [ClientExpenseController::class, 'delete']);
+
 		Route::get('/incident-management', [IncidentManagementController::class, 'index'])->name('roster.incident.management');
 		Route::get('/incident-ai-prevention', [IncidentManagementController::class, 'ai_prevention']);
 		Route::get('/incident-report-details/{id}', [IncidentManagementController::class, 'incident_report_details']);
@@ -236,6 +242,7 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 			Route::get('/download-pdf/{id}', [invoiceManagementController::class, 'downloadPdf'])->name('roster.invoice.download-pdf');
 			Route::get('/get-billing-info', [invoiceManagementController::class, 'getClientBillingInfo'])->name('roster.invoice.get-billing-info');
 			Route::post('/bulk-generate', [invoiceManagementController::class, 'bulkGenerate'])->name('roster.invoice.bulk-generate');
+			Route::get('/get-details', [invoiceManagementController::class, 'getInvoiceDetails'])->name('roster.invoice.get-details');
 		});
 
 		// Onboarding Configuration

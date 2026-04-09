@@ -120,6 +120,9 @@
                             </h6>
                         </div>
                         <div class="d-flex gap-2">
+                            <button class="borderBtn view-invoice" data-id="{{ $invoice->id }}">
+                                <i class="bx bx-show me-2 f18"></i> View
+                            </button>
                             @if($invoice->status == 'Draft')
                             <button class="borderBtn edit-invoice"
                                 data-id="{{ $invoice->id }}"
@@ -283,8 +286,75 @@
     </div>
 </div>
 
+<!-- View Invoice Modal -->
+<div class="modal fade" id="viewInvoiceModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content premium-modal">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="h5Head modTitle">Invoice Details - <span id="view_inv_ref"></span></h5>
+                <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="table-responsive">
+                    <table class="table custom-table">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Description</th>
+                                <th class="text-right">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody id="viewInvoiceItems">
+                            <!-- Items will be loaded here -->
+                        </tbody>
+                        <tfoot>
+                            <tr class="font-weight-bold">
+                                <td class="text-right">Total Amount</td>
+                                <td class="text-right" id="view_inv_total"></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="bgBtn" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     $(document).ready(function() {
+        // View Invoice Details
+        $(document).on('click', '.view-invoice', function() {
+            var id = $(this).data('id');
+            $('#viewInvoiceItems').html('<tr><td colspan="2" class="text-center"><i class="bx bx-loader-alt bx-spin"></i> Loading...</td></tr>');
+            $('#viewInvoiceModal').modal('show');
+
+            $.ajax({
+                url: "{{ route('roster.invoice.get-details') }}",
+                type: "GET",
+                data: {
+                    id: id
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $('#view_inv_ref').text(response.invoice.invoice_ref);
+                        $('#view_inv_total').text('£' + parseFloat(response.invoice.Total).toFixed(2));
+
+                        var html = '';
+                        response.products.forEach(function(item) {
+                            html += `<tr>
+                                <td>${item.description}</td>
+                                <td class="text-right">£${parseFloat(item.price).toFixed(2)}</td>
+                            </tr>`;
+                        });
+                        $('#viewInvoiceItems').html(html);
+                    } else {
+                        toastr.error('Failed to load invoice details.');
+                    }
+                }
+            });
+        });
         // Bulk Generate
         $('#bulkGenerateForm').on('submit', function(e) {
             e.preventDefault();
