@@ -243,6 +243,7 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 			Route::get('/get-billing-info', [invoiceManagementController::class, 'getClientBillingInfo'])->name('roster.invoice.get-billing-info');
 			Route::post('/bulk-generate', [invoiceManagementController::class, 'bulkGenerate'])->name('roster.invoice.bulk-generate');
 			Route::get('/get-details', [invoiceManagementController::class, 'getInvoiceDetails'])->name('roster.invoice.get-details');
+			Route::post('/regenerate', [invoiceManagementController::class, 'regenerateInvoice'])->name('roster.invoice.regenerate');
 		});
 
 		// Onboarding Configuration

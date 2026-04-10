@@ -4,8 +4,6 @@ namespace App\Models\Invoice;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Customer;
-use App\Models\Constructor_customer_site;
 
 class Invoice extends Model
 {
@@ -17,8 +15,10 @@ class Invoice extends Model
         'invoice_ref',
         'invoice_type',
         'invoice_date',
+        'payment_terms',
         'due_date',
         'sub_total',
+        'deposit_percentage',
         'VAT_id',
         'VAT_amount',
         'Total',
@@ -44,7 +44,7 @@ class Invoice extends Model
     }
     public function serviceUser()
     {
-        return $this->belongsTo(\App\ServiceUser::class, 'customer_ref', 'id');
+        return $this->belongsTo(\App\ServiceUser::class, 'customer_id', 'id');
     }
     public function invoiceAttachments()
     {

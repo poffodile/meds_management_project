@@ -23,9 +23,11 @@ class InvoiceService
             'invoice_ref' => $this->generateInvoiceRef(),
             'invoice_type' => 1,
             'invoice_date' => Carbon::now()->format('Y-m-d'),
+            'payment_terms' => 14,
             'due_date' => Carbon::now()->addDays(14)->format('Y-m-d'),
             'status' => 'Draft',
             'sub_total' => $request->sub_total ?? 0,
+            'deposit_percentage' => 0,
             'VAT_id' => $request->VAT_id ?? 0,
             'VAT_amount' => $request->VAT_amount ?? 0,
             'Total' => $request->total ?? 0,
@@ -72,19 +74,9 @@ class InvoiceService
         $start = Carbon::parse($start);
         $end = Carbon::parse($end);
 
-        // Duplicate Check: Look for existing invoice for this client within the same period 
-        // to prevent double billing (checking customer_ref which stores clientId)
-        $existing = Invoice::where([
-            'home_id' => $home_id,
-            'customer_ref' => $clientId,
-        ])
-            ->whereIn('status', ['Draft', 'Invoiced', 'Outstanding', 'Paid'])
-            ->where('invoice_date', now()->format('Y-m-d')) // Basic check for same generation day
-            ->first();
-
-        // Optional: More advanced check based on period string in product description could be added
-        // but for now, we'll block multiple generations for the same client on the same day.
-        if ($existing) return null;
+        // 1. Overlap Check: Prevent invoices with overlapping periods
+        $overlap = $this->checkForOverlap($clientId, $start, $end);
+        if ($overlap) return null;
 
         // Fetch client billing settings
         $billingFrequency = $client->billing_frequency; // 1 = Weekly, 2 = Monthly
@@ -98,37 +90,37 @@ class InvoiceService
         // 1. Calculate base amount
         $baseAmount = $billingRate;
 
-        // 2. Calculate deductions from onboarding_details
-        $onboardingDetails = \App\Models\OnboardingDetail::where('client_id', $clientId)->get();
-        $totalDeductions = 0;
-        foreach ($onboardingDetails as $detail) {
-            if ($detail->type == 1) { // Percentage
-                $totalDeductions += ($billingRate * floatval($detail->vat) / 100);
-            } else { // Amount
-                $totalDeductions += floatval($detail->vat);
-            }
-        }
+        // 2. Calculate Service Charges from onboarding_details (Skip - requested to remove)
+        $totalServiceCharges = 0;
 
-        // 3. Fetch Unbilled Expenses for the client within the period
+        // 3. Fetch Unbilled Expenses for the client
         $expenses = \App\Models\ServiceUserManagement\ServiceUserExpense::where('service_user_id', $clientId)
-            ->whereBetween('expense_date', [$start->format('Y-m-d'), $end->format('Y-m-d')])
             ->whereNull('invoice_id')
+            ->whereBetween('expense_date', [$start->format('Y-m-d'), $end->format('Y-m-d')])
             ->get();
         $totalExpenses = $expenses->sum('amount');
 
-        $finalAmount = ($baseAmount - $totalDeductions) + $totalExpenses;
+        $finalAmount = $baseAmount + $totalExpenses;
         if ($finalAmount < 0) $finalAmount = 0;
+
+        $vatRate = 0.20;
+        $vatAmount = $finalAmount * $vatRate;
+        $totalWithVat = $finalAmount + $vatAmount;
 
         // 4. Create Invoice
         $invoice = Invoice::create([
             'home_id' => $home_id,
-            'customer_id' => $clientId, // Decoupled from legacy customers table
+            'customer_id' => $clientId,
             'invoice_ref' => $this->generateInvoiceRef(),
             'invoice_date' => now()->format('Y-m-d'),
+            'payment_terms' => 14,
             'due_date' => now()->addDays(14)->format('Y-m-d'),
             'sub_total' => $finalAmount,
-            'Total' => $finalAmount,
-            'outstanding' => $finalAmount,
+            'deposit_percentage' => 0,
+            'VAT_id' => 0,
+            'VAT_amount' => $vatAmount,
+            'Total' => $totalWithVat,
+            'outstanding' => $totalWithVat,
             'status' => 'Draft',
             'invoice_type' => 1,
         ]);
@@ -139,7 +131,7 @@ class InvoiceService
             $expense->save();
         }
 
-        // 5. Create Care Service Line Item
+        // 5. Create Line Item for Base Care Services
         $periodStr = $start->format('d M') . ' to ' . $end->format('d M Y');
         $totalHours = 0;
         if ($timesheets) {
@@ -153,19 +145,18 @@ class InvoiceService
             }
         }
 
-        $baseServiceAmount = ($baseAmount - $totalDeductions);
         \App\Models\Invoice\InvoiceProduct::create([
             'home_id' => $home_id,
             'invoice_id' => $invoice->id,
             'customer_id' => 0,
             'product_id' => 0,
-            'description' => ucfirst($periodType) . " Care Services for " . $client->name . " ($periodStr). Total shifts hours: " . number_format($totalHours, 1),
+            'description' => ucfirst($periodType) . " Care Services for " . $client->name . " ($periodStr). Total hours: " . number_format($totalHours, 1),
             'qty' => 1,
-            'price' => $baseServiceAmount,
+            'price' => $baseAmount,
             'discount' => 0,
             'discount_type' => 'fixed',
             'vat_id' => 0,
-            'vat' => 0,
+            'vat' => 20,
         ]);
 
         // 6. Create Line Items for each Expense
@@ -181,7 +172,7 @@ class InvoiceService
                 'discount' => 0,
                 'discount_type' => 'fixed',
                 'vat_id' => 0,
-                'vat' => 0,
+                'vat' => 20,
             ]);
         }
 
@@ -196,45 +187,48 @@ class InvoiceService
         $invoice = Invoice::find($invoiceId);
         if (!$invoice || $invoice->status != 'Draft') return false;
 
-        $clientId = $invoice->customer_ref; // We stored client_id here in generateInvoiceForClientPeriod
+        $clientId = $invoice->customer_id; 
         $client = \App\ServiceUser::find($clientId);
         if (!$client) return false;
 
         $billingRate = floatval($client->billing_rate ?? 0);
-        $onboardingDetails = \App\Models\OnboardingDetail::where('client_id', $clientId)->get();
-
-        $totalDeductions = 0;
-        foreach ($onboardingDetails as $detail) {
-            if ($detail->type == 1) { // Percentage
-                $totalDeductions += ($billingRate * floatval($detail->vat) / 100);
-            } else { // Amount
-                $totalDeductions += floatval($detail->vat);
-            }
-        }
 
         // Fetch Unbilled Expenses for the client
         $totalExpenses = \App\Models\ServiceUserManagement\ServiceUserExpense::where('invoice_id', $invoiceId)->sum('amount');
 
-        $finalAmount = ($billingRate - $totalDeductions) + $totalExpenses;
+        $finalAmount = $billingRate + $totalExpenses;
         if ($finalAmount < 0) $finalAmount = 0;
+
+        $vatRate = 0.20;
+        $vatAmount = $finalAmount * $vatRate;
+        $totalWithVat = $finalAmount + $vatAmount;
 
         $invoice->update([
             'sub_total' => $finalAmount,
-            'Total' => $finalAmount,
-            'outstanding' => $finalAmount,
+            'Total' => $totalWithVat,
+            'outstanding' => $totalWithVat,
+            'VAT_amount' => $vatAmount,
         ]);
 
-        // Update product line item for care services
+        // 1. Update Care Services line item
         $careProduct = \App\Models\Invoice\InvoiceProduct::where('invoice_id', $invoiceId)
-            ->where('description', 'like', '%' . ucfirst($client->billing_frequency == 2 ? 'monthly' : 'weekly') . ' Care Services%')
+            ->where(function($q) {
+                $q->where('description', 'like', '%Care Services%');
+            })
             ->first();
 
         if ($careProduct) {
-            $careProduct->update(['price' => ($billingRate - $totalDeductions)]);
+            $careProduct->update(['price' => $billingRate, 'vat' => 20]);
         }
 
-        // Expenses are already listed as separate line items and their cost is fixed (not based on client rate)
-        // so we just ensure the totals are correct.
+        // 1b. Update any other line items (like expenses) to have 20% VAT
+        \App\Models\Invoice\InvoiceProduct::where('invoice_id', $invoiceId)
+            ->update(['vat' => 20]);
+
+        // 2. Remove any existing Service Charge line items
+        \App\Models\Invoice\InvoiceProduct::where('invoice_id', $invoiceId)
+            ->where('description', 'like', 'Service Charge: %')
+            ->delete();
 
         return true;
     }
@@ -281,5 +275,50 @@ class InvoiceService
         }
 
         return $count;
+    }
+
+    /**
+     * Checks if a requested period overlaps with any existing invoices for a client.
+     */
+    public function checkForOverlap($clientId, $start, $end)
+    {
+        $start = Carbon::parse($start)->startOfDay();
+        $end = Carbon::parse($end)->endOfDay();
+
+        $invoices = Invoice::where('customer_id', $clientId)
+            ->whereIn('status', ['Draft', 'Invoiced', 'Outstanding', 'Paid'])
+            ->with(['invoiceProducts' => function($q) {
+                $q->where('description', 'like', '% Care Services %');
+            }])
+            ->get();
+
+        foreach ($invoices as $invoice) {
+            foreach ($invoice->invoiceProducts as $product) {
+                // Match "DD MMM to DD MMM YYYY" pattern
+                if (preg_match('/(\d{2} [A-Z][a-z]{2}) to (\d{2} [A-Z][a-z]{2} (\d{4}))/', $product->description, $matches)) {
+                    try {
+                        $year = $matches[3];
+                        $invEnd = Carbon::parse($matches[2])->endOfDay();
+                        $invStart = Carbon::parse($matches[1] . " " . $year)->startOfDay();
+                        
+                        // Handle potential year wrap
+                        if ($invStart->gt($invEnd)) {
+                            $invStart->subYear();
+                        }
+
+                        // Overlap condition: max(start1, start2) <= min(end1, end2)
+                        if ($start->lte($invEnd) && $end->gte($invStart)) {
+                            return [
+                                'ref' => $invoice->invoice_ref,
+                                'period' => $matches[1] . " to " . $matches[2]
+                            ];
+                        }
+                    } catch (\Exception $e) {
+                        continue;
+                    }
+                }
+            }
+        }
+        return false;
     }
 }

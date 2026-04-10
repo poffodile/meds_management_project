@@ -139,12 +139,11 @@ class ScheduleController extends Controller
         $validated = $validator->validated();
         $homeId = $validated['home_id'];
 
-        $shifts = ScheduledShift::whereNull('service_user_id')
-            ->whereNull('staff_id')
+        $shifts = ScheduledShift::whereNull('staff_id')
             ->where('home_id', $homeId)
             ->select('id', 'start_date', 'start_time', 'end_time', 'shift_type', 'notes', 'tasks')
-            ->orderBy('start_date')
-            ->orderBy('start_time')
+            ->orderBy('start_date', 'desc')
+            ->orderBy('start_time', 'desc')
             ->get();
 
         if ($shifts->isEmpty()) {
@@ -160,6 +159,7 @@ class ScheduleController extends Controller
             $shift->day = \Carbon\Carbon::parse($shift->start_date)->format('l');
             $shift->start_time = \Carbon\Carbon::parse($shift->start_time)->format('H:i');
             $shift->end_time   = \Carbon\Carbon::parse($shift->end_time)->format('H:i');
+            $shift->client_name = $shift->client->name ?? 'N/A';
             return $shift;
         });
 

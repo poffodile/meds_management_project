@@ -14,10 +14,10 @@
                         <p class="header-subtitle mb-0">Manage client invoices and track payments</p>
                     </div>
                     <div>
-                    <div class="d-flex gap-3">
-                        <button class="borderBtn" data-toggle="modal" data-target="#bulkGenerateModal"><i class="bx  bx-sync me-2"></i>Bulk Generate</button>
-                        <button class="bgBtn" data-toggle="modal" data-target="#createInvoiceModal"><i class="bx  bx-plus me-2"></i>Create Invoice</button>
-                    </div>
+                        <div class="d-flex gap-3">
+                            <button class="borderBtn" data-toggle="modal" data-target="#bulkGenerateModal"><i class="bx  bx-sync me-2"></i>Bulk Generate</button>
+                            <button class="bgBtn" data-toggle="modal" data-target="#createInvoiceModal"><i class="bx  bx-plus me-2"></i>Create Invoice</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -96,7 +96,7 @@
 
         <div class="row" id="invoiceList">
             @forelse($invoices as $invoice)
-            <div class="col-lg-12 invoice-card" data-status="{{ $invoice->status }}" data-ref="{{ $invoice->invoice_ref }}" data-client="{{ optional($invoice->customers)->name ?? '' }}">
+            <div class="col-lg-12 invoice-card" data-status="{{ $invoice->status }}" data-ref="{{ $invoice->invoice_ref }}" data-client="{{ optional($invoice->serviceUser)->name ?? '' }}">
                 <div class="bBorderCard mt-4 p24">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
@@ -116,7 +116,7 @@
                                 </div>
                             </div>
                             <h6 class="h6Head textGray mb-0">
-                                {{ optional($invoice->customers)->name ?? 'Unknown Payer' }}
+                                {{ optional($invoice->serviceUser)->name ?? 'Unknown Payer' }}
                             </h6>
                         </div>
                         <div class="d-flex gap-2">
@@ -124,6 +124,9 @@
                                 <i class="bx bx-show me-2 f18"></i> View
                             </button>
                             @if($invoice->status == 'Draft')
+                            <button class="borderBtn regenerate-invoice" data-id="{{ $invoice->id }}" title="Recalculate from billing settings">
+                                <i class="bx bx-refresh me-2 f18"></i> Recalculate
+                            </button>
                             <button class="borderBtn edit-invoice"
                                 data-id="{{ $invoice->id }}"
                                 data-date="{{ $invoice->invoice_date }}"
@@ -135,15 +138,17 @@
                                 <i class="bx bx-send me-2 f18"></i> Process
                             </button>
                             @else
-                            <span class="textGray fs12"><i class="bx bx-lock-alt me-1"></i> Locked</span>
+                            <div class="lockBadge">
+                                <i class="bx bx-lock-alt me-1"></i> Locked
+                            </div>
                             @if($invoice->status != 'Paid')
                             <button class="bgBtn pgreenBtn mark-status" data-id="{{ $invoice->id }}" data-status="Paid">
                                 <i class="bx bx-check-circle me-2 f18"></i> Mark Paid
                             </button>
+                            <button type="button" class="borderBtn openPdfModal" data-id="{{$invoice->id}}" title="Download PDF">
+                                <i class='bx bx-download me-2 f18'></i> PDF
+                            </button>
                             @endif
-                            <a href="{{ route('roster.invoice.download-pdf', $invoice->id) }}" class="borderBtn" target="_blank">
-                                <i class="bx bx-arrow-to-bottom-stroke me-2 f18"></i> PDF
-                            </a>
                             @endif
                         </div>
                     </div>
@@ -307,9 +312,26 @@
                             <!-- Items will be loaded here -->
                         </tbody>
                         <tfoot>
-                            <tr class="font-weight-bold">
-                                <td class="text-right">Total Amount</td>
-                                <td class="text-right" id="view_inv_total"></td>
+                            <tr>
+                                <td class="text-right font-weight-bold">Sub Total</td>
+                                <td class="text-right" id="view_inv_subtotal"></td>
+                            </tr>
+                            <tr>
+                                <td class="text-right font-weight-bold">VAT (20%)</td>
+                                <td class="text-right" id="view_inv_vat"></td>
+                            </tr>
+                            <tr class="f18" style="color: #0369a1;">
+                                <td class="text-right font-weight-bold">Total Amount</td>
+                                <td class="text-right font-weight-bold" id="view_inv_total"></td>
+                            </tr>
+                        </tfoot>
+                        <tbody id="fundingRows" style="border-top: none !important;">
+                            <!-- Funding deductions here -->
+                        </tbody>
+                        <tfoot>
+                            <tr class="f18" style="color: #15803d;">
+                                <td class="text-right font-weight-bold">Authority Amount</td>
+                                <td class="text-right font-weight-bold" id="view_inv_authority"></td>
                             </tr>
                         </tfoot>
                     </table>
@@ -339,21 +361,102 @@
                 success: function(response) {
                     if (response.success) {
                         $('#view_inv_ref').text(response.invoice.invoice_ref);
+                        $('#view_inv_subtotal').text('£' + parseFloat(response.invoice.sub_total || 0).toFixed(2));
+                        $('#view_inv_vat').text('£' + parseFloat(response.invoice.VAT_amount || 0).toFixed(2));
                         $('#view_inv_total').text('£' + parseFloat(response.invoice.Total).toFixed(2));
 
                         var html = '';
+                        var careAmount = 0;
                         response.products.forEach(function(item) {
                             html += `<tr>
                                 <td>${item.description}</td>
                                 <td class="text-right">£${parseFloat(item.price).toFixed(2)}</td>
                             </tr>`;
+                            
+                            // Check if this is a Care Service line to calculate Authority Amount
+                            if (item.description.toLowerCase().includes('care services')) {
+                                careAmount += parseFloat(item.price);
+                            }
                         });
                         $('#viewInvoiceItems').html(html);
+
+                        // Authority Amount Calculation
+                        var authorityAmount = careAmount * 1.20;
+                        var fundingHtml = '';
+
+                        if (response.onboardingDetails && response.onboardingDetails.length > 0) {
+                            response.onboardingDetails.forEach(function(detail) {
+                                var deduction = 0;
+                                var val = parseFloat(detail.vat || 0);
+
+                                if (detail.type == 1) { // Percentage
+                                    deduction = authorityAmount * (val / 100);
+                                    fundingHtml += `<tr>
+                                        <td class="text-right text-muted italic fs13">Less: ${detail.name} (${val}%)</td>
+                                        <td class="text-right text-muted fs13">-£${deduction.toFixed(2)}</td>
+                                    </tr>`;
+                                } else { // Amount
+                                    deduction = val;
+                                    fundingHtml += `<tr>
+                                        <td class="text-right text-muted italic fs13">Less: ${detail.name}</td>
+                                        <td class="text-right text-muted fs13">-£${deduction.toFixed(2)}</td>
+                                    </tr>`;
+                                }
+                                authorityAmount -= deduction;
+                            });
+                        }
+                        
+                        $('#fundingRows').html(fundingHtml);
+                        $('#view_inv_authority').text('£' + authorityAmount.toFixed(2));
                     } else {
                         toastr.error('Failed to load invoice details.');
                     }
                 }
             });
+        });
+
+        $(document).on('click', '.openPdfModal', function() {
+            var invoiceId = $(this).data('id');
+            $('#pdf_invoice_id').val(invoiceId);
+            $('#pdfFundingOptions').empty();
+            
+            // Fetch invoice details to get funding options
+            $.ajax({
+                type: "GET",
+                url: "{{route('roster.invoice.get-details')}}",
+                data: { id: invoiceId },
+                success: function(response) {
+                    if (response.success) {
+                        if (response.onboardingDetails && response.onboardingDetails.length > 0) {
+                            response.onboardingDetails.forEach(function(detail, index) {
+                                var html = `
+                                    <div class="custom-control custom-radio mb-2">
+                                        <input type="radio" id="pdf_funding_${detail.id}" name="pdf_type" value="${detail.id}" class="custom-control-input">
+                                        <label class="custom-control-label" for="pdf_funding_${detail.id}">${detail.name}</label>
+                                    </div>`;
+                                $('#pdfFundingOptions').append(html);
+                            });
+                        } else {
+                            $('#pdfFundingOptions').html('<p class="text-muted italic small">No funding sources available for this invoice.</p>');
+                        }
+                        $('#downloadPdfModal').modal('show');
+                    } else {
+                        toastr.error('Failed to fetch invoice details.');
+                    }
+                }
+            });
+        });
+
+        $(document).on('click', '#confirmPdfDownload', function() {
+            var invoiceId = $('#pdf_invoice_id').val();
+            var pdfType = $('input[name="pdf_type"]:checked').val();
+            
+            // Build the URL correctly using the named route
+            var baseUrl = "{{ route('roster.invoice.download-pdf', ['id' => ':id']) }}";
+            var url = baseUrl.replace(':id', invoiceId) + "?type=" + pdfType;
+            
+            window.location.href = url;
+            $('#downloadPdfModal').modal('hide');
         });
         // Bulk Generate
         $('#bulkGenerateForm').on('submit', function(e) {
@@ -444,6 +547,29 @@
             });
         });
 
+        // Regenerate Invoice Amount/Breakdown
+        $(document).on('click', '.regenerate-invoice', function() {
+            var id = $(this).data('id');
+            if (confirm('Recalculate this invoice based on latest billing rates and service charges?')) {
+                $.ajax({
+                    url: "{{ route('roster.invoice.regenerate') }}",
+                    type: "POST",
+                    data: {
+                        id: id,
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            toastr.success(response.message);
+                            setTimeout(() => location.reload(), 1000);
+                        } else {
+                            toastr.error(response.message);
+                        }
+                    }
+                });
+            }
+        });
+
         // Update Status
         $(document).on('click', '.mark-status', function() {
             var id = $(this).data('id');
@@ -532,9 +658,115 @@
         color: #b91c1c;
     }
 
+    .lockBadge {
+        background: #f8fafc;
+        color: #64748b;
+        padding: 0 16px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        border: 1.5px solid #e2e8f0;
+        height: 42px;
+        transition: all 0.3s ease;
+    }
+
+    .lockBadge i {
+        font-size: 18px;
+    }
+
+    .careBadg {
+        padding: 4px 12px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
     .caret-locked {
         opacity: 0.6;
         pointer-events: none;
+    }
+
+    .bBorderCard {
+        background: #fff;
+        border: 1.5px solid #eef2f7;
+        border-radius: 16px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .bBorderCard:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+        border-color: #e2e8f0;
+    }
+
+    .bBorderCard::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: transparent;
+        transition: all 0.3s ease;
+    }
+
+    .bBorderCard[data-status="Paid"]::before {
+        background: #22c55e;
+    }
+
+    .bBorderCard[data-status="Draft"]::before {
+        background: #a855f7;
+    }
+
+    .bBorderCard[data-status="Outstanding"]::before {
+        background: #eab308;
+    }
+
+    .bBorderCard[data-status="Invoiced"]::before {
+        background: #3b82f6;
+    }
+
+    .h5Head {
+        font-weight: 700;
+        color: #1e293b;
+        letter-spacing: -0.01em;
+    }
+
+    .h6Head {
+        font-weight: 600;
+        color: #334155;
+    }
+
+    .searchWithtabs {
+        background: #fff;
+        border: 1.5px solid #eef2f7;
+        border-radius: 10px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .searchWithtabs:focus-within {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.05);
+    }
+
+    .searchWithtabs .form-control {
+        border: none;
+        padding-left: 10px;
+    }
+
+    .searchWithtabs .input-group-addon {
+        background: transparent;
+        border: none;
+        padding-left: 15px;
+        color: #94a3b8;
     }
 
     .premium-modal {
@@ -573,5 +805,41 @@
         margin: -1rem -1rem -1rem auto;
     }
 </style>
+
+    <!-- Download PDF Selection Modal -->
+    <div class="modal fade" id="downloadPdfModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content border-0">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title">Download Invoice PDF</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body p-4">
+                    <p class="font-weight-bold">Select invoice recipient:</p>
+                    <input type="hidden" id="pdf_invoice_id">
+                    <div id="pdfOptionsContainer">
+                        <div class="custom-control custom-radio mb-3">
+                            <input type="radio" id="pdf_self" name="pdf_type" value="self" class="custom-control-input" checked>
+                            <label class="custom-control-label font-weight-bold" for="pdf_self">Self (Client Remainder)</label>
+                            <small class="d-block text-muted">Weekly Care Services + Expenses + VAT (Less Deductions)</small>
+                        </div>
+                        <hr>
+                        <p class="text-muted small mb-2">Or select a Funding Source:</p>
+                        <div id="pdfFundingOptions">
+                            <!-- Funding options will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="confirmPdfDownload">
+                        <i class='bx bx-download'></i> Download
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 @endsection

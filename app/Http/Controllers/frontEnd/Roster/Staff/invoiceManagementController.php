@@ -25,7 +25,7 @@ class invoiceManagementController extends Controller
         $this->invoiceService = $invoiceService;
     }
 
-    public function downloadPdf($id)
+    public function downloadPdf(Request $request, $id)
     {
         $invoice = Invoice::with(['serviceUser', 'invoiceProducts'])->find($id);
         if (!$invoice) return abort(404);
@@ -36,11 +36,13 @@ class invoiceManagementController extends Controller
             'invoice' => $invoice,
             'home' => $home,
             'customer' => $invoice->serviceUser,
-            'products' => $invoice->invoiceProducts
+            'products' => $invoice->invoiceProducts,
+            'onboardingDetails' => \App\Models\OnboardingDetail::where('client_id', $invoice->customer_id)->get(),
+            'download_type' => $request->type ?? 'self'
         ];
 
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('frontEnd.roster.payroll_finance.invoice_management.pdf', $data);
-        return $pdf->download('Invoice-' . $invoice->invoice_ref . '.pdf');
+        return $pdf->download('Invoice-' . $invoice->invoice_ref . ($request->type ? '-' . $request->type : '') . '.pdf');
     }
 
     public function index(Request $request)
@@ -104,15 +106,11 @@ class invoiceManagementController extends Controller
         try {
             $home_id = Auth::user()->home_id;
 
-            // Check if already created for this client today (to prevent duplicate run mentioned by user)
-            $existing = Invoice::where('home_id', $home_id)
-                ->where('customer_ref', $request->client_id)
-                ->where('invoice_date', now()->format('Y-m-d'))
-                ->whereIn('status', ['Draft', 'Invoiced', 'Outstanding', 'Paid'])
-                ->first();
+            // 1. Overlap Check: Block if any part of the requested period is already invoiced
+            $overlap = $this->invoiceService->checkForOverlap($request->client_id, $request->start_date, $request->end_date);
 
-            if ($existing) {
-                return response()->json(['success' => false, 'message' => 'Invoice for this client already exists for today. Please wait for the next billing cycle.']);
+            if ($overlap) {
+                return response()->json(['success' => false, 'message' => "An invoice (Ref: {$overlap['ref']}) already exists covering the period {$overlap['period']}."]);
             }
 
             // The service now handles checking the billing_type from service_user table
@@ -145,24 +143,34 @@ class invoiceManagementController extends Controller
         if ($validator->fails()) {
             return response()->json(['success' => false, 'message' => $validator->errors()->first()]);
         }
-
-        $invoice = Invoice::find($request->id);
-
-        // Status check logic
-        if ($invoice->status != 'Draft') {
-            return response()->json(['success' => false, 'message' => 'Cannot edit invoice in ' . $invoice->status . ' status.']);
+        $id = $request->id;
+        $invoice = Invoice::find($id);
+        if (!$invoice) {
+            return response()->json(['success' => false, 'message' => 'Invoice not found.']);
         }
 
-        $invoice->invoice_date = $request->invoice_date;
-        $invoice->due_date = $request->due_date;
-        $invoice->save();
+        $invoice->update([
+            'invoice_date' => $request->invoice_date,
+            'due_date' => $request->due_date,
+        ]);
 
-        // If it's a roster-generated invoice (has client link in customer_ref), regenerate the amount
-        if (!empty($invoice->customer_ref)) {
+        if (!empty($invoice->customer_id)) {
             $this->invoiceService->regenerateInvoiceAmount($invoice->id);
         }
 
-        return response()->json(['success' => true, 'message' => 'Invoice details and amount updated successfully.']);
+        return response()->json(['success' => true, 'message' => 'Invoice updated and recalculated successfully.']);
+    }
+
+    public function regenerateInvoice(Request $request)
+    {
+        $id = $request->id;
+        $success = $this->invoiceService->regenerateInvoiceAmount($id);
+
+        if ($success) {
+            return response()->json(['success' => true, 'message' => 'Invoice amount recalculated and breakdown updated.']);
+        } else {
+            return response()->json(['success' => false, 'message' => 'Failed to recalculate invoice. It might not be in Draft status.']);
+        }
     }
 
     public function updateInvoiceStatus(Request $request)
@@ -216,10 +224,9 @@ class invoiceManagementController extends Controller
             $count = $this->invoiceService->generateBatchInvoices($home_id, $request->start_date, $request->end_date);
 
             return response()->json([
-                'success' => true, 
+                'success' => true,
                 'message' => "Successfully generated $count invoices for clients with completed shifts."
             ]);
-
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
         }
@@ -232,11 +239,13 @@ class invoiceManagementController extends Controller
         if (!$invoice) return response()->json(['success' => false]);
 
         $products = \App\Models\Invoice\InvoiceProduct::where('invoice_id', $id)->get();
+        $onboardingDetails = \App\Models\OnboardingDetail::where('client_id', $invoice->customer_id)->get();
 
         return response()->json([
             'success' => true,
             'invoice' => $invoice,
-            'products' => $products
+            'products' => $products,
+            'onboardingDetails' => $onboardingDetails
         ]);
     }
 }
