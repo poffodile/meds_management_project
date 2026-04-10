@@ -67,6 +67,24 @@ class ScheduleShiftController extends Controller
             'start_time' => 'required',
             'end_time'   => 'required|after:start_time',
         ]);
+
+        // Double Booking Check
+        if ($request->carer_id) {
+            $formattedStart = date('H:i:s', strtotime($request->start_time));
+            $formattedEnd = date('H:i:s', strtotime($request->end_time));
+            
+            $overlap = ScheduledShift::where('staff_id', $request->carer_id)
+                ->where('start_date', $request->start_date)
+                ->where(function ($q) use ($formattedStart, $formattedEnd) {
+                    $q->whereTime('start_time', '<', $formattedEnd)
+                      ->whereTime('end_time', '>', $formattedStart);
+                })
+                ->exists();
+
+            if ($overlap) {
+                return redirect()->back()->with('error', 'The selected carer is already assigned to another shift at this time.')->withInput();
+            }
+        }
         // Determine shift status based on staff assignment
         $status = isset($request->carer_id) ? 'assigned' : 'unfilled';
 
@@ -183,6 +201,25 @@ class ScheduleShiftController extends Controller
             'start_time' => 'required',
             'end_time'   => 'required|after:start_time',
         ]);
+
+        // Double Booking Check
+        if ($request->carer_id) {
+            $formattedStart = date('H:i:s', strtotime($request->start_time));
+            $formattedEnd = date('H:i:s', strtotime($request->end_time));
+            
+            $overlap = ScheduledShift::where('staff_id', $request->carer_id)
+                ->where('start_date', $request->start_date)
+                ->where('id', '!=', $id)
+                ->where(function ($q) use ($formattedStart, $formattedEnd) {
+                    $q->whereTime('start_time', '<', $formattedEnd)
+                      ->whereTime('end_time', '>', $formattedStart);
+                })
+                ->exists();
+
+            if ($overlap) {
+                return redirect()->back()->with('error', 'The selected carer is already assigned to another shift at this time.')->withInput();
+            }
+        }
 
         $status = isset($request->carer_id) ? 'assigned' : 'unfilled';
 

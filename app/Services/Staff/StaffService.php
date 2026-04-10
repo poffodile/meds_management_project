@@ -350,15 +350,22 @@ class StaffService
         if ($startDate && $startTime && $endTime) {
             $formattedStart = date('H:i:s', strtotime($startTime));
             $formattedEnd = date('H:i:s', strtotime($endTime));
+            $shiftId = $request->input('shift_id');
 
-            $overlappingStaffIds = \App\Models\ScheduledShift::where('start_date', $startDate)
+            $query = \App\Models\ScheduledShift::where('start_date', $startDate)
                 ->where(function ($query) use ($formattedStart, $formattedEnd) {
-                    $query->whereTime('start_time', '<', $formattedEnd)
-                        ->whereTime('end_time', '>', $formattedStart);
+                    $query->where(function ($q) use ($formattedStart, $formattedEnd) {
+                        $q->whereTime('start_time', '<', $formattedEnd)
+                            ->whereTime('end_time', '>', $formattedStart);
+                    });
                 })
-                ->whereNotNull('staff_id')
-                ->pluck('staff_id')
-                ->toArray();
+                ->whereNotNull('staff_id');
+
+            if ($shiftId) {
+                $query->where('id', '!=', $shiftId);
+            }
+
+            $overlappingStaffIds = $query->pluck('staff_id')->toArray();
         }
 
         // 4. Base query for users
