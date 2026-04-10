@@ -484,7 +484,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         /* ================= DRAG & DROP ================= */
         eventDrop: function (info) {
-
             const event = info.event;
             const shiftId = event.extendedProps.shift_id;
 
@@ -500,8 +499,50 @@ document.addEventListener('DOMContentLoaded', function () {
                 return;
             }
 
+            // Get new dates/times in local time
+            const year = event.start.getFullYear();
+            const month = String(event.start.getMonth() + 1).padStart(2, '0');
+            const day = String(event.start.getDate()).padStart(2, '0');
+            const startDate = `${year}-${month}-${day}`;
+            
+            const hours = String(event.start.getHours()).padStart(2, '0');
+            const mins = String(event.start.getMinutes()).padStart(2, '0');
+            const startTime = `${hours}:${mins}:00`;
+
+            let endTime = startTime;
+            if (event.end) {
+                const eHours = String(event.end.getHours()).padStart(2, '0');
+                const eMins = String(event.end.getMinutes()).padStart(2, '0');
+                endTime = `${eHours}:${eMins}:00`;
+            }
+
             // ✅ Assign OR Reassign
-            assignShift(shiftId, newResource, info);
+            assignShift(shiftId, newResource, info, startDate, startTime, endTime);
+        },
+
+        eventResize: function (info) {
+            const event = info.event;
+            const shiftId = event.extendedProps.shift_id;
+            const resourceId = event.getResources()[0]?.id;
+
+            // Get new dates/times in local time
+            const year = event.start.getFullYear();
+            const month = String(event.start.getMonth() + 1).padStart(2, '0');
+            const day = String(event.start.getDate()).padStart(2, '0');
+            const startDate = `${year}-${month}-${day}`;
+            
+            const hours = String(event.start.getHours()).padStart(2, '0');
+            const mins = String(event.start.getMinutes()).padStart(2, '0');
+            const startTime = `${hours}:${mins}:00`;
+
+            let endTime = startTime;
+            if (event.end) {
+                const eHours = String(event.end.getHours()).padStart(2, '0');
+                const eMins = String(event.end.getMinutes()).padStart(2, '0');
+                endTime = `${eHours}:${eMins}:00`;
+            }
+
+            assignShift(shiftId, resourceId, info, startDate, startTime, endTime);
         },
 
     });
@@ -510,7 +551,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
     /* ================= FUNCTION ================= */
-    function assignShift(shiftId, staffId, info) {
+    function assignShift(shiftId, staffId, info, startDate = null, startTime = null, endTime = null) {
 
         fetch(`${BASE_URL}/roster/schedule-shift/assign-shift`, {
             method: 'POST',
@@ -520,7 +561,10 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             body: JSON.stringify({
                 shift_id: shiftId,
-                staff_id: staffId
+                staff_id: staffId,
+                start_date: startDate,
+                start_time: startTime,
+                end_time: endTime
             })
         })
             .then(res => res.json())

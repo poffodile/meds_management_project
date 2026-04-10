@@ -604,7 +604,38 @@ class ScheduleShiftController extends Controller
 
         $shift = ScheduledShift::find($request->shift_id);
 
+        // Update shift times if provided (from drag-and-drop)
+        $startDate = $request->start_date ?? $shift->start_date;
+        $startTime = $request->start_time ?? $shift->start_time;
+        $endTime   = $request->end_time   ?? $shift->end_time;
+
+        // Double Booking Check for drag-and-drop
+        if ($request->staff_id != 'open') {
+            $formattedStart = date('H:i:s', strtotime($startTime));
+            $formattedEnd = date('H:i:s', strtotime($endTime));
+            
+            $overlap = ScheduledShift::where('staff_id', $request->staff_id)
+                ->where('start_date', $startDate)
+                ->where('id', '!=', $shift->id)
+                ->where(function ($q) use ($formattedStart, $formattedEnd) {
+                    $q->whereTime('start_time', '<', $formattedEnd)
+                      ->whereTime('end_time', '>', $formattedStart);
+                })
+                ->exists();
+
+            if ($overlap) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'This carer is already assigned to another shift at this time.'
+                ]);
+            }
+        }
+
+        // Save new values
         $shift->staff_id = $request->staff_id == 'open' ? null : $request->staff_id;
+        $shift->start_date = $startDate;
+        $shift->start_time = $startTime;
+        $shift->end_time = $endTime;
         $shift->status = 'assigned';
         $shift->save();
 
