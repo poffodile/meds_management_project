@@ -131,6 +131,11 @@
         position: relative;
     }
 
+    .lightPurpleBg {
+        background-color: #f5f3ff !important;
+        color: #5b21b6 !important;
+    }
+
     .payRollAcood .accIcon {
         position: absolute;
         right: 24px;
@@ -736,11 +741,73 @@
                             </div>
                         </div>
                     </div>
+
+                <!-- Panel 4: Unscheduled Logs -->
+                <div class="panel panel-default mt-4 payRollAcood p-0">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordion" href="#collapse4" class="lightPurpleBg collapsed">
+                                <i class="bx bx-time-five f20 me-2" style="color: #8b5cf6;"></i>
+                                Unscheduled Shifts ({{ count($unscheduled_logs) }})
+                                <i class="bx bx-chevron-down accIcon"></i>
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapse4" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            @if (count($unscheduled_logs) > 0)
+                            @foreach ($unscheduled_logs as $log)
+                            <div class="recon-card" style="border-left: 4px solid #8b5cf6;">
+                                <div class="d-flex justify-content-between align-items-start mb-4">
+                                    <div class="d-flex flex-column gap-2">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="h5Head">{{ $log->staff ? $log->staff->name : 'Unknown Staff' }}</span>
+                                            <span class="badge-soft badge-standard">unscheduled log</span>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex gap-2">
+                                        <button class="bgBtn pgreenBtn approve-unscheduled-btn" 
+                                                data-staff-id="{{ $log->staff_id }}" 
+                                                data-date="{{ $log->start_date }}">
+                                            <i class="bx bx-check-circle"></i> Approve
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-3">
+                                        <p class="data-label">Date</p>
+                                        <p class="data-value">{{ \Carbon\Carbon::parse($log->start_date)->format('D, M d') }}</p>
+                                    </div>
+                                        <div class="col-lg-4">
+                                            <p class="data-label">Clock Activity</p>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <p class="data-value mb-0">
+                                                    {{ $log->login_activities->count() }} Sessions Recorded
+                                                </p>
+                                                <i class="fa fa-eye fs18 text-purple" style="cursor:pointer;" data-toggle="modal" data-target="#logDetails-{{ $log->id }}"></i>
+                                            </div>
+                                        </div>
+                                    <div class="col-lg-2">
+                                        <p class="data-label">Scheduled</p>
+                                        <p class="data-value">0.00h</p>
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <p class="data-label">Actual Worked</p>
+                                        <p class="data-value text-purple">{{ number_format($log->actual_duration_minutes / 60, 2) }}h</p>
+                                    </div>
+                                </div>
+                            </div>
+                            @endforeach
+                            @else
+                            <p class="textGray500 fs13 text-center py-5 mb-0">No unscheduled staff logs found.</p>
+                            @endif
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-
+</div>
     <!-- modal Adjust reconciliation start -->
     @foreach ($shifts as $shift)
     <div class="modal fade leaveCommunStyle" id="adjustNodal-{{ $shift->id }}" tabindex="1" role="dialog"
@@ -904,6 +971,53 @@
     </div>
     @endforeach
     <!-- end clock details -->
+
+    <!-- unscheduled log details -->
+    @foreach ($unscheduled_logs as $log)
+    <div class="modal fade leaveCommunStyle" id="logDetails-{{ $log->id }}" tabindex="1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog pModalScroll">
+            <div class="modal-content">
+                <div class="modal-header p24">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Unscheduled Activity Logs - {{ $log->staff ? $log->staff->name : 'Unknown' }}</h4>
+                </div>
+                <div class="modal-body heightScrollModal p24" style="height: unset;">
+                    <div class="mb-4">
+                        <p class="fs14 font600 mb-1">Date: {{ \Carbon\Carbon::parse($log->start_date)->format('l, M d, Y') }}</p>
+                        <p class="textGray mb-0">Total Time: {{ number_format($log->actual_duration_minutes / 60, 2) }}h</p>
+                    </div>
+                    <div class="scrollDailyCheck pe-3">
+                        @foreach ($log->login_activities as $activity)
+                        <div class="lightBorderp mb-3 rounded8 p-3" style="border: 1px solid #e5e7eb; border-radius: 8px;">
+                            <div class="d-flex gap-5 mb-3">
+                                <div class="flex-grow-1">
+                                    <p class="fs13 textGray500 mb-1">Clock In:</p>
+                                    <p class="fs13 blackText font600">{{ \Carbon\Carbon::parse($activity->check_in_time)->format('g:i A') }}</p>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <p class="fs13 textGray500 mb-1">Clock Out:</p>
+                                    <p class="fs13 blackText font600">{{ $activity->check_out_time ? \Carbon\Carbon::parse($activity->check_out_time)->format('g:i A') : 'In progress' }}</p>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-5">
+                                <div class="flex-grow-1">
+                                    <p class="fs13 textGray500 mb-1">Check In Reason:</p>
+                                    <p class="fs13 blackText font600">{{ $activity->check_in_reason ?: 'N/A' }}</p>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <p class="fs13 textGray500 mb-1">Check Out Reason:</p>
+                                    <p class="fs13 blackText font600">{{ $activity->check_out_reason ?: 'N/A' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endforeach
+    <!-- end unscheduled log details -->
 </main>
 <!-- append section -->
 <script>
@@ -1216,6 +1330,39 @@
                 error: function() {
                     toastr.error('Error in bulk approval');
                     btn.prop('disabled', false).html('<i class="bx bx-check-double me-2"></i> Approve All Matched');
+                }
+            });
+        }
+    });
+
+    $(document).on('click', '.approve-unscheduled-btn', function() {
+        const staffId = $(this).data('staff-id');
+        const date = $(this).data('date');
+        const btn = $(this);
+
+        if (confirm('Are you sure you want to approve this unscheduled work? It will be added to payroll.')) {
+            btn.prop('disabled', true).html('<i class="bx bx-loader fs-18 bx-spin"></i>');
+
+            $.ajax({
+                url: "{{ route('timesheet.approve.unscheduled') }}",
+                method: 'POST',
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    staff_id: staffId,
+                    date: date
+                },
+                success: function(response) {
+                    if (response.success) {
+                        toastr.success(response.message);
+                        setTimeout(() => location.reload(), 1000);
+                    } else {
+                        toastr.error(response.message || 'Error occurred');
+                        btn.prop('disabled', false).html('<i class="bx bx-check-circle"></i> Approve');
+                    }
+                },
+                error: function(xhr) {
+                    toastr.error('Failed to approve unscheduled work');
+                    btn.prop('disabled', false).html('<i class="bx bx-check-circle"></i> Approve');
                 }
             });
         }

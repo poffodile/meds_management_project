@@ -222,6 +222,7 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 		Route::get('/timesheet-reconciliation', [PayrollFinanceController::class, 'timesheetreconciliation'])->name('roster.payroll.finance.reconciliation');
 		Route::post('/timesheet-reconciliation/save', [PayrollFinanceController::class, 'saveTimesheet'])->name('timesheet.save');
 		Route::post('/timesheet-reconciliation/approve', [PayrollFinanceController::class, 'approveShift'])->name('timesheet.approve');
+		Route::post('/timesheet-reconciliation/approve-unscheduled', [PayrollFinanceController::class, 'approveUnscheduledLog'])->name('timesheet.approve.unscheduled');
 
 		// Payroll Report
 		Route::get('/payroll-report/{week_key}', [PayrollFinanceController::class, 'weeklyReport'])->name('roster.payroll.report');

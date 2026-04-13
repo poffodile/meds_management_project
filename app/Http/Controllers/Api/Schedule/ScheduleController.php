@@ -54,6 +54,7 @@ class ScheduleController extends Controller
             $shift->day = \Carbon\Carbon::parse($shift->start_date)->format('l');
             $shift->start_time = \Carbon\Carbon::parse($shift->start_time)->format('H:i');
             $shift->end_time   = \Carbon\Carbon::parse($shift->end_time)->format('H:i');
+            $shift->current_date = date('Y-m-d');
 
             if ($shift->assessments) {
                 foreach ($shift->assessments as $assessment) {
@@ -80,6 +81,7 @@ class ScheduleController extends Controller
             'success' => true,
             'message' => 'Shift details retrieved successfully.',
             'data' => $data->first(),
+            'current_date' => date('Y-m-d'),
         ]);
     }
 
@@ -187,8 +189,29 @@ class ScheduleController extends Controller
 
         $shift = ScheduledShift::find($request->shift_id);
 
+        if ($request->staff_id) {
+            $formattedStart = date('H:i:s', strtotime($shift->start_time));
+            $formattedEnd = date('H:i:s', strtotime($shift->end_time));
+
+            $overlap = ScheduledShift::where('staff_id', $request->staff_id)
+                ->where('start_date', $shift->start_date)
+                ->where('id', '!=', $shift->id)
+                ->where(function ($q) use ($formattedStart, $formattedEnd) {
+                    $q->whereTime('start_time', '<', $formattedEnd)
+                        ->whereTime('end_time', '>', $formattedStart);
+                })
+                ->exists();
+
+            if ($overlap) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'This carer is already assigned to another shift at this time.',
+                ], 200);
+            }
+        }
+
         $shift->staff_id = $request->staff_id;
-        $shift->status   = 'assigned';
+        $shift->status   = $request->staff_id ? 'assigned' : 'unfilled';
         $shift->save();
 
         return response()->json([

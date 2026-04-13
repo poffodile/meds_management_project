@@ -423,6 +423,52 @@ class PayrollFinanceController extends Controller
             ];
         });
 
+        // 5. Fetch Unscheduled Logs (shift_id = 0)
+        $unscheduledLogsQuery = \App\LoginInActivity::where('home_id', $homeId)
+            ->where('shift_id', 0)
+            ->where('is_deleted', 0)
+            ->with('user');
+
+        if ($date_filter) {
+            $unscheduledLogsQuery->whereDate('check_in_time', $date_filter);
+        }
+        if ($staff_filter) {
+            $unscheduledLogsQuery->where('user_id', $staff_filter);
+        }
+
+        $unscheduled_activities = $unscheduledLogsQuery->get();
+
+        $unscheduled_logs = $unscheduled_activities->groupBy(function ($log) {
+            return $log->user_id . '_' . \Carbon\Carbon::parse($log->check_in_time)->format('Y-m-d');
+        })->map(function ($group) {
+            $firstLog = $group->first();
+            $totalMinutes = 0;
+            foreach ($group as $log) {
+                if ($log->check_in_time && $log->check_out_time) {
+                    $in = \Carbon\Carbon::parse($log->check_in_time);
+                    $out = \Carbon\Carbon::parse($log->check_out_time);
+                    if ($out->lessThan($in)) $out->addDay();
+                    $totalMinutes += $in->diffInMinutes($out);
+                }
+            }
+
+            return (object)[
+                'id' => 'log_' . $firstLog->user_id . '_' . \Carbon\Carbon::parse($firstLog->check_in_time)->format('Y-m-d'),
+                'staff_id' => $firstLog->user_id,
+                'staff' => $firstLog->user,
+                'start_date' => \Carbon\Carbon::parse($firstLog->check_in_time)->format('Y-m-d'),
+                'actual_duration_minutes' => $totalMinutes,
+                'scheduled_duration_minutes' => 0,
+                'variance_minutes' => $totalMinutes,
+                'reconciliation_status' => 'Unscheduled',
+                'login_activities' => $group,
+                'is_unscheduled_log' => true
+            ];
+        })->values();
+
+        // Update counts
+        $unscheduledCount += $unscheduled_logs->count();
+
         return view('frontEnd/roster/payroll_finance/timesheetreconciliation', compact(
             'shifts',
             'matchedCount',
@@ -433,7 +479,8 @@ class PayrollFinanceController extends Controller
             'users',
             'shift_options',
             'categories',
-            'manual_timesheets'
+            'manual_timesheets',
+            'unscheduled_logs'
         ));
     }
 
@@ -566,6 +613,73 @@ class PayrollFinanceController extends Controller
                 'success' => false,
                 'message' => 'Error: ' . $e->getMessage()
             ], 500);
+        }
+    }
+
+    public function approveUnscheduledLog(Request $request)
+    {
+        try {
+            $userId = $request->staff_id;
+            $date = $request->date;
+            $homeId = \Illuminate\Support\Facades\Auth::user()->home_id;
+
+            if (!$userId || !$date) {
+                return response()->json(['success' => false, 'message' => 'Missing required data.'], 400);
+            }
+
+            // Fetch logs to get clock times
+            $logs = \App\LoginInActivity::where('user_id', $userId)
+                ->whereDate('check_in_time', $date)
+                ->where('shift_id', 0)
+                ->where('is_deleted', 0)
+                ->get();
+
+            if ($logs->isEmpty()) {
+                return response()->json(['success' => false, 'message' => 'No unscheduled logs found for this user/date.'], 404);
+            }
+
+            $firstIn = \Carbon\Carbon::parse($logs->min('check_in_time'))->format('H:i');
+            $maxOut = $logs->max('check_out_time');
+            $lastOut = $maxOut ? \Carbon\Carbon::parse($maxOut)->format('H:i') : null;
+
+            // Create a pseudo shift to maintain consistency in timesheet reconciliation
+            $shift = \App\Models\ScheduledShift::create([
+                'staff_id' => $userId,
+                'home_id' => $homeId,
+                'start_date' => $date,
+                'start_time' => $firstIn,
+                'end_time' => $lastOut ?? $firstIn,
+                'status' => 'approved',
+                'assignment' => 'Location',
+                'care_type_id' => 1,
+                'shift_category_id' => $request->category_id ?? 1,
+            ]);
+
+            // Create Timesheet record
+            \App\Models\Timesheet::create([
+                'staff_id'    => $userId,
+                'home_id'     => $homeId,
+                'clock_in'    => $firstIn,
+                'clock_out'   => $lastOut ?? $firstIn,
+                'status'      => 'approved',
+                'notes'       => 'Approved from unscheduled logs dashboard.',
+                'shift_id'    => $shift->id,
+                'category_id' => $request->category_id ?? 1
+            ]);
+
+            // Update login activities with this new shift ID
+            \App\LoginInActivity::where('user_id', $userId)
+                ->whereDate('check_in_time', $date)
+                ->where('shift_id', 0)
+                ->update(['shift_id' => $shift->id]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Unscheduled work approved and added to payroll.'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Approve Unscheduled Log Error: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Error: ' . $e->getMessage()], 500);
         }
     }
     public function downloadReport(Request $request, $week_key)
