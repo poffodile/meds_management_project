@@ -9,6 +9,8 @@ use App\Models\CompanyDepartment;
 use App\User;
 use App\ServiceUser;
 use App\Models\ScheduledShift;
+use App\Models\ClientAlert;
+use Carbon\Carbon;
 
 class RosterController extends Controller
 {
@@ -48,6 +50,59 @@ class RosterController extends Controller
             ->whereNull('staff_id')
             ->count();
 
+		$now = Carbon::now();
+		$home_id = Auth::user()->home_id;
+
+        // Automatically sync missed shifts to ClientAlert table for persistent tracking
+        // (Removing the need to pass $missed_shifts separately to view)
+        $missed_shifts_raw = ScheduledShift::where('home_id', $home_id)
+			->where(function($query) use ($now) {
+				$query->where('status', 'no_show')
+					->orWhere(function($q) use ($now) {
+						$q->where('status', 'assigned')
+							->whereRaw("CONCAT(start_date, ' ', start_time) < ?", [$now->copy()->subMinutes(30)->toDateTimeString()]);
+					});
+			})
+			->get();
+
+        foreach($missed_shifts_raw as $shift) {
+            $exists = ClientAlert::where('shift_id', $shift->id)->exists();
+            if (!$exists) {
+                ClientAlert::create([
+                    'home_id' => $home_id,
+                    'client_id' => $shift->client_id,
+                    'shift_id' => $shift->id,
+                    'user_id' => Auth::user()->id,
+                    'alert_type_id' => 1, 
+                    'severity' => 'critical',
+                    'alert_title' => 'MISSED SHIFT',
+                    'description' => 'A scheduled shift for ' . $shift->start_date . ' at ' . date('H:i', strtotime($shift->start_time)) . ' was missed.',
+                    'status' => 1
+                ]);
+            }
+        }
+
+		// 2. Unfilled shifts (starting within 24 hours) - These are dynamic
+		$data['unfilled_shifts_alerts'] = ScheduledShift::where('home_id', $home_id)
+			->where('status', 'unfilled')
+			->whereRaw("CONCAT(start_date, ' ', start_time) <= ?", [$now->copy()->addHours(24)->toDateTimeString()])
+			->with('client:id,name')
+			->get();
+
+		// 3. Combined Critical Alerts (Custom + Automated Missed)
+		$data['critical_alerts'] = ClientAlert::where('severity', 'critical')
+            ->where('home_id', $home_id)
+			->where(function($query) use ($now) {
+				$query->whereNull('expiry_date')
+					->orWhere('expiry_date', '>=', $now->toDateString());
+			})
+            ->whereNull('resolve_date')
+			->with(['client:id,name', 'alert_types'])
+            ->orderBy('created_at', 'desc')
+			->get();
+
+        $data['missed_shifts'] = []; // Cleared to avoid duplicates in view
+        
         return view('frontEnd.roster.index', $data);
     }
 

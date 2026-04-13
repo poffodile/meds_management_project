@@ -51,7 +51,9 @@ use App\Http\Controllers\frontEnd\Roster\TaskCenter\TaskCenterController;
 use App\Http\Controllers\frontEnd\Roster\Staff\OnboardingConfigurationController;
 use App\Http\Controllers\frontEnd\Roster\Staff\AuditLogController;
 use App\Http\Controllers\frontEnd\Roster\OnboardingDetailController;
-
+use App\Http\Controllers\frontEnd\Roster\ReportingEngine\ReportingEngineController;
+use App\Http\Controllers\frontEnd\Roster\ComplianceDashboard\ComplianceDashboardController;
+use App\Http\Controllers\frontEnd\Roster\CRMDashboard\CRMDashboardController;
 
 // Backend Controllers
 use App\Http\Controllers\backEnd\user\LatnessLeaveController;
@@ -203,6 +205,15 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 		Route::post('/client-search', [ClientController::class, 'client_search']);
 		Route::get('/care-task-add', [ClientController::class, 'care_task_add']);
 
+		// Client Alerts
+		Route::post('/client-alert-save', [ClientController::class, 'client_alert_save']);
+		Route::post('/client-alert-edit', [ClientController::class, 'client_alert_save']); // Uses same save method
+		Route::post('/client/alert-type', [ClientController::class, 'client_alert_type']);
+		Route::post('/client/alert-increase-acknowledge', [ClientController::class, 'alert_increase_acknowledge']);
+		Route::post('/client/alert-resolve', [ClientController::class, 'client_alert_resolve']);
+		Route::post('/client/alert-archived', [ClientController::class, 'client_alert_archived']);
+		Route::post('/client/alert-increase-all-acknowledge', [ClientController::class, 'alert_increase_all_acknowledge']);
+
 		// Client Controller Expenses
 		Route::post('/client-expense-save', [ClientExpenseController::class, 'save']);
 		Route::post('/client-expense-list', [ClientExpenseController::class, 'list']);
@@ -263,6 +274,16 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 		Route::post('/onboarding-detail-save', [OnboardingDetailController::class, 'onboarding_detail_save']);
 		Route::post('/onboarding-detail-list', [OnboardingDetailController::class, 'onboarding_detail_list']);
 		Route::post('/onboarding-detail-delete', [OnboardingDetailController::class, 'onboarding_detail_delete']);
+
+
+		// Reporting Engine
+		Route::get('/reporting-engine', [ReportingEngineController::class, 'reporting_engine']);
+
+		// Compliance Dashboard
+		Route::get('/compliance-dashboard', [ComplianceDashboardController::class, 'compliance_dashboard']);
+
+		// CRM Dashboard
+		Route::get('/crm-dashboard', [CRMDashboardController::class, 'crm_dashboard']);
 	});
 
 	// Report Section

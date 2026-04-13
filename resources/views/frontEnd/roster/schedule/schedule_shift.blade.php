@@ -360,7 +360,6 @@
                 <button class="filterBtn lightGreen" data-toggle="modal" data-target="#recurringShiftModal"> 🔁 Recurring </button>
                 <button class="btn allBtnUseColor" data-toggle="modal" data-target="#addShiftModal">+ Add Shift</button>
             </div>
-
         </div>
 
         <!-- Alerts -->

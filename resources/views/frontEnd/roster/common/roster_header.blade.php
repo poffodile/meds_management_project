@@ -515,29 +515,28 @@
           <li> <a href="{{ url('/roster/leave-request') }}"><i class='bx  bx-clipboard-detail'></i> <span>Leave Requests</span> </a></li>
           <li> <a href="{{ url('/roster/payroll-finance') }}"><i class='bx bx-file-detail'></i> <span>Payroll & Finance</span> </a></li>
           <li> <a href="{{ url('/roster/reports') }}"><i class='bx  bx-file-report'></i> <span>Reports</span> </a></li>
-          <li> <a href="{{ url('/roster/onboarding-configuration') }}"><i
-                class='bx bx-cog'></i><span>Onboarding Configuration</span></a></li>
-          <li> <a href="{{url('/roster/staffonboarding')}}"><i class='bx  bx-file-report'></i> <span>Staff Onboarding</span> </a></li>
-          <li> <a href="{{url('/roster/clientonboarding')}}"><i class='bx  bx-file-report'></i> <span>Client Onboarding</span> </a></li>
-          <li> <a href="#!"><i class='bx  bx-shield'></i> <span>Compliance Hub</span> </a></li>
-          <li> <a href="{{url('/roster/task-center')}}"><i class='bx  bx-clipboard-detail'></i> <span>Task Center</span> </a></li>
-          <li> <a href="#!"><i class='bx  bx-clipboard-detail'></i> <span>Action Plan Progress</span> </a></li>
-          <li> <a href="#!"><i class='bx bx-file-detail'></i> <span>Reporting Engine</span> </a></li>
-          <li> <a href="{{url('/roster/audit-log')}}"><i class='bx bx-file-detail'></i> <span>Audit Log</span> </a></li>
-          <li> <a href="#!"><i class='bx bx-file-detail'></i> <span>Form Builder</span> </a></li>
-          <li> <a href="#!"><i class='bx bx-group'></i> <span>CRM Dashboard</span> </a></li>
-          <li> <a href="#!"><i class='bx  bx-message'></i> <span>Client Comms Hub</span> </a></li>
+          <li> <a href="{{ url('/roster/onboarding-configuration') }}"><i class='bx bx-cog'></i><span>Onboarding Configuration</span></a></li>
+          <li> <a href="{{ url('/roster/staffonboarding')}}"><i class='bx  bx-file-report'></i> <span>Staff Onboarding</span> </a></li>
+          <li> <a href="{{ url('/roster/clientonboarding')}}"><i class='bx  bx-file-report'></i> <span>Client Onboarding</span> </a></li>
+          <li> <a href="{{ url('/roster/compliance-hub')}}"><i class='bx  bx-shield'></i> <span>Compliance Hub</span> </a></li>
+          <li> <a href="{{ url('/roster/task-center')}}"><i class='bx  bx-clipboard-detail'></i> <span>Task Center</span> </a></li>
+          <li> <a href="{{ url('/roster/action-plan-progress')}}"><i class='bx  bx-clipboard-detail'></i> <span>Action Plan Progress</span> </a></li>
+          <li> <a href="{{ url('/roster/reporting-engine')}}"><i class='bx bx-file-detail'></i> <span>Reporting Engine</span> </a></li>
+          <li> <a href="{{ url('/roster/compliance-dashboard')}}"><i class='bx  bx-message'></i> <span>Compliance Dashboard</span> </a></li>
+          <li> <a href="{{ url('/roster/audit-log')}}"><i class='bx bx-file-detail'></i> <span>Audit Log</span> </a></li>
+          <li> <a href="{{ url('/roster/form-builder')}}"><i class='bx bx-file-detail'></i> <span>Form Builder</span> </a></li>
+          <li> <a href="{{ url('/roster/crm-dashboard')}}"><i class='bx bx-group'></i> <span>CRM Dashboard</span> </a></li>
+          <li> <a href="{{ url('/roster/client-comms-hub')}}"><i class='bx  bx-message'></i> <span>Client Comms Hub</span> </a></li>
           <li class="header-menu"> <span>System</span> </li>
-          <li> <a href="#!"><i class='bx  bx-shield'></i> <span>Role Management</span> </a></li>
-          <li> <a href="#!"><i class='bx  bx-cog'></i> <span>Module Settings</span> </a></li>
-          <li> <a href="#!"><i class='bx bx-group'></i> <span>User Management</span> </a></li>
+          <li> <a href="{{ url('/roster/role-management')}}"><i class='bx  bx-shield'></i> <span>Role Management</span> </a></li>
+          <li> <a href="{{ url('/roster/module-settings')}}"><i class='bx  bx-cog'></i> <span>Module Settings</span> </a></li>
+          <li> <a href="{{ url('/roster/user-management')}}"><i class='bx bx-group'></i> <span>User Management</span> </a></li>
           <li> <a href="#!"><i class='bx bx-file-detail'></i> <span>Technical Spec</span> </a></li>
         </ul>
       </div>
       <!-- sidebar-menu  -->
     </div>
     <!-- sidebar-content  -->
-
   </nav>
 
 

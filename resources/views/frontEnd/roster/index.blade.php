@@ -20,36 +20,76 @@
         </div>
 
         <!-- Alerts -->
+        @php
+        $totalCriticalAlertsCount = count($missed_shifts) + count($unfilled_shifts_alerts) + count($critical_alerts);
+        $alertIndex = 0;
+        @endphp
+
         <div class="rota_alerts" id="alertsContainer">
-            @forelse ($scheduled_shifts as $shift)
-            <div class="rota_alert {{ $loop->index >= 3 ? 'extra-alert' : '' }}" @if($loop->index >= 3) style="display: none;" @endif>
-                <div class="rota_alert-icon"><i class="fa fa fa-calendar-o"></i></div>
+            @if($totalCriticalAlertsCount > 0)
+            {{-- Missed Shifts --}}
+            @foreach ($missed_shifts as $shift)
+            <div class="rota_alert {{ $alertIndex >= 3 ? 'extra-alert' : '' }}" @if($alertIndex>= 3) style="display: none;" @endif>
+                <div class="rota_alert-icon"><i class="fa fa-exclamation-circle"></i></div>
                 <div class="rota_alert-content">
-                    <div class="rota_alert-title">{{ $shift->client_name ?? 'Unknown Client' }} - {{ date('H:i', strtotime($shift->start_time)) }}</div>
+                    <div class="rota_alert-title">{{ $shift->client->name ?? 'Unknown Client' }} - MISSED SHIFT</div>
                     <div class="rota_alert-description">
-                        Assigned to: {{ $shift->staff_name ?? 'Unassigned' }} |
-                        Shift Type: {{ ucfirst($shift->shift_type) }} |
-                        Date: {{ date('M d, Y', strtotime($shift->start_date)) }}
+                        The shift scheduled for {{ date('d M, Y', strtotime($shift->start_date)) }} at {{ date('H:i', strtotime($shift->start_time)) }} was missed.
                     </div>
                     <div class="rota_alert-bottmDescription">
-                        <i class="fa fa-clock-o"></i> {{ date('h:i A', strtotime($shift->start_time)) }} - {{ date('h:i A', strtotime($shift->end_time)) }}
-                        @if($shift->notes)
-                        <br><i class="fa fa-info-circle"></i> {{ $shift->notes }}
-                        @endif
+                        <i class="fa fa-clock-o"></i> Missed at: {{ date('h:i A', strtotime($shift->start_time)) }}
                     </div>
                 </div>
-                <div class="rota_alert-badge">New</div>
+                <div class="rota_alert-badge">Critical</div>
             </div>
-            @empty
+            @php $alertIndex++; @endphp
+            @endforeach
+
+            {{-- Unassigned Shifts --}}
+            @foreach ($unfilled_shifts_alerts as $shift)
+            <div class="rota_alert {{ $alertIndex >= 3 ? 'extra-alert' : '' }}" @if($alertIndex>= 3) style="display: none;" @endif>
+                <div class="rota_alert-icon"><i class="fa fa-user-times"></i></div>
+                <div class="rota_alert-content">
+                    <div class="rota_alert-title">{{ $shift->client->name ?? 'Unknown Client' }} - UNASSIGNED SHIFT</div>
+                    <div class="rota_alert-description">
+                        No carer assigned for shift starting in less than 24 hours: {{ date('d M, Y', strtotime($shift->start_date)) }}
+                    </div>
+                    <div class="rota_alert-bottmDescription">
+                        <i class="fa fa-clock-o"></i> Starts at: {{ date('h:i A', strtotime($shift->start_time)) }}
+                    </div>
+                </div>
+                <div class="rota_alert-badge">Unassigned</div>
+            </div>
+            @php $alertIndex++; @endphp
+            @endforeach
+
+            {{-- Custom Critical Alerts --}}
+            @foreach ($critical_alerts as $alert)
+            <div class="rota_alert {{ $alertIndex >= 3 ? 'extra-alert' : '' }}" @if($alertIndex>= 3) style="display: none;" @endif>
+                <div class="rota_alert-icon"><i class="fa fa-warning"></i></div>
+                <div class="rota_alert-content">
+                    <div class="rota_alert-title">{{ $alert->client->name ?? 'Unknown Client' }} - {{ $alert->alert_title }}</div>
+                    <div class="rota_alert-description">
+                        {{ $alert->description }}
+                    </div>
+                    <div class="rota_alert-bottmDescription">
+                        <i class="fa fa-info-circle"></i> Critical Alert recorded on {{ date('d M, Y', strtotime($alert->created_at)) }}
+                    </div>
+                </div>
+                <div class="rota_alert-badge">Critical</div>
+            </div>
+            @php $alertIndex++; @endphp
+            @endforeach
+            @else
             <div class="rota_alert">
                 <div class="rota_alert-content">
-                    <div class="rota_alert-title">No shifts found</div>
+                    <div class="rota_alert-title">No critical alerts found</div>
                 </div>
             </div>
-            @endforelse
+            @endif
 
-            @if(count($scheduled_shifts) > 3)
-            <div class="rota_view-all" id="viewAllAlerts" style="cursor: pointer;" onclick="toggleAlerts()">View All ({{ count($scheduled_shifts) }}) →</div>
+            @if($totalCriticalAlertsCount > 3)
+            <div class="rota_view-all" id="viewAllAlerts" style="cursor: pointer;" onclick="toggleAlerts()">View All ({{ $totalCriticalAlertsCount }}) →</div>
             @endif
         </div>
 
@@ -93,7 +133,6 @@
         <!-- Smart Automation -->
 
         <div class="rota_dashboard-cards">
-
             <a href="{{ url('roster/carer') }}" class="rota_dash-card blue" style="text-decoration: none; color: inherit;">
                 <div class="rota_dash-left">
                     <p class="rota_title">Active Carers</p>
@@ -133,7 +172,6 @@
                     <i class="fa fa-exclamation-circle"></i>
                 </div>
             </a>
-
         </div>
 
         <!-- Smart Suggestions -->
@@ -299,7 +337,6 @@
                 @endforelse
             </div>
         </div>
-
 
 
     </div>
