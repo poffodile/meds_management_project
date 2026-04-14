@@ -174,9 +174,9 @@
                         <li class="{{ $page == 'system-guide' ? 'active' : '' }}">
                             <a href="{{ url('admin/system-guide-category') }}"> System Guide </a>
                         </li>
-                        <li class="{{ $page == 'managers' ? 'active' : '' }}">
+                        <!-- <li class="{{ $page == 'managers' ? 'active' : '' }}">
                             <a href="{{ url('admin/managers') }}">Managers </a>
-                        </li>
+                        </li> -->
                         <!-- <li class="{{ $page == 'placement_plan' ? 'active' : '' }}"><a href="{{ url('admin/placement-plan') }}">Placement Plan</a></li> -->
                         <li class="{{ $page == 'appointmen_plans' ? 'active' : '' }}">
                             <a href="{{ url('admin/appointment/plans') }}"> Appointments / Plans </a>
@@ -251,6 +251,9 @@
                         </li>
                         <li class="{{ ($page == 'entitytype') ? 'active' : '' }}">
                             <a href="{{ url('admin/entity-type') }}">Entity Type </a>
+                        </li>
+                        <li class="{{ $page == 'policylibrarycategory' ? 'active' : '' }}">
+                            <a href="{{ url('admin/policylibrarycategory') }}">Policy Library Category </a>
                         </li>
                         <li class="sub-menu">
                             <a href="javascript:void(0)"

@@ -93,6 +93,24 @@
                                             } ?>>Dyslexia</option>
                     </select>
                 </div>
+                @php
+                    $raw_home_id = Auth::user()->getAttributes()['home_id'] ?? '';
+                    $allowed_ids = array_filter(explode(',', str_replace(' ', '', $raw_home_id)));
+                @endphp
+
+                @if(Auth::check() && count($allowed_ids) > 1)
+                    @php
+                        $allowed_homes = \App\Home::whereIn('id', $allowed_ids)->get();
+                    @endphp
+                    <div class="select-dyslexia" style="margin-right: 15px;">
+                        <select class="form-control" style="background-color: #aec785; color: #fff; border: 1px solid #aec785;" onchange="window.location.href='{{ url('/switch_home_submit') }}?home='+this.value">
+                            <option value="">Switch Home</option>
+                            @foreach($allowed_homes as $home)
+                                <option value="{{ $home->id }}" {{ Auth::user()->home_id == $home->id ? 'selected' : '' }}>{{ $home->title }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                @endif
             </div>
             <div class="col-md-4 col-sm-4 col-xs-12 col-lg-4">
                 <ul class="nav pull-left top-menu">

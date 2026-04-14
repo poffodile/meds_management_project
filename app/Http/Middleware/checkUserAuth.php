@@ -38,6 +38,15 @@ class checkUserAuth
                 // return redirect('/')->with('success','Your sesion has been expired');
                 return redirect('/login')->with('success', 'Your sesion has been expired');
             }
+
+            // Populate manager session if missing
+            if (in_array(Auth::user()->user_type, ['M', 'CM']) && !Session::has('allowed_home_ids')) {
+                $raw_home_id = \App\User::where('id', Auth::user()->id)->value('home_id');
+                Session::put('allowed_home_ids', explode(',', $raw_home_id));
+                if (!Session::has('active_home_id')) {
+                    Session::put('active_home_id', explode(',', $raw_home_id)[0]);
+                }
+            }
         }
 
         if (!Auth::check()) {

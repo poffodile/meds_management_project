@@ -95,6 +95,7 @@ class UserController extends Controller
 									User::setUserLogInStatus(1);
 									//echo csrf_token(); die;
 									//echo "222"; die;
+									$this->handleManagerSession($hme_id);
 									return redirect('/roster')->with('success', 'Welcome back ' . Auth::user()->user_name);
 									// return redirect('/roster/')->with('success', 'Welcome back ' . Auth::user()->user_name);
 								} else {
@@ -153,6 +154,7 @@ class UserController extends Controller
 									User::setUserLogInStatus(1);
 									//echo csrf_token(); die;
 									// return redirect('/roster/')->with('success', 'Welcome back ' . Auth::user()->user_name);
+									$this->handleManagerSession($hme_id);
 									return redirect('/roster')->with('success', 'Welcome back ' . Auth::user()->user_name);
 								} else {  //echo "string3"; die;
 									return redirect()->back()->with('error', 'Incorrect email or password combination.');
@@ -199,6 +201,7 @@ class UserController extends Controller
 								User::setUserLogInStatus(1);
 								//echo csrf_token(); die;
 								// return redirect('/roster/')->with('success', 'Welcome back ' . Auth::user()->user_name);
+								$this->handleManagerSession($hme_id);
 								return redirect('/roster')->with('success', 'Welcome back ' . Auth::user()->user_name);
 							} else {
 								return redirect()->back()->with('error', 'Incorrect email or password combination.');
@@ -260,6 +263,7 @@ class UserController extends Controller
 						$session_id_update->save();
 						User::setUserLogInStatus(1);
 						//echo csrf_token(); die;
+						$this->handleManagerSession($data['home']);
 						return redirect('/roster')->with('success', 'Welcome back ' . Auth::user()->user_name);
 						// return redirect('/')->with('success', 'Welcome back ' . Auth::user()->user_name);
 					} else {
@@ -361,6 +365,8 @@ class UserController extends Controller
 			$user->save();
 			Auth::logout();
 			Session::forget('LAST_ACTIVITY');
+			Session::forget('active_home_id');
+			Session::forget('allowed_home_ids');
 		}
 		return redirect('/login');
 	}
@@ -458,6 +464,10 @@ class UserController extends Controller
 
 	public function switch_home_submit(Request $request)
 	{
+		if (Auth::check() && in_array(Auth::user()->user_type, ['M', 'CM'])) {
+			Session::put('active_home_id', $request->home);
+			return redirect()->back()->with('success', 'Home switched successfully.');
+		}
 
 		$previouHome = User::where('id', Auth::user()->id)->value('home_id');
 		$array = [$request->home];
@@ -488,4 +498,14 @@ class UserController extends Controller
             echo json_encode(true);      //  for jquery validations
         }  
     }*/
+	private function handleManagerSession($selected_home_id)
+	{
+		if (Auth::check() && in_array(Auth::user()->user_type, ['M', 'CM'])) {
+			$user = Auth::user();
+			// Get raw home_id from DB
+			$raw_home_id = User::where('id', $user->id)->value('home_id');
+			Session::put('allowed_home_ids', explode(',', $raw_home_id));
+			Session::put('active_home_id', $selected_home_id);
+		}
+	}
 }

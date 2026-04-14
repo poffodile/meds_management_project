@@ -66,11 +66,12 @@ class RosterController extends Controller
 			->get();
 
         foreach($missed_shifts_raw as $shift) {
+            // Check if alert already exists for this shift
             $exists = ClientAlert::where('shift_id', $shift->id)->exists();
-            if (!$exists) {
+            if (!$exists && !empty($shift->service_user_id)) {
                 ClientAlert::create([
                     'home_id' => $home_id,
-                    'client_id' => $shift->client_id,
+                    'client_id' => $shift->service_user_id,
                     'shift_id' => $shift->id,
                     'user_id' => Auth::user()->id,
                     'alert_type_id' => 1, 

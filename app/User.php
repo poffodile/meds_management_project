@@ -15,6 +15,7 @@ use App\Models\ClientCareScheduleDate;
 use App\Models\ClientCareScheduleDay;
 use App\Models\ClientCareWorkPrefer;
 use App\Models\ClientCareUnavailableDate;
+use Illuminate\Support\Facades\Session;
 
 class User extends Authenticatable
 {
@@ -435,4 +436,20 @@ class User extends Authenticatable
             input password
             press submit the user will be logged in.
     */
+    public function getHomeIdAttribute($value)
+    {
+        if (Session::has('active_home_id')) {
+            return Session::get('active_home_id');
+        }
+
+        if (strpos($value, ',') !== false) {
+            return explode(',', $value)[0];
+        }
+        return $value;
+    }
+
+    public function getRealHomeIdAttribute()
+    {
+        return $this->getAttributes()['home_id'];
+    }
 }

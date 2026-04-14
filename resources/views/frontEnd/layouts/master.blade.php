@@ -116,8 +116,6 @@
 
     <link rel="stylesheet" href="{{ url('public\frontEnd\css\time-line.css') }}">
 
-
-
     <style type="text/css">
         .chat_opt {
             display: flex;
@@ -283,9 +281,9 @@
         @yield('content')
 
         @include('frontEnd.common.footer')
-        <a class="chat_opt" data-toggle="modal" data-target="#call_modal">
+        <!-- <a class="chat_opt" data-toggle="modal" data-target="#call_modal">
             <i class="fa fa-phone"></i>
-        </a>
+        </a> -->
 
     </section>
 

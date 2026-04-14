@@ -54,7 +54,7 @@ if (isset($system_admin_home)) {
 								</div>
 
 								<div class="form-group">
-									<label class="col-lg-3 control-label">Enable For Home Area</label>
+									<label class="col-lg-3 control-label">Home Location</label>
 									<div class="col-lg-9">
 										<div class="checkbox">
 											<label>
@@ -90,7 +90,7 @@ if (isset($system_admin_home)) {
 								</div>
 
 								<div class="form-group">
-									<label class="col-lg-3 control-label">Home Area</label>
+									<label class="col-lg-3 control-label">Clock in/Clock out Range</label>
 									<div class="col-lg-9">
 										<input type="text" name="home_area" id="home_area" class="form-control" placeholder="Home area" value="{{ (isset($system_admin_home->home_area)) ? $system_admin_home->home_area : '' }}" maxlength="255">
 										<span class="help-block">(In meters or min 10 meters)</span>
@@ -143,16 +143,16 @@ if (isset($system_admin_home)) {
 								}
 								?>
 								<div class="form-group">
-									<label class="col-lg-3 control-label">Weekly Allowance (Service Users)</label>
+									<label class="col-lg-3 control-label">Weekly Rate (Service Users)</label>
 									<div class="col-lg-9">
-										<input type="number" step="0.01" name="weekly_allowance_service_users" class="form-control" placeholder="Weekly allowance" value="{{ (isset($system_admin_home->weekly_allowance_service_users)) ? $system_admin_home->weekly_allowance_service_users : '' }}">
+										<input type="number" step="0.01" name="weekly_allowance_service_users" class="form-control" placeholder="Weekly Rate" value="{{ (isset($system_admin_home->weekly_allowance_service_users)) ? $system_admin_home->weekly_allowance_service_users : '' }}">
 									</div>
 								</div>
 
 								<div class="form-group">
-									<label class="col-lg-3 control-label">Monthly Allowance (Service Users)</label>
+									<label class="col-lg-3 control-label">Monthly Rate (Service Users)</label>
 									<div class="col-lg-9">
-										<input type="number" step="0.01" name="monthly_allowance_service_users" class="form-control" placeholder="Monthly allowance" value="{{ (isset($system_admin_home->monthly_allowance_service_users)) ? $system_admin_home->monthly_allowance_service_users : '' }}">
+										<input type="number" step="0.01" name="monthly_allowance_service_users" class="form-control" placeholder="Monthly Rate" value="{{ (isset($system_admin_home->monthly_allowance_service_users)) ? $system_admin_home->monthly_allowance_service_users : '' }}">
 									</div>
 								</div>
 								<div class="form-group">
