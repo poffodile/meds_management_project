@@ -167,7 +167,12 @@ class HomeController extends Controller
         }
 
         $page = 'system-admins';
-        return view('backEnd/superAdmin/home/home_form', compact('page', 'system_admin_id'));
+
+        // Fetch company default settings
+        $company_settings = \App\Models\CompanyHomeSetting::where('company_id', $system_admin_id)->first();
+        $company_areas    = \App\Models\CompanyHomeArea::where('company_id', $system_admin_id)->get();
+
+        return view('backEnd/superAdmin/home/home_form', compact('page', 'system_admin_id', 'company_settings', 'company_areas'));
     }
 
     public function edit(Request $request, $id)

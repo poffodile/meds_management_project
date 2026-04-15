@@ -49,7 +49,7 @@ if (isset($system_admin_home)) {
 								<div class="form-group">
 									<label class="col-lg-3 control-label">Address</label>
 									<div class="col-lg-9">
-										<textarea name="address" class="form-control" placeholder="address" rows="3" maxlength="1000">{{ (isset($system_admin_home->address)) ? $system_admin_home->address : '' }}</textarea>
+										<textarea name="address" class="form-control" placeholder="address" rows="3" maxlength="1000">@if(isset($system_admin_home->address)){{ $system_admin_home->address }}@elseif(isset($company_settings->address)){{ $company_settings->address }}@endif</textarea>
 									</div>
 								</div>
 
@@ -58,14 +58,15 @@ if (isset($system_admin_home)) {
 									<div class="col-lg-9">
 										<div class="checkbox">
 											<label>
-												<input type="checkbox" name="is_home_area" id="is_home_area_checkbox" value="1" {{ (isset($system_admin_home->is_home_area) && $system_admin_home->is_home_area == 1) ? 'checked' : '' }}>
+												<input type="checkbox" name="is_home_area" id="is_home_area_checkbox" value="1" 
+													{{ (isset($system_admin_home->is_home_area) && $system_admin_home->is_home_area == 1) || (!isset($system_admin_home) && isset($company_settings->is_home_area) && $company_settings->is_home_area == 1) ? 'checked' : '' }}>
 												(Check if this home have home area list)
 											</label>
 										</div>
 									</div>
 								</div>
 
-								<div id="home_area_list_section" style="display: {{ (isset($system_admin_home->is_home_area) && $system_admin_home->is_home_area == 1) ? 'block' : 'none' }};">
+								<div id="home_area_list_section" style="display: {{ (isset($system_admin_home->is_home_area) && $system_admin_home->is_home_area == 1) || (!isset($system_admin_home) && isset($company_settings->is_home_area) && $company_settings->is_home_area == 1) ? 'block' : 'none' }};">
 									<div class="form-group">
 										<label class="col-lg-3 control-label">Home Area List</label>
 										<div class="col-lg-9">
@@ -74,6 +75,13 @@ if (isset($system_admin_home)) {
 												@foreach($home_areas as $area)
 												<div class="d-flex mb-2 area-input-group" style="display:flex; margin-bottom:10px;">
 													<input type="text" name="home_area_names[]" class="form-control" placeholder="Area name" value="{{ $area->name }}">
+													<button type="button" class="btn btn-danger btn-sm remove-area-btn" style="margin-left:10px;"><i class="fa fa-trash"></i></button>
+												</div>
+												@endforeach
+												@elseif(!isset($system_admin_home) && isset($company_areas) && count($company_areas) > 0)
+												@foreach($company_areas as $area)
+												<div class="d-flex mb-2 area-input-group" style="display:flex; margin-bottom:10px;">
+													<input type="text" name="home_area_names[]" class="form-control" placeholder="Area name" value="{{ $area->area_name }}">
 													<button type="button" class="btn btn-danger btn-sm remove-area-btn" style="margin-left:10px;"><i class="fa fa-trash"></i></button>
 												</div>
 												@endforeach
@@ -92,7 +100,7 @@ if (isset($system_admin_home)) {
 								<div class="form-group">
 									<label class="col-lg-3 control-label">Clock in/Clock out Range</label>
 									<div class="col-lg-9">
-										<input type="text" name="home_area" id="home_area" class="form-control" placeholder="Home area" value="{{ (isset($system_admin_home->home_area)) ? $system_admin_home->home_area : '' }}" maxlength="255">
+										<input type="text" name="home_area" id="home_area" class="form-control" placeholder="Home area" value="{{ (isset($system_admin_home->home_area)) ? $system_admin_home->home_area : (isset($company_settings->clock_in_range) ? $company_settings->clock_in_range : '') }}" maxlength="255">
 										<span class="help-block">(In meters or min 10 meters)</span>
 									</div>
 								</div>
@@ -145,14 +153,14 @@ if (isset($system_admin_home)) {
 								<div class="form-group">
 									<label class="col-lg-3 control-label">Weekly Rate (Service Users)</label>
 									<div class="col-lg-9">
-										<input type="number" step="0.01" name="weekly_allowance_service_users" class="form-control" placeholder="Weekly Rate" value="{{ (isset($system_admin_home->weekly_allowance_service_users)) ? $system_admin_home->weekly_allowance_service_users : '' }}">
+										<input type="number" step="0.01" name="weekly_allowance_service_users" class="form-control" placeholder="Weekly Rate" value="{{ (isset($system_admin_home->weekly_allowance_service_users)) ? $system_admin_home->weekly_allowance_service_users : (isset($company_settings->weekly_allowance_service_users) ? $company_settings->weekly_allowance_service_users : '') }}">
 									</div>
 								</div>
 
 								<div class="form-group">
 									<label class="col-lg-3 control-label">Monthly Rate (Service Users)</label>
 									<div class="col-lg-9">
-										<input type="number" step="0.01" name="monthly_allowance_service_users" class="form-control" placeholder="Monthly Rate" value="{{ (isset($system_admin_home->monthly_allowance_service_users)) ? $system_admin_home->monthly_allowance_service_users : '' }}">
+										<input type="number" step="0.01" name="monthly_allowance_service_users" class="form-control" placeholder="Monthly Rate" value="{{ (isset($system_admin_home->monthly_allowance_service_users)) ? $system_admin_home->monthly_allowance_service_users : (isset($company_settings->monthly_allowance_service_users) ? $company_settings->monthly_allowance_service_users : '') }}">
 									</div>
 								</div>
 								<div class="form-group">
