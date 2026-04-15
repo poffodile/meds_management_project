@@ -242,9 +242,11 @@
                 <h2 class="section-title">Quick Actions</h2>
             </div>
 
+            @if($unfilled_shifts_count > 0)
             <div class="quick_alert-notice">
-                ⚠️ <strong>Attention Required</strong> - No contact shifts today poor/poor
+                ⚠️ <strong>Attention Required</strong> - {{ $unfilled_shifts_count }} unfilled shifts need assignment
             </div>
+            @endif
 
             <div class="quick_actions-grid">
                 <a href="{{ url('roster/schedule-shift') }}">
