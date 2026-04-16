@@ -2155,8 +2155,7 @@
                         const fileName = file.name;
                         const itemId = 'assessment-item-' + Date.now() + '-' + index;
 
-                        const itemHtml = `
-                                <div class="assessment-item" id="${itemId}">
+                        const itemHtml = `<div class="assessment-item" id="${itemId}">
                                     <div class="assessment-item-left">
                                         <i class="fa fa-file-text-o"></i>
                                         <span class="assessment-item-name" title="${fileName}">${fileName}</span>
@@ -2173,8 +2172,7 @@
                                             <i class="fa fa-trash-o"></i>
                                         </button>
                                     </div>
-                                </div>
-                            `;
+                                </div>`;
 
                         assessmentList.insertAdjacentHTML('beforeend', itemHtml);
 

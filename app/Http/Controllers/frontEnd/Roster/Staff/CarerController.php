@@ -510,4 +510,87 @@ class CarerController extends Controller
             'weeks' => $weeksData
         ]);
     }
+
+    public function export(Request $request)
+    {
+        $homeIds = explode(',', auth()->user()->home_id);
+        $homeId  = $homeIds[0] ?? null;
+
+        if (!$homeId) {
+            return back()->with('error', 'Home ID not found');
+        }
+
+        $type   = $request->type ?? 'allCarerActibity';
+        $search = trim($request->search ?? '');
+
+        switch ($type) {
+            case 'activeCarer':
+                $staffQuery = $this->staffService->activeStaff($homeId);
+                break;
+            case 'inactiveCarer':
+                $staffQuery = $this->staffService->inactiveStaff($homeId);
+                break;
+            case 'onLeaveCarer':
+                $staffQuery = $this->staffService->onLeaveStaff($homeId);
+                break;
+            case 'allCarerActibity':
+            default:
+                $staffQuery = $this->staffService->allStaff($homeId);
+                break;
+        }
+
+        if (!empty($search)) {
+            $staffQuery->where(function ($q) use ($search) {
+                $q->where('name', 'LIKE', "%{$search}%")
+                    ->orWhere('user_name', 'LIKE', "%{$search}%")
+                    ->orWhere('email', 'LIKE', "%{$search}%");
+            });
+        }
+
+        $staff = $staffQuery->get();
+
+        $filename = "carers_" . date('Ymd_His') . ".csv";
+        $headers = [
+            "Content-Type"        => "text/csv; charset=UTF-8",
+            "Content-Disposition" => "attachment; filename=$filename",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        ];
+
+        $columns = ['ID', 'Name', 'Username', 'Email', 'Phone', 'Job Title', 'Employment Type', 'Status', 'Hourly Rate', 'DBS Expiry', 'Date of Joining'];
+
+        $handle = fopen('php://temp', 'w+');
+        fputcsv($handle, $columns);
+
+        foreach ($staff as $carer) {
+            $status = $carer->status == 1 ? 'Active' : ($carer->status == 2 ? 'On Leave' : 'Inactive');
+            $employment_type = [
+                'full_time' => 'Full Time',
+                'part_time' => 'Part Time',
+                'contract' => 'Contract'
+            ][$carer->employment_type] ?? $carer->employment_type;
+
+            fputcsv($handle, [
+                $carer->id,
+                $carer->name,
+                $carer->user_name,
+                $carer->email,
+                $carer->phone_no,
+                $carer->job_title,
+                $employment_type,
+                $status,
+                $carer->hourly_rate,
+                $carer->dbs_expiry_date,
+                $carer->date_of_joining
+            ]);
+        }
+
+        rewind($handle);
+        // Add UTF-8 BOM for Excel compatibility
+        $csvContent = "\xEF\xBB\xBF" . stream_get_contents($handle);
+        fclose($handle);
+
+        return response($csvContent, 200, $headers);
+    }
 }

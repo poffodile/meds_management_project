@@ -162,6 +162,11 @@
             -------------------------- */
         $(document).ready(function() {
             loadStaff('allCarerActibity');
+
+            $('.btn-export').on('click', function() {
+                const search = $('.searchWithtabs input').val() || '';
+                window.location.href = "{{ route('roster.staff.carer.export') }}?type=" + currentTab + "&search=" + encodeURIComponent(search);
+            });
         });
 
         /* -------------------------

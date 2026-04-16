@@ -158,6 +158,7 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 
 		// Carer Section Start
 		Route::get('/carer', [CarerController::class, 'index'])->name('roster.staff.carer');
+		Route::get('/carer/export', [CarerController::class, 'export'])->name('roster.staff.carer.export');
 		Route::post('/carer/get-hourly-rate', [CarerController::class, 'getHourlyRate'])->name('roster.staff.carer.get.hourly.rate');
 		Route::put('/carer-update/{carer_id}', [CarerController::class, 'update'])->name('roster.staff.carer.update');
 		Route::post('/carer/getStaffByStatus', [CarerController::class, 'getStaffByStatus']);

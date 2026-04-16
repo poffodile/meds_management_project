@@ -368,11 +368,24 @@ class StaffService
             $overlappingStaffIds = $query->pluck('staff_id')->toArray();
         }
 
-        // 4. Base query for users
+        // 4. Find staff who are marked as unavailable globally (Holidays, Sick, etc.)
+        $unavailableStaffIds = [];
+        if ($startDate) {
+            $unavailableStaffIds = \App\Models\ClientCareUnavailableDate::whereNotNull('carer_id')
+                ->where('start_date', '<=', $startDate)
+                ->where('end_date', '>=', $startDate)
+                ->pluck('carer_id')
+                ->toArray();
+        }
+
+        // Combine both exclusions
+        $excludeIds = array_unique(array_merge($overlappingStaffIds, $unavailableStaffIds));
+
+        // 5. Base query for users
         $query = User::select('id', 'name', 'postcode', 'latitude', 'longitude')
             ->where('home_id', Auth::user()->home_id)
             ->where('status', 1)
-            ->whereNotIn('id', $overlappingStaffIds)
+            ->whereNotIn('id', $excludeIds)
             ->where('is_deleted', 0); // Exclude deleted users
 
         // 5. Find users who have the matching course_id in user_qualification

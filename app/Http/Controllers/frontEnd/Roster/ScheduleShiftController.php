@@ -68,16 +68,16 @@ class ScheduleShiftController extends Controller
             'end_time'   => 'required|after:start_time',
         ]);
 
-        // Double Booking Check
+        // 1. Double Booking Check (against other shifts)
         if ($request->carer_id) {
             $formattedStart = date('H:i:s', strtotime($request->start_time));
             $formattedEnd = date('H:i:s', strtotime($request->end_time));
-            
+
             $overlap = ScheduledShift::where('staff_id', $request->carer_id)
                 ->where('start_date', $request->start_date)
                 ->where(function ($q) use ($formattedStart, $formattedEnd) {
                     $q->whereTime('start_time', '<', $formattedEnd)
-                      ->whereTime('end_time', '>', $formattedStart);
+                        ->whereTime('end_time', '>', $formattedStart);
                 })
                 ->exists();
 
@@ -85,6 +85,38 @@ class ScheduleShiftController extends Controller
                 return redirect()->back()->with('error', 'The selected carer is already assigned to another shift at this time.')->withInput();
             }
         }
+
+        // 2. Complete Availability Check (against unavailability table)
+        $shiftStartStr = $request->start_date . ' ' . $request->start_time;
+        $shiftEndStr = $request->start_date . ' ' . $request->end_time;
+
+        // Check Carer Unavailability
+        if ($request->carer_id) {
+            $carerUnavail = \App\Models\ClientCareUnavailableDate::where('carer_id', $request->carer_id)
+                ->where('start_date', '<=', $request->start_date)
+                ->where('end_date', '>=', $request->start_date)
+                ->exists();
+            if ($carerUnavail) {
+                return redirect()->back()->with('error', 'The selected carer is marked as unavailable on this date.')->withInput();
+            }
+
+            // --- ADDED: Regular Availability Check ---
+            $availCheck = $this->checkStaffWorkingHours($request->carer_id, $request->start_date, $request->start_time, $request->end_time);
+            if ($availCheck !== true) {
+                return redirect()->back()->with('error', $availCheck)->withInput();
+            }
+        }
+
+        // // Check Client Unavailability
+        // if ($request->client_id) {
+        //     $clientUnavail = \App\Models\ClientCareUnavailableDate::where('service_user_id', $request->client_id)
+        //         ->where('start_date', '<', $shiftEndStr)
+        //         ->where('end_date', '>', $shiftStartStr)
+        //         ->exists();
+        //     if ($clientUnavail) {
+        //         return redirect()->back()->with('error', 'The client is marked as unavailable on the selected date/time.')->withInput();
+        //     }
+        // }
         // Determine shift status based on staff assignment
         $status = isset($request->carer_id) ? 'assigned' : 'unfilled';
 
@@ -202,22 +234,54 @@ class ScheduleShiftController extends Controller
             'end_time'   => 'required|after:start_time',
         ]);
 
-        // Double Booking Check
+        // 1. Double Booking Check (against other shifts)
         if ($request->carer_id) {
             $formattedStart = date('H:i:s', strtotime($request->start_time));
             $formattedEnd = date('H:i:s', strtotime($request->end_time));
-            
+
             $overlap = ScheduledShift::where('staff_id', $request->carer_id)
                 ->where('start_date', $request->start_date)
                 ->where('id', '!=', $id)
                 ->where(function ($q) use ($formattedStart, $formattedEnd) {
                     $q->whereTime('start_time', '<', $formattedEnd)
-                      ->whereTime('end_time', '>', $formattedStart);
+                        ->whereTime('end_time', '>', $formattedStart);
                 })
                 ->exists();
 
             if ($overlap) {
                 return redirect()->back()->with('error', 'The selected carer is already assigned to another shift at this time.')->withInput();
+            }
+        }
+
+        // 2. Complete Availability Check (against unavailability table)
+        $shiftStartStr = $request->start_date . ' ' . $request->start_time;
+        $shiftEndStr = $request->start_date . ' ' . $request->end_time;
+
+        // Check Carer Unavailability
+        if ($request->carer_id) {
+            $carerUnavail = \App\Models\ClientCareUnavailableDate::where('carer_id', $request->carer_id)
+                ->where('start_date', '<=', $request->start_date)
+                ->where('end_date', '>=', $request->start_date)
+                ->exists();
+            if ($carerUnavail) {
+                return redirect()->back()->with('error', 'The selected carer is marked as unavailable on this date.')->withInput();
+            }
+
+            // --- ADDED: Regular Availability Check ---
+            $availCheck = $this->checkStaffWorkingHours($request->carer_id, $request->start_date, $request->start_time, $request->end_time);
+            if ($availCheck !== true) {
+                return redirect()->back()->with('error', $availCheck)->withInput();
+            }
+        }
+
+        // Check Client Unavailability
+        if ($request->client_id) {
+            $clientUnavail = \App\Models\ClientCareUnavailableDate::where('service_user_id', $request->client_id)
+                ->where('start_date', '<', $shiftEndStr)
+                ->where('end_date', '>', $shiftStartStr)
+                ->exists();
+            if ($clientUnavail) {
+                return redirect()->back()->with('error', 'The client is marked as unavailable on the selected date/time.')->withInput();
             }
         }
 
@@ -609,17 +673,17 @@ class ScheduleShiftController extends Controller
         $startTime = $request->start_time ?? $shift->start_time;
         $endTime   = $request->end_time   ?? $shift->end_time;
 
-        // Double Booking Check for drag-and-drop
+        // 1. Double Booking Check for drag-and-drop (against other shifts)
         if ($request->staff_id != 'open') {
             $formattedStart = date('H:i:s', strtotime($startTime));
             $formattedEnd = date('H:i:s', strtotime($endTime));
-            
+
             $overlap = ScheduledShift::where('staff_id', $request->staff_id)
                 ->where('start_date', $startDate)
                 ->where('id', '!=', $shift->id)
                 ->where(function ($q) use ($formattedStart, $formattedEnd) {
                     $q->whereTime('start_time', '<', $formattedEnd)
-                      ->whereTime('end_time', '>', $formattedStart);
+                        ->whereTime('end_time', '>', $formattedStart);
                 })
                 ->exists();
 
@@ -627,6 +691,29 @@ class ScheduleShiftController extends Controller
                 return response()->json([
                     'success' => false,
                     'message' => 'This carer is already assigned to another shift at this time.'
+                ]);
+            }
+        }
+
+        // 2. Complete Availability Check (against unavailability table)
+        if ($request->staff_id != 'open') {
+            $carerUnavail = \App\Models\ClientCareUnavailableDate::where('carer_id', $request->staff_id)
+                ->where('start_date', '<=', $startDate)
+                ->where('end_date', '>=', $startDate)
+                ->exists();
+            if ($carerUnavail) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'The selected carer is marked as unavailable on this date.'
+                ]);
+            }
+
+            // --- ADDED: Regular Availability Check ---
+            $availCheck = $this->checkStaffWorkingHours($request->staff_id, $startDate, $startTime, $endTime);
+            if ($availCheck !== true) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $availCheck
                 ]);
             }
         }
@@ -703,5 +790,59 @@ class ScheduleShiftController extends Controller
                 'prev_page_url' => $alertScheduledShift->previousPageUrl()
             ],
         ]);
+    }
+
+    /**
+     * Helper to check if a staff member is available according to their regular schedule or specific dates.
+     */
+    private function checkStaffWorkingHours($staffId, $startDate, $startTime, $endTime)
+    {
+        $shiftStart = Carbon::parse($startDate . ' ' . $startTime);
+        $shiftEnd = Carbon::parse($startDate . ' ' . $endTime);
+        $dayOfWeek = $shiftStart->format('l');
+
+        // 1. Check Specific Dates (Overrides/Supplements)
+        $specific = \App\Models\ClientCareScheduleDate::where('carer_id', $staffId)
+            ->whereDate('start_date', $startDate)
+            ->first();
+
+        if ($specific) {
+            if ($specific->is_working == 0) {
+                return "The carer is marked as not working on this specific date ($startDate).";
+            }
+            $specStart = Carbon::parse($specific->start_date);
+            $specEnd = Carbon::parse($specific->end_date);
+            if ($shiftStart < $specStart || $shiftEnd > $specEnd) {
+                return "Shift is outside the carer's defined working hours for this specific date (" . $specStart->format('H:i') . " - " . $specEnd->format('H:i') . ").";
+            }
+            return true;
+        }
+
+        // 2. Check Weekly Schedule
+        $schedules = \App\Models\ClientCareScheduleDay::where('carer_id', $staffId)
+            ->where('day', $dayOfWeek)
+            ->where('is_working', 1)
+            ->get();
+
+        if ($schedules->isEmpty()) {
+            return "The carer has no regular schedule defined for $dayOfWeek.";
+        }
+
+        $fits = false;
+        foreach ($schedules as $sched) {
+            $schedStart = Carbon::parse($startDate . ' ' . $sched->start_time);
+            $schedEnd = Carbon::parse($startDate . ' ' . $sched->end_time);
+            if ($shiftStart >= $schedStart && $shiftEnd <= $schedEnd) {
+                $fits = true;
+                break;
+            }
+        }
+
+        if (!$fits) {
+            $ranges = $schedules->map(fn($s) => substr($s->start_time, 0, 5) . "-" . substr($s->end_time, 0, 5))->implode(', ');
+            return "Shift is outside the carer's regular $dayOfWeek schedule ($ranges).";
+        }
+
+        return true;
     }
 }
