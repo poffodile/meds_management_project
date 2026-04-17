@@ -1218,7 +1218,13 @@
                                             <span><strong> {{ $shift->location_name ?? 'East Wing' }} </strong> </span>
                                         </div>
                                         <div class="item redalrttext">
-                                            <i class='bx  bx-user'></i> <span>{{ $shift->staff_name ?? 'Unassigned' }}</span>
+                                            <i class='bx  bx-user'></i> <span>
+                                                @if($shift->staff_id)
+                                                    <a href="{{ url('/roster/carer-availability') }}?staff_id={{ $shift->staff_id }}" style="color:inherit;text-decoration:none;">{{ $shift->staff_name }}</a>
+                                                @else
+                                                    {{ $shift->staff_name ?? 'Unassigned' }}
+                                                @endif
+                                            </span>
                                         </div>
                                     </div>
                                     <hr />
@@ -1764,7 +1770,7 @@
 
     <!-- FullCalendar Scheduler JS (includes core + interaction + resource) -->
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar-scheduler@6.1.11/index.global.min.js"></script>
-    <script src="{{ url('public/frontEnd/staff/js/schedule-shift.js') }}"></script>
+    <script src="{{ url('public/frontEnd/staff/js/schedule-shift.js') }}?v=1.1"></script>
 
 
     <!-- Advanced Filters  -->
@@ -2645,7 +2651,7 @@
                     card.innerHTML = `
                     <div class="sv-avatar">${initials}</div>
                     <div class="sv-staff-info">
-                        <div class="sv-staff-name">${member.name || 'Unknown'}</div>
+                        <div class="sv-staff-name"><a href="{{ url('/roster/carer-availability') }}?staff_id=${member.id}" style="color:inherit;text-decoration:none;">${member.name || 'Unknown'}</a></div>
                         <div class="sv-staff-type">${(member.employment_type || 'full time').replace('_', ' ')}</div>
                     </div>`;
                     teamList.appendChild(card);
@@ -2800,7 +2806,7 @@
                                 <div class="byGroupContent">
                                     <div class="workHoursHeader">
                                         <div class="title radIconClr">
-                                            ${user.name}
+                                            <a href="{{ url('/roster/carer-availability') }}?staff_id=${user.id}" style="color:inherit;text-decoration:none;">${user.name}</a>
                                         </div>
                                         <div class="actions">
                                             ${user.shifts.length} shifts

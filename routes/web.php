@@ -340,7 +340,6 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 	Route::post('/add-leave', 'App\Http\Controllers\Rota\RotaController@add_leave');
 	Route::post('/date_validation_for_user', 'App\Http\Controllers\Rota\RotaController@date_validation_for_user');
 
-
 	Route::get('/pending-request', 'App\Http\Controllers\Rota\RotaController@leave_pending');
 	Route::post('/pending-request-data', 'App\Http\Controllers\Rota\RotaController@pending_request_data');
 	Route::get('/get_all_leave', 'App\Http\Controllers\Rota\RotaController@get_all_leave');

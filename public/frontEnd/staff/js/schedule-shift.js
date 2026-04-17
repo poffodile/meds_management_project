@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         ${initials}
                     </div>
                     <div style="flex:1;">
-                        <div style="font-weight:600;color:#1f2937;font-size:13px;">${arg.resource.title}</div>
+                        <div style="font-weight:600;color:#1f2937;font-size:13px;"><a href="${BASE_URL}/roster/carer-availability?staff_id=${arg.resource.id}" style="color:inherit;text-decoration:none;">${arg.resource.title}</a></div>
                         <div style="display:flex;align-items:center;gap:6px;margin-top:2px;">
                             <small style="color:#6b7280;font-size:11px;">${hoursLogged.toFixed(1)}h / ${hoursTotal}h</small>
                             <div style="flex:1;height:4px;background:#e5e7eb;border-radius:2px;position:relative;">
