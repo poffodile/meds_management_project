@@ -504,7 +504,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const month = String(event.start.getMonth() + 1).padStart(2, '0');
             const day = String(event.start.getDate()).padStart(2, '0');
             const startDate = `${year}-${month}-${day}`;
-            
+
             const hours = String(event.start.getHours()).padStart(2, '0');
             const mins = String(event.start.getMinutes()).padStart(2, '0');
             const startTime = `${hours}:${mins}:00`;
@@ -530,7 +530,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const month = String(event.start.getMonth() + 1).padStart(2, '0');
             const day = String(event.start.getDate()).padStart(2, '0');
             const startDate = `${year}-${month}-${day}`;
-            
+
             const hours = String(event.start.getHours()).padStart(2, '0');
             const mins = String(event.start.getMinutes()).padStart(2, '0');
             const startTime = `${hours}:${mins}:00`;

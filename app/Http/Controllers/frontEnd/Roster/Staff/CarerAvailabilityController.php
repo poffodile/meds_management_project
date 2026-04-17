@@ -193,8 +193,8 @@ class CarerAvailabilityController extends Controller
             }
             $validator = Validator::make($req->all(), [
                 'carer_id' => 'required',
-                'max_per_day' => 'required|integer|min:1|max:8',
-                'max_per_week' => 'required|integer|min:1|max:40',
+                'max_per_day' => 'required|integer|min:1',
+                'max_per_week' => 'required|integer|min:1',
                 'postcode' => 'nullable|string|max:255',
             ], [
                 'max_per_day.required' => 'Max hours per day is required',

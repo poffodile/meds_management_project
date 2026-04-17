@@ -12,6 +12,7 @@ use App\Models\Staff\StaffSupervisionForm;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Staffleaves;
+
 class CarerWorkingHourService
 {
     public function store(array $data)
@@ -80,7 +81,10 @@ class CarerWorkingHourService
                     $savedData->day = $i['activeDays'];
                     $savedData->start_time = $i['startTime'];
                     $savedData->end_time = $i['endTime'];
-                    isset($i['week_number']) ? $savedData->week_number = $i['week_number'] : "";
+                    if (isset($i['week_number'])) {
+                        $savedData->week_number = $i['week_number'];
+                    }
+                    $savedData->is_working = 1;
 
                     $savedData->save();
                 }
@@ -121,8 +125,6 @@ class CarerWorkingHourService
             }
 
             // delete missing records (only when type same)
-
-
             DB::commit();
 
             return true;

@@ -383,15 +383,29 @@ class StaffService
 
         // 5. Base query for users
         $query = User::select('id', 'name', 'postcode', 'latitude', 'longitude')
+            ->withCount(['certificates as qualifications_count'])
             ->where('home_id', Auth::user()->home_id)
             ->where('status', 1)
             ->whereNotIn('id', $excludeIds)
             ->where('is_deleted', 0); // Exclude deleted users
 
         // 5. Find users who have the matching course_id in user_qualification
-        $userIdsWithCourses = [];
+        $userIdsWithAllCourses = [];
+        $userIdsWithPartialCourses = [];
         if (!empty($clientCourses)) {
-            $userIdsWithCourses = DB::table('user_qualification')
+            $requiredCount = count($clientCourses);
+            
+            // Users with ALL required courses
+            $userIdsWithAllCourses = DB::table('user_qualification')
+                ->whereIn('course_id', $clientCourses)
+                ->select('user_id')
+                ->groupBy('user_id')
+                ->havingRaw('COUNT(DISTINCT course_id) = ?', [$requiredCount])
+                ->pluck('user_id')
+                ->toArray();
+
+            // Users with AT LEAST ONE required course (but not all)
+            $userIdsWithPartialCourses = DB::table('user_qualification')
                 ->whereIn('course_id', $clientCourses)
                 ->pluck('user_id')
                 ->toArray();
@@ -400,7 +414,7 @@ class StaffService
         $users = $query->get();
 
         // 5. Map staff to process distance and matching logic
-        $nearbyStaff = $users->map(function ($staff) use ($clientLatitude, $clientLongitude, $clientCourses, $userIdsWithCourses) {
+        $nearbyStaff = $users->map(function ($staff) use ($clientLatitude, $clientLongitude, $clientCourses, $userIdsWithAllCourses, $userIdsWithPartialCourses) {
 
             $distance = null;
 
@@ -416,13 +430,17 @@ class StaffService
 
             // Assign Card Color & Tag based on course match and distance
             if (!empty($clientCourses)) {
-                if (in_array($staff->id, $userIdsWithCourses)) {
+                if (in_array($staff->id, $userIdsWithAllCourses)) {
                     $staff->card_color = 'greenCarerCard';
                     $staff->tag = 'Course Match';
+                } elseif (in_array($staff->id, $userIdsWithPartialCourses)) {
+                    $staff->card_color = 'muteCarerCard';
+                    $staff->tag = 'Partial Match';
+                    $staff->warning = 'Missing some required courses';
                 } else {
                     $staff->card_color = 'red';
                     $staff->tag = 'Course Mismatch';
-                    $staff->warning = 'Missing required courses';
+                    $staff->warning = 'Missing all required courses';
                 }
             } else {
                 // Fallback to original distance logic if no client courses are required

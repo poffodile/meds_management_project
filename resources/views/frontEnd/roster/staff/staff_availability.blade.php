@@ -14,8 +14,8 @@
         }
 
         /* .sideTabs {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            width: 100%;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        } */
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        width: 100%;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    } */
         .sideTabs .tab {
             width: 100%;
             text-align: left;
@@ -137,6 +137,7 @@
                                 </div>
                             </div>
                             <div class="sideTabs suggestedCarers  p-20 p-t-0" id="usersListWrapper">
+                                Please Wait...
                                 {{-- <button class="tab active" data-tab="overviewTab">
                                     <div class="carerCard">
                                         <div class="avatar">A</div>
@@ -844,6 +845,15 @@
         </form>
         <script src="{{ asset('public/frontEnd/staff/js/working-hours1.js') }}"></script>
         <script>
+            function alertMsg(selector = 'err', msg) {
+                $('.ajax-alert-' + selector).find('.msg').text(
+                    msg);
+                $('.ajax-alert-' + selector).show();
+
+                setTimeout(function() {
+                    $(".ajax-alert-" + selector).fadeOut()
+                }, 5000);
+            }
             let userWorkingHours = null;
             let setWorkingHours = null;
 
@@ -879,7 +889,6 @@
                         if (res.status) {
                             unavailabilityHtml(res.data);
                             leaveDataHtml(res.leave_data);
-
                         }
                     },
                     error: function(xhr, ajaxOptions, thrownError) {
@@ -1042,6 +1051,9 @@
                 }
                 let selectTabs = 'standard';
                 let availableWorkingHrsDay = availabilityHrs ? availabilityHrs.reduce((acc, curr) => {
+                    // Check if actually marked as working
+                    if (curr.is_working == 0) return acc;
+
                     if (curr.day && curr.week_number == null) {
                         selectTabs = curr.type;
                         acc[curr.day.toLowerCase()] = {
@@ -1064,7 +1076,7 @@
                             week_number: curr.week_number,
                             weekDaysName: dayKey,
                         });
-                    } else {
+                    } else if (curr.start_date) { // Specific dates
                         selectTabs = 'specific';
                         acc[curr.start_date] = {
                             startTime: curr.start_time,
@@ -1247,7 +1259,9 @@
                         }
                     },
                     error: function(xhr, ajaxOptions, thrownError) {
-                        // Code to run if the request fails
+                        let errorMSg = xhr.responseJSON && xhr.responseJSON.message ? xhr
+                            .responseJSON.message : 'An error occurred';
+                        alertMsg('err', errorMSg);
                     }
 
                 });
@@ -1271,20 +1285,8 @@
                         let day = item.day.toLowerCase();
                         let start_time = item.start_time.substring(0, 5);
                         let end_time = item.end_time.substring(0, 5);
-                        // let end_time = item.end_time.substring(0, 5);
-                        // let end_time = item.end_time.substring(0, 5);
-
-                        // checkbox se match karo
                         let dayRow = selected_tab_standard.find(`.dayToggle[data-daysname="${day}"]`).closest(
                             ".dayRow");
-
-                        // if (item.is_working == 0) {
-                        //     dayRow.removeClass("active");
-                        //     dayRow.find(".dayToggle").prop("checked", false);
-                        //     dayRow.find(".workingFields").hide();
-                        //     dayRow.find(".notWorking").show();
-                        // } else {
-                        // }
                         let startDate = new Date(`1970-01-01T${start_time}`);
                         let endDate = new Date(`1970-01-01T${end_time}`);
 
@@ -1308,9 +1310,6 @@
                         let end_time = item.end_time.substring(0, 5);
 
                         let week_number_text = '.week_' + week_number;
-                        // checkbox se match karo
-                        // let dayRow = selected_tab_standard.find(`${week_number_text} .dayToggle[data-daysname="${day}"]`).closest(
-                        //     `.dayRow`);
                         let dayRow = selected_tab_standard
                             .find(`${week_number_text} .dayRow`)
                             .find(`.dayToggle[data-daysname="${day}"]`)
@@ -1363,11 +1362,14 @@
                     });
                 }
                 calculateTotalHours();
-                // $("#workHoursPerWeekText").text("10.0 hrs/week");
             }
             let nextPageUrl = null;
             let loading = false;
+            let isFirstTime = false;
             let search = '';
+            if (!isFirstTime) {
+                $("#usersListWrapper").html('Please Wait...');
+            }
 
             function loadUsers(url = "{{ route('roster.carer.availability.loadUserData') }}", reset = true) {
 
@@ -1381,6 +1383,11 @@
                     data: {
                         search: search
                     },
+                    beforeSend: function() {
+                        if (!isFirstTime) {
+                            $("#usersListWrapper").html('Please Wait..');
+                        }
+                    },
                     success: function(res) {
                         $(".addUnavailabilityList").empty();
                         if (typeof isAuthenticated === "function") {
@@ -1392,6 +1399,7 @@
                             $("#usersListWrapper").empty();
                         }
                         if (res.data.length > 0) {
+                            isFirstTime = true;
                             setUserHtml(res); // ✅ full response bhejo
                         } else {
 
@@ -1456,7 +1464,8 @@
                     }
                 });
                 $(document).on('click', '.users-tab', function() {
-
+                    $("#workPreferencesFormError").addClass('d-none').html('');
+                    $("#unavailabilityFormError").addClass('d-none').html('');
                     $('.users-tab').removeClass('active');
 
                     $(this).addClass('active');
@@ -1519,9 +1528,9 @@
                                     .toFixed(2))
                                 workingPreferences = {
                                     max_per_day: res.data.work_preferences ? res.data
-                                        .work_preferences.max_per_day : 8,
+                                        .work_preferences.max_per_day : null,
                                     max_per_week: res.data.work_preferences ? res.data
-                                        .work_preferences.max_per_week : 40,
+                                        .work_preferences.max_per_week : null,
                                     postcode: res.data.work_preferences ? res.data
                                         .work_preferences.postcode : ''
                                 };
@@ -1535,20 +1544,15 @@
                                     selectTabs1 = '#tab-specific';
                                     selectTabs = 'specific';
                                 }
-                                //  else if (res.data.alternate_working_hours.length > 0) {
-                                //     array1 = res.data.alternate_working_hours;
-                                //     selectTabs1 = '#tab-alternate';
-                                //     selectTabs = 'alternate';
-                                // }
                                 $("#schedule_pattern").val(selectTabs).change();
                                 setWorkingHours = array1;
                                 loadWorkingHrsData(array1, selectTabs);
-                                // track.appendChild(renderMonth(new Date(), res.data
-                                //     .working_hours));
                             }
                         },
                         error: function(xhr, ajaxOptions, thrownError) {
-                            // Code to run if the request fails
+                            let errorMSg = xhr.responseJSON && xhr.responseJSON.message ? xhr
+                                .responseJSON.message : 'An error occurred';
+                            alertMsg('err', errorMSg);
                         }
                     });
                 });
@@ -1649,9 +1653,10 @@
                             $(this).find(".day-error").remove();
                             errMsg = 'Please select at least one working day and time.';
                             isValid = false;
-                            $("#workingHoursFormError").removeClass('d-none alert-success')
-                                .css('text-align', 'left')
-                                .html(errMsg);
+                            alertMsg('err', errMsg);
+                            // $("#workingHoursFormError").removeClass('d-none alert-success')
+                            //     .css('text-align', 'left')
+                            //     .html(errMsg);
                             return;
                         }
                         // remove error if valid
@@ -1713,7 +1718,7 @@
 
                         });
                     }
-                    if (schedule_pattern !== "specific" && totalHrs > maxPerDay) {
+                    if (maxPerDay && schedule_pattern !== "specific" && totalHrs > maxPerDay) {
 
                         errMsg =
                             `Total hours (${totalHrs.toFixed(1)}) exceed the weekly limit (${maxPerDay.toFixed(1)} hrs).`
@@ -1725,9 +1730,10 @@
                         isValid = false;
                     }
                     if (!isValid) {
-                        $("#workingHoursFormError").removeClass('d-none alert-success')
-                            .css('text-align', 'left')
-                            .html(errMsg);
+                        alertMsg('err', errMsg);
+                        // $("#workingHoursFormError").removeClass('d-none alert-success')
+                        //     .css('text-align', 'left')
+                        //     .html(errMsg);
                         return;
                     };
                     // console.log(arr);
@@ -1758,14 +1764,14 @@
                                 }
                             }
                             $("#schedule_pattern").val(schedule_pattern).change();
-                            alert(res.message);
+                            alertMsg('suc', res.message);
                         },
                         error: function(xhr, ajaxOptions, thrownError) {
                             $("#saveWorkingHrsBtn").prop('disabled', false).html(
                                 'Save Working Hours');
                             let errorMSg = xhr.responseJSON && xhr.responseJSON.message ? xhr
                                 .responseJSON.message : 'An error occurred';
-                            alert(errorMSg);
+                            alertMsg('err', errorMSg);
                             // Code to run if the request fails
                         }
                     });
@@ -1787,12 +1793,10 @@
                                 }
                             }
                             if (res.status) {
-                                $("#workPreferencesFormError").removeClass(
-                                        'd-none alert-danger')
-                                    .addClass('alert-success').html(res.message);
+                                alertMsg('suc', res.message);
                                 $("#workPreferencesId").val(res.data.id);
                             } else {
-                                alert('Failed to save preferences. Please try again.');
+                                alertMsg('err', 'Failed to save preferences. Please try again.');
                             }
 
                             setTimeout(() => {
@@ -1814,13 +1818,11 @@
                                     .addClass('alert-danger').html(`<ul>${htm}</ul>`);
 
                             } else {
-                                $("#workPreferencesFormError").removeClass(
-                                        'd-none alert-success')
-                                    .addClass('alert-danger').html(errorMSg);
+                                alertMsg('err', errorMSg);
                             }
-                            // setTimeout(() => {
-                            //     $("#workPreferencesFormError").addClass('d-none').html('');
-                            // }, 3000);
+                            setTimeout(() => {
+                                $("#workPreferencesFormError").addClass('d-none').html('');
+                            }, 3000);
                         }
                     });
                 });
@@ -1846,7 +1848,6 @@
                 $("#addUnavailabilityBtn").click(function() {
                     let carer_id = $("#carer_id").val();
 
-                    // return false;
                     $.ajax({
                         url: "{{ route('roster.carer.availability.save_unavailability') }}", // URL to send the request to
                         type: 'POST', // or 'POST'
@@ -1861,8 +1862,7 @@
                                 }
                             }
                             if (res.status) {
-                                $("#unavailabilityFormError").removeClass('d-none alert-danger')
-                                    .addClass('alert-success').html(res.message);
+                                alertMsg('suc', res.message);
                                 $('.addUnavailabilityForm').removeClass('active');
                                 loadUnavailability();
                             } else {
@@ -1888,13 +1888,11 @@
                                     .addClass('alert-danger').html(`<ul>${htm}</ul>`);
 
                             } else {
-                                $("#unavailabilityFormError").removeClass(
-                                        'd-none alert-success')
-                                    .addClass('alert-danger').html(errorMSg);
+                                alertMsg('err', errorMSg);
                             }
-                            // setTimeout(() => {
-                            //     $("#workPreferencesFormError").addClass('d-none').html('');
-                            // }, 3000);
+                            setTimeout(() => {
+                                $("#unavailabilityFormError").addClass('d-none').html('');
+                            }, 3000);
                         }
                     });
                 });
@@ -1920,8 +1918,7 @@
                                 }
                             }
                             if (res.status) {
-                                $("#unavailabilityFormError").removeClass('d-none alert-danger')
-                                    .addClass('alert-success').html(res.message);
+                                alertMsg('suc', res.message);
                                 loadUnavailability();
                             } else {
                                 // alert('Failed to save preferences. Please try again.');
@@ -1932,7 +1929,11 @@
                                     '');
                             }, 3000);
                         },
-                        error: function(xhr, ajaxOptions, thrownError) {}
+                        error: function(xhr, ajaxOptions, thrownError) {
+                            let errorMSg = xhr.responseJSON && xhr.responseJSON.message ? xhr
+                                .responseJSON.message : 'An error occurred';
+                            alertMsg('err', errorMSg);
+                        }
                     });
 
                 });
@@ -1940,66 +1941,6 @@
                 $("#schedule_pattern").change(function() {
                     let val = $(this).val();
                     let userId = $("#carer_id").val();
-
-                    // $.ajax({
-                    //     url: "{{ route('roster.carer.availability.details') }}",
-                    //     type: 'POST',
-                    //     data: {
-                    //         userId: userId,
-                    //         _token: "{{ @csrf_token() }}"
-                    //     },
-                    //     beforeSend: function() {},
-                    //     success: function(res) {
-                    //         if (typeof isAuthenticated === "function") {
-                    //             if (isAuthenticated(res) == false) {
-                    //                 return false;
-                    //             }
-                    //         }
-                    //         setAvailabilityData(res.data);
-                    //         $("#carerUserDataWrapper").addClass('d-none');
-                    //         $("#carerUserProfileWrapper").addClass('d-none');
-                    //         $("#defaultBlankCarerWrapper").removeClass('d-none');
-                    //         if (res.status) {
-                    //             $("#defaultBlankCarerWrapper").addClass('d-none');
-                    //             $("#carerUserDataWrapper").removeClass('d-none');
-                    //             $("#carerUserProfileWrapper").removeClass('d-none');
-                    //             $("#resetWorkingHrsBtn").trigger('click');
-                    //             // loadOverviewData();
-                    //             let array1 = [];
-                    //             let selectTabs = val;
-                    //             workingPreferences = {
-                    //                 max_per_day: res.data.work_preferences ? res.data
-                    //                     .work_preferences.max_per_day : 8,
-                    //                 max_per_week: res.data.work_preferences ? res.data
-                    //                     .work_preferences.max_per_week : 40,
-                    //                 postcode: res.data.work_preferences ? res.data
-                    //                     .work_preferences.postcode : ''
-                    //             };
-                    //             if (res.data.working_hours.length > 0 && (val == 'standard' ||
-                    //                     val == 'alternate')) {
-                    //                 array1 = res.data.working_hours;
-                    //                 selectTabs1 = '#tab-' + array1[0].type;
-                    //                 selectTabs = val;
-
-
-                    //             } else if (res.data.specific_working_hours.length > 0 && val ==
-                    //                 'specific') {
-                    //                 array1 = res.data.specific_working_hours;
-                    //                 selectTabs1 = '#tab-specific';
-                    //                 selectTabs = 'specific';
-                    //             }
-
-                    //             setWorkingHours = array1;
-                    //             // console.log(selectTabs, array1);
-                    //             loadWorkingHrsData(array1, selectTabs);
-                    //             // track.appendChild(renderMonth(new Date(), res.data
-                    //             //     .working_hours));
-                    //         }
-                    //     },
-                    //     error: function(xhr, ajaxOptions, thrownError) {
-                    //         // Code to run if the request fails
-                    //     }
-                    // });
                     $.ajax({
                         url: "{{ route('roster.carer.availability.loadworkinghours') }}",
                         type: 'POST',
@@ -2023,15 +1964,14 @@
                                 let array1 = [];
                                 workingPreferences = {
                                     max_per_day: res.data.work_preferences ? res.data
-                                        .work_preferences.max_per_day : 8,
+                                        .work_preferences.max_per_day : null,
                                     max_per_week: res.data.work_preferences ? res.data
-                                        .work_preferences.max_per_week : 40,
+                                        .work_preferences.max_per_week : null,
                                     postcode: res.data.work_preferences ? res.data
                                         .work_preferences.postcode : ''
                                 };
                                 array1 = res.data.working_hours;
                                 staffDetails = res.data.staff;
-                                console.log(staffDetails);
                                 total_working_week_1 = staffDetails.week_1_sum != null ?
                                     Number(staffDetails.week_1_sum).toFixed(2) :
                                     "0.00";
@@ -2041,24 +1981,18 @@
                                     "0.00";
                                 $("#total_working_week_1").val(total_working_week_1);
                                 $("#total_working_week_2").val(total_working_week_2);
-                                // $("#summaryCard").html(
-                                //     `<button class="greenShowbtn"><i class='bx  bx-history'></i>${staffDetails.working_hrs_per_week}</button>
-                                //                 ${staffDetails.specific_total_working_hours_sum ? `<span class="careBadg muteBadges">No working hours set</span>`:''}`
-                                //     );
+
                                 setWorkingHours = array1;
                                 loadWorkingHrsData(array1, val);
-                                // track.appendChild(renderMonth(new Date(), res.data
-                                //     .working_hours));
+
                             }
                         },
                         error: function(xhr, ajaxOptions, thrownError) {
-                            // Code to run if the request fails
+                            let errorMSg = xhr.responseJSON && xhr.responseJSON.message ? xhr
+                                .responseJSON.message : 'An error occurred';
+                            alertMsg('err', errorMSg);
                         }
                     });
-
-                    // if (val == 'standard') {
-                    //     loadWorkingHrsData(userWorkingHours, val);
-                    // }
                 });
 
                 $("#schedule_pattern_2").change(function() {

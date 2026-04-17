@@ -12,6 +12,7 @@ use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ManageDashboardController extends Controller
 {
@@ -67,7 +68,7 @@ class ManageDashboardController extends Controller
         $pendingLeaveCount = Staffleaves::where('home_id', Auth::user()->home_id)->where('leave_status', 0)->count();
         // return  $arr;
         $data['userCount'] = [
-            'activeClients'  => ServiceUser::getServiceUserByResidentialId(1),
+            'activeClients'  => ServiceUser::where('home_id', Auth::user()->home_id)->where('status', 1)->where('is_deleted', 0)->count(), //ServiceUser::getServiceUserByResidentialId(1),
             'activeCarers'   => User::getstaffByResidentialId(),
             'todayShifts'    => $todayShifts,
             'unfilledShifts' => $unfilledShifts,
@@ -82,7 +83,68 @@ class ManageDashboardController extends Controller
 
         ];
         $data['alertScheduledShift'] = $alertScheduledShift;
-        $data;
         return view('frontEnd.roster.manage_dashboard.manage_dashboard', $data);
+    }
+
+    public function export()
+    {
+        $todayShifts = ScheduledShift::homeId()->todayShifts()->count();
+        $unfilledShifts = ScheduledShift::homeId()->todayShifts()->unfilledShifts()->count();
+        $filledShifts = $todayShifts - $unfilledShifts;
+        $fillRate = ($todayShifts > 0) ? round(($filledShifts / $todayShifts) * 100, 1) : 0;
+
+        $activeClients = ServiceUser::where('home_id', Auth::user()->home_id)->where('status', 1)->where('is_deleted', 0)->count();
+
+        // Capacity matches the hardcoded 50 in the dashboard view
+        $totalBeds = 50;
+        $occupancyRate = ($totalBeds > 0) ? round(($activeClients / $totalBeds) * 100, 1) : 0;
+
+        $incidentThisMonth = StaffReportIncidents::where('home_id', Auth::user()->home_id)->whereMonth('date_time', date('m'))
+            ->whereYear('date_time', date('Y'))
+            ->count();
+        $unresolvedIncident = StaffReportIncidents::where('home_id', Auth::user()->home_id)->where('status', '!=', 4)
+            ->count();
+        $criticalIncident = StaffReportIncidents::where('home_id', Auth::user()->home_id)->where('status', '!=', 4)
+            ->where('severity_id', 4)
+            ->count();
+
+        $pendingLeaveCount = Staffleaves::where('home_id', Auth::user()->home_id)->where('leave_status', 0)->count();
+
+        // Using placeholders for training as they are currently hardcoded in the dashboard view
+        $overdueTraining = 9;
+        $expiringCertificates = 0;
+        $completionRate = 0.0;
+
+        $reportData = [
+            'reportDate' => date('Y-m-d H:i'),
+            'occupancy' => [
+                'bedsOccupied' => $activeClients,
+                'totalBeds' => $totalBeds,
+                'percentage' => $occupancyRate
+            ],
+            'staffManagement' => [
+                'todayShifts' => $todayShifts,
+                'unfilledShifts' => $unfilledShifts,
+                'fillRate' => $fillRate
+            ],
+            'training' => [
+                'completionRate' => $completionRate,
+                'expiring' => $expiringCertificates,
+                'overdue' => $overdueTraining
+            ],
+            'incidents' => [
+                'recent' => $incidentThisMonth,
+                'unresolved' => $unresolvedIncident,
+                'critical' => $criticalIncident
+            ],
+            'communication' => [
+                'pendingLeave' => $pendingLeaveCount,
+                'newFeedback' => 1,
+                'criticalAlerts' => 1
+            ]
+        ];
+
+        $pdf = Pdf::loadView('frontEnd.roster.manage_dashboard.export_pdf', $reportData);
+        return $pdf->download('Manager-Dashboard-Report-' . date('Y-m-d-His') . '.pdf');
     }
 }

@@ -267,14 +267,25 @@
     }
 
     /* Red Card / Geographic Mismatch (> 50km) */
-    .geographic-mismatch {
+    .geographic-mismatch,
+    .redCourseMismatch {
         background: #fff1f2;
         border-color: #fecaca;
     }
 
-    .geographic-mismatch .avatar {
+    .geographic-mismatch .avatar,
+    .redCourseMismatch .avatar {
         background: #ffe4e6;
         color: #991b1b;
+    }
+
+    .redBadges {
+        background: #ef4444 !important;
+        color: #fff !important;
+    }
+
+    .partial-match {
+        border-left: 4px solid #facc15;
     }
 
     /* Best Match Badge */
@@ -2239,9 +2250,21 @@
                 const sTime = form.querySelector('input[name="start_time"]');
                 const eTime = form.querySelector('input[name="end_time"]');
 
-                if (sDate) sDate.addEventListener('change', fetchSuggestedCarers);
-                if (sTime) sTime.addEventListener('change', fetchSuggestedCarers);
-                if (eTime) eTime.addEventListener('change', fetchSuggestedCarers);
+                if (sDate) sDate.addEventListener('change', () => {
+                    if (suggestionsWrapper) suggestionsWrapper.style.display = 'block';
+                    if (toggleBtn) toggleBtn.innerText = 'Hide Suggestions';
+                    fetchSuggestedCarers();
+                });
+                if (sTime) sTime.addEventListener('change', () => {
+                    if (suggestionsWrapper) suggestionsWrapper.style.display = 'block';
+                    if (toggleBtn) toggleBtn.innerText = 'Hide Suggestions';
+                    fetchSuggestedCarers();
+                });
+                if (eTime) eTime.addEventListener('change', () => {
+                    if (suggestionsWrapper) suggestionsWrapper.style.display = 'block';
+                    if (toggleBtn) toggleBtn.innerText = 'Hide Suggestions';
+                    fetchSuggestedCarers();
+                });
             }
 
             function fetchSuggestedCarers() {
@@ -2305,12 +2328,16 @@
                     .then(res => {
                         suggestedCarerContainer.innerHTML = "";
 
+                        let currentStaffId = $('#selected_carer_id').val();
+                        let isCurrentStaffAvailable = false;
+
                         if (res.status && res.data.length > 0) {
                             toggleBtn.style.display = 'inline-block';
                             toggleBtn.innerText = 'Hide Suggestions';
                             document.getElementById('assessment_card').style.display = 'block';
 
                             res.data.forEach(carer => {
+                                if (carer.id == currentStaffId) isCurrentStaffAvailable = true;
                                 let firstLetter = carer.name.charAt(0).toUpperCase();
                                 let dist = parseFloat(carer.distance);
                                 let cardHtml = '';
@@ -2325,12 +2352,21 @@
                                     if (carer.tag === 'Course Match') {
                                         cardClass = 'carerCard greenCarerCard best-match';
                                         matchLabel = 'Course Match';
+                                    } else if (carer.tag === 'Partial Match') {
+                                        cardClass = 'carerCard muteCarerCard partial-match';
+                                        matchLabel = 'Partial Match';
+                                    } else if (carer.tag === 'Course Mismatch') {
+                                        cardClass = 'carerCard redCourseMismatch course-mismatch';
+                                        matchLabel = 'Course Mismatch';
                                     } else if (carer.tag === 'Best Match' || dist < 20) {
                                         cardClass = 'carerCard greenCarerCard best-match';
                                         matchLabel = 'Best Match';
                                     } else if (dist > 50) {
                                         cardClass = 'carerCard geographic-mismatch';
                                         matchLabel = 'Geographic Mismatch';
+                                    } else {
+                                        cardClass = 'carerCard muteCarerCard';
+                                        matchLabel = 'Available';
                                     }
                                 } else {
                                     // Location/Property shifts
@@ -2357,6 +2393,20 @@
                             });
                         } else {
                             suggestedCarerContainer.innerHTML = '<p>No Carer Found</p>';
+                        }
+
+                        // Check if currently assigned carer is still available
+                        if (currentStaffId && !isCurrentStaffAvailable) {
+                            $('#selectedCarerCard').css('border', '1px solid #ef4444');
+                            if (!$('#carerUnvailWarning').length) {
+                                $('#selectedCarerCard').append('<p id="carerUnvailWarning" style="color:#ef4444; font-size:12px; font-weight:600; margin-top:5px; margin-bottom:0;"><i class="fa fa-warning"></i> Selected carer is NOT available at this new time.</p>');
+                            }
+                        } else {
+                            $('#selectedCarerCard').css({
+                                'border': '1px solid #e5e7eb',
+                                'border-left': '4px solid #10b981'
+                            }); // Restore original style if any, or just clear red border
+                            $('#carerUnvailWarning').remove();
                         }
                     })
                     .catch(() => {
@@ -2993,6 +3043,8 @@
                     const notes = props.notes;
                     const tasks = props.tasks;
                     const staffName = props.staff_name || '';
+                    const shiftCategoryId = props.shift_category_id;
+                    const homeAreaId = props.home_area_id;
 
                     const form = $('#createShiftForm');
 
@@ -3010,9 +3062,9 @@
                     console.log('shiftId', shiftId);
 
                     // Set Date/Time FIRST (to avoid incorrect initial suggestion API call)
-                    form.find('[name="start_date"]').val(date);
-                    form.find('[name="start_time"]').val(start);
-                    form.find('[name="end_time"]').val(end);
+                    form.find('[name="start_date"]').val(date).trigger('change');
+                    form.find('[name="start_time"]').val(start).trigger('change');
+                    form.find('[name="end_time"]').val(end).trigger('change');
 
                     if (client) {
                         form.find('[name="client_id"]').val(client).trigger('change');
@@ -3035,7 +3087,7 @@
                     }
 
                     form.find('[name="shift_type"]').val(type).trigger('change');
-                    form.find('[name="shift_category"]').val(shiftCategory).trigger('change');
+                    if (shiftCategoryId) form.find('[name="shift_category"]').val(shiftCategoryId).trigger('change');
                     if (homeAreaId) form.find('[name="home_area_id"]').val(homeAreaId).trigger('change');
                     if (property) form.find('[name="property_id"]').val(property).trigger('change');
                     form.find('[name="location_name"]').val(locationName || '');
@@ -3271,6 +3323,7 @@
                                     data-end="${shift.end_time_raw || ''}"
                                     data-staff="${shift.staff_id || ''}"
                                     data-type="${shift.shift_type_raw || ''}"
+                                    data-shiftcategory="${shift.shift_category_id || ''}"
                                     data-care="${shift.care_type || ''}"
                                     data-homearea="${shift.home_area_id || ''}"
                                     data-assignment="${shift.assignment || ''}"
@@ -3373,9 +3426,9 @@
                     form.find('[name="client_id"]').val('').trigger('change');
                     $('#assignedClientTo').text('Not assigned');
                 }
-                form.find('[name="start_date"]').val(date);
-                form.find('[name="start_time"]').val(start);
-                form.find('[name="end_time"]').val(end);
+                form.find('[name="start_date"]').val(date).trigger('change');
+                form.find('[name="start_time"]').val(start).trigger('change');
+                form.find('[name="end_time"]').val(end).trigger('change');
 
                 // Handle optional/empty selects
                 if (staff) {

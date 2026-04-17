@@ -135,9 +135,11 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 	Route::prefix('roster')->group(function () {
 		Route::get('/', [RosterController::class, 'index'])->name('roster.index');
 		Route::get('/dashboard', [RosterController::class, 'dashboard'])->name('roster.dashboard');
+		// Manage Dashboard
 		Route::get('/manage-dashboard', [ManageDashboardController::class, 'index'])->name('roster.manage.dashboard');
+		Route::get('/manage-dashboard/export', [ManageDashboardController::class, 'export'])->name('roster.manage.dashboard.export');
+		// Carer Availability
 		Route::get('/carer-availability', [CarerAvailabilityController::class, 'index'])->name('roster.carer.availability');
-
 		Route::get('/carer-availability/loadData', [CarerAvailabilityController::class, 'loadUserData'])->name('roster.carer.availability.loadUserData');
 		Route::post('/carer-availability/details', [CarerAvailabilityController::class, 'details'])->name('roster.carer.availability.details');
 		Route::post('/carer-availability/load-working-hours', [CarerAvailabilityController::class, 'loadworkinghours'])->name('roster.carer.availability.loadworkinghours');

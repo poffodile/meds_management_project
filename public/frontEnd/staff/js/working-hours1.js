@@ -3,8 +3,8 @@ const alternateDates = [];
 let total_working_week_1 = "0.0";
 let total_working_week_2 = "0.0";
 let workingPreferences = {
-    max_per_day: 8,
-    max_per_week: 40,
+    max_per_day: null,
+    max_per_week: null,
     postcode: "",
 };
 document.addEventListener("DOMContentLoaded", function () {
@@ -140,21 +140,23 @@ $(document).on("change", ".dayToggle", function () {
         row.find(".notWorking").hide();
 
         let startTime = "09:00";
-        let allowedHours = Math.min(maxPerDay, 8); // max 8 hrs
+        // let allowedHours = null;
+        // if (maxPerDay) {
+        //     allowedHours = Math.min(maxPerDay, null); // max 8 hrs
+        // } else {
+        // }
 
         let startDate = new Date(`1970-01-01T${startTime}`);
-        let endDate = new Date(
-            startDate.getTime() + allowedHours * 60 * 60 * 1000,
-        );
+        let endDate = new Date(`1970-01-01T17:00`);
 
         let endTime = endDate.toTimeString().slice(0, 5);
-
+        let diff = (endDate - startDate) / 1000 / 60 / 60;
         row.find(".startTime").val(startTime);
         row.find(".endTime").val(endTime);
 
         row.find(".hours")
-            .attr("data-hrsdiffval", allowedHours.toFixed(1))
-            .text(allowedHours.toFixed(1) + " hrs");
+            .attr("data-hrsdiffval", diff.toFixed(1))
+            .text(diff.toFixed(1) + " hrs");
     } else {
         row.find(".day-error").remove();
         row.removeClass("active");
@@ -184,8 +186,8 @@ function calculateHours(row) {
             class: "day-error text-danger",
             text: "End time must be greater than start time",
         });
-
-        row.append(errorSpan);
+        alertMsg("err", `End time must be greater than start time`);
+        //row.append(errorSpan);
 
         row.find(".endTime").val("");
         row.find(".hours").attr("data-hrsdiffval", 0).text("0.0 hrs");
@@ -194,13 +196,13 @@ function calculateHours(row) {
     }
 
     // ❌ max per day check
-    if (diff > maxPerDay) {
+    if (maxPerDay && diff > maxPerDay) {
         let errorSpan = $("<div>", {
             class: "day-error text-danger",
             text: `Max ${maxPerDay} hrs allowed per day`,
         });
-
-        row.append(errorSpan);
+        alertMsg("err", `Max ${maxPerDay} hrs allowed per day`);
+        // row.append(errorSpan);
 
         row.find(".endTime").val("");
         row.find(".hours").attr("data-hrsdiffval", 0).text("0.0 hrs");
@@ -216,7 +218,6 @@ function calculateHours(row) {
     alternateDates.push({
         week_type: $("#schedule_pattern_2").val(),
     });
-    console.log(alternateDates);
     calculateTotalHours();
 }
 function calculateTotalHours() {
@@ -241,13 +242,15 @@ function calculateTotalHours() {
     });
     let maxPerDay = workingPreferences.max_per_week;
     // Display total
-    if (patternSelect2.value !== "specific" && total > maxPerDay) {
-        $("#workingHoursFormError")
-            .removeClass("d-none alert-success")
-            .css("text-align", "left")
-            .html(
-                `Total hours (${total.toFixed(1)}) exceed the weekly limit (${maxPerDay.toFixed(1)} hrs).`,
-            );
+    if (maxPerDay && patternSelect2.value !== "specific" && total > maxPerDay) {
+        let er = `Total hours (${total.toFixed(1)}) exceed the weekly limit (${maxPerDay.toFixed(1)} hrs).`;
+        // $("#workingHoursFormError")
+        //     .removeClass("d-none alert-success")
+        //     .css("text-align", "left")
+        //     .html(
+        //         er
+        //     );
+        alertMsg("err", er);
     } else {
         $("#workingHoursFormError").addClass("d-none").html("");
     }

@@ -107,16 +107,6 @@ class ScheduleShiftController extends Controller
             }
         }
 
-        // // Check Client Unavailability
-        // if ($request->client_id) {
-        //     $clientUnavail = \App\Models\ClientCareUnavailableDate::where('service_user_id', $request->client_id)
-        //         ->where('start_date', '<', $shiftEndStr)
-        //         ->where('end_date', '>', $shiftStartStr)
-        //         ->exists();
-        //     if ($clientUnavail) {
-        //         return redirect()->back()->with('error', 'The client is marked as unavailable on the selected date/time.')->withInput();
-        //     }
-        // }
         // Determine shift status based on staff assignment
         $status = isset($request->carer_id) ? 'assigned' : 'unfilled';
 
@@ -818,9 +808,13 @@ class ScheduleShiftController extends Controller
             return true;
         }
 
-        // 2. Check Weekly Schedule
+        // 2. Check Weekly Schedule (including alternate weeks)
+        $firstOfMonth = $shiftStart->copy()->firstOfMonth();
+        $weekOfMonth = (int)ceil(($shiftStart->day + $firstOfMonth->dayOfWeek) / 7);
+        $isOddWeek = ($weekOfMonth % 2 !== 0);
+
         $schedules = \App\Models\ClientCareScheduleDay::where('carer_id', $staffId)
-            ->where('day', $dayOfWeek)
+            ->where('day', strtolower($dayOfWeek))
             ->where('is_working', 1)
             ->get();
 
@@ -829,18 +823,40 @@ class ScheduleShiftController extends Controller
         }
 
         $fits = false;
+        $activeScheduleFound = false;
+
         foreach ($schedules as $sched) {
+            // Handle standard vs alternate
+            if ($sched->type === 'alternate') {
+                $isTargetWeek = ($sched->week_number == 1 && $isOddWeek) || ($sched->week_number == 2 && !$isOddWeek);
+                if (!$isTargetWeek) {
+                    continue;
+                }
+            }
+
+            $activeScheduleFound = true;
             $schedStart = Carbon::parse($startDate . ' ' . $sched->start_time);
             $schedEnd = Carbon::parse($startDate . ' ' . $sched->end_time);
+
             if ($shiftStart >= $schedStart && $shiftEnd <= $schedEnd) {
                 $fits = true;
                 break;
             }
         }
 
+        if (!$activeScheduleFound) {
+            return "The carer is not scheduled to work on this specific " . ($isOddWeek ? "odd" : "even") . " week ($dayOfWeek).";
+        }
+
         if (!$fits) {
-            $ranges = $schedules->map(fn($s) => substr($s->start_time, 0, 5) . "-" . substr($s->end_time, 0, 5))->implode(', ');
-            return "Shift is outside the carer's regular $dayOfWeek schedule ($ranges).";
+            $ranges = $schedules->filter(function ($s) use ($isOddWeek) {
+                if ($s->type === 'alternate') {
+                    return ($s->week_number == 1 && $isOddWeek) || ($s->week_number == 2 && !$isOddWeek);
+                }
+                return true;
+            })->map(fn($s) => substr($s->start_time, 0, 5) . "-" . substr($s->end_time, 0, 5))->implode(', ');
+
+            return "Shift is outside the carer's scheduled hours for this $dayOfWeek ($ranges).";
         }
 
         return true;
