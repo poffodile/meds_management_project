@@ -326,148 +326,169 @@ class StaffService
 
     public function getShiftUser($id)
     {
-        $request = request();
-        $startDate = $request->input('start_date');
-        $startTime = $request->input('start_time');
-        $endTime = $request->input('end_time');
-
-        // 1. Get the courses for this service user (if client ID is provided)
-        $clientCourses = [];
-        $clientLatitude = null;
-        $clientLongitude = null;
-
-        if (!empty($id)) {
-            $clientCourses = suUserCourse::where('su_user_id', $id)->pluck('course_id')->toArray();
-            $client = ServiceUser::find($id);
-            if ($client) {
-                $clientLatitude = $client->latitude;
-                $clientLongitude = $client->longitude;
+        try {
+            $user = Auth::user();
+            if (!$user) {
+                Log::error("getShiftUser: No authenticated user found.");
+                return collect();
             }
-        }
 
-        // 3. Find staff with overlapping shifts
-        $overlappingStaffIds = [];
-        if ($startDate && $startTime && $endTime) {
-            $formattedStart = date('H:i:s', strtotime($startTime));
-            $formattedEnd = date('H:i:s', strtotime($endTime));
-            $shiftId = $request->input('shift_id');
+            $homeId = $user->home_id;
+            $request = request();
+            $startDate = $request->input('start_date');
+            $startTime = $request->input('start_time');
+            $endTime = $request->input('end_time');
 
-            $query = \App\Models\ScheduledShift::where('start_date', $startDate)
-                ->where(function ($query) use ($formattedStart, $formattedEnd) {
-                    $query->where(function ($q) use ($formattedStart, $formattedEnd) {
-                        $q->whereTime('start_time', '<', $formattedEnd)
+            // 1. Get the courses for this service user (if client ID is provided)
+            $clientCourses = [];
+            $clientLatitude = null;
+            $clientLongitude = null;
+
+            if (!empty($id)) {
+                $clientCourses = suUserCourse::where('su_user_id', $id)->pluck('course_id')->toArray();
+                $client = ServiceUser::find($id);
+                if ($client) {
+                    $clientLatitude = $client->latitude;
+                    $clientLongitude = $client->longitude;
+                }
+            }
+
+            // 2. Find staff with overlapping shifts
+            $overlappingStaffIds = [];
+            if ($startDate && $startTime && $endTime) {
+                $formattedStart = date('H:i:s', strtotime($startTime));
+                $formattedEnd = date('H:i:s', strtotime($endTime));
+                $shiftId = $request->input('shift_id');
+
+                $query = \App\Models\ScheduledShift::where('start_date', $startDate)
+                    ->where(function ($query) use ($formattedStart, $formattedEnd) {
+                        $query->whereTime('start_time', '<', $formattedEnd)
                             ->whereTime('end_time', '>', $formattedStart);
-                    });
-                })
-                ->whereNotNull('staff_id');
+                    })
+                    ->whereNotNull('staff_id');
 
-            if ($shiftId) {
-                $query->where('id', '!=', $shiftId);
+                if ($shiftId) {
+                    $query->where('id', '!=', $shiftId);
+                }
+
+                $overlappingStaffIds = $query->pluck('staff_id')->toArray();
             }
 
-            $overlappingStaffIds = $query->pluck('staff_id')->toArray();
-        }
-
-        // 4. Find staff who are marked as unavailable globally (Holidays, Sick, etc.)
-        $unavailableStaffIds = [];
-        if ($startDate) {
-            $unavailableStaffIds = \App\Models\ClientCareUnavailableDate::whereNotNull('carer_id')
-                ->where('start_date', '<=', $startDate)
-                ->where('end_date', '>=', $startDate)
-                ->pluck('carer_id')
-                ->toArray();
-        }
-
-        // Combine both exclusions
-        $excludeIds = array_unique(array_merge($overlappingStaffIds, $unavailableStaffIds));
-
-        // 5. Base query for users
-        $query = User::select('id', 'name', 'postcode', 'latitude', 'longitude')
-            ->withCount(['certificates as qualifications_count'])
-            ->where('home_id', Auth::user()->home_id)
-            ->where('status', 1)
-            ->whereNotIn('id', $excludeIds)
-            ->where('is_deleted', 0); // Exclude deleted users
-
-        // 5. Find users who have the matching course_id in user_qualification
-        $userIdsWithAllCourses = [];
-        $userIdsWithPartialCourses = [];
-        if (!empty($clientCourses)) {
-            $requiredCount = count($clientCourses);
-            
-            // Users with ALL required courses
-            $userIdsWithAllCourses = DB::table('user_qualification')
-                ->whereIn('course_id', $clientCourses)
-                ->select('user_id')
-                ->groupBy('user_id')
-                ->havingRaw('COUNT(DISTINCT course_id) = ?', [$requiredCount])
-                ->pluck('user_id')
-                ->toArray();
-
-            // Users with AT LEAST ONE required course (but not all)
-            $userIdsWithPartialCourses = DB::table('user_qualification')
-                ->whereIn('course_id', $clientCourses)
-                ->pluck('user_id')
-                ->toArray();
-        }
-
-        $users = $query->get();
-
-        // 5. Map staff to process distance and matching logic
-        $nearbyStaff = $users->map(function ($staff) use ($clientLatitude, $clientLongitude, $clientCourses, $userIdsWithAllCourses, $userIdsWithPartialCourses) {
-
-            $distance = null;
-
-            // Check if both client and staff have location data
-            if ($clientLatitude && $clientLongitude && $staff->latitude && $staff->longitude) {
-                // Calculate distance
-                $distance = $this->calculateDistance($clientLatitude, $clientLongitude, $staff->latitude, $staff->longitude);
-                $staff->distance = $distance;
-            } else {
-                // No location data -> Treat as very far / mismatch
-                $staff->distance = 999999;
+            // 3. Find staff who are marked as unavailable globally
+            $unavailableStaffIds = [];
+            if ($startDate) {
+                $unavailableStaffIds = \App\Models\ClientCareUnavailableDate::whereNotNull('carer_id')
+                    ->where('start_date', '<=', $startDate)
+                    ->where('end_date', '>=', $startDate)
+                    ->pluck('carer_id')
+                    ->toArray();
             }
 
-            // Assign Card Color & Tag based on course match and distance
+            // Combine both exclusions
+            $excludeIds = array_unique(array_merge($overlappingStaffIds, $unavailableStaffIds));
+
+            // 4. Base query for users
+            $query = User::select('id', 'name', 'postcode', 'latitude', 'longitude')
+                ->withCount(['certificates as qualifications_count'])
+                ->where('home_id', $homeId)
+                ->where('status', 1)
+                ->where('is_deleted', 0);
+
+            if (!empty($excludeIds)) {
+                $query->whereNotIn('id', $excludeIds);
+            }
+
+            // 5. Course matching logic
+            $userIdsWithAllCourses = [];
+            $userIdsWithPartialCourses = [];
             if (!empty($clientCourses)) {
-                if (in_array($staff->id, $userIdsWithAllCourses)) {
-                    $staff->card_color = 'greenCarerCard';
-                    $staff->tag = 'Course Match';
-                } elseif (in_array($staff->id, $userIdsWithPartialCourses)) {
-                    $staff->card_color = 'muteCarerCard';
-                    $staff->tag = 'Partial Match';
-                    $staff->warning = 'Missing some required courses';
-                } else {
-                    $staff->card_color = 'red';
-                    $staff->tag = 'Course Mismatch';
-                    $staff->warning = 'Missing all required courses';
-                }
-            } else {
-                // Fallback to original distance logic if no client courses are required
-                if ($distance !== null && $distance < 20) {
-                    $staff->card_color = 'greenCarerCard';
-                    $staff->tag = 'Best Match';
-                } elseif ($distance !== null && $distance == 20) {
-                    $staff->card_color = 'muteCarerCard';
-                    $staff->tag = 'Standard Match';
-                } else { // Greater than 20 or no location
-                    $staff->card_color = 'red';
-                    $staff->tag = 'Geographic Mismatch';
-                    $staff->warning = 'Very far from source';
-                }
+                $requiredCount = count($clientCourses);
+
+                // Users with ALL required courses
+                $userIdsWithAllCourses = DB::table('user_qualification')
+                    ->whereIn('course_id', $clientCourses)
+                    ->where('is_deleted', 0)
+                    ->select('user_id')
+                    ->groupBy('user_id')
+                    ->havingRaw('COUNT(DISTINCT course_id) = ?', [$requiredCount])
+                    ->pluck('user_id')
+                    ->toArray();
+
+                // Users with AT LEAST ONE required course (distinct IDs)
+                $userIdsWithPartialCourses = DB::table('user_qualification')
+                    ->whereIn('course_id', $clientCourses)
+                    ->where('is_deleted', 0)
+                    ->distinct()
+                    ->pluck('user_id')
+                    ->toArray();
             }
 
-            return $staff;
-        });
+            $users = $query->get();
 
-        // If no distance information is available (e.g. location shift), sort by name
-        if ($clientLatitude === null) {
-            $nearbyStaff = $nearbyStaff->sortBy('name');
-        } else {
-            $nearbyStaff = $nearbyStaff->sortBy('distance');
+            // 6. Map staff to process distance and matching logic
+            $nearbyStaff = $users->map(function ($staff) use ($clientLatitude, $clientLongitude, $clientCourses, $userIdsWithAllCourses, $userIdsWithPartialCourses) {
+
+                $distance = null;
+
+                // Ensure latitude/longitude are numeric
+                $sLat = is_numeric($staff->latitude) ? (float)$staff->latitude : null;
+                $sLon = is_numeric($staff->longitude) ? (float)$staff->longitude : null;
+                $cLat = is_numeric($clientLatitude) ? (float)$clientLatitude : null;
+                $cLon = is_numeric($clientLongitude) ? (float)$clientLongitude : null;
+
+                if ($cLat !== null && $cLon !== null && $sLat !== null && $sLon !== null) {
+                    $distance = $this->calculateDistance($cLat, $cLon, $sLat, $sLon);
+                    $staff->distance = $distance;
+                } else {
+                    $staff->distance = 999999;
+                }
+
+                // Match logic
+                if (!empty($clientCourses)) {
+                    if (in_array($staff->id, $userIdsWithAllCourses)) {
+                        $staff->card_color = 'greenCarerCard';
+                        $staff->tag = 'Course Match';
+                    } elseif (in_array($staff->id, $userIdsWithPartialCourses)) {
+                        $staff->card_color = 'muteCarerCard';
+                        $staff->tag = 'Partial Match';
+                        $staff->warning = 'Missing some required courses';
+                    } else {
+                        $staff->card_color = 'red';
+                        $staff->tag = 'Course Mismatch';
+                        $staff->warning = 'Missing all required courses';
+                    }
+                } else {
+                    if ($distance !== null && $distance < 20) {
+                        $staff->card_color = 'greenCarerCard';
+                        $staff->tag = 'Best Match';
+                    } elseif ($distance !== null && $distance <= 20) {
+                        $staff->card_color = 'muteCarerCard';
+                        $staff->tag = 'Standard Match';
+                    } else {
+                        $staff->card_color = 'red';
+                        $staff->tag = 'Geographic Mismatch';
+                        $staff->warning = 'Very far from source';
+                    }
+                }
+
+                return $staff;
+            });
+
+            // Sorting
+            if ($clientLatitude === null) {
+                $nearbyStaff = $nearbyStaff->sortBy('name');
+            } else {
+                $nearbyStaff = $nearbyStaff->sortBy('distance');
+            }
+
+            return $nearbyStaff->values();
+        } catch (\Exception $e) {
+            Log::error("getShiftUser Error: " . $e->getMessage(), [
+                'stack' => $e->getTraceAsString(),
+                'client_id' => $id
+            ]);
+            return collect();
         }
-
-        return $nearbyStaff->values(); // Reset collection keys
     }
 
     public function getLatLongFromAddress($address)

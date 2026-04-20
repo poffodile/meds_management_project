@@ -10,6 +10,7 @@ use App\Models\Staff\UserNote;
 use Illuminate\Support\Facades\Storage;
 use App\LoginInActivity;
 use App\Models\Staff\StaffSupervision;
+
 class CarerDetailsController extends Controller
 {
 
@@ -20,7 +21,7 @@ class CarerDetailsController extends Controller
         $this->staffService = $staffService;
     }
 
-     public function carer_details($carer_id)
+    public function carer_details($carer_id)
     {
         if (!$carer_id) {
             abort(400, 'User ID is required.');

@@ -68,7 +68,7 @@ class ManageDashboardController extends Controller
         $pendingLeaveCount = Staffleaves::where('home_id', Auth::user()->home_id)->where('leave_status', 0)->count();
         // return  $arr;
         $data['userCount'] = [
-            'activeClients'  => ServiceUser::where('home_id', Auth::user()->home_id)->where('status', 1)->where('is_deleted', 0)->count(), //ServiceUser::getServiceUserByResidentialId(1),
+            'activeClients'  => ServiceUser::getServiceUserByResidentialId(1),
             'activeCarers'   => User::getstaffByResidentialId(),
             'todayShifts'    => $todayShifts,
             'unfilledShifts' => $unfilledShifts,
@@ -93,7 +93,7 @@ class ManageDashboardController extends Controller
         $filledShifts = $todayShifts - $unfilledShifts;
         $fillRate = ($todayShifts > 0) ? round(($filledShifts / $todayShifts) * 100, 1) : 0;
 
-        $activeClients = ServiceUser::where('home_id', Auth::user()->home_id)->where('status', 1)->where('is_deleted', 0)->count();
+        $activeClients = ServiceUser::getServiceUserByResidentialId(1);
 
         // Capacity matches the hardcoded 50 in the dashboard view
         $totalBeds = 50;

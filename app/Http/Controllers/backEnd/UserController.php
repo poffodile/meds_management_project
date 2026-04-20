@@ -125,6 +125,7 @@ class UserController extends Controller
             $user->department           = $request->department;
             $user->description          = $request->description;
             $user->payroll              = $request->payroll;
+            $user->hourly_rate          = $request->hourly_rate;
             $user->holiday_entitlement  = $request->holiday_entitlement;
             $user->date_of_joining      = $date_of_joining;
             $user->date_of_leaving      = $date_of_leaving;
@@ -235,9 +236,10 @@ class UserController extends Controller
                 $user->email            = $request->email;
                 $user->job_title        = $request->job_title;
                 $user->access_level     = $request->access_level;
-                $user->department           = $request->department;
+                $user->department       = $request->department;
                 $user->description      = $request->description;
                 $user->payroll          = $request->payroll;
+                $user->hourly_rate      = $request->hourly_rate;
                 $user->holiday_entitlement = $request->holiday_entitlement;
                 $user->date_of_joining  = $date_of_joining;
                 $user->date_of_leaving  = $date_of_leaving;

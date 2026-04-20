@@ -346,6 +346,58 @@
         margin-top: 0;
         margin-bottom: 0;
     }
+
+    /* Scroller Design for Large Data */
+    .payRollAcood .panel-body {
+        max-height: 600px;
+        overflow-y: auto;
+        padding: 20px 24px !important;
+        scroll-behavior: smooth;
+    }
+
+    .payRollAcood .panel-body::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .payRollAcood .panel-body::-webkit-scrollbar-track {
+        background: #f9fafb;
+        border-radius: 10px;
+    }
+
+    .payRollAcood .panel-body::-webkit-scrollbar-thumb {
+        background: #d1d5db;
+        border-radius: 10px;
+    }
+
+    .payRollAcood .panel-body::-webkit-scrollbar-thumb:hover {
+        background: #9ca3af;
+    }
+
+    .tab-search-wrapper {
+        position: sticky;
+        top: -20px;
+        background: #fff;
+        z-index: 10;
+        padding-bottom: 15px;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #f3f4f6;
+    }
+
+    .inner-tab-search {
+        border-radius: 8px;
+        border: 1px solid #e5e7eb;
+        padding-left: 40px !important;
+        height: 42px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+
+    .search-icon-inner {
+        position: absolute;
+        left: 15px;
+        top: 12px;
+        color: #9ca3af;
+        font-size: 18px;
+    }
 </style>
 
 <main class="page-content">
@@ -441,6 +493,12 @@
                         </div>
                         <div id="collapse1" class="panel-collapse collapse in">
                             <div class="panel-body">
+                                <div class="tab-search-wrapper">
+                                    <div class="position-relative">
+                                        <i class="bx bx-search search-icon-inner"></i>
+                                        <input type="text" class="form-control inner-tab-search" placeholder="Search by staff name or date..." onkeyup="filterTabContent(this, '#collapse1')">
+                                    </div>
+                                </div>
                                 @if ($matchedCount > 0)
                                 <button class="bgBtn pgreenBtn" id="approve-all-matched">
                                     <i class="bx bx-check-double me-2"></i> Approve All Matched
@@ -524,6 +582,12 @@
                         </div>
                         <div id="collapse2" class="panel-collapse collapse">
                             <div class="panel-body">
+                                <div class="tab-search-wrapper">
+                                    <div class="position-relative">
+                                        <i class="bx bx-search search-icon-inner"></i>
+                                        <input type="text" class="form-control inner-tab-search" placeholder="Search by staff name or date..." onkeyup="filterTabContent(this, '#collapse2')">
+                                    </div>
+                                </div>
                                 @if ($needsAdjustmentCount > 0)
                                 @foreach ($shifts->where('reconciliation_status', 'Needs Adjustment') as $shift)
                                 <div class="recon-card needs-adj" style="border-color: {{ $shift->shiftCategory->color ?? '#e2e8f0' }};">
@@ -623,6 +687,12 @@
                         </div>
                         <div id="collapse3" class="panel-collapse collapse">
                             <div class="panel-body">
+                                <div class="tab-search-wrapper">
+                                    <div class="position-relative">
+                                        <i class="bx bx-search search-icon-inner"></i>
+                                        <input type="text" class="form-control inner-tab-search" placeholder="Search by staff name or date..." onkeyup="filterTabContent(this, '#collapse3')">
+                                    </div>
+                                </div>
                                 @if ($approvedCount > 0)
                                 @foreach ($shifts->where('reconciliation_status', 'Approved') as $shift)
                                 <div class="recon-card" style="border-color: {{ $shift->shiftCategory->color ?? '#e2e8f0' }};">
@@ -742,42 +812,48 @@
                         </div>
                     </div>
 
-                <!-- Panel 4: Unscheduled Logs -->
-                <div class="panel panel-default mt-4 payRollAcood p-0">
-                    <div class="panel-heading">
-                        <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#accordion" href="#collapse4" class="lightPurpleBg collapsed">
-                                <i class="bx bx-time-five f20 me-2" style="color: #8b5cf6;"></i>
-                                Unscheduled Shifts ({{ count($unscheduled_logs) }})
-                                <i class="bx bx-chevron-down accIcon"></i>
-                            </a>
-                        </h4>
-                    </div>
-                    <div id="collapse4" class="panel-collapse collapse">
-                        <div class="panel-body">
-                            @if (count($unscheduled_logs) > 0)
-                            @foreach ($unscheduled_logs as $log)
-                            <div class="recon-card" style="border-left: 4px solid #8b5cf6;">
-                                <div class="d-flex justify-content-between align-items-start mb-4">
-                                    <div class="d-flex flex-column gap-2">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <span class="h5Head">{{ $log->staff ? $log->staff->name : 'Unknown Staff' }}</span>
-                                            <span class="badge-soft badge-standard">unscheduled log</span>
-                                        </div>
-                                    </div>
-                                    <div class="d-flex gap-2">
-                                        <button class="bgBtn pgreenBtn approve-unscheduled-btn" 
-                                                data-staff-id="{{ $log->staff_id }}" 
-                                                data-date="{{ $log->start_date }}">
-                                            <i class="bx bx-check-circle"></i> Approve
-                                        </button>
+                    <!-- Panel 4: Unscheduled Logs -->
+                    <div class="panel panel-default mt-4 payRollAcood p-0">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#accordion" href="#collapse4" class="lightPurpleBg collapsed">
+                                    <i class="bx bx-time-five f20 me-2" style="color: #8b5cf6;"></i>
+                                    Unscheduled Shifts ({{ count($unscheduled_logs) }})
+                                    <i class="bx bx-chevron-down accIcon"></i>
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="collapse4" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                <div class="tab-search-wrapper">
+                                    <div class="position-relative">
+                                        <i class="bx bx-search search-icon-inner"></i>
+                                        <input type="text" class="form-control inner-tab-search" placeholder="Search by staff name or date..." onkeyup="filterTabContent(this, '#collapse4')">
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="col-lg-3">
-                                        <p class="data-label">Date</p>
-                                        <p class="data-value">{{ \Carbon\Carbon::parse($log->start_date)->format('D, M d') }}</p>
+                                @if (count($unscheduled_logs) > 0)
+                                @foreach ($unscheduled_logs as $log)
+                                <div class="recon-card" style="border-left: 4px solid #8b5cf6;">
+                                    <div class="d-flex justify-content-between align-items-start mb-4">
+                                        <div class="d-flex flex-column gap-2">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span class="h5Head">{{ $log->staff ? $log->staff->name : 'Unknown Staff' }}</span>
+                                                <span class="badge-soft badge-standard">unscheduled log</span>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex gap-2">
+                                            <button class="bgBtn pgreenBtn approve-unscheduled-btn"
+                                                data-staff-id="{{ $log->staff_id }}"
+                                                data-date="{{ $log->start_date }}">
+                                                <i class="bx bx-check-circle"></i> Approve
+                                            </button>
+                                        </div>
                                     </div>
+                                    <div class="row">
+                                        <div class="col-lg-3">
+                                            <p class="data-label">Date</p>
+                                            <p class="data-value">{{ \Carbon\Carbon::parse($log->start_date)->format('D, M d') }}</p>
+                                        </div>
                                         <div class="col-lg-4">
                                             <p class="data-label">Clock Activity</p>
                                             <div class="d-flex align-items-center gap-2">
@@ -787,27 +863,27 @@
                                                 <i class="fa fa-eye fs18 text-purple" style="cursor:pointer;" data-toggle="modal" data-target="#logDetails-{{ $log->id }}"></i>
                                             </div>
                                         </div>
-                                    <div class="col-lg-2">
-                                        <p class="data-label">Scheduled</p>
-                                        <p class="data-value">0.00h</p>
-                                    </div>
-                                    <div class="col-lg-3">
-                                        <p class="data-label">Actual Worked</p>
-                                        <p class="data-value text-purple">{{ number_format($log->actual_duration_minutes / 60, 2) }}h</p>
+                                        <div class="col-lg-2">
+                                            <p class="data-label">Scheduled</p>
+                                            <p class="data-value">0.00h</p>
+                                        </div>
+                                        <div class="col-lg-3">
+                                            <p class="data-label">Actual Worked</p>
+                                            <p class="data-value text-purple">{{ number_format($log->actual_duration_minutes / 60, 2) }}h</p>
+                                        </div>
                                     </div>
                                 </div>
+                                @endforeach
+                                @else
+                                <p class="textGray500 fs13 text-center py-5 mb-0">No unscheduled staff logs found.</p>
+                                @endif
                             </div>
-                            @endforeach
-                            @else
-                            <p class="textGray500 fs13 text-center py-5 mb-0">No unscheduled staff logs found.</p>
-                            @endif
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
     <!-- modal Adjust reconciliation start -->
     @foreach ($shifts as $shift)
     <div class="modal fade leaveCommunStyle" id="adjustNodal-{{ $shift->id }}" tabindex="1" role="dialog"
@@ -1022,6 +1098,20 @@
 <!-- append section -->
 <script>
     document.addEventListener("DOMContentLoaded", function() {
+        window.filterTabContent = function(input, collapseId) {
+            const filter = input.value.toLowerCase();
+            const cards = document.querySelectorAll(collapseId + ' .recon-card');
+
+            cards.forEach(card => {
+                const text = card.innerText.toLowerCase();
+                if (text.indexOf(filter) > -1) {
+                    card.style.display = "";
+                } else {
+                    card.style.display = "none";
+                }
+            });
+        }
+
         document.querySelectorAll(".appendBtn").forEach(button => {
             button.addEventListener("click", function(e) {
                 e.preventDefault();

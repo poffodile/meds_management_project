@@ -39,11 +39,17 @@ class CarerAvailabilityController extends Controller
             ]);
         }
         $search = trim($req->search ?? '');
+        $staff_id = $req->staff_id ?? null;
         $staff = $this->staffService->allStaff($homeId);
         $staff->select('id', 'home_id', 'name', 'email');
         if (!empty($search)) {
             $staff->where('name', 'LIKE', "%{$search}%");
         }
+
+        if ($staff_id) {
+            $staff->orderByRaw("id = ? DESC", [$staff_id]);
+        }
+
         $staff->withCount('working_hours as total_working_hours')
             ->withCount('work_unavailability')
             ->withSum(

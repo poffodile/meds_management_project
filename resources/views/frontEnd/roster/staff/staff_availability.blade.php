@@ -1377,11 +1377,13 @@
 
             loading = true;
 
+            const urlParams = new URLSearchParams(window.location.search);
             $.ajax({
                 url: url,
                 type: 'GET',
                 data: {
-                    search: search
+                    search: search,
+                    staff_id: urlParams.get('staff_id')
                 },
                 beforeSend: function() {
                     if (!isFirstTime) {
