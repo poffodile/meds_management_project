@@ -164,7 +164,10 @@ class CarerController extends Controller
             return response()->json(['error' => 'Access level is required.'], 400);
         }
 
-        $pay_rate = $this->staffService->getPayRateForAccessLevel($access_level_id, Auth::user()->home_id);
+        $homeIds = explode(',', Auth::user()->home_id);
+        $homeId  = $homeIds[0] ?? null;
+
+        $pay_rate = $this->staffService->getPayRateForAccessLevel($access_level_id, $homeId);
 
         if (!$pay_rate) {
             return response()->json(['error' => 'Pay rate not found.'], 404);

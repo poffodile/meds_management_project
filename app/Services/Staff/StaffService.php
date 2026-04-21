@@ -135,7 +135,9 @@ class StaffService
 
     public function getStaffDetails($userId)
     {
-        $payRateTypeId = $this->getPayRateTypeId();
+        $homeIds = explode(',', Auth::user()->home_id);
+        $homeId  = $homeIds[0] ?? null;
+        $payRateTypeId = $this->getPayRateTypeId($homeId);
 
         $user = User::select('user.*')
             ->where('user.id', $userId)

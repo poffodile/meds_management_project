@@ -129,6 +129,7 @@ class ScheduleController extends Controller
     {
         $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
             'home_id' => ['required', 'integer', 'exists:home,id'],
+            'user_id' => ['nullable', 'integer', 'exists:user,id'],
         ]);
 
         if ($validator->fails()) {
@@ -140,13 +141,15 @@ class ScheduleController extends Controller
 
         $validated = $validator->validated();
         $homeId = $validated['home_id'];
+        $userId = $validated['user_id'] ?? null;
 
-        $shifts = ScheduledShift::whereNull('staff_id')
+        $shiftsQuery = ScheduledShift::whereNull('staff_id')
             ->where('home_id', $homeId)
             ->select('id', 'start_date', 'start_time', 'end_time', 'shift_type', 'notes', 'tasks')
             ->orderBy('start_date', 'desc')
-            ->orderBy('start_time', 'desc')
-            ->get();
+            ->orderBy('start_time', 'desc');
+
+        $shifts = $shiftsQuery->get();
 
         if ($shifts->isEmpty()) {
             return response()->json([
@@ -157,7 +160,22 @@ class ScheduleController extends Controller
             ], 200);
         }
 
-        $data = $shifts->map(function ($shift) {
+        // Filter out shifts where the user is already assigned to another shift at the same time
+        if ($userId) {
+            $shifts = $shifts->filter(function ($unassignedShift) use ($userId) {
+                $overlap = ScheduledShift::where('staff_id', $userId)
+                    ->where('start_date', $unassignedShift->start_date)
+                    ->where(function ($q) use ($unassignedShift) {
+                        $q->whereTime('start_time', '<', $unassignedShift->end_time)
+                            ->whereTime('end_time', '>', $unassignedShift->start_time);
+                    })
+                    ->exists();
+
+                return !$overlap; // Keep the shift ONLY if there is no overlap
+            });
+        }
+
+        $data = $shifts->values()->map(function ($shift) {
             $shift->day = \Carbon\Carbon::parse($shift->start_date)->format('l');
             $shift->start_time = \Carbon\Carbon::parse($shift->start_time)->format('H:i');
             $shift->end_time   = \Carbon\Carbon::parse($shift->end_time)->format('H:i');
@@ -307,11 +325,11 @@ class ScheduleController extends Controller
                     continue;
                 }
             }
-            
+
             $activeScheduleFound = true;
             $schedStart = \Carbon\Carbon::parse($startDate . ' ' . $sched->start_time);
             $schedEnd = \Carbon\Carbon::parse($startDate . ' ' . $sched->end_time);
-            
+
             if ($shiftStart >= $schedStart && $shiftEnd <= $schedEnd) {
                 $fits = true;
                 break;
@@ -323,13 +341,13 @@ class ScheduleController extends Controller
         }
 
         if (!$fits) {
-            $ranges = $schedules->filter(function($s) use ($isOddWeek) {
+            $ranges = $schedules->filter(function ($s) use ($isOddWeek) {
                 if ($s->type === 'alternate') {
                     return ($s->week_number == 1 && $isOddWeek) || ($s->week_number == 2 && !$isOddWeek);
                 }
                 return true;
             })->map(fn($s) => substr($s->start_time, 0, 5) . "-" . substr($s->end_time, 0, 5))->implode(', ');
-            
+
             return "Shift is outside the carer's scheduled hours for this $dayOfWeek ($ranges).";
         }
 
