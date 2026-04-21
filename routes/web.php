@@ -54,6 +54,7 @@ use App\Http\Controllers\frontEnd\Roster\OnboardingDetailController;
 use App\Http\Controllers\frontEnd\Roster\ReportingEngine\ReportingEngineController;
 use App\Http\Controllers\frontEnd\Roster\ComplianceDashboard\ComplianceDashboardController;
 use App\Http\Controllers\frontEnd\Roster\CRMDashboard\CRMDashboardController;
+use App\Http\Controllers\frontEnd\Roster\Staff\staffonboardingController;
 
 // Backend Controllers
 use App\Http\Controllers\backEnd\user\LatnessLeaveController;
@@ -174,10 +175,12 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 
 		Route::get('/carer-details/{carer_id}', [CarerDetailsController::class, 'carer_details'])->name('roster.staff.carer.details');
 		Route::post('/carer/save-documents', [CarerDetailsController::class, 'saveDouments'])->name('carer.save.documents');
+		Route::get('/carer/fetch-shifts', [CarerDetailsController::class, 'fetch_staff_shifts'])->name('carer.fetch.shifts');
 		Route::post('/carer/save-notes', [CarerDetailsController::class, 'saveNote'])->name('carer.save.notes');
 		Route::delete('/carer/delete-notes/{id}', [CarerDetailsController::class, 'destroy_notes'])->name('carer.notes.delete');
 		Route::delete('/carer/delete-documents/{id}', [CarerDetailsController::class, 'destroy_documents'])->name('carer.documents.delete');
 		Route::post('/carer/qualifications/store', [StaffQualificationController::class, 'store'])->name('staff.qualifications.store');
+		Route::post('/carer_active_status', [CarerDetailsController::class, 'carer_active_status'])->name('carer.carer_active_status');
 		// Carer Section End
 
 		Route::get('/schedule-shift/weekly-data', [ScheduleShiftController::class, 'getWeeklyData']);
@@ -287,6 +290,13 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 
 		// CRM Dashboard
 		Route::get('/crm-dashboard', [CRMDashboardController::class, 'crm_dashboard']);
+
+		// staffonboarding
+		Route::get('staffonboarding', [staffonboardingController::class, 'index']);
+		Route::get('staffonboarding/loadData', [staffonboardingController::class, 'loadData'])->name('roster.staffonboarding.loadData');
+		Route::post('staffonboarding/loadUserDetails', [staffonboardingController::class, 'loadUserDetails'])->name('roster.staffonboarding.loadUserDetails');
+		Route::post('staffonboarding/loadforms', [staffonboardingController::class, 'loadforms'])->name('roster.staffonboarding.loadforms');
+		Route::post('staffonboarding/loadforms/save', [staffonboardingController::class, 'saveforms'])->name('roster.staffonboarding.saveforms');
 	});
 
 	// Report Section

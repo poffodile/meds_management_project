@@ -50,6 +50,7 @@ class CarerDetailsController extends Controller
         $data['user_documents'] = Documents::where('user_id', $carer_id)->get()->toArray();
         $data['courses'] = $this->staffService->courses();
         $data['user_notes'] = UserNote::where('user_id', $carer_id)->orderBy('created_at', 'DESC')->get()->toArray();
+        $data['shiftCount'] = \App\Models\ScheduledShift::where('staff_id', $carer_id)->count();
 
         // dd($data['user_notes']);
         return view('frontEnd.roster.staff.carer_details', $data);
@@ -123,4 +124,47 @@ class CarerDetailsController extends Controller
         ]);
     }
     // Notes Section End
+
+    public function fetch_staff_shifts(Request $request)
+    {
+        $carer_id = $request->carer_id;
+        if (!$carer_id) {
+            return response()->json(['success' => false, 'message' => 'Carer ID is required.']);
+        }
+
+        $shifts = \App\Models\ScheduledShift::where('staff_id', $carer_id)
+            ->orderBy('start_date', 'desc')
+            ->orderBy('start_time', 'desc')
+            ->limit(10)
+            ->get();
+
+        $data = $shifts->map(function ($shift) {
+            $start = \Carbon\Carbon::parse($shift->start_date . ' ' . $shift->start_time);
+            $end = \Carbon\Carbon::parse($shift->start_date . ' ' . $shift->end_time);
+
+            // Handle shifts crossing midnight if end_time < start_time
+            if ($end->lt($start)) {
+                $end->addDay();
+            }
+
+            $durationMinutes = $start->diffInMinutes($end);
+            $hours = floor($durationMinutes / 60);
+            $minutes = $durationMinutes % 60;
+            $durationStr = $hours . 'h' . ($minutes > 0 ? ' ' . $minutes . 'm' : '');
+
+            return [
+                'id' => $shift->id,
+                'date' => \Carbon\Carbon::parse($shift->start_date)->format('D, M j, Y'),
+                'time_range' => \Carbon\Carbon::parse($shift->start_time)->format('H:i') . ' - ' . \Carbon\Carbon::parse($shift->end_time)->format('H:i'),
+                'hours' => $durationStr,
+                'status' => $shift->status,
+                'shift_type' => $shift->shift_type,
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'data' => $data
+        ]);
+    }
 }

@@ -15,12 +15,6 @@
         flex-grow: 3;
     }
 
-    /*
-                                                                                                                                                                                                                                                                                                                                                                                                                    .leavebanktabCont i {
-                                                                                                                                                                                                                                                                                                                                                                                                                        font-size: 18px;
-                                                                                                                                                                                                                                                                                                                                                                                                                        color: #f00;
-                                                                                                                                                                                                                                                                                                                                                                                                                    } */
-
     .notContDetails .planCard {
         border: 1px solid #eee;
     }
@@ -140,13 +134,12 @@ $week_days = [
             <div class="tabs p-1 ">
                 <button class="tab active" data-tab="generalTab">General</button>
                 <button class="tab" data-tab="availabilityTab">Availability</button>
-                <button class="tab" data-tab="trainingQualificationsTab">Training & Qualifications <span
-                        class="tabNumber">{{ count($staffDetails->qualifications) }}</span></button>
-                <button class="tab" data-tab="supervisionsTab">Supervisions<span
-                        class="tabNumber">{{ $superVisionCount ?? 0 }}</span></button>
-                <button class="tab" data-tab="shiftsTab">Shifts</button>
+                <button class="tab" data-tab="trainingQualificationsTab">Training & Qualifications <span class="tabNumber">{{ count($staffDetails->qualifications) }}</span></button>
+                <button class="tab" data-tab="supervisionsTab">Supervisions<span class="tabNumber">{{ $superVisionCount ?? 0 }}</span></button>
+                <button class="tab" data-tab="shiftsTab">Shifts <span class="tabNumber">{{ $shiftCount ?? 0 }}</span></button>
                 <button class="tab" data-tab="documentsTab">Documents</button>
                 <button class="tab" data-tab="notesTab">Notes</button>
+                <button class="tab" data-tab="onBoarding">Onboarding</button>
             </div>
 
             <!-- TAB CONTENT -->
@@ -267,6 +260,7 @@ $week_days = [
                         </div>
                     </div>
                 </div>
+
                 <div class="content" id="availabilityTab">
                     <div class="availabilityTabs">
                         <!-- TAB HEADER -->
@@ -771,29 +765,11 @@ $week_days = [
                             </div>
                         </div>
                         <!-- <div class="leavebanktabCont">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <p>No shifts recorded</p>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                        </div> -->
-                        <div class="">
-                            <div class="certifiedList">
-                                <span class="">
-                                    <div>Wed, Dec 10, 2025</div>
-                                    <small>09:00 - 17:00 • 8hrs</small>
-                                </span>
-                                <span class="roundBtntag greenShowbtn"> scheduled </span>
-                            </div>
-                            <div class="certifiedList">
-                                <span class="">
-                                    <div>Wed, Dec 10, 2025</div>
-                                    <small>09:00 - 17:00 • 8hrs</small>
-                                </span>
-                                <span class="roundBtntag inactive"> published </span>
-                            </div>
-                            <div class="certifiedList">
-                                <span class="">
-                                    <div>Wed, Dec 10, 2025</div>
-                                    <small>09:00 - 17:00 • 8hrs</small>
-                                </span>
-                                <span class="roundBtntag greenShowbtn"> Certified </span>
+                            <p>No shifts recorded</p>
+                        </div> -->
+                        <div class="" id="shift-list-wrapper">
+                            <div class="leavebanktabCont">
+                                <p>Loading shifts...</p>
                             </div>
                         </div>
                     </div>
@@ -839,8 +815,8 @@ $week_days = [
                         <div class="workHoursHeader">
                             <div class="title">Notes</div>
                             <div class="actions">
-                                <button class="allbuttonDarkClr openNotesModal" data-id="{{ $staffDetails->id }}">
-                                    <i class='bx bx-file-detail'></i> Add
+                                <button class="allbuttonDarkClr openNotesModal" data-id="{{ $staffDetails->id }}"> <i
+                                        class='bx bx-file-detail'></i> Add
                                     Note</button>
                             </div>
                         </div>
@@ -860,6 +836,47 @@ $week_days = [
                             <p>No notes recorded</p>
                             @endforelse
                         </div>
+                    </div>
+                </div>
+                <div class="content" id="onBoarding">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="bg-blue-50 rounded8 shadowp p-4">
+                                <div class="occupancyBox" style="border: none;">
+                                    <div class="topRow">
+                                        <span class="fs16 font600">Onboarding Progress</span>
+                                        <span class="value f20 onboardingformprogresspercentage"
+                                            style="color: #3376f2;">0%</span>
+                                    </div>
+                                    <div class="progressBar">
+                                        <div class="progressFill onboardingformprogressfill"
+                                            style="width:0%; background:#3376f2"></div>
+                                    </div>
+                                </div>
+                                <p class="textGray500 fs13 onboardingformprogresstext">
+                                </p>
+                            </div>
+                            <div class="rounded8 shadowp p24 mt20 bg-greenp-50 d-none" id="activate_client_wrapper">
+                                <div class="flexBw">
+                                    <div class="dFlexGap align-items-start">
+                                        <i class="bx bx-check-circle greenText fs23"></i>
+                                        <div class="greenText">
+                                            <h6 class="h6Head font700 darkGreenTextp">Staff onboarding complete!
+                                                All stages approved.</h6>
+                                            <p class="fs13 mb-0">Staff can now be activated</p>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <button class="bgBtn pgreenBtn activateClientBtn">Activate Staff</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="recordSec" id="loadStagesData">
+
+                            </div>
+
+                        </div>
+                        <!--  -->
                     </div>
                 </div>
             </div>
@@ -1018,15 +1035,6 @@ $week_days = [
     <script src="{{ asset('public/frontEnd/staff/js/working-hours1.js') }}"></script>
 
     <script>
-        function alertMsg(selector = 'err', msg) {
-            $('.ajax-alert-' + selector).find('.msg').text(
-                msg);
-            $('.ajax-alert-' + selector).show();
-
-            setTimeout(function() {
-                $(".ajax-alert-" + selector).fadeOut()
-            }, 5000);
-        }
         const tabs = document.querySelectorAll(".tab");
         const contents = document.querySelectorAll(".content");
 
@@ -1036,7 +1044,7 @@ $week_days = [
                 tab.classList.add("active");
 
                 let tabName = tab.getAttribute("data-tab");
-                //console.log(tabName);
+                console.log(tabName);
 
                 contents.forEach(content => {
                     content.classList.remove("active");
@@ -1047,6 +1055,9 @@ $week_days = [
                 }
                 if (tabName === 'supervisionsTab') {
                     fetch_supervisions(1)
+                }
+                if (tabName === 'shiftsTab') {
+                    fetchShifts()
                 }
 
                 document.getElementById(tabName).classList.add("active");
@@ -1068,7 +1079,7 @@ $week_days = [
                     panels.forEach(p => p.classList.remove("active"));
 
                     tab.classList.add("active");
-                    // console.log(tab.dataset.target);
+                    console.log(tab.dataset.target);
                     wrapper
                         .querySelector("#" + tab.dataset.target)
                         .classList.add("active");
@@ -1092,6 +1103,53 @@ $week_days = [
             }
 
         });
+
+        function fetchShifts() {
+            let carer_id = $("#carer_id").val();
+            $.ajax({
+                url: "{{ route('carer.fetch.shifts') }}",
+                type: 'GET',
+                data: {
+                    carer_id: carer_id
+                },
+                beforeSend: function() {
+                    $("#shift-list-wrapper").html(
+                        '<div class="leavebanktabCont"><p>Loading shifts...</p></div>');
+                },
+                success: function(res) {
+                    if (res.success) {
+                        let htm = '';
+                        if (res.data.length == 0) {
+                            $("#shift-list-wrapper").html(
+                                '<div class="leavebanktabCont"><i class="bx bx-calendar"></i><p>No shifts recorded</p></div>'
+                            );
+                            return;
+                        }
+                        $.each(res.data, function(index, shift) {
+                            let statusClass = 'roundBtntag ';
+                            if (shift.status == 'assigned') statusClass += 'greenShowbtn';
+                            else if (shift.status == 'completed') statusClass += 'greenShowbtn';
+                            else if (shift.status == 'published') statusClass += 'inactive';
+                            else statusClass += 'radShowbtn';
+
+                            htm += `
+                            <div class="certifiedList">
+                                <span class="">
+                                    <div>${shift.date}</div>
+                                    <small>${shift.time_range} • ${shift.hours}</small>
+                                </span>
+                                <span class="${statusClass}"> ${shift.status} </span>
+                            </div>`;
+                        });
+                        $("#shift-list-wrapper").html(htm);
+                    }
+                },
+                error: function() {
+                    $("#shift-list-wrapper").html(
+                        '<div class="leavebanktabCont"><p>Error loading shifts.</p></div>');
+                }
+            });
+        }
 
         $(document).on('click', '.openUploadDocumentModal', function() {
 
@@ -1131,6 +1189,285 @@ $week_days = [
                 }
             });
         });
+
+        let USER_ID = $("#carer_id").val();
+        loadOnboarding();
+
+        function loadOnboarding() {
+            USER_ID = $("#carer_id").val();
+            $.ajax({
+                url: "{{ route('roster.staffonboarding.loadUserDetails') }}", // URL to send the request to
+                type: 'POST',
+                data: {
+                    user_id: USER_ID,
+                    _token: "{{ @csrf_token() }}"
+                },
+                beforeSend: function() {},
+                success: function(res) {
+                    $("#activate_client_wrapper").addClass('d-none');
+                    if (typeof isAuthenticated === "function") {
+                        if (isAuthenticated(res) == false) {
+                            return false;
+                        }
+                    }
+                    if (res.status) {
+                        if (res.workflowData) {
+                            HOME_ID = res.workflowData.home_id;
+                            if (res.workflowData.form_percentage === 100) {
+                                $("#activate_client_wrapper").removeClass('d-none');
+                            }
+
+
+                        }
+                        let userData = res.userData;
+
+                        let onboardingformprogresstext =
+                            `${res.workflowData.onboardingforms_count} of ${res.workflowData.getstages_count } stages completed`;
+                        let onboardingformprogresspercentage =
+                            `${res.workflowData.form_percentage}%`;
+                        $(".onboardingformprogresstext").html(onboardingformprogresstext);
+                        $(".onboardingformprogresspercentage").html(
+                            onboardingformprogresspercentage);
+                        $(".onboardingformprogressfill").css('width',
+                            onboardingformprogresspercentage)
+                        $("#loadStagesData").empty();
+                        // return;
+                        if (res.workflowStages.length > 0) {
+                            let html = '';
+                            $.each(res.workflowStages, function(key, val) {
+                                let stageformid = val.onboardingforms ? val
+                                    .onboardingforms.id : "";
+                                let STATUS_VAL = stageformid ? 'Completed' :
+                                    (val.required_stage == 1 ? 'Required' :
+                                        "Pending");
+                                let HEADER_STATUS = stageformid ?
+                                    '<span class="careBadg redbadges ms-2">Required</span>' :
+                                    (val.required_stage == 1 ?
+                                        '<span class="careBadg redbadges ms-2">Required</span>' :
+                                        '<span class="borderBadg ms-2">Optional</span>'
+                                    );
+
+                                html += `<div class="recordCard">
+                                                                                    <div class="rounded8 shadowp p24 mt20 recordBtn cursorPointer"
+                                                                                        ${stageformid ? 'style="border: 1px solid #86efac;"':''} type="button">
+                                                                                        <div class="flexBw recordBtn1">
+                                                                                            <div>
+                                                                                                <div class="dFlexGap mb-3 align-items-start">
+                                                                                                    <div>
+                                                                                                        <i class="bx ${stageformid?'bx-check-circle greenText':'bx-circle'} fs23"></i>
+                                                                                                    </div>
+                                                                                                    <div>
+                                                                                                        <h6 class="h6Head">${val.order_no}. ${val.stage_name} ${HEADER_STATUS}
+                                                                                                        </h6>
+                                                                                                        <p class="fs13 textGray500 mb-0">${val.description}</p>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                            <div>
+                                                                                                <span class="careBadg ${stageformid?'darkGreenBadges':'darkMuteBadg'}">${STATUS_VAL}</span>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="recordContent" data-stageid="${val.id}" data-stageformid="${stageformid}">
+                                                                                            <h6 class="fs13 font600 dynamic_form_title"></h6>
+                                                                                            <form id="saveForms" class="mt-2 saveForms">
+                                                                                                <div class="alert alert-danger d-none stage_error_msg"></div>
+                                                                                                <div id="loadStagesFormData-${val.id}" class="loadStagesFormData">
+                                                                                                    Loading...
+                                                                                                </div>
+                                                                                                <div class="row">
+                                                                                                    <div class="col-md-12">
+                                                                                                        <button class="bgBtn w100 mt-4 pgreenBtn submitBtn" type="button"
+                                                                                                            id="submitBtn"><i class="bx bx-check-circle f18"></i>Save
+                                                                                                            Form</button>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </form>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>`;
+                            });
+                            $("#loadStagesData").html(html);
+                        }
+                    }
+                },
+                error: function(xhr, ajaxOptions, thrownError) {
+                    console.log('error');
+
+                }
+            });
+        }
+        $(".recordSec").on("click", ".recordBtn1", function() {
+
+            let card = $(this).closest(".recordCard");
+
+
+            let content = card.find(".recordContent");
+
+            if (!content.length) return;
+
+            // close all
+            $(".recordSec .recordContent").each(function() {
+                // console.log(this);
+                $(this).hide();
+                $(this).removeClass('activeForm');
+            });
+            $(".loadStagesFormData").html('');
+
+            // open current
+            STAGE_ID = content.attr('data-stageid');
+            STAGE_FORM_ID = content.attr('data-stageformid');
+            content.addClass('activeForm');
+            viewdatawithvalueFormios()
+            console.log(`STAGE_ID : ${STAGE_ID}`, `STAGE_FORM_ID: ${STAGE_FORM_ID}`);
+            content.show();
+        });
+
+        function viewdatawithvalueFormios() {
+            var token = "<?= csrf_token() ?>";
+            var settings = {
+                "url": "{{ route('roster.staffonboarding.loadforms') }}",
+                "method": "POST",
+                "data": {
+                    stage_id: STAGE_ID,
+                    stage_form_id: STAGE_FORM_ID,
+                    _token: token
+                },
+                //dataType: "json",
+            };
+            $.ajax(settings).done(function(response) {
+                if (typeof isAuthenticated === "function") {
+                    if (isAuthenticated(response) == false) {
+                        return false;
+                    }
+                }
+                $(".dynamic_form_title").html(response.title)
+                Formio.createForm(document.getElementById('loadStagesFormData-' + STAGE_ID), {
+                    components: JSON.parse(response.pattern)
+                }, {
+                    readOnly: false
+                }).then(function(form) {
+                    if (response.pattern_value) {
+                        form.submission = {
+                            data: JSON.parse(response.pattern_value)
+                        }
+                    }
+                });
+            });
+        }
+        $(document).on('click', ".submitBtn", function() {
+
+
+            let form = $(this).closest("form");
+
+            if (!form.length) return false;
+
+            let isValid = true;
+
+            let fields = form.find('[aria-required="true"]');
+
+            console.log("Total required fields:", fields.length);
+            let errHtml = '';
+            fields.each(function() {
+
+                let field = $(this);
+                let val = field.val();
+
+                if (!val || val.trim() === "") {
+                    errHtml += 'Please fill all required fields';
+                    field.addClass("error");
+                    isValid = false;
+                } else {
+                    field.removeClass("error");
+                }
+            });
+            if (!isValid) {
+                form.find('.stage_error_msg')
+                    .html('Please fill all required fields')
+                    .removeClass('d-none');
+                // alert("Please fill all required fields");
+                return false;
+            }
+            console.log('SAVED');
+            let formData = new FormData(form[0]);
+            console.log(`STAGE_ID : ${STAGE_ID}`,
+                `STAGE_FORM_ID: ${STAGE_FORM_ID}  , USER_ID: ${USER_ID}`);
+            // return;
+            // extra params append karo
+            formData.append('_token', "<?= csrf_token() ?>");
+            formData.append('stage_id', STAGE_ID);
+            formData.append('stage_form_id', STAGE_FORM_ID);
+            formData.append('user_id', USER_ID);
+            let fileInput = document.querySelector('input[type=file]');
+            if (fileInput.files.length > 0) {
+                formData.append('file', fileInput.files[0]);
+            }
+            $.ajax({
+                url: "{{ route('roster.staffonboarding.saveforms') }}",
+                type: 'POST',
+                data: formData,
+
+                // 👇 IMPORTANT for FormData
+                processData: false,
+                contentType: false,
+
+                beforeSend: function() {},
+
+                success: function(res) {
+                    if (typeof isAuthenticated === "function") {
+                        if (isAuthenticated(res) == false) {
+                            return false;
+                        }
+                    }
+                    if (res.success) {
+                        STAGE_FORM_ID = res.data.id;
+                        alertMsg('suc', res.message);
+
+                        // optional reload
+                        location.reload();
+                    }
+                },
+
+                error: function() {
+                    alertMsg('err', 'Form Not Saved');
+                }
+            });
+
+        });
+
+        $(".activateClientBtn").click(function() {
+
+            $.ajax({
+                url: "{{ route('carer.carer_active_status') }}", // URL to send the request to
+                type: 'POST', // or 'POST'
+                data: {
+                    id: USER_ID,
+                    status: 1,
+                    _token: "<?= csrf_token() ?>"
+                }, // Data to send with the request
+                beforeSend: function() {},
+                success: function(res) {
+                    if (typeof isAuthenticated === "function") {
+                        if (isAuthenticated(res) == false) {
+                            return false;
+                        }
+                    }
+                    alertMsg('suc', res.message)
+                },
+                error: function(xhr, ajaxOptions, thrownError) {
+                    alertMsg('err', 'Status Not Updated');
+                }
+            });
+        });
+
+        function alertMsg(selector = 'err', msg) {
+            $('.ajax-alert-' + selector).find('.msg').text(
+                msg);
+            $('.ajax-alert-' + selector).show();
+
+            setTimeout(function() {
+                $(".ajax-alert-" + selector).fadeOut()
+            }, 5000);
+        }
         $(document).ready(function() {
 
             /* -------------------------
@@ -1274,7 +1611,7 @@ $week_days = [
                     },
                     error: function(xhr) {
                         alert('Something went wrong');
-                        // console.log(xhr.responseText);
+                        console.log(xhr.responseText);
                     }
                 });
 
@@ -1285,7 +1622,7 @@ $week_days = [
         $("#schedule_pattern").change(function() {
             let val = $(this).val();
             let userId = $("#carer_id").val();
-            // console.log("LOAD FIRST");
+            // console.log(val);
 
             $.ajax({
                 url: "{{ route('roster.carer.availability.loadworkinghours') }}",
@@ -1318,7 +1655,7 @@ $week_days = [
                         };
                         array1 = res.data.working_hours;
                         staffDetails = res.data.staff;
-                        // console.log(staffDetails);
+                        console.log(staffDetails);
                         total_working_week_1 = staffDetails.week_1_sum != null ?
                             Number(staffDetails.week_1_sum).toFixed(2) :
                             "0.00";
@@ -1387,14 +1724,13 @@ $week_days = [
             let userId = $("#carer_id").val();
 
             if ($("#working_hours_type").val()) {
-                // console.log($("#working_hours_type").val());
+                console.log($("#working_hours_type").val());
 
                 $("#schedule_pattern").val($("#working_hours_type").val().trim()).trigger('change');
             }
         }
         // Load & Set WOrking Hours
         function loadWorkingHrsData(workingHrs, selectTabs) {
-            $("#unavailabilityFormError").addClass('d-none').html('');
             const tabs1 = {
                 standard: document.getElementById("tab-standard"),
                 alternate: document.getElementById("tab-alternate"),
@@ -1407,7 +1743,7 @@ $week_days = [
             document.getElementById("editing_week").style.display =
                 selectTabs === "alternate" ? "block" : "none";
             if (selectTabs === 'standard') {
-                //console.log(workingHrs, selectTabs);
+                console.log(workingHrs, selectTabs);
                 workingHrs.forEach(function(item) {
 
                     let day = item.day.toLowerCase();
@@ -1442,7 +1778,7 @@ $week_days = [
                         .text(diff.toFixed(1) + " hrs");
                 });
             } else if (selectTabs === 'alternate') {
-                // console.log(workingHrs, selectTabs);
+                console.log(workingHrs, selectTabs);
                 workingHrs.forEach(function(item) {
 
                     let day = item.day.toLowerCase();
@@ -1484,7 +1820,7 @@ $week_days = [
                     );
                 });
             } else if (selectTabs === 'specific') {
-                //  console.log(workingHrs, selectTabs);
+                console.log(workingHrs, selectTabs);
 
                 workingHrs.forEach(function(item) {
                     const hoursList1 = document.getElementById("hoursList");
@@ -1521,7 +1857,6 @@ $week_days = [
         }
         // SAVE WORKING HRS
         $("#saveWorkingHrsBtn").click(function() {
-            $("#unavailabilityFormError").addClass('d-none').html('');
             let schedule_pattern = $("#schedule_pattern").val();
             let schedule_pattern_2 = $("#schedule_pattern_2").val();
             let carer_id = $("#carer_id").val();
@@ -1636,9 +1971,7 @@ $week_days = [
 
                     if (endDate <= startDate) {
                         $(this).find(".day-error").remove();
-                        $(this).append(
-                            `<div class="day-error text-danger">End time must be greater than start time</div>`
-                        );
+                        alertMsg('err', 'End time must be greater than start time');
                         isValid = false;
                         return;
                     }
@@ -1667,7 +2000,7 @@ $week_days = [
             // return;
             $("#workingHoursFormError").addClass('d-none alert-success');
             let formData = new FormData();
-            //     console.log(arr);
+            // console.log(arr);
             // return;
 
             formData.append('type', schedule_pattern);
@@ -1749,6 +2082,7 @@ $week_days = [
                     } else {
                         // alert('Failed to save preferences. Please try again.');
                     }
+
                 },
                 error: function(xhr, ajaxOptions, thrownError) {
                     $("#unavailabilityFormError").addClass('d-none').html('');
@@ -1767,7 +2101,7 @@ $week_days = [
                         alertMsg('err', errorMSg);
                     }
                     setTimeout(() => {
-                        $("#workPreferencesFormError").addClass('d-none').html('');
+                        $("#unavailabilityFormError").addClass('d-none').html('');
                     }, 3000);
                 }
             });
@@ -1804,6 +2138,7 @@ $week_days = [
                     let errorMSg = xhr.responseJSON && xhr.responseJSON.message ? xhr
                         .responseJSON.message : 'An error occurred';
                     alertMsg('err', errorMSg);
+
                 }
             });
 
@@ -1845,7 +2180,9 @@ $week_days = [
                     }
                 },
                 error: function(xhr, ajaxOptions, thrownError) {
-                    // Code to run if the request fails
+                    let errorMSg = xhr.responseJSON && xhr.responseJSON.message ? xhr
+                        .responseJSON.message : 'An error occurred';
+                    alertMsg('err', errorMSg);
                 }
             });
         }
@@ -1935,7 +2272,6 @@ $week_days = [
                         $("#supervision-pagination").empty();
                         $("#supervision-list-wrapper").empty();
                         let htm = '';
-                        let superVisionHeaderBadgeHtml = '';
                         if (res.data.length == 0) {
                             $("#supervision-list-wrapper").html(`<div class="leavebanktabCont">
                                     <i class="bx  bx-clipboard-detail"></i>
@@ -1945,11 +2281,11 @@ $week_days = [
                         }
                         $.each(res.data, function(index, item) {
                             if (index == 0) {
-                                let colorText = item.status == 'On Track' ? "greenbadges" : (item
-                                    .status == 'Due Soon' ? "yellowbadges" : "redbadges");
+                                let colorText = item.status == 'On Track' ? "greenbadges" : (item.status == 'Due Soon' ? "yellowbadges" : "redbadges");
                                 superVisionHeaderBadgeHtml = `<span class="careBadg ${colorText}"> Next:
                                         ${item.status} </span>`;
                             }
+
                             htm += `<div class="lightBorderp rounded8 p-4 hoverBg bottomSpace viewBtn" type="button" data-id="${item.id}">
                                     <div class="flexBw">
                                         <div>
