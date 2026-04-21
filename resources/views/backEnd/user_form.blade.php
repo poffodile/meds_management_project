@@ -692,7 +692,7 @@ if (isset($user_info)) {
             }
 
             $.ajax({
-                url: "{{ url('/roster/carer/get-hourly-rate') }}",
+                url: "{{ url('/admin/users/get-hourly-rate') }}",
                 type: "POST",
                 data: {
                     access_level_id: accessLevelId,

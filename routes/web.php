@@ -1704,6 +1704,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'CheckAdminAuth'], function (
 
 	Route::match(['get', 'post'], '/users', 'App\Http\Controllers\backEnd\UserController@users');
 	Route::match(['get', 'post'], '/users/add', 'App\Http\Controllers\backEnd\UserController@add');
+	Route::match(['get', 'post'], '/users/get-hourly-rate', 'App\Http\Controllers\backEnd\UserController@getHourlyRate');
 	Route::match(['get', 'post'], '/users/edit/{id}', 'App\Http\Controllers\backEnd\UserController@edit');
 	Route::match(['get', 'post'], '/users/delete/{id}', 'App\Http\Controllers\backEnd\UserController@delete');
 	Route::get('/users/certificates/delete/{id}', 'App\Http\Controllers\backEnd\UserController@delete_certificates');

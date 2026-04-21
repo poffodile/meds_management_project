@@ -13,6 +13,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Schema;
 use App\ServiceUser;
 use App\Models\suUserCourse;
+use Illuminate\Support\Facades\Log;
 
 
 class StaffService
@@ -20,32 +21,59 @@ class StaffService
     /**
      * Get Pay Rate Type ID by name
      */
-    public function getPayRateTypeId(): ?int
+    public function getPayRateTypeId($home_id): ?int
     {
         return DB::table('pay_rate_types')
             ->where('type_name', 'Hourly Rate')
-            ->where('home_id', Auth::user()->home_id)
+            ->where('home_id', $home_id)
             ->value('id');
     }
 
     /**
      * Get pay rate (hourly) for a given access level id
      */
-    public function getPayRateForAccessLevel($access_level_id)
+    public function getPayRateForAccessLevel($access_level_id, $home_id)
     {
+        Log::info('=== getPayRateForAccessLevel START ===', [
+            'access_level_id' => $access_level_id,
+            'home_id' => $home_id
+        ]);
+
         if (empty($access_level_id)) {
+            Log::warning('Access level ID is empty');
             return null;
         }
 
-        $hourly_rate_id = $this->getPayRateTypeId();
+        $hourly_rate_id = $this->getPayRateTypeId($home_id);
+
+        Log::info('Rate Type ID fetched', [
+            'hourly_rate_id' => $hourly_rate_id
+        ]);
+
         if (empty($hourly_rate_id)) {
+            Log::warning('Hourly rate type ID is empty');
             return null;
         }
 
-        return PayRate::where('access_level_id', $access_level_id)
+        $query = PayRate::where('access_level_id', $access_level_id)
             ->where('rate_type_id', trim($hourly_rate_id))
-            ->where('status', 1)
-            ->value('pay_rate');
+            ->where('home_id', $home_id)
+            ->where('status', 1);
+
+        Log::info('Query Debug', [
+            'sql' => $query->toSql(),
+            'bindings' => $query->getBindings()
+        ]);
+
+        $result = $query->value('pay_rate');
+
+        Log::info('Query Result', [
+            'pay_rate' => $result
+        ]);
+
+        Log::info('=== getPayRateForAccessLevel END ===');
+
+        return $result;
     }
 
     /**

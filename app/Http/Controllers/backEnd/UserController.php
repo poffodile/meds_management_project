@@ -635,4 +635,61 @@ class UserController extends Controller
             return redirect()->back()->with('error', 'An unexpected error occurred. Please try again.');
         }
     }
+
+    public function getHourlyRate(Request $request)
+    {
+        Log::info('getHourlyRate API called', [
+            'request_data' => $request->all()
+        ]);
+
+        try {
+            $request->validate([
+                'access_level_id' => 'required'
+            ]);
+
+            $session = Session::get('scitsAdminSession');
+
+            Log::info('Session Data', [
+                'session' => $session
+            ]);
+
+            if (!$session) {
+                Log::warning('Session expired or not found');
+                return response()->json(['error' => 'Session expired'], 401);
+            }
+
+            $pay_rate = $this->staffService->getPayRateForAccessLevel(
+                $request->access_level_id,
+                $session->home_id
+            );
+
+            Log::info('Pay Rate Result', [
+                'access_level_id' => $request->access_level_id,
+                'home_id' => $session->home_id,
+                'pay_rate' => $pay_rate
+            ]);
+
+            if (!$pay_rate) {
+                Log::warning('Pay rate not found', [
+                    'access_level_id' => $request->access_level_id
+                ]);
+                return response()->json(['error' => 'Pay rate not found'], 404);
+            }
+
+            return response()->json([
+                'hourly_rate' => $pay_rate
+            ]);
+        } catch (\Exception $e) {
+
+            Log::error('Error in getHourlyRate', [
+                'message' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile()
+            ]);
+
+            return response()->json([
+                'error' => 'Something went wrong'
+            ], 500);
+        }
+    }
 }
