@@ -148,6 +148,7 @@ class ScheduleShiftController extends Controller
                     'week_days'          => $request->week_days,
                     'end_recurring_date' => $request->end_date,
                 ]);
+                $this->generateRecurringShifts($shift);
             }
 
             // 2. Handle Multiple Assessment Documents
@@ -312,8 +313,13 @@ class ScheduleShiftController extends Controller
                         'end_recurring_date' => $request->end_date,
                     ]
                 );
+                // Delete future instances and re-generate
+                $shift->children()->where('start_date', '>', Carbon::now()->toDateString())->delete();
+                $this->generateRecurringShifts($shift);
             } else {
                 ShiftRecurrence::where('shift_id', $shift->id)->delete();
+                // If it was recurring before but now it's not, delete future instances
+                $shift->children()->where('start_date', '>', Carbon::now()->toDateString())->delete();
             }
 
             // --- Document & Assessment Updates ---
@@ -615,6 +621,11 @@ class ScheduleShiftController extends Controller
             return response()->json(['success' => false, 'message' => 'Shift not found'], 404);
         }
 
+        // If it's a parent recurring shift, delete all future instances
+        if ($shift->is_recurring) {
+            $shift->children()->where('start_date', '>=', $shift->start_date)->delete();
+        }
+
         $shift->delete();
 
         return response()->json(['success' => true, 'message' => 'Shift deleted successfully']);
@@ -715,6 +726,12 @@ class ScheduleShiftController extends Controller
         $shift->end_time = $endTime;
         $shift->status = 'assigned';
         $shift->save();
+
+        if ($shift->is_recurring) {
+            // Delete future instances and re-generate
+            $shift->children()->where('start_date', '>', Carbon::now()->toDateString())->delete();
+            $this->generateRecurringShifts($shift);
+        }
 
         return response()->json([
             'success' => true,
@@ -860,5 +877,71 @@ class ScheduleShiftController extends Controller
         }
 
         return true;
+    }
+
+    /**
+     * Generate future shift instances based on recurrence rules.
+     */
+    private function generateRecurringShifts($parentShift)
+    {
+        $recurrence = $parentShift->recurrence;
+        if (!$recurrence) return;
+
+        $startDate = Carbon::parse($parentShift->start_date);
+        $endDate = $recurrence->end_recurring_date ? Carbon::parse($recurrence->end_recurring_date) : $startDate->copy()->addMonths(3);
+        $frequency = $recurrence->frequency;
+        $weekDays = $recurrence->week_days ? explode(',', $recurrence->week_days) : [];
+
+        $currentDate = $startDate->copy();
+
+        while ($currentDate->addDay()->lte($endDate)) {
+            $shouldCreate = false;
+
+            if ($frequency == 'daily') {
+                $shouldCreate = true;
+            } elseif ($frequency == 'weekly') {
+                if (in_array($currentDate->format('D'), $weekDays)) {
+                    $shouldCreate = true;
+                }
+            } elseif ($frequency == 'fortnightly') {
+                $diffInWeeks = $startDate->diffInWeeks($currentDate);
+                if ($diffInWeeks % 2 == 0 && in_array($currentDate->format('D'), $weekDays)) {
+                    $shouldCreate = true;
+                }
+            } elseif ($frequency == 'monthly') {
+                if ($currentDate->day == $startDate->day) {
+                    $shouldCreate = true;
+                }
+            }
+
+            if ($shouldCreate) {
+                // Check if a shift already exists for this carer/client on this date/time to avoid duplicates during re-generation
+                $exists = ScheduledShift::where('parent_shift_id', $parentShift->id)
+                    ->where('start_date', $currentDate->format('Y-m-d'))
+                    ->exists();
+
+                if (!$exists) {
+                    $newShift = $parentShift->replicate();
+                    $newShift->start_date = $currentDate->format('Y-m-d');
+                    $newShift->parent_shift_id = $parentShift->id;
+                    $newShift->is_recurring = 0; // Mark as instance
+                    $newShift->save();
+
+                    // Replicate documents
+                    foreach ($parentShift->documents as $doc) {
+                        $newDoc = $doc->replicate();
+                        $newDoc->shift_id = $newShift->id;
+                        $newDoc->save();
+                    }
+
+                    // Replicate assessments
+                    foreach ($parentShift->assessments as $ass) {
+                        $newAss = $ass->replicate();
+                        $newAss->shift_id = $newShift->id;
+                        $newAss->save();
+                    }
+                }
+            }
+        }
     }
 }

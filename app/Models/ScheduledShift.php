@@ -15,6 +15,16 @@ class ScheduledShift extends Model
 
     protected $guarded = [];
 
+    public function children()
+    {
+        return $this->hasMany(ScheduledShift::class, 'parent_shift_id');
+    }
+
+    public function parent()
+    {
+        return $this->belongsTo(ScheduledShift::class, 'parent_shift_id');
+    }
+
     public function client()
     {
         return $this->belongsTo(\App\ServiceUser::class, 'service_user_id');

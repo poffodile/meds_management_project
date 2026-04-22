@@ -445,64 +445,6 @@
         </div> -->
         <!-- Smart Suggestions -->
 
-        <!-- advancedFiltersBox -->
-
-        <!-- <div class="advancedFiltersBox m-b-15">
-            <button class="advBtn">
-                🔍 Advanced Filters ▼
-            </button>
-            <div class="filterPanel" style="display:none;">
-                <h4>QUICK PRESETS</h4>
-                <div class="quickPresets">
-                    <button class="preset activeDot">
-                        <span class="dot"></span> Active Only
-                    </button>
-                    <button class="preset">
-                        📅 This Week
-                    </button>
-                    <button class="preset yellow">
-                        ⚠ High Priority
-                    </button>
-                </div>
-
-
-                <div class="filter-row m-t-15">
-                    <select class="filter-item">
-                        <option>Status</option>
-                        <option>Active</option>
-                        <option>Draft</option>
-                        <option>Closed</option>
-                    </select>
-
-                    <select class="filter-item small">
-                        <option>is</option>
-                        <option>is not</option>
-                        <option>contains</option>
-                    </select>
-
-                    <input type="text" class="filter-input" placeholder="draft" />
-
-                    <button class="close-btn">×</button>
-                </div>
-
-                <hr>
-                <h4>ADD FILTER FIELD</h4>
-                <div class="searchBox">
-                    <span>🔍</span>
-                    <input type="text" placeholder="Search all fields...">
-                </div>
-
-                <div class="filterFields">
-                    <button class="fieldBtn">+ Status</button>
-                    <button class="fieldBtn">+ Shift Type</button>
-                    <button class="fieldBtn">+ Date</button>
-                    <button class="fieldBtn">+ Duration</button>
-                </div>
-
-            </div>
-        </div> -->
-        <!-- End of advancedFiltersBox -->
-
         <div class="calendarTabs">
             <div class="tabs">
                 <button class="tab active" data-tab="roster">
@@ -1220,9 +1162,9 @@
                                         <div class="item redalrttext">
                                             <i class='bx  bx-user'></i> <span>
                                                 @if($shift->staff_id)
-                                                    <a href="{{ url('/roster/carer-availability') }}?staff_id={{ $shift->staff_id }}" style="color:inherit;text-decoration:none;">{{ $shift->staff_name }}</a>
+                                                <a href="{{ url('/roster/carer-availability') }}?staff_id={{ $shift->staff_id }}" style="color:inherit;text-decoration:none;">{{ $shift->staff_name }}</a>
                                                 @else
-                                                    {{ $shift->staff_name ?? 'Unassigned' }}
+                                                {{ $shift->staff_name ?? 'Unassigned' }}
                                                 @endif
                                             </span>
                                         </div>
