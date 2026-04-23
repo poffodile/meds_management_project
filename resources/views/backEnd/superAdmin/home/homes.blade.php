@@ -119,32 +119,35 @@
         right: 0;
     }
 </style>
-<?php
-if ($company_package != '') {
-    if ($company_package->free_trial_done) {
-        $free_trail = 'disabled';
-    } else {
-        $free_trail = '';
-    }
-    $range          = $company_package->home_range;
-    $range          = explode('-', $range);
-    $range_end      = $range['1'];
-    if ($current_date < $company_package->expiry_date) {
-        if ($company_package->homes_added < $range_end && $company_package->status == '1') {
-            // echo "<pre>"; print_r($company_package->homes_added);
-            // echo "<pre>"; print_r($range_end); die;
-            $add_home_url   = 'add_home'; // Add Home allowed
+<?php 
+    /*if ($company_package != '') {
+        if ($company_package->free_trial_done) {
+            $free_trail = 'disabled';
         } else {
-            $add_home_url   = 'select_package'; // choose package
+            $free_trail = '';
+        }
+        $range          = $company_package->home_range;
+        $range          = explode('-', $range);
+        $range_end      = $range['1'];
+        if ($current_date < $company_package->expiry_date) {
+            if ($company_package->homes_added < $range_end && $company_package->status == '1') {
+                // echo "<pre>"; print_r($company_package->homes_added);
+                // echo "<pre>"; print_r($range_end); die;
+                $add_home_url   = 'add_home'; // Add Home allowed
+            } else {
+                $add_home_url   = 'select_package'; // choose package
+            }
+        } else {
+            $add_home_url = 'select_package'; // choose package
         }
     } else {
-        $add_home_url = 'select_package'; // choose package
-    }
-} else {
-    $free_trail     = '';
-    $disabled       = '';
-    $add_home_url   = 'select_package';
-}
+        $free_trail     = '';
+        $disabled       = '';
+        $add_home_url   = 'select_package';
+    }*/
+    $free_trail = '';
+    $disabled = '';
+    $add_home_url = 'add_home';
 ?>
 <!--main content start-->
 <section id="main-content">

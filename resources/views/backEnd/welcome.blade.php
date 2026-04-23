@@ -150,7 +150,13 @@
 </section>
 
 <!-- Chose Home Package  -->
-<?php   if(Session::get('scitsAdminSession')->access_type == 'O'){
+<?php
+    $selected_company_id = '';
+    $current_date = '';
+    $expiry_date_next_day = '';
+    $check_card_detail = '';
+
+    if(Session::get('scitsAdminSession')->access_type == 'O'){
 	    // $admin_dtl = Session::get('scitsAdminSession'); echo "<pre>"; print_r($admin_dtl); die;
 	    $selected_home_id       = Session::get('scitsAdminSession')->home_id; 
 	    $selected_company_id    = App\Home::where('id',$selected_home_id)->value('admin_id');
@@ -413,7 +419,7 @@
 @if(Session::get('scitsAdminSession')->access_type == 'O')
 <script type="text/javascript">
     $(document).ready(function(){
-        var current_date        = "{{ $current_date}}";
+        /*var current_date        = "{{ $current_date}}";
         var correct_expiry_date = "{{ $expiry_date_next_day}}";
         var check_card_detail   = "{{ $check_card_detail }}";
         // console.log(current_date);
@@ -432,9 +438,7 @@
                     $('#package_modal').modal('show');
                 }
             }
-        }
-        
-        
+        }*/
     });
 </script>
 @endif

@@ -28,7 +28,7 @@
     }
 </style>
 <?php 
-    if($company_package != ''){
+    /*if($company_package != ''){
 
         if($company_package->free_trial_done){
             $free_trail = 'disabled';
@@ -54,7 +54,10 @@
         $free_trail     = '';
         $disabled       = '';
         $add_home_url   = 'select_package';
-    }
+    }*/
+    $free_trail = '';
+    $disabled = '';
+    $add_home_url = 'add_home';
 ?>
 <!--main content start-->
 <section id="main-content">

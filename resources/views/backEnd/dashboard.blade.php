@@ -1093,7 +1093,7 @@ if (!empty($check_package_dtl)) {
 
 <script type="text/javascript">
     $(document).ready(function() {
-        var current_date = "{{ $current_date}}";
+        /*var current_date = "{{ $current_date}}";
         var correct_expiry_date = "{{ $expiry_date_next_day}}";
         var check_card_detail = "{{ $check_card_detail }}";
         // console.log(current_date);
@@ -1118,9 +1118,7 @@ if (!empty($check_package_dtl)) {
                     $('#package_modal').modal('show');
                 }
             }
-        }
-
-
+        }*/
     });
 </script>
 
