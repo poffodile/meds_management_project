@@ -241,25 +241,25 @@
                 </div> -->
                 <div class="col-md-12">
                     <section class="panel">
-                        <header class="panel-heading tab-bg-dark-navy-blue cus-panel-heading">
+                        <!-- <header class="panel-heading tab-bg-dark-navy-blue cus-panel-heading">
                             <ul class="nav nav-tabs ">
-                                <!-- <li class="active">
+                                <li class="active">
                                     <a data-toggle="tab" href="#overview"> Overview</a>
-                                </li> -->
+                                </li>
                                  <li  class="active">
                                     <a data-toggle="tab" href="#profile_settings">My Profile & Contact </a>
                                 </li>
                                 <li>
                                     <a data-toggle="tab" href="#manager_access_rights">Access Rights & Info</a>
                                 </li>
-                                <!-- <li>
+                                <li>
                                     <a data-toggle="tab" href="#my_profile_contacts" class="profile-contact-map"> Contacts</a>
-                                </li> -->
-                                <!-- <li>
+                                </li>
+                                <li>
                                     <a data-toggle="tab" href="#my_profile_info">Full Profile</a>
-                                </li>                                -->
+                                </li>                               
                             </ul>
-                        </header>
+                        </header> -->
                         <div class="panel-body">
                             <div class="tab-content tasi-tab">
                                 <!-- <div id="overview" class="tab-pane active">

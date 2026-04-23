@@ -56,7 +56,6 @@
     .personalprofile .proFilesocial a i {
         font-size: 3rem;
         margin: 1rem 0.4rem;
-        /* color: #858585; */
     }
 
     .personalprofile .proFilesocial a i.fa-facebook {
@@ -131,6 +130,26 @@
                                     <p><b>Current Location:</b> {{ $manager_profile->current_location }}</p>
                                 </div>
                             </div>
+
+
+                            <div id="my_profile_info" class="tab-pane">
+                                <div class="position-center">
+                                    <div class="prf-contacts sttng stf-details">
+
+                                        <h2 class="accordion-header">Personal Information</h2>
+                                        <div class="accordion-content full-info persnl-detail">
+                                            {!! $manager_profile->personal_info !!}
+                                        </div>
+
+                                        <h2 class="accordion-header">Banking Information</h2>
+                                        <div class="accordion-content full-info">
+                                            {!! $manager_profile->banking_info !!}
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
 
@@ -139,8 +158,6 @@
                         <div class="prf-contacts sttng">
                             <h2> Profile Info</h2>
                         </div>
-
-
 
                         <!-- <div class="form-group">
                             <label class="col-lg-2 control-label">Image</label>
@@ -154,7 +171,7 @@
                                 <input name="name" placeholder="" id="name" class="form-control" type="text" maxlength="255" value="{{ $manager_profile->name }}" required="">
                             </div>
 
-                            <label class="col-lg-2 control-label">Job Title</label>
+                            <label class="col-lg-2 control-label pe-0">Job Title</label>
                             <div class="col-md-4 col-sm-4 col-xs-12">
                                 <input name="job_title" placeholder="" id="name" class="form-control" type="text" maxlength="255" value="{{ $manager_profile->job_title }}" readonly="">
                             </div>
@@ -165,8 +182,8 @@
                                 <input name="payroll" placeholder="" id="name" class="form-control" type="text" maxlength="255" value="{{ $manager_profile->payroll }}" readonly="">
                             </div>
 
-                            <label class="col-lg-3 control-label">Holiday Entitlement</label>
-                            <div class="col-md-3 col-sm-3 col-xs-12">
+                            <label class="col-lg-2 control-label pe-0">Holiday Entitlement</label>
+                            <div class="col-md-4 col-sm-4 col-xs-12">
                                 <input name="holiday_entitlement" placeholder="" id="name" class="form-control" type="text" maxlength="255" value="{{ $manager_profile->holiday_entitlement }}" readonly="">
                             </div>
                         </div>
@@ -411,5 +428,23 @@
                 }
             }
             readURL(this);
+        });
+    </script>
+
+    <!-- Accordion js -->
+    <script>
+        $(document).ready(function() {
+            $('.stf-details .full-info').hide();
+            $('.stf-details .persnl-detail').show();
+            $('.stf-details .accordion-header').click(function() {
+                let content = $(this).next('.full-info');
+
+                $('.stf-details .full-info').hide();
+                if (content.length) {
+                    content.show();
+                } else {
+                    console.log('Next element not found'); // debug
+                }
+            });
         });
     </script>
