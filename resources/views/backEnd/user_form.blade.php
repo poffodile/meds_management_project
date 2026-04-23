@@ -33,11 +33,13 @@
     .input-group-addon.remove-addon {
         padding: 5px 0px 15px 0px;
     }
+    
+   
 </style>
 
-<!-- <link href="{{asset('public/backEnd/css/bootstrap-datetimepicker.min.css')}}" rel="stylesheet">
-<script src="{{asset('public/backEnd/js/jquery.js')}}"></script>
-<script src="{{asset('public/backEnd/js/bootstrap-datetimepicker.min.js')}}"></script> -->
+
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
 <?php
 if (isset($user_info)) {
@@ -181,17 +183,18 @@ if (isset($user_info)) {
                                             <input class="form-control date-format" type="text" value="{{ isset($user_info->date_of_leaving) ? date('d-m-Y', strtotime($user_info->date_of_leaving)) : '' }}" placeholder="DD-MM-YYYY" name="date_of_leaving" value="" maxlength="10" autocomplete="off"/>
                                         </div>
                                     </div> -->
+                                    
                                 <div class="form-group">
                                     <label class="col-lg-3 control-label">Date of Joining</label>
                                     <div class="col-lg-9">
-                                        <input class="form-control dpd1" type="text" value="{{ isset($user_info->date_of_joining) ? date('d-m-Y', strtotime($user_info->date_of_joining)) : '' }}" placeholder="DD-MM-YYYY" name="date_of_joining" value="" id="joining-date" maxlength="10" autocomplete="off" / {{ isset($del_status) ? $disabled : '' }}>
+                                        <input type="text" name="date_of_joining" class="form-control datepicker" placeholder="DD-MM-YYYY" value="{{ isset($user_info->date_of_joining) ? date('d-m-Y', strtotime($user_info->date_of_joining)) : '' }}" id="" maxlength="10" autocomplete="off" {{ isset($del_status) ? $disabled : '' }}>
                                     </div>
                                 </div>
 
                                 <div class="form-group check">
                                     <label class="col-lg-3 control-label">Date of Leaving</label>
                                     <div class="col-lg-9">
-                                        <input class="form-control dpd2" type="text" value="{{ isset($user_info->date_of_leaving) ? date('d-m-Y', strtotime($user_info->date_of_leaving)) : '' }}" placeholder="DD-MM-YYYY" name="date_of_leaving" value="" id="leaving-date" maxlength="10" autocomplete="off" class="custom-dtpikr" / {{ isset($del_status) ? $disabled : '' }}>
+                                        <input class="form-control datepicker" type="text" value="{{ isset($user_info->date_of_leaving) ? date('d-m-Y', strtotime($user_info->date_of_leaving)) : '' }}" placeholder="DD-MM-YYYY" name="date_of_leaving" id="" maxlength="10" autocomplete="off" class="custom-dtpikr" {{ isset($del_status) ? $disabled : '' }}>
                                     </div>
                                 </div>
 
@@ -293,200 +296,197 @@ if (isset($user_info)) {
                                     </div> -->
 
                                 {{-- @if (isset($user_info->certificates))
-                                                    <div class="form-group">
-                                                        <label class="col-lg-3 col-md-2 col-sm-2 col-xs-12 control-label ">Qualification Information</label>
-                                                        <div class="col-lg-9 col-md-10 col-sm-10 col-xs-12 qualification">
-                                                            <div class="add-admin-btn-are">
-                                                                <div class="input_fields">
-                                                                    @foreach ($user_info->certificates as $certi)
-                                                                        <div class="appended-whole-div" rel="{{ $certi->id }}">
-                                <div class="multi-upload">
-                                    <div>
-                                        <input type="text" class="form-control" value="{{ $certi->name }}" readonly="" / {{ isset($del_status) ? $disabled : '' }}>
-                                    </div>
-                                    <div class="input-group">
-                                        <a href="{{ userQualificationImgPath . '/' . $certi->image }}" class="image save-btn clr-blue" target="blank">View Image</a>
-                                        <span class="input-group-addon remove-addon">
-                                            <button type="button" class="e_remove_field btn btn-danger save-btn" {{ isset($del_status) ? $disabled : '' }}>Remove</button>
-                                        </span>
+                                <div class="form-group">
+                                    <label class="col-lg-3 col-md-2 col-sm-2 col-xs-12 control-label ">Qualification Information</label>
+                                    <div class="col-lg-9 col-md-10 col-sm-10 col-xs-12 qualification">
+                                        <div class="add-admin-btn-are">
+                                            <div class="input_fields">
+                                                @foreach ($user_info->certificates as $certi)
+                                                    <div class="appended-whole-div" rel="{{ $certi->id }}">
+                                                        <div class="multi-upload">
+                                                            <div>
+                                                                <input type="text" class="form-control" value="{{ $certi->name }}" readonly="" / {{ isset($del_status) ? $disabled : '' }}>
+                                                            </div>
+                                                            <div class="input-group">
+                                                                <a href="{{ userQualificationImgPath . '/' . $certi->image }}" class="image save-btn clr-blue" target="blank">View Image</a>
+                                                                <span class="input-group-addon remove-addon">
+                                                                    <button type="button" class="e_remove_field btn btn-danger save-btn" {{ isset($del_status) ? $disabled : '' }}>Remove</button>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                        <div class="input_fields_wrap">
+                                        </div>
+                                        <div>
+                                            <button class="add_field_button btn btn-primary" {{ isset($del_status) ? $disabled : '' }}>Add More Fields <i class="fa fa-plus"></i></button>
+                                        </div>
                                     </div>
                                 </div>
+                                @else
+                                <div class="form-group">
+                                    <label class="col-lg-3 col-md-2 col-sm-2 col-xs-12 control-label ">Qualification Information
+                                    </label>
+                                    <div class="col-lg-9 col-md-10 col-sm-10 col-xs-12 qualification">
+                                        <div class="input_fields_wrap">
+                                            <!-- <div><button class="add_field_button btn btn-primary">Add More Fields</button></div> -->
+                                            <div><input type="text" name="qualification[]" class="form-control" /></div>
+                                            <div><input type="file" name="qualifiaction_cert[]" class="qual_upload" /></div>
+                                        </div>
+                                        <div class="add_field_button-area add-admin-btn-area">
+                                            <button class="add_field_button btn btn-primary save-btn">Add More Fields</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                @endif --}}
+
+                                <div class="form-group">
+                                    <label class="col-lg-3 col-md-2 col-sm-2 col-xs-12 control-label">
+                                        Qualification Information
+                                    </label>
+
+                                    <div class="col-lg-9 col-md-10 col-sm-10 col-xs-12 qualification">
+
+                                        @foreach ($courses as $course)
+                                        @php
+                                        // Always define variable (important)
+                                        $existing = null;
+
+                                        if (isset($user_info) && $user_info->certificates) {
+                                        $existing = $user_info->certificates->where('course_id', $course['course_id'])->first();
+                                        }
+                                        @endphp
+
+                                        <div class="row mb-10">
+                                            {{-- Course checkbox --}}
+                                            <div class="col-md-4">
+                                                <label class="col-lg-12 control-label">
+                                                    <input type="checkbox"
+                                                        name="qualifications[{{ $course['course_id'] }}][course_id]"
+                                                        value="{{ $course['course_id'] }}"
+                                                        {{ $existing ? 'checked' : '' }}>
+
+                                                    {{ $course['title'] }}
+                                                </label>
+
+                                                {{-- Hidden course name --}}
+                                                <input type="hidden" name="qualifications[{{ $course['course_id'] }}][name]" value="{{ $course['title'] }}">
+                                            </div>
+
+                                            {{-- Certificate upload --}}
+                                            <div class="col-md-4">
+                                                <input type="file" name="qualifications[{{ $course['course_id'] }}][cert]"
+                                                    class="form-control">
+                                            </div>
+
+                                            {{-- View existing certificate --}}
+                                            <div class="col-md-4">
+                                                @if ($existing && $existing->image)
+                                                <a href="{{ url(userQualificationImgPath . '/' . $existing->image) }}"
+                                                    target="_blank"
+                                                    class="btn btn-info">
+                                                    View Certificate
+                                                </a>
+                                                @endif
+                                            </div>
+                                        </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group">
+                                    <label class="col-lg-3 control-label">Emergency Contact</label>
+                                    <div class="col-lg-3">
+                                        <input type="text" name="emergency_contact[name]" class="form-control" placeholder="Name" value="{{ isset($user_info->emergencyContact->name) ? $user_info->emergencyContact->name : '' }}" maxlength="60" {{ isset($del_status) ? $disabled : '' }}>
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <input type="text" name="emergency_contact[phone_no]" class="form-control" placeholder="Phone Number" value="{{ isset($user_info->emergencyContact->phone_no) ? $user_info->emergencyContact->phone_no : '' }}" maxlength="60" {{ isset($del_status) ? $disabled : '' }}>
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <input type="text" name="emergency_contact[relationship]" class="form-control" placeholder="Relation" value="{{ isset($user_info->emergencyContact->relationship) ? $user_info->emergencyContact->relationship : '' }}" maxlength="60" {{ isset($del_status) ? $disabled : '' }}>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-lg-3 control-label">DBS Certificate Number</label>
+                                    <div class="col-lg-9">
+                                        <input type="text" name="dbs_certificate_number" class="form-control" placeholder="DBS Certificate Number" value="{{ isset($user_info->dbs_certificate_number) ? $user_info->dbs_certificate_number : '' }}" maxlength="60" {{ isset($del_status) ? $disabled : '' }}>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-lg-3 control-label">DBS Expiry Date</label>
+                                    <div class="col-lg-9">
+                                        <!-- <input type="text" name="dbs_expiry_date" class="form-control datepicker" placeholder="DBS Expiry Date" value="{{ isset($user_info->dbs_expiry_date) ? $user_info->dbs_expiry_date : '' }}" maxlength="60" {{ isset($del_status) ? $disabled : '' }}> -->
+                                        <input type="text"
+                                            name="dbs_expiry_date"
+                                            class="form-control datepicker"
+                                            placeholder="DBS Expiry Date"
+                                            value="{{ isset($user_info->dbs_expiry_date) ? \Carbon\Carbon::parse($user_info->dbs_expiry_date)->format('Y-m-d') : '' }}"
+                                            maxlength="60"
+                                            {{ isset($del_status) ? $disabled : '' }}>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-lg-3 control-label"></label>
+                                    <div class="col-lg-9">
+                                        <div class="checkbox">
+                                            <?php
+                                            $is_right_assigned = '';
+                                            if (isset($user_info->access_level) && isset($user_info->access_rights)) {
+                                                foreach ($access_levels as $access_level) {
+                                                    if ($access_level['id'] == $user_info->access_level) {
+                                                        if ($access_level['access_rights'] == $user_info->access_rights) {
+                                                            $is_right_assigned = 'checked';
+                                                        }
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                            ?>
+                                            <label class="assign-access"><input type="checkbox" value="yes" name="assign_right_check" {{ $is_right_assigned }} {{ isset($del_status) ? $disabled : '' }}>Assign access rights according to the access level
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-actions">
+                                    <div class="row">
+                                        <div class="col-lg-offset-3 col-lg-10">
+                                            <div class="add-admin-btn-area">
+                                                <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                                <input type="hidden" name="user_id" value="{{ isset($user_info->id) ? $user_info->id : '' }}">
+                                                <button type="submit" class="btn btn-primary save-btn" name="submit1" {{ isset($del_status) ? $disabled : '' }}>Save</button>
+                                                @if (isset($del_status))
+                                                @if ($del_status == '1')
+                                                <a href="{{ url('admin/users/' . '?user=archive') }}">
+                                                    <button type="button" class="btn btn-default" name="cancel">Cancel</button>
+                                                </a>
+                                                @else
+                                                <a href="{{ url('admin/users') }}">
+                                                    <button type="button" class="btn btn-default" name="cancel">Cancel</button>
+                                                </a>
+                                                @endif
+                                                @else
+                                                <a href="{{ url('admin/users') }}">
+                                                    <button type="button" class="btn btn-default" name="cancel">Cancel</button>
+                                                </a>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
                         </div>
-                        @endforeach
                     </div>
+                </section>
             </div>
-            <div class="input_fields_wrap">
-            </div>
-            <div>
-                <button class="add_field_button btn btn-primary" {{ isset($del_status) ? $disabled : '' }}>Add More Fields <i class="fa fa-plus"></i></button>
-            </div>
-        </div>
-        </div>
-        @else
-        <div class="form-group">
-            <label class="col-lg-3 col-md-2 col-sm-2 col-xs-12 control-label ">Qualification Information
-            </label>
-            <div class="col-lg-9 col-md-10 col-sm-10 col-xs-12 qualification">
-                <div class="input_fields_wrap">
-                    <!-- <div><button class="add_field_button btn btn-primary">Add More Fields</button></div> -->
-                    <div><input type="text" name="qualification[]" class="form-control" /></div>
-                    <div><input type="file" name="qualifiaction_cert[]" class="qual_upload" /></div>
-                </div>
-                <div class="add_field_button-area add-admin-btn-area">
-                    <button class="add_field_button btn btn-primary save-btn">Add More Fields</button>
-                </div>
-            </div>
-        </div>
-        @endif --}}
-
-        <div class="form-group">
-            <label class="col-lg-3 col-md-2 col-sm-2 col-xs-12 control-label">
-                Qualification Information
-            </label>
-
-            <div class="col-lg-9 col-md-10 col-sm-10 col-xs-12 qualification">
-
-                @foreach ($courses as $course)
-                @php
-                // Always define variable (important)
-                $existing = null;
-
-                if (isset($user_info) && $user_info->certificates) {
-                $existing = $user_info->certificates->where('course_id', $course['course_id'])->first();
-                }
-                @endphp
-
-                <div class="row mb-10">
-                    {{-- Course checkbox --}}
-                    <div class="col-md-4">
-                        <label class="col-lg-12 control-label">
-                            <input type="checkbox"
-                                name="qualifications[{{ $course['course_id'] }}][course_id]"
-                                value="{{ $course['course_id'] }}"
-                                {{ $existing ? 'checked' : '' }}>
-
-                            {{ $course['title'] }}
-                        </label>
-
-                        {{-- Hidden course name --}}
-                        <input type="hidden"
-                            name="qualifications[{{ $course['course_id'] }}][name]"
-                            value="{{ $course['title'] }}">
-                    </div>
-
-                    {{-- Certificate upload --}}
-                    <div class="col-md-4">
-                        <input type="file"
-                            name="qualifications[{{ $course['course_id'] }}][cert]"
-                            class="form-control">
-                    </div>
-
-                    {{-- View existing certificate --}}
-                    <div class="col-md-4">
-                        @if ($existing && $existing->image)
-                        <a href="{{ url(userQualificationImgPath . '/' . $existing->image) }}"
-                            target="_blank"
-                            class="btn btn-info">
-                            View Certificate
-                        </a>
-                        @endif
-                    </div>
-                </div>
-                @endforeach
-            </div>
-        </div>
-
-
-        <div class="form-group">
-            <label class="col-lg-3 control-label">Emergency Contact</label>
-            <div class="col-lg-3">
-                <input type="text" name="emergency_contact[name]" class="form-control" placeholder="Name" value="{{ isset($user_info->emergencyContact->name) ? $user_info->emergencyContact->name : '' }}" maxlength="60" {{ isset($del_status) ? $disabled : '' }}>
-            </div>
-            <div class="col-lg-3">
-                <input type="text" name="emergency_contact[phone_no]" class="form-control" placeholder="Phone Number" value="{{ isset($user_info->emergencyContact->phone_no) ? $user_info->emergencyContact->phone_no : '' }}" maxlength="60" {{ isset($del_status) ? $disabled : '' }}>
-            </div>
-            <div class="col-lg-3">
-                <input type="text" name="emergency_contact[relationship]" class="form-control" placeholder="Relation" value="{{ isset($user_info->emergencyContact->relationship) ? $user_info->emergencyContact->relationship : '' }}" maxlength="60" {{ isset($del_status) ? $disabled : '' }}>
-            </div>
-        </div>
-
-        <div class="form-group">
-            <label class="col-lg-3 control-label">DBS Certificate Number</label>
-            <div class="col-lg-9">
-                <input type="text" name="dbs_certificate_number" class="form-control" placeholder="DBS Certificate Number" value="{{ isset($user_info->dbs_certificate_number) ? $user_info->dbs_certificate_number : '' }}" maxlength="60" {{ isset($del_status) ? $disabled : '' }}>
-            </div>
-        </div>
-
-        <div class="form-group">
-            <label class="col-lg-3 control-label">DBS Expiry Date</label>
-            <div class="col-lg-9">
-                <!-- <input type="text" name="dbs_expiry_date" class="form-control datepicker" placeholder="DBS Expiry Date" value="{{ isset($user_info->dbs_expiry_date) ? $user_info->dbs_expiry_date : '' }}" maxlength="60" {{ isset($del_status) ? $disabled : '' }}> -->
-                <input type="text"
-                    name="dbs_expiry_date"
-                    class="form-control datepicker"
-                    placeholder="DBS Expiry Date"
-                    value="{{ isset($user_info->dbs_expiry_date) ? \Carbon\Carbon::parse($user_info->dbs_expiry_date)->format('Y-m-d') : '' }}"
-                    maxlength="60"
-                    {{ isset($del_status) ? $disabled : '' }}>
-            </div>
-        </div>
-
-        <div class="form-group">
-            <label class="col-lg-3 control-label"></label>
-            <div class="col-lg-9">
-                <div class="checkbox">
-                    <?php
-                    $is_right_assigned = '';
-                    if (isset($user_info->access_level) && isset($user_info->access_rights)) {
-                        foreach ($access_levels as $access_level) {
-                            if ($access_level['id'] == $user_info->access_level) {
-                                if ($access_level['access_rights'] == $user_info->access_rights) {
-                                    $is_right_assigned = 'checked';
-                                }
-                                break;
-                            }
-                        }
-                    }
-                    ?>
-                    <label class="assign-access"><input type="checkbox" value="yes" name="assign_right_check" {{ $is_right_assigned }} {{ isset($del_status) ? $disabled : '' }}>Assign access rights according to the access level
-                    </label>
-                </div>
-            </div>
-        </div>
-
-        <div class="form-actions">
-            <div class="row">
-                <div class="col-lg-offset-3 col-lg-10">
-                    <div class="add-admin-btn-area">
-                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                        <input type="hidden" name="user_id" value="{{ isset($user_info->id) ? $user_info->id : '' }}">
-                        <button type="submit" class="btn btn-primary save-btn" name="submit1" {{ isset($del_status) ? $disabled : '' }}>Save</button>
-                        @if (isset($del_status))
-                        @if ($del_status == '1')
-                        <a href="{{ url('admin/users/' . '?user=archive') }}">
-                            <button type="button" class="btn btn-default" name="cancel">Cancel</button>
-                        </a>
-                        @else
-                        <a href="{{ url('admin/users') }}">
-                            <button type="button" class="btn btn-default" name="cancel">Cancel</button>
-                        </a>
-                        @endif
-                        @else
-                        <a href="{{ url('admin/users') }}">
-                            <button type="button" class="btn btn-default" name="cancel">Cancel</button>
-                        </a>
-                        @endif
-                    </div>
-                </div>
-            </div>
-        </div>
-        </form>
-        </div>
         </div>
     </section>
-    </div>
-    </div>
-</section>
 </section>
 
 <script>
@@ -541,6 +541,9 @@ if (isset($user_info)) {
             todayHighlight: true
         });
     });
+
+    
+    
 </script>
 
 <script>
@@ -692,7 +695,7 @@ if (isset($user_info)) {
             }
 
             $.ajax({
-                url: "{{ url('/admin/users/get-hourly-rate') }}",
+                url: "{{ url('/roster/carer/get-hourly-rate') }}",
                 type: "POST",
                 data: {
                     access_level_id: accessLevelId,

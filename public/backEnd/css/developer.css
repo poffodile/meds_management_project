@@ -612,13 +612,13 @@ display: none;
 
 /*date time picker selected date color*/
 .day.active{
-  background : #41cac0 none repeat scroll 0 0 !important;
+  background : #2563eb none repeat scroll 0 0 !important;
 }
 .clr-them-green{
-  color : #1fb5ad;  
+  color : #2563eb;  
 }
 .clr-them-green:hover{
-  color : #1fb5ad;  
+  color : #2563eb;  
 }
 
 
@@ -708,7 +708,7 @@ display: none;
 }
 .bmp-rmp-btns a.active
 {
-  background-color: #57C8F1;
+  background-color: #2563eb;
 }
 .input-group.bmp-rmp-input
 {
@@ -1309,3 +1309,33 @@ mdl-edit-btn{
 .lightRed{
     background: #f38d8d;
 }
+
+/* **********************Start Arjun Css ************************ */
+
+.datepicker thead tr th.prev, .datepicker thead tr th.next {
+    background: transparent;
+    margin: 0 8px;
+    position: relative;
+}
+.datepicker thead tr th.prev::before, .datepicker thead tr th.next::before{
+    position: absolute;
+    font-family: "fontawesome";
+    left: 0;
+    top: 6px;
+    right: 0;
+    font-size: 13px; 
+    color: #000;
+    font-weight: 400;
+}
+.datepicker thead tr th.prev::before{
+    content: "\f060";
+}
+.datepicker thead tr th.next::before{
+    content: "\f061";
+}
+.datepicker td span {
+    width: 54px;
+    height: 54px;
+}
+.datepicker td, .datepicker th {
+    font-size: 14px;}
