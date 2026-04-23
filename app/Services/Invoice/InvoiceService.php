@@ -88,10 +88,31 @@ class InvoiceService
         }
 
         // 1. Calculate base amount
-        $baseAmount = $billingRate;
+        $baseAmount = 0;
+        $totalHours = 0;
 
-        // 2. Calculate Service Charges from onboarding_details (Skip - requested to remove)
-        $totalServiceCharges = 0;
+        if ($timesheets && $timesheets->count() > 0) {
+            foreach ($timesheets as $ts) {
+                if ($ts->clock_in && $ts->clock_out) {
+                    $s = Carbon::parse($ts->clock_in);
+                    $e = Carbon::parse($ts->clock_out);
+                    if ($e->lessThan($s)) $e->addDay();
+                    
+                    $hours = $s->diffInMinutes($e) / 60;
+                    $totalHours += $hours;
+
+                    $rate = 0;
+                    if ($ts->shift && $ts->shift->hourly_rate > 0) {
+                        $rate = $ts->shift->hourly_rate;
+                    } else {
+                        $rate = $billingRate;
+                    }
+                    $baseAmount += ($hours * $rate);
+                }
+            }
+        } else {
+            $baseAmount = $billingRate;
+        }
 
         // 3. Fetch Unbilled Expenses for the client
         $expenses = \App\Models\ServiceUserManagement\ServiceUserExpense::where('service_user_id', $clientId)
@@ -133,18 +154,7 @@ class InvoiceService
 
         // 5. Create Line Item for Base Care Services
         $periodStr = $start->format('d M') . ' to ' . $end->format('d M Y');
-        $totalHours = 0;
-        if ($timesheets) {
-            foreach ($timesheets as $ts) {
-                if ($ts->clock_in && $ts->clock_out) {
-                    $s = Carbon::parse($ts->clock_in);
-                    $e = Carbon::parse($ts->clock_out);
-                    if ($e->lessThan($s)) $e->addDay();
-                    $totalHours += $s->diffInMinutes($e) / 60;
-                }
-            }
-        }
-
+        
         \App\Models\Invoice\InvoiceProduct::create([
             'home_id' => $home_id,
             'invoice_id' => $invoice->id,

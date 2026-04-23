@@ -9,7 +9,7 @@ class ShiftCategory extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['home_id', 'name', 'color', 'status', 'is_deleted'];
+    protected $fillable = ['home_id', 'name', 'color', 'start_time', 'end_time', 'rate', 'status', 'is_deleted'];
 
     public static function getAllCategories($home_id)
     {

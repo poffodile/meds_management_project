@@ -9,7 +9,7 @@ if (!defined('adminImgPath'))define('adminImgPath', 'public/images/admin');
 if (!defined('ServiceUserFilePath'))define('ServiceUserFilePath', 'public/images/serviceUserFiles');
 if (!defined('pettyCashReceiptPath'))define('pettyCashReceiptPath', '/public/images/pettyCash');
 if (!defined('MoodImgPath'))define('MoodImgPath', '/public/images/mood');
-if (!defined('userQualificationImgPath'))define('userQualificationImgPath', '/public/images/userQualification');
+if (!defined('userQualificationImgPath'))define('userQualificationImgPath', 'public/images/userQualification');
 if (!defined('PoliciesFilePath'))define('PoliciesFilePath', 'public/images/policies');
 if (!defined('contactsPath'))define('contactsPath','/public/images/contacts');
 if (!defined('pemFilePath'))define('pemFilePath','/home/mercury/public_html/scits/public/notify.pem');

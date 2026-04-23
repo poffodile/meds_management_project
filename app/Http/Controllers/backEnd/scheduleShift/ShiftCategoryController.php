@@ -6,8 +6,7 @@ use App\Models\ShiftCategory;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreShiftCategoryRequest;
-use App\Http\Requests\UpdateShiftCategoryRequest;
+
 
 class ShiftCategoryController extends Controller
 {
@@ -40,7 +39,10 @@ class ShiftCategoryController extends Controller
         $data['page'] = 'shift_category';
         $request->validate([
             'name' => 'required|max:255',
-            'color' => 'nullable|max:10'
+            'color' => 'nullable|max:10',
+            'start_time' => 'nullable',
+            'end_time' => 'nullable',
+            'rate' => 'nullable|numeric'
         ]);
 
         try {
@@ -48,6 +50,9 @@ class ShiftCategoryController extends Controller
                 'home_id' => $this->home_id,
                 'name'    => $request->name,
                 'color'   => $request->color,
+                'start_time' => $request->start_time,
+                'end_time'   => $request->end_time,
+                'rate'       => $request->rate,
                 'status'  => 1,
                 'is_deleted' => 0
             ]);
@@ -79,7 +84,10 @@ class ShiftCategoryController extends Controller
         try {
             $request->validate([
                 'name' => 'required|max:255',
-                'color' => 'nullable|max:10'
+                'color' => 'nullable|max:10',
+                'start_time' => 'nullable',
+                'end_time' => 'nullable',
+                'rate' => 'nullable|numeric'
             ]);
 
             $category = ShiftCategory::findOrFail($id);
@@ -87,6 +95,9 @@ class ShiftCategoryController extends Controller
             $category->update([
                 'name'   => $request->name,
                 'color'  => $request->color,
+                'start_time' => $request->start_time,
+                'end_time'   => $request->end_time,
+                'rate'       => $request->rate,
                 'status' => $request->status,
             ]);
 

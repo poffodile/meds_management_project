@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Auth;
 use App\Home, App\Admin, App\StaffSickLeave;
 use App\Models\PersonalManagement\TimeSheet;
 use Illuminate\Support\Facades\Log;
-use Carbon\Carbon;
 use App\Models\ScheduledShift;
 use App\Models\ClientCareScheduleDate;
 use App\Models\ClientCareScheduleDay;
@@ -79,14 +78,6 @@ class User extends Authenticatable
         return User::byHome()->active()->notDeleted()->selectBasic()->get();
     }
 
-
-
-    // protected static function booted()
-    // {
-    //     static::addGlobalScope('active', function ($query) {
-    //         $query->where('user.status', 1);
-    //     });
-    // }
 
     public function access_level()
     {
@@ -356,11 +347,10 @@ class User extends Authenticatable
 
         if (!empty($staff_member->admn_id)) {
 
-            $company_manager = CompanyManagers::where('company_id', $staff_member->admn_id)->first();
-            $manager_name    = $company_manager->name;
-            $email           = $company_manager->email;
-            // $email = $company_manager->email;
+            $company_manager = \App\CompanyManagers::where('company_id', $staff_member->admn_id)->first();
             if (!empty($company_manager)) {
+                $manager_name    = $company_manager->name;
+                $email           = $company_manager->email;
                 $company_name = PROJECT_NAME;
                 if (!filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
                     Mail::send('emails.email_to_manager', ['manager_name' => $manager_name, 'user_email' => $user_email, 'user_name' => $user_name], function ($message) use ($email, $company_name) {

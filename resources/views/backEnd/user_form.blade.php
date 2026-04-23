@@ -35,9 +35,9 @@
     }
 </style>
 
-
-<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<!-- <link href="{{asset('public/backEnd/css/bootstrap-datetimepicker.min.css')}}" rel="stylesheet">
+<script src="{{asset('public/backEnd/js/jquery.js')}}"></script>
+<script src="{{asset('public/backEnd/js/bootstrap-datetimepicker.min.js')}}"></script> -->
 
 <?php
 if (isset($user_info)) {

@@ -32,6 +32,8 @@
                                         <th>Date</th>
                                         <th>Name</th>
                                         <th>Color</th>
+                                        <th>Time Range</th>
+                                        <th>Rate (£)</th>
                                         <th>Status</th>
                                         <th width="20%">Actions</th>
                                     </tr>
@@ -49,6 +51,14 @@
                                                 -
                                                 @endif
                                             </td>
+                                            <td>
+                                                @if($category->start_time && $category->end_time)
+                                                    {{ date('H:i', strtotime($category->start_time)) }} - {{ date('H:i', strtotime($category->end_time)) }}
+                                                @else
+                                                    -
+                                                @endif
+                                            </td>
+                                            <td>{{ $category->rate ? '£' . number_format($category->rate, 2) : '-' }}</td>
                                             <td>
                                                 @if($category->status == 1)
                                                     Active

@@ -56,11 +56,13 @@ class PayrollFinanceController extends Controller
 
             // Rate logic (standardized)
             $categoryName = ($t->category->name ?? $t->shift->shiftCategory->name ?? 'general');
-            $rate = 0;
             $normalizedCategory = strtolower(trim($categoryName));
+            $rate = 0;
 
-            if ($t->staff) {
-                if ($normalizedCategory == 'General' || empty($normalizedCategory) || $normalizedCategory == 'general') {
+            if ($t->shift && $t->shift->hourly_rate > 0) {
+                $rate = $t->shift->hourly_rate;
+            } elseif ($t->staff) {
+                if ($normalizedCategory == 'general' || empty($normalizedCategory)) {
                     $rate = $t->staff->hourly_rate ?? 0;
                 } else {
                     $payRateType = PayRateType::where('type_name', $categoryName)
@@ -150,8 +152,10 @@ class PayrollFinanceController extends Controller
                 $rate = 0;
                 $normalizedCategory = strtolower(trim($categoryName));
 
-                if ($t->staff) {
-                    if ($normalizedCategory == 'General' || empty($normalizedCategory)) {
+                if ($t->shift && $t->shift->hourly_rate > 0) {
+                    $rate = $t->shift->hourly_rate;
+                } elseif ($t->staff) {
+                    if ($normalizedCategory == 'general' || empty($normalizedCategory)) {
                         $rate = $t->staff->hourly_rate ?? 0;
                     } else {
                         // Try to match the category name with pay_rate_types
@@ -701,7 +705,14 @@ class PayrollFinanceController extends Controller
                 $end = \Carbon\Carbon::parse($date . ' ' . $t->clock_out);
                 if ($end->lessThan($start)) $end->addDay();
                 $t->duration_hours = $start->diffInMinutes($end) / 60;
-                $t->gross_pay = $t->duration_hours * ($t->staff->hourly_rate ?? 0);
+                
+                $rate = 0;
+                if ($t->shift && $t->shift->hourly_rate > 0) {
+                    $rate = $t->shift->hourly_rate;
+                } else {
+                    $rate = $t->staff->hourly_rate ?? 0;
+                }
+                $t->gross_pay = $t->duration_hours * $rate;
                 return $t;
             });
 
@@ -756,8 +767,13 @@ class PayrollFinanceController extends Controller
 
                 $t->duration_hours = $start->diffInMinutes($end) / 60;
 
-                // Simplified rate lookup (we already have gross calculated in most cases or can calc here)
-                $rate = $t->staff->hourly_rate ?? 0;
+                // Rate logic
+                $rate = 0;
+                if ($t->shift && $t->shift->hourly_rate > 0) {
+                    $rate = $t->shift->hourly_rate;
+                } else {
+                    $rate = $t->staff->hourly_rate ?? 0;
+                }
                 $t->gross_pay = $t->duration_hours * $rate;
                 return $t;
             });
@@ -808,7 +824,14 @@ class PayrollFinanceController extends Controller
                 $end = \Carbon\Carbon::parse($date . ' ' . $t->clock_out);
                 if ($end->lessThan($start)) $end->addDay();
                 $t->duration_hours = $start->diffInMinutes($end) / 60;
-                $t->gross_pay = $t->duration_hours * ($t->staff->hourly_rate ?? 0);
+                
+                $rate = 0;
+                if ($t->shift && $t->shift->hourly_rate > 0) {
+                    $rate = $t->shift->hourly_rate;
+                } else {
+                    $rate = $t->staff->hourly_rate ?? 0;
+                }
+                $t->gross_pay = $t->duration_hours * $rate;
                 return $t;
             });
 
@@ -853,7 +876,14 @@ class PayrollFinanceController extends Controller
                 $end = \Carbon\Carbon::parse($date . ' ' . $t->clock_out);
                 if ($end->lessThan($start)) $end->addDay();
                 $t->duration_hours = $start->diffInMinutes($end) / 60;
-                $t->gross_pay = $t->duration_hours * ($t->staff->hourly_rate ?? 0);
+                
+                $rate = 0;
+                if ($t->shift && $t->shift->hourly_rate > 0) {
+                    $rate = $t->shift->hourly_rate;
+                } else {
+                    $rate = $t->staff->hourly_rate ?? 0;
+                }
+                $t->gross_pay = $t->duration_hours * $rate;
                 return $t;
             });
 

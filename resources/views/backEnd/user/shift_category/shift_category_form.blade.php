@@ -69,6 +69,31 @@
                                     </div>
 
                                     <div class="form-group">
+                                        <label class="col-lg-2 control-label">Start Time</label>
+                                        <div class="col-lg-10">
+                                            <input type="time" name="start_time" class="form-control"
+                                                value="{{ isset($category->start_time) ? date('H:i', strtotime($category->start_time)) : old('start_time') }}">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-lg-2 control-label">End Time</label>
+                                        <div class="col-lg-10">
+                                            <input type="time" name="end_time" class="form-control"
+                                                value="{{ isset($category->end_time) ? date('H:i', strtotime($category->end_time)) : old('end_time') }}">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-lg-2 control-label">Rate (£)</label>
+                                        <div class="col-lg-10">
+                                            <input type="number" step="0.01" name="rate" class="form-control"
+                                                placeholder="e.g. 15.50"
+                                                value="{{ $category->rate ?? old('rate') }}">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
                                         <label class="col-lg-2 control-label">Status</label>
                                         <div class="col-lg-10">
                                            <select name="status" class="form-control">

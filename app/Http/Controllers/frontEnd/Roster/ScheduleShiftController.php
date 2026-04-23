@@ -135,6 +135,7 @@ class ScheduleShiftController extends Controller
                 'shift_category_id' => $request->shift_category,
                 'tasks'             => $request->tasks,
                 'notes'             => $request->notes,
+                'hourly_rate'       => $request->hourly_rate,
                 'is_recurring'      => $request->has('is_recurring') ? 1 : 0,
             ]);
 
@@ -301,6 +302,7 @@ class ScheduleShiftController extends Controller
                 'shift_category_id' => $request->shift_category,
                 'tasks'             => $request->tasks,
                 'notes'             => $request->notes,
+                'hourly_rate'       => $request->hourly_rate,
                 'is_recurring'      => $request->has('is_recurring') ? 1 : 0,
             ]);
 
@@ -411,7 +413,7 @@ class ScheduleShiftController extends Controller
             ->where('is_deleted', 0)
             ->get();
 
-        $shifts = ScheduledShift::with(['recurrence', 'documents', 'assessments'])->where('home_id', $home_id)
+        $shifts = ScheduledShift::with(['recurrence', 'documents', 'assessments', 'client'])->where('home_id', $home_id)
             ->whereBetween('start_date', [
                 $startOfWeek->format('Y-m-d'),
                 $endOfWeek->format('Y-m-d')
@@ -446,6 +448,8 @@ class ScheduleShiftController extends Controller
                     'recurrence'       => $shift->recurrence,
                     'documents'        => $shift->documents,
                     'assessments'      => $shift->assessments,
+                    'hourly_rate'      => $shift->hourly_rate,
+                    'client_name'      => $shift->client ? $shift->client->name : 'Unknown',
                 ];
             });
 
@@ -544,7 +548,7 @@ class ScheduleShiftController extends Controller
     public function getMonthlyShifts(Request $request)
     {
 
-        $shifts = ScheduledShift::with(['recurrence', 'staff', 'documents', 'assessments'])->where('home_id', Auth::user()->home_id)
+        $shifts = ScheduledShift::with(['recurrence', 'staff', 'client', 'documents', 'assessments'])->where('home_id', Auth::user()->home_id)
             ->whereBetween('start_date', [$request->start, $request->end])
             ->get();
 
@@ -581,7 +585,7 @@ class ScheduleShiftController extends Controller
             $endTime = \Carbon\Carbon::parse($shift->end_time);
 
             $events[] = [
-                'title' => date('H:i', strtotime($shift->start_time)),
+                'title' => date('H:i', strtotime($shift->start_time)) . ' ' . ($shift->client ? $shift->client->name : ''),
                 'start' => $shift->start_date,
                 'backgroundColor' => $color,
                 'borderColor' => $color,
@@ -607,6 +611,7 @@ class ScheduleShiftController extends Controller
                 'recurrence' => $shift->recurrence,
                 'documents' => $shift->documents,
                 'assessments' => $shift->assessments,
+                'hourly_rate' => $shift->hourly_rate,
             ];
         }
 

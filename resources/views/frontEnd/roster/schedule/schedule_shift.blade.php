@@ -482,7 +482,7 @@
 
             <!-- ********************************** -->
 
-            <div class="schedulingIssues">
+            <!-- <div class="schedulingIssues">
                 <div class="accordion" id="accordionExample">
                     <div class="item">
                         <div class="item-header" id="headingFour">
@@ -691,7 +691,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> -->
 
             <!-- TAB CONTENT -->
             <div class="tab-content">
@@ -1150,7 +1150,7 @@
                                     <div class="sectionCarer">
                                         <div class="tags">
                                             <span class="yellow">{{ $shift->status ?? 'unfilled' }}</span>
-                                            <span class="inactive">{{ ucfirst($shift->shift_type) }}</span>
+                                            <span class="inactive">{{ $shift->client->name ?? 'Unknown' }}</span>
                                             <!-- <span class="inactive">residential care</span> -->
                                         </div>
                                     </div>
@@ -1187,7 +1187,8 @@
                                             data-assignment="{{ $shift->assignment ?? '' }}"
                                             data-homearea="{{ $shift->home_area_id ?? '' }}"
                                             data-notes="{{ $shift->notes ?? '' }}"
-                                            data-tasks="{{ $shift->tasks ?? '' }}">
+                                            data-tasks="{{ $shift->tasks ?? '' }}"
+                                            data-hourly-rate="{{ $shift->hourly_rate ?? '' }}">
                                             <i class='bx bx-edit'></i> Edit
                                         </button>
                                         <button class="borderBtn delete" data-id="{{ $shift->id }}"> <i class='bx  bx-trash'></i></button>
@@ -1354,7 +1355,7 @@
                                             </div>
                                         </div>
                                         <div class="row">
-                                            <div class="col-md-12  m-t-10">
+                                            <!-- <div class="col-md-12  m-t-10">
                                                 <label>Shift Type</label>
                                                 <select class="form-control" name="shift_type">
                                                     <option value="morning">Morning</option>
@@ -1367,15 +1368,26 @@
                                                     <option value="sleep_in">Sleep In</option>
                                                     <option value="waking_night">Waking Night</option>
                                                 </select>
-                                            </div>
+                                            </div> -->
 
                                             <div class="col-md-12  m-t-10">
                                                 <label>Shift Category</label>
-                                                <select class="form-control" name="shift_category">
+                                                <select class="form-control" name="shift_category" id="shift_category_select">
+                                                    <option value="">Select Category</option>
                                                     @foreach ($shift_categories as $shift_category)
-                                                    <option value="{{ $shift_category->id }}">{{ $shift_category->name }}</option>
+                                                    <option value="{{ $shift_category->id }}"
+                                                        data-start="{{ $shift_category->start_time ? date('H:i', strtotime($shift_category->start_time)) : '' }}"
+                                                        data-end="{{ $shift_category->end_time ? date('H:i', strtotime($shift_category->end_time)) : '' }}"
+                                                        data-rate="{{ $shift_category->rate }}">
+                                                        {{ $shift_category->name }}
+                                                    </option>
                                                     @endforeach
                                                 </select>
+                                            </div>
+
+                                            <div class="col-md-12 m-t-10">
+                                                <label>Shift Rate Per Hour (£)</label>
+                                                <input type="number" step="0.01" name="hourly_rate" id="sshift_rate_per_hour" class="form-control" placeholder="e.g. 15.50">
                                             </div>
 
                                             <div class="col-md-12  m-t-10">
@@ -2648,12 +2660,28 @@
                             block.dataset.documents = JSON.stringify(sh.documents || null);
                             block.dataset.assessments = JSON.stringify(sh.assessments || null);
                             block.dataset.staffName = sh.staff_name || member.name || '';
+                            block.dataset.hourlyRate = sh.hourly_rate || '';
 
                             const st = sh.start_time ? sh.start_time.substring(0, 5) : '?';
                             const et = sh.end_time ? sh.end_time.substring(0, 5) : '?';
-                            const label = sh.location || sh.shift_type || 'Shift';
-                            block.innerHTML = `<div class="sv-shift-time">${st} - ${et}</div>
-                                           <div class="sv-shift-label">${label}</div>`;
+                            
+                            // Calculate duration for the badge
+                            let duration = '';
+                            if (sh.start_time && sh.end_time) {
+                                const start = new Date(`2000-01-01T${sh.start_time}`);
+                                const end = new Date(`2000-01-01T${sh.end_time}`);
+                                const diff = (end - start) / (1000 * 60 * 60);
+                                duration = diff.toFixed(1) + 'h';
+                            }
+
+                            const label = sh.client_name || 'Shift';
+                            block.innerHTML = `
+                                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:2px;">
+                                    <div class="sv-shift-label" style="font-weight:700; font-size:11px; margin-top:0; opacity:1;">${label}</div>
+                                    <div style="background:rgba(0,0,0,0.05); padding:1px 4px; border-radius:4px; font-size:9px; font-weight:600;">${duration}</div>
+                                </div>
+                                <div class="sv-shift-time" style="font-weight:500; font-size:10px; opacity:0.8;">${st} - ${et}</div>
+                            `;
                             cell.appendChild(block);
                         });
 
@@ -2784,9 +2812,7 @@
                                                     ${shift.shift_date}
                                                 </div>
 
-                                                <div class="inactive roundTag">
-                                                    ${shift.shift_type ?? ''}
-                                                </div>
+
 
                                                 <div class="planActions" style="display:flex; gap: 8px;">
                                                     <button class="day-shift-item" style="border: 1px solid #d1d5db; border-radius: 4px; padding: 4px 8px; background: transparent; cursor: pointer;"
@@ -2805,6 +2831,7 @@
                                                         data-notes="${shift.notes || ''}"
                                                         data-tasks="${shift.tasks || ''}"
                                                         data-is-recurring="${shift.is_recurring || ''}"
+                                                        data-hourly-rate="${shift.hourly_rate || ''}"
                                                         data-recurrence='${JSON.stringify(shift.recurrence || null)}'
                                                         data-documents='${JSON.stringify(shift.documents || null)}'
                                                         data-assessments='${JSON.stringify(shift.assessments || null)}'
@@ -3063,6 +3090,12 @@
                         form.find('[name="tasks"]').val('').trigger('change');
                     }
 
+                    if (props.hourly_rate) {
+                        form.find('[name="hourly_rate"]').val(props.hourly_rate);
+                    } else {
+                        form.find('[name="hourly_rate"]').val('');
+                    }
+
                     // Populate Recurrence
                     if (props.is_recurring == "1" || props.is_recurring === true) {
                         form.find('#recurringClientToggle').prop('checked', true);
@@ -3277,6 +3310,7 @@
                                     data-assignment="${shift.assignment || ''}"
                                     data-notes="${shift.notes || ''}"
                                     data-tasks="${shift.tasks || ''}"
+                                    data-hourly-rate="${shift.hourly_rate || ''}"
                                     data-is-recurring="${shift.is_recurring || ''}"
                                     data-recurrence='${JSON.stringify(shift.recurrence || null)}'
                                     data-documents='${JSON.stringify(shift.documents || null)}'
@@ -3284,7 +3318,7 @@
                                     data-staff-name="${shift.staff_name || ''}">
                                     <div style="display:flex;gap:8px;margin-bottom:12px;">
                                         <span style="background:#f3e8ff;color:#9333ea;padding:4px 8px;border-radius:6px;font-size:12px;font-weight:600;">scheduled</span>
-                                        <span style="border:1px solid #e5e7eb;color:#374151;padding:4px 8px;border-radius:6px;font-size:12px;font-weight:600;">${shift.shift_type}</span>
+                                        <span style="border:1px solid #e5e7eb;color:#374151;padding:4px 8px;border-radius:6px;font-size:12px;font-weight:600;">${shift.client_name}</span>
                                     </div>
                                     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
                                         <div style="display:flex;align-items:center;gap:6px;font-weight:600;color:#111827;font-size:14px;min-width:180px;">
@@ -3353,6 +3387,7 @@
                 const assignment = $(this).data('assignment');
                 const notes = $(this).data('notes');
                 const tasks = $(this).data('tasks');
+                const hourlyRate = $(this).data('hourly-rate');
                 const staffName = $(this).data('staff-name') || '';
                 const isRecurring = $(this).data('is-recurring');
                 const recurrenceData = $(this).data('recurrence');
@@ -3419,6 +3454,12 @@
                     form.find('[name="tasks"]').val(tasks).trigger('change');
                 } else {
                     form.find('[name="tasks"]').val('').trigger('change');
+                }
+
+                if (hourlyRate) {
+                    form.find('[name="hourly_rate"]').val(hourlyRate);
+                } else {
+                    form.find('[name="hourly_rate"]').val('');
                 }
 
                 // Populate Recurrence
@@ -3664,21 +3705,23 @@
                                         data-assignment="${shift.assignment || ''}"
                                         data-notes="${shift.notes || ''}"
                                         data-tasks="${shift.tasks || ''}"
+                                        data-hourly-rate="${shift.hourly_rate || ''}"
                                         data-is-recurring="${shift.is_recurring || ''}"
                                         data-recurrence='${JSON.stringify(shift.recurrence || null)}'
                                         data-documents='${JSON.stringify(shift.documents || null)}'
                                         data-assessments='${JSON.stringify(shift.assessments || null)}'
                                         data-staff-name="${shift.staff_name || ''}">
-                                        <div style="display:flex;align-items:center;gap:6px;font-weight:600;color:#1f2937;font-size:13px;margin-bottom:6px;">
+                                        <div style="display:flex;align-items:center;gap:6px;font-weight:700;color:#1f2937;font-size:13px;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                                            ${shift.client_name}
+                                        </div>
+                                        <div style="display:flex;align-items:center;gap:6px;font-weight:500;color:#6b7280;font-size:12px;margin-bottom:6px;">
                                             <span style="width:6px;height:6px;background:#3b82f6;border-radius:50%;"></span>
                                             ${shift.start_time}
                                         </div>
                                         <div style="display:flex;align-items:center;gap:4px;color:#6b7280;font-size:12px;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
                                             <i class="bx bx-user" style="color:#9ca3af;"></i> ${shift.staff_name}
                                         </div>
-                                        <div style="display:flex;align-items:center;gap:4px;color:#6b7280;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
-                                            <i class="bx bx-right-arrow-alt" style="color:#9ca3af;"></i> ${shift.client_name}
-                                        </div>
+
                                     </div>`;
                                 });
                             }
@@ -3810,6 +3853,24 @@
             });
 
             load90DaysShifts();
+
+            // Shift Category Auto-populate Times & Rate
+            $('#shift_category_select').on('change', function() {
+                const selectedOption = $(this).find('option:selected');
+                const startTime = selectedOption.data('start');
+                const endTime = selectedOption.data('end');
+                const rate = selectedOption.data('rate');
+
+                if (startTime) {
+                    $('#createShiftForm').find('[name="start_time"]').val(startTime).trigger('change');
+                }
+                if (endTime) {
+                    $('#createShiftForm').find('[name="end_time"]').val(endTime).trigger('change');
+                }
+                if (rate) {
+                    $('#createShiftForm').find('[name="hourly_rate"]').val(rate);
+                }
+            });
         });
 
         // Form Reset for New Shift
@@ -3822,6 +3883,7 @@
 
                 // Reset custom inputs & layouts
                 form.find('[name="carer_id"]').val('');
+                form.find('[name="hourly_rate"]').val('');
                 form.attr('action', "{{ route('roster.schedule.store') }}"); // Assuming store
                 $(this).find('.modal-title').text('Create New Shift');
                 form.find('button[type="submit"]').html('Create Shift');

@@ -263,7 +263,7 @@ class CarerController extends Controller
     {
         // Add where('home_id', Auth::user()->home_id) optionally for security as seen elsewhere
         $homeId = Auth::user()->home_id;
-        $shifts = \App\Models\ScheduledShift::with(['staff', 'documents', 'assessments', 'recurrence'])->where('home_id', $homeId)->get();
+        $shifts = \App\Models\ScheduledShift::with(['staff', 'client', 'documents', 'assessments', 'recurrence'])->where('home_id', $homeId)->get();
 
         $events = $shifts->map(function ($shift) {
             $startDate = $shift->start_date;
@@ -274,7 +274,7 @@ class CarerController extends Controller
 
             return [
                 'id' => (string) $shift->id,
-                'title' => $shift->client_name ?? ucfirst($shift->shift_type) ?? 'Shift',
+                'title' => ($shift->client ? $shift->client->name : 'Unknown Client'),
                 'start' => $startDate . 'T' . $shift->start_time,
                 'end' => $endDate . 'T' . $shift->end_time,
                 'resourceId' => $shift->staff_id ? (string) $shift->staff_id : 'open',
@@ -301,6 +301,7 @@ class CarerController extends Controller
                 'assessments' => $shift->assessments,
                 'is_recurring' => $shift->is_recurring,
                 'recurrence' => $shift->recurrence,
+                'hourly_rate' => $shift->hourly_rate,
             ];
         })->toArray();
 
@@ -348,6 +349,7 @@ class CarerController extends Controller
                 'recurrence' => $shift->recurrence,
                 'documents' => $shift->documents,
                 'assessments' => $shift->assessments,
+                'hourly_rate' => $shift->hourly_rate,
             ];
         });
 
@@ -409,6 +411,7 @@ class CarerController extends Controller
                     'recurrence' => $shift->recurrence,
                     'documents' => $shift->documents,
                     'assessments' => $shift->assessments,
+                    'hourly_rate' => $shift->hourly_rate,
                 ];
             })->values();
 

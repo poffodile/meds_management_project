@@ -930,15 +930,19 @@ class UserController extends Controller
 				$normalizedCategory = strtolower(trim($categoryName));
 				$rate = 0;
 
-				if ($normalizedCategory == 'general' || empty($normalizedCategory)) {
-					$rate = $staff->hourly_rate ?? 0;
+				if ($t->shift && $t->shift->hourly_rate > 0) {
+					$rate = $t->shift->hourly_rate;
 				} else {
-					$payRateType = PayRateType::where('type_name', $categoryName)->where('home_id', $homeId)->where('is_deleted', 0)->first();
-					if ($payRateType) {
-						$payRate = PayRate::where('rate_type_id', $payRateType->id)->where('access_level_id', $staff->access_level)->where('home_id', $homeId)->where('is_deleted', 0)->first();
-						$rate = $payRate ? $payRate->pay_rate : ($staff->hourly_rate ?? 0);
-					} else {
+					if ($normalizedCategory == 'general' || empty($normalizedCategory)) {
 						$rate = $staff->hourly_rate ?? 0;
+					} else {
+						$payRateType = PayRateType::where('type_name', $categoryName)->where('home_id', $homeId)->where('is_deleted', 0)->first();
+						if ($payRateType) {
+							$payRate = PayRate::where('rate_type_id', $payRateType->id)->where('access_level_id', $staff->access_level)->where('home_id', $homeId)->where('is_deleted', 0)->first();
+							$rate = $payRate ? $payRate->pay_rate : ($staff->hourly_rate ?? 0);
+						} else {
+							$rate = $staff->hourly_rate ?? 0;
+						}
 					}
 				}
 
@@ -1013,7 +1017,14 @@ class UserController extends Controller
 				$end = Carbon::parse($date . ' ' . $t->clock_out);
 				if ($end->lessThan($start)) $end->addDay();
 				$t->duration_hours = $start->diffInMinutes($end) / 60;
-				$t->gross_pay = $t->duration_hours * ($t->staff->hourly_rate ?? 0);
+				
+				$rate = 0;
+				if ($t->shift && $t->shift->hourly_rate > 0) {
+					$rate = $t->shift->hourly_rate;
+				} else {
+					$rate = $t->staff->hourly_rate ?? 0;
+				}
+				$t->gross_pay = $t->duration_hours * $rate;
 				return $t;
 			});
 
@@ -1068,7 +1079,14 @@ class UserController extends Controller
 				$end = Carbon::parse($date . ' ' . $t->clock_out);
 				if ($end->lessThan($start)) $end->addDay();
 				$t->duration_hours = $start->diffInMinutes($end) / 60;
-				$t->gross_pay = $t->duration_hours * ($t->staff->hourly_rate ?? 0);
+				
+				$rate = 0;
+				if ($t->shift && $t->shift->hourly_rate > 0) {
+					$rate = $t->shift->hourly_rate;
+				} else {
+					$rate = $t->staff->hourly_rate ?? 0;
+				}
+				$t->gross_pay = $t->duration_hours * $rate;
 				return $t;
 			});
 
