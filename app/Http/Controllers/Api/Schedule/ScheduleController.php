@@ -251,7 +251,7 @@ class ScheduleController extends Controller
 
             // Check Client Unavailability
             if ($shift->service_user_id) {
-                $clientUnavail = \App\Models\ClientCareUnavailableDate::where('service_user_id', $shift->service_user_id)
+                $clientUnavail = \App\Models\ClientCareUnavailableDate::where('user_id', $shift->service_user_id)
                     ->where('start_date', '<=', $shift->start_date)
                     ->where('end_date', '>=', $shift->start_date)
                     ->exists();

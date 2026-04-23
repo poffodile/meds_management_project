@@ -351,6 +351,17 @@
     #suggested_carer::-webkit-scrollbar-thumb:hover {
         background: #94a3b8;
     }
+
+    .sv-day-cell.sv-cell-hover {
+        background: #f0f9ff !important;
+        border: 2px dashed #3b82f6 !important;
+    }
+
+    .sv-shift-block.ui-draggable-dragging {
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        opacity: 0.9;
+        transform: scale(1.02);
+    }
 </style>
 <main class="page-content">
     <div class="container-fluid">
@@ -1294,11 +1305,11 @@
                                         <label>Assignment *</label>
                                         <input type="hidden" name="assignment" id="selected_assignment" value="Client">
                                         <div class="tabs p-2 m-b-10" style="background-color: #f5f5f5;">
-                                            <button type="button" class="tab" id="locationTab" data-tab="scheduleLocation">
+                                            <button type="button" class="tab" id="locationTab" data-tab="scheduleLocation" data-assignment="Location">
                                                 <i class='bx  bx-location'></i> Location
                                             </button>
 
-                                            <button type="button" class="tab active" id="clientTab" data-tab="scheduleClient">
+                                            <button type="button" class="tab active" id="clientTab" data-tab="scheduleClient" data-assignment="Client">
                                                 <i class='bx  bx-user'></i> Client
                                             </button>
                                         </div>
@@ -1749,6 +1760,8 @@
         tabs.forEach(tab => {
             tab.addEventListener("click", () => {
                 const tabName = tab.getAttribute("data-tab");
+                const assignmentType = tab.getAttribute("data-assignment");
+
                 let scope = tab.parentElement;
                 while (scope && !scope.querySelector(`#${tabName}`)) {
                     scope = scope.parentElement;
@@ -1768,8 +1781,13 @@
 
                 // Update hidden assignment field
                 const assignmentInput = document.getElementById("selected_assignment");
-                if (assignmentInput && tab.innerText) {
-                    assignmentInput.value = tab.innerText.trim();
+                if (assignmentInput) {
+                    assignmentInput.value = assignmentType || tab.innerText.trim();
+                }
+
+                // Trigger suggestions and header update if in the roster modal context
+                if (typeof fetchSuggestedCarers === 'function') {
+                    fetchSuggestedCarers();
                 }
             });
         });
@@ -1883,7 +1901,8 @@
             const daysWrapper = document.querySelector('.weeklyDaysSelect').closest('.col-md-12');
 
             function toggleWeeklyDays() {
-                if (frequencySelect.value === 'weekly') {
+                const freq = frequencySelect.value;
+                if (freq === 'weekly' || freq === 'fortnightly' || freq === 'monthly') {
                     daysWrapper.style.display = 'block';
                 } else {
                     daysWrapper.style.display = 'none';
@@ -2236,7 +2255,7 @@
                 suggestionsWrapper.style.display = 'block';
 
                 if (assignment === 'Client') {
-                    if (clientId === "") {
+                    if (clientId === "" || !clientId) {
                         assignedClientTo.textContent = "Not assigned";
                         blankSection.style.display = 'block';
                         suggestionsContainer.style.display = 'none';
@@ -2245,7 +2264,11 @@
                         return;
                     }
                     let selectedText = clientSelect.options[clientSelect.selectedIndex].text;
-                    assignedClientTo.textContent = selectedText;
+                    if (selectedText.toLowerCase().includes('select client')) {
+                        assignedClientTo.textContent = "Not assigned";
+                    } else {
+                        assignedClientTo.textContent = selectedText.trim();
+                    }
                 } else if (assignment === 'Location') {
                     clientId = '0';
                     const homeAreaVal = homeAreaSelect.value;
@@ -2632,6 +2655,8 @@
 
                         const cell = document.createElement('div');
                         cell.className = 'sv-day-cell' + (isToday(day) ? ' sv-today-cell' : '');
+                        cell.dataset.date = dayStr;
+                        cell.dataset.staffId = member.id || '';
 
                         const cellShifts = shiftMap[key] || [];
                         cellShifts.forEach(sh => {
@@ -2664,7 +2689,7 @@
 
                             const st = sh.start_time ? sh.start_time.substring(0, 5) : '?';
                             const et = sh.end_time ? sh.end_time.substring(0, 5) : '?';
-                            
+
                             // Calculate duration for the badge
                             let duration = '';
                             if (sh.start_time && sh.end_time) {
@@ -2690,6 +2715,64 @@
 
                     row.appendChild(daysDiv);
                     rowsContainer.appendChild(row);
+                });
+
+                initDragAndDrop();
+            }
+
+            function initDragAndDrop() {
+                // Initialize Draggable on shifts
+                $('.sv-shift-block').draggable({
+                    revert: 'invalid',
+                    appendTo: 'body',
+                    helper: 'clone',
+                    start: function() {
+                        $(this).css('opacity', '0.5');
+                    },
+                    stop: function() {
+                        $(this).css('opacity', '1');
+                    }
+                });
+
+                // Initialize Droppable on cells
+                $('.sv-day-cell').droppable({
+                    accept: '.sv-shift-block',
+                    hoverClass: 'sv-cell-hover',
+                    drop: function(event, ui) {
+                        const shiftId = ui.draggable.data('id');
+                        const newDate = $(this).data('date');
+                        const newStaffId = $(this).data('staff-id');
+
+                        moveShift(shiftId, newDate, newStaffId);
+                    }
+                });
+            }
+
+            function moveShift(shiftId, newDate, newStaffId) {
+                loadingEl.classList.add('sv-active');
+                const baseUrl = document.querySelector('meta[name="base-url"]').getAttribute('content');
+
+                $.ajax({
+                    url: baseUrl + '/roster/schedule-shift/drag-update',
+                    type: 'POST',
+                    data: {
+                        _token: $('meta[name="csrf-token"]').attr('content'),
+                        shift_id: shiftId,
+                        new_date: newDate,
+                        new_staff_id: newStaffId
+                    },
+                    success: function(res) {
+                        if (res.success) {
+                            loadWeek(currentWeekStart);
+                        } else {
+                            loadingEl.classList.remove('sv-active');
+                            alert(res.message || 'Error moving shift');
+                        }
+                    },
+                    error: function() {
+                        loadingEl.classList.remove('sv-active');
+                        alert('An error occurred while moving the shift');
+                    }
                 });
             }
 

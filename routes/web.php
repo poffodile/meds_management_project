@@ -187,6 +187,7 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 		Route::get('/schedule-shift', [ScheduleShiftController::class, 'index'])->name('roster.schedule.dashboard');
 		Route::post('/schedule-shift/store', [ScheduleShiftController::class, 'store'])->name('roster.schedule.store');
 		Route::post('/schedule-shift/update/{id}', [ScheduleShiftController::class, 'updateShift'])->name('roster.schedule.update');
+		Route::post('/schedule-shift/drag-update', [ScheduleShiftController::class, 'dragUpdate'])->name('roster.schedule.dragUpdate');
 		Route::get('/schedule-shift-by-group', [ScheduleShiftController::class, 'scheduleShiftByGroup'])->name('roster.scheduleShiftByGroup');
 		Route::get('/ninety-days-data', [ScheduleShiftController::class, 'get90DaysData'])->name('ninety.days.data');
 		Route::get('/get-monthly-shifts', [ScheduleShiftController::class, 'getMonthlyShifts'])->name('get.monthly.shifts');
