@@ -59,6 +59,7 @@
                     <button class="tab" data-tab="clientPEEPTab"> PEEP </button>
                     <button class="tab" data-tab="clientRepositioningTab"> Repositioning </button>
                     <button class="tab" data-tab="clientBehaviorTab"> Behavior </button>
+                    <button class="tab" data-tab="clientEducationTab"> Education </button>
                     <button class="tab" data-tab="clientMentalCapacityTab"> Mental Capacity </button>
                     <button class="tab" data-tab="clientDoLSTab" onclick="showDolsList()"> DoLS </button>
                     <button class="tab" data-tab="clientDNACPRTab"> DNACPR </button>
@@ -4164,6 +4165,10 @@
                         </div>
                     </div>
 
+                </div>
+
+                <div class="content" id="clientEducationTab">
+                    @include('frontEnd.roster.client.elements.education')
                 </div>
                 <div class="content" id="clientMentalCapacityTab">
 

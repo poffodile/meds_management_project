@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Android\AndroidApiController;
 use App\Http\Controllers\Api\Schedule\ScheduleController;
+use App\Http\Controllers\Api\EducationApiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -177,4 +178,18 @@ Route::group(['prefix' => '/staff'], function () {
 	Route::post('/schedule-shifts/update-status', [ScheduleController::class, 'schedule_shifts_update_status']);
 	Route::post('/unassigned-shifts', [ScheduleController::class, 'get_unassigned_shifts']);
 	Route::post('/assign-shift', [ScheduleController::class, 'assignShift']);
+
+	// Education Module - Staff Side
+	Route::match(['get', 'post'], '/education/assigned-children/{staff_id?}', [EducationApiController::class, 'getAssignedChildren']);
+	Route::match(['get', 'post'], '/education/profile/{service_user_id?}', [EducationApiController::class, 'getEducationProfile']);
+	Route::post('/education/task/add', [EducationApiController::class, 'addTask']);
+	Route::post('/education/attendance/add', [EducationApiController::class, 'addAttendance']);
+	Route::post('/education/note/add', [EducationApiController::class, 'addNote']);
+	Route::post('/education/resource/add', [EducationApiController::class, 'addResource']);
+});
+
+Route::group(['prefix' => '/child'], function() {
+    // Education Module - Child Side
+    Route::match(['get', 'post'], '/education/tasks/{service_user_id?}', [EducationApiController::class, 'getChildTasks']);
+    Route::post('/education/task/complete/{task_id}', [EducationApiController::class, 'completeTask']);
 });

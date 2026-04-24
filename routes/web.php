@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\frontEnd\Roster\Client\EducationController;
 use App\Http\Controllers\frontEnd\salesFinance\LeadController as FrontendLeadController;
 use App\Http\Controllers\frontEnd\salesFinance\QuoteController as FrontendQuoteController;
 use App\Http\Controllers\frontEnd\salesFinance\CouncilTaxController;
@@ -172,6 +173,17 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 		Route::get('/carer/shifts/week', [CarerController::class, 'weekShifts'])->name('carer.shifts.week');
 		Route::get('/carer/get-shift-carer/{client_id}', [CarerController::class, 'getShiftStaff'])->name('carer.shift.staff');
 		Route::get('/carer/shifts/ninety-days', [CarerController::class, 'ninetyDaysShifts'])->name('carer.shifts.ninety-days');
+
+		// Carer Section End
+
+		// Education Module
+		Route::post('/education/add-profile', [EducationController::class, 'addProfile'])->name('education.add-profile');
+		Route::post('/education/assign-staff', [EducationController::class, 'assignStaff'])->name('education.assign-staff');
+		Route::post('/education/add-attendance', [EducationController::class, 'addAttendance'])->name('education.add-attendance');
+		Route::post('/education/add-task', [EducationController::class, 'addTask'])->name('education.add-task');
+		Route::post('/education/add-note', [EducationController::class, 'addNote'])->name('education.add-note');
+		Route::post('/education/add-resource', [EducationController::class, 'addResource'])->name('education.add-resource');
+		Route::get('/education/timeline/{service_user_id}', [EducationController::class, 'monitorTimeline'])->name('education.timeline');
 
 		Route::get('/carer-details/{carer_id}', [CarerDetailsController::class, 'carer_details'])->name('roster.staff.carer.details');
 		Route::post('/carer/save-documents', [CarerDetailsController::class, 'saveDouments'])->name('carer.save.documents');

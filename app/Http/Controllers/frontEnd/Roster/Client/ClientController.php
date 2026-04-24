@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Http;
 use Carbon\Carbon;
 use App\ServiceUser;
 use App\Models\suUserCourse;
+use App\Models\SuEducationProfile, App\Models\SuEducationStaffAssignment, App\Models\SuEducationTask, App\Models\SuEducationAttendance, App\Models\SuEducationNote, App\Models\SuEducationResource;
 use Auth, DB, Session;
 use App\Home;
 use App\Services\Staff\ClientManagementService;
@@ -69,7 +70,18 @@ class ClientController extends Controller
         $ex_home_ids = explode(',', $home_ids);
         $home_id = $ex_home_ids[0];
         $data['home_details'] = Home::find($home_id);
-        // echo "<pre>";print_r($data['clientCareTask']);die;
+
+        // Education Data
+        $data['education_profile'] = SuEducationProfile::where('service_user_id', $client_id)->where('status', 1)->first();
+        $data['assigned_staff'] = SuEducationStaffAssignment::with('staff')->where('service_user_id', $client_id)->where('status', 1)->get();
+        $data['users'] = DB::table('user')->where('home_id', $home_id)->where('is_deleted', 0)->get()->toArray();
+        $data['service_user_id'] = $client_id;
+
+        $data['education_tasks'] = SuEducationTask::with('staff')->where('service_user_id', $client_id)->orderBy('due_date', 'asc')->get();
+        $data['education_attendance'] = SuEducationAttendance::with('staff')->where('service_user_id', $client_id)->orderBy('date', 'desc')->get();
+        $data['education_notes'] = SuEducationNote::with('staff')->where('service_user_id', $client_id)->orderBy('created_at', 'desc')->get();
+        $data['education_resources'] = SuEducationResource::where('service_user_id', $client_id)->orderBy('created_at', 'desc')->get();
+
         return view('frontEnd.roster.client.client_details', $data);
     }
     public function child_courses($childId)
