@@ -213,7 +213,7 @@ class CarerController extends Controller
     public function shift_resources()
     {
         $homeId = Auth::user()->home_id;
-        $staff = User::where('home_id', $homeId)->select('id', 'name')->where('is_deleted', 0)->where('status', 1)->get();
+        $staff = User::where('home_id', $homeId)->select('id', 'name')->where('user_type', 'N')->where('is_deleted', 0)->where('status', 1)->get();
 
         $preferences = \App\Models\ClientCareWorkPrefer::where('home_id', $homeId)
             ->get()

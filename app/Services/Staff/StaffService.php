@@ -82,6 +82,7 @@ class StaffService
     public function allStaff($homeId)
     {
         return User::with('emergencyContacts')
+            ->where('user_type', 'N')
             ->where('home_id', $homeId)
             ->where('is_deleted', 0);
     }
@@ -92,6 +93,7 @@ class StaffService
     public function activeStaff($homeId)
     {
         return User::with('emergencyContacts')->select('user.*')
+            ->where('user_type', 'N')
             ->where('home_id', $homeId)
             ->where('is_deleted', 0)
             ->where('status', 1);
@@ -104,6 +106,7 @@ class StaffService
     {
         // dd($homeId);
         return  User::with('emergencyContacts')
+            ->where('user_type', 'N')
             ->where('home_id', $homeId)
             ->where('is_deleted', 0)
             ->where('status', 0);
@@ -115,6 +118,7 @@ class StaffService
     public function onLeaveStaff($homeId)
     {
         return  User::with('emergencyContacts')
+            ->where('user_type', 'N')
             ->where('home_id', $homeId)
             ->where('is_deleted', 0)
             ->where('status', 2);
@@ -140,6 +144,7 @@ class StaffService
         $payRateTypeId = $this->getPayRateTypeId($homeId);
 
         $user = User::select('user.*')
+            ->where('user.user_type', 'N')
             ->where('user.id', $userId)
             ->where('user.is_deleted', 0)
             ->first();
@@ -422,6 +427,7 @@ class StaffService
                 ->withCount(['certificates as qualifications_count'])
                 ->where('home_id', $homeId)
                 ->where('status', 1)
+                ->where('user_type', 'N')
                 ->where('is_deleted', 0);
 
             if (!empty($excludeIds)) {
@@ -648,6 +654,7 @@ class StaffService
                 'work_preferences',
                 'specific_working_hours'
             ])
+            ->where('user.user_type', 'N')
             ->where('user.id', $userId)
             ->where('user.is_deleted', 0)
             ->first();
