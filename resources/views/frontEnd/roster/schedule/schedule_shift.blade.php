@@ -419,10 +419,42 @@
         <!-- Alerts -->
         <div class="rota_alerts">
             @forelse ($scheduled_shifts as $shift)
-            <div class="rota_alert {{ $loop->index >= 3 ? 'extra-shift' : '' }}" style="{{ $loop->index >= 3 ? 'display: none;' : '' }}">
+            <div class="rota_alert edit-shift-alert {{ $loop->index >= 3 ? 'extra-shift' : '' }}" 
+                 style="{{ $loop->index >= 3 ? 'display: none;' : '' }}; cursor: pointer;"
+                 data-id="{{ $shift->id }}"
+                 data-client="{{ $shift->service_user_id }}"
+                 data-staff="{{ $shift->staff_id }}"
+                 data-staff-name="{{ $shift->staff_name }}"
+                 data-date="{{ $shift->start_date }}"
+                 data-start="{{ $shift->start_time }}"
+                 data-end="{{ $shift->end_time }}"
+                 data-type="{{ $shift->shift_type }}"
+                 data-shiftcategory="{{ $shift->shift_category_id }}"
+                 data-homearea="{{ $shift->home_area_id }}"
+                 data-property="{{ $shift->property_id }}"
+                 data-location="{{ $shift->location_name }}"
+                 data-address="{{ $shift->location_address }}"
+                 data-care="{{ $shift->care_type_id }}"
+                 data-assignment="{{ $shift->assignment }}"
+                 data-notes="{{ $shift->notes }}"
+                 data-tasks="{{ $shift->tasks }}"
+                 data-hourly-rate="{{ $shift->hourly_rate }}"
+                 data-is-recurring="{{ $shift->is_recurring }}"
+                 data-recurrence="{{ json_encode($shift->recurrence) }}"
+                 data-documents="{{ json_encode($shift->documents) }}"
+                 data-assessments="{{ json_encode($shift->assessments) }}"
+            >
                 <div class="rota_alert-icon"><i class="fa fa fa-calendar-o"></i></div>
                 <div class="rota_alert-content">
-                    <div class="rota_alert-title">{{ $shift->client_name ?? 'Unknown Client' }} - {{ date('H:i', strtotime($shift->start_time)) }}</div>
+                    @php
+                        $title = $shift->client_name ?? 'Unknown Client';
+                        if (empty($shift->service_user_id) && empty($shift->staff_id)) {
+                            if ($shift->assignment == 'Location' || $shift->assignment == 'Home Area') {
+                                $title = $shift->location_address ?? $shift->location_name ?? 'Unassigned Location Shift';
+                            }
+                        }
+                    @endphp
+                    <div class="rota_alert-title">{{ $title }} - {{ date('H:i', strtotime($shift->start_time)) }}</div>
                     <div class="rota_alert-description">
                         Assigned to: {{ $shift->staff_name ?? 'Unassigned' }} |
                         Shift Type: {{ ucfirst($shift->shift_type) }} |
@@ -3145,6 +3177,7 @@
                     console.log('shiftId2', shiftId);
                     form.closest('.modal-content').find('.modal-title').text('Edit Shift');
                     form.find('button[type="submit"]').html('Update Shift');
+                    form.find('.recurringShift').hide();
 
                     // Populate fields
 
@@ -3485,7 +3518,7 @@
             loadDayShifts();
 
             // Handle edit modal opening
-            $(document).on('click', '.day-shift-item', function() {
+            $(document).on('click', '.day-shift-item, .edit-shift-alert', function() {
                 const shiftId = $(this).data('id');
                 const client = $(this).data('client');
                 const date = $(this).data('date');
@@ -3515,6 +3548,7 @@
                 form.attr('action', '{{ url("roster/schedule-shift/update") }}/' + shiftId);
                 form.closest('.modal-content').find('.modal-title').text('Edit Shift');
                 form.find('button[type="submit"]').html('Update Shift');
+                form.find('.recurringShift').hide();
 
                 // Populate fields
                 if (client) {

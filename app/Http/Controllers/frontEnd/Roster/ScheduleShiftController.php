@@ -36,12 +36,12 @@ class ScheduleShiftController extends Controller
         $data['company_department'] = CompanyDepartment::getActiveCompanyDepartment();
         $data['service_users'] = $this->serviceUserService->getAllserviceUser();
         $data['dynamic_form_builder'] = DynamicFormBuilder::getFormList();
-        $data['scheduled_shifts_by_group'] = ScheduledShift::with(['client', 'staff'])
+        $data['scheduled_shifts_by_group'] = ScheduledShift::with(['client', 'staff', 'recurrence', 'documents', 'assessments'])
             ->where('home_id', Auth::user()->home_id)
             ->orderBy('start_date', 'desc')
             ->get();
 
-        $data['scheduled_shifts'] = ScheduledShift::with(['client', 'staff'])
+        $data['scheduled_shifts'] = ScheduledShift::with(['client', 'staff', 'recurrence', 'documents', 'assessments'])
             ->where('home_id', Auth::user()->home_id)
             ->orderBy('start_date', 'desc')
             ->get()
