@@ -41,6 +41,17 @@ class PayRatesTypeController extends Controller
         ]);
 
         try {
+            $exists = PayRateType::where('type_name', $request->type_name)
+                ->where(function ($query) {
+                    $query->where('home_id', $this->home_id)
+                        ->orWhere('home_id', 0);
+                })
+                ->where('is_deleted', 0)
+                ->exists();
+
+            if ($exists) {
+                return redirect()->back()->withInput()->with('error', 'Pay rate type with this name already exists.');
+            }
 
             PayRateType::create([
                 'home_id'   => $this->home_id,
@@ -54,9 +65,6 @@ class PayRatesTypeController extends Controller
                 ->with('success', 'Pay rate type added successfully.');
         } catch (\Exception $e) {
 
-            // Log the error (recommended)
-            \Log::error('PayRateType Store Error: ' . $e->getMessage());
-
             return redirect()
                 ->back()
                 ->withInput()
@@ -68,6 +76,10 @@ class PayRatesTypeController extends Controller
     {
         $data['page'] = 'pay_rates_type';
         $data['rateType'] = PayRateType::findOrFail($id);
+
+        if ($data['rateType']->home_id == 0) {
+            return redirect()->back()->with('error', 'You are not allowed to edit this record.');
+        }
 
         return view('backEnd.user.pay_rates.pay_rate_type_form', $data);
     }
@@ -81,6 +93,23 @@ class PayRatesTypeController extends Controller
             ]);
 
             $type = PayRateType::findOrFail($id);
+
+            if ($type->home_id == 0) {
+                return redirect()->back()->with('error', 'You are not allowed to update this record.');
+            }
+
+            $exists = PayRateType::where('type_name', $request->type_name)
+                ->where(function ($query) {
+                    $query->where('home_id', $this->home_id)
+                        ->orWhere('home_id', 0);
+                })
+                ->where('is_deleted', 0)
+                ->where('id', '!=', $id)
+                ->exists();
+
+            if ($exists) {
+                return redirect()->back()->withInput()->with('error', 'Pay rate type with this name already exists.');
+            }
 
             $type->update([
                 'type_name' => $request->type_name,
@@ -98,6 +127,10 @@ class PayRatesTypeController extends Controller
     {
         $data['page'] = 'pay_rates_type';
         $type = PayRateType::findOrFail($id);
+
+        if ($type->home_id == 0) {
+            return redirect()->back()->with('error', 'You are not allowed to delete this record.');
+        }
 
         $type->update([
             'is_deleted' => 1,

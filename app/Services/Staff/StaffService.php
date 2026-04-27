@@ -25,7 +25,7 @@ class StaffService
     {
         return DB::table('pay_rate_types')
             ->where('type_name', 'Hourly Rate')
-            ->where('home_id', $home_id)
+            // ->where('home_id', $home_id)
             ->value('id');
     }
 

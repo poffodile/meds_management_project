@@ -19,9 +19,7 @@ class PayRate extends Model
         'is_deleted'
     ];
 
-    /**
-     * Get all payrates with access level details
-     */
+
     public static function getAllPayRates($home_id)
     {
         return self::select(
@@ -36,12 +34,12 @@ class PayRate extends Model
             'access_level.name as access_level_name',
             'pay_rate_types.type_name as rate_type_name'
         )
-        ->join('access_level', 'pay_rates.access_level_id', '=', 'access_level.id')
-        ->join('pay_rate_types', 'pay_rates.rate_type_id', '=', 'pay_rate_types.id')
-        ->where('pay_rates.home_id', $home_id)
-        ->where('pay_rates.is_deleted', 0)
-        ->orderBy('pay_rates.id', 'DESC')
-        ->get();
+            ->join('access_level', 'pay_rates.access_level_id', '=', 'access_level.id')
+            ->join('pay_rate_types', 'pay_rates.rate_type_id', '=', 'pay_rate_types.id')
+            ->where('pay_rates.home_id', $home_id)
+            ->where('pay_rates.is_deleted', 0)
+            ->orderBy('pay_rates.id', 'DESC')
+            ->get();
     }
 
     /**
