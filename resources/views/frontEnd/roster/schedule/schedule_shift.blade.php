@@ -27,6 +27,38 @@
         }
     }
 
+    /* Hover + icon for timeline slots */
+    .fc-timeline-slot-lane {
+        position: relative;
+    }
+
+    .fc-plus-icon-cell {
+        display: none;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 28px;
+        height: 28px;
+        background: #3b82f6;
+        color: white;
+        border-radius: 50%;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        z-index: 5;
+        box-shadow: 0 2px 6px rgba(59, 130, 246, 0.4);
+        pointer-events: none;
+    }
+
+    .fc-timeline-slot-lane:hover .fc-plus-icon-cell {
+        display: flex;
+    }
+
+    .fc-timeline-slot-lane:hover {
+        cursor: pointer;
+    }
+
     #close_document {
         display: none;
     }
@@ -3970,6 +4002,7 @@
                 form.attr('action', "{{ route('roster.schedule.store') }}"); // Assuming store
                 $(this).find('.modal-title').text('Create New Shift');
                 form.find('button[type="submit"]').html('Create Shift');
+                form.find('.recurringShift').show();
 
                 $('#selectedCarerName').text('');
                 $('#selectedCarerCard').hide();

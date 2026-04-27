@@ -144,6 +144,7 @@ document.addEventListener('DOMContentLoaded', function () {
             form.attr('action', BASE_URL + '/roster/schedule-shift/update/' + props.shift_id);
             form.closest('.modal-content').find('.modal-title').text('Edit Shift');
             form.find('button[type="submit"]').html('Update Shift');
+            form.find('.recurringShift').hide();
             form.find('#edit_shift_id').val(props.shift_id);
             console.log('shiftId3', props.shift_id);
             // Populate fields
@@ -412,10 +413,28 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
         },
+
+        slotLaneContent: function (arg) {
+            return {
+                html: '<div class="fc-plus-icon-cell"><i class="fa fa-plus"></i></div>'
+            };
+        },
         /* ===== CLICK MONTH DAY → OPEN WEEK ===== */
         dateClick: function (info) {
+            console.log('Calendar dateClick triggered:', info);
             if (calendar.view.type === 'dayGridMonth') {
                 calendar.changeView('resourceTimelineWeek', info.dateStr);
+            } else if (calendar.view.type === 'resourceTimelineWeek' || calendar.view.type === 'resourceTimelineDay') {
+                console.log('Timeline view click detected. Opening modal...');
+                openAddShiftModal(info.dateStr, info.resource);
+            }
+        },
+
+        select: function (info) {
+            console.log('Calendar select triggered:', info);
+            if (calendar.view.type === 'resourceTimelineWeek' || calendar.view.type === 'resourceTimelineDay') {
+                // If it's a single cell selection or we want to use the selection range
+                openAddShiftModal(info.startStr, info.resource);
             }
         },
 
@@ -636,6 +655,42 @@ document.addEventListener('DOMContentLoaded', function () {
         new ResizeObserver(function () {
             calendar.updateSize();
         }).observe(calendarEl);
+    }
+
+    function openAddShiftModal(dateStr, resource) {
+        const dateOnly = dateStr.split('T')[0];
+        const resourceId = resource ? resource.id : '';
+        const form = $('#createShiftForm');
+
+        // Reset form for a new shift
+        form[0].reset();
+        form.find('input[type="hidden"]').val('');
+        form.find('select').val('').trigger('change');
+
+        // Pre-fill date
+        form.find('[name="start_date"]').val(dateOnly);
+
+        // Pre-fill staff if a specific resource was clicked
+        if (resourceId && resourceId !== 'open') {
+            form.find('[name="carer_id"]').val(resourceId).trigger('change');
+            $('#selected_carer_id').val(resourceId);
+            $('#selectedCarerName').text(resource.title || '');
+            $('#selectedCarerCard').show();
+            $('#carerSuggestionsWrapper').hide();
+        } else {
+            form.find('[name="carer_id"]').val('').trigger('change');
+            $('#selected_carer_id').val('');
+            $('#selectedCarerCard').hide();
+            $('#carerSuggestionsWrapper').show();
+        }
+
+        // Set modal mode to "Create"
+        form.attr('action', BASE_URL + '/roster/schedule-shift/store');
+        form.closest('.modal-content').find('.modal-title').text('Create New Shift');
+        form.find('button[type="submit"]').html('Create Shift');
+        form.find('.recurringShift').show();
+
+        $('#addShiftModal').modal('show');
     }
 
 });
