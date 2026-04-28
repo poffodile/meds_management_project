@@ -303,6 +303,7 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 
 		// CRM Dashboard
 		Route::get('/crm-dashboard', [CRMDashboardController::class, 'crm_dashboard']);
+		Route::get('/crm-dashboard-details', [CRMDashboardController::class, 'crm_dashboard_details']);
 
 		// staffonboarding
 		Route::get('staffonboarding', [staffonboardingController::class, 'index']);

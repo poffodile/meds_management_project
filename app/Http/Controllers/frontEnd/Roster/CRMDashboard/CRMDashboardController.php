@@ -11,4 +11,8 @@ class CRMDashboardController extends Controller
     {
         return view('frontEnd.roster.crm_dashboard.crm_dashboard');
     }
+    public function crm_dashboard_details()
+    {
+        return view('frontEnd.roster.crm_dashboard.crm_dashboard_details');
+    }
 }
