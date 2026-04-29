@@ -182,14 +182,15 @@ Route::group(['prefix' => '/staff'], function () {
 	// Education Module - Staff Side
 	Route::match(['get', 'post'], '/education/assigned-children/{staff_id?}', [EducationApiController::class, 'getAssignedChildren']);
 	Route::match(['get', 'post'], '/education/profile/{service_user_id?}', [EducationApiController::class, 'getEducationProfile']);
+	Route::match(['get', 'post'], '/education/subjects/{education_profile_id?}', [EducationApiController::class, 'getSubjects']);
 	Route::post('/education/task/add', [EducationApiController::class, 'addTask']);
 	Route::post('/education/attendance/add', [EducationApiController::class, 'addAttendance']);
 	Route::post('/education/note/add', [EducationApiController::class, 'addNote']);
 	Route::post('/education/resource/add', [EducationApiController::class, 'addResource']);
 });
 
-Route::group(['prefix' => '/child'], function() {
-    // Education Module - Child Side
-    Route::match(['get', 'post'], '/education/tasks/{service_user_id?}', [EducationApiController::class, 'getChildTasks']);
-    Route::post('/education/task/complete/{task_id}', [EducationApiController::class, 'completeTask']);
+Route::group(['prefix' => '/child'], function () {
+	// Education Module - Child Side
+	Route::match(['get', 'post'], '/education/tasks/{service_user_id?}', [EducationApiController::class, 'getChildTasks']);
+	Route::post('/education/task/complete/{task_id}', [EducationApiController::class, 'completeTask']);
 });

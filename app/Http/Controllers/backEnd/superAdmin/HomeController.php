@@ -93,18 +93,15 @@ class HomeController extends Controller
 
         if ($request->isMethod('post')) {
 
-            $address = $request->address;
+            $request->validate([
+                'address' => 'required',
+                'latitude' => 'required|numeric',
+                'longitude' => 'required|numeric'
+            ]);
 
-            $apiKey = 'AIzaSyBxoFiKEhpV_lzf-i17vjFb9hZZwHSkZGI'; // Google maps now requires an API key.
-            // Get JSON results from this request
-            $geo = file_get_contents('https://maps.googleapis.com/maps/api/geocode/json?address=' . urlencode($address) . '&sensor=false&key=' . $apiKey);
-
-            $geo = json_decode($geo, true); // Convert the JSON to an array
-
-            if (isset($geo['status']) && ($geo['status'] == 'OK')) {
-                $latitude = $geo['results'][0]['geometry']['location']['lat']; // Latitude
-                $longitude = $geo['results'][0]['geometry']['location']['lng']; // Longitude
-            }
+            $latitude = $request->latitude;
+            $longitude = $request->longitude;
+            $place_id = $request->place_id;
 
             $admin  = Session::get('scitsAdminSession');
             $data   = $request->input();
@@ -115,7 +112,8 @@ class HomeController extends Controller
             $system_admin_home->home_area                   = $data['home_area'];
             $system_admin_home->latitude                    = $latitude;
             $system_admin_home->longitude                   = $longitude;
-            $system_admin_home->is_home_area               = $request->is_home_area ?? 0;
+            $system_admin_home->place_id                    = $place_id;
+            $system_admin_home->is_home_area                = $request->is_home_area ?? 0;
             $system_admin_home->is_registered               = $data['is_registered'] ?? 0;
             $system_admin_home->weekly_allowance_service_users = $data['weekly_allowance_service_users'] ?? 0;
             $system_admin_home->monthly_allowance_service_users = $data['monthly_allowance_service_users'] ?? 0;
@@ -186,17 +184,15 @@ class HomeController extends Controller
         if (!empty($system_admin_home)) {
             $system_admin_id = $system_admin_home->admin_id;
             if ($request->isMethod('post')) {
-                $address = $request->address;
-                $apiKey = 'AIzaSyBxoFiKEhpV_lzf-i17vjFb9hZZwHSkZGI'; // Google maps now requires an API key.
-                // Get JSON results from this request
-                $geo = file_get_contents('https://maps.googleapis.com/maps/api/geocode/json?address=' . urlencode($address) . '&sensor=false&key=' . $apiKey);
+                $request->validate([
+                    'address' => 'required',
+                    'latitude' => 'required|numeric',
+                    'longitude' => 'required|numeric'
+                ]);
 
-                $geo = json_decode($geo, true); // Convert the JSON to an array
-
-                if (isset($geo['status']) && ($geo['status'] == 'OK')) {
-                    $latitude = $geo['results'][0]['geometry']['location']['lat']; // Latitude
-                    $longitude = $geo['results'][0]['geometry']['location']['lng']; // Longitude
-                }
+                $latitude = $request->latitude;
+                $longitude = $request->longitude;
+                $place_id = $request->place_id;
 
                 $home_old_image                               = $system_admin_home->image;
                 //$home_old_policy                              = $system_admin_home->security_policy;
@@ -211,6 +207,7 @@ class HomeController extends Controller
                 $system_admin_home->monthly_allowance_service_users = $request->monthly_allowance_service_users ?? 0;
                 $system_admin_home->latitude                  = $latitude;
                 $system_admin_home->longitude                 = $longitude;
+                $system_admin_home->place_id                  = $place_id;
                 //$system_admin_home->image            = $request->image;
 
                 /*if(!empty($request->password))
