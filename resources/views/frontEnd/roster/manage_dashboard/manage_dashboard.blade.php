@@ -22,7 +22,7 @@
 
             <div class="rota_dash-card" onclick="window.location='{{ url('/roster/carer') }}'">
                 <div class="rota_dash-left">
-                    <p class="rota_title fs12">Active Carers</p>
+                    <p class="rota_title fs12">Active {{ getTerm('Staff') }}s</p>
                     <h2 class="rota_count mt-2">{{ $userCount['activeCarers'] }}</h2>
                 </div>
                 <div>
@@ -32,7 +32,7 @@
 
             <div class="rota_dash-card" onclick="window.location='{{ url('/roster/client') }}'">
                 <div class="rota_dash-left">
-                    <p class="rota_title">Active Clients</p>
+                    <p class="rota_title">Active {{ getTerm('Service User') }}s</p>
                     <h2 class="rota_count mt-2">{{ $userCount['activeClients'] }}</h2>
                 </div>
                 <div>
@@ -126,8 +126,8 @@
                             <?php
                             $start_time = date('H:i', strtotime($row->start_time));
                             $date = date('F d, Y H:i', strtotime($row->start_date . ' ' . $start_time));
-                            $staff_name = $row->staff ? "Assigned: {$row->staff->name}" : 'No carer assigned';
-                            $client_name = $row->client ? $row->client->name : 'Unknown Client';
+                            $staff_name = $row->staff ? "Assigned: {$row->staff->name}" : 'No ' . strtolower(getTerm('Staff')) . ' assigned';
+                            $client_name = $row->client ? $row->client->name : 'Unknown ' . getTerm('Service User');
                             $htm = "Shift scheduled for {$start_time} has not been started. {$staff_name}";
                             ?>
                             <div class="bg-orange-50 rounded8 p-3 manageDSysAlrt" id="alertShiftWrapper">
@@ -160,7 +160,7 @@
                                         <div class="darkOrangeTextp fs12 w100">
                                             <p class="mb-2 fs12">{{ $htm }}</p>
                                             <div class="p-2 bgWhite50 rounded8 mb-2">
-                                                <p class="fs12 blackText mb-0 font600"> ⚡ Contact carer
+                                                <p class="fs12 blackText mb-0 font600"> ⚡ Contact {{ strtolower(getTerm('Staff')) }}
                                                     immediately
                                                     and
                                                     verify shift status</p>
@@ -235,7 +235,6 @@
                                                             class="bx bx-x fs16 me-2"></i> Resolve</span>
                                                 </div>
                                             </div>
-
                                         </div>
                                     </div>
                                 </div>

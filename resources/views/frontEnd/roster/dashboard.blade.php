@@ -24,7 +24,7 @@
                                             </div>
                                             <div class="rotsBoxRightCont">
                                                 <h4>{{ $serviceUserCount }} </h4>
-                                                <p> Active Clients </p>
+                                                <p> Active {{ getTerm('Service User') }}s </p>
                                             </div>
                                         </div>
                                     </a>
@@ -40,7 +40,7 @@
                                             </div>
                                             <div class="rotsBoxRightCont">
                                                 <h4>{{ $userCount }} </h4>
-                                                <p>Active Carers</p>
+                                                <p>Active {{ getTerm('Staff') }}s</p>
                                             </div>
                                         </div>
                                     </a>
@@ -99,13 +99,13 @@
                                         <div class="siftTime">
                                             <div class="siftTimeCont">
                                                 <i class="fa fa-user-o"></i>
-                                                <span>Carer: <strong> {{ $shift->staff_name ?? 'Unassigned' }}</strong></span>
+                                                <span>{{ getTerm('Staff') }}: <strong> {{ $shift->staff_name ?? 'Unassigned' }}</strong></span>
                                             </div>
                                         </div>
                                         <div class="siftTime">
                                             <div class="siftTimeCont">
                                                 <i class="fa  fa-map-marker"></i>
-                                                <span>Client: <strong> {{ $shift->client_name ?? 'Unknown Client' }}</strong></span>
+                                                <span>{{ getTerm('Service User') }}: <strong> {{ $shift->client_name ?? 'Unknown ' . getTerm('Service User') }}</strong></span>
                                             </div>
                                         </div>
                                     </div>
@@ -144,7 +144,7 @@
                                                 <div class="quickActions">
                                                     <div class="activityCalendar"> <i class="fa fa-calendar-o"></i></div>
                                                     <div class="rotsBoxRightCont">
-                                                        <h4>Add Carer </h4>
+                                                        <h4>Add {{ getTerm('Staff') }} </h4>
                                                     </div>
                                                 </div>
                                             </a>
@@ -154,7 +154,7 @@
                                                 <div class="quickActions  m-t-15">
                                                     <div class="activityCalendar"> <i class="fa fa-calendar-o"></i></div>
                                                     <div class="rotsBoxRightCont">
-                                                        <h4>Add Client </h4>
+                                                        <h4>Add {{ getTerm('Service User') }} </h4>
                                                     </div>
                                                 </div>
                                             </a>

@@ -20,5 +20,7 @@ class CompanyHomeSetting extends Model
         'weekly_allowance_service_users',
         'monthly_allowance_service_users',
         'clock_in_range',
+        'staff_term',
+        'service_user_term',
     ];
 }

@@ -1,6 +1,6 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 @extends('frontEnd.layouts.master')
-@section('title', 'Carer')
+@section('title', getTerm('Staff') . 's')
 @section('content')
 
 @include('frontEnd.roster.common.roster_header')
@@ -42,12 +42,12 @@
     <div class="container-fluid">
         <div class="topHeaderCont">
             <div>
-                <h1>Carers</h1>
+                <h1>{{ getTerm('Staff') }}s</h1>
                 <p class="header-subtitle">Manage your care team</p>
             </div>
             <div class="action-buttons">
                 <button class="btn btn-export add_staff" data-mode="export"><i class="fa fa-download"></i> Export </button>
-                <button class="btn btn-add-carer add_staff openStaffModal" data-mode="add"> <i class="fa fa-plus"></i> Add Carer </button>
+                <button class="btn btn-add-carer add_staff openStaffModal" data-mode="add"> <i class="fa fa-plus"></i> Add {{ getTerm('Staff') }} </button>
             </div>
 
             <!-- <div class="header-actions">
@@ -59,7 +59,7 @@
         <div class="rota_dashboard-cards simpleCard">
             <div class="rota_dash-card blue">
                 <div class="rota_dash-left">
-                    <p class="rota_title">Total Carers</p>
+                    <p class="rota_title">Total {{ getTerm('Staff') }}s</p>
                     <h2 class="rota_count" id="countAll">{{ $counts['all'] }}</h2>
                 </div>
             </div>
@@ -217,7 +217,7 @@
                 container.innerHTML = `
                         <div class="leave-card">
                             <div class="leavebanktabCont">
-                                <h4>No carers found</h4>
+                                <h4>No {{ strtolower(getTerm('Staff')) }}s found</h4>
                             </div>
                         </div>`;
                 return;
@@ -356,7 +356,7 @@
         $(document).on('click', '.deleteCarer', function() {
             let carerId = $(this).data('id');
 
-            if (!confirm('Are you sure you want to delete this carer?')) {
+            if (!confirm(`Are you sure you want to delete this ${"{{ strtolower(getTerm('Staff')) }}"}?`)) {
                 return;
             }
 

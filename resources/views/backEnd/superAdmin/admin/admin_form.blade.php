@@ -179,6 +179,22 @@ if (isset($system_admins)) {
                                     </div>
                                 </div>
 
+                                <div class="form-group">
+                                    <label class="col-lg-3 control-label">System Term for 'Staff'</label>
+                                    <div class="col-lg-9">
+                                        <input type="text" name="staff_term" class="form-control" placeholder="e.g. Carer, Staff" value="{{ (isset($system_admin_home->staff_term)) ? $system_admin_home->staff_term : 'Staff' }}">
+                                        <span class="help-block">This will change how staff members are referred to in the system.</span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-lg-3 control-label">System Term for 'Service User'</label>
+                                    <div class="col-lg-9">
+                                        <input type="text" name="service_user_term" class="form-control" placeholder="e.g. Client, Child, Service User" value="{{ (isset($system_admin_home->service_user_term)) ? $system_admin_home->service_user_term : 'Service User' }}">
+                                        <span class="help-block">This will change how service users are referred to in the system.</span>
+                                    </div>
+                                </div>
+
                                 <div class="form-actions">
                                     <div class="row">
                                         <div class="col-lg-offset-2 col-lg-9">

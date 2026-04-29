@@ -292,7 +292,13 @@ class AdminController extends Controller
                     'weekly_allowance_service_users'  => $request->weekly_allowance_service_users,
                     'monthly_allowance_service_users' => $request->monthly_allowance_service_users,
                     'clock_in_range'                  => $request->clock_in_range,
+                    'staff_term'                      => $request->staff_term ?? 'Staff',
+                    'service_user_term'               => $request->service_user_term ?? 'Service User',
                 ]);
+
+                // Clear terminology cache for this company
+                \Illuminate\Support\Facades\Cache::forget('terminology_' . $system_admin->id . '_staff_term');
+                \Illuminate\Support\Facades\Cache::forget('terminology_' . $system_admin->id . '_service_user_term');
 
                 Log::info('Company settings saved');
 
@@ -548,9 +554,15 @@ class AdminController extends Controller
                         'weekly_allowance_service_users'  => $request->weekly_allowance_service_users,
                         'monthly_allowance_service_users' => $request->monthly_allowance_service_users,
                         'clock_in_range'                  => $request->clock_in_range,
+                        'staff_term'                      => $request->staff_term ?? 'Staff',
+                        'service_user_term'               => $request->service_user_term ?? 'Service User',
                     ]
                 );
                 Log::info('Company settings updated');
+                
+                // Clear terminology cache for this company
+                \Illuminate\Support\Facades\Cache::forget('terminology_' . $system_admin->id . '_staff_term');
+                \Illuminate\Support\Facades\Cache::forget('terminology_' . $system_admin->id . '_service_user_term');
 
                 // =========================
                 // 6. UPDATE COMPANY AREAS
