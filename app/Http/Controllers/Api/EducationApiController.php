@@ -244,6 +244,19 @@ class EducationApiController extends Controller
 
     public function addResource(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'service_user_id' => 'required',
+            'education_profile_id' => 'required',
+            'staff_id' => 'required',
+            'title' => 'required',
+            'subject' => 'required',
+            'file' => 'required|file',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['status' => 'error', 'message' => $validator->errors()->first()], 400);
+        }
+
         $resource = new SuEducationResource($request->all());
         if ($request->hasFile('file')) {
             $file = $request->file('file');
@@ -251,7 +264,9 @@ class EducationApiController extends Controller
             $file->move(public_path('uploads/education/resources'), $fileName);
             $resource->file_path = 'uploads/education/resources/' . $fileName;
         }
-        $resource->save();
-        return response()->json(['status' => 'success', 'data' => $resource]);
+        if ($resource->save()) {
+            return response()->json(['status' => 'success', 'data' => $resource, 'message' => 'Resource added successfully']);
+        }
+        return response()->json(['status' => 'error', 'message' => 'Could not save resource'], 500);
     }
 }
