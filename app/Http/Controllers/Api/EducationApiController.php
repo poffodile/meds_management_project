@@ -143,6 +143,7 @@ class EducationApiController extends Controller
             'education_profile_id' => 'required',
             'staff_id' => 'required',
             'subject' => 'required',
+            'title' => 'required',
             'description' => 'required',
             'due_date' => 'required|date',
         ]);

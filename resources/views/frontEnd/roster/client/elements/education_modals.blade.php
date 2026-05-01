@@ -70,7 +70,7 @@
     <div class="modal-dialog">
         <div class="modal-content" style="border-radius: 12px; border: none;">
             <div class="modal-header" style="border-bottom: 1px solid #f1f5f9; padding: 15px 25px;">
-                <h4 class="modal-title" style="font-weight: 500; color: #334155; font-size: 18px;">Assign New Task</h4>
+                <h4 class="modal-title" style="font-weight: 500; color: #334155; font-size: 18px;">Add Homework / Task</h4>
                 <button type="button" class="close" data-dismiss="modal" style="font-size: 24px; color: #cbd5e1; opacity: 0.8;">&times;</button>
             </div>
             <form action="{{ route('education.add-task') }}" method="post" enctype="multipart/form-data">
@@ -80,7 +80,7 @@
                 <div class="modal-body" style="padding: 25px;">
                     <div class="form-group mb-4">
                         <label class="form-label" style="font-weight: 500; color: #1e293b; margin-bottom: 12px; display: block;">Subject</label>
-                        <select name="subject" class="form-control" required style="border: 1.5px solid #8b5cf6; border-radius: 8px; padding: 12px; height: auto; appearance: auto; color: #64748b;">
+                        <select name="subject" class="form-control" required style="border: 1px solid #8b5cf6; border-radius: 8px; padding: 12px; height: auto; appearance: auto; color: #64748b;">
                             <option value="">Select subject</option>
                             @if(isset($education_profile->subjects))
                                 @foreach(explode(',', $education_profile->subjects) as $subj)
@@ -90,19 +90,32 @@
                         </select>
                     </div>
                     <div class="form-group mb-4">
-                        <label class="form-label" style="font-weight: 500; color: #1e293b; margin-bottom: 12px; display: block;">Task Description</label>
-                        <textarea name="description" class="form-control" rows="5" placeholder="Write description..." required style="border: 1.5px solid #8b5cf6; border-radius: 8px; padding: 12px;"></textarea>
-                        <input type="hidden" name="title" value="Task">
+                        <label class="form-label" style="font-weight: 500; color: #1e293b; margin-bottom: 12px; display: block;">Task Title</label>
+                        <input type="text" name="title" class="form-control" placeholder="e.g. Complete Chapter 5 exercises" required style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; height: auto; width: 100%;">
                     </div>
-                    <div class="form-group mb-0">
+                    <div class="form-group mb-4">
+                        <label class="form-label" style="font-weight: 500; color: #1e293b; margin-bottom: 12px; display: block;">Description</label>
+                        <textarea name="description" class="form-control" rows="4" placeholder="Task details..." required style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px;"></textarea>
+                    </div>
+                    <div class="form-group mb-4">
                         <label class="form-label" style="font-weight: 500; color: #1e293b; margin-bottom: 12px; display: block;">Due Date</label>
                         <div style="position: relative;">
                             <input type="date" name="due_date" class="form-control" value="{{ date('Y-m-d') }}" required style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; height: auto; width: 100%;">
                         </div>
                     </div>
+                    <div class="form-group mb-0">
+                        <label class="form-label" style="font-weight: 500; color: #1e293b; margin-bottom: 12px; display: block;">Attachment (optional)</label>
+                        <label class="attachment-box" for="taskFile" style="border: 1px dashed #cbd5e1; border-radius: 8px; padding: 12px; cursor: pointer; background: #f8fafc; text-align: left; display: block;">
+                            <div id="taskFileUI" style="display: flex; align-items: center; gap: 8px;">
+                                <i class='bx bx-paperclip' style="font-size: 18px; color: #94a3b8;"></i>
+                                <p id="taskFileName" style="margin: 0; color: #94a3b8; font-size: 14px;">Click to attach file</p>
+                            </div>
+                            <input type="file" name="attachment" id="taskFile" style="display: none !important;" onchange="updateFileName(this, 'taskFileName')">
+                        </label>
+                    </div>
                 </div>
                 <div class="modal-footer" style="border-top: 1px solid #f1f5f9; padding: 15px 25px; border-radius: 0 0 12px 12px;">
-                    <button class="btn-assign" type="submit" style="background: #4db6ac; color: #fff; border: none; padding: 10px 30px; border-radius: 10px; font-weight: 700; font-size: 15px;">Assign Task</button>
+                    <button class="btn-assign w-100" type="submit" style="background: #a78bfa; color: #fff; border: none; padding: 12px; border-radius: 8px; font-weight: 600; font-size: 15px;">Create Task</button>
                 </div>
             </form>
         </div>
@@ -246,13 +259,13 @@
                     </div>
                     <div class="form-group mb-4">
                         <label class="form-label" style="font-weight: 500; color: #1e293b; margin-bottom: 12px; display: block;">Upload File</label>
-                        <div class="attachment-box" onclick="$('#resourceFile').click()" style="border: 2px dashed #e2e8f0; border-radius: 10px; padding: 25px; text-align: center; cursor: pointer; transition: all 0.2s;">
+                        <label class="attachment-box" for="resourceFile" style="border: 2px dashed #e2e8f0; border-radius: 10px; padding: 25px; text-align: center; cursor: pointer; transition: all 0.2s; display: block;">
                             <div id="resourceFileUI">
                                 <i class='bx bx-upload' style="font-size: 24px; color: #94a3b8; margin-bottom: 8px; display: block;"></i>
                                 <p id="resourceFileName" style="margin: 0; color: #64748b; font-size: 14px;">Click to upload</p>
                             </div>
                             <input type="file" name="file" id="resourceFile" style="display: none !important;" onchange="updateFileName(this, 'resourceFileName')">
-                        </div>
+                        </label>
                     </div>
                     <div class="form-group mb-0">
                         <label class="form-label" style="font-weight: 500; color: #1e293b; margin-bottom: 12px; display: block;"><i class='bx bx-link'></i> Or add a link</label>

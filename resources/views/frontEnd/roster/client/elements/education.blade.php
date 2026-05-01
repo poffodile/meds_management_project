@@ -1,4 +1,5 @@
 <style>
+    .edu-container { background: #f8fafc; border-radius: 16px; padding: 1.5rem; }
     .edu-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 25px; }
     .edu-name h2 { margin: 0; font-size: 28px; font-weight: 700; color: #1e293b; }
     .edu-name p { margin: 5px 0 0; color: #64748b; font-size: 16px; }
@@ -36,9 +37,39 @@
     .edu-actions-dropdown .dropdown-item { border-radius: 8px; padding: 10px 12px; font-size: 14px; color: #475569; font-weight: 500; display: flex; align-items: center; gap: 10px; }
     .edu-actions-dropdown .dropdown-item:hover { background: #f1f5f9; color: #1e293b; }
     .edu-actions-dropdown .dropdown-item i { font-size: 18px; color: #94a3b8; }
+
+    .view-doc-link { color: #4f46e5; font-weight: 600; font-size: 13px; text-decoration: none; display: flex; align-items: center; gap: 5px; }
+    .view-doc-link:hover { color: #4338ca; text-decoration: underline; }
+
+    /* Assigned Staff Styles */
+    .edu-assigned-section { font-weight: 600; color: #334155; font-size: 14px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+    .staff-pills-container { display: flex; flex-wrap: wrap; gap: 10px; }
+    .staff-pill { background: #f1f5f9; border-radius: 30px; padding: 6px 15px; display: flex; align-items: center; gap: 10px; border: 1px solid #e2e8f0; }
+    .staff-avatar { width: 24px; height: 24px; background: #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #64748b; }
+    .staff-name { font-size: 13px; font-weight: 500; color: #1e293b; }
+    .staff-remove { color: #94a3b8; font-size: 14px; }
+    .no-staff-text { color: #94a3b8; font-size: 13px; font-style: italic; }
+
+    /* Empty States */
+    .empty-state { text-center: center; padding: 3rem 0; }
+    .empty-state i { font-size: 64px; color: #cbd5e1; margin-bottom: 15px; display: block; }
+    .empty-state p { font-size: 14px; color: #94a3b8; }
+
+    /* Attendance */
+    .attendance-row { display: flex; justify-content: space-between; align-items: center; }
+    .attendance-date { font-weight: 500; color: #475569; }
+    .att-present { background: #dcfce7; color: #15803d; }
+    .att-absent { background: #fee2e2; color: #b91c1c; }
+    .att-late { background: #fef3c7; color: #b45309; }
+
+    /* Resources */
+    .resource-card { border: 1.5px solid #8b5cf6; display: flex; justify-content: space-between; align-items: center; }
+    .resource-title { font-weight: 700; color: #1e293b; font-size: 16px; }
+    .resource-subject { color: #64748b; font-size: 13px; margin-top: 4px; }
+    .resource-action-link { color: #4f46e5; font-weight: 500; font-size: 14px; text-decoration: none; }
 </style>
 
-<div class="p-4" style="background: #f8fafc; border-radius: 16px;">
+<div class="edu-container">
     <!-- HEADER SECTION -->
     <div class="edu-header">
         <div class="edu-name">
@@ -89,29 +120,29 @@
                         <span class="subject-pill">{{ trim($subj) }}</span>
                     @endforeach
                 @else
-                    <span class="text-muted" style="font-size: 13px;">None</span>
+                    <span class="text-muted small">None</span>
                 @endif
             </div>
         </div>
     </div>
     
     <!-- ASSIGNED STAFF SECTION -->
-    <div class="edu-card" style="margin-bottom: 25px;">
-        <div style="font-weight: 600; color: #334155; font-size: 14px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
-            <i class='bx bx-group' style="font-size: 18px; color: #64748b;"></i>
+    <div class="edu-card mb-4">
+        <div class="edu-assigned-section">
+            <i class='bx bx-group'></i>
             Assigned Staff
         </div>
-        <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+        <div class="staff-pills-container">
             @forelse($assigned_staff as $assign)
-                <div style="background: #f1f5f9; border-radius: 30px; padding: 6px 15px; display: flex; align-items: center; gap: 10px; border: 1px solid #e2e8f0;">
-                    <div style="width: 24px; height: 24px; background: #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #64748b;">
+                <div class="staff-pill">
+                    <div class="staff-avatar">
                         {{ substr($assign->staff->name ?? '?', 0, 1) }}
                     </div>
-                    <span style="font-size: 13px; font-weight: 500; color: #1e293b;">{{ $assign->staff->name ?? 'Unknown' }}</span>
-                    <a href="#" style="color: #94a3b8; font-size: 14px;"><i class='bx bx-trash'></i></a>
+                    <span class="staff-name">{{ $assign->staff->name ?? 'Unknown' }}</span>
+                    <a href="#" class="staff-remove"><i class='bx bx-trash'></i></a>
                 </div>
             @empty
-                <div style="color: #94a3b8; font-size: 13px; font-style: italic;">No staff assigned yet.</div>
+                <div class="no-staff-text">No staff assigned yet.</div>
             @endforelse
         </div>
     </div>
@@ -138,6 +169,11 @@
                                 {{ ucfirst($task->status) }}
                             </span>
                         </div>
+                        @if($task->attachment)
+                            <a href="{{ asset($task->attachment) }}" target="_blank" class="view-doc-link">
+                                <i class='bx bx-file'></i> View Document
+                            </a>
+                        @endif
                     </div>
                     <div class="edu-card-meta">
                         {{ $task->subject }} • Due {{ date('M d, Y', strtotime($task->due_date)) }} • by {{ $task->staff->name ?? 'System' }}
@@ -147,9 +183,9 @@
                     </div>
                 </div>
             @empty
-                <div class="text-center py-5">
-                    <i class='bx bx-task' style="font-size: 64px; color: #cbd5e1; margin-bottom: 15px; display: block;"></i>
-                    <p class="mt-2 text-muted" style="font-size: 14px;">No educational tasks assigned yet.</p>
+                <div class="empty-state">
+                    <i class='bx bx-task'></i>
+                    <p>No educational tasks assigned yet.</p>
                 </div>
             @endforelse
         </div>
@@ -157,24 +193,24 @@
         <!-- ATTENDANCE PANE -->
         <div class="edu-pane d-none" id="edu-attendance-pane">
             @forelse($education_attendance as $att)
-                <div class="edu-card py-3 px-4 d-flex justify-content-between align-items-center">
-                    <div style="font-weight: 500; color: #475569;">
+                <div class="edu-card py-3 px-4 attendance-row">
+                    <div class="attendance-date">
                         {{ date('D, M d', strtotime($att->date)) }}
                     </div>
                     <div>
                         @if($att->status == 'present')
-                            <span class="status-badge status-completed" style="background: #dcfce7; color: #15803d;">Present</span>
+                            <span class="status-badge att-present">Present</span>
                         @elseif($att->status == 'absent')
-                            <span class="status-badge status-pending" style="background: #fee2e2; color: #b91c1c;">Absent</span>
+                            <span class="status-badge att-absent">Absent</span>
                         @else
-                            <span class="status-badge status-progress" style="background: #fef3c7; color: #b45309;">Late</span>
+                            <span class="status-badge att-late">Late</span>
                         @endif
                     </div>
                 </div>
             @empty
-                <div class="text-center py-5">
-                    <i class='bx bx-calendar-check' style="font-size: 64px; color: #cbd5e1; margin-bottom: 15px; display: block;"></i>
-                    <p class="text-muted" style="font-size: 14px;">No attendance records found.</p>
+                <div class="empty-state">
+                    <i class='bx bx-calendar-check'></i>
+                    <p>No attendance records found.</p>
                 </div>
             @endforelse
         </div>
@@ -191,9 +227,9 @@
                     <div class="mt-2 text-muted small">Logged by: {{ $note->staff->name ?? 'System' }}</div>
                 </div>
             @empty
-                <div class="text-center py-5">
-                    <i class='bx bx-note' style="font-size: 64px; color: #cbd5e1; margin-bottom: 15px; display: block;"></i>
-                    <p class="text-muted" style="font-size: 14px;">No notes found.</p>
+                <div class="empty-state">
+                    <i class='bx bx-note'></i>
+                    <p>No notes found.</p>
                 </div>
             @endforelse
         </div>
@@ -201,23 +237,23 @@
         <!-- RESOURCES PANE -->
         <div class="edu-pane d-none" id="edu-resources-pane">
             @forelse($education_resources as $res)
-                <div class="edu-card d-flex justify-content-between align-items-center" style="border: 1.5px solid #8b5cf6;">
+                <div class="edu-card resource-card">
                     <div>
-                        <div style="font-weight: 700; color: #1e293b; font-size: 16px;">{{ $res->title }}</div>
-                        <div style="color: #64748b; font-size: 13px; margin-top: 4px;">{{ $res->subject ?? 'General' }}</div>
+                        <div class="resource-title">{{ $res->title }}</div>
+                        <div class="resource-subject">{{ $res->subject ?? 'General' }}</div>
                     </div>
                     <div>
                         @if($res->file_path)
-                            <a href="{{ asset($res->file_path) }}" target="_blank" style="color: #4f46e5; font-weight: 500; font-size: 14px; text-decoration: none;">Download</a>
+                            <a href="{{ asset($res->file_path) }}" target="_blank" class="resource-action-link">Download</a>
                         @elseif($res->link)
-                            <a href="{{ $res->link }}" target="_blank" style="color: #4f46e5; font-weight: 500; font-size: 14px; text-decoration: none;">View Link</a>
+                            <a href="{{ $res->link }}" target="_blank" class="resource-action-link">View Link</a>
                         @endif
                     </div>
                 </div>
             @empty
-                <div class="text-center py-5">
-                    <i class='bx bx-file' style="font-size: 64px; color: #cbd5e1; margin-bottom: 15px; display: block;"></i>
-                    <p class="text-muted" style="font-size: 14px;">No resources available.</p>
+                <div class="empty-state">
+                    <i class='bx bx-file'></i>
+                    <p>No resources available.</p>
                 </div>
             @endforelse
         </div>
@@ -230,6 +266,7 @@
         </div>
     </div>
 </div>
+
 
 <!-- MODALS -->
 @include('frontEnd.roster.client.elements.education_modals')
