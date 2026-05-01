@@ -3,12 +3,13 @@
 namespace App\Http\Controllers\Api\ServiceUser;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail;
+use App\Models\SuBehavior;
+use App\User, App\ServiceUser, App\SocialApp, App\ServiceUserContacts, App\Risk, App\Home;
 use Auth, DB, Hash;
 use DateTime, Carbon\Carbon;
-use App\User, App\ServiceUser, App\SocialApp, App\ServiceUserContacts, App\Risk, App\Home;
-use App\Models\SuBehavior;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
@@ -28,6 +29,7 @@ class UserController extends Controller
                     $date_of_birth = date('d F Y', strtotime($user_detail->date_of_birth));
 
                     $user_age = Carbon::parse($date_of_birth)->diff(Carbon::now())->format('%y years, %m months and %d days');
+                    $numeric_age = Carbon::parse($date_of_birth)->age ?? 0;
                     /*echo "<pre>";
                     print_r($user_detail);
                     die;*/
@@ -47,6 +49,7 @@ class UserController extends Controller
                         "name"          => $user_detail->name,
                         "date_of_birth" => date('d M Y', strtotime($user_detail->date_of_birth)),
                         "age"           => $user_age,
+                        'user_age' => $numeric_age,
                         "wish"          => $wish,
                         "image"         => $user_detail->image ?? '',
                         "su_image_ur"   => serviceUserProfileImagePath,
@@ -153,8 +156,8 @@ class UserController extends Controller
     //         $current_location = preg_replace($pattern, ' ', (string) $current_location);
     //         $coordinates = ServiceUser::getLongLat($current_location);
 
-    //         $latitude = (isset($coordinates['results']['0']['geometry']['location']['lat'])) ? $coordinates['results']['0']['geometry']['location']['lat'] : ''; 
-    //         $longitude = (isset($coordinates['results']['0']['geometry']['location']['lng'])) ? $coordinates['results']['0']['geometry']['location']['lng'] : ''; 
+    //         $latitude = (isset($coordinates['results']['0']['geometry']['location']['lat'])) ? $coordinates['results']['0']['geometry']['location']['lat'] : '';
+    //         $longitude = (isset($coordinates['results']['0']['geometry']['location']['lng'])) ? $coordinates['results']['0']['geometry']['location']['lng'] : '';
 
     //         $user_details['location']['latitude'] = $latitude;
     //         $user_details['location']['longitude'] = $longitude;
@@ -263,7 +266,7 @@ class UserController extends Controller
                 'message' => 'User not found.'
             ]);
         }
-        
+
         $user = (array) $exist;
 
         /* ================= BASIC DETAILS ================= */
@@ -293,7 +296,7 @@ class UserController extends Controller
         $data['name'] = $user['name'] ?? '';
         $data['user_name'] = $user['user_name'] ?? '';
         $data['phone_no'] = $user['phone_no'] ?? '';
-        $data['date_of_birth'] = !empty($dob_db) ? Carbon::createFromFormat('Y-m-d', $dob_db)->format('d/m/Y'): '';
+        $data['date_of_birth'] = !empty($dob_db) ? Carbon::createFromFormat('Y-m-d', $dob_db)->format('d/m/Y') : '';
         $data['age'] = $age . ' years';
         $data['department'] = $user['department'] ?? null;
         $data['child_type'] = $user['child_type'] ?? '';
@@ -393,7 +396,7 @@ class UserController extends Controller
 
         $data['avg_rating'] = $rating ? (string)round($rating, 1) : '0.0';
 
-         /* ================= MOOD ================= */
+        /* ================= MOOD ================= */
         $data['mood'] = [
             'id' => null,
             'mood_image' => '',
@@ -417,9 +420,16 @@ class UserController extends Controller
                 'mood_name' => ucfirst($su_mood->name)
             ];
         }
+
         
+        /* ================= EDUCATION PROFILE CHECK ================= */
+        $data['education_profile'] = DB::table('su_education_profiles')
+            ->where('service_user_id', $service_user_id)
+            ->exists();
+        
+
         /* ================= FINAL RESPONSE ================= */
-       return response()->json([
+        return response()->json([
             'success' => true,
             'message' => 'User Details.',
             'data' => $data
@@ -587,7 +597,7 @@ class UserController extends Controller
 
 
     /* public function show_forget_password_form(Request $request, $user_name = null, $security_code = null) {
-        
+
         $decoded_user_name     = convert_uudecode(base64_decode($user_name));
         $decoded_security_code = convert_uudecode(base64_decode($security_code));
         $count = ServiceUser::where('user_name', $decoded_user_name)
@@ -596,7 +606,7 @@ class UserController extends Controller
         if(!empty($count)) {
             $user_name = $count->user_name;
             $user_id   = $count->id;
-            return view('frontEnd.forget_set_password', compact('user_id','user_name','security_code')); 
+            return view('frontEnd.forget_set_password', compact('user_id','user_name','security_code'));
         } else {
             return redirect('/login')->with('error','This link has been already used.');
         }
@@ -675,6 +685,109 @@ class UserController extends Controller
             } else {
                 return redirect()->back()->with('error', 'Some error occured. Please try again later');
             }
+        }
+    }
+
+    public function change_notification(Request $req)
+    {
+        try {
+            $validator = Validator::make($req->all(), [
+                'child_id' => 'required|exists:service_user,id',
+                'type' => 'required',
+                'status' => "required|in:0,1"
+            ]);
+            if ($validator->fails()) {
+                return response()->json([
+                    'status'  => false,
+                    'message' => $validator->errors()->first(),
+                ], 422);
+            }
+            $child_id = $req->child_id ?? "";
+            $childData = ServiceUser::find($child_id);
+            $msg = 'Notification Changed Successfully';
+            if ($req->type == 'mood') {
+
+                $childData->mood_notification = $req->status ?? 0;
+                $msg = ($req->status == 1)
+                    ? 'Mood sound notifications have been enabled.'
+                    : 'Mood sound notifications have been disabled.';
+            } else {
+                $childData->notification = $req->status ?? 0;
+                $msg = ($req->status == 1)
+                    ? 'Notifications have been enabled.'
+                    : 'Notifications have been disabled.';
+            }
+            $childData->save();
+
+            return response()->json([
+                'status'  => true,
+                'message' => $msg,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function dashboard(Request $req)
+    {
+        try {
+            $validator = Validator::make($req->all(), [
+                'child_id' => 'required|exists:service_user,id',
+            ]);
+            if ($validator->fails()) {
+                return response()->json([
+                    'status'  => false,
+                    'message' => $validator->errors()->first(),
+                ], 422);
+            }
+            $child_id = $req->child_id ?? "";
+            $childData = ServiceUser::find($child_id);
+
+
+            /* ================= BASIC DETAILS ================= */
+            $dob_db = $childData->date_of_birth;
+
+            // age calculation (parse DB format)
+            $age = 0;
+            if (!empty($dob_db)) {
+                $age = Carbon::createFromFormat('Y-m-d', date('Y-m-d', strtotime($dob_db)))->diffInYears(now());
+            }
+            $time = date("H");
+            $timezone = date("e");
+            if ($time < "12") {
+                $wish = "Good morning";
+            } elseif ($time >= "12" && $time < "17") {
+                $wish = "Good afternoon";
+            } elseif ($time >= "17" && $time < "19") {
+                $wish = "Good evening";
+            } elseif ($time >= "19") {
+                $wish = "Good night";
+            }
+            $data = [
+                'id' => $child_id,
+                'home_id' => $childData->home_id,
+                'name' => $childData->name,
+                'age' => $age,
+                "wish" => $wish,
+                "mood_notification" => $childData->mood_notification,
+                "notification" => $childData->notification,
+                "current_date" => date('l d, F'),
+            ];
+
+            /* ================= FINAL RESPONSE ================= */
+            return response()->json([
+                'status' => true,
+                'message' => 'User Details',
+                'data' => $data
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage()
+            ], 500);
         }
     }
 }
