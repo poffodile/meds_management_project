@@ -1,6 +1,6 @@
 @extends('backEnd.layouts.master')
 
-@section('title',' :Company Manager Form')
+@section('title',' : Company Manager Form')
 <meta name="csrf-token" content="{{ csrf_token() }}">
 
 @section('content')
@@ -88,6 +88,22 @@ if (isset($user_info)) {
                                         <input type="text" name="user_name" class="form-control" placeholder="username" value="{{ (isset($user_info->user_name)) ? $user_info->user_name : '' }}" {{ (isset($user_info)) ? 'readonly': '' }} maxlength="255" {{ (isset($del_status)) ? $disabled: '' }}>
                                     </div>
                                 </div>
+
+                                @if(!isset($user_info))
+                                <div class="form-group">
+                                    <label class="col-lg-3 control-label">Password</label>
+                                    <div class="col-lg-9">
+                                        <input type="password" name="password" class="form-control" placeholder="password" maxlength="255" required>
+                                    </div>
+                                </div>
+                                @else
+                                <div class="form-group">
+                                    <label class="col-lg-3 control-label">Password</label>
+                                    <div class="col-lg-9">
+                                        <input type="password" name="password" class="form-control" placeholder="Leave blank to keep current password" maxlength="255">
+                                    </div>
+                                </div>
+                                @endif
 
                                 <div class="form-group">
                                     <label class="col-lg-3 control-label">Job Title</label>
@@ -305,33 +321,33 @@ if (isset($user_info)) {
                                     <div class="col-lg-9">
                                         <div class="checkbox">
                                             <label class="assign-access"><input type="checkbox" value="yes" name="assign_right_check" {{ (isset($user_info->access_rights)) ? 'checked' : '' }}>Assign access rights according to the access level</label>
-                                        </div>
-                                    </div>
-                                </div>--}}
-
-                                <div class="form-actions">
-                                    <div class="row">
-                                        <div class="col-lg-3">
-                                        </div>
-                                        <div class="col-lg-9">
-                                            <div class="edit-submit-btn-area">
-                                                <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                                                <input type="hidden" name="user_id" value="{{ (isset($user_info->id)) ? $user_info->id : '' }}">
-                                                <button type="submit" class="btn btn-primary" name="submit1" {{ (isset($del_status)) ? $disabled: '' }}>Save</button>
-                                                <a href="{{ url('admin/company-managers') }}">
-                                                    <button type="button" class="btn btn-default" name="cancel">Cancel</button>
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
                         </div>
                     </div>
-                </section>
+            </div>--}}
+
+            <div class="form-actions">
+                <div class="row">
+                    <div class="col-lg-3">
+                    </div>
+                    <div class="col-lg-9">
+                        <div class="edit-submit-btn-area">
+                            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="user_id" value="{{ (isset($user_info->id)) ? $user_info->id : '' }}">
+                            <button type="submit" class="btn btn-primary" name="submit1" {{ (isset($del_status)) ? $disabled: '' }}>Save</button>
+                            <a href="{{ url('admin/company-managers') }}">
+                                <button type="button" class="btn btn-default" name="cancel">Cancel</button>
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
+            </form>
+        </div>
         </div>
     </section>
+    </div>
+    </div>
+</section>
 </section>
 
 <script>

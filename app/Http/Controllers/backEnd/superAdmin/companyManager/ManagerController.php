@@ -56,7 +56,6 @@ class ManagerController extends Controller
 
     public function add(Request $request)
     {
-
         $admin = Session::get('scitsAdminSession');
         $home_id = $admin->home_id;
         //$del_status = '0';
@@ -85,19 +84,19 @@ class ManagerController extends Controller
 
             if ($request->has('allHome') && !empty($company_ids)) {
                 // User selected "All homes"
-                $home_ids = Home::whereIn('admin_id', $data['company_id'])
+                $home_ids_arr = Home::whereIn('admin_id', $data['company_id'])
                     ->pluck('id')
                     ->toArray();
             } elseif ($request->has('homes') && !empty($request->homes)) {
                 // User selected specific homes
-                $home_ids = $request->homes;
+                $home_ids_arr = $request->homes;
             } else {
                 // Default home
-                $home_ids = [$home_id];
+                $home_ids_arr = [$home_id];
             }
 
             // Convert to comma-separated string if needed
-            $home_ids = implode(',', $home_ids);
+            $home_ids = implode(',', $home_ids_arr);
 
 
 
@@ -119,12 +118,13 @@ class ManagerController extends Controller
             $user->name                 = $request->name;
             $user->user_name            = $request->user_name;
             $user->email                = $request->email;
-            //$random_no                  = rand(111111,999999);
-            $user->password             = '';
-            //$user->password             = Hash::make($random_no);
-            //$user->password           = Hash::make($request->password);
+            $user->password             = Hash::make($request->password);
             if (!empty($company_ids)) {
                 $user->company_id       = $company_ids;
+                // Set admn_id to the first selected company's ID for login consistency
+                $user->admn_id          = $data['company_id'][0];
+            } else {
+                $user->admn_id          = $admin->id;
             }
             $user->user_type            = 'M';
             $user->job_title            = $request->job_title;
@@ -136,7 +136,6 @@ class ManagerController extends Controller
             $user->date_of_leaving      = $date_of_leaving;
             $user->status               = $request->status;
             $user->phone_no             = $request->phone_no;
-
             $user->current_location     = nl2br(trim($request->current_location));
             $user->personal_info        = nl2br(trim($request->personal_info));
             $user->banking_info         = nl2br(trim($request->banking_info));
@@ -236,19 +235,19 @@ class ManagerController extends Controller
 
             if ($request->has('allHome') && !empty($company_ids)) {
                 // User selected "All homes"
-                $home_ids = Home::whereIn('admin_id', $data['company_id'])
+                $home_ids_arr = Home::whereIn('admin_id', $data['company_id'])
                     ->pluck('id')
                     ->toArray();
             } elseif ($request->has('homes') && !empty($request->homes)) {
                 // User selected specific homes
-                $home_ids = $request->homes;
+                $home_ids_arr = $request->homes;
             } else {
                 // Default home
-                $home_ids = [$home_id];
+                $home_ids_arr = [$home_id];
             }
 
             // Convert to comma-separated string if needed
-            $home_ids = implode(',', $home_ids);
+            $home_ids = implode(',', $home_ids_arr);
 
 
             $user = User::find($user_id);
@@ -282,6 +281,7 @@ class ManagerController extends Controller
                 $user->home_id          = $home_ids;
                 //$user->user_name        = $request->user_name;
                 $user->email            = $request->email;
+                $user->admn_id          = $admin->id;
                 $user->job_title        = $request->job_title;
                 $user->access_level     = '';
                 $user->description      = $request->description;
@@ -293,16 +293,19 @@ class ManagerController extends Controller
                 $user->phone_no         = $request->phone_no;
                 if (!empty($company_ids)) {
                     $user->company_id   = $company_ids;
+                    // Set admn_id to the first selected company's ID
+                    $user->admn_id      = $data['company_id'][0];
+                } else {
+                    $user->admn_id      = $admin->id;
                 }
                 $user->user_type            = 'M';
-                $user->current_location     =  nl2br(trim($request->current_location));
-                $user->personal_info        =  nl2br(trim($request->personal_info));
-                $user->banking_info         =  nl2br(trim($request->banking_info));
-                $user->qualification_info   =  nl2br(trim($request->qualification_info));
-                /*if(!empty($request->password))
-                {
+                $user->current_location     = nl2br(trim($request->current_location));
+                $user->personal_info        = nl2br(trim($request->personal_info));
+                $user->banking_info         = nl2br(trim($request->banking_info));
+                $user->qualification_info   = nl2br(trim($request->qualification_info));
+                if (!empty($request->password)) {
                     $user->password   = Hash::make($request->password);
-                }*/
+                }
 
                 if (!empty($_FILES['image']['name'])) {
                     $tmp_image  =   $_FILES['image']['tmp_name'];

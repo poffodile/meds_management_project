@@ -132,6 +132,10 @@ Route::group(['prefix' => '/service'], function () {
 	Route::match(['get', 'post'], '/logout/location', 'App\Http\Controllers\Api\ServiceUser\LocationController@lat_long_update_logout_tym');
 	//save device id
 	Route::post('/device/add', 'App\Http\Controllers\Api\DeviceController@add_su_device');
+
+	// Education Module - Child Side
+	Route::match(['get', 'post'], '/education/tasks/{service_user_id?}', [EducationApiController::class, 'getChildTasks']);
+	Route::get('/education/task/complete/{task_id}', [EducationApiController::class, 'completeTask']);
 });
 
 
@@ -187,10 +191,4 @@ Route::group(['prefix' => '/staff'], function () {
 	Route::post('/education/attendance/add', [EducationApiController::class, 'addAttendance']);
 	Route::post('/education/note/add', [EducationApiController::class, 'addNote']);
 	Route::post('/education/resource/add', [EducationApiController::class, 'addResource']);
-});
-
-Route::group(['prefix' => '/child'], function () {
-	// Education Module - Child Side
-	Route::match(['get', 'post'], '/education/tasks/{service_user_id?}', [EducationApiController::class, 'getChildTasks']);
-	Route::post('/education/task/complete/{task_id}', [EducationApiController::class, 'completeTask']);
 });

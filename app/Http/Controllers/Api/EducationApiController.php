@@ -27,7 +27,17 @@ class EducationApiController extends Controller
         $assignments = SuEducationStaffAssignment::where('staff_id', $id)
             ->where('status', 1)
             ->with('serviceUser:id,name,image')
-            ->get();
+            ->get()
+            ->map(function ($assignment) {
+                if ($assignment->serviceUser && $assignment->serviceUser->image) {
+                    $image = $assignment->serviceUser->image;
+                    if (!str_starts_with($image, 'http') && !str_starts_with($image, 'public/')) {
+                        $image = 'public/' . $image;
+                    }
+                    $assignment->serviceUser->image = str_starts_with($image, 'http') ? $image : url($image);
+                }
+                return $assignment;
+            });
 
         return response()->json([
             'status' => 'success',
@@ -49,7 +59,7 @@ class EducationApiController extends Controller
             ->first();
 
         if (!$profile) {
-            return response()->json(['status' => 'error', 'message' => 'Education profile not found'], 404);
+            return response()->json(['status' => 'error', 'message' => 'Education profile not found. Please create the profile first'], 404);
         }
 
         $profileData = $profile->toArray();
@@ -65,6 +75,20 @@ class EducationApiController extends Controller
                 $dateStr = $task->due_date ? Carbon::parse($task->due_date)->format('M d, Y') : '';
                 $taskData['formatted_date_info'] = $dateStr . ' • by ' . $staffName;
                 $taskData['staff_name'] = $staffName;
+                if ($task->attachment) {
+                    $path = $task->attachment;
+                    if (!str_starts_with($path, 'http') && !str_starts_with($path, 'public/')) {
+                        $path = 'public/' . $path;
+                    }
+                    $taskData['attachment'] = str_starts_with($path, 'http') ? $path : url($path);
+                }
+                if ($task->submission_file) {
+                    $path = $task->submission_file;
+                    if (!str_starts_with($path, 'http') && !str_starts_with($path, 'public/')) {
+                        $path = 'public/' . $path;
+                    }
+                    $taskData['submission_file'] = str_starts_with($path, 'http') ? $path : url($path);
+                }
                 return $taskData;
             });
         $attendance = SuEducationAttendance::where('education_profile_id', $profile->id)
@@ -93,7 +117,20 @@ class EducationApiController extends Controller
                 $noteData['staff_name'] = $staffName;
                 return $noteData;
             });
-        $resources = SuEducationResource::where('education_profile_id', $profile->id)->orderBy('created_at', 'desc')->get();
+        $resources = SuEducationResource::where('education_profile_id', $profile->id)
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($resource) {
+                $resourceData = $resource->toArray();
+                if ($resource->file_path) {
+                    $path = $resource->file_path;
+                    if (!str_starts_with($path, 'http') && !str_starts_with($path, 'public/')) {
+                        $path = 'public/' . $path;
+                    }
+                    $resourceData['file_path'] = str_starts_with($path, 'http') ? $path : url($path);
+                }
+                return $resourceData;
+            });
 
         return response()->json([
             'status' => 'success',
@@ -117,7 +154,7 @@ class EducationApiController extends Controller
         $profile = SuEducationProfile::find($id);
 
         if (!$profile) {
-            return response()->json(['status' => 'error', 'message' => 'Education profile not found'], 404);
+            return response()->json(['status' => 'error', 'message' => 'Education profile not found. Please create the profile first'], 404);
         }
 
         $subjects = [];
@@ -125,7 +162,7 @@ class EducationApiController extends Controller
             $subjectsArray = explode(',', $profile->subjects);
             foreach ($subjectsArray as $subject) {
                 if (trim($subject) !== '') {
-                    $subjects[] = trim($subject);
+                    $subjects[] = ['subject' => trim($subject)];
                 }
             }
         }
@@ -158,10 +195,11 @@ class EducationApiController extends Controller
             $file = $request->file('attachment');
             $fileName = time() . '_' . $file->getClientOriginalName();
             $file->move(public_path('uploads/education/tasks'), $fileName);
-            $task->attachment = 'uploads/education/tasks/' . $fileName;
+            $task->attachment = 'public/uploads/education/tasks/' . $fileName;
         }
 
         if ($task->save()) {
+            $task->attachment = $task->attachment ? url($task->attachment) : null;
             // STEP 6: System Trigger - Notification would go here
             return response()->json(['status' => 'success', 'message' => 'Task created successfully', 'data' => $task]);
         }
@@ -178,7 +216,25 @@ class EducationApiController extends Controller
 
         $tasks = SuEducationTask::where('service_user_id', $id)
             ->orderBy('due_date', 'asc')
-            ->get();
+            ->get()
+            ->map(function ($task) {
+                $taskData = $task->toArray();
+                if ($task->attachment) {
+                    $path = $task->attachment;
+                    if (!str_starts_with($path, 'http') && !str_starts_with($path, 'public/')) {
+                        $path = 'public/' . $path;
+                    }
+                    $taskData['attachment'] = str_starts_with($path, 'http') ? $path : url($path);
+                }
+                if ($task->submission_file) {
+                    $path = $task->submission_file;
+                    if (!str_starts_with($path, 'http') && !str_starts_with($path, 'public/')) {
+                        $path = 'public/' . $path;
+                    }
+                    $taskData['submission_file'] = str_starts_with($path, 'http') ? $path : url($path);
+                }
+                return $taskData;
+            });
 
         return response()->json(['status' => 'success', 'data' => $tasks]);
     }
@@ -197,11 +253,11 @@ class EducationApiController extends Controller
             $file = $request->file('submission_file');
             $fileName = time() . '_sub_' . $file->getClientOriginalName();
             $file->move(public_path('uploads/education/submissions'), $fileName);
-            $task->submission_file = 'uploads/education/submissions/' . $fileName;
+            $task->submission_file = 'public/uploads/education/submissions/' . $fileName;
         }
 
         if ($task->save()) {
-            return response()->json(['status' => 'success', 'message' => 'Task completed successfully']);
+            return response()->json(['status' => 'success', 'message' => 'Task completed successfully', 'submission_file' => url($task->submission_file)]);
         }
         return response()->json(['status' => 'error', 'message' => 'Could not update task'], 500);
     }
@@ -262,9 +318,10 @@ class EducationApiController extends Controller
             $file = $request->file('file');
             $fileName = time() . '_' . $file->getClientOriginalName();
             $file->move(public_path('uploads/education/resources'), $fileName);
-            $resource->file_path = 'uploads/education/resources/' . $fileName;
+            $resource->file_path = 'public/uploads/education/resources/' . $fileName;
         }
         if ($resource->save()) {
+            $resource->file_path = $resource->file_path ? url($resource->file_path) : null;
             return response()->json(['status' => 'success', 'data' => $resource, 'message' => 'Resource added successfully']);
         }
         return response()->json(['status' => 'error', 'message' => 'Could not save resource'], 500);

@@ -1,7 +1,7 @@
-<?php
-// $alert_dynamic_form = App\DynamicForm::alertDynamicForm();
-//     echo "<pre>"; print_r($alert_dynamic_form); die;
-?>
+@php
+$raw_home_id = Auth::user()->getAttributes()['home_id'] ?? '';
+$allowed_ids = array_filter(explode(',', str_replace(' ', '', $raw_home_id)));
+@endphp
 
 <style type="text/css">
     .header-dys {
@@ -63,7 +63,8 @@
         <!--logo start-->
         <div class="brand ">
             <a href="{{ url('/roster') }}" class="logo">
-                <span style="color: white;">SCITS </span>
+                 <img src="{{ url('public/images/n-logo1.jpg') }}">
+                <!-- <span style="color: white;">SCITS </span> -->
             </a>
         </div>
         <!--logo end-->
@@ -72,44 +73,28 @@
         </div>
         <div class="header-dys top-nav hr-top-nav cus-nav">
             <div class="col-md-8 col-sm-8 col-xs-12 col-lg-8">
-                <?php
-                if (Auth::check()) {
-                    $design_layout_id = Auth::user()->design_layout;
-                } else {
-                    $design_layout_id = '0';
-                }
-                ?>
-                <div class="select-dyslexia">
+                 @php
+                    $design_layout_id = Auth::check() ? Auth::user()->design_layout : '0';
+                @endphp
+               <div class="select-dyslexia">
                     <select class="form-control sel_design_layout" name="design_layout_id">
-                        <option value="0" <?php if (isset($design_layout_id)) {
-                                                if ($design_layout_id == '0') {
-                                                    echo "selected";
-                                                }
-                                            } ?>>Default</option>
-                        <option value="1" <?php if (isset($design_layout_id)) {
-                                                if ($design_layout_id == '1') {
-                                                    echo "selected";
-                                                }
-                                            } ?>>Dyslexia</option>
+                        <option value="0" {{ $design_layout_id == '0' ? 'selected' : '' }}>Default</option>
+                        <option value="1" {{ $design_layout_id == '1' ? 'selected' : '' }}>Dyslexia</option>
                     </select>
                 </div>
-                @php
-                    $raw_home_id = Auth::user()->getAttributes()['home_id'] ?? '';
-                    $allowed_ids = array_filter(explode(',', str_replace(' ', '', $raw_home_id)));
-                @endphp
-
+          
                 @if(Auth::check() && count($allowed_ids) > 1)
-                    @php
-                        $allowed_homes = \App\Home::whereIn('id', $allowed_ids)->get();
-                    @endphp
-                    <div class="select-dyslexia" style="margin-right: 15px;">
-                        <select class="form-control" style="background-color: #aec785; color: #fff; border: 1px solid #aec785;" onchange="window.location.href='{{ url('/switch_home_submit') }}?home='+this.value">
-                            <option value="">Switch Home</option>
-                            @foreach($allowed_homes as $home)
-                                <option value="{{ $home->id }}" {{ Auth::user()->home_id == $home->id ? 'selected' : '' }}>{{ $home->title }}</option>
-                            @endforeach
-                        </select>
-                    </div>
+                @php
+                $allowed_homes = \App\Home::whereIn('id', $allowed_ids)->get();
+                @endphp
+                <div class="select-dyslexia" style="margin-right: 15px;">
+                    <select class="form-control" style="background-color: #aec785; color: #fff; border: 1px solid #aec785;" onchange="window.location.href='{{ url('/switch_home_submit') }}?home='+this.value">
+                        <option value="">Switch Home</option>
+                        @foreach($allowed_homes as $home)
+                        <option value="{{ $home->id }}" {{ Auth::user()->home_id == $home->id ? 'selected' : '' }}>{{ $home->title }}</option>
+                        @endforeach
+                    </select>
+                </div>
                 @endif
             </div>
             <div class="col-md-4 col-sm-4 col-xs-12 col-lg-4">
@@ -117,15 +102,11 @@
                     <!-- user login dropdown start-->
                     <li class="dropdown">
                         <a data-toggle="dropdown" class="dropdown-toggle" href="#">
-                            <?php
-                            $user_image = Auth::user()->image;
-                            if (empty($user_image)) {
-                                $user_image = 'default_user.jpg';
-                            }
-                            $current_path = Request::path();
-
-                            $user_id = Auth::user()->id;
-                            ?>
+                            @php
+                                $user_image = Auth::user()->image ?: 'default_user.jpg';
+                                $current_path = Request::path();
+                                $user_id = Auth::user()->id;
+                            @endphp
                             <!-- <img alt="" src="{{ userProfileImagePath.'/'.$user_image }}"> -->
                             <img alt="" src="{{ url('public/images/userProfileImages'.'/'.$user_image) }}">
                             <span class="username">{{ ucfirst(Auth::user()->name) }}</span>
