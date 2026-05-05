@@ -464,16 +464,17 @@
           <li> <a href="{{ url('/roster/carer') }}"><i class='bx bx-group'></i> <span>{{ getTerm('Staff') }}s</span> </a></li>
           <li> <a href="{{ url('/roster/client') }}"><i class='bx bx-user-circle'></i> <span>{{ getTerm('Service User') }}s</span> </a></li>
           <li> <a href="{{ url('/roster/daily-log') }}"><i class='bx  bx-clipboard-detail'></i> <span>Daily Log</span></a></li>
+
           <li class="header-menu"> <span>Domiciliary Care</span> </li>
-          <li> <a href="#"><i class='bx bx-dashboard'></i> <span>Dom Care Dashboard</span></a></li>
-          <li> <a href="#"><i class='bx bx-location'></i> <span>Visit Schedule</span></a></li>
-          <li> <a href="#"><i class='bx bx-calendar'></i> <span>{{ getTerm('Staff') }} Availability</span></a></li>
-          <li> <a href="#"><i class='bx bx-group'></i> <span>{{ getTerm('Staff') }}s</span></a></li>
-          <li> <a href="#"><i class='bx bx-user-circle'></i> <span>{{ getTerm('Service User') }}s</span></a></li>
-          <li> <a href="#"><i class='bx bx-send'></i> <span>Runs</span></a></li>
-          <li> <a href="#"><i class='bx  bx-file-report'></i> <span>Reports</span></a></li>
-          <li> <a href="#"><i class='bx bx-message'></i> <span>Communications</span></a></li>
-          <li> <a href="#"><i class='bx bx-message'></i> <span>{{ getTerm('Service User') }} Feedback</span></a></li>
+          <li> <a href="{{ route('domiciliary.dashboard') }}"><i class='bx bx-dashboard'></i> <span>Dom Care Dashboard</span></a></li>
+          <li> <a href="{{ route('domiciliary.visit_schedule') }}"><i class='bx bx-location'></i> <span>Visit Schedule</span></a></li>
+          <li> <a href="{{ route('domiciliary.staff_availability') }}"><i class='bx bx-calendar'></i> <span>{{ getTerm('Staff') }} Availability</span></a></li>
+          <li> <a href="{{ route('domiciliary.staffs') }}"><i class='bx bx-group'></i> <span>{{ getTerm('Staff') }}s</span></a></li>
+          <li> <a href="{{ route('domiciliary.service_users') }}"><i class='bx bx-user-circle'></i> <span>{{ getTerm('Service User') }}s</span></a></li>
+          <li> <a href="{{ route('domiciliary.runs') }}"><i class='bx bx-send'></i> <span>Runs</span></a></li>
+          <li> <a href="{{ route('domiciliary.reports') }}"><i class='bx  bx-file-report'></i> <span>Reports</span></a></li>
+          <li> <a href="{{ route('domiciliary.communications') }}"><i class='bx bx-message'></i> <span>Communications</span></a></li>
+          <li> <a href="{{ route('domiciliary.service_user_feedback') }}"><i class='bx bx-message'></i> <span>{{ getTerm('Service User') }} Feedback</span></a></li>
 
           <li class="header-menu"> <span>Supported Living</span> </li>
           <li> <a href="#"><i class='bx bx-dashboard'></i> <span>SL Dashboard</span></a></li>
@@ -481,16 +482,6 @@
           <li> <a href="#"><i class='bx  bx-home'></i> <span>Properties</span></a></li>
           <li> <a href="#"><i class='bx bx-calendar'></i> <span>Schedule</span></a></li>
 
-          <!-- <li class="header-menu"> <span>General</span> </li>
-          <li> <a href="{{ url('/roster/messaging-center') }}"><i class="fa fa-globe"></i> <span> Messaging Center</span> </a> </li>
-          <li> <a href="{{ url('/roster/staff-task') }}"><i class="fa fa-globe"></i> <span>Staff Tasks</span> </a> </li>
-          <li> <a href="{{ url('/roster/care-document') }}"><i class="fa fa-globe"></i> <span> Care Documents</span> </a> </li>
-          <li> <a href="{{ url('/roster/leave-request') }}"><i class="fa fa-globe"></i> <span> Leave Requests </span> </a> </li>
-          <li> <a href="{{ url('/roster/payroll-finance') }}"><i class="fa fa-globe"></i> <span> Payroll & Finance </span> </a> </li>
-          <li> <a href="#"><i class="fa fa-book"></i> <span>Documentation</span></a></li>
-          <li> <a href="{{ url('/roster/incident-management') }}"><i class="fa fa-book"></i> <span>Incident Management</span></a></li>
-          <li> <a href="#"><i class="fa fa-calendar"></i> <span>Calendar</span> </a></li>
-          <li> <a href="#"> <i class="fa fa-folder"></i> <span>Examples</span> </a></li> -->
           <li class="header-menu"> <span>Day Centre</span> </li>
           <li> <a href="#!"><i class='bx bx-dashboard'></i> <span>Day Centre Dashboard</span> </a> </li>
           <li> <a href="#!"><i class='bx bx-user-circle'></i> <span>{{ getTerm('Service User') }}s</span> </a> </li>
@@ -508,15 +499,14 @@
           <li> <a href="{{ url('roster/supervision-management') }}"><i class='bx  bx-clipboard-detail'></i> <span>{{ getTerm('Staff') }} Supervisions</span> </a></li>
           <li> <a href="{{ url('/roster/incident-management') }}"><i class='bx  bx-shield'></i> <span>Incident Management</span> </a></li>
           <?php $encodedUser = base64_encode(Auth::user()->user_name);
-          $url = env('COURSE_API_BASE_URL') . "/Learner/Learner-Dashboard/?key=" . $encodedUser;
+            $url = env('COURSE_API_BASE_URL') . "/Learner/Learner-Dashboard/?key=" . $encodedUser;
           ?>
           <li> <a href="{{ $url }}"><i class='bx  bx-education'></i> <span>Training</span> </a></li>
           <li> <a href="{{url('/roster/notifications')}}"><i class='bx  bx-bell'></i> <span>Notifications</span> </a></li>
           <li> <a href="{{ url('/roster/leave-request') }}"><i class='bx  bx-clipboard-detail'></i> <span>Leave Requests</span> </a></li>
           <li> <a href="{{ url('/roster/payroll-finance') }}"><i class='bx bx-file-detail'></i> <span>Payroll & Finance</span> </a></li>
           <li> <a href="{{ url('/roster/reports') }}"><i class='bx  bx-file-report'></i> <span>Reports</span> </a></li>
-          <li> <a href="{{ url('/roster/onboarding-configuration') }}"><i
-                class='bx bx-cog'></i><span>Onboarding Configuration</span></a></li>
+          <li> <a href="{{ url('/roster/onboarding-configuration') }}"><i class='bx bx-cog'></i><span>Onboarding Configuration</span></a></li>
           <li> <a href="{{url('/roster/staffonboarding')}}"><i class='bx  bx-file-report'></i> <span>{{ getTerm('Staff') }} Onboarding</span> </a></li>
           <li> <a href="{{url('/roster/clientonboarding')}}"><i class='bx  bx-file-report'></i> <span>{{ getTerm('Service User') }} Onboarding</span> </a></li>
           <li> <a href="{{url('/roster/policylibrary')}}"><i class='bx  bx-file-report'></i> <span>Policy Library</span> </a></li>
@@ -531,6 +521,7 @@
           <li> <a href="{{url('roster/onboarding-hub')}}"><i class='bx bx-file-detail'></i> <span>Onboarding Hub</span> </a></li>
           <li> <a href="{{ url('/roster/crm-dashboard')}}"><i class='bx bx-group'></i> <span>CRM Dashboard</span> </a></li>
           <li> <a href="{{url('roster/clientcommunicationhub')}}"><i class='bx  bx-message'></i> <span>{{ getTerm('Service User') }} Comms Hub</span> </a></li>
+          
           <li class="header-menu"> <span>System</span> </li>
           <li> <a href="#!"><i class='bx  bx-shield'></i> <span>Role Management</span> </a></li>
           <li> <a href="#!"><i class='bx  bx-cog'></i> <span>Module Settings</span> </a></li>
@@ -543,9 +534,6 @@
     <!-- sidebar-content  -->
 
   </nav>
-
-
-
 
   <script>
     $(".sidebar-dropdown > a").click(function() {

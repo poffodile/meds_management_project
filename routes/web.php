@@ -56,6 +56,18 @@ use App\Http\Controllers\frontEnd\Roster\ReportingEngine\ReportingEngineControll
 use App\Http\Controllers\frontEnd\Roster\ComplianceDashboard\ComplianceDashboardController;
 use App\Http\Controllers\frontEnd\Roster\CRMDashboard\CRMDashboardController;
 use App\Http\Controllers\frontEnd\Roster\Staff\staffonboardingController;
+use App\Http\Controllers\frontEnd\Domiciliary\DashboardController as DomDashboardController;
+use App\Http\Controllers\frontEnd\Domiciliary\VisitScheduleController as DomVisitScheduleController;
+use App\Http\Controllers\frontEnd\Domiciliary\StaffAvailabilityController as DomStaffAvailabilityController;
+use App\Http\Controllers\frontEnd\Domiciliary\StaffController as DomStaffController;
+use App\Http\Controllers\frontEnd\Domiciliary\ServiceUserController as DomServiceUserController;
+use App\Http\Controllers\frontEnd\Domiciliary\RunController as DomRunController;
+use App\Http\Controllers\frontEnd\Domiciliary\ReportController as DomReportController;
+use App\Http\Controllers\frontEnd\Domiciliary\CommunicationController as DomCommunicationController;
+use App\Http\Controllers\frontEnd\Domiciliary\ServiceUserFeedbackController as DomServiceUserFeedbackController;
+
+
+
 
 // Backend Controllers
 use App\Http\Controllers\backEnd\user\LatnessLeaveController;
@@ -312,6 +324,20 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 		Route::post('staffonboarding/loadforms', [staffonboardingController::class, 'loadforms'])->name('roster.staffonboarding.loadforms');
 		Route::post('staffonboarding/loadforms/save', [staffonboardingController::class, 'saveforms'])->name('roster.staffonboarding.saveforms');
 	});
+
+	// Domiciliary Care Section
+	Route::prefix('domiciliary')->group(function () {
+		Route::get('/dashboard', [DomDashboardController::class, 'index'])->name('domiciliary.dashboard');
+		Route::get('/visit-schedule', [DomVisitScheduleController::class, 'index'])->name('domiciliary.visit_schedule');
+		Route::get('/staff-availability', [DomStaffAvailabilityController::class, 'index'])->name('domiciliary.staff_availability');
+		Route::get('/staffs', [DomStaffController::class, 'index'])->name('domiciliary.staffs');
+		Route::get('/service-users', [DomServiceUserController::class, 'index'])->name('domiciliary.service_users');
+		Route::get('/runs', [DomRunController::class, 'index'])->name('domiciliary.runs');
+		Route::get('/reports', [DomReportController::class, 'index'])->name('domiciliary.reports');
+		Route::get('/communications', [DomCommunicationController::class, 'index'])->name('domiciliary.communications');
+		Route::get('/service-user-feedback', [DomServiceUserFeedbackController::class, 'index'])->name('domiciliary.service_user_feedback');
+	});
+
 
 	// Report Section
 	Route::post('user/record', 'App\Http\Controllers\frontEnd\StaffManagementController@record')->name('staff.record');
