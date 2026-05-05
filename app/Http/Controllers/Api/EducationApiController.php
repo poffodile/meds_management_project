@@ -327,9 +327,10 @@ class EducationApiController extends Controller
         return response()->json(['status' => 'error', 'message' => 'Could not save resource'], 500);
     }
 
-    public function rateTask(Request $request, $task_id)
+    public function rateTask(Request $request)
     {
         $validator = Validator::make($request->all(), [
+            'task_id' => 'required',
             'rating' => 'required|integer|min:1|max:5',
             'staff_feedback' => 'nullable|string'
         ]);
@@ -338,7 +339,7 @@ class EducationApiController extends Controller
             return response()->json(['status' => 'error', 'message' => $validator->errors()->first()], 400);
         }
 
-        $task = SuEducationTask::find($task_id);
+        $task = SuEducationTask::find($request->task_id);
         if (!$task) {
             return response()->json(['status' => 'error', 'message' => 'Task not found'], 404);
         }
