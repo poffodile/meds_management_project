@@ -196,6 +196,7 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 		Route::post('/education/add-note', [EducationController::class, 'addNote'])->name('education.add-note');
 		Route::post('/education/add-resource', [EducationController::class, 'addResource'])->name('education.add-resource');
 		Route::get('/education/timeline/{service_user_id}', [EducationController::class, 'monitorTimeline'])->name('education.timeline');
+		Route::post('/education/task/rate', [EducationController::class, 'rateTask'])->name('education.rate-task');
 
 		Route::get('/carer-details/{carer_id}', [CarerDetailsController::class, 'carer_details'])->name('roster.staff.carer.details');
 		Route::post('/carer/save-documents', [CarerDetailsController::class, 'saveDouments'])->name('carer.save.documents');

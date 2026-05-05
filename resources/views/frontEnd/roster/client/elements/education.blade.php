@@ -181,6 +181,29 @@
                     <div class="edu-card-desc">
                         {{ $task->description }}
                     </div>
+                    @if($task->status == 'completed')
+                        @if($task->rating)
+                            <div class="mt-3 p-3 bg-light rounded" style="border-left: 4px solid #10b981;">
+                                <div class="d-flex align-items-center gap-2 mb-1">
+                                    <span class="text-warning" style="font-size: 18px;">
+                                        @for($i=1; $i<=5; $i++)
+                                            <i class='bx {{ $i <= $task->rating ? "bxs-star" : "bx-star" }}'></i>
+                                        @endfor
+                                    </span>
+                                    <span class="font-weight-bold" style="color: #065f46;">Rating: {{ $task->rating }}/5</span>
+                                </div>
+                                @if($task->staff_feedback)
+                                    <div class="text-muted small"><strong>Feedback:</strong> {{ $task->staff_feedback }}</div>
+                                @endif
+                            </div>
+                        @else
+                            <div class="mt-3">
+                                <button class="btn btn-sm btn-outline-primary rate-task-btn" data-id="{{ $task->id }}" data-toggle="modal" data-target="#rateTaskModal">
+                                    <i class='bx bx-star'></i> Rate Task
+                                </button>
+                            </div>
+                        @endif
+                    @endif
                 </div>
             @empty
                 <div class="empty-state">

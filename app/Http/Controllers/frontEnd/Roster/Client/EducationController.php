@@ -215,4 +215,31 @@ class EducationController extends Controller
             return redirect()->back()->with('error', 'Something went wrong.');
         }
     }
+
+    public function rateTask(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'task_id' => 'required|exists:su_education_tasks,id',
+            'rating' => 'required|integer|min:1|max:5',
+            'staff_feedback' => 'nullable|string'
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()->with('error', $validator->errors()->first());
+        }
+
+        $task = SuEducationTask::find($request->task_id);
+        if ($task->status !== 'completed') {
+            return redirect()->back()->with('error', 'Only completed tasks can be rated.');
+        }
+
+        $task->rating = $request->rating;
+        $task->staff_feedback = $request->staff_feedback;
+
+        if ($task->save()) {
+            return redirect()->back()->with('success', 'Task rated successfully.');
+        } else {
+            return redirect()->back()->with('error', 'Something went wrong.');
+        }
+    }
 }

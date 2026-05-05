@@ -94,6 +94,20 @@
                             Task "{{ $item['data']->title ?? $item['data']->subject }}" assigned in {{ $item['data']->subject }}
                         @elseif($item['type'] == 'task_completion')
                             Task "{{ $item['data']->title ?? $item['data']->subject }}" completed by the child
+                            @if($item['data']->rating)
+                                <div class="mt-2 d-flex align-items-center gap-2">
+                                    <span class="text-warning small">
+                                        @for($i=1; $i<=5; $i++)
+                                            <i class='bx {{ $i <= $item['data']->rating ? "bxs-star" : "bx-star" }}'></i>
+                                        @endfor
+                                    </span>
+                                    <span class="small font-weight-bold">({{ $item['data']->rating }}/5)</span>
+                                </div>
+                            @else
+                                <div class="mt-2">
+                                    <button class="btn btn-xs btn-outline-primary rate-task-btn" data-id="{{ $item['data']->id }}" data-toggle="modal" data-target="#rateTaskModal" style="padding: 2px 8px; font-size: 11px;">Rate Task</button>
+                                </div>
+                            @endif
                         @elseif($item['type'] == 'attendance')
                             Attendance marked as {{ $item['data']->status }} for {{ date('Y-m-d', strtotime($item['data']->date)) }}
                         @elseif($item['type'] == 'note')

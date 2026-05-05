@@ -21,7 +21,9 @@ class SuEducationTask extends Model
         'attachment',
         'status',
         'submission_file',
-        'submitted_at'
+        'submitted_at',
+        'rating',
+        'staff_feedback'
     ];
 
     public function serviceUser()

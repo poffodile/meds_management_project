@@ -309,4 +309,73 @@
             $('#' + targetId).text(input.files[0].name).css('color', '#1e293b');
         }
     }
+
+    $(document).on('click', '.rate-task-btn', function() {
+        const taskId = $(this).data('id');
+        $('#rateTaskId').val(taskId);
+        $('#taskRatingValue').val('');
+        highlightStars(0);
+    });
+
+    $(document).on('mouseover', '.star-item', function() {
+        const val = $(this).data('value');
+        highlightStars(val);
+    });
+
+    $(document).on('mouseout', '.star-item', function() {
+        const currentVal = $('#taskRatingValue').val();
+        highlightStars(currentVal || 0);
+    });
+
+    $(document).on('click', '.star-item', function() {
+        const val = $(this).data('value');
+        $('#taskRatingValue').val(val);
+        highlightStars(val);
+    });
+
+    function highlightStars(val) {
+        $('.star-item').each(function() {
+            if($(this).data('value') <= val) {
+                $(this).css('color', '#f59e0b');
+            } else {
+                $(this).css('color', '#cbd5e1');
+            }
+        });
+    }
 </script>
+
+<!-- Rate Task Modal -->
+<div class="modal fade" id="rateTaskModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Rate Completed Task</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <form action="{{ route('education.rate-task') }}" method="post">
+                @csrf
+                <input type="hidden" name="task_id" id="rateTaskId">
+                <div class="modal-body">
+                    <div class="form-group mb-4">
+                        <label class="form-label" style="display: block; text-align: center;">Rating</label>
+                        <div class="rating-stars text-center" style="font-size: 40px; color: #cbd5e1; cursor: pointer;">
+                            <i class='bx bxs-star star-item' data-value="1"></i>
+                            <i class='bx bxs-star star-item' data-value="2"></i>
+                            <i class='bx bxs-star star-item' data-value="3"></i>
+                            <i class='bx bxs-star star-item' data-value="4"></i>
+                            <i class='bx bxs-star star-item' data-value="5"></i>
+                        </div>
+                        <input type="hidden" name="rating" id="taskRatingValue" value="" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Staff Feedback</label>
+                        <textarea name="staff_feedback" class="form-control" rows="4" placeholder="Add your feedback about the task submission..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-assign w-100" type="submit">Submit Rating</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -190,4 +190,5 @@ Route::group(['prefix' => '/staff'], function () {
 	Route::post('/education/attendance/add', [EducationApiController::class, 'addAttendance']);
 	Route::post('/education/note/add', [EducationApiController::class, 'addNote']);
 	Route::post('/education/resource/add', [EducationApiController::class, 'addResource']);
+	Route::post('/education/task/rate/{task_id}', [EducationApiController::class, 'rateTask']);
 });
