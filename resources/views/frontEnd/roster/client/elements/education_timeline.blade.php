@@ -98,7 +98,13 @@
                                 <div class="mt-2 d-flex align-items-center gap-2">
                                     <span class="text-warning small">
                                         @for($i=1; $i<=5; $i++)
-                                            <i class='bx {{ $i <= $item['data']->rating ? "bxs-star" : "bx-star" }}'></i>
+                                            @if($i <= $item['data']->rating)
+                                                <i class='bx bxs-star'></i>
+                                            @elseif($i - 0.5 <= $item['data']->rating)
+                                                <i class='bx bxs-star-half'></i>
+                                            @else
+                                                <i class='bx bx-star'></i>
+                                            @endif
                                         @endfor
                                     </span>
                                     <span class="small font-weight-bold">({{ $item['data']->rating }}/5)</span>

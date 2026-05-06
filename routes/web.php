@@ -110,7 +110,6 @@ Route::get('clear', function () {
 
 Route::get('/proxy/courses', function () {
 	return Http::get(env('COURSE_API_BASE_URL') . "/api/all-courses-list/")->json();
-	// return Http::get("http://66.116.198.68:8055/api/all-courses-list/")->json();
 });
 
 //  QR code for company

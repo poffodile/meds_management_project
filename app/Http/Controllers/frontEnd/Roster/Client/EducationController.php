@@ -220,7 +220,7 @@ class EducationController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'task_id' => 'required|exists:su_education_tasks,id',
-            'rating' => 'required|integer|min:1|max:5',
+            'rating' => 'required|numeric|min:0.5|max:5.0',
             'staff_feedback' => 'nullable|string'
         ]);
 

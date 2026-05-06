@@ -314,34 +314,15 @@
         const taskId = $(this).data('id');
         $('#rateTaskId').val(taskId);
         $('#taskRatingValue').val('');
-        highlightStars(0);
+        $('.rating-point').removeClass('active');
     });
 
-    $(document).on('mouseover', '.star-item', function() {
-        const val = $(this).data('value');
-        highlightStars(val);
-    });
-
-    $(document).on('mouseout', '.star-item', function() {
-        const currentVal = $('#taskRatingValue').val();
-        highlightStars(currentVal || 0);
-    });
-
-    $(document).on('click', '.star-item', function() {
+    $(document).on('click', '.rating-point', function() {
         const val = $(this).data('value');
         $('#taskRatingValue').val(val);
-        highlightStars(val);
+        $('.rating-point').removeClass('active');
+        $(this).addClass('active');
     });
-
-    function highlightStars(val) {
-        $('.star-item').each(function() {
-            if($(this).data('value') <= val) {
-                $(this).css('color', '#f59e0b');
-            } else {
-                $(this).css('color', '#cbd5e1');
-            }
-        });
-    }
 </script>
 
 <!-- Rate Task Modal -->
@@ -358,12 +339,23 @@
                 <div class="modal-body">
                     <div class="form-group mb-4">
                         <label class="form-label" style="display: block; text-align: center;">Rating</label>
-                        <div class="rating-stars text-center" style="font-size: 40px; color: #cbd5e1; cursor: pointer;">
-                            <i class='bx bxs-star star-item' data-value="1"></i>
-                            <i class='bx bxs-star star-item' data-value="2"></i>
-                            <i class='bx bxs-star star-item' data-value="3"></i>
-                            <i class='bx bxs-star star-item' data-value="4"></i>
-                            <i class='bx bxs-star star-item' data-value="5"></i>
+                        <style>
+                            .rating-points { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 10px; }
+                            .rating-point { width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; border: 1px solid #e2e8f0; border-radius: 10px; cursor: pointer; font-weight: 600; transition: all 0.2s; color: #64748b; background: #fff; }
+                            .rating-point:hover { background: #f8fafc; border-color: #cbd5e1; }
+                            .rating-point.active { background: #f59e0b; color: #fff; border-color: #d97706; }
+                        </style>
+                        <div class="rating-points">
+                            <div class="rating-point" data-value="0.5">0.5</div>
+                            <div class="rating-point" data-value="1.0">1.0</div>
+                            <div class="rating-point" data-value="1.5">1.5</div>
+                            <div class="rating-point" data-value="2.0">2.0</div>
+                            <div class="rating-point" data-value="2.5">2.5</div>
+                            <div class="rating-point" data-value="3.0">3.0</div>
+                            <div class="rating-point" data-value="3.5">3.5</div>
+                            <div class="rating-point" data-value="4.0">4.0</div>
+                            <div class="rating-point" data-value="4.5">4.5</div>
+                            <div class="rating-point" data-value="5.0">5.0</div>
                         </div>
                         <input type="hidden" name="rating" id="taskRatingValue" value="" required>
                     </div>

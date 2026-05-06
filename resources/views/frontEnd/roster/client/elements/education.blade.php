@@ -187,7 +187,13 @@
                                 <div class="d-flex align-items-center gap-2 mb-1">
                                     <span class="text-warning" style="font-size: 18px;">
                                         @for($i=1; $i<=5; $i++)
-                                            <i class='bx {{ $i <= $task->rating ? "bxs-star" : "bx-star" }}'></i>
+                                            @if($i <= $task->rating)
+                                                <i class='bx bxs-star'></i>
+                                            @elseif($i - 0.5 <= $task->rating)
+                                                <i class='bx bxs-star-half'></i>
+                                            @else
+                                                <i class='bx bx-star'></i>
+                                            @endif
                                         @endfor
                                     </span>
                                     <span class="font-weight-bold" style="color: #065f46;">Rating: {{ $task->rating }}/5</span>
