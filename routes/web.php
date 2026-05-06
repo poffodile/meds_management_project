@@ -67,8 +67,6 @@ use App\Http\Controllers\frontEnd\Domiciliary\CommunicationController as DomComm
 use App\Http\Controllers\frontEnd\Domiciliary\ServiceUserFeedbackController as DomServiceUserFeedbackController;
 
 
-
-
 // Backend Controllers
 use App\Http\Controllers\backEnd\user\LatnessLeaveController;
 use App\Http\Controllers\backEnd\superAdmin\HomeController;
@@ -95,6 +93,14 @@ use App\Http\Controllers\backEnd\user\PayRatesTypeController;
 use App\Http\Controllers\backEnd\user\PayRatesController;
 use App\Http\Controllers\backEnd\homeManage\LeaveTypeController;
 use App\Http\Controllers\backEnd\scheduleShift\ShiftCategoryController;
+use App\Http\Controllers\backEnd\homeManage\SafeguardingTypeController;
+use App\Http\Controllers\backEnd\homeManage\OnboardingEntityTypeController;
+use App\Http\Controllers\backEnd\homeManage\StaffTaskTypeController;
+use App\Http\Controllers\backEnd\homeManage\PolicyLibraryCategoryController;
+use App\Http\Controllers\backEnd\homeManage\DailyLogCategoryController;
+use App\Http\Controllers\backEnd\homeManage\ClientTaskTypeController;
+use App\Http\Controllers\backEnd\homeManage\StaffIncidentTypeController;
+
 
 
 Route::get('clear', function () {
@@ -2533,6 +2539,100 @@ Route::group(['prefix' => 'admin', 'middleware' => 'CheckAdminAuth'], function (
 		});
 	});
 	// end here
+
+	// Backend Roster Start here
+	// Daily Log Category and Sub category start here
+	Route::controller(DailyLogCategoryController::class)->group(function () {
+		Route::prefix('daily-log-category')->group(function () {
+			Route::match(['get', 'post'], '/', 'index');
+			Route::post('/add', 'save');
+			Route::post('/edit', 'save');
+			Route::get('/delete/{id}', 'delete');
+			Route::post('/status-change', 'status_change');
+		});
+		Route::prefix('daily-log-sub-category')->group(function () {
+			Route::match(['get', 'post'], '/', 'sub_category');
+			Route::post('/add', 'sub_category_save');
+			Route::post('/edit', 'sub_category_save');
+			Route::post('/status-change', 'sub_category_status_change');
+			Route::get('/delete/{id}', 'sub_category_delete');
+		});
+	});
+	// end here
+	// Backend Incident Type
+	Route::controller(StaffIncidentTypeController::class)->group(function () {
+		Route::prefix('incident-type')->group(function () {
+			Route::match(['get', 'post'], '/', 'index');
+			Route::post('/add', 'save');
+			Route::post('/edit', 'save');
+			Route::get('/delete/{id}', 'delete');
+			Route::post('/status-change', 'status_change');
+		});
+	});
+	// end here
+	// Backend Client Management
+	Route::controller(clientManagementController::class)->group(function () {
+		Route::prefix('client-task-type')->group(function () {
+			Route::match(['get', 'post'], '/', 'index');
+			Route::post('/add', 'save');
+			Route::post('/edit', 'save');
+			Route::get('/delete/{id}', 'delete');
+			Route::post('/status-change', 'status_change');
+		});
+
+		Route::prefix('task/category')->group(function () {
+			Route::match(['get', 'post'], '/', 'task_category');
+			Route::post('/add', 'save_task_category');
+			Route::post('/edit', 'save_task_category');
+			Route::get('/delete/{id}', 'delete_task_category');
+			Route::post('/status-change', 'status_change_task_category');
+		});
+		Route::prefix('alert-type')->group(function () {
+			Route::match(['get', 'post'], '/', 'alert_type');
+			Route::post('/add', 'save_alert_type');
+			Route::post('/edit', 'save_alert_type');
+			Route::get('/delete/{id}', 'delete_alert_type');
+			Route::post('/status-change', 'status_change_alert_type');
+		});
+	});
+	// end here
+
+	Route::controller(SafeguardingTypeController::class)->group(function () {
+		Route::prefix('safeguarding-type')->group(function () {
+			Route::match(['get', 'post'], '/', 'index');
+			Route::post('/add', 'save');
+			Route::post('/edit', 'save');
+			Route::get('/delete/{id}', 'delete');
+			Route::post('/status-change', 'status_change');
+		});
+	});
+	Route::controller(StaffTaskTypeController::class)->group(function () {
+		Route::prefix('stafftask-type')->group(function () {
+			Route::match(['get', 'post'], '/', 'index');
+			Route::post('/add', 'save');
+			Route::post('/edit', 'save');
+			Route::get('/delete/{id}', 'delete');
+			Route::post('/status-change', 'status_change');
+		});
+	});
+	Route::controller(OnboardingEntityTypeController::class)->group(function () {
+		Route::prefix('entity-type')->group(function () {
+			Route::match(['get', 'post'], '/', 'index');
+			Route::post('/add', 'save');
+			Route::post('/edit', 'save');
+			Route::get('/delete/{id}', 'delete');
+			Route::post('/status-change', 'status_change');
+		});
+	});
+	Route::controller(PolicyLibraryCategoryController::class)->group(function () {
+		Route::prefix('policylibrarycategory')->group(function () {
+			Route::match(['get', 'post'], '/', 'index');
+			Route::post('/add', 'save');
+			Route::post('/edit', 'save');
+			Route::get('/delete/{id}', 'delete');
+			Route::post('/status-change', 'status_change');
+		});
+	});
 });
 
 //super admin path

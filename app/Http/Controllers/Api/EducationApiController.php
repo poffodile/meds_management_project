@@ -89,6 +89,7 @@ class EducationApiController extends Controller
                     }
                     $taskData['submission_file'] = str_starts_with($path, 'http') ? $path : url($path);
                 }
+                $taskData['staff_feedback'] = $task->staff_feedback ?? '';
                 return $taskData;
             });
         $attendance = SuEducationAttendance::where('education_profile_id', $profile->id)
