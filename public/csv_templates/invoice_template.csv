@@ -1,0 +1,4 @@
+home,customer,invoice_ref,invoice_date,due_date,item_name,item_description,quantity,rate,sub_total,VAT_amount,Total,outstanding,status,notes
+1,101,INV-2023-001,10/1/2023,10/21/2023,Support Care,Monthly support care charges,,,620,124,744,0,Paid,October Invoice
+1,101,INV-2023-001,10/1/2023,10/21/2023,Medication Support,Daily medication administration,,,155,31,186,0,Paid,October Invoice
+1,102,INV-2023-002,10/5/2023,10/26/2023,Night Supervision,Wake night support,,,200,40,240,240,Outstanding,Waiting for payment

@@ -1,0 +1,4 @@
+home,service_user,staff,start_date,end_date,start_time,end_time,shift_type,shift_category,hourly_rate,assignment,tasks,status,notes,is_recurring
+1,1,1,2024-05-10,2024-05-10,08:00:00,14:00:00,morning,1,15.50,Client,"Personal care, medication",assigned,"Regular morning shift",0
+1,2,,2024-05-10,2024-05-10,14:00:00,20:00:00,afternoon,2,14.00,Location,"General support",unfilled,"Need staff for this shift",0
+1,1,2,2024-05-11,2024-05-11,20:00:00,08:00:00,night,3,18.00,Client,"Night supervision",assigned,"Night wake shift",0
