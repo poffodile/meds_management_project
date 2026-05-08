@@ -102,6 +102,8 @@ use App\Http\Controllers\backEnd\homeManage\DailyLogCategoryController;
 use App\Http\Controllers\backEnd\homeManage\ClientTaskTypeController;
 use App\Http\Controllers\backEnd\homeManage\StaffIncidentTypeController;
 use App\Http\Controllers\backEnd\systemManage\TransportController;
+use App\Http\Controllers\backEnd\systemManage\ClientCarePlanController;
+use App\Http\Controllers\backEnd\homeManage\clientManagementController;
 
 
 
@@ -2568,6 +2570,15 @@ Route::group(['prefix' => 'admin', 'middleware' => 'CheckAdminAuth'], function (
 
 	Route::controller(TransportController::class)->group(function () {
 		Route::prefix('transport')->group(function () {
+			Route::match(['get', 'post'], '/', 'index');
+			Route::post('/save', 'save');
+			Route::get('/delete/{id}', 'delete');
+			Route::post('/status-change', 'status_change');
+		});
+	});
+
+	Route::controller(ClientCarePlanController::class)->group(function () {
+		Route::prefix('client-care-plan')->group(function () {
 			Route::match(['get', 'post'], '/', 'index');
 			Route::post('/save', 'save');
 			Route::get('/delete/{id}', 'delete');

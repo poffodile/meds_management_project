@@ -79,8 +79,9 @@
                                         <div class="col-lg-12  m-t-10">
                                             <label>Care Plan *</label>
                                             <select class="form-control checkCareTask" id="care_plan_id" name="care_plan_id">
-                                                <option value="1" <?php if(!empty($clientCareTask) && $clientCareTask->care_plan_id == 1){echo 'selected';}?>>Personal Care</option>
-                                                <option value="2" <?php if(!empty($clientCareTask) && $clientCareTask->care_plan_id == 2){echo 'selected';}?>>Spot Check</option>
+                                                @foreach($care_plans as $plan)
+                                                    <option value="{{ $plan->id }}" {{ (!empty($clientCareTask) && $clientCareTask->care_plan_id == $plan->id) ? 'selected' : '' }}>{{ $plan->name }}</option>
+                                                @endforeach
                                             </select>
                                         </div>
                                     </div>
