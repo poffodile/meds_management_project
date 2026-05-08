@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Android\AndroidApiController;
 use App\Http\Controllers\Api\Schedule\ScheduleController;
 use App\Http\Controllers\Api\EducationApiController;
+use App\Http\Controllers\Api\DailyLogApiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -136,6 +137,14 @@ Route::group(['prefix' => '/service'], function () {
 	// Education Module - Child Side
 	Route::match(['get', 'post'], '/education/tasks/{service_user_id?}', [EducationApiController::class, 'getChildTasks']);
 	Route::get('/education/task/complete/{task_id}', [EducationApiController::class, 'completeTask']);
+});
+
+/*-------Daily Log Module--------*/
+Route::group(['prefix' => '/daily-log'], function () {
+	Route::post('/add', [DailyLogApiController::class, 'add_daily_log']);
+	Route::get('/entity-types', [DailyLogApiController::class, 'get_entity_types']);
+	Route::get('/active-service-users', [DailyLogApiController::class, 'get_active_service_users']);
+	Route::post('/transports', [DailyLogApiController::class, 'get_transports']);
 });
 
 

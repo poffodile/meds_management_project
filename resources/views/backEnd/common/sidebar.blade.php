@@ -133,6 +133,7 @@
                                                         $page == 'child_section' ||
                                                         $page == 'daily_log_category' ||
                                                         $page == 'daily_log_sub_category' ||
+                                                        $page == 'transport' ||
                                                         $page == 'department'
                                                     ) {
                                                         echo 'active';
@@ -180,6 +181,8 @@
                                 href="{{ url('admin/daily-log-category') }}"> Daily Log Category </a></li>
                         <li class="{{ $page == 'daily_log_sub_category' ? 'active' : '' }}"><a
                                 href="{{ url('admin/daily-log-sub-category') }}"> Daily Log Sub Category </a></li>
+                        <li class="{{ $page == 'transport' ? 'active' : '' }}"><a
+                                href="{{ url('admin/transport') }}"> Transport </a></li>
                         <li class="{{ $page == 'department' ? 'active' : '' }}">
                             <a href="{{ url('admin/general-admin/department') }}">Department </a>
                         </li>

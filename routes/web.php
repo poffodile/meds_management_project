@@ -65,6 +65,7 @@ use App\Http\Controllers\frontEnd\Domiciliary\RunController as DomRunController;
 use App\Http\Controllers\frontEnd\Domiciliary\ReportController as DomReportController;
 use App\Http\Controllers\frontEnd\Domiciliary\CommunicationController as DomCommunicationController;
 use App\Http\Controllers\frontEnd\Domiciliary\ServiceUserFeedbackController as DomServiceUserFeedbackController;
+use App\Http\Controllers\frontEnd\Roster\DailyLogController;
 
 
 // Backend Controllers
@@ -100,6 +101,7 @@ use App\Http\Controllers\backEnd\homeManage\PolicyLibraryCategoryController;
 use App\Http\Controllers\backEnd\homeManage\DailyLogCategoryController;
 use App\Http\Controllers\backEnd\homeManage\ClientTaskTypeController;
 use App\Http\Controllers\backEnd\homeManage\StaffIncidentTypeController;
+use App\Http\Controllers\backEnd\systemManage\TransportController;
 
 
 
@@ -190,7 +192,6 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 		Route::get('/carer/shifts/week', [CarerController::class, 'weekShifts'])->name('carer.shifts.week');
 		Route::get('/carer/get-shift-carer/{client_id}', [CarerController::class, 'getShiftStaff'])->name('carer.shift.staff');
 		Route::get('/carer/shifts/ninety-days', [CarerController::class, 'ninetyDaysShifts'])->name('carer.shifts.ninety-days');
-
 		// Carer Section End
 
 		// Education Module
@@ -322,6 +323,13 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 		// CRM Dashboard
 		Route::get('/crm-dashboard', [CRMDashboardController::class, 'crm_dashboard']);
 		Route::get('/crm-dashboard-details', [CRMDashboardController::class, 'crm_dashboard_details']);
+
+		// Roster Daily Log frontend
+		Route::get('/daily-log', [DailyLogController::class, 'index']);
+		Route::post('/save-daily-log', [DailyLogController::class, 'save_daily_log']);
+		Route::post('/edit-daily-log', [DailyLogController::class, 'save_daily_log']);
+		Route::post('/daily-log-delete', [DailyLogController::class, 'daily_log_delete']);
+		Route::post('/daily-log-loadData', [DailyLogController::class, 'daily_log_loadData']);
 
 		// staffonboarding
 		Route::get('staffonboarding', [staffonboardingController::class, 'index']);
@@ -2555,6 +2563,15 @@ Route::group(['prefix' => 'admin', 'middleware' => 'CheckAdminAuth'], function (
 			Route::post('/edit', 'sub_category_save');
 			Route::post('/status-change', 'sub_category_status_change');
 			Route::get('/delete/{id}', 'sub_category_delete');
+		});
+	});
+
+	Route::controller(TransportController::class)->group(function () {
+		Route::prefix('transport')->group(function () {
+			Route::match(['get', 'post'], '/', 'index');
+			Route::post('/save', 'save');
+			Route::get('/delete/{id}', 'delete');
+			Route::post('/status-change', 'status_change');
 		});
 	});
 	// end here

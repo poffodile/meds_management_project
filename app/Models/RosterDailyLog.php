@@ -23,4 +23,7 @@ class RosterDailyLog extends Model
     public function clients(){
         return $this->belongsTo(ServiceUser::class, 'client_id' , 'id');
     }
+    public function transport(){
+        return $this->belongsTo(Transport::class, 'transport_id' , 'id');
+    }
 }
