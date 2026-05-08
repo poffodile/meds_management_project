@@ -7,8 +7,8 @@ use Illuminate\Http\Request;
 use Session,DB,Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
-use App\Models\clientTaskType;
-use App\Models\clientTaskCategory;
+use App\Models\ClientTaskType;
+use App\Models\ClientTaskCategory;
 use App\Models\AlertType;
 
 class clientManagementController extends Controller
@@ -18,7 +18,7 @@ class clientManagementController extends Controller
         if(empty($home_id)) {
             return redirect('admin/')->with('error',NO_HOME_ERR);
         }
-        $task_type = clientTaskType::select('id','home_id','title','created_at','status')
+        $task_type = ClientTaskType::select('id','home_id','title','created_at','status')
                                         // ->where('home_id',$home_id)
                                         ->orderBy('id','desc');
         // echo "<pre>";print_r($task_type);die;
@@ -69,7 +69,7 @@ class clientManagementController extends Controller
             DB::beginTransaction();
             $data = $request->except('id');
             $data['home_id'] = Session::get('scitsAdminSession')->home_id;
-            clientTaskType::updateOrCreate(['id' => $request['id'] ?? null],$data);
+            ClientTaskType::updateOrCreate(['id' => $request['id'] ?? null],$data);
             DB::commit();
             Session::flash('success','Saved successfully done.');
             return response()->json([
@@ -99,7 +99,7 @@ class clientManagementController extends Controller
         }
         try{
             DB::beginTransaction();
-            $table = clientTaskType::find($id);
+            $table = ClientTaskType::find($id);
             $table->delete();
             DB::commit();
             Session::flash('success','Deleted successfully done.');
@@ -128,7 +128,7 @@ class clientManagementController extends Controller
         }
         try{
             DB::beginTransaction();
-            $table = clientTaskType::find($request->id);
+            $table = ClientTaskType::find($request->id);
             $table->status = $request->status;
             $table->save();
             DB::commit();
@@ -154,7 +154,7 @@ class clientManagementController extends Controller
         if(empty($home_id)) {
             return redirect('admin/')->with('error',NO_HOME_ERR);
         }
-        $task_category = clientTaskCategory::select('id','home_id','title','created_at','status')
+        $task_category = ClientTaskCategory::select('id','home_id','title','created_at','status')
                                         // ->where('home_id',$home_id)
                                         ->orderBy('id','desc');
         // echo "<pre>";print_r($task_category);die;
@@ -205,7 +205,7 @@ class clientManagementController extends Controller
             DB::beginTransaction();
             $data = $request->except('id');
             $data['home_id'] = Session::get('scitsAdminSession')->home_id;
-            clientTaskCategory::updateOrCreate(['id' => $request['id'] ?? null],$data);
+            ClientTaskCategory::updateOrCreate(['id' => $request['id'] ?? null],$data);
             DB::commit();
             Session::flash('success','Saved successfully done.');
             return response()->json([
@@ -237,7 +237,7 @@ class clientManagementController extends Controller
         }
         try{
             DB::beginTransaction();
-            $table = clientTaskCategory::find($request->id);
+            $table = ClientTaskCategory::find($request->id);
             $table->status = $request->status;
             $table->save();
             DB::commit();
@@ -270,7 +270,7 @@ class clientManagementController extends Controller
         }
         try{
             DB::beginTransaction();
-            $table = clientTaskCategory::find($id);
+            $table = ClientTaskCategory::find($id);
             $table->delete();
             DB::commit();
             Session::flash('success','Deleted successfully done.');

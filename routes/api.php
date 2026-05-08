@@ -200,4 +200,10 @@ Route::group(['prefix' => '/staff'], function () {
 	Route::post('/education/note/add', [EducationApiController::class, 'addNote']);
 	Route::post('/education/resource/add', [EducationApiController::class, 'addResource']);
 	Route::post('/education/task/rate', [EducationApiController::class, 'rateTask']);
+
+	// Client Care Task
+	Route::post('/care-task', 'App\Http\Controllers\Api\Staff\ClientCareTaskApi@index');
+	Route::post('care-task/details', 'App\Http\Controllers\Api\Staff\ClientCareTaskApi@details');
+	Route::post('care-task/comment/add', 'App\Http\Controllers\Api\Staff\ClientCareTaskApi@add_comment');
+	Route::post('care-task/status', 'App\Http\Controllers\Api\Staff\ClientCareTaskApi@status_change');
 });

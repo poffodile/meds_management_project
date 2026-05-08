@@ -7,8 +7,8 @@ use App\DynamicFormBuilder;
 use App\Home;
 use App\Http\Controllers\Controller;
 use App\Models\AlertType;
-use App\Models\clientTaskCategory;
-use App\Models\clientTaskType;
+use App\Models\ClientTaskCategory;
+use App\Models\ClientTaskType;
 use App\Models\EducationType;
 use App\Models\SuEducationProfile, App\Models\SuEducationStaffAssignment, App\Models\SuEducationTask, App\Models\SuEducationAttendance, App\Models\SuEducationNote, App\Models\SuEducationResource;
 use App\Models\suUserCourse;
@@ -258,8 +258,8 @@ class ClientController extends Controller
         $home_ids = Auth::user()->home_id;
         $ex_home_ids = explode(',', $home_ids);
         $home_id = $ex_home_ids[0];
-        $data['task_type'] = clientTaskType::where('status', 1)->get();
-        $data['task_category'] = clientTaskCategory::where('status', 1)->get();
+        $data['task_type'] = ClientTaskType::where('status', 1)->get();
+        $data['task_category'] = ClientTaskCategory::where('status', 1)->get();
         $data['child'] = ServiceUser::select('id', 'home_id', 'earning_scheme_label_id', 'name', 'user_name', 'phone_no', 'date_of_birth', 'child_type', 'room_type', 'current_location', 'street', 'care_needs', 'suFundingType', 'status', 'is_deleted')
             ->where(['home_id' => $home_id, 'is_deleted' => 0, 'status' => 1])->get();
         $data['carer'] = $this->staffService->activeStaff($home_id)->get();
