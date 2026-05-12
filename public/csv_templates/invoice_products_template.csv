@@ -1,4 +1,0 @@
-invoice,item_name,description,quantity,rate,amount,vat_label,vat
-1,Support Care,Monthly support care charges,40,15.50,620.00,1,124.00
-1,Medication Support,Daily medication administration,31,5.00,155.00,1,31.00
-2,Night Supervision,Wake night support,10,20.00,200.00,1,40.00

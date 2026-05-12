@@ -1,3 +1,0 @@
-home,user,shift,login_date,check_in_time,check_out_time,latitude_in,longitude_in,latitude_out,longitude_out,check_in_reason,check_out_reason,status
-1,1,101,2024-05-10,2024-05-10 08:00:00,2024-05-10 14:05:00,51.5074,-0.1278,51.5075,-0.1279,"Started shift on time","Handover completed",1
-1,2,102,2024-05-10,2024-05-10 14:10:00,2024-05-10 20:15:00,53.4808,-2.2426,53.4809,-2.2427,"Slightly late due to traffic","Finished all tasks",1

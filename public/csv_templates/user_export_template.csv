@@ -1,3 +1,4 @@
-home,name,user_name,email,password,phone_no,job_title,description,status,personal_info,banking_info,user_type,company_name,available_for_overtime,employment_type,dbs_certificate_number,dbs_expiry_date,hourly_rate,street,city,postcode,date_of_joining
-1,John Doe,johndoe,john@example.com,password123,7123456789,Staff,Experience staff,1,Details here,Bank details here,N,Social Care Solutions,yes,full time,DBS1234567,12/31/2025,15,123 High Street,London,NW1 1AB,1/15/2023
-1,Jane Smith,janesmith,jane@example.com,password456,7987654321,Manager,Team lead,1,Details here,Bank details here,M,Social Care Solutions,no,part time,DBS7654321,5/20/2026,20,456 Park Avenue,Manchester,M1 2CD,11/20/2022
+Serial No. ,Home,Name,Color,Start Time,End Time,Rate,Status
+1,Neptune House,Day Shift,#FF5733,8:00,20:00,15.5,Active
+2,Neptune House,Night Shift,#3357FF,20:00,8:00,18,Active
+3,Neptune House,Morning Shift,#33FF57,8:00,14:00,14,Active
