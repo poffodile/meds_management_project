@@ -17,10 +17,13 @@ class DynamicForm extends Model //FormBuilder
 
         //here $service_user_id is used to get care team, staff and contacts of a yp, if its send to value is yes
         //search for the customized user dynamic form, if present
-        $home_id   =  Auth::user()->home_id;
-        $home_idme = DB::table('service_user')->where('id', $service_user_id)->value('home_id');
-        $admin_id = DB::table('home')->where('id', $home_idme)->value('admin_id');
+        $home_ids   =  Auth::user()->home_id;
+        $ex_home_ids = explode(',', $home_ids);
+        $home_id = $ex_home_ids[0];
+
+        $admin_id = DB::table('home')->where('id', $home_id)->value('admin_id');
         $image_id = DB::table('admin')->where('id', $admin_id)->value('image');
+
         $form      =  DynamicFormBuilder::where('id', $form_builder_id)
             ->where('home_id', $home_id)
             ->first();
@@ -212,10 +215,13 @@ class DynamicForm extends Model //FormBuilder
 
         //here $service_user_id is used to get care team, staff and contacts of a yp, if its send to value is yes
         //search for the customized user dynamic form, if present
-        $home_id   =  Auth::user()->home_id;
-        $home_idme = DB::table('service_user')->where('id', $service_user_id)->value('home_id');
+        $home_ids   =  Auth::user()->home_id;
+        $ex_home_ids = explode(',', $home_ids);
+        $home_id = $ex_home_ids[0];
+
         $admin_id = DB::table('home')->where('id', $home_id)->value('admin_id');
         $image_id = DB::table('admin')->where('id', $admin_id)->value('image');
+
         $form      =  DynamicFormBuilder::where('id', $form_builder_id)
             ->where('home_id', $home_id)
             ->first();

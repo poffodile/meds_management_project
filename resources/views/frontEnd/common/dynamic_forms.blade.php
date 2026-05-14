@@ -49,9 +49,10 @@ $service_user_id = isset($service_user_id) ? $service_user_id : 0;
                                         <select name="service_user_id" class="su_n_id">
                                             <!--<option value=""> Child </option>-->
                                             @foreach ($service_users as $value)
-                                                <option value="{{ $value['id'] }}"
-                                                    {{ $service_user_id == $value['id'] ? 'selected' : '' }}>
-                                                    {{ ucfirst($value['name']) }}</option>
+                                            <option value="{{ $value['id'] }}"
+                                                {{ $service_user_id == $value['id'] ? 'selected' : '' }}>
+                                                {{ ucfirst($value['name']) }}
+                                            </option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -71,8 +72,8 @@ $service_user_id = isset($service_user_id) ? $service_user_id : 0;
                                                 $location_ids_arr = explode(',', $value['location_ids']);
                                                 if (in_array($this_location_id, $location_ids_arr)) {
                                             ?>
-                                            <option value="{{ $value['id'] }}"> {{ ucfirst($value['title']) }}
-                                            </option>
+                                                    <option value="{{ $value['id'] }}"> {{ ucfirst($value['title']) }}
+                                                    </option>
                                             <?php }
                                             } ?>
                                         </select>
@@ -199,7 +200,7 @@ $service_user_id = isset($service_user_id) ? $service_user_id : 0;
                                     <select name="service_user_id" class="su_id" disabled="">
                                         <option value="0"> N/A Child </option>
                                         @foreach ($service_users as $value)
-                                            <option value="{{ $value['id'] }}">{{ $value['name'] }}</option>
+                                        <option value="{{ $value['id'] }}">{{ $value['name'] }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -214,7 +215,7 @@ $service_user_id = isset($service_user_id) ? $service_user_id : 0;
                                         <option value="0"> Select Form </option>
                                         <?php foreach ($dynamic_forms as $value) {
                                             $location_ids_arr = explode(',', $value['location_ids']); ?>
-                                        <option value="{{ $value['id'] }}"> {{ $value['title'] }} </option>
+                                            <option value="{{ $value['id'] }}"> {{ $value['title'] }} </option>
                                         <?php  } ?>
                                     </select>
                                 </div>
@@ -252,7 +253,7 @@ $service_user_id = isset($service_user_id) ? $service_user_id : 0;
         </div>
     </div>
 </div>
-<!-- View/Edit dynamic form End --> 
+<!-- View/Edit dynamic form End -->
 
 
 <!-- Su Daily Log Book Modal -->
@@ -278,7 +279,7 @@ $service_user_id = isset($service_user_id) ? $service_user_id : 0;
                                             style="width:100%;">
                                             <option value="0"> Select Child </option>
                                             @foreach ($service_users as $value)
-                                                <option value="{{ $value['id'] }}">{{ $value['name'] }}</option>
+                                            <option value="{{ $value['id'] }}">{{ $value['name'] }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -336,7 +337,7 @@ $service_user_id = isset($service_user_id) ? $service_user_id : 0;
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <div class="form-group modal-footer m-t-0 modal-bttm">
                                 <button class="btn btn-default" type="button" data-dismiss="modal"
                                     aria-hidden="true"> Cancel </button>
@@ -1214,17 +1215,17 @@ $service_user_id = isset($service_user_id) ? $service_user_id : 0;
             printWindow.document.write('<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">');
             printWindow.document.write('<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">');
             printWindow.document.write('<link rel="stylesheet" href="https://cdn.form.io/formiojs/formio.full.min.css">');
-            printWindow.document.write('<link href="{{ url('public/backEnd/css/amarjeet.css') }}" rel="stylesheet" type="text/css">');
-            printWindow.document.write('<link href="{{ url('public/backEnd/css/pdfstyle.css') }}" rel="stylesheet" type="text/css" >');
+            printWindow.document.write('<link href="{{ url("public/backEnd/css/amarjeet.css") }}" rel="stylesheet" type="text/css">');
+            printWindow.document.write('<link href="{{ url("public/backEnd/css/pdfstyle.css") }}" rel="stylesheet" type="text/css" >');
             printWindow.document.write('</head><body > <div class="masterprintmainarea">');
             printWindow.document.write('<div class="header">');
-            printWindow.document.write('<img src="{{ url('/public/images/scits.png') }}" style="float:right;height:80px;">');
+            printWindow.document.write('<img src="{{ url("/public/images/scits.png") }}" style="float:right;height:80px;">');
             printWindow.document.write('</div>');
             // printWindow.document.write(divContents);
             printWindow.document.write('</div>');
             printWindow.document.write('<div class="footer">');
             printWindow.document.write('<div class="footer-section-area">');
-            printWindow.document.write('© {{ date('Y') }} Omega Care Group (SCITS). All Rights Reserved | www.socialcareitsolutions.co.uk ');
+            printWindow.document.write('© {{ date("Y") }} Omega Care Group (SCITS). All Rights Reserved | www.socialcareitsolutions.co.uk ');
             printWindow.document.write('</div>');
             printWindow.document.write('</div>');
             printWindow.document.write('</div> </body></html>');
@@ -1347,7 +1348,7 @@ $service_user_id = isset($service_user_id) ? $service_user_id : 0;
 </script> -->
 
 <script>
-    let loaddataontable = () => {
+    var loaddataontable = () => {
         let formid = $("#formid").val();
         let home_id = $("#home_id").val();
         var token = "<?= csrf_token() ?>";
@@ -1372,15 +1373,8 @@ $service_user_id = isset($service_user_id) ? $service_user_id : 0;
             });
         });
 
-
-        // console.log(formid);
-        // console.log(home_id);
-
-        // console.log(pattendata);
-        //console.log($('#getdatamodel').val());
-
     }
-    let viewdatawithvalueFormio = () => {
+    var viewdatawithvalueFormio = () => {
         // console.log($('#dynamic_form_idformio').val());
         let dynamic_form_idformio = $("#dynamic_form_idformio").val();
         var token = "<?= csrf_token() ?>";

@@ -57,7 +57,7 @@ $service_user_id = (isset($service_user_id)) ? $service_user_id : 0;
     .header_form select {
         color: #8d8d8d;
         font-size: 14px;
-        
+
     }
 </style>
 
@@ -247,7 +247,7 @@ $service_user_id = (isset($service_user_id)) ? $service_user_id : 0;
                 <h4 class="modal-title">View Details</h4>
             </div>
             <div class="modal-body">
-                <form method="" id="dynFormFormData" >
+                <form method="" id="dynFormFormData">
                     <div class="row">
                         <div class="mb-3 col-md-12 col-sm-12 col-12 p-0">
                             <label class="col-md-1 col-sm-1 col-12 pt-2">Child: </label>
@@ -1259,17 +1259,17 @@ $service_user_id = (isset($service_user_id)) ? $service_user_id : 0;
             printWindow.document.write('<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">');
             printWindow.document.write('<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">');
             printWindow.document.write('<link rel="stylesheet" href="https://cdn.form.io/formiojs/formio.full.min.css">');
-            printWindow.document.write('<link href="{{ url('public/backEnd/css/amarjeet.css')}}" rel="stylesheet" type="text/css" >');
-            printWindow.document.write('<link href="{{ url('public/backEnd/css/pdfstyle.css')}}" rel="stylesheet" type="text/css" >');
+            printWindow.document.write('<link href="{{ url("public/backEnd/css/amarjeet.css")}}" rel="stylesheet" type="text/css" >');
+            printWindow.document.write('<link href="{{ url("public/backEnd/css/pdfstyle.css")}}" rel="stylesheet" type="text/css" >');
             printWindow.document.write('</head><body > <div class="masterprintmainarea">');
             printWindow.document.write('<div class="header">');
-            printWindow.document.write('<img src="{{url('/public/images/scits.png')}}" style="float:right;height:80px;">');
+            printWindow.document.write('<img src="{{url("/public/images/scits.png")}}" style="float:right;height:80px;">');
             printWindow.document.write('</div>');
             // printWindow.document.write(divContents);
             printWindow.document.write('</div>');
             printWindow.document.write('<div class="footer">');
             printWindow.document.write('<div class="footer-section-area">');
-            printWindow.document.write('© {{ date('Y') }} Omega Care Group (SCITS). All Rights Reserved | www.socialcareitsolutions.co.uk ');
+            printWindow.document.write('© {{ date("Y") }} Omega Care Group (SCITS). All Rights Reserved | www.socialcareitsolutions.co.uk ');
             printWindow.document.write('</div>');
             printWindow.document.write('</div>');
             printWindow.document.write('</div> </body></html>');

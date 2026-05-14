@@ -23,9 +23,28 @@ class StaffReportIncidentService
             } else if ($countData > 100 && $countData < 1000) {
                 $ref = '0';
             }
-            $data['ref'] =  "INC-" . time() . '-' . $ref . $countData + 1;
+            $data['ref'] =  "INC-" . time() . '-' . $ref . ($countData + 1);
             // return $data['ref'];
             $incident = StaffReportIncidents::updateOrCreate(['id' => $data['id'] ?? null], $data);
+
+            // Save Dynamic Form Data if present
+            if (isset($data['formdata']) && !empty($data['formdata']) && isset($data['dynamic_form_builder_id'])) {
+                $dynamicFormData = [
+                    'dynamic_form_builder_id' => $data['dynamic_form_builder_id'],
+                    'formdata'                => $data['formdata'],
+                    'service_user_id'         => $data['client_id'] ?? 0,
+                    'home_id'                 => $data['home_id'] ?? 0,
+                    'user_id'                 => $data['user_id'] ?? 0,
+                ];
+
+                $dynamicFormId = \App\DynamicForm::saveForm($dynamicFormData);
+                if ($dynamicFormId) {
+                    $incident->dynamic_form_id = $dynamicFormId;
+                    $incident->dynamic_form_builder_id = $data['dynamic_form_builder_id'];
+                    $incident->save();
+                }
+            }
+
             if (isset($data['is_safeguarding']) && $data['is_safeguarding'] == 1) {
                 $sfArr = $data['safeguarding_detail'] ?? [];
                 $incident->safeguarddetails()->sync($sfArr);
@@ -82,15 +101,17 @@ class StaffReportIncidentService
         }
         return $query->with([
             'incidentType:id,type',
-            'clients:id,name'
-        ])->latest()->paginate(2);
+            'clients:id,name',
+            'dynamicFormBuilder:id,title'
+        ])->latest()->paginate(10);
     }
     public function report_details($id)
     {
         return StaffReportIncidents::with([
             'incidentType:id,type',
             'clients:id,name',
-            'safeguarddetails'
+            'safeguarddetails',
+            'dynamicFormBuilder:id,title'
         ])->find($id);
     }
 }

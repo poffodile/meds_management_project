@@ -3,19 +3,19 @@
 @section('content')
 
 <!--main content start-->
-    <section id="main-content">
-        <section class="wrapper">
+<section id="main-content">
+    <section class="wrapper">
         <!-- page start-->
 
         <div class="row">
             <div class="col-sm-12">
-                <section class="panel">                   
+                <section class="panel">
                     <div class="panel-body">
                         <div class="adv-table editable-table ">
                             <div class="clearfix">
                                 <div class="btn-group">
                                     <h3>Shift Category</h3>
-                                      <a href="{{ url('admin/user/shift-category/add') }}">
+                                    <a href="{{ url('admin/user/shift-category/add') }}">
                                         <button id="editable-sample_new" class="btn btn-primary">
                                             Add Shift Category <i class="fa fa-plus"></i>
                                         </button>
@@ -28,18 +28,18 @@
                             <div class="table-responsive">
                                 <table class="table table-striped table-hover table-bordered" id="editable-sample">
                                     <thead>
-                                    <tr>
-                                        <th>Date</th>
-                                        <th>Name</th>
-                                        <th>Color</th>
-                                        <th>Time Range</th>
-                                        <th>Rate (£)</th>
-                                        <th>Status</th>
-                                        <th width="20%">Actions</th>
-                                    </tr>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Name</th>
+                                            <th>Color</th>
+                                            <th>Time Range</th>
+                                            <th>Rate (£)</th>
+                                            <th>Status</th>
+                                            <th width="20%">Actions</th>
+                                        </tr>
                                     </thead>
                                     <tbody>
-                                      @foreach($categories as $category)
+                                        @foreach($categories as $category)
                                         <tr class="">
                                             <td>{{ date('d-m-Y', strtotime($category->created_at)) }}</td>
                                             <td>{{ $category->name }}</td>
@@ -53,17 +53,17 @@
                                             </td>
                                             <td>
                                                 @if($category->start_time && $category->end_time)
-                                                    {{ date('H:i', strtotime($category->start_time)) }} - {{ date('H:i', strtotime($category->end_time)) }}
+                                                {{ date('H:i', strtotime($category->start_time)) }} - {{ date('H:i', strtotime($category->end_time)) }}
                                                 @else
-                                                    -
+                                                -
                                                 @endif
                                             </td>
                                             <td>{{ $category->rate ? '£' . number_format($category->rate, 2) : '-' }}</td>
                                             <td>
                                                 @if($category->status == 1)
-                                                    Active
+                                                Active
                                                 @else
-                                                    Inactive
+                                                Inactive
                                                 @endif
                                             </td>
                                             <td>
@@ -72,7 +72,6 @@
                                             </td>
                                         </tr>
                                         @endforeach
-                                  
                                     </tbody>
                                 </table>
                             </div>
@@ -82,8 +81,8 @@
             </div>
         </div>
         <!-- page end-->
-        </section>
     </section>
+</section>
 <!--main content end-->
 
 @endsection

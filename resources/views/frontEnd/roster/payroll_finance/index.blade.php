@@ -186,6 +186,68 @@
                 </div>
             </div>
         </div>
+
+        <!-- <div class="row mt20">
+            <div class="col-lg-12">
+                <div class="emergencyMain p24">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h5 class="h5Head mb-1">Data Collection & Migration</h5>
+                            <p class="textGray fs13 mb-0">Download templates for 6-month historical data collection</p>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <a href="{{ asset('public/csv_templates/master_import_template.csv') }}" class="bgBtn" download>
+                                <i class="bx bx-download me-2"></i> Download Master Template
+                            </a>
+                            <form action="{{ route('roster.master-import') }}" method="POST" enctype="multipart/form-data" class="d-inline-flex gap-2">
+                                @csrf
+                                <input type="file" name="import_file" class="form-control form-control-sm" accept=".csv" required style="width: 200px;">
+                                <button type="submit" class="bgBtn pgreenBtn">
+                                    <i class="bx bx-upload me-2"></i> Process Import
+                                </button>
+                            </form>
+                        </div>
+                        @if(session('success'))
+                        <div class="alert alert-success mt-3">
+                            {{ session('success') }}
+                        </div>
+                        @endif
+                        @if(session('error'))
+                        <div class="alert alert-danger mt-3">
+                            {{ session('error') }}
+                        </div>
+                        @endif
+                        @if(session('import_errors'))
+                        <div class="alert alert-warning mt-3">
+                            <strong>Import skipped some rows:</strong>
+                            <ul>
+                                @foreach(session('import_errors') as $error)
+                                <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                        @endif
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="muteBg rounded8 p-4">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="icon-circle bg-white p-2 rounded-circle">
+                                        <i class="bx bx-info-circle fs23 textBlue"></i>
+                                    </div>
+                                    <div>
+                                        <p class="mb-0 fs14 textGray">
+                                            This comprehensive template includes columns for <strong>Staff, Clients, Shifts, Logs, Payroll, and Client Billing</strong>.
+                                            Use this for collecting 6 months of historical data to be imported into the system.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> -->
         <div class="row mt20">
             <div class="col-lg-12">
                 <div class="emergencyMain p24">

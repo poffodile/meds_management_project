@@ -66,6 +66,7 @@ use App\Http\Controllers\frontEnd\Domiciliary\ReportController as DomReportContr
 use App\Http\Controllers\frontEnd\Domiciliary\CommunicationController as DomCommunicationController;
 use App\Http\Controllers\frontEnd\Domiciliary\ServiceUserFeedbackController as DomServiceUserFeedbackController;
 use App\Http\Controllers\frontEnd\Roster\DailyLogController;
+use App\Http\Controllers\frontEnd\Roster\PayrollFinance\MasterDataImportController;
 
 
 // Backend Controllers
@@ -268,6 +269,7 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 		Route::get('/payroll-finance', [PayrollFinanceController::class, 'index'])->name('roster.payroll.finance');
 		Route::get('/payroll-processing', [PayrollFinanceController::class, 'payrollprocessing']);
 		Route::post('/payroll-processing/process', [PayrollFinanceController::class, 'processPayrollWeek'])->name('payroll.process.week');
+		Route::post('/master-import', [MasterDataImportController::class, 'import'])->name('roster.master-import');
 
 		// Timesheet Reconciliation
 		Route::get('/timesheet-reconciliation', [PayrollFinanceController::class, 'timesheetreconciliation'])->name('roster.payroll.finance.reconciliation');

@@ -14,28 +14,17 @@
                             <i class=" mainTitleIcon bx bx-shield"></i>
                             <h1 class="mainTitlep mb-0"> CQC Incident Management</h1>
                         </div>
-
-
-                        <p class="header-subtitle mb-0"> Record, investigate, and report incidents in line with CQC
-                            regulations </p>
+                        <p class="header-subtitle mb-0"> Record, investigate, and report incidents in line with CQC regulations </p>
                     </div>
                     <div class="d-flex align-items-center gap-3">
                         <div>
-
-                            <button class="borderBtn"><i class=' f18 bx  bx bx-arrow-to-bottom-stroke me-2'></i>
-                                Export</button>
+                            <button class="borderBtn"><i class='f18 bx bx-arrow-to-bottom me-2'></i> Export</button>
                         </div>
                         <div>
-                            <button class="borderBtn pupleBorderBtn" type="button"
-                                onclick="window.location.href='{{url('roster/incident-ai-prevention')}}'"><i
-                                    class='f18 bx  bx-sparkles me-2'></i> AI Prevention</button>
-
+                            <button class="borderBtn pupleBorderBtn" type="button" onclick="window.location.href='{{url('roster/incident-ai-prevention')}}'"><i class='f18 bx bx-sparkles me-2'></i> AI Prevention</button>
                         </div>
                         <div>
-                            <button class="bgBtn bgRedBtn" type="button" onclick="showAddReportInc()"><i
-                                    class='f18 bx  bx-plus me-2'></i> Report
-                                Incident</button>
-
+                            <button class="bgBtn bgRedBtn" type="button" onclick="showAddReportInc()"><i class='f18 bx bx-plus me-2'></i> Report Incident</button>
                         </div>
                     </div>
                 </div>
@@ -51,10 +40,8 @@
                         <div>
                             <h5 class="h5Head">Urgent Action Required</h5>
                             <div class="d-flex gap-4 mt-3 urReqDetails">
-
                                 <span>• 6 incidents require CQC notification</span>
                                 <span>• 2 critical incidents open</span>
-
                             </div>
                         </div>
                     </div>
@@ -88,15 +75,12 @@
                             <h2 class="rota_count" id="cqcCount">0</h2>
                         </div>
                     </div>
-
-
                     <div class="rota_dash-card bg-greenp-50">
                         <div class="rota_dash-left">
                             <p class="rota_title"> <i class="bx  bx-check-circle me-2"></i> Resolved</p>
                             <h2 class="rota_count greenTextp" id="resolveCount">0</h2>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
@@ -155,7 +139,6 @@
                                 </div>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>
@@ -164,18 +147,17 @@
             <div class="col-md-12" id="incident_report_data">
                 <div class="emergencyMain p24 text-center">
                     <i class="lightMute bx bx-shield" style="font-size:54px"></i>
-                    <h5 class="h5Head mt-3">No incidents found</h5>
+                    <!-- <h5 class="h5Head mt-3">No incidents found</h5> -->
                     <p class="textGray fs13">No incidents match the selected criteria</p>
                     <div class="d-flex justify-content-center mt-3">
                         <button class="bgBtn bgRedBtn" type="button" onclick="showAddReportInc()">
-                            <i class="f18 bx  bx-plus me-3"></i> Report First Incident
+                            <i class="f18 bx bx-plus me-3"></i> Report First Incident
                         </button>
                     </div>
-                </div>    
+                </div>
             </div>
             <div id="incident_reportPagination"></div>
         </div>
-
     </div>
 
     <!--  report new incident form -->
@@ -188,11 +170,8 @@
                             <div class="emergencyContent">
                                 <div class="gap-3 d-flex align-items-center radIconClr">
                                     <i class="bx bx-shield f20"></i>
-                                    <h3>Report New Incident
-
-                                    </h3>
+                                    <h3>Report New Incident</h3>
                                 </div>
-
                             </div>
                             <div class="emergencyBtn">
                                 <i onclick=showMainIncident() class='bx  bx-x'></i>
@@ -208,14 +187,10 @@
                                         <input type="checkbox" id="safeguarding" name="is_safeguarding" value="0">
                                     </div>
                                     <div class="">
-                                        <p class="mb-2" for="safeguarding"> <strong>This is a SAFEGUARDING concern</strong>
-                                        </p>
-                                        <p class="mb-0">Click "Generate Care Plan" to automatically create care plan,
-                                            medications, and risk assessments from uploaded documents
-                                        </p>
+                                        <p class="mb-2" for="safeguarding"> <strong>This is a SAFEGUARDING concern</strong></p>
+                                        <p class="mb-0">Click "Generate Care Plan" to automatically create care plan, medications, and risk assessments from uploaded documents</p>
                                     </div>
                                 </div>
-
                             </div>
                             <div class="carer-form mt20">
                                 <div class="row">
@@ -260,6 +235,18 @@
                                         <label>Location Detail</label>
                                         <input type="text" class="form-control" placeholder="e.g., Bathroom, Bedroom" name="location_detail">
                                     </div>
+                                    <div class="col-md-12 m-t-10">
+                                        <label>Dynamic Form (Optional)</label>
+                                        <select class="form-control" name="dynamic_form_builder_id" id="dynamic_form_builder_id">
+                                            <option value="">Select Dynamic Form</option>
+                                            @foreach($dynamic_forms as $form)
+                                            <option value="{{$form->id}}">{{$form->title}}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="col-md-12" id="dynamic_form_container" style="display:none">
+                                        <div id="dynamic_form_fields"></div>
+                                    </div>
                                     <div class="col-md-12 mt20">
                                         <div class="purpleBox p-4 reportRedBox" style="display:none" id="safeguardingDetailsForm">
                                             <div class="d-flex gap-3">
@@ -273,19 +260,19 @@
                                                 </div>
                                             </div>
                                             <div class="row addReportCheck">
-                                                 @foreach ($safeguard_type as $item)
-                                                        <div class="col-md-6 m-t-5">
-                                                            <div class="checkboxp">
-                                                                <input type="checkbox"  id="safeguarding_details_{{ $item->id }}"
-                                                                    name="safeguarding_detail[]"
-                                                                    value="{{ $item->id }}"
-                                                                    class="SafeguardingDetailsCheckBox">
-                                                                <label  id="safeguarding_details_{{ $item->id }}">
-                                                                    {{ $item->type }}
-                                                                </label>
-                                                            </div>
-                                                        </div>
-                                                    @endforeach
+                                                @foreach ($safeguard_type as $item)
+                                                <div class="col-md-6 m-t-5">
+                                                    <div class="checkboxp">
+                                                        <input type="checkbox" id="safeguarding_details_{{ $item->id }}"
+                                                            name="safeguarding_detail[]"
+                                                            value="{{ $item->id }}"
+                                                            class="SafeguardingDetailsCheckBox">
+                                                        <label id="safeguarding_details_{{ $item->id }}">
+                                                            {{ $item->type }}
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                @endforeach
                                                 <!--<div class="col-md-6 m-t-10">-->
 
                                                 <!--    <div class="checkboxp">-->
@@ -418,11 +405,9 @@
                                                 </div>
                                             </div>
                                             <ul class="addIncidentList">
-                                                <li>All safeguarding concerns must be reported to local authority within 24
-                                                    hours</li>
+                                                <li>All safeguarding concerns must be reported to local authority within 24 hours</li>
                                                 <li>CQC must be notified of serious incidents without delay</li>
-                                                <li>Deaths, serious injuries, and safeguarding concerns require statutory
-                                                    notifications</li>
+                                                <li>Deaths, serious injuries, and safeguarding concerns require statutory notifications</li>
                                                 <li>Ensure all relevant parties have been informed as per your policy</li>
                                             </ul>
                                         </div>
@@ -433,10 +418,8 @@
                                         <hr class="hrLinep">
                                         <div class="d-flex gap-3 incidentAddFooter">
                                             <div>
-                                                <button style="width:100%" class="bgBtn bgRedBtn incedent_form_submit"><i
-                                                        class="bx bx-save f18"></i>Submit
-                                                    Incident
-                                                    Report</button>
+                                                <button class="bgBtn bgRedBtn incedent_form_submit"><i
+                                                        class="bx bx-save f18"></i>Submit Incident Report</button>
                                             </div>
                                             <div>
                                                 <button class="borderBtn" onclick=showMainIncident()>
@@ -456,183 +439,173 @@
     </div>
     <!-- report new end -->
     <script>
-    const showAddReportInc = () => {
-
-        document.getElementById("incidentAddForm").style.display = "block";
-        document.getElementById("mainIncidentPage").style.display = "none";
-    };
-    const showMainIncident = () => {
-        document.getElementById("incidentAddForm").style.display = "none";
-        document.getElementById("mainIncidentPage").style.display = "block";
-    }
+        const showAddReportInc = () => {
+            document.getElementById("incidentAddForm").style.display = "block";
+            document.getElementById("mainIncidentPage").style.display = "none";
+        };
+        const showMainIncident = () => {
+            document.getElementById("incidentAddForm").style.display = "none";
+            document.getElementById("mainIncidentPage").style.display = "block";
+        }
     </script>
     <script>
-        $(document).ready(function(){
+        $(document).ready(function() {
             loadIncidentReportData();
         });
-        var is_ready = 1;
-        function loadIncidentReportData(pageUrl = '{{ url("/roster/incident-report-loadData") }}',start_date = null,end_date = null,Safeguarding = 0, search = null,incident_typeFileter = null, incident_statusFilter = null){
+        var is_ready = true;
+
+        function loadIncidentReportData(pageUrl = '{{ url("/roster/incident-report-loadData") }}', start_date = null, end_date = null, Safeguarding = 0, search = null, incident_typeFileter = null, incident_statusFilter = null) {
+            if (!is_ready) return;
+            is_ready = false;
+
             $.ajax({
                 url: pageUrl,
                 type: "post",
-                data: {start_date:start_date,end_date:end_date,Safeguarding:Safeguarding,search_incident:search,incident_type_id:incident_typeFileter,status:incident_statusFilter,_token:"{{csrf_token()}}"},
-                success: function (res) {
+                data: {
+                    start_date: start_date,
+                    end_date: end_date,
+                    Safeguarding: Safeguarding,
+                    search_incident: search,
+                    incident_type_id: incident_typeFileter,
+                    status: incident_statusFilter,
+                    _token: "{{csrf_token()}}"
+                },
+                success: function(res) {
+                    is_ready = true;
                     console.log(res);
-                    // return false;
                     if (typeof isAuthenticated === "function") {
                         if (isAuthenticated(res) == false) {
                             return false;
                         }
                     }
-                    if(res.success == false){
+                    if (res.success == false) {
                         alert(res.errors);
-                    }else{
-                        
+                    } else {
                         var data = res.data;
                         var no_data = `<div class="emergencyMain p24 text-center">
-                    <i class="lightMute bx bx-shield" style="font-size:54px"></i>
-                    <h5 class="h5Head mt-3">No incidents found</h5>
-                    <p class="textGray fs13">No incidents match the selected criteria</p>
-                    <div class="d-flex justify-content-center mt-3">
-                        <button class="bgBtn bgRedBtn" type="button"onclick="showAddReportInc()">
-                            <i class="f18 bx  bx-plus me-3"></i> Report First Incident
-                        </button>
-                    </div>
-                </div>`;
-                        if(data.length == 0){
-                            $("#incident_report_data").html(no_data);
-                        }else{
-                            var allHtmlData = ``;
-                            var totalCount = 0;
-                            var openCount = 0;
-                            var safeguardCount = 0;
-                            var cqcCount = 0;
-                            var resolveCount = 0;
+                                            <i class="lightMute bx bx-shield" style="font-size:54px"></i>
+                                            <h5 class="h5Head mt-3">No incidents found</h5>
+                                            <p class="textGray fs13">No incidents match the selected criteria</p>
+                                            <div class="d-flex justify-content-center mt-3">
+                                                <button class="bgBtn bgRedBtn" type="button" onclick="showAddReportInc()">
+                                                    <i class="f18 bx bx-plus me-3"></i> Report First Incident
+                                                </button>
+                                            </div>
+                                        </div>`;
 
-                            data.forEach(function(item){
+                        if (!data || data.length == 0) {
+                            $("#incident_report_data").html(no_data);
+                        } else {
+                            var allHtmlData = ``;
+                            data.forEach(function(item) {
                                 let bgColorClass = '';
                                 let is_safeguardinghtml = '';
-                                if(item.is_safeguarding == 1){
-                                    safeguardCount++;
+                                if (item.is_safeguarding == 1) {
                                     bgColorClass = 'urReqSec';
                                     is_safeguardinghtml = `<div>
-                                                            <span class="careBadg redDarkBadgesAni">SAFEGUARDING</span>
-                                                        </div>`;
+                                                        <span class="careBadg redDarkBadgesAni">SAFEGUARDING</span>
+                                                    </div>`;
                                 }
                                 let severityhtml = '';
-                                if(item.severity_id == 1){
+                                if (item.severity_id == 1) {
                                     severityhtml = `<span class="careBadg">Low</span>`;
-                                }else if(item.severity_id == 2){
+                                } else if (item.severity_id == 2) {
                                     severityhtml = `<span class="careBadg yellowBadges">Medium</span>`;
-                                }else if(item.severity_id == 3){
+                                } else if (item.severity_id == 3) {
                                     severityhtml = `<span class="careBadg highBadges">High</span>`;
-                                }else if(item.severity_id == 4){
+                                } else if (item.severity_id == 4) {
                                     severityhtml = `<span class="careBadg redbadges">Critical</span>`;
                                 }
                                 let statushtml = '';
-                                if(item.status == 1){
-                                    openCount++;
+                                if (item.status == 1) {
                                     statushtml = `<span class="careBadg muteBadges">reported</span>`;
-                                }else if(item.status == 2){
-                                    openCount++;
+                                } else if (item.status == 2) {
                                     statushtml = `<span class="careBadg muteBadges">Under Investigation</span>`;
-                                }else if(item.status == 3){
-                                    resolveCount++;
-                                    statushtml = `<span class="careBadg muteBadges">Resoled</span>`;
-                                }else if(item.status == 4){
-                                    openCount++;
+                                } else if (item.status == 3) {
+                                    statushtml = `<span class="careBadg muteBadges">Resolved</span>`;
+                                } else if (item.status == 4) {
                                     statushtml = `<span class="careBadg muteBadges">Closed</span>`;
                                 }
                                 let cocHtml = '';
-                                if(item.cqcNotification == 1){
-                                    cqcCount++;
+                                if (item.cqcNotification == 1) {
                                     cocHtml = `<span class="careBadg purpleBadgesDark">CQC NOTIFICATION REQUIRED</span>`;
                                 }
-                               allHtmlData+=`<a href="{{ url('roster/incident-report-details/`+item.id+`') }}">
-                                    <div class="bBorderCard mt-4 `+bgColorClass+`">
-                                    
-                                        <div class="d-flex justify-content-between">
-                                            <div>
-                                                <div class="d-flex gap-3 align-items-center mb-2">
-                                                    <h5 class="h5Head m-0">`+item.incident_type.type+`</h5>
-                                                    <div class="d-flex align-items-center gap-3">
-                                                        <div>
-                                                            `+severityhtml+`
-                                                        </div>
-
-                                                        <div>
-                                                            `+statushtml+`
-                                                        </div>
-                                                        `+is_safeguardinghtml+`
-                                                        <div>
-                                                            `+cocHtml+`
-                                                        </div>
-                                                        <div class="userMum">
-                                                            <span class="title mt-0">
-                                                                <span>Ref: </span> `+item.ref+`
-                                                            </span>
-                                                        </div>
+                                let dynamicFormHtml = '';
+                                if (item.dynamic_form_builder) {
+                                    dynamicFormHtml = `<div><span class="careBadg blueBadges">Form: ` + item.dynamic_form_builder.title + `</span></div>`;
+                                }
+                                allHtmlData += `<a href="{{ url('roster/incident-report-details/` + item.id + `') }}">
+                                <div class="bBorderCard mt-4 ` + bgColorClass + `">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div class="w-100">
+                                            <div class="d-flex gap-3 align-items-center mb-2 flex-wrap">
+                                                <h5 class="h5Head m-0">` + (item.incident_type ? item.incident_type.type : 'N/A') + `</h5>
+                                                <div class="d-flex align-items-center gap-2">
+                                                    ` + severityhtml + `
+                                                    ` + statushtml + `
+                                                    ` + is_safeguardinghtml + `
+                                                    ` + cocHtml + `
+                                                    <div class="ref-pill">
+                                                        <span>Ref: ` + item.ref + `</span>
                                                     </div>
-
-                                                </div>
-                                                <div class="fallRedCon">
-                                                    <div class="d-flex align-items-center gap-3 mt-3">
-                                                        <p class="para text-sm mb-0"> <span>`+formatDateTime(item.date_time)+`</span></p>
-                                                    </div>
-                                                    <div>
-                                                        <h6 class="h6Head my-3"><span>Client</span>: `+item.clients.name+`</h6>
-                                                        <p class="para text-sm mb-0"> <span>`+item.what_happened+`</span></p>
-                                                        <div class="footerRedFall">
-                                                            <div class="d-flex gap-4">
-                                                                <div>
-
-                                                                    <span class="muchsmallText">Location: `+item.location+`</span>
-                                                                </div>
-                                                                <div>
-                                                                    <span class="greenText" style="font-size: 11px;">• Action taken</span>
-
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
                                                 </div>
                                             </div>
-                                            <div>
-                                                <button  class="borderBtn"><i
-                                                        class='bx  bx-eye f18 me-3 '></i> View</button>
+                                            <p class="para text-muted fs-13 mb-3">` + formatDateTime(item.date_time) + `</p>
+                                            
+                                            <div class="mb-3">
+                                                <h6 class="h6Head mb-1"><strong>Client:</strong> ` + (item.clients ? item.clients.name : 'N/A') + `</h6>
+                                                <p class="para text-sm mb-0">` + item.what_happened + `</p>
+                                            </div>
+
+                                            <div class="d-flex align-items-center gap-3">
+                                                <span class="text-muted fs-12">Location: ` + item.location + `</span>
+                                                <span class="text-success fs-12 d-flex align-items-center"><i class="bx bxs-circle me-1" style="font-size: 6px;"></i> Action taken</span>
+                                                ` + dynamicFormHtml + `
                                             </div>
                                         </div>
-
+                                        <div>
+                                            <button class="borderBtn d-flex align-items-center gap-2">
+                                                <i class='bx bx-eye f18'></i> View
+                                            </button>
+                                        </div>
                                     </div>
-                                </a>`; 
+                                </div>
+                            </a>`;
                             });
-                            if(is_ready){
-                                $("#totalCount").text(data.length);
-                                $("#openCount").text(openCount);
-                                $("#safeguardCount").text(safeguardCount);
-                                $("#cqcCount").text(cqcCount);
-                                $("#resolveCount").text(resolveCount);
-                            }
-                            is_ready = 0;
                             $("#incident_report_data").html(allHtmlData);
+
+                            if (res.counts) {
+                                $("#totalCount").text(res.counts.total);
+                                $("#openCount").text(res.counts.open);
+                                $("#safeguardCount").text(res.counts.safeguarding);
+                                $("#cqcCount").text(res.counts.cqc);
+                                $("#resolveCount").text(res.counts.resolved);
+                            }
+
                             var paginationControls = $("#incident_reportPagination");
                             paginationControls.empty();
-                            if (res.pagination.prev_page_url) {
-                                paginationControls.append('<button class="profileDrop" onclick="loadIncidentReportData( \'' + pagination.prev_page_url + '\')">Previous</button>');
+                            if (res.pagination) {
+                                if (res.pagination.prev_page_url) {
+                                    paginationControls.append('<button class="profileDrop" onclick="loadIncidentReportData( \'' + res.pagination.prev_page_url + '\')">Previous</button>');
+                                }
+                                if (res.pagination.next_page_url) {
+                                    paginationControls.append('<button class="profileDrop" onclick="loadIncidentReportData( \'' + res.pagination.next_page_url + '\')">Next</button>');
+                                }
                             }
-                            if (res.pagination.next_page_url) {
-                                paginationControls.append('<button class="profileDrop" onclick="loadIncidentReportData( \'' + pagination.next_page_url + '\')">Next</button>');
-                            }
-                        } 
+                        }
                     }
+                },
+                error: function(xhr) {
+                    is_ready = true;
+                    console.error("Error loading incidents:", xhr);
                 }
             });
         }
+
         function formatDateTime(datetime) {
             const date = new Date(datetime.replace(' ', 'T'));
 
-            return date.toLocaleString('en-US', {
+            const options = {
                 weekday: 'long',
                 year: 'numeric',
                 month: 'long',
@@ -640,53 +613,62 @@
                 hour: '2-digit',
                 minute: '2-digit',
                 hour12: false
-            });
+            };
+
+            let formatted = date.toLocaleString('en-US', options);
+            // Replace the last comma with " at"
+            return formatted.replace(/,([^,]*)$/, ' at$1');
         }
-        $(document).on('change','#safeguarding',function(){
+
+        $(document).on('change', '#safeguarding', function() {
             $("#safeguardingDetailsForm").hide();
             $(this).val(0);
-            $("#cqcNotification").prop('checked',false).val(0);
+            $("#cqcNotification").prop('checked', false).val(0);
             if ($(this).is(':checked')) {
                 $(this).val(1);
                 $("#severity_id").val(4);
-                $("#cqcNotification").prop('checked',true).val(1);
+                $("#cqcNotification").prop('checked', true).val(1);
                 $("#safeguardingDetailsForm").show();
             }
         });
-        $(document).on('change','.form_notification',function(){
-            if($(this).is(':checked')){
+
+        $(document).on('change', '.form_notification', function() {
+            if ($(this).is(':checked')) {
                 $(this).val(1);
-            }else{
+            } else {
                 $(this).val(0);
             }
         });
-        $(document).on('click','.incedent_form_submit',function(){
+
+        $(document).on('click', '.incedent_form_submit', function() {
             var error = 0;
-            $('.checkVali').each(function(){
-                if($(this).val() == ''|| $(this).val() == undefined){
+            $('.checkVali').each(function() {
+                if ($(this).val() == '' || $(this).val() == undefined) {
                     error = 1;
-                    $(this).css('border','1px solid red').focus();
+                    $(this).css('border', '1px solid red').focus();
                     return false;
-                }else{
+                } else {
                     error = 0;
-                    $(this).css('border','');
+                    $(this).css('border', '');
                 }
             });
-            if(error == 1){
+            if (error == 1) {
                 return false;
             }
         });
-        $(document).on('change','.SafeguardingDetailsCheckBox',function(){
-            if($(this).is(':checked')){
+
+        $(document).on('change', '.SafeguardingDetailsCheckBox', function() {
+            if ($(this).is(':checked')) {
                 $(this).val(1);
-            }else{
+            } else {
                 $(this).val(0);
             }
         });
-        document.addEventListener('DOMContentLoaded', function () {
+
+        document.addEventListener('DOMContentLoaded', function() {
             const input = document.getElementById('date_time');
 
-            if (!input.value) {
+            if (input && !input.value) {
                 const now = new Date();
 
                 // YYYY-MM-DDTHH:MM (required format for datetime-local)
@@ -700,50 +682,189 @@
                 input.value = formatted;
             }
         });
-    var searchData = undefined;
-    var startDate = undefined;
-    var endDate = undefined;
-    var incident_typeData = undefined;
-    var incident_statusData = undefined;
-    var SafeguardingData = 0;
-    $(document).on('keyup','#incident_serach',function(){
-        searchData = $(this).val();
-        loadIncidentReportData(undefined,startDate,endDate,SafeguardingData, searchData,incident_typeData,incident_statusData);
-    });
-    
-    $(document).on('change','#start_date',function(){
-        startDate = $(this).val();
-    });
 
-    $(document).on('change','#end_date',function(){
-        if ((Date.parse($(this).val()) <= Date.parse(startDate))) {
-            alert("Start date should be less than End date");
-            $(this).val('');
-            return false;
+        var searchData = undefined;
+        var startDate = undefined;
+        var endDate = undefined;
+        var incident_typeData = undefined;
+        var incident_statusData = undefined;
+        var SafeguardingData = 0;
+
+        $(document).on('keyup', '#incident_serach', function() {
+            searchData = $(this).val();
+            loadIncidentReportData(undefined, startDate, endDate, SafeguardingData, searchData, incident_typeData, incident_statusData);
+        });
+
+        $(document).on('change', '#start_date', function() {
+            startDate = $(this).val();
+        });
+
+        $(document).on('change', '#end_date', function() {
+            if ((Date.parse($(this).val()) <= Date.parse(startDate))) {
+                alert("Start date should be less than End date");
+                $(this).val('');
+                return false;
+            }
+            endDate = $(this).val();
+            loadIncidentReportData(undefined, startDate, endDate, SafeguardingData, searchData, incident_typeData, incident_statusData);
+        });
+
+        $(document).on('change', '#safeguardingRiskFilter', function() {
+            SafeguardingData = 0;
+            if ($(this).is(':checked')) {
+                SafeguardingData = 1;
+            }
+            loadIncidentReportData(undefined, startDate, endDate, SafeguardingData, searchData, incident_typeData, incident_statusData);
+        });
+
+        $(document).on('change', '#incident_typeFileter', function() {
+            incident_typeData = $(this).val();
+            loadIncidentReportData(undefined, startDate, endDate, SafeguardingData, searchData, incident_typeData, incident_statusData);
+        });
+
+        $(document).on('change', '#incident_statusFilter', function() {
+            incident_statusData = $(this).val();
+            loadIncidentReportData(undefined, startDate, endDate, SafeguardingData, searchData, incident_typeData, incident_statusData);
+        });
+
+        function clearFilterData() {
+            location.reload();
         }
-        endDate = $(this).val();
-        loadIncidentReportData(undefined,startDate,endDate,SafeguardingData, searchData,incident_typeData,incident_statusData);
-    });
-    
-    $(document).on('change','#safeguardingRiskFilter',function(){
-        SafeguardingData = 0;
-        if($(this).is(':checked')){
-            SafeguardingData = 1;
-        }
-        loadIncidentReportData(undefined,startDate,endDate,SafeguardingData, searchData,incident_typeData,incident_statusData);
-    });
-    $(document).on('change','#incident_typeFileter',function(){
-        incident_typeData = $(this).val();
-        loadIncidentReportData(undefined,startDate,endDate,SafeguardingData, searchData,incident_typeData,incident_statusData);
-    });
-    $(document).on('change','#incident_statusFilter',function(){
-        incident_statusData = $(this).val();
-        loadIncidentReportData(undefined,startDate,endDate,SafeguardingData, searchData,incident_typeData,incident_statusData);
-    });
-    function clearFilterData(){
-        location.reload();
-    }
+
+        $(document).on('change', '#dynamic_form_builder_id', function() {
+            var form_builder_id = $(this).val();
+            var service_user_id = $('select[name="client_id"]').val();
+
+            if (form_builder_id) {
+                if (!service_user_id) {
+                    alert('Please select a client first');
+                    $(this).val('');
+                    return false;
+                }
+
+                $.ajax({
+                    url: "{{ url('service/dynamic-form/view/pattern') }}",
+                    type: "post",
+                    data: {
+                        form_builder_id: form_builder_id,
+                        service_user_id: service_user_id,
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function(res) {
+                        if (res.response) {
+                            $('#dynamic_form_fields').html(res.pattern);
+                            $('#dynamic_form_container').show();
+
+                            // Initialize datepickers if any in the dynamic form
+                            if ($(".dpYears").length > 0) {
+                                $(".dpYears").datepicker({
+                                    format: 'dd-mm-yyyy',
+                                    autoclose: true
+                                });
+                            }
+
+                            // Load Form.io if it exists
+                            if (typeof loaddataontable === 'function') {
+                                loaddataontable();
+                            }
+                        } else {
+                            $('#dynamic_form_container').hide();
+                            $('#dynamic_form_fields').html('');
+                        }
+                    }
+                });
+            } else {
+                $('#dynamic_form_container').hide();
+                $('#dynamic_form_fields').html('');
+            }
+        });
+
+        $(document).on('click', '.incedent_form_submit', function(e) {
+            var form = $(this).closest('form');
+            var formio_el = document.getElementById('formiotest');
+
+            // Clear any previously appended dynamic form data
+            form.find('input[name^="formdata["]').remove();
+
+            if (formio_el && formio_el.formio) {
+                e.preventDefault();
+                formio_el.formio.submit().then(function(submission) {
+                    var data = submission.data;
+                    for (var key in data) {
+                        if (data.hasOwnProperty(key)) {
+                            $('<input>').attr({
+                                type: 'hidden',
+                                name: 'formdata[' + key + ']',
+                                value: typeof data[key] === 'object' ? JSON.stringify(data[key]) : data[key]
+                            }).appendTo(form);
+                        }
+                    }
+                    form.submit();
+                });
+            }
+        });
     </script>
 </main>
 
+
+<style>
+    #dynamic_form_fields .dynamic_form_h3,
+    #dynamic_form_fields .cog-panel:nth-child(n+1):nth-child(-n+5),
+    #dynamic_form_fields .below-divider,
+    #dynamic_form_fields .prient-btn {
+        display: none !important;
+    }
+
+    .blueBadges {
+        background-color: #e0f2fe;
+        color: #0369a1;
+    }
+
+    #dynamic_form_fields .cog-panel {
+        margin-top: 15px !important;
+    }
+
+    #dynamic_form_fields .cog-panel label {
+        display: block !important;
+        width: 100% !important;
+        float: none !important;
+        text-align: left !important;
+        padding: 0 !important;
+        margin-bottom: 8px !important;
+        font-weight: 500 !important;
+        color: #374151 !important;
+    }
+
+    #dynamic_form_fields .cog-panel div[class*="col-md-"] {
+        width: 100% !important;
+        padding: 0 !important;
+        float: none !important;
+    }
+
+    #dynamic_form_fields .form-group {
+        margin-bottom: 0 !important;
+    }
+
+    .ref-pill {
+        background: #fff;
+        border: 1px solid #e0e0e0;
+        padding: 2px 12px;
+        border-radius: 50px;
+        font-size: 11px;
+        font-weight: 500;
+        color: #333;
+    }
+
+    .fs-12 {
+        font-size: 12px !important;
+    }
+
+    .fs-13 {
+        font-size: 13px !important;
+    }
+
+    .text-success {
+        color: #28a745 !important;
+    }
+</style>
 @endsection

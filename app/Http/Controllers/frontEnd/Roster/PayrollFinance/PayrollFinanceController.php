@@ -273,7 +273,7 @@ class PayrollFinanceController extends Controller
 
         if (count($processedIds) > 0) {
             \App\Models\Timesheet::whereIn('id', $processedIds)->update(['status' => 'processed']);
-            
+
             // AUTOMATED INVOICE GENERATION
             try {
                 $this->invoiceService->generateInvoicesFromProcessedTimesheets($week_start, $homeId);
@@ -705,7 +705,7 @@ class PayrollFinanceController extends Controller
                 $end = \Carbon\Carbon::parse($date . ' ' . $t->clock_out);
                 if ($end->lessThan($start)) $end->addDay();
                 $t->duration_hours = $start->diffInMinutes($end) / 60;
-                
+
                 $rate = 0;
                 if ($t->shift && $t->shift->hourly_rate > 0) {
                     $rate = $t->shift->hourly_rate;
@@ -824,7 +824,7 @@ class PayrollFinanceController extends Controller
                 $end = \Carbon\Carbon::parse($date . ' ' . $t->clock_out);
                 if ($end->lessThan($start)) $end->addDay();
                 $t->duration_hours = $start->diffInMinutes($end) / 60;
-                
+
                 $rate = 0;
                 if ($t->shift && $t->shift->hourly_rate > 0) {
                     $rate = $t->shift->hourly_rate;
@@ -876,7 +876,7 @@ class PayrollFinanceController extends Controller
                 $end = \Carbon\Carbon::parse($date . ' ' . $t->clock_out);
                 if ($end->lessThan($start)) $end->addDay();
                 $t->duration_hours = $start->diffInMinutes($end) / 60;
-                
+
                 $rate = 0;
                 if ($t->shift && $t->shift->hourly_rate > 0) {
                     $rate = $t->shift->hourly_rate;

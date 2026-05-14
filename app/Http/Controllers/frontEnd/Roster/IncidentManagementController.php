@@ -10,6 +10,8 @@ use App\Services\Staff\StaffReportIncidentService;
 use App\ServiceUser;
 use App\Models\IncidentType;
 use App\Models\Staff\SafeguardingType;
+use App\DynamicFormBuilder;
+use App\Models\Staff\StaffReportIncidents;
 
 class IncidentManagementController extends Controller
 {
@@ -29,6 +31,9 @@ class IncidentManagementController extends Controller
             ->where(['home_id' => $home_id, 'is_deleted' => 0, 'status' => 1])->get();
         $data['incident_type'] = IncidentType::where('status', 1)->get();
         $data['safeguard_type'] = SafeguardingType::where('status', 1)->get();
+        $data['dynamic_forms'] = DynamicFormBuilder::whereRaw('FIND_IN_SET(4, location_ids)')
+            ->where('home_id', $home_id)
+            ->get();
         // echo "<pre>";print_r($data['incidents']);die;
         return view('frontEnd.roster.incident_management.incident', $data);
     }
@@ -107,11 +112,27 @@ class IncidentManagementController extends Controller
         $requestData = $request->all();
         $requestData['home_id'] = $home_id;
         $incidents = $this->incidentService->list($requestData);
+
+        // Dashboard counts
+        $total_count = StaffReportIncidents::where('home_id', $home_id)->count();
+        $open_count = StaffReportIncidents::where('home_id', $home_id)->whereIn('status', [1, 2])->count();
+        $safeguard_count = StaffReportIncidents::where('home_id', $home_id)->where('is_safeguarding', 1)->count();
+        $cqc_count = StaffReportIncidents::where('home_id', $home_id)->where('cqcNotification', 1)->count();
+        $resolve_count = StaffReportIncidents::where('home_id', $home_id)->whereIn('status', [3, 4])->count();
+
         return response()->json([
             'success' => true,
             'message' => 'Incident Report List',
             'data' => $incidents->items(),
+            'counts' => [
+                'total' => $total_count,
+                'open' => $open_count,
+                'safeguarding' => $safeguard_count,
+                'cqc' => $cqc_count,
+                'resolved' => $resolve_count
+            ],
             'pagination' => [
+                'total'         => $incidents->total(),
                 'next_page_url' => $incidents->nextPageUrl(),
                 'prev_page_url' => $incidents->previousPageUrl(),
             ]
