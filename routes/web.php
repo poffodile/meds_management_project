@@ -178,6 +178,22 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 		Route::get('/care-document', [CareDocumentController::class, 'index'])->name('roster.care.document');
 		Route::get('/reports', [ReportController::class, 'index'])->name('roster.report');
 
+		// AI Form Builder
+		Route::get('/form-builder', [\App\Http\Controllers\frontEnd\Roster\RosterFormBuilderController::class, 'index']);
+		Route::post('/form-builder/upload', [\App\Http\Controllers\frontEnd\Roster\RosterFormBuilderController::class, 'uploadAndGenerate'])->middleware('throttle:10,1');
+		Route::post('/form-builder/template', [\App\Http\Controllers\frontEnd\Roster\RosterFormBuilderController::class, 'storeTemplate'])->middleware('throttle:30,1');
+		Route::post('/form-builder/template/{id}', [\App\Http\Controllers\frontEnd\Roster\RosterFormBuilderController::class, 'updateTemplate'])->middleware('throttle:30,1')->where('id', '[0-9]+');
+		Route::post('/form-builder/template/{id}/delete', [\App\Http\Controllers\frontEnd\Roster\RosterFormBuilderController::class, 'deleteTemplate'])->middleware('throttle:20,1')->where('id', '[0-9]+');
+		Route::get('/form-builder/template/{id}', [\App\Http\Controllers\frontEnd\Roster\RosterFormBuilderController::class, 'getTemplate'])->where('id', '[0-9]+');
+		Route::get('/form-builder/fill/{templateId}', [\App\Http\Controllers\frontEnd\Roster\RosterFormBuilderController::class, 'fillForm'])->where('templateId', '[0-9]+');
+		Route::post('/form-builder/ai-fill', [\App\Http\Controllers\frontEnd\Roster\RosterFormBuilderController::class, 'aiFill'])->middleware('throttle:10,1');
+		Route::post('/form-builder/submission', [\App\Http\Controllers\frontEnd\Roster\RosterFormBuilderController::class, 'saveSubmission'])->middleware('throttle:30,1');
+		Route::get('/form-builder/submission/list', [\App\Http\Controllers\frontEnd\Roster\RosterFormBuilderController::class, 'listSubmissions']);
+		Route::post('/form-builder/submission/{id}', [\App\Http\Controllers\frontEnd\Roster\RosterFormBuilderController::class, 'updateSubmission'])->middleware('throttle:30,1')->where('id', '[0-9]+');
+		Route::post('/form-builder/submission/{id}/delete', [\App\Http\Controllers\frontEnd\Roster\RosterFormBuilderController::class, 'deleteSubmission'])->middleware('throttle:20,1')->where('id', '[0-9]+');
+		Route::get('/form-builder/submission/{id}', [\App\Http\Controllers\frontEnd\Roster\RosterFormBuilderController::class, 'getSubmission'])->where('id', '[0-9]+');
+		Route::get('/form-builder/client/{clientId}/submissions', [\App\Http\Controllers\frontEnd\Roster\RosterFormBuilderController::class, 'clientSubmissions'])->where('clientId', '[0-9]+');
+
 		// Frontend Leave Request
 		Route::get('/leave-request', [LeaveRequestController::class, 'index'])->name('roster.leave.request');
 		Route::post('/leave/update', [LeaveRequestController::class, 'update'])->name('roster.leave.update');
