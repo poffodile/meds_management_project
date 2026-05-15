@@ -531,6 +531,7 @@
                     success: function(res) {
                         if (res.status) {
                             fbToast('Form saved.', 'success');
+                            if (typeof window.loadSubmissions === 'function') window.loadSubmissions();
                         } else {
                             fbToast(res.error || 'Failed to save.', 'error');
                         }
@@ -557,6 +558,7 @@
                         if (res.status) {
                             currentSubmissionId = res.submission_id;
                             fbToast('Form saved.', 'success');
+                            if (typeof window.loadSubmissions === 'function') window.loadSubmissions();
                         } else {
                             fbToast(res.error || 'Failed to save.', 'error');
                         }

@@ -385,7 +385,7 @@ class FormBuilderService
                 'allergies' => $client->allergies ?? '',
                 'medical_notes' => $client->medical_notes ?? '',
                 'care_needs' => $client->care_needs ?? '',
-                'mobility' => $client->suMobility ?? ($client->mobility ?? ''),
+                'mobility' => $client->suMobility ?? '',
                 'emergency_contact' => ($client->em_name ?? '') . ' ' . ($client->em_phone ?? ''),
             ],
         ];
@@ -479,13 +479,23 @@ class FormBuilderService
                 ->map(fn($row) => (array)$row)->toArray()
             : [];
 
+        $data['care_tasks'] = Schema::hasTable('client_care_tasks')
+            ? DB::table('client_care_tasks')
+                ->where('client_id', $clientId)
+                ->where('home_id', $homeId)
+                ->orderBy('scheduled_date', 'desc')
+                ->limit(20)
+                ->get(['task_title', 'task_description', 'priority', 'frequency', 'status'])
+                ->map(fn($row) => (array)$row)->toArray()
+            : [];
+
         return $data;
     }
 
     private function buildTemplatePrompt(string $documentText, string $filename): array
     {
         $system = <<<'PROMPT'
-You are a form digitisation expert for UK care services. You convert uploaded care documents into structured, blank digital form templates.
+You are a form digitisation expert for UK children's residential care. You convert uploaded care documents into structured, blank digital form templates.
 
 CRITICAL: Most uploaded documents are FILLED-IN forms (assessments, reviews, plans with real client data). REVERSE-ENGINEER the blank template. Every data entry point becomes a blank fillable field. Every piece of client data proves a field exists — extract the field, discard the data.
 
@@ -499,6 +509,11 @@ RULES:
 7. REPEATED SECTIONS — if the same section repeats for multiple children/people, include it ONCE with a "text" field for the person's name at the top.
 8. NEVER classify assessment forms, review forms, or care plans as "reference/policy documents". They are ALWAYS fillable.
 9. COMPLETENESS — before outputting, verify every section heading from the original document has a matching section in your output.
+
+EXAMPLE — a "Child Health Referral Form" should produce JSON like this (abbreviated):
+{"formTitle":"Child Health Referral Form","formDescription":"Referral of children for health services.","sections":[{"title":"Child Information","fields":[{"id":"full_name","label":"Full Name","type":"text","required":true,"hint":"Enter the child's full name"},{"id":"date_of_birth","label":"Date of Birth","type":"date","required":true,"hint":"Select the child's date of birth"},{"id":"case_number","label":"Case Number","type":"text","required":true,"hint":"Enter the unique case number"},{"id":"gender","label":"Gender","type":"checkbox","required":true,"hint":"Select the child's gender","options":["Female","Male","Other"]},{"id":"referral_start_date","label":"Referral Start Date","type":"date","required":true,"hint":"Select the date the referral starts"}]},{"title":"Contact Information","fields":[{"id":"council_contact","label":"Council Contact","type":"text","hint":"Contact information for the council"},{"id":"telephone","label":"Telephone Number","type":"tel","hint":"Enter the contact telephone number"},{"id":"fax","label":"Fax Number","type":"tel","hint":"Enter the contact fax number"}]},{"title":"Referral Details","fields":[{"id":"reason_for_referral","label":"Reason for Referral","type":"textarea","required":true,"hint":"Provide details on the reason for referral"},{"id":"risk_assessment","label":"Risk Assessment","type":"risk","required":true,"hint":"Assess the risk level","options":["Low","Medium","High"]},{"id":"additional_notes","label":"Additional Notes","type":"textarea","hint":"Any other relevant information"},{"id":"services_needed","label":"Services Needed","type":"checkbox","hint":"Select all services required","options":["Physiotherapy","Psychology","Occupational Therapy","Speech Therapy"]},{"id":"date_referral_received","label":"Date Referral Received","type":"date","hint":"The date when the referral was received"}]}]}
+
+Notice: every field has id, label, type, hint. Tables use "columns" and "rows". No client data anywhere.
 
 OUTPUT: Valid JSON only. formTitle (string), formDescription (string), sections (array of {title, fields}). Each field: id (snake_case, unique), label, type. Always include: hint. Optional: required, options, columns, rows, content.
 PROMPT;
@@ -604,6 +619,13 @@ PROMPT;
             foreach ($data['dols'] as $d) {
                 $parts[] = "- Status: " . ($d['dols_status'] ?? '') . ", Type: " . ($d['authorisation_type'] ?? '');
                 if (!empty($d['reason_for_dols'])) $parts[] = "  Reason: " . $d['reason_for_dols'];
+            }
+        }
+
+        if (!empty($data['care_tasks'])) {
+            $parts[] = "\n--- Care Tasks (" . count($data['care_tasks']) . ") ---";
+            foreach ($data['care_tasks'] as $ct) {
+                $parts[] = "- " . ($ct['task_title'] ?? '') . ": " . ($ct['task_description'] ?? '') . " (Priority: " . ($ct['priority'] ?? '') . ", Status: " . ($ct['status'] ?? '') . ")";
             }
         }
 

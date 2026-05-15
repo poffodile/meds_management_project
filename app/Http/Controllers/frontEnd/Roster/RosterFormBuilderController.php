@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use RuntimeException;
 
 class RosterFormBuilderController extends Controller
@@ -318,21 +319,26 @@ class RosterFormBuilderController extends Controller
             return response()->json(['status' => false, 'error' => 'Invalid form values.'], 422);
         }
 
-        $submission = FormSubmission::create([
-            'home_id' => $homeId,
-            'form_template_id' => $template->id,
-            'client_id' => $clientId,
-            'form_title' => $template->title,
-            'values_json' => json_encode($valuesJson),
-            'submitted_by' => $user->id,
-            'submitted_by_name' => $user->name ?? 'Unknown',
-            'ai_filled' => $request->input('ai_filled') ? 1 : 0,
-        ]);
+        try {
+            $submission = FormSubmission::create([
+                'home_id' => $homeId,
+                'form_template_id' => $template->id,
+                'client_id' => $clientId,
+                'form_title' => $template->title,
+                'values_json' => json_encode($valuesJson),
+                'submitted_by' => $user->id,
+                'submitted_by_name' => $user->name ?? 'Unknown',
+                'ai_filled' => $request->input('ai_filled') ? 1 : 0,
+            ]);
 
-        return response()->json([
-            'status' => true,
-            'submission_id' => $submission->id,
-        ]);
+            return response()->json([
+                'status' => true,
+                'submission_id' => $submission->id,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Form Builder Save Error: ' . $e->getMessage());
+            return response()->json(['status' => false, 'error' => 'Failed to save: ' . $e->getMessage()], 500);
+        }
     }
 
     public function updateSubmission(Request $request, int $id): JsonResponse
@@ -353,11 +359,16 @@ class RosterFormBuilderController extends Controller
             return response()->json(['status' => false, 'error' => 'Invalid form values.'], 422);
         }
 
-        $submission->update([
-            'values_json' => json_encode($valuesJson),
-        ]);
+        try {
+            $submission->update([
+                'values_json' => json_encode($valuesJson),
+            ]);
 
-        return response()->json(['status' => true]);
+            return response()->json(['status' => true]);
+        } catch (\Exception $e) {
+            Log::error('Form Builder Update Error: ' . $e->getMessage());
+            return response()->json(['status' => false, 'error' => 'Failed to update: ' . $e->getMessage()], 500);
+        }
     }
 
     public function deleteSubmission(Request $request, int $id): JsonResponse
@@ -409,10 +420,21 @@ class RosterFormBuilderController extends Controller
     {
         $homeId = $this->homeId();
 
-        $submissions = FormSubmission::where('home_id', $homeId)
-            ->where('is_deleted', 0)
-            ->orderBy('created_at', 'desc')
-            ->get(['id', 'form_template_id', 'client_id', 'form_title', 'submitted_by_name', 'ai_filled', 'created_at']);
+        $submissions = DB::table('form_submissions as fs')
+            ->leftJoin('service_user as su', 'fs.client_id', '=', 'su.id')
+            ->where('fs.home_id', $homeId)
+            ->where('fs.is_deleted', 0)
+            ->orderBy('fs.created_at', 'desc')
+            ->get([
+                'fs.id',
+                'fs.form_template_id',
+                'fs.client_id',
+                'fs.form_title',
+                'fs.submitted_by_name',
+                'fs.ai_filled',
+                'fs.created_at',
+                'su.name as client_name'
+            ]);
 
         return response()->json([
             'status' => true,
@@ -421,10 +443,11 @@ class RosterFormBuilderController extends Controller
                     'id' => $s->id,
                     'form_template_id' => $s->form_template_id,
                     'client_id' => $s->client_id,
+                    'client_name' => $s->client_name,
                     'form_title' => $s->form_title,
                     'submitted_by_name' => $s->submitted_by_name,
                     'ai_filled' => $s->ai_filled,
-                    'created_at' => $s->created_at ? $s->created_at->format('d M Y H:i') : '',
+                    'created_at' => $s->created_at ? date('d M Y H:i', strtotime($s->created_at)) : '',
                 ];
             }),
         ]);
@@ -440,22 +463,31 @@ class RosterFormBuilderController extends Controller
             return response()->json(['status' => false, 'error' => 'Client not found.'], 404);
         }
 
-        $submissions = FormSubmission::where('home_id', $homeId)
-            ->where('client_id', $clientId)
-            ->where('is_deleted', 0)
-            ->orderBy('created_at', 'desc')
-            ->get(['id', 'form_template_id', 'form_title', 'submitted_by_name', 'ai_filled', 'created_at']);
+        $submissions = DB::table('form_submissions as fs')
+            ->where('fs.home_id', $homeId)
+            ->where('fs.client_id', $clientId)
+            ->where('fs.is_deleted', 0)
+            ->orderBy('fs.created_at', 'desc')
+            ->get([
+                'fs.id',
+                'fs.form_template_id',
+                'fs.form_title',
+                'fs.submitted_by_name',
+                'fs.ai_filled',
+                'fs.created_at'
+            ]);
 
         return response()->json([
             'status' => true,
-            'submissions' => $submissions->map(function ($s) {
+            'submissions' => $submissions->map(function ($s) use ($client) {
                 return [
                     'id' => $s->id,
                     'form_template_id' => $s->form_template_id,
+                    'client_name' => $client->name,
                     'form_title' => $s->form_title,
                     'submitted_by_name' => $s->submitted_by_name,
                     'ai_filled' => $s->ai_filled,
-                    'created_at' => $s->created_at ? $s->created_at->format('d M Y H:i') : '',
+                    'created_at' => $s->created_at ? date('d M Y H:i', strtotime($s->created_at)) : '',
                 ];
             }),
         ]);

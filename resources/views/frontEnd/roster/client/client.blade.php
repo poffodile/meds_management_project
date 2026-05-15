@@ -5,6 +5,44 @@
 
     @include('frontEnd.roster.common.roster_header')
 
+<style>
+    .nci-drop-zone {
+        border: 2px dashed #ddd;
+        border-radius: 8px;
+        padding: 40px;
+        text-align: center;
+        background: #fafafa;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    .nci-drop-zone:hover {
+        border-color: #337ab7;
+        background: #f0f7ff;
+    }
+    .nci-file-item {
+        transition: all 0.2s ease;
+    }
+    .nci-file-item:hover {
+        background: #f9f9f9;
+    }
+    .borderBtn {
+        background: transparent;
+        border: 1px solid #1f88b5;
+        color: #1f88b5 !important;
+        margin-right: 10px;
+    }
+    .borderBtn:hover {
+        background: #1f88b5;
+        color: #fff !important;
+    }
+    .nci-category {
+        transition: all 0.2s ease;
+    }
+    .nci-category:hover {
+        background: #fcfcfc;
+    }
+</style>
+
     <main class="page-content">
         <div class="container-fluid">
 
@@ -14,6 +52,7 @@
                     <p class="header-subtitle">Manage {{ strtolower(getTerm('Service User')) }} information and care plans</p>
                 </div>
                 <div class="header-actions">
+                    <button class="btn borderBtn" onclick="openNewClientImportModal()"><i class="fa fa-file-text"></i> Import Client</button>
                     <button class="btn addClient" onclick="childCourseData()" data-toggle="modal"
                         data-target="#addServiceUserModal"><i class="fa fa-plus"></i> Add {{ getTerm('Service User') }}</button>
                 </div>
@@ -758,5 +797,57 @@
         </script>
 
 
-    @endsection
+    
+<!-- AI New Client Import Modal -->
+<div class="modal fade leaveCommunStyle" id="aiNewClientImportModal" tabindex="-1" role="dialog" aria-labelledby="aiNewClientImportLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="aiNewClientImportLabel">Import New Client from Documents</h4>
+            </div>
+            <div class="modal-body" id="aiNewClientImportBody">
+                <p class="text-muted">Upload client documentation to automatically create a new client record with care data.</p>
+
+                <!-- Step 1: Upload -->
+                <div id="nciStep1">
+                    <div id="nciDropZone" class="nci-drop-zone">
+                        <i class="fa fa-cloud-upload" style="font-size:36px;color:#999;"></i>
+                        <p style="margin:10px 0 5px;">Drag & drop files here or click to browse</p>
+                        <p class="text-muted" style="font-size:12px;">PDF or Word (.docx) &bull; Max 10MB each &bull; Multiple files allowed</p>
+                        <input type="file" id="nciFileInput" multiple accept=".pdf,.docx,.doc" style="display:none;">
+                    </div>
+
+                    <div id="nciFileList" style="margin-top:15px;display:none;">
+                        <h5>Uploaded Files</h5>
+                        <div id="nciFileItems"></div>
+                    </div>
+
+                    <div style="margin-top:15px;">
+                        <button class="btn btn-primary" id="nciExtractBtn" style="display:none;" onclick="uploadAndExtract()">
+                            <i class="fa fa-magic"></i> Extract Client & Care Data
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Review -->
+                <div id="nciStep2" style="display:none;"></div>
+
+                <!-- Step 3: Success -->
+                <div id="nciStep3" style="display:none;"></div>
+
+                <!-- Loading overlay -->
+                <div id="nciLoading" style="display:none;text-align:center;padding:40px;">
+                    <i class="fa fa-spinner fa-spin" style="font-size:32px;color:#337ab7;"></i>
+                    <p id="nciLoadingText" style="margin-top:15px;color:#666;"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>var nciBaseUrl = '{{ url("/roster") }}'; var nciCsrfToken = '{{ csrf_token() }}';</script>
+<script src="{{ url('public/js/roster/ai-new-client-import.js') }}"></script>
+
+@endsection
 </main>

@@ -178,6 +178,51 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 		Route::get('/care-document', [CareDocumentController::class, 'index'])->name('roster.care.document');
 		Route::get('/reports', [ReportController::class, 'index'])->name('roster.report');
 
+		// Workflow Automation
+		Route::get('/workflows', [\App\Http\Controllers\frontEnd\Roster\WorkflowController::class, 'index']);
+		Route::get('/workflows/list', [\App\Http\Controllers\frontEnd\Roster\WorkflowController::class, 'list'])->middleware('throttle:30,1');
+		Route::post('/workflows/store', [\App\Http\Controllers\frontEnd\Roster\WorkflowController::class, 'store'])->middleware('throttle:30,1');
+		Route::post('/workflows/update', [\App\Http\Controllers\frontEnd\Roster\WorkflowController::class, 'update'])->middleware('throttle:30,1');
+		Route::post('/workflows/toggle', [\App\Http\Controllers\frontEnd\Roster\WorkflowController::class, 'toggle'])->middleware('throttle:30,1');
+		Route::post('/workflows/delete', [\App\Http\Controllers\frontEnd\Roster\WorkflowController::class, 'delete'])->middleware('throttle:20,1');
+		Route::get('/workflows/executions', [\App\Http\Controllers\frontEnd\Roster\WorkflowController::class, 'executions'])->middleware('throttle:30,1');
+		Route::get('/workflows/templates', [\App\Http\Controllers\frontEnd\Roster\WorkflowController::class, 'templates'])->middleware('throttle:30,1');
+		Route::post('/workflows/install-template', [\App\Http\Controllers\frontEnd\Roster\WorkflowController::class, 'installTemplate'])->middleware('throttle:30,1');
+		Route::post('/workflows/run-all', [\App\Http\Controllers\frontEnd\Roster\WorkflowController::class, 'runAll'])->middleware('throttle:10,1');
+		Route::post('/workflows/run-single', [\App\Http\Controllers\frontEnd\Roster\WorkflowController::class, 'runSingle'])->middleware('throttle:20,1');
+
+		// AI Copilot
+		Route::get('/ai-copilot', [\App\Http\Controllers\frontEnd\Roster\AICopilotController::class, 'index']);
+		Route::get('/ai-copilot/sessions', [\App\Http\Controllers\frontEnd\Roster\AICopilotController::class, 'sessions'])->middleware('throttle:30,1');
+		Route::get('/ai-copilot/messages', [\App\Http\Controllers\frontEnd\Roster\AICopilotController::class, 'messages'])->middleware('throttle:30,1');
+		Route::post('/ai-copilot/send', [\App\Http\Controllers\frontEnd\Roster\AICopilotController::class, 'send'])->middleware('throttle:20,1');
+		Route::post('/ai-copilot/new-session', [\App\Http\Controllers\frontEnd\Roster\AICopilotController::class, 'newSession'])->middleware('throttle:10,1');
+		Route::post('/ai-copilot/delete-session', [\App\Http\Controllers\frontEnd\Roster\AICopilotController::class, 'deleteSession'])->middleware('throttle:20,1');
+		Route::get('/ai-copilot/usage', [\App\Http\Controllers\frontEnd\Roster\AICopilotController::class, 'usage'])->middleware('throttle:30,1');
+
+		// AI Care Plan Generator
+		Route::post('/ai-care-plan/generate', [\App\Http\Controllers\frontEnd\Roster\AICarePlanController::class, 'generate'])->middleware('throttle:10,1');
+		Route::post('/ai-care-plan/save', [\App\Http\Controllers\frontEnd\Roster\AICarePlanController::class, 'save'])->middleware('throttle:20,1');
+		Route::get('/ai-care-plan/list', [\App\Http\Controllers\frontEnd\Roster\AICarePlanController::class, 'list'])->middleware('throttle:30,1');
+		Route::get('/ai-care-plan/view', [\App\Http\Controllers\frontEnd\Roster\AICarePlanController::class, 'view'])->middleware('throttle:30,1');
+		Route::post('/ai-care-plan/update', [\App\Http\Controllers\frontEnd\Roster\AICarePlanController::class, 'update'])->middleware('throttle:20,1');
+		Route::post('/ai-care-plan/delete', [\App\Http\Controllers\frontEnd\Roster\AICarePlanController::class, 'delete'])->middleware('throttle:20,1');
+		Route::post('/ai-care-plan/activate', [\App\Http\Controllers\frontEnd\Roster\AICarePlanController::class, 'activate'])->middleware('throttle:20,1');
+
+		// AI Document Importer
+		Route::post('/ai-document-import/upload', [\App\Http\Controllers\frontEnd\Roster\AIDocumentImportController::class, 'upload'])->middleware('throttle:10,1');
+		Route::post('/ai-document-import/extract', [\App\Http\Controllers\frontEnd\Roster\AIDocumentImportController::class, 'extract'])->middleware('throttle:10,1');
+		Route::post('/ai-document-import/confirm', [\App\Http\Controllers\frontEnd\Roster\AIDocumentImportController::class, 'confirmImport'])->middleware('throttle:10,1');
+		Route::get('/ai-document-import/list', [\App\Http\Controllers\frontEnd\Roster\AIDocumentImportController::class, 'list'])->middleware('throttle:30,1');
+		Route::get('/ai-document-import/documents', [\App\Http\Controllers\frontEnd\Roster\AIDocumentImportController::class, 'documents'])->middleware('throttle:30,1');
+		Route::post('/ai-document-import/delete', [\App\Http\Controllers\frontEnd\Roster\AIDocumentImportController::class, 'delete'])->middleware('throttle:20,1');
+		Route::get('/ai-document-import/download/{id}', [\App\Http\Controllers\frontEnd\Roster\AIDocumentImportController::class, 'download'])->middleware('throttle:30,1')->where('id', '[0-9]+');
+
+		// AI New Client Importer
+		Route::post('/ai-new-client-import/upload', [\App\Http\Controllers\frontEnd\Roster\AINewClientImportController::class, 'upload'])->middleware('throttle:10,1');
+		Route::post('/ai-new-client-import/extract', [\App\Http\Controllers\frontEnd\Roster\AINewClientImportController::class, 'extract'])->middleware('throttle:10,1');
+		Route::post('/ai-new-client-import/confirm', [\App\Http\Controllers\frontEnd\Roster\AINewClientImportController::class, 'confirm'])->middleware('throttle:10,1');
+
 		// AI Form Builder
 		Route::get('/form-builder', [\App\Http\Controllers\frontEnd\Roster\RosterFormBuilderController::class, 'index']);
 		Route::post('/form-builder/upload', [\App\Http\Controllers\frontEnd\Roster\RosterFormBuilderController::class, 'uploadAndGenerate'])->middleware('throttle:10,1');
@@ -188,15 +233,76 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 		Route::get('/form-builder/fill/{templateId}', [\App\Http\Controllers\frontEnd\Roster\RosterFormBuilderController::class, 'fillForm'])->where('templateId', '[0-9]+');
 		Route::post('/form-builder/ai-fill', [\App\Http\Controllers\frontEnd\Roster\RosterFormBuilderController::class, 'aiFill'])->middleware('throttle:10,1');
 		Route::post('/form-builder/submission', [\App\Http\Controllers\frontEnd\Roster\RosterFormBuilderController::class, 'saveSubmission'])->middleware('throttle:30,1');
+		// Corrected submission routes
 		Route::get('/form-builder/submission/list', [\App\Http\Controllers\frontEnd\Roster\RosterFormBuilderController::class, 'listSubmissions']);
 		Route::post('/form-builder/submission/{id}', [\App\Http\Controllers\frontEnd\Roster\RosterFormBuilderController::class, 'updateSubmission'])->middleware('throttle:30,1')->where('id', '[0-9]+');
 		Route::post('/form-builder/submission/{id}/delete', [\App\Http\Controllers\frontEnd\Roster\RosterFormBuilderController::class, 'deleteSubmission'])->middleware('throttle:20,1')->where('id', '[0-9]+');
 		Route::get('/form-builder/submission/{id}', [\App\Http\Controllers\frontEnd\Roster\RosterFormBuilderController::class, 'getSubmission'])->where('id', '[0-9]+');
 		Route::get('/form-builder/client/{clientId}/submissions', [\App\Http\Controllers\frontEnd\Roster\RosterFormBuilderController::class, 'clientSubmissions'])->where('clientId', '[0-9]+');
 
+		// Workflow Automation
+		Route::get('/workflows', [\App\Http\Controllers\frontEnd\Roster\WorkflowController::class, 'index']);
+		Route::get('/workflows/list', [\App\Http\Controllers\frontEnd\Roster\WorkflowController::class, 'list'])->middleware('throttle:30,1');
+		Route::post('/workflows/store', [\App\Http\Controllers\frontEnd\Roster\WorkflowController::class, 'store'])->middleware('throttle:30,1');
+		Route::post('/workflows/update', [\App\Http\Controllers\frontEnd\Roster\WorkflowController::class, 'update'])->middleware('throttle:30,1');
+		Route::post('/workflows/toggle', [\App\Http\Controllers\frontEnd\Roster\WorkflowController::class, 'toggle'])->middleware('throttle:30,1');
+		Route::post('/workflows/delete', [\App\Http\Controllers\frontEnd\Roster\WorkflowController::class, 'delete'])->middleware('throttle:20,1');
+		Route::get('/workflows/executions', [\App\Http\Controllers\frontEnd\Roster\WorkflowController::class, 'executions'])->middleware('throttle:30,1');
+		Route::get('/workflows/templates', [\App\Http\Controllers\frontEnd\Roster\WorkflowController::class, 'templates'])->middleware('throttle:30,1');
+		Route::post('/workflows/install-template', [\App\Http\Controllers\frontEnd\Roster\WorkflowController::class, 'installTemplate'])->middleware('throttle:20,1');
+		Route::post('/workflows/run-all', [\App\Http\Controllers\frontEnd\Roster\WorkflowController::class, 'runAll'])->middleware('throttle:10,1');
+		Route::post('/workflows/run-single', [\App\Http\Controllers\frontEnd\Roster\WorkflowController::class, 'runSingle'])->middleware('throttle:30,1');
+
 		// Frontend Leave Request
 		Route::get('/leave-request', [LeaveRequestController::class, 'index'])->name('roster.leave.request');
 		Route::post('/leave/update', [LeaveRequestController::class, 'update'])->name('roster.leave.update');
+
+		// MAR Sheets
+		Route::get('/client/mar-sheets', [\App\Http\Controllers\frontEnd\Roster\Client\MARSheetController::class, 'index']);
+		Route::get('/client/mar-sheet/list', [\App\Http\Controllers\frontEnd\Roster\Client\MARSheetController::class, 'list'])->middleware('throttle:30,1');
+		Route::post('/client/mar-sheet/store', [\App\Http\Controllers\frontEnd\Roster\Client\MARSheetController::class, 'store'])->middleware('throttle:20,1');
+		Route::post('/client/mar-sheet/update', [\App\Http\Controllers\frontEnd\Roster\Client\MARSheetController::class, 'update'])->middleware('throttle:20,1');
+		Route::post('/client/mar-sheet/details', [\App\Http\Controllers\frontEnd\Roster\Client\MARSheetController::class, 'details'])->middleware('throttle:30,1');
+		Route::post('/client/mar-sheet/delete', [\App\Http\Controllers\frontEnd\Roster\Client\MARSheetController::class, 'delete'])->middleware('throttle:20,1');
+		Route::post('/client/mar-sheet/discontinue', [\App\Http\Controllers\frontEnd\Roster\Client\MARSheetController::class, 'discontinue'])->middleware('throttle:20,1');
+		Route::post('/client/mar-administer', [\App\Http\Controllers\frontEnd\Roster\Client\MARSheetController::class, 'administer'])->middleware('throttle:30,1');
+		Route::post('/client/mar-administration-grid', [\App\Http\Controllers\frontEnd\Roster\Client\MARSheetController::class, 'administrationGrid'])->middleware('throttle:30,1');
+		Route::post('/client/mar-monthly-grid', [\App\Http\Controllers\frontEnd\Roster\Client\MARSheetController::class, 'monthlyGrid'])->middleware('throttle:30,1');
+
+		// Safeguarding
+		Route::get('/safeguarding', [\App\Http\Controllers\frontEnd\Roster\SafeguardingController::class, 'index']);
+		Route::get('/safeguarding/list', [\App\Http\Controllers\frontEnd\Roster\SafeguardingController::class, 'list'])->middleware('throttle:30,1');
+		Route::post('/safeguarding/save', [\App\Http\Controllers\frontEnd\Roster\SafeguardingController::class, 'save'])->middleware('throttle:20,1');
+		Route::post('/safeguarding/update', [\App\Http\Controllers\frontEnd\Roster\SafeguardingController::class, 'update'])->middleware('throttle:20,1');
+		Route::post('/safeguarding/details', [\App\Http\Controllers\frontEnd\Roster\SafeguardingController::class, 'details'])->middleware('throttle:30,1');
+		Route::post('/safeguarding/delete', [\App\Http\Controllers\frontEnd\Roster\SafeguardingController::class, 'delete'])->middleware('throttle:20,1');
+		Route::post('/safeguarding/status-change', [\App\Http\Controllers\frontEnd\Roster\SafeguardingController::class, 'statusChange'])->middleware('throttle:20,1');
+
+		// SOS Alerts
+		Route::post('/sos-alert/trigger', [\App\Http\Controllers\frontEnd\Roster\SosAlertController::class, 'trigger'])->middleware('throttle:5,1');
+		Route::post('/sos-alert/list', [\App\Http\Controllers\frontEnd\Roster\SosAlertController::class, 'list'])->middleware('throttle:30,1');
+		Route::post('/sos-alert/acknowledge', [\App\Http\Controllers\frontEnd\Roster\SosAlertController::class, 'acknowledge'])->middleware('throttle:20,1');
+		Route::post('/sos-alert/resolve', [\App\Http\Controllers\frontEnd\Roster\SosAlertController::class, 'resolve'])->middleware('throttle:20,1');
+
+		// Portal Access
+		Route::get('/client/portal-access', [\App\Http\Controllers\frontEnd\Roster\PortalAccessController::class, 'index']);
+		Route::get('/client/portal-access-list', [\App\Http\Controllers\frontEnd\Roster\PortalAccessController::class, 'list'])->middleware('throttle:30,1');
+		Route::post('/client/portal-access-save', [\App\Http\Controllers\frontEnd\Roster\PortalAccessController::class, 'save'])->middleware('throttle:20,1');
+		Route::post('/client/portal-access-revoke', [\App\Http\Controllers\frontEnd\Roster\PortalAccessController::class, 'revoke'])->middleware('throttle:20,1');
+		Route::post('/client/portal-access-delete', [\App\Http\Controllers\frontEnd\Roster\PortalAccessController::class, 'delete'])->middleware('throttle:20,1');
+
+		// Feedback Hub
+		Route::get('/feedback-hub', [\App\Http\Controllers\frontEnd\Roster\FeedbackHubController::class, 'index']);
+		Route::get('/feedback-hub/list', [\App\Http\Controllers\frontEnd\Roster\FeedbackHubController::class, 'list'])->middleware('throttle:30,1');
+		Route::post('/feedback-hub/save', [\App\Http\Controllers\frontEnd\Roster\FeedbackHubController::class, 'save'])->middleware('throttle:20,1');
+
+		// Notifications
+		Route::get('/notifications', [\App\Http\Controllers\frontEnd\Roster\NotificationController::class, 'index']);
+		Route::post('/notifications/list', [\App\Http\Controllers\frontEnd\Roster\NotificationController::class, 'list'])->middleware('throttle:30,1');
+		Route::post('/notifications/mark-read', [\App\Http\Controllers\frontEnd\Roster\NotificationController::class, 'markRead'])->middleware('throttle:30,1');
+		Route::post('/notifications/mark-all-read', [\App\Http\Controllers\frontEnd\Roster\NotificationController::class, 'markAllRead'])->middleware('throttle:20,1');
+		Route::post('/notifications/delete', [\App\Http\Controllers\frontEnd\Roster\NotificationController::class, 'delete'])->middleware('throttle:20,1');
+		Route::post('/notifications/unread-count', [\App\Http\Controllers\frontEnd\Roster\NotificationController::class, 'unreadCount'])->middleware('throttle:60,1');
 
 		// Carer Section Start
 		Route::get('/carer', [CarerController::class, 'index'])->name('roster.staff.carer');

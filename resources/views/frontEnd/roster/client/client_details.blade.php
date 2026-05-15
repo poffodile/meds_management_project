@@ -19,7 +19,7 @@
                 <button class="btn borderBtn editClient" data-toggle="modal" data-target="#addServiceUserModal" data-child_id="{{$clientDetails['id']}}"><i class='bx  bx-edit'></i> Edit Client</button>
                 <!-- <button class="btn borderBtn"><i class='bx  bx-arrow-in-up-square-half'></i> Import Documents</button> -->
                 <button class="btn borderBtn" type="button" data-toggle="modal" data-target="#importDoc"><i class='bx  bx-arrow-in-up-square-half'></i> Import Documents</button>
-                <button class="btn allBtnUseColor"><i class='bx  bx-sparkles'></i> Generate Care Plan</button>
+                <button class="btn allBtnUseColor" data-toggle="modal" data-target="#generateCarePlanModal"><i class='bx  bx-sparkles'></i> Generate Care Plan</button>
             </div>
         </div>
         <div class="row">
@@ -53,7 +53,7 @@
                     <!-- onclick="getAlerts()" -->
                     <button class="tab" data-tab="clientAlertsTab"> Alerts </button>
                     <button class="tab" data-tab="clientAIInsightsTab"> AI Insights </button>
-                    <button class="tab" data-tab="clientCarePlanTab" onclick="getCarePlan()"> Care Plan </button>
+                    <button class="tab" data-tab="clientCarePlanTab" onclick="loadCarePlans()"> Care Plan </button>
                     <button class="tab" data-tab="clientRiskAssessmentsTab"> Risk Assessments </button>
                     <button class="tab" data-tab="clientMedicationTab" onclick="getMedication()"> Medication </button>
                     <button class="tab" data-tab="clientPEEPTab"> PEEP </button>
@@ -2540,63 +2540,13 @@
                         <div class="workHoursHeader">
                             <div class="title"><i class='bx  bx-heart'></i> Care Plans</div>
                             <div class="actions">
+                                <button class="btn allBtnUseColor" data-toggle="modal" data-target="#generateCarePlanModal" style="margin-right:10px;"><i class='bx bx-sparkles'></i> Generate AI Plan</button>
                                 <button class="allBtnUseColor" data-toggle="modal" data-target="#addcreateCarePlanModal"> <i class='bx  bx-plus'></i> Create Care Plan</button>
                             </div>
                         </div>
 
-                        <div class="carePlanWrapper">
-
-                            <!-- Active Plan Summary -->
-                            <div class="activePlanCard">
-                                <div class="activePlanHeader">
-                                    <div class="leftInfo">
-                                        <span class="activeBadge">Active Plan</span>
-                                        <span class="assessedDate">Assessed Dec 19, 2025</span>
-                                    </div>
-                                    <button class="viewPlanBtn">
-                                        View Full Plan <span>›</span>
-                                    </button>
-                                </div>
-
-                                <div class="activePlanStats">
-                                    <div class="statItem">
-                                        <span class="statIcon iconblue"><i class='bx  bx-radio-circle-marked'></i> </span>
-                                        <div>
-                                            <div class="statLabel">Objectives</div>
-                                            <div class="statValue">5</div>
-                                        </div>
-                                    </div>
-                                    <div class="statItem">
-                                        <span class="statIcon iconpurple"><i class='bx  bx-checklist'></i> </span>
-                                        <div>
-                                            <div class="statLabel">Tasks</div>
-                                            <div class="statValue">5</div>
-                                        </div>
-                                    </div>
-                                    <div class="statItem">
-                                        <span class="statIcon iconpink"><i class='bx  bx-pill'></i> </span>
-                                        <div>
-                                            <div class="statLabel">Medications</div>
-                                            <div class="statValue">6</div>
-                                        </div>
-                                    </div>
-                                    <div class="statItem">
-                                        <span class="statIcon iconorange"><i class='bx  bx-alert-triangle'></i> </span>
-                                        <div>
-                                            <div class="statLabel">Risk Factors</div>
-                                            <div class="statValue">4</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Care Plan Card -->
-                            <div class="carePlanRenderHtmlData">
-
-                            </div>
-                            <div class="clientCarePlanPagnation">
-
-                            </div>
+                        <div class="carePlanWrapper" id="carePlanTabListContainer">
+                            <div class="text-center p-4"><i class="bx bx-loader-alt bx-spin" style="font-size:24px"></i> Loading care plans...</div>
                         </div>
 
                     </div>
@@ -9292,5 +9242,81 @@
             $('.modal-title').html('<i class="bx bx-plus"></i> Add Expense');
         });
     </script>
+    <!-- AI Generate Care Plan Modal -->
+    <div class="modal fade" id="generateCarePlanModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title"><i class='bx bx-sparkles'></i> Generate AI Care Plan</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label><strong>Assessment Type</strong></label>
+                        <select class="form-control" id="cpAssessmentType">
+                            <option value="">Select...</option>
+                            <option value="initial">Initial Assessment</option>
+                            <option value="review">Review</option>
+                            <option value="reassessment">Reassessment</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin-top:15px;">
+                        <label><strong>Care Setting</strong></label>
+                        <select class="form-control" id="cpCareSetting">
+                            <option value="">Select...</option>
+                            <option value="residential">Residential</option>
+                            <option value="nursing">Nursing</option>
+                            <option value="domiciliary">Domiciliary</option>
+                        </select>
+                    </div>
+                    <div id="generateCPProgress" style="display:none; margin-top:15px; padding:12px; background:#f0f4ff; border-radius:8px; text-align:center; color:#555;"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn borderBtn" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn allBtnUseColor" id="generateCPBtn" onclick="generateCarePlan()"><i class='bx bx-sparkles'></i> Generate</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Review Generated Care Plan Modal -->
+    <div class="modal fade" id="reviewCarePlanModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" onclick="closeCarePlanModal()" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title"><i class='bx bx-check-shield'></i> Review Generated Care Plan</h4>
+                </div>
+                <div class="modal-body" style="max-height:70vh; overflow-y:auto;">
+                    <div id="reviewPlanInfo" style="margin-bottom:10px;"></div>
+                    <div id="reviewPlanContent"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn borderBtn" onclick="closeCarePlanModal()">Discard</button>
+                    <button type="button" class="btn borderBtn" onclick="saveCarePlanAsDraft()"><i class='bx bx-save'></i> Save as Draft</button>
+                    <button type="button" class="btn allBtnUseColor" onclick="saveCarePlanAsActive()"><i class='bx bx-check-circle'></i> Approve & Activate</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI View Care Plan Modal -->
+    <div class="modal fade" id="viewCarePlanModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" onclick="closeCarePlanModal()" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title"><i class='bx bx-heart'></i> Care Plan</h4>
+                </div>
+                <div class="modal-body" style="max-height:70vh; overflow-y:auto;">
+                    <div id="viewPlanContent"></div>
+                </div>
+                <div class="modal-footer" id="viewPlanFooter">
+                    <button type="button" class="btn borderBtn" onclick="closeCarePlanModal()">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     @endsection
 </main>

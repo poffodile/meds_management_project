@@ -453,7 +453,10 @@ class AIDocumentImportService
 
         $updates['updated_at'] = Carbon::now();
 
-        DB::table('service_user')->where('id', $clientId)->where('home_id', $homeId)->update($updates);
+        DB::table('service_user')
+            ->where('id', $clientId)
+            ->where('home_id', $homeId)
+            ->update($updates);
 
         return count($updates) - 1;
     }

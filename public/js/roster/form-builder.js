@@ -240,11 +240,16 @@
         $.get(url, function(res) {
             if (res.status) {
                 renderSubmissions(res.submissions || [], templateId);
+            } else {
+                fbToast(res.error || 'Failed to load submissions.', 'error');
+                renderSubmissions([], '');
             }
         }).fail(function() {
+            fbToast('Failed to load submissions.', 'error');
             renderSubmissions([], '');
         });
     }
+    window.loadSubmissions = loadSubmissions;
 
     function renderSubmissions(submissions, templateFilter) {
         var $list = $('#fbSubmissionsList');
@@ -271,6 +276,7 @@
                 + '<div class="fb-sub-title">' + esc(s.form_title) + '</div>'
                 + '<div class="fb-sub-meta">'
                 + '<span>By: ' + esc(s.submitted_by_name || '') + '</span>'
+                + (s.client_name ? '<span>Client: ' + esc(s.client_name) + '</span>' : '')
                 + '<span>' + esc(s.created_at || '') + '</span>'
                 + '<span>' + aiBadge + '</span>'
                 + '</div></div>'
