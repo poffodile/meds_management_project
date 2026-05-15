@@ -291,11 +291,6 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 		Route::post('/client/portal-access-revoke', [\App\Http\Controllers\frontEnd\Roster\PortalAccessController::class, 'revoke'])->middleware('throttle:20,1');
 		Route::post('/client/portal-access-delete', [\App\Http\Controllers\frontEnd\Roster\PortalAccessController::class, 'delete'])->middleware('throttle:20,1');
 
-		// Feedback Hub
-		Route::get('/feedback-hub', [\App\Http\Controllers\frontEnd\Roster\FeedbackHubController::class, 'index']);
-		Route::get('/feedback-hub/list', [\App\Http\Controllers\frontEnd\Roster\FeedbackHubController::class, 'list'])->middleware('throttle:30,1');
-		Route::post('/feedback-hub/save', [\App\Http\Controllers\frontEnd\Roster\FeedbackHubController::class, 'save'])->middleware('throttle:20,1');
-
 		// Notifications
 		Route::get('/notifications', [\App\Http\Controllers\frontEnd\Roster\NotificationController::class, 'index']);
 		Route::post('/notifications/list', [\App\Http\Controllers\frontEnd\Roster\NotificationController::class, 'list'])->middleware('throttle:30,1');
@@ -303,6 +298,12 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 		Route::post('/notifications/mark-all-read', [\App\Http\Controllers\frontEnd\Roster\NotificationController::class, 'markAllRead'])->middleware('throttle:20,1');
 		Route::post('/notifications/delete', [\App\Http\Controllers\frontEnd\Roster\NotificationController::class, 'delete'])->middleware('throttle:20,1');
 		Route::post('/notifications/unread-count', [\App\Http\Controllers\frontEnd\Roster\NotificationController::class, 'unreadCount'])->middleware('throttle:60,1');
+
+		Route::get('/feedback-hub', [\App\Http\Controllers\frontEnd\Roster\FeedbackHubController::class, 'index'])->name('roster.feedback-hub');
+		Route::get('/feedback-hub/list', [\App\Http\Controllers\frontEnd\Roster\FeedbackHubController::class, 'list'])->middleware('throttle:30,1');
+		Route::post('/feedback-hub/acknowledge', [\App\Http\Controllers\frontEnd\Roster\FeedbackHubController::class, 'acknowledge'])->middleware('throttle:30,1');
+		Route::post('/feedback-hub/respond', [\App\Http\Controllers\frontEnd\Roster\FeedbackHubController::class, 'respond'])->middleware('throttle:30,1');
+		Route::post('/feedback-hub/close', [\App\Http\Controllers\frontEnd\Roster\FeedbackHubController::class, 'close'])->middleware('throttle:20,1');
 
 		// Carer Section Start
 		Route::get('/carer', [CarerController::class, 'index'])->name('roster.staff.carer');
