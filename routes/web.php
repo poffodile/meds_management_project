@@ -258,7 +258,7 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 
 		// Safeguarding
 		Route::get('/safeguarding', [\App\Http\Controllers\frontEnd\Roster\SafeguardingController::class, 'index']);
-		Route::get('/safeguarding/list', [\App\Http\Controllers\frontEnd\Roster\SafeguardingController::class, 'list'])->middleware('throttle:30,1');
+		Route::post('/safeguarding/list', [\App\Http\Controllers\frontEnd\Roster\SafeguardingController::class, 'list'])->middleware('throttle:30,1');
 		Route::post('/safeguarding/save', [\App\Http\Controllers\frontEnd\Roster\SafeguardingController::class, 'save'])->middleware('throttle:20,1');
 		Route::post('/safeguarding/update', [\App\Http\Controllers\frontEnd\Roster\SafeguardingController::class, 'update'])->middleware('throttle:20,1');
 		Route::post('/safeguarding/details', [\App\Http\Controllers\frontEnd\Roster\SafeguardingController::class, 'details'])->middleware('throttle:30,1');
