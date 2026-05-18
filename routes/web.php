@@ -178,19 +178,6 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 		Route::get('/care-document', [CareDocumentController::class, 'index'])->name('roster.care.document');
 		Route::get('/reports', [ReportController::class, 'index'])->name('roster.report');
 
-		// Workflow Automation
-		Route::get('/workflows', [\App\Http\Controllers\frontEnd\Roster\WorkflowController::class, 'index']);
-		Route::get('/workflows/list', [\App\Http\Controllers\frontEnd\Roster\WorkflowController::class, 'list'])->middleware('throttle:30,1');
-		Route::post('/workflows/store', [\App\Http\Controllers\frontEnd\Roster\WorkflowController::class, 'store'])->middleware('throttle:30,1');
-		Route::post('/workflows/update', [\App\Http\Controllers\frontEnd\Roster\WorkflowController::class, 'update'])->middleware('throttle:30,1');
-		Route::post('/workflows/toggle', [\App\Http\Controllers\frontEnd\Roster\WorkflowController::class, 'toggle'])->middleware('throttle:30,1');
-		Route::post('/workflows/delete', [\App\Http\Controllers\frontEnd\Roster\WorkflowController::class, 'delete'])->middleware('throttle:20,1');
-		Route::get('/workflows/executions', [\App\Http\Controllers\frontEnd\Roster\WorkflowController::class, 'executions'])->middleware('throttle:30,1');
-		Route::get('/workflows/templates', [\App\Http\Controllers\frontEnd\Roster\WorkflowController::class, 'templates'])->middleware('throttle:30,1');
-		Route::post('/workflows/install-template', [\App\Http\Controllers\frontEnd\Roster\WorkflowController::class, 'installTemplate'])->middleware('throttle:30,1');
-		Route::post('/workflows/run-all', [\App\Http\Controllers\frontEnd\Roster\WorkflowController::class, 'runAll'])->middleware('throttle:10,1');
-		Route::post('/workflows/run-single', [\App\Http\Controllers\frontEnd\Roster\WorkflowController::class, 'runSingle'])->middleware('throttle:20,1');
-
 		// AI Copilot
 		Route::get('/ai-copilot', [\App\Http\Controllers\frontEnd\Roster\AICopilotController::class, 'index']);
 		Route::get('/ai-copilot/sessions', [\App\Http\Controllers\frontEnd\Roster\AICopilotController::class, 'sessions'])->middleware('throttle:30,1');
@@ -1403,16 +1390,18 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 	Route::post('/service/bmp-rmp/add', 'App\Http\Controllers\frontEnd\ServiceUserManagement\BmpRmpController@add');
 	Route::post('/service/bmp-rmp/edit', 'App\Http\Controllers\frontEnd\ServiceUserManagement\BmpRmpController@edit');
 	Route::get('/service/bmp-rmp/delete/{bmp_rmp_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\BmpRmpController@delete');
-
 	Route::match(['get', 'post'], '/service/bmp-rmp/view/{bmp_rmp_risk_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\BmpRmpController@view_detail');
-
 	Route::post('/service/user/edit-details', 'App\Http\Controllers\frontEnd\ServiceUserManagement\ProfileController@edit_detail_info');
-	/*Route::match(['get','post'], '/service/daily-records-bmp-rmp/{service_user_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\BmpRmpController@service_users_list');*/
 
-	//Body Map
-	Route::match(['get', 'post'], '/service/body-map/{risk_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\BodyMapController@index');
-	Route::match(['get', 'post'], '/service/body-map/injury/add', 'App\Http\Controllers\frontEnd\ServiceUserManagement\BodyMapController@addInjury');
-	Route::match(['get', 'post'], '/service/body-map/injury/remove/{service_user_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\BodyMapController@removeInjury');
+	// Body Map routes
+	Route::post('/service/body-map/injury/add', 'App\Http\Controllers\frontEnd\ServiceUserManagement\BodyMapController@addInjury')->middleware('throttle:30,1');
+	Route::post('/service/body-map/injury/remove', 'App\Http\Controllers\frontEnd\ServiceUserManagement\BodyMapController@removeInjury')->middleware('throttle:20,1');
+	Route::post('/service/body-map/injury/update', 'App\Http\Controllers\frontEnd\ServiceUserManagement\BodyMapController@updateInjury')->middleware('throttle:30,1');
+	Route::get('/service/body-map/injury/{id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\BodyMapController@getInjury')->where('id', '[0-9]+');
+	Route::get('/service/body-map/history/{service_user_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\BodyMapController@history')->where('service_user_id', '[0-9]+');
+	Route::get('/service/body-map/list/{risk_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\BodyMapController@listForRisk')->where('risk_id', '[0-9]+');
+	Route::get('/service/body-map/service-user/{service_user_id}/list', 'App\Http\Controllers\frontEnd\ServiceUserManagement\BodyMapController@listForServiceUser')->where('service_user_id', '[0-9]+');
+	Route::get('/service/body-map/{risk_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\BodyMapController@index')->where('risk_id', '[0-9]+');
 
 	//calender paths
 	Route::match(['get', 'post'], '/service/calendar/{service_user_id}', 'App\Http\Controllers\frontEnd\CalendarController@index');

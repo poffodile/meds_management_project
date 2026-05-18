@@ -2,6 +2,37 @@
 @extends('frontEnd.layouts.master')
 @section('title','Client')
 @section('content')
+<style>
+    /* Global overrides for clipping issues in modals and page content */
+    .modal-body select.form-control, 
+    .modal-body input.form-control,
+    .page-content select.form-control,
+    .page-content input.form-control {
+        height: 45px !important;
+        padding: 8px 15px !important;
+        line-height: 25px !important;
+        font-size: 14px !important;
+        vertical-align: middle !important;
+        overflow: visible !important;
+        box-sizing: border-box !important;
+    }
+    .modal-body textarea.form-control,
+    .page-content textarea.form-control {
+        height: auto !important;
+        min-height: 80px !important;
+        padding: 10px 15px !important;
+        line-height: 1.5 !important;
+        overflow: auto !important;
+    }
+    /* Ensure labels don't overlap */
+    .modal-body label, .page-content label {
+        margin-bottom: 8px !important;
+        display: inline-block !important;
+    }
+</style>
+
+
+
 
 @include('frontEnd.roster.common.roster_header')
 
@@ -17,6 +48,7 @@
             </div>
             <div class="header-actions addnewicons">
                 <button class="btn borderBtn editClient" data-toggle="modal" data-target="#addServiceUserModal" data-child_id="{{$clientDetails['id']}}"><i class='bx  bx-edit'></i> Edit Client</button>
+                <button class="btn borderBtn openBodyMapProfile" data-service-user-id="{{ $client_id }}"><i class='bx  bx-body'></i> Body Map</button>
                 <!-- <button class="btn borderBtn"><i class='bx  bx-arrow-in-up-square-half'></i> Import Documents</button> -->
                 <button class="btn borderBtn" type="button" data-toggle="modal" data-target="#importDoc"><i class='bx  bx-arrow-in-up-square-half'></i> Import Documents</button>
                 <button class="btn allBtnUseColor" data-toggle="modal" data-target="#generateCarePlanModal"><i class='bx  bx-sparkles'></i> Generate Care Plan</button>
@@ -419,132 +451,38 @@
                                                         </div>
 
                                                         <div class="carePlanWrapper">
+                                                            @forelse($risks ?? [] as $risk)
+                                                            @php
+                                                            $statusMap = [
+                                                            '1' => ['label' => 'historic', 'cls' => 'roundTag yellow'],
+                                                            '2' => ['label' => 'live', 'cls' => 'roundTag radShowbtn'],
+                                                            '3' => ['label' => 'no risk', 'cls' => 'roundTag greenTag'],
+                                                            ];
+                                                            $riskStatus = $statusMap[(string) $risk->status] ?? ['label' => 'unknown', 'cls' => 'roundTag'];
+                                                            $assessedDate = $risk->created_at ? date('M j, Y', strtotime($risk->created_at)) : '—';
+                                                            @endphp
                                                             <div class="planCard borderleftOrange">
                                                                 <div class="planTop">
                                                                     <div class="planTitle">
-                                                                        <!-- <span class="heartIcon"><i class="bx  bx-heart"></i></span> -->
                                                                         <span class="statIcon heartIcon iconorange"><i class="bx  bx-alert-triangle"></i> </span>
-                                                                        general
-                                                                        <span class="roundTag radShowbtn">high</span>
+                                                                        {{ $risk->description }}
+                                                                        <span class="{{ $riskStatus['cls'] }}">{{ $riskStatus['label'] }}</span>
                                                                     </div>
                                                                     <div class="planActions">
-                                                                        <button class="riskAssessmentDeatils"><i class="bx  bx-eye"></i> </button>
-                                                                        <button class="danger"><i class="bx  bx-trash"></i> </button>
+                                                                        <button class="realRiskBodyMapBtn" data-su-risk-id="{{ $risk->id }}" title="Open Body Map"><i class="bx  bx-body"></i> </button>
                                                                     </div>
-                                                                </div>
-                                                                <div class="planFooter">
-                                                                    <span>Substance misuse: Concerns around purchasing and taking various substances, an incident regarding substance misuse in July. Vaping (e-cigarette use) with declining cessation support. ADHD medication is withheld due to substance concerns.</span>
                                                                 </div>
                                                                 <div class="planMeta">
-                                                                    <div><strong>Assessed: </strong> Dec 16, 2025</div>
-                                                                    <div><strong>Review: </strong> Mar 16, 2026</div>
+                                                                    <div><strong>Assessed: </strong> {{ $assessedDate }}</div>
                                                                 </div>
                                                             </div>
-                                                            <div class="planCard borderleftOrange">
-                                                                <div class="planTop">
-                                                                    <div class="planTitle">
-                                                                        <!-- <span class="heartIcon"><i class="bx  bx-heart"></i></span> -->
-                                                                        <span class="statIcon heartIcon iconorange"><i class="bx  bx-alert-triangle"></i> </span>
-                                                                        general
-                                                                        <span class="roundTag yellow">medium</span>
-                                                                    </div>
-                                                                    <div class="planActions">
-                                                                        <button class="riskAssessmentDeatils"><i class="bx  bx-eye"></i> </button>
-                                                                        <button class="danger"><i class="bx  bx-trash"></i> </button>
-                                                                    </div>
-                                                                </div>
+                                                            @empty
+                                                            <div class="planCard">
                                                                 <div class="planFooter">
-                                                                    <span>Dental health: Overdue for dental check-ups and has refused recent reviews due to a fear of the dentist. History of multiple dental procedures.</span>
-                                                                </div>
-                                                                <div class="planMeta">
-                                                                    <div><strong>Assessed: </strong> Dec 16, 2025</div>
-                                                                    <div><strong>Review: </strong> Mar 16, 2026</div>
+                                                                    <span>No risk assessments recorded for this client yet.</span>
                                                                 </div>
                                                             </div>
-                                                            <div class="planCard borderleftOrange">
-                                                                <div class="planTop">
-                                                                    <div class="planTitle">
-                                                                        <!-- <span class="heartIcon"><i class="bx  bx-heart"></i></span> -->
-                                                                        <span class="statIcon heartIcon iconorange"><i class="bx  bx-alert-triangle"></i> </span>
-                                                                        general
-                                                                        <span class="roundTag radShowbtn">high</span>
-                                                                    </div>
-                                                                    <div class="planActions">
-                                                                        <button class="riskAssessmentDeatils"><i class="bx  bx-eye"></i> </button>
-                                                                        <button class="danger"><i class="bx  bx-trash"></i> </button>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="planFooter">
-                                                                    <span>Substance misuse: Concerns around purchasing and taking various substances, an incident regarding substance misuse in July. Vaping (e-cigarette use) with declining cessation support. ADHD medication is withheld due to substance concerns.</span>
-                                                                </div>
-                                                                <div class="planMeta">
-                                                                    <div><strong>Assessed: </strong> Dec 16, 2025</div>
-                                                                    <div><strong>Review: </strong> Mar 16, 2026</div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="planCard borderleftOrange">
-                                                                <div class="planTop">
-                                                                    <div class="planTitle">
-                                                                        <!-- <span class="heartIcon"><i class="bx  bx-heart"></i></span> -->
-                                                                        <span class="statIcon heartIcon iconorange"><i class="bx  bx-alert-triangle"></i> </span>
-                                                                        general
-                                                                        <span class="roundTag yellow">medium</span>
-                                                                    </div>
-                                                                    <div class="planActions">
-                                                                        <button class="riskAssessmentDeatils"><i class="bx  bx-eye"></i> </button>
-                                                                        <button class="danger"><i class="bx  bx-trash"></i> </button>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="planFooter">
-                                                                    <span>Dental health: Overdue for dental check-ups and has refused recent reviews due to a fear of the dentist. History of multiple dental procedures.</span>
-                                                                </div>
-                                                                <div class="planMeta">
-                                                                    <div><strong>Assessed: </strong> Dec 16, 2025</div>
-                                                                    <div><strong>Review: </strong> Mar 16, 2026</div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="planCard borderleftOrange">
-                                                                <div class="planTop">
-                                                                    <div class="planTitle">
-                                                                        <!-- <span class="heartIcon"><i class="bx  bx-heart"></i></span> -->
-                                                                        <span class="statIcon heartIcon iconorange"><i class="bx  bx-alert-triangle"></i> </span>
-                                                                        general
-                                                                        <span class="roundTag radShowbtn">high</span>
-                                                                    </div>
-                                                                    <div class="planActions">
-                                                                        <button class="riskAssessmentDeatils"><i class="bx  bx-eye"></i> </button>
-                                                                        <button class="danger"><i class="bx  bx-trash"></i> </button>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="planFooter">
-                                                                    <span>Substance misuse: Concerns around purchasing and taking various substances, an incident regarding substance misuse in July. Vaping (e-cigarette use) with declining cessation support. ADHD medication is withheld due to substance concerns.</span>
-                                                                </div>
-                                                                <div class="planMeta">
-                                                                    <div><strong>Assessed: </strong> Dec 16, 2025</div>
-                                                                    <div><strong>Review: </strong> Mar 16, 2026</div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="planCard borderleftOrange">
-                                                                <div class="planTop">
-                                                                    <div class="planTitle">
-                                                                        <!-- <span class="heartIcon"><i class="bx  bx-heart"></i></span> -->
-                                                                        <span class="statIcon heartIcon iconorange"><i class="bx  bx-alert-triangle"></i> </span>
-                                                                        general
-                                                                        <span class="roundTag yellow">medium</span>
-                                                                    </div>
-                                                                    <div class="planActions">
-                                                                        <button class="riskAssessmentDeatils"><i class="bx  bx-eye"></i> </button>
-                                                                        <button class="danger"><i class="bx  bx-trash"></i> </button>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="planFooter">
-                                                                    <span>Dental health: Overdue for dental check-ups and has refused recent reviews due to a fear of the dentist. History of multiple dental procedures.</span>
-                                                                </div>
-                                                                <div class="planMeta">
-                                                                    <div><strong>Assessed: </strong> Dec 16, 2025</div>
-                                                                    <div><strong>Review: </strong> Mar 16, 2026</div>
-                                                                </div>
-                                                            </div>
+                                                            @endforelse
                                                         </div>
                                                     </div>
 
@@ -2535,20 +2473,17 @@
                     </div>
                 </div>
                 <div class="content" id="clientCarePlanTab">
-
                     <div class="carePlanTabCont carePlanBtnSectionFirst" style="display: ;">
                         <div class="workHoursHeader">
                             <div class="title"><i class='bx  bx-heart'></i> Care Plans</div>
                             <div class="actions">
                                 <button class="btn allBtnUseColor" data-toggle="modal" data-target="#generateCarePlanModal" style="margin-right:10px;"><i class='bx bx-sparkles'></i> Generate AI Plan</button>
-                                <button class="allBtnUseColor" data-toggle="modal" data-target="#addcreateCarePlanModal"> <i class='bx  bx-plus'></i> Create Care Plan</button>
                             </div>
                         </div>
 
                         <div class="carePlanWrapper" id="carePlanTabListContainer">
                             <div class="text-center p-4"><i class="bx bx-loader-alt bx-spin" style="font-size:24px"></i> Loading care plans...</div>
                         </div>
-
                     </div>
 
 
@@ -2691,7 +2626,6 @@
                                     </div>
 
                                     <div class="carePlanObjectiveHtmlRender">
-
                                     </div>
                                 </div>
 
@@ -3190,132 +3124,42 @@
                         </div>
 
                         <div class="carePlanWrapper">
+                            @forelse($risks ?? [] as $risk)
+                            @php
+                            $statusMap = [
+                            '1' => ['label' => 'historic', 'cls' => 'roundTag yellow'],
+                            '2' => ['label' => 'live', 'cls' => 'roundTag radShowbtn'],
+                            '3' => ['label' => 'no risk', 'cls' => 'roundTag greenTag'],
+                            ];
+                            $riskStatus = $statusMap[(string) $risk->status] ?? ['label' => 'unknown', 'cls' => 'roundTag'];
+                            $assessedDate = $risk->created_at ? date('M j, Y', strtotime($risk->created_at)) : '—';
+                            $reviewDate = (isset($risk->review_date) && $risk->review_date) ? date('M j, Y', strtotime($risk->review_date)) : '—';
+                            @endphp
                             <div class="planCard borderleftOrange">
                                 <div class="planTop">
                                     <div class="planTitle">
-                                        <!-- <span class="heartIcon"><i class="bx  bx-heart"></i></span> -->
                                         <span class="statIcon heartIcon iconorange"><i class="bx  bx-alert-triangle"></i> </span>
-                                        general
-                                        <span class="roundTag radShowbtn">high</span>
+                                        {{ $risk->description }}
+                                        <span class="{{ $riskStatus['cls'] }}">{{ $riskStatus['label'] }}</span>
                                     </div>
                                     <div class="planActions">
+                                        <button class="realRiskBodyMapBtn" data-su-risk-id="{{ $risk->id }}" title="Open Body Map"><i class="bx  bx-body"></i> </button>
                                         <button class="riskAssessmentDeatils"><i class="bx  bx-eye"></i> </button>
                                         <button class="danger"><i class="bx  bx-trash"></i> </button>
                                     </div>
                                 </div>
-                                <div class="planFooter">
-                                    <span>Substance misuse: Concerns around purchasing and taking various substances, an incident regarding substance misuse in July. Vaping (e-cigarette use) with declining cessation support. ADHD medication is withheld due to substance concerns.</span>
-                                </div>
                                 <div class="planMeta">
-                                    <div><strong>Assessed: </strong> Dec 16, 2025</div>
-                                    <div><strong>Review: </strong> Mar 16, 2026</div>
+                                    <div><strong>Assessed: </strong> {{ $assessedDate }}</div>
+                                    <div><strong>Review: </strong> {{ $reviewDate }}</div>
                                 </div>
                             </div>
-                            <div class="planCard borderleftOrange">
-                                <div class="planTop">
-                                    <div class="planTitle">
-                                        <!-- <span class="heartIcon"><i class="bx  bx-heart"></i></span> -->
-                                        <span class="statIcon heartIcon iconorange"><i class="bx  bx-alert-triangle"></i> </span>
-                                        general
-                                        <span class="roundTag yellow">medium</span>
-                                    </div>
-                                    <div class="planActions">
-                                        <button class="riskAssessmentDeatils"><i class="bx  bx-eye"></i> </button>
-                                        <button class="danger"><i class="bx  bx-trash"></i> </button>
-                                    </div>
-                                </div>
+                            @empty
+                            <div class="planCard">
                                 <div class="planFooter">
-                                    <span>Dental health: Overdue for dental check-ups and has refused recent reviews due to a fear of the dentist. History of multiple dental procedures.</span>
-                                </div>
-                                <div class="planMeta">
-                                    <div><strong>Assessed: </strong> Dec 16, 2025</div>
-                                    <div><strong>Review: </strong> Mar 16, 2026</div>
+                                    <span>No risk assessments recorded for this client yet.</span>
                                 </div>
                             </div>
-                            <div class="planCard borderleftOrange">
-                                <div class="planTop">
-                                    <div class="planTitle">
-                                        <!-- <span class="heartIcon"><i class="bx  bx-heart"></i></span> -->
-                                        <span class="statIcon heartIcon iconorange"><i class="bx  bx-alert-triangle"></i> </span>
-                                        general
-                                        <span class="roundTag radShowbtn">high</span>
-                                    </div>
-                                    <div class="planActions">
-                                        <button class="riskAssessmentDeatils"><i class="bx  bx-eye"></i> </button>
-                                        <button class="danger"><i class="bx  bx-trash"></i> </button>
-                                    </div>
-                                </div>
-                                <div class="planFooter">
-                                    <span>Substance misuse: Concerns around purchasing and taking various substances, an incident regarding substance misuse in July. Vaping (e-cigarette use) with declining cessation support. ADHD medication is withheld due to substance concerns.</span>
-                                </div>
-                                <div class="planMeta">
-                                    <div><strong>Assessed: </strong> Dec 16, 2025</div>
-                                    <div><strong>Review: </strong> Mar 16, 2026</div>
-                                </div>
-                            </div>
-                            <div class="planCard borderleftOrange">
-                                <div class="planTop">
-                                    <div class="planTitle">
-                                        <!-- <span class="heartIcon"><i class="bx  bx-heart"></i></span> -->
-                                        <span class="statIcon heartIcon iconorange"><i class="bx  bx-alert-triangle"></i> </span>
-                                        general
-                                        <span class="roundTag yellow">medium</span>
-                                    </div>
-                                    <div class="planActions">
-                                        <button class="riskAssessmentDeatils"><i class="bx  bx-eye"></i> </button>
-                                        <button class="danger"><i class="bx  bx-trash"></i> </button>
-                                    </div>
-                                </div>
-                                <div class="planFooter">
-                                    <span>Dental health: Overdue for dental check-ups and has refused recent reviews due to a fear of the dentist. History of multiple dental procedures.</span>
-                                </div>
-                                <div class="planMeta">
-                                    <div><strong>Assessed: </strong> Dec 16, 2025</div>
-                                    <div><strong>Review: </strong> Mar 16, 2026</div>
-                                </div>
-                            </div>
-                            <div class="planCard borderleftOrange">
-                                <div class="planTop">
-                                    <div class="planTitle">
-                                        <!-- <span class="heartIcon"><i class="bx  bx-heart"></i></span> -->
-                                        <span class="statIcon heartIcon iconorange"><i class="bx  bx-alert-triangle"></i> </span>
-                                        general
-                                        <span class="roundTag radShowbtn">high</span>
-                                    </div>
-                                    <div class="planActions">
-                                        <button class="riskAssessmentDeatils"><i class="bx  bx-eye"></i> </button>
-                                        <button class="danger"><i class="bx  bx-trash"></i> </button>
-                                    </div>
-                                </div>
-                                <div class="planFooter">
-                                    <span>Substance misuse: Concerns around purchasing and taking various substances, an incident regarding substance misuse in July. Vaping (e-cigarette use) with declining cessation support. ADHD medication is withheld due to substance concerns.</span>
-                                </div>
-                                <div class="planMeta">
-                                    <div><strong>Assessed: </strong> Dec 16, 2025</div>
-                                    <div><strong>Review: </strong> Mar 16, 2026</div>
-                                </div>
-                            </div>
-                            <div class="planCard borderleftOrange">
-                                <div class="planTop">
-                                    <div class="planTitle">
-                                        <!-- <span class="heartIcon"><i class="bx  bx-heart"></i></span> -->
-                                        <span class="statIcon heartIcon iconorange"><i class="bx  bx-alert-triangle"></i> </span>
-                                        general
-                                        <span class="roundTag yellow">medium</span>
-                                    </div>
-                                    <div class="planActions">
-                                        <button class="riskAssessmentDeatils"><i class="bx  bx-eye"></i> </button>
-                                        <button class="danger"><i class="bx  bx-trash"></i> </button>
-                                    </div>
-                                </div>
-                                <div class="planFooter">
-                                    <span>Dental health: Overdue for dental check-ups and has refused recent reviews due to a fear of the dentist. History of multiple dental procedures.</span>
-                                </div>
-                                <div class="planMeta">
-                                    <div><strong>Assessed: </strong> Dec 16, 2025</div>
-                                    <div><strong>Review: </strong> Mar 16, 2026</div>
-                                </div>
-                            </div>
+                            @endforelse
                         </div>
                     </div>
 
@@ -9241,6 +9085,25 @@
             $('#expense_id').val('');
             $('.modal-title').html('<i class="bx bx-plus"></i> Add Expense');
         });
+
+        // Body Map — header button opens the modal in aggregated read-only
+        // mode (every active injury for this client, across all risks).
+        $(document).on('click', '.openBodyMapProfile', function() {
+            var suId = $(this).data('service-user-id');
+            $('input[name=bm_aggregated_su_id]').val(suId);
+            $('input[name=su_rsk_id]').val('');
+            $('#bodyMapModal').modal('show');
+        });
+
+        // Body Map — per-risk body map button on each risk assessment card.
+        // Opens the modal in risk mode so carers can add/remove injuries
+        // against that specific risk.
+        $(document).on('click', '.realRiskBodyMapBtn', function() {
+            var riskId = $(this).data('su-risk-id');
+            $('input[name=bm_aggregated_su_id]').val('');
+            $('input[name=su_rsk_id]').val(riskId);
+            $('#bodyMapModal').modal('show');
+        });
     </script>
     <!-- AI Generate Care Plan Modal -->
     <div class="modal fade" id="generateCarePlanModal" tabindex="-1" role="dialog">
@@ -9317,6 +9180,8 @@
             </div>
         </div>
     </div>
+
+    @include('frontEnd.serviceUserManagement.elements.risk_change.body_map_popup')
 
     @endsection
 </main>
