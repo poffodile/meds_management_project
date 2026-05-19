@@ -82,6 +82,15 @@ class AIDocumentImportService
             throw new RuntimeException('Document file is too large to process safely.');
         }
 
+        // Fallback if ZipArchive is missing on the server
+        if (!class_exists('ZipArchive')) {
+            $cliText = $this->extractTextFromDocxCommandLine($fullPath);
+            if ($cliText !== null) {
+                return $cliText;
+            }
+            throw new RuntimeException('PHP ZipArchive extension is missing on the server. Please enable php-zip or upload the document as a PDF.');
+        }
+
         try {
             $phpWord = \PhpOffice\PhpWord\IOFactory::load($fullPath);
         } catch (\Exception $e) {
@@ -104,6 +113,30 @@ class AIDocumentImportService
         }
 
         return $text;
+    }
+
+    private function extractTextFromDocxCommandLine(string $fullPath): ?string
+    {
+        if (!function_exists('shell_exec') && !function_exists('exec')) {
+            return null;
+        }
+
+        $output = [];
+        $returnVar = -1;
+        @exec("unzip -p " . escapeshellarg($fullPath) . " word/document.xml 2>&1", $output, $returnVar);
+
+        if ($returnVar === 0 && !empty($output)) {
+            $xmlContent = implode("\n", $output);
+            if (preg_match_all('/<w:t[^>]*>(.*?)<\/w:t>/s', $xmlContent, $matches)) {
+                $text = '';
+                foreach ($matches[1] as $val) {
+                    $text .= html_entity_decode(strip_tags($val)) . ' ';
+                }
+                return trim($text);
+            }
+        }
+
+        return null;
     }
 
     private function extractElementText($element): string
