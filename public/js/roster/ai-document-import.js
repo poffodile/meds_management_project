@@ -112,9 +112,14 @@ function handleFileSelect(file) {
     var allowedTypes = [
         'application/pdf',
         'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        'application/msword'
+        'application/msword',
+        'application/octet-stream',
+        'application/zip',
+        'application/x-zip-compressed'
     ];
-    if (allowedTypes.indexOf(file.type) === -1) {
+    var fileExt = file.name.split('.').pop().toLowerCase();
+    var allowedExts = ['pdf', 'docx', 'doc'];
+    if (allowedTypes.indexOf(file.type) === -1 && allowedExts.indexOf(fileExt) === -1) {
         showImportError('Please select a PDF or Word document (.pdf, .docx).');
         return;
     }

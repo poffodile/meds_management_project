@@ -82,7 +82,16 @@ class AIDocumentImportService
             throw new RuntimeException('Document file is too large to process safely.');
         }
 
-        $phpWord = \PhpOffice\PhpWord\IOFactory::load($fullPath);
+        try {
+            $phpWord = \PhpOffice\PhpWord\IOFactory::load($fullPath);
+        } catch (\Exception $e) {
+            $msg = $e->getMessage();
+            if (str_contains($msg, 'error code: 19') || str_contains($msg, 'failed to load') || str_contains($msg, 'ZipArchive')) {
+                throw new RuntimeException('The document is password-protected, encrypted, or corrupted. Please upload a standard unencrypted PDF or Word document.');
+            }
+            throw new RuntimeException('Failed to read the Word document: ' . $msg);
+        }
+
         $text = '';
 
         foreach ($phpWord->getSections() as $section) {

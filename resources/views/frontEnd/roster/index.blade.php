@@ -19,6 +19,7 @@
             </div>
         </div>
 
+
         <!-- Alerts -->
         @php
         $totalCriticalAlertsCount = count($missed_shifts) + count($unfilled_shifts_alerts) + count($critical_alerts);
@@ -236,6 +237,27 @@
         </div> -->
         <!-- Smart Suggestions -->
 
+        {{-- SOS Alert Trigger --}}
+        <div class="sectionWhiteBgAllUse" style="background: #d9534f !important; border: none; text-align: center; padding: 15px;">
+            <button type="button" id="sos-trigger-btn" class="btn btn-lg" style="background: #fff; color: #d9534f; font-weight: bold; font-size: 18px; padding: 10px 40px; border-radius: 4px;">
+                <i class="fa fa-exclamation-triangle"></i> SOS ALERT
+            </button>
+            <p style="color: #fff; margin: 8px 0 0; font-size: 13px;">Press to alert all managers immediately</p>
+        </div>
+
+        {{-- SOS Alert History --}}
+        <div class="sectionWhiteBgAllUse">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fa fa-exclamation-triangle" style="color: #d9534f;"></i> SOS Alert History
+                    <span id="sos-active-count" class="badge" style="background: #d9534f; color: #fff; margin-left: 5px;"></span>
+                </h2>
+            </div>
+            <div id="sos-alerts-container">
+                <p class="text-muted text-center">Loading alerts...</p>
+            </div>
+        </div>
+
         <!-- Quick Actions -->
         <div class="quick-actions sectionWhiteBgAllUse">
             <div class="section-header">
@@ -342,6 +364,59 @@
 
 
     </div>
+
+    {{-- SOS Trigger Modal --}}
+    <div class="modal fade" id="sosModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header" style="background: #d9534f; color: #fff;">
+                    <h4 class="modal-title"><i class="fa fa-exclamation-triangle"></i> Send SOS Alert</h4>
+                    <button type="button" class="close" data-dismiss="modal" style="color: #fff;"><span>&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>This will alert all managers immediately.</strong></p>
+                    <div class="form-group">
+                        <label for="sos-message">What's the emergency? (optional)</label>
+                        <textarea id="sos-message" class="form-control" rows="3" maxlength="2000" placeholder="Describe the emergency..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button type="button" id="sos-confirm-btn" class="btn btn-danger"><i class="fa fa-exclamation-triangle"></i> SEND SOS</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- SOS Resolve Modal --}}
+    <div class="modal fade" id="sosResolveModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header" style="background: #5cb85c; color: #fff;">
+                    <h4 class="modal-title"><i class="fa fa-check"></i> Resolve SOS Alert</h4>
+                    <button type="button" class="close" data-dismiss="modal" style="color: #fff;"><span>&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="resolve-notes">Resolution notes (optional)</label>
+                        <textarea id="resolve-notes" class="form-control" rows="3" maxlength="2000" placeholder="How was this resolved?"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <input type="hidden" id="resolve-alert-id" value="">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button type="button" id="resolve-confirm-btn" class="btn btn-success"><i class="fa fa-check"></i> Resolve</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <input type="hidden" id="sos-user-type" value="{{ Auth::user()->user_type }}">
+    <script>
+        var baseUrl = "{{ url('') }}";
+    </script>
+    <script src="{{ url('public/js/roster/sos_alerts.js') }}"></script>
+
     @endsection
 </main>
 <!-- page-content" -->

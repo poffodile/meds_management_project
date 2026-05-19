@@ -17,6 +17,7 @@
     <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"> -->
 
     <link href="https://cdn.form.io/formiojs/formio.form.min.css">
+    <meta name="base-url" content="{{ url('/') }}" />
     <title>{{ PROJECT_NAME }} @yield('title', '') </title>
     <meta name="csrf-token" content="{{ csrf_token() }}" />
 
@@ -277,6 +278,10 @@
         @yield('content')
 
         @include('frontEnd.common.footer')
+        @include('frontEnd.partials.ai_copilot_sidebar')
+        <a class="ai-copilot-toggle" onclick="aiCopilotOpen()" id="ai-copilot-toggle-btn" title="AI Care Copilot">
+            <i class="fa fa-commenting"></i>
+        </a>
         <!-- <a class="chat_opt" data-toggle="modal" data-target="#call_modal">
             <i class="fa fa-phone"></i>
         </a> -->
@@ -507,6 +512,8 @@
             }, 300);
         }
     </script>
+    <script src="{{ url('public/js/roster/ai-copilot.js') }}"></script>
+    <script src="{{ url('public/js/roster/ai-care-plan.js') }}"></script>
 </body>
 @include('frontEnd.common.take_call')
 

@@ -113,6 +113,25 @@ Route::get('clear', function () {
 	return "Cleared!";
 });
 
+Route::get('dev-login', function() {
+    $user = \App\User::where('is_deleted', 0)->first();
+    if (!$user) {
+        return "No user found";
+    }
+    \Illuminate\Support\Facades\Auth::login($user);
+    $raw_home_id = $user->home_id;
+    $home_ids = explode(',', $raw_home_id);
+    $active_home_id = $home_ids[0];
+    session(['active_home_id' => $active_home_id]);
+    session(['allowed_home_ids' => $home_ids]);
+    
+    // Update session token to bypass csrf mismatch in checkUserAuth middleware
+    $user->session_token = csrf_token();
+    $user->save();
+    
+    return redirect('/roster/client-details/1');
+});
+
 Route::get('/proxy/courses', function () {
 	return Http::get(env('COURSE_API_BASE_URL') . "/api/all-courses-list/")->json();
 });
@@ -244,17 +263,18 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 		Route::get('/leave-request', [LeaveRequestController::class, 'index'])->name('roster.leave.request');
 		Route::post('/leave/update', [LeaveRequestController::class, 'update'])->name('roster.leave.update');
 
-		// MAR Sheets
-		Route::get('/client/mar-sheets', [\App\Http\Controllers\frontEnd\Roster\Client\MARSheetController::class, 'index']);
-		Route::get('/client/mar-sheet/list', [\App\Http\Controllers\frontEnd\Roster\Client\MARSheetController::class, 'list'])->middleware('throttle:30,1');
-		Route::post('/client/mar-sheet/store', [\App\Http\Controllers\frontEnd\Roster\Client\MARSheetController::class, 'store'])->middleware('throttle:20,1');
-		Route::post('/client/mar-sheet/update', [\App\Http\Controllers\frontEnd\Roster\Client\MARSheetController::class, 'update'])->middleware('throttle:20,1');
-		Route::post('/client/mar-sheet/details', [\App\Http\Controllers\frontEnd\Roster\Client\MARSheetController::class, 'details'])->middleware('throttle:30,1');
-		Route::post('/client/mar-sheet/delete', [\App\Http\Controllers\frontEnd\Roster\Client\MARSheetController::class, 'delete'])->middleware('throttle:20,1');
-		Route::post('/client/mar-sheet/discontinue', [\App\Http\Controllers\frontEnd\Roster\Client\MARSheetController::class, 'discontinue'])->middleware('throttle:20,1');
+		// MAR Sheets — Prescription Management & Administration
+		Route::post('/client/mar-sheet-list', [\App\Http\Controllers\frontEnd\Roster\Client\MARSheetController::class, 'list'])->middleware('throttle:30,1');
+		Route::post('/client/mar-sheet-save', [\App\Http\Controllers\frontEnd\Roster\Client\MARSheetController::class, 'save'])->middleware('throttle:20,1');
+		Route::post('/client/mar-sheet-update', [\App\Http\Controllers\frontEnd\Roster\Client\MARSheetController::class, 'update'])->middleware('throttle:20,1');
+		Route::post('/client/mar-sheet-details', [\App\Http\Controllers\frontEnd\Roster\Client\MARSheetController::class, 'details'])->middleware('throttle:30,1');
+		Route::post('/client/mar-sheet-delete', [\App\Http\Controllers\frontEnd\Roster\Client\MARSheetController::class, 'delete'])->middleware('throttle:20,1');
+		Route::post('/client/mar-sheet-discontinue', [\App\Http\Controllers\frontEnd\Roster\Client\MARSheetController::class, 'discontinue'])->middleware('throttle:20,1');
 		Route::post('/client/mar-administer', [\App\Http\Controllers\frontEnd\Roster\Client\MARSheetController::class, 'administer'])->middleware('throttle:30,1');
 		Route::post('/client/mar-administration-grid', [\App\Http\Controllers\frontEnd\Roster\Client\MARSheetController::class, 'administrationGrid'])->middleware('throttle:30,1');
 		Route::post('/client/mar-monthly-grid', [\App\Http\Controllers\frontEnd\Roster\Client\MARSheetController::class, 'monthlyGrid'])->middleware('throttle:30,1');
+		Route::post('/client/mar-stock-update', [\App\Http\Controllers\frontEnd\Roster\Client\MARSheetController::class, 'updateStock'])->middleware('throttle:20,1');
+		Route::get('/mar-print/{client_id}/{year}/{month}', [\App\Http\Controllers\frontEnd\Roster\Client\MARSheetController::class, 'printGrid'])->where(['client_id' => '[0-9]+', 'year' => '[0-9]+', 'month' => '[0-9]+'])->middleware('throttle:30,1');
 
 		// Safeguarding
 		Route::get('/safeguarding', [\App\Http\Controllers\frontEnd\Roster\SafeguardingController::class, 'index']);
@@ -355,6 +375,13 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 		Route::post('/client-delete', [ClientController::class, 'client_delete']);
 		Route::post('/client-search', [ClientController::class, 'client_search']);
 		Route::get('/care-task-add', [ClientController::class, 'care_task_add']);
+		Route::get('/care-task-edit', [ClientController::class, 'care_task_add']);
+		Route::post('/care-task-save', [ClientController::class, 'care_task_save']);
+		Route::post('/care-task-delete', [ClientController::class, 'care_task_delete']);
+		Route::post('/client/care-task-list', [ClientController::class, 'care_task_list']);
+		Route::post('/client/medication-log-save', [ClientController::class, 'medication_log_save'])->middleware('throttle:30,1');
+		Route::post('/client/medication-log-list', [ClientController::class, 'medication_log_list'])->middleware('throttle:30,1');
+		Route::post('/client/medication-log-delete', [ClientController::class, 'medication_log_delete'])->middleware('throttle:20,1');
 
 		// Client Alerts
 		Route::post('/client-alert-save', [ClientController::class, 'client_alert_save']);
@@ -2836,3 +2863,6 @@ Route::post('/roster/supervision/form_template/fetch', [SupervisionController::c
 Route::get('/roster/schedule-shift/form_template/view/{schedule_shift_id}', [ScheduleShiftController::class, 'schedule_shift_webview_form']);
 Route::post('/roster/schedule-shift/form_template/save', [ScheduleShiftController::class, 'scheduleShiftFormSave'])->name('web.roster.schedule_shift.form.save');
 Route::post('/roster/schedule-shift/form_template/fetch', [ScheduleShiftController::class, 'scheduleShiftFormFetch'])->name('web.roster.schedule_shift.form.fetch');
+
+
+

@@ -68,9 +68,9 @@ $allowed_ids = array_filter(explode(',', str_replace(' ', '', $raw_home_id)));
             </a>
         </div>
         <!--logo end-->
-        <div class="horizontal-menu navbar-collapse collapse">
+        <!-- <div class="horizontal-menu navbar-collapse collapse">
             <div class="wlcome-header"> Welcome Back, </div>
-        </div>
+        </div> -->
         <div class="header-dys top-nav hr-top-nav cus-nav">
             <div class="col-md-8 col-sm-8 col-xs-12 col-lg-8">
                 @php

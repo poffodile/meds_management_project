@@ -50,7 +50,7 @@ class RosterFormBuilderController extends Controller
     public function uploadAndGenerate(Request $request): JsonResponse
     {
         $request->validate([
-            'file' => 'required|file|mimes:pdf,docx,doc|max:10240',
+            'file' => 'required|file|max:10240',
         ]);
 
         $homeId = $this->homeId();
@@ -59,17 +59,26 @@ class RosterFormBuilderController extends Controller
         $file = $request->file('file');
 
         $mime = $file->getMimeType();
+        $originalName = $file->getClientOriginalName();
+        $ext = strtolower($file->getClientOriginalExtension()) ?: 'pdf';
+        if (empty($ext)) {
+            $ext = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
+        }
+
         $allowedMimes = [
             'application/pdf',
             'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
             'application/msword',
+            'application/octet-stream',
+            'application/zip',
+            'application/x-zip-compressed'
         ];
-        if (!in_array($mime, $allowedMimes)) {
+        $allowedExts = ['pdf', 'docx', 'doc'];
+
+        if (!in_array($mime, $allowedMimes) && !in_array($ext, $allowedExts)) {
             return response()->json(['status' => false, 'error' => 'Invalid file type. Only PDF and Word documents are accepted.'], 422);
         }
 
-        $originalName = $file->getClientOriginalName();
-        $ext = strtolower($file->getClientOriginalExtension()) ?: 'pdf';
         $ext = in_array($ext, ['pdf', 'docx', 'doc']) ? $ext : 'pdf';
         $hash = substr(md5($originalName . time()), 0, 8);
         $storedName = time() . '_' . $hash . '.' . $ext;
@@ -79,9 +88,9 @@ class RosterFormBuilderController extends Controller
 
         try {
             $result = $this->formService->generateTemplateFromDocument($storedPath, $originalName, $homeId, $userId);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Storage::disk('local')->delete('private/' . $storedPath);
-            $msg = $e instanceof RuntimeException ? $e->getMessage() : 'Failed to process document.';
+            $msg = 'Failed to process document: ' . $e->getMessage();
             return response()->json(['status' => false, 'error' => $msg], 422);
         }
 

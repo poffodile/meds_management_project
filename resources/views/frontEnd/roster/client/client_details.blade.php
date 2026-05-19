@@ -4,7 +4,7 @@
 @section('content')
 <style>
     /* Global overrides for clipping issues in modals and page content */
-    .modal-body select.form-control, 
+    .modal-body select.form-control,
     .modal-body input.form-control,
     .page-content select.form-control,
     .page-content input.form-control {
@@ -16,6 +16,7 @@
         overflow: visible !important;
         box-sizing: border-box !important;
     }
+
     .modal-body textarea.form-control,
     .page-content textarea.form-control {
         height: auto !important;
@@ -24,21 +25,208 @@
         line-height: 1.5 !important;
         overflow: auto !important;
     }
+
     /* Ensure labels don't overlap */
-    .modal-body label, .page-content label {
+    .modal-body label,
+    .page-content label {
         margin-bottom: 8px !important;
         display: inline-block !important;
     }
+
+    /* MAR Monthly Grid Styles */
+    .mar-grid-scroll {
+        overflow-x: auto;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+
+    .mar-grid-table {
+        border-collapse: collapse;
+        width: 100%;
+        font-size: 11px;
+    }
+
+    .mar-grid-table th,
+    .mar-grid-table td {
+        border: 1px solid #ccc;
+        padding: 2px 3px;
+        text-align: center;
+        white-space: nowrap;
+    }
+
+    .mar-grid-table thead th {
+        background: #1e3a5f;
+        color: #fff;
+        font-weight: 600;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    .mar-grid-med-col {
+        text-align: left !important;
+        min-width: 160px;
+        max-width: 200px;
+        white-space: normal !important;
+        word-break: break-word;
+        font-size: 11px;
+    }
+
+    .mar-grid-time-col {
+        min-width: 45px;
+        font-weight: 600;
+        background: #f0f4ff;
+    }
+
+    .mar-grid-day-col {
+        min-width: 24px;
+        font-size: 10px;
+    }
+
+    .mar-grid-bal-col {
+        min-width: 35px;
+        font-weight: 600;
+        background: #f9f9f9;
+    }
+
+    .mar-grid-sunday {
+        color: #f87171;
+    }
+
+    .mar-grid-week-sep {
+        border-left: 2px solid #1e3a5f !important;
+    }
+
+    .mar-grid-med-first>td {
+        border-top: 2px solid #555 !important;
+    }
+
+    .mar-grid-cell {
+        width: 24px;
+        height: 24px;
+        cursor: pointer;
+        transition: background 0.15s;
+        font-weight: 600;
+    }
+
+    .mar-grid-cell:hover {
+        background: #dbeafe !important;
+    }
+
+    .mar-code-a,
+    .mar-code-s {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .mar-code-r {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .mar-code-w {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .mar-code-n {
+        background: #f1f5f9;
+        color: #475569;
+    }
+
+    .mar-code-o {
+        background: #f3e8ff;
+        color: #6b21a8;
+    }
+
+    .mar-grid-dosage {
+        color: #888;
+        font-weight: normal;
+    }
+
+    .mar-grid-route {
+        color: #888;
+        font-weight: normal;
+        font-size: 10px;
+    }
+
+    .mar-grid-freq {
+        color: #666;
+        font-size: 10px;
+    }
+
+    .mar-grid-prn {
+        display: inline-block;
+        background: #f0ad4e;
+        color: #fff;
+        font-size: 9px;
+        padding: 1px 4px;
+        border-radius: 3px;
+        font-weight: 600;
+    }
+
+    .mar-grid-stock-row td {
+        background: #f5f5f5;
+        border-top: 1px solid #999;
+    }
+
+    .mar-grid-stock-cell {
+        text-align: left !important;
+    }
+
+    .mar-grid-stock-form {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        padding: 3px 0;
+    }
+
+    .mar-grid-stock-field {
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        font-size: 11px;
+    }
+
+    .mar-grid-stock-field label {
+        margin: 0;
+        font-weight: 600;
+        color: #555;
+        font-size: 10px;
+    }
+
+    .mar-stock-input {
+        width: 55px;
+        padding: 2px 4px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        font-size: 11px;
+        text-align: center;
+    }
+
+    .mar-grid-legend {
+        margin-top: 10px;
+        font-size: 12px;
+        color: #555;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+    }
+
+    .mar-grid-legend-item {
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-weight: 600;
+        font-size: 11px;
+    }
 </style>
-
-
-
 
 @include('frontEnd.roster.common.roster_header')
 
 <main class="page-content">
     <div class="container-fluid">
-
         <div class="topHeaderCont">
             <div>
                 <h1>{{$clientDetails['name']}}</h1>
@@ -50,7 +238,7 @@
                 <button class="btn borderBtn editClient" data-toggle="modal" data-target="#addServiceUserModal" data-child_id="{{$clientDetails['id']}}"><i class='bx  bx-edit'></i> Edit Client</button>
                 <button class="btn borderBtn openBodyMapProfile" data-service-user-id="{{ $client_id }}"><i class='bx  bx-body'></i> Body Map</button>
                 <!-- <button class="btn borderBtn"><i class='bx  bx-arrow-in-up-square-half'></i> Import Documents</button> -->
-                <button class="btn borderBtn" type="button" data-toggle="modal" data-target="#importDoc"><i class='bx  bx-arrow-in-up-square-half'></i> Import Documents</button>
+                <button class="btn borderBtn" onclick="openImportModal({{ $client_id }})"><i class='bx  bx-arrow-in-up-square-half'></i> Import Documents</button>
                 <button class="btn allBtnUseColor" data-toggle="modal" data-target="#generateCarePlanModal"><i class='bx  bx-sparkles'></i> Generate Care Plan</button>
             </div>
         </div>
@@ -154,7 +342,6 @@
                                             </div>
                                         </div>
                                     </div>
-
 
                                     <div class="item">
                                         <span class="label">Medical Notes</span>
@@ -3228,15 +3415,13 @@
                                 <h4>Additional Controls Required</h4>
                             </div>
                         </div>
-
                     </div>
-
                 </div>
                 <div class="content" id="clientMedicationTab">
                     <div class="careTaskstbbg sectionWhiteBgAllUse p-0 medicationSectionFirst" style="display:;">
                         <header class="panel-heading headingCapitilize medicationManagementHeader">
                             <div class="clientHeadung">
-                                <div class="onlyheadingmain purpleiconclr"><i class='bx  bx-link'></i> Medication Management </div>
+                                <div class="onlyheadingmain purpleiconclr"><i class='fa fa-medkit'></i> Medication Management </div>
                                 <p>Track medication administration and MAR sheets</p>
                             </div>
                         </header>
@@ -3254,55 +3439,161 @@
                                                 <div class="workHoursHeader">
                                                     <div class="title"> MAR Sheets</div>
                                                     <div class="actions">
-                                                        <button class="purpleBgBtn"> <i class='bx  bx-plus'></i> Add MAR Sheet</button>
+                                                        <button class="btn borderBtn" id="viewMonthlyGridBtn" style="margin-right:5px;"><i class="fa fa-calendar"></i> Monthly MAR Grid</button>
+                                                        <button class="purpleBgBtn" id="addPrescriptionBtn"><i class="fa fa-plus"></i> Add Prescription</button>
                                                     </div>
                                                 </div>
 
-                                                <div class="carePlanWrapper">
-                                                    <div class="planCard borderleftPurple">
-                                                        <div class="planTop">
-                                                            <div class="planTitle">
-                                                                Norethisterone
+                                                <div class="m-b-10" style="display:flex;gap:5px;">
+                                                    <button class="btn btn-sm btn-default mar-status-filter active" data-status="all">All</button>
+                                                    <button class="btn btn-sm btn-default mar-status-filter" data-status="active">Active</button>
+                                                    <button class="btn btn-sm btn-default mar-status-filter" data-status="discontinued">Discontinued</button>
+                                                </div>
+
+                                                <div class="marPrescriptionFormWrapper" style="display:none;">
+                                                    <div class="clientFilterform greanHeaderbgClr">
+                                                        <div class="createNewAlert"><i class="fa fa-medkit"></i> Prescription Details</div>
+                                                        <form id="marPrescriptionForm">
+                                                            @csrf
+                                                            <input type="hidden" id="mar_sheet_id" value="">
+                                                            <div class="row">
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label>Medication Name *</label>
+                                                                        <input type="text" class="form-control" id="mar_medication_name" placeholder="e.g., Metformin">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-3">
+                                                                    <div class="form-group">
+                                                                        <label>Dosage</label>
+                                                                        <input type="text" class="form-control" id="mar_dosage" placeholder="e.g., 500mg">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-3">
+                                                                    <div class="form-group">
+                                                                        <label>Dose</label>
+                                                                        <input type="text" class="form-control" id="mar_dose" placeholder="e.g., 2 tablets">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-4">
+                                                                    <div class="form-group">
+                                                                        <label>Route</label>
+                                                                        <select class="form-control" id="mar_route">
+                                                                            <option value="">Select route</option>
+                                                                            <option value="Oral">Oral</option>
+                                                                            <option value="Topical">Topical</option>
+                                                                            <option value="Inhaled">Inhaled</option>
+                                                                            <option value="Injection">Injection</option>
+                                                                            <option value="Sublingual">Sublingual</option>
+                                                                            <option value="Rectal">Rectal</option>
+                                                                            <option value="Other">Other</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-4">
+                                                                    <div class="form-group">
+                                                                        <label>Frequency</label>
+                                                                        <input type="text" class="form-control" id="mar_frequency" placeholder="e.g., Twice daily">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-4">
+                                                                    <div class="form-group">
+                                                                        <label>Time Slots</label>
+                                                                        <div id="mar-time-slots-container">
+                                                                            <div class="input-group m-b-5 time-slot-row">
+                                                                                <input type="time" class="form-control mar-time-slot-input" name="time_slots[]" value="08:00">
+                                                                                <span class="input-group-btn"><button type="button" class="btn btn-danger remove-time-slot"><i class="fa fa-times"></i></button></span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <button type="button" class="btn btn-xs btn-default" id="addTimeSlotBtn"><i class="fa fa-plus"></i> Add Time</button>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-12">
+                                                                    <div class="form-group">
+                                                                        <label><input type="checkbox" id="mar_as_required"> PRN (as required)</label>
+                                                                    </div>
+                                                                </div>
+                                                                <div id="mar-prn-fields" style="display:none;">
+                                                                    <div class="col-md-12">
+                                                                        <div class="form-group">
+                                                                            <label>PRN Details</label>
+                                                                            <textarea class="form-control" id="mar_prn_details" rows="2" placeholder="When and why to give this PRN medication"></textarea>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-12">
+                                                                    <div class="form-group">
+                                                                        <label>Reason for Medication</label>
+                                                                        <textarea class="form-control" id="mar_reason_for_medication" rows="2" placeholder="Why this medication is prescribed"></textarea>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-4">
+                                                                    <div class="form-group">
+                                                                        <label>Prescribed By</label>
+                                                                        <input type="text" class="form-control" id="mar_prescribed_by" placeholder="e.g., Dr. Smith">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-4">
+                                                                    <div class="form-group">
+                                                                        <label>Prescriber / Specialist</label>
+                                                                        <input type="text" class="form-control" id="mar_prescriber" placeholder="GP / specialist name">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-4">
+                                                                    <div class="form-group">
+                                                                        <label>Pharmacy</label>
+                                                                        <input type="text" class="form-control" id="mar_pharmacy" placeholder="Dispensing pharmacy">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-3">
+                                                                    <div class="form-group">
+                                                                        <label>Start Date</label>
+                                                                        <input type="date" class="form-control" id="mar_start_date">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-3">
+                                                                    <div class="form-group">
+                                                                        <label>End Date</label>
+                                                                        <input type="date" class="form-control" id="mar_end_date">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-3">
+                                                                    <div class="form-group">
+                                                                        <label>Stock Level</label>
+                                                                        <input type="number" class="form-control" id="mar_stock_level" min="0" placeholder="0">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-3">
+                                                                    <div class="form-group">
+                                                                        <label>Reorder Level</label>
+                                                                        <input type="number" class="form-control" id="mar_reorder_level" min="0" placeholder="0">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label>Storage Requirements</label>
+                                                                        <input type="text" class="form-control" id="mar_storage_requirements" placeholder="e.g., Room temperature, away from light">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label>Allergies / Warnings</label>
+                                                                        <input type="text" class="form-control" id="mar_allergies_warnings" placeholder="e.g., Penicillin allergy">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-12">
+                                                                    <div class="header-actions">
+                                                                        <button class="btn allbuttonDarkClr" type="button" id="saveMarPrescriptionBtn">Save Prescription</button>
+                                                                        <button class="btn borderBtn" type="button" id="cancelMarPrescriptionBtn">Cancel</button>
+                                                                    </div>
+                                                                </div>
                                                             </div>
-                                                            <div class="planActions">
-                                                                <button class="marSheetDetails"><i class="bx  bx-eye"></i> </button>
-                                                                <button class="danger"><i class="bx  bx-trash"></i> </button>
-                                                            </div>
-                                                        </div>
-                                                        <div class="planMeta">
-                                                            <div><strong>Dose: </strong> N/A</div>
-                                                            <div><strong>Route: </strong> oral</div>
-                                                            <div><strong>Frequency: </strong> N/A</div>
-                                                            <div><strong>Period: </strong> December 2025</div>
-                                                        </div>
-                                                        <div class="planFooter">
-                                                            <span><strong> Reason: </strong> Taken for one week during August to delay period whilst on holiday.</span>
-                                                        </div>
+                                                        </form>
                                                     </div>
                                                 </div>
-                                                <div class="carePlanWrapper">
-                                                    <div class="planCard borderleftPurple">
-                                                        <div class="planTop">
-                                                            <div class="planTitle">
-                                                                Zolmitriptan
-                                                                <span class="roundTag yellow">PRN</span>
-                                                            </div>
-                                                            <div class="planActions">
-                                                                <button class="marSheetDetails"><i class="bx  bx-eye"></i> </button>
-                                                                <button class="danger"><i class="bx  bx-trash"></i> </button>
-                                                            </div>
-                                                        </div>
-                                                        <div class="planMeta">
-                                                            <div><strong>Dose: </strong> N/A</div>
-                                                            <div><strong>Route: </strong> oral</div>
-                                                            <div><strong>Frequency: </strong> N/A</div>
-                                                            <div><strong>Period: </strong> December 2025</div>
-                                                        </div>
-                                                        <div class="planFooter">
-                                                            <span><strong> Reason: </strong> One to be taken at the onset of a migraine.</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
+
+                                                <div class="carePlanWrapper m-t-15" id="mar-sheet-list"></div>
+                                                <div id="mar-sheet-pagination"></div>
                                             </div>
                                         </div>
 
@@ -3311,16 +3602,18 @@
                                                 <div class="workHoursHeader">
                                                     <div class="title"> Medication Logs</div>
                                                     <div class="actions">
-                                                        <button class="purpleBgBtn" id="logMedicationBtn"><i class='bx bx-plus'></i> Log Medication</button>
+                                                        <button class="purpleBgBtn" id="logMedicationBtn"><i class='fa fa-plus'></i> Log Medication</button>
                                                     </div>
                                                 </div>
 
                                                 <div class="">
                                                     <div class="clientFilterform greanHeaderbgClr medicationLogsForm " style="display:none">
 
-                                                        <div class="createNewAlert"><i class='bx  bx-link'></i> Add Medication Administration Log </div>
+                                                        <div class="createNewAlert"><i class='fa fa-medkit'></i> Add Medication Administration Log </div>
 
                                                         <form id="medication_logsForm" class="addAlertForm">
+                                                            @csrf
+                                                            <input type="hidden" name="id" id="medication_log_id" value="">
                                                             <div class="row">
                                                                 <div class="col-md-6">
                                                                     <div class="form-group">
@@ -3398,253 +3691,115 @@
                         </div>
                     </div>
                     <div class="careTaskstbbg sectionWhiteBgAllUse p-0 medicationSectionSecond" style="display:none">
-                        <div class="medicationManagement" id="availabilityTab">
-                            <div class="availabilityTabs">
-                                <header class="panel-heading headingCapitilize medicationManagementHeader">
-                                    <div class="clientHeadung">
-                                        <button class="btn borderBtn backBtn" id="medicationBackBtn"><i class="bx  bx-arrow-left-stroke"></i> Back to MAR Sheets </button>
-                                        <div class="onlyheadingmain purpleiconclr m-t-10"><i class='bx  bx-link'></i> Medication Management </div>
-                                        <p>Track medication administration and MAR sheets</p>
+                        <div class="medicationManagement">
+                            <header class="panel-heading headingCapitilize medicationManagementHeader">
+                                <div class="clientHeadung" style="display: flex; align-items: center;">
+                                    <button class="btn borderBtn backBtn" id="medicationBackBtn" style="display: inline-flex !important; align-items: center; margin: 0;"><i class="fa fa-arrow-left" style="margin-right: 8px;"></i> Back to MAR Sheets</button>
+                                </div>
+                            </header>
+
+                            <div class="p-20">
+                                <div id="mar-detail-header"></div>
+
+                                <div style="margin-bottom:15px;">
+                                    <label style="font-weight:600;margin-right:10px;">Date:</label>
+                                    <input type="date" id="mar-grid-date" class="form-control" style="display:inline-block;width:200px;">
+                                </div>
+
+                                <div id="mar-grid-container"></div>
+
+                                <div id="mar-detail-info" style="margin-top:20px;"></div>
+
+                                <div style="margin-top:20px;">
+                                    <h4 style="margin-bottom:10px;"><i class="fa fa-history"></i> Administration History</h4>
+                                    <div id="mar-admin-history"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="careTaskstbbg sectionWhiteBgAllUse p-0 medicationSectionGrid" style="display:none">
+                        <div class="medicationManagement">
+                            <header class="panel-heading headingCapitilize medicationManagementHeader">
+                                <div class="clientHeadung" style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                                    <button class="btn borderBtn backBtn" id="gridBackBtn" style="display: inline-flex !important; align-items: center; margin: 0;"><i class="fa fa-arrow-left" style="margin-right: 8px;"></i> Back to MAR Sheets</button>
+                                    <div class="onlyheadingmain purpleiconclr" style="display: inline-flex !important; align-items: center; margin: 0;"><i class="fa fa-calendar" style="margin-right: 8px;"></i> Monthly MAR Grid</div>
+                                </div>
+                            </header>
+
+                            <div class="p-20">
+                                <div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;flex-wrap:wrap;">
+                                    <button class="btn btn-sm btn-default" id="mar-grid-prev-month"><i class="fa fa-chevron-left"></i></button>
+                                    <select class="form-control" id="mar-grid-month" style="width:130px;display:inline-block;">
+                                        <option value="1">January</option>
+                                        <option value="2">February</option>
+                                        <option value="3">March</option>
+                                        <option value="4">April</option>
+                                        <option value="5">May</option>
+                                        <option value="6">June</option>
+                                        <option value="7">July</option>
+                                        <option value="8">August</option>
+                                        <option value="9">September</option>
+                                        <option value="10">October</option>
+                                        <option value="11">November</option>
+                                        <option value="12">December</option>
+                                    </select>
+                                    <select class="form-control" id="mar-grid-year" style="width:90px;display:inline-block;">
+                                        @for($y = date('Y') - 1; $y <= date('Y') + 1; $y++)
+                                            <option value="{{ $y }}">{{ $y }}</option>
+                                            @endfor
+                                    </select>
+                                    <button class="btn btn-sm btn-default" id="mar-grid-next-month"><i class="fa fa-chevron-right"></i></button>
+                                    <button class="btn btn-sm btn-default" id="mar-grid-print-btn" style="margin-left:auto;"><i class="fa fa-print"></i> Print MAR</button>
+                                </div>
+
+                                <div id="mar-monthly-grid-container"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MAR Administer Modal -->
+                    <div class="modal fade" id="marAdministerModal" tabindex="-1" role="dialog">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                                    <h4 class="modal-title"><i class="fa fa-medkit"></i> Record Administration</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <p><strong>Medication:</strong> <span id="admin-modal-med-name"></span></p>
+                                    <p><strong>Time Slot:</strong> <span id="admin-modal-slot"></span> | <strong>Date:</strong> <span id="admin-modal-date"></span></p>
+                                    <hr>
+                                    <input type="hidden" id="admin_mar_sheet_id">
+                                    <input type="hidden" id="admin_time_slot">
+                                    <input type="hidden" id="admin_date">
+                                    <div class="form-group">
+                                        <label>Status *</label>
+                                        <select class="form-control" id="admin_code">
+                                            <option value="A">A - Administered</option>
+                                            <option value="S">S - Self-administered</option>
+                                            <option value="R">R - Refused</option>
+                                            <option value="W">W - Withheld</option>
+                                            <option value="N">N - Not Available</option>
+                                            <option value="O">O - Other</option>
+                                        </select>
                                     </div>
-
-                                    <div class="availabilityTabs__nav m-b-0">
-                                        <button class="availabilityTabs__tab borderBtn active" data-target="MARSheetsPanel"> <i class='bx  bx-list-ul'></i> List </button>
-                                        <button class="availabilityTabs__tab borderBtn" data-target="medicationLogsPanel"> <i class='bx  bx-table-cells'></i> Table</button>
+                                    <div class="form-group">
+                                        <label>Dose Given</label>
+                                        <input type="text" class="form-control" id="admin_dose_given" placeholder="e.g., 500mg">
                                     </div>
-                                </header>
-
-                                <div class="availabilityTabs__content p-20">
-                                    <div class="availabilityTabs__panel active" id="MARSheetsPanel">
-                                        <div class="carePlanTabCont" style="">
-                                            <div class="space-y-4">
-                                                <div class="borderB">
-                                                    <h4 class="fontSemibold textSm text-gray-600 uppercase mb-3">month year</h4>
-                                                    <div class="text-gray-900">
-                                                        <p>December 2025</p>
-                                                    </div>
-                                                </div>
-                                                <div class="borderB pt-3 pb-3">
-                                                    <h4 class="fontSemibold textSm text-gray-600 uppercase mb-3">medication name</h4>
-                                                    <div class="text-gray-900">
-                                                        <p>Norethisterone</p>
-                                                    </div>
-                                                </div>
-                                                <div class="borderB pt-3 pb-3">
-                                                    <h4 class="fontSemibold textSm text-gray-600 uppercase mb-3">dose</h4>
-                                                    <div class="text-gray-900">
-                                                        <p>N/A</p>
-                                                    </div>
-                                                </div>
-                                                <div class="borderB pt-3 pb-3">
-                                                    <h4 class="fontSemibold textSm text-gray-600 uppercase mb-3">route</h4>
-                                                    <div class="text-gray-900">
-                                                        <p>oral</p>
-                                                    </div>
-                                                </div>
-                                                <div class="borderB pt-3 pb-3">
-                                                    <h4 class="fontSemibold textSm text-gray-600 uppercase mb-3">frequency</h4>
-                                                    <div class="text-gray-900">
-                                                        <p>N/A</p>
-                                                    </div>
-                                                </div>
-                                                <div class="borderB pt-3 pb-3">
-                                                    <h4 class="fontSemibold textSm text-gray-600 uppercase mb-3">time slots</h4>
-                                                    <div class="text-gray-900">
-                                                        <p>N/A</p>
-                                                    </div>
-                                                </div>
-                                                <div class="borderB pt-3 pb-3">
-                                                    <h4 class="fontSemibold textSm text-gray-600 uppercase mb-3">reason for medication</h4>
-                                                    <div class="text-gray-900">
-                                                        <p>Taken for one week during August to delay period whilst on holiday.</p>
-                                                    </div>
-                                                </div>
-                                                <div class="borderB pt-3 pb-3">
-                                                    <h4 class="fontSemibold textSm text-gray-600 uppercase mb-3">start date</h4>
-                                                    <div class="text-gray-900">
-                                                        <p>August</p>
-                                                    </div>
-                                                </div>
-                                                <div class="borderB pt-3 pb-3">
-                                                    <h4 class="fontSemibold textSm text-gray-600 uppercase mb-3">administration records</h4>
-                                                </div>
-                                                <div class="borderB pt-3 pb-3">
-                                                    <h4 class="fontSemibold textSm text-gray-600 uppercase mb-3">created date</h4>
-                                                    <div class="text-gray-900">
-                                                        <p>December 16th, 2025</p>
-                                                    </div>
-                                                </div>
-                                                <div class="borderB pt-3 pb-3">
-                                                    <h4 class="fontSemibold textSm text-gray-600 uppercase mb-3">updated date</h4>
-                                                    <div class="text-gray-900">
-                                                        <p>December 16th, 2025</p>
-                                                    </div>
-                                                </div>
-                                                <div class="borderB pt-3 pb-3">
-                                                    <h4 class="fontSemibold textSm text-gray-600 uppercase mb-3">created by id</h4>
-                                                    <div class="text-gray-900">
-                                                        <p>6909e61b89f26ef7fa768434</p>
-                                                    </div>
-                                                </div>
-                                                <div class="borderB pt-3 pb-3">
-                                                    <h4 class="fontSemibold textSm text-gray-600 uppercase mb-3">created by</h4>
-                                                    <div class="text-gray-900">
-                                                        <p>p.holt@omegalife.uk</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                    <div class="form-group">
+                                        <label>Witnessed By</label>
+                                        <input type="text" class="form-control" id="admin_witnessed_by" placeholder="Witness name">
                                     </div>
-
-                                    <div class="availabilityTabs__panel" id="medicationLogsPanel">
-                                        <div class="carePlanTabCont" style="">
-                                            <div class="medicationSheet">
-                                                <!-- Patient Header -->
-                                                <div class="patientInfo">
-                                                    <div>
-                                                        <p><strong>Name:</strong> Logan Jones</p>
-                                                        <p><strong>Date of Birth:</strong> 29.10.2009</p>
-                                                        <p><strong>Address:</strong> N/A</p>
-                                                    </div>
-                                                    <div>
-                                                        <p><strong>Period:</strong> December 2025</p>
-                                                        <p><strong>Prescriber:</strong> N/A</p>
-                                                        <p><strong>Pharmacy:</strong> N/A</p>
-                                                    </div>
-                                                </div>
-
-                                                <!-- Medication Card -->
-                                                <div class="medicationCard">
-                                                    <div class="medGrid">
-                                                        <div>
-                                                            <span class="label">Medication:</span>
-                                                            <p class="medName">Norethisterone</p>
-                                                        </div>
-                                                        <div>
-                                                            <span class="label">Dose:</span>
-                                                            <p>N/A</p>
-                                                        </div>
-                                                        <div>
-                                                            <span class="label">Route:</span>
-                                                            <p>Oral</p>
-                                                        </div>
-                                                        <div>
-                                                            <span class="label">Frequency:</span>
-                                                            <p>N/A</p>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="reasonBox">
-                                                        <strong>Reason:</strong>
-                                                        Taken for one week during August to delay period whilst on holiday.
-                                                    </div>
-                                                </div>
-
-                                                <!-- Legend -->
-                                                <div class="legend">
-                                                    <span class="tag a">A</span> Administered
-                                                    <span class="tag r">R</span> Refused
-                                                    <span class="tag s">S</span> Self-administered
-                                                    <span class="tag h">H</span> Hospital
-                                                    <span class="tag nd">ND</span> Not in home
-                                                </div>
-
-                                                <!-- Week 1 -->
-                                                <div class="weekBlock">
-                                                    <h4>Week 1</h4>
-                                                    <table>
-                                                        <thead>
-                                                            <tr>
-                                                                <th>Time</th>
-                                                                <th>Mon<br>01</th>
-                                                                <th>Tue<br>02</th>
-                                                                <th>Wed<br>03</th>
-                                                                <th>Thu<br>04</th>
-                                                                <th>Fri<br>05</th>
-                                                                <th>Sat<br>06</th>
-                                                                <th>Sun<br>07</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            <tr>
-                                                                <td>N/A</td>
-                                                                <td>-</td>
-                                                                <td>-</td>
-                                                                <td>-</td>
-                                                                <td>-</td>
-                                                                <td>-</td>
-                                                                <td>-</td>
-                                                                <td>-</td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-
-                                                <!-- Week 2 -->
-                                                <div class="weekBlock">
-                                                    <h4>Week 2</h4>
-                                                    <table>
-                                                        <thead>
-                                                            <tr>
-                                                                <th>Time</th>
-                                                                <th>Mon<br>08</th>
-                                                                <th>Tue<br>09</th>
-                                                                <th>Wed<br>10</th>
-                                                                <th>Thu<br>11</th>
-                                                                <th>Fri<br>12</th>
-                                                                <th>Sat<br>13</th>
-                                                                <th>Sun<br>14</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            <tr>
-                                                                <td>N/A</td>
-                                                                <td>-</td>
-                                                                <td>-</td>
-                                                                <td>-</td>
-                                                                <td>-</td>
-                                                                <td>-</td>
-                                                                <td>-</td>
-                                                                <td>-</td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                                <!-- Week 3 -->
-                                                <div class="weekBlock">
-                                                    <h4>Week 3</h4>
-                                                    <table>
-                                                        <thead>
-                                                            <tr>
-                                                                <th>Time</th>
-                                                                <th>Mon<br>08</th>
-                                                                <th>Tue<br>09</th>
-                                                                <th>Wed<br>10</th>
-                                                                <th>Thu<br>11</th>
-                                                                <th>Fri<br>12</th>
-                                                                <th>Sat<br>13</th>
-                                                                <th>Sun<br>14</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            <tr>
-                                                                <td>N/A</td>
-                                                                <td>-</td>
-                                                                <td>-</td>
-                                                                <td>-</td>
-                                                                <td>-</td>
-                                                                <td>-</td>
-                                                                <td>-</td>
-                                                                <td>-</td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-
-                                            </div>
-
-                                        </div>
+                                    <div class="form-group">
+                                        <label>Notes</label>
+                                        <textarea class="form-control" id="admin_notes" rows="2" placeholder="Additional notes"></textarea>
                                     </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn borderBtn" data-dismiss="modal">Cancel</button>
+                                    <button type="button" class="btn allbuttonDarkClr" id="saveAdministrationBtn">Save</button>
                                 </div>
                             </div>
                         </div>
@@ -4629,190 +4784,19 @@
                                 </div>
                                 <div class="emergencyBtn d-flex gap-3">
                                     <div>
-
-                                        <button class="borderBtn">
-                                            <i class="bx  bx-sparkles me-3"></i>
-                                            <span> Generate Care Plan</span>
-                                        </button>
-                                    </div>
-                                    <div>
-                                        <button class="bgBtn" data-target-form="docForm1" onclick="toggleDocForm()">
-                                            <i class='bx  bx-arrow-from-bottom-stroke'></i>
-                                            <span> Upload Document</span>
+                                        <button class="borderBtn" onclick="openImportModal({{ $client_id }})">
+                                            <i class="bx bx-import me-1"></i>
+                                            <span>Import Documents</span>
                                         </button>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div style="margin: 24px;">
-                            <div class="purpleBox">
-                                <div class="d-flex gap-3">
-                                    <i class="bx  bx-sparkles"></i>
-                                    <div>
-                                        <p class="mb-2"> <strong>Assessment documents detected</strong></p>
-                                        <p class="mb-0">Click "Generate Care Plan" to automatically create care plan, medications, and risk assessments from uploaded documents
-                                        </p>
-                                    </div>
-                                </div>
-
+                            <div id="documentListContainer">
+                                <div class="text-center p-4"><i class="fa fa-spinner fa-spin"></i> Loading documents...</div>
                             </div>
-                            <div class="mainBlueCard">
-                                <div class="docForm " data-form-id="docForm1" style="display: none;">
-                                    <div class="emergencyHeader mt-4" style="border-bottom: unset;">
-                                        <div class="emeregencyParent">
-                                            <div class="emergencyContent">
-                                                <div class="gap-3 d-flex align-items-center iconConsent">
-                                                    <i style="color: #434447;" class="fa fa-upload" aria-hidden="true"></i>
-                                                    <h3>Upload New Document
-                                                    </h3>
-                                                </div>
-                                                <div class="emergencyForm">
-                                                    <div class="row mt-4">
-                                                        <div class="col-lg-6">
-                                                            <div>
-                                                                <label class="form-label">Document Type *
-                                                                </label>
-                                                                <select name="" id="" class="form-control">
-                                                                    <option value="">Other</option>
-                                                                    <option value="">Care Plan</option>
-                                                                    <option value="">Risk Assessment</option>
-                                                                    <option value="">Other</option>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="col-lg-6">
-                                                            <label class="form-label">
-                                                                Document Name *</label>
-                                                            <input class="form-control" type="text" placeholder="Enter document name">
-                                                        </div>
-
-                                                        <div class="col-lg-12">
-                                                            <label class="form-label">Select File *</label>
-                                                            <input class="form-control" type="file">
-                                                        </div>
-                                                        <div class="col-lg-6">
-                                                            <label class="form-label">Expiry Date (Optional)</label>
-                                                            <input class="form-control" type="date">
-                                                        </div>
-                                                        <div class="col-lg-6">
-                                                            <label class="form-label">Access Level
-                                                            </label>
-                                                            <select name="" id="" class="form-control">
-                                                                <option value="">Other</option>
-                                                                <option value="">Care Plan</option>
-                                                                <option value="">Risk Assessment</option>
-                                                                <option value="">Other</option>
-                                                            </select>
-                                                        </div>
-                                                        <div class="col-lg-6">
-                                                            <label class="form-label">Tags (comma separated)</label>
-                                                            <input class="form-control" type="text " placeholder="e.g., urgent, review, annual">
-                                                        </div>
-                                                        <div class="col-lg-6">
-                                                            <div class="formCheck d-flex gap-3 align-items-center">
-                                                                <input type="checkbox">
-                                                                <label class="form-label mb-0" style="display: inline-block;">Mark as Confidential</label>
-                                                            </div>
-
-
-                                                        </div>
-                                                        <div class="col-lg-12">
-                                                            <label class="form-label">Notes</label>
-                                                            <textarea class="form-control" placeholder="Additional notes about this document "></textarea>
-                                                        </div>
-                                                        <div class="col-lg-12">
-                                                            <div class="formFooter">
-
-                                                                <div class="d-flex gap-3">
-                                                                    <button class="redBtn">Save Contacts</button>
-                                                                    <button class="borderBtn cancelBtn" onclick="closeDocForm()">Cancel</button>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                </div>
-                            </div>
-                            <div id="aiPlan">
-                                <div class="bBorderCard mt-4">
-                                    <div class="d-flex justify-content-between">
-                                        <div class="bCardHead">
-                                            <div>
-                                                <i class="far fa-file-alt"></i>
-                                            </div>
-                                            <div>
-                                                <h3>AI Care Plan - 19/12/2025</h3>
-                                            </div>
-                                            <div>
-                                                <span class="careBadg">Care Plan</span>
-                                            </div>
-                                        </div>
-                                        <div class="d-flex gap-3 careIconButton">
-                                            <div>
-                                                <button class="uploadBtn"> <i class="fa fa-download" aria-hidden="true"></i>
-                                                </button>
-                                            </div>
-                                            <div> <button class="deleteBtn"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="docPlanD">
-                                        <div class="uploadBy">
-                                            <p class="mb-3"><strong>Uploaded :</strong> <span>Dec 16, 2025</span></p>
-                                            <p class="mb-3"><strong>By :</strong> <span>Unknown Staff</span></p>
-                                        </div>
-                                        <p class="mb-3"><strong>Size :</strong> <span>Dec 16, 2025</span></p>
-                                        <p class="mb-3"><strong>Uploaded :</strong> <span> 2.71 KB</span></p>
-                                    </div>
-                                    <div class=" userMum  d-flex gap-3 mb-3">
-                                        <span class="title">processed_for_care_plan </span>
-                                        <span class="title">processed_for_care_plan </span>
-                                    </div>
-                                    <p class="para text-sm">AI-generated person-centered care plan with actionable tasks and objectives Used to generate care plan 6958abcf3cdd6f7f93bc71eb on 1/3/2026 Used to generate care plan 6958c1fa065bde2dc29dac0f on 1/3/2026</p>
-                                </div>
-
-                                <div class="bBorderCard mt-4">
-                                    <div class="d-flex justify-content-between">
-                                        <div class="bCardHead">
-                                            <div>
-                                                <i class="far fa-file-alt"></i>
-                                            </div>
-                                            <div>
-                                                <h3>AI Care Plan - 19/12/2025</h3>
-                                            </div>
-                                            <div>
-                                                <span class="careBadg">Care Plan</span>
-                                            </div>
-                                        </div>
-                                        <div class="d-flex gap-3 careIconButton">
-                                            <div>
-                                                <button class="uploadBtn"> <i class="fa fa-download" aria-hidden="true"></i>
-                                                </button>
-                                            </div>
-                                            <div> <button class="deleteBtn"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="docPlanD">
-                                        <div class="uploadBy">
-                                            <p class="mb-3"><strong>Uploaded :</strong> <span>Dec 16, 2025</span></p>
-                                            <p class="mb-3"><strong>By :</strong> <span>Unknown Staff</span></p>
-                                        </div>
-                                        <p class="mb-3"><strong>Size :</strong> <span>Dec 16, 2025</span></p>
-                                        <p class="mb-3"><strong>Uploaded :</strong> <span> 2.71 KB</span></p>
-                                    </div>
-                                    <div class="userMum d-flex gap-3 mb-3">
-                                        <span class="title">processed_for_care_plan </span>
-                                        <span class="title">processed_for_care_plan </span>
-                                    </div>
-                                    <p class="para text-sm">AI-generated person-centered care plan with actionable tasks and objectives Used to generate care plan 6958abcf3cdd6f7f93bc71eb on 1/3/2026 Used to generate care plan 6958c1fa065bde2dc29dac0f on 1/3/2026</p>
-                                </div>
-                            </div>
+                            <div id="importHistoryContainer" class="mt-4"></div>
                         </div>
                     </div>
                 </div>
@@ -7447,72 +7431,84 @@
             </div>
         </div>
     </div>
-    <div class="modal fade leaveCommunStyle" id="importDoc" tabindex="1" role="dialog"
-        aria-labelledby="myModalLabel" aria-hidden="true">
-        <div class="modal-dialog pModalScroll modalMd">
+    <!-- AI Document Import Modal (outside all tab divs) -->
+    <div class="modal fade" id="aiDocumentImportModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
-                <div class="modal-header p24">
-                    <div class="flexBw mb-3">
-                        <div class="dFlexGap">
-                            <div>
-                                <i class="bx bx-sparkles fs23 purpleTextp"></i>
-                            </div>
-                            <div>
-                                <h4 class="modal-title">AI Document Importer</h4>
-                            </div>
-                        </div>
-                        <button class="close" type="button" data-dismiss="modal" aria-hidden="true">×</button>
-                    </div>
-                    <p class="fs13 textGray500 mb-0">Upload documentation for <strong>{{$clientDetails['name']}}</strong> to automatically extract and create care records</p>
+                <div class="modal-header">
+                    <h4 class="modal-title"><i class="bx bx-import"></i> AI Document Import</h4>
+                    <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
                 </div>
-                <div class="modal-body heightScrollModal" style="height: unset;">
-                    <form id="import_documentForm">
-                        <div class="uploadBox mb-2 text-center" id="uploadBox" style="padding:20px;">
-                            <i class="bx bx-arrow-from-bottom" style="font-size:40px"></i>
-                            <div class="mt-4">
-                                <p class="fs15 mb-3 textGray600 font700">Click to upload documentation</p>
-                                <p class="fs13 mb-2 textGray500">PDF, Word, or Image files</p>
-                            </div>
-                            <input type="file" id="fileInput" style="display:none;" name="import_document">
-                        </div>
-                        <div id="filePreview" style="display:none; border:1px dashed #ccc; padding:20px; text-align:center;">
-                            <i class="bx bx-file" style="font-size:40px; color:#4c6ef5;"></i>
-                            <p id="fileName" class="mt-2"></p>
-                            <p id="fileSize" class="textGray500"></p>
-                            <button type="button" id="removeFile" class="borderBtn m-auto">Remove</button>
-                        </div>
-                        <div class="mt-4">
-                            <label for="">What should we extract?</label>
-                            <div class="dFlexGap flexWrap document_type_badgeSection">
-                                <div>
-                                    <span class="careBadg muteBadges" onclick="document_type(this)">Care Plan</span>
-                                </div>
-                                <div>
-                                    <span class="careBadg muteBadges" onclick="document_type(this,'greenbadges')">Medication / MAR Sheet</span>
-                                </div>
-                                <div>
-                                    <span class="careBadg muteBadges" onclick="document_type(this,'orangeBages')">Risk Assessment</span>
-                                </div>
-                                <div>
-                                    <span class="careBadg muteBadges" onclick="document_type(this,'purpleBadges')">Behaviour Support Plan</span>
-                                </div>
-                                <div>
-                                    <span class="careBadg muteBadges" onclick="document_type(this)">Mental Capacity Assessment</span>
-                                </div>
-                                <div>
-                                    <span class="careBadg muteBadges" onclick="document_type(this,'redbadges')">PEEP (Emergency Evacuation)</span>
-                                </div>
+                <div class="modal-body" style="max-height:70vh;overflow-y:auto;">
+                    <input type="hidden" id="docImportClientId" value="">
+                    <input type="hidden" id="docImportId" value="">
 
-                            </div>
-                            <div class="mt-4" style="display:none" id="document_typeBtnSection">
-                                <button class="bgBtn w100 purpleBgBtn saveDocument" type="button"> <i class="bx bx-sparkles"></i> Extract Data</button>
+                    <!-- Step 1: Upload -->
+                    <div id="importStep1">
+                        <h5 class="mb-3">Step 1: Upload Document</h5>
+                        <div id="dropZone" style="border:2px dashed #ccc;border-radius:8px;padding:40px;text-align:center;cursor:pointer;background:#f9f9f9;transition:background 0.2s;">
+                            <i class="far fa-file-alt" style="font-size:48px;color:#2563eb;"></i>
+                            <p class="mt-2 mb-1"><strong>Drag &amp; drop document here</strong></p>
+                            <p class="text-muted mb-0">or click to browse</p>
+                            <p class="text-muted"><small>PDF or Word (.docx) &bull; Max 10MB</small></p>
+                            <input type="file" id="pdfFileInput" accept=".pdf,.docx,.doc,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword" style="display:none;">
+                        </div>
+                        <div id="selectedFileInfo" style="display:none;" class="mt-3 p-3" style="background:#f0f7ff;border-radius:6px;">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="far fa-file-pdf" style="color:#e74c3c;"></i>
+                                    <strong id="selectedFileName" class="ml-2"></strong>
+                                    <span id="selectedFileSize" class="text-muted ml-2"></span>
+                                </div>
+                                <button class="btn btn-sm btn-outline-secondary" onclick="clearFileSelection()">Remove</button>
                             </div>
                         </div>
-                    </form>
+                        <div class="mt-3">
+                            <button class="btn allBtnUseColor" id="uploadBtn" disabled onclick="uploadAndExtractText()">
+                                <i class="bx bx-upload"></i> Upload &amp; Analyse
+                            </button>
+                        </div>
+                        <div id="uploadProgress" style="display:none;" class="mt-3">
+                            <div class="progress" style="height:6px;">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated" style="width:100%;background:#2563eb;"></div>
+                            </div>
+                            <p class="text-muted mt-2" id="uploadStatusText">Uploading document...</p>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Review -->
+                    <div id="importStep2" style="display:none;">
+                        <h5 class="mb-3">Step 2: Review Extracted Data</h5>
+                        <p class="text-muted mb-3">Select which categories to import into the client's record.</p>
+                        <div id="extractedDataContainer"></div>
+                        <div id="noDataMessage" style="display:none;" class="text-center p-4 text-muted">
+                            <i class="bx bx-info-circle" style="font-size:24px;"></i>
+                            <p class="mt-2">No structured data could be extracted from this document.</p>
+                        </div>
+                        <div class="mt-3 d-flex gap-3">
+                            <button class="btn allBtnUseColor" id="confirmImportBtn" onclick="confirmImport()">
+                                <i class="bx bx-check"></i> Confirm Import (<span id="selectedCount">0</span> categories)
+                            </button>
+                            <button class="btn borderBtn" data-dismiss="modal">Cancel</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Summary -->
+                    <div id="importStep3" style="display:none;">
+                        <h5 class="mb-3">Step 3: Import Summary</h5>
+                        <div id="importSummaryContainer"></div>
+                        <div class="mt-3">
+                            <button class="btn allBtnUseColor" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+
+                    <!-- Error display -->
+                    <div id="importError" style="display:none;" class="alert alert-danger mt-3">
+                        <i class="bx bx-error"></i> <span id="importErrorText"></span>
+                    </div>
                 </div>
             </div>
         </div>
-
     </div>
     <!-- pratima modal end -->
     <style>
@@ -7627,12 +7623,16 @@
         var clientCarePlanMedicalDeleteUrl = "{{url('roster/client/care-plan-medical-delete')}}";
         var clientCarePlanRiskDeleteUrl = "{{url('roster/client/care-plan-risk-delete')}}";
         var get_document_ai_response = "{{url('roster/get-document-ai-response')}}";
+        var docImportBaseUrl = '{{ url("roster/ai-document-import") }}';
     </script>
     <!-- end here -->
     <script src="{{ url('public/js/roster/client/client_details.js')}}" defer></script>
     <script src="{{ url('public/js/roster/client/client_alert.js')}}" defer></script>
     <script src="{{ url('public/js/roster/client/client_dols.js')}}" defer></script>
+    <script src="{{ url('public/js/roster/client/mar_sheets.js')}}" defer></script>
+    <script src="{{ url('public/js/roster/client/mar_grid.js')}}" defer></script>
     <script src="{{ url('public/js/roster/client/care_plan.js')}}" defer></script>
+    <script src="{{ url('public/js/roster/ai-document-import.js') }}"></script>
     <script>
         const tabs = document.querySelectorAll(".tab");
         const contents = document.querySelectorAll(".content");

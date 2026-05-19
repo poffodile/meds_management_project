@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('ai_document_imports', function (Blueprint $table) {
             $table->id();
             $table->unsignedInteger('home_id');
-            $table->unsignedInteger('client_id');
+            $table->unsignedInteger('client_id')->nullable();
             $table->unsignedInteger('uploaded_by');
             $table->string('original_filename', 255);
             $table->string('stored_path', 500);
