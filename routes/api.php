@@ -206,4 +206,18 @@ Route::group(['prefix' => '/staff'], function () {
 	Route::post('care-task/details', 'App\Http\Controllers\Api\Staff\ClientCareTaskApi@details');
 	Route::post('care-task/comment/add', 'App\Http\Controllers\Api\Staff\ClientCareTaskApi@add_comment');
 	Route::post('care-task/status', 'App\Http\Controllers\Api\Staff\ClientCareTaskApi@status_change');
+
+	// SOS Alerts
+	// Route::post('/sos-alert/trigger', 'App\Http\Controllers\Api\Staff\SosAlertController@trigger')->middleware('throttle:5,1');
+	// Route::post('/sos-alert/list', 'App\Http\Controllers\Api\Staff\SosAlertController@list')->middleware('throttle:30,1');
+	// Route::post('/sos-alert/acknowledge', 'App\Http\Controllers\Api\Staff\SosAlertController@acknowledge')->middleware('throttle:20,1');
+	// Route::post('/sos-alert/resolve', 'App\Http\Controllers\Api\Staff\SosAlertController@resolve')->middleware('throttle:20,1');
+
+	// SOS Alerts
+	Route::post('/sos-alert/trigger', 'App\Http\Controllers\Api\Staff\SosAlertController@trigger');
+	Route::post('/sos-alert/list', 'App\Http\Controllers\Api\Staff\SosAlertController@list');
+	Route::post('/sos-alert/acknowledge', 'App\Http\Controllers\Api\Staff\SosAlertController@acknowledge');
+	Route::post('/sos-alert/resolve', 'App\Http\Controllers\Api\Staff\SosAlertController@resolve');
+
+
 });

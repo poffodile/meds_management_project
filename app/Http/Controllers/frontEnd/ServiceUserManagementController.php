@@ -104,6 +104,10 @@ class ServiceUserManagementController extends Controller
             return response()->json([
                 'redirect_url' => url('service/location-history/' . $data['su_id'])
             ]);
+        } else if ($noti_data['event_type'] == 'SOS_ALERT') {
+            return response()->json([
+                'redirect_url' => url('roster/dashboard')
+            ]);
         }
     }
 

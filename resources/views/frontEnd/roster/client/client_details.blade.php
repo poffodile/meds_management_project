@@ -4793,6 +4793,16 @@
                             </div>
                         </div>
                         <div style="margin: 24px;">
+                            <!-- Category Filters -->
+                            <div class="d-flex align-items-center gap-2 mb-4 pb-3" style="border-bottom: 1px solid #f1f5f9; display: flex; flex-wrap: wrap; gap: 8px;">
+                                <span class="text-muted me-2" style="font-size: 13px; font-weight: 600; margin-right: 8px;">Filter by Category:</span>
+                                <button class="btn btn-sm btn-primary filter-btn active" data-category="All" style="border-radius: 20px; padding: 4px 14px; font-size: 12px; font-weight: 500; border: none; margin-right: 4px;">All</button>
+                                <button class="btn btn-sm btn-outline-secondary filter-btn" data-category="Care Plan" style="border-radius: 20px; padding: 4px 14px; font-size: 12px; font-weight: 500; background: transparent; color: #475569; border: 1px solid #cbd5e1; margin-right: 4px;">Care Plan</button>
+                                <button class="btn btn-sm btn-outline-secondary filter-btn" data-category="Risk Assessment" style="border-radius: 20px; padding: 4px 14px; font-size: 12px; font-weight: 500; background: transparent; color: #475569; border: 1px solid #cbd5e1; margin-right: 4px;">Risk Assessment</button>
+                                <button class="btn btn-sm btn-outline-secondary filter-btn" data-category="Medical" style="border-radius: 20px; padding: 4px 14px; font-size: 12px; font-weight: 500; background: transparent; color: #475569; border: 1px solid #cbd5e1; margin-right: 4px;">Medical</button>
+                                <button class="btn btn-sm btn-outline-secondary filter-btn" data-category="Other" style="border-radius: 20px; padding: 4px 14px; font-size: 12px; font-weight: 500; background: transparent; color: #475569; border: 1px solid #cbd5e1; margin-right: 4px;">Other</button>
+                            </div>
+
                             <div id="documentListContainer">
                                 <div class="text-center p-4"><i class="fa fa-spinner fa-spin"></i> Loading documents...</div>
                             </div>
@@ -7451,8 +7461,8 @@
                             <p class="mt-2 mb-1"><strong>Drag &amp; drop document here</strong></p>
                             <p class="text-muted mb-0">or click to browse</p>
                             <p class="text-muted"><small>PDF or Word (.docx) &bull; Max 10MB</small></p>
-                            <input type="file" id="pdfFileInput" accept=".pdf,.docx,.doc,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword" style="display:none;">
                         </div>
+                        <input type="file" id="pdfFileInput" accept=".pdf,.docx,.doc,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword" style="display:none;">
                         <div id="selectedFileInfo" style="display:none;" class="mt-3 p-3" style="background:#f0f7ff;border-radius:6px;">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>

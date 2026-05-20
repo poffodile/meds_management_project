@@ -71,7 +71,14 @@
 
         $title = '';
         $message = '';
-        if($event_type_id == '14'){ //In danger
+        if($event_type_id == '24') { // SOS Alert
+            $staff_id = App\Models\staffManagement\sosAlert::where('id', $event_id)->value('staff_id');
+            $staff_name = App\User::where('id', $staff_id)->value('name') ?? 'Staff';
+            $title = "🚨 SOS Alert";
+            $message = "has triggered an SOS alert " . $created_at . ".";
+            $type = 'SOS_ALERT';
+            $su_name = $staff_name;
+        } else if($event_type_id == '14'){ //In danger
            
             if($event_action == 'ADD'){ 
                 $title   = "In danger";

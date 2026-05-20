@@ -99,6 +99,14 @@ $(document).ready(function() {
         }
     });
 
+    // Handle filter buttons click
+    $(document).on('click', '.filter-btn', function() {
+        $('.filter-btn').removeClass('btn-primary active').addClass('btn-outline-secondary');
+        $(this).removeClass('btn-outline-secondary').addClass('btn-primary active');
+        currentFilter = $(this).data('category');
+        applyDocumentFilter();
+    });
+
     // Restore tab state on modal close
     $('#aiDocumentImportModal').on('hidden.bs.modal', function() {
         $('.modal-backdrop').remove();
@@ -448,6 +456,9 @@ function renderImportSummary(summary, selectedCategories) {
     );
 }
 
+var allDocuments = [];
+var currentFilter = 'All';
+
 function loadDocumentList(clientId) {
     $.ajax({
         url: docImportBaseUrl + '/documents',
@@ -455,7 +466,8 @@ function loadDocumentList(clientId) {
         data: { client_id: clientId },
         success: function(response) {
             if (response.status) {
-                renderDocumentList(response.documents);
+                allDocuments = response.documents || [];
+                applyDocumentFilter();
             }
         },
         error: function() {
@@ -464,48 +476,112 @@ function loadDocumentList(clientId) {
     });
 }
 
+function applyDocumentFilter() {
+    var filtered = allDocuments;
+    if (currentFilter !== 'All') {
+        filtered = allDocuments.filter(function(doc) {
+            var cat = (doc.category || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+            var filter = currentFilter.toLowerCase().replace(/[^a-z0-9]/g, '');
+            return cat === filter;
+        });
+    }
+    renderDocumentList(filtered);
+}
+
 function renderDocumentList(documents) {
     var container = $('#documentListContainer');
     container.empty();
 
     if (!documents || documents.length === 0) {
         container.html(
-            '<div class="text-center p-4 text-muted">' +
-            '<i class="far fa-folder-open" style="font-size:48px;"></i>' +
-            '<p class="mt-2">No documents uploaded yet.</p>' +
-            '<p><small>Click "Import Documents" to upload and analyse a PDF.</small></p></div>'
+            '<div class="text-center p-5 text-muted" style="background:#f8fafc; border-radius:12px; border:1px dashed #e2e8f0; margin-top:16px;">' +
+            '<i class="far fa-folder-open mb-3" style="font-size:48px; color:#94a3b8;"></i>' +
+            '<p class="mb-1" style="font-size:16px; font-weight:600; color:#475569;">No documents found</p>' +
+            '<p class="text-muted mb-0" style="font-size:13px;">There are no documents matching this category.</p></div>'
         );
         return;
     }
 
     documents.forEach(function(doc) {
-        var html = '<div class="bBorderCard mt-3">';
-        html += '<div class="d-flex justify-content-between">';
-        html += '<div class="bCardHead">';
-        html += '<div><i class="far fa-file-pdf" style="color:#e74c3c;"></i></div>';
-        html += '<div><h3>' + esc(doc.filename) + '</h3></div>';
-        html += '<div><span class="careBadg">' + esc(doc.category) + '</span></div>';
-        html += '</div>';
-        html += '</div>';
-        html += '<div class="docPlanD">';
+        var html = '<div class="bBorderCard mt-3" style="border: 1px solid #e2e8f0; border-radius:12px; padding: 18px; background: #fff; transition: box-shadow 0.2s; position: relative;">';
+        
+        // Header Row: Icon, Filename, Category badge and Download/Delete buttons
+        html += '<div class="d-flex justify-content-between align-items-start mb-2">';
+        html += '  <div class="d-flex align-items-center gap-3">';
+        html += '    <div style="font-size:24px; color:#e74c3c;"><i class="far fa-file-pdf"></i></div>';
+        html += '    <div>';
+        html += '      <h3 style="margin:0; font-size:16px; font-weight:600; color:#1e293b;">' + esc(doc.filename) + '</h3>';
+        
+        // Sub-header info: Category • Uploaded: Date • By: User Name
+        var metaParts = [];
+        metaParts.push('<span style="font-weight:600; color:#3b82f6;">' + esc(doc.category) + '</span>');
         if (doc.created_at) {
-            html += '<p class="mb-2"><strong>Uploaded:</strong> <span>' + esc(doc.created_at) + '</span></p>';
+            metaParts.push('Uploaded: ' + esc(doc.created_at));
         }
+        if (doc.uploaded_by_name) {
+            metaParts.push('By: ' + esc(doc.uploaded_by_name));
+        }
+        html += '      <p class="text-muted mb-0" style="font-size:12px; margin-top:2px;">' + metaParts.join(' &bull; ') + '</p>';
+        html += '    </div>';
+        html += '  </div>';
+        
+        // Actions
+        html += '  <div class="d-flex gap-2">';
+        if (doc.ai_import) {
+            html += '    <a href="' + docImportBaseUrl + '/download/' + doc.ai_import.id + '" class="btn btn-sm btn-outline-secondary" title="Download" style="border-radius:6px; padding: 4px 8px;"><i class="fa fa-download"></i></a>';
+            html += '    <button class="btn btn-sm btn-outline-danger" onclick="deleteDocument(' + doc.ai_import.id + ', null)" title="Delete" style="border-radius:6px; padding: 4px 8px;"><i class="fa fa-trash-o"></i></button>';
+        } else {
+            if (doc.download_url) {
+                html += '    <a href="' + esc(doc.download_url) + '" target="_blank" class="btn btn-sm btn-outline-secondary" title="Download" style="border-radius:6px; padding: 4px 8px;"><i class="fa fa-download"></i></a>';
+            }
+            html += '    <button class="btn btn-sm btn-outline-danger" onclick="deleteDocument(null, ' + doc.id + ')" title="Delete" style="border-radius:6px; padding: 4px 8px;"><i class="fa fa-trash-o"></i></button>';
+        }
+        html += '  </div>';
+        html += '</div>';
+        
+        // Body Row: File Size, Tags & AI Import details
+        html += '<div class="mt-2" style="font-size:13px; color:#475569;">';
+        if (doc.file_size) {
+            html += '  <div class="mb-1"><strong>Size:</strong> ' + formatFileSize(doc.file_size) + '</div>';
+        }
+        
+        // Tags
+        var tags = [];
+        if (doc.ai_import) {
+            tags.push('<span class="badge" style="background:#eff6ff; color:#1e40af; border:1px solid #bfdbfe; font-size:11px; padding: 2px 6px; border-radius:4px; margin-right:4px;">ai-imported</span>');
+            if (doc.ai_import.categories) {
+                doc.ai_import.categories.forEach(function(c) {
+                    var label = (categoryLabels[c] || c).toLowerCase().replace('_', '-');
+                    tags.push('<span class="badge" style="background:#f1f5f9; color:#475569; border:1px solid #cbd5e1; font-size:11px; padding: 2px 6px; border-radius:4px; margin-right:4px;">' + esc(label) + '</span>');
+                });
+            }
+        } else {
+            tags.push('<span class="badge" style="background:#f8fafc; color:#64748b; border:1px solid #e2e8f0; font-size:11px; padding: 2px 6px; border-radius:4px; margin-right:4px;">manual-upload</span>');
+        }
+        html += '  <div class="mb-2 d-flex flex-wrap align-items-center gap-1"><strong>Tags:</strong> ' + tags.join('') + '</div>';
+        
+        // AI Import Counts Detail
         if (doc.ai_import && doc.ai_import.summary) {
             var summaryParts = [];
             var s = doc.ai_import.summary;
             if (s.care_history) summaryParts.push(s.care_history + ' care history');
             if (s.medications) summaryParts.push(s.medications + ' medications');
             if (s.risk_assessments) summaryParts.push(s.risk_assessments + ' risk assessments');
-            if (s.client_profile) summaryParts.push(s.client_profile + ' profile fields');
+            if (s.client_profile) summaryParts.push(s.client_profile + ' profile updates');
             if (s.body_map) summaryParts.push(s.body_map + ' body map');
             if (s.dols) summaryParts.push(s.dols + ' DoLS');
+            
             if (summaryParts.length > 0) {
-                html += '<p class="mb-2"><span class="careBadg" style="background:#e8f5e9;color:#2e7d32;">AI Imported</span> ' + esc(summaryParts.join(', ')) + '</p>';
+                html += '  <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px; padding:6px 12px; color:#166534; font-size:12px; margin-top:8px; display:inline-block;">';
+                html += '    <i class="fa fa-sparkles mr-1" style="color:#22c55e;"></i>';
+                html += '    <strong>AI Imported:</strong> ' + esc(summaryParts.join(', '));
+                html += '  </div>';
             }
         }
-        html += '</div>';
-        html += '</div>';
+        
+        html += '</div>'; // End body
+        html += '</div>'; // End card
+        
         container.append(html);
     });
 }
@@ -578,20 +654,45 @@ function renderImportHistory(imports) {
 }
 
 function deleteImport(importId) {
-    if (!confirm('Delete this import record?')) return;
+    deleteDocument(importId, null);
+}
+
+function deleteDocument(importId, fileId) {
+    var confirmMsg = importId ? 'Delete this import record and document?' : 'Delete this document?';
+    if (!confirm(confirmMsg)) return;
+
+    var postData = {};
+    if (importId) {
+        postData.import_id = importId;
+    } else {
+        postData.file_id = fileId;
+    }
 
     $.ajax({
         url: docImportBaseUrl + '/delete',
         type: 'POST',
-        data: { import_id: importId },
+        data: postData,
         success: function(response) {
             if (response.status) {
-                var clientId = $('#docImportClientId').val();
+                var clientId = $('#docImportClientId').val() || $('input[name="service_user_id"]').val();
+                if (!clientId) {
+                    var urlParts = window.location.pathname.split('/');
+                    clientId = urlParts[urlParts.length - 1];
+                }
                 if (clientId) {
                     loadDocumentList(clientId);
                     loadImportHistory(clientId);
                 }
+            } else {
+                alert(response.error || 'Failed to delete document.');
             }
+        },
+        error: function(xhr) {
+            var msg = 'Failed to delete document.';
+            if (xhr.responseJSON && xhr.responseJSON.error) {
+                msg = xhr.responseJSON.error;
+            }
+            alert(msg);
         }
     });
 }

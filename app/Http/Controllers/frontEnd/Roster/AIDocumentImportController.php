@@ -203,20 +203,32 @@ class AIDocumentImportController extends Controller
             ->orderByDesc('su_file_manager.created_at')
             ->get();
 
-        $imports = AIDocumentImport::forHome($homeId)
+        $imports = AIDocumentImport::with('uploader')
+            ->forHome($homeId)
             ->forClient($clientId)
             ->notDeleted()
             ->where('import_status', 'completed')
             ->get()
             ->keyBy('stored_path');
 
-        $documents = $files->map(function ($file) use ($imports) {
+        $documents = $files->map(function ($file) use ($imports, $clientId) {
             $importData = $imports->get($file->file);
+            
+            $isAiImport = ($importData !== null);
+            $downloadUrl = '';
+            if (!$isAiImport) {
+                $downloadUrl = url('public/images/serviceUserFiles/' . $clientId . '/' . $file->file);
+            }
+
             return [
                 'id' => $file->id,
                 'filename' => basename($file->file),
                 'category' => $file->category_name ?? 'Other',
                 'created_at' => $file->created_at ? Carbon::parse($file->created_at)->format('d M Y') : null,
+                'file_size' => $importData ? $importData->file_size : null,
+                'uploaded_by_name' => ($importData && $importData->uploader) ? $importData->uploader->name : null,
+                'is_ai_import' => $isAiImport,
+                'download_url' => $downloadUrl,
                 'ai_import' => $importData ? [
                     'id' => $importData->id,
                     'summary' => $importData->import_summary,
@@ -231,23 +243,41 @@ class AIDocumentImportController extends Controller
     public function delete(Request $request): JsonResponse
     {
         $request->validate([
-            'import_id' => 'required|integer',
+            'import_id' => 'nullable|integer',
+            'file_id' => 'nullable|integer',
         ]);
 
         $homeId = $this->homeId();
 
-        $import = AIDocumentImport::where('id', (int) $request->input('import_id'))
-            ->where('home_id', $homeId)
-            ->where('is_deleted', 0)
-            ->first();
+        if ($request->filled('import_id')) {
+            $import = AIDocumentImport::where('id', (int) $request->input('import_id'))
+                ->where('home_id', $homeId)
+                ->where('is_deleted', 0)
+                ->first();
 
-        if (!$import) {
-            return response()->json(['status' => false, 'error' => 'Import not found.'], 404);
+            if (!$import) {
+                return response()->json(['status' => false, 'error' => 'Import not found.'], 404);
+            }
+
+            $import->update(['is_deleted' => 1]);
+
+            // Also soft delete in su_file_manager
+            DB::table('su_file_manager')
+                ->where('home_id', $homeId)
+                ->where('file', $import->stored_path)
+                ->update(['is_deleted' => 1]);
+
+        } elseif ($request->filled('file_id')) {
+            // Soft delete directly from su_file_manager
+            DB::table('su_file_manager')
+                ->where('home_id', $homeId)
+                ->where('id', (int) $request->input('file_id'))
+                ->update(['is_deleted' => 1]);
+        } else {
+            return response()->json(['status' => false, 'error' => 'Invalid parameters.'], 422);
         }
 
-        $import->update(['is_deleted' => 1]);
-
-        return response()->json(['status' => true, 'message' => 'Import deleted.']);
+        return response()->json(['status' => true, 'message' => 'Document deleted.']);
     }
 
     public function download(Request $request, int $id): mixed

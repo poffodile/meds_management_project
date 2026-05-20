@@ -5,7 +5,7 @@
 <!--footer start-->
 <footer class="footer-section">
   <div class="text-center">
-    {{ date('Y')}} &copy; SCITS
+    {{ date('Y')}} &copy; Care One OS
     <a href="#" class="go-top">
       <!-- <i class="fa fa-angle-up"></i> -->
       <img src="{{  asset('public/images/scits_hand.png')}}" alt="system_guide" class="system_guide" height="25" width="auto" />
@@ -155,29 +155,29 @@
   // } );
 </script>
 <script>
-  // function childCourseData(){
-  //   $.ajax({
-  //       url: "{{ url('/proxy/courses') }}",
-  //       type: "GET",
-  //       success: function(response) {
-  //         console.log(response);
-  //         var courseHtml='<option selected disabled >Select Course</option>';
-  //         if(response.status === true){
-  //             var courseList=response.all_course_list;
-  //             courseList.forEach((val) =>{
-  //                 courseHtml+=`
-  //                     <option value="${val.title}" data-level="${val.level}" data-image="${val.image}" data-description="${val.description}" data-coursenumber="${val.coursenumber}">${val.title}</option>
-  //                 `;
-  //             });
-  //         }
-  //         $("#childCourse").html(courseHtml);
-  //       },
-  //       error: function(xhr) {
-  //           console.log("Error", xhr);
-  //       }
-  //   });
-  // }
-  function childCourseData(id = null, callback = null){
+//   function childCourseData(){
+//     $.ajax({
+//         url: "{{ url('/proxy/courses') }}",
+//         type: "GET",
+//         success: function(response) {
+//           console.log(response);
+//           var courseHtml='<option selected disabled >Select Course</option>';
+//           if(response.status === true){
+//               var courseList=response.all_course_list;
+//               courseList.forEach((val) =>{
+//                   courseHtml+=`
+//                       <option value="${val.title}" data-level="${val.level}" data-image="${val.image}" data-description="${val.description}" data-coursenumber="${val.coursenumber}">${val.title}</option>
+//                   `;
+//               });
+//           }
+//           $("#childCourse").html(courseHtml);
+//         },
+//         error: function(xhr) {
+//             console.log("Error", xhr);
+//         }
+//     });
+//   }
+function childCourseData(id = null, callback = null){
     $("#ClientModalTitle").text("Add Client");
     $("#clientFormSaveBtn").text("Create Client");
     if (callback){
@@ -202,6 +202,7 @@
           var courseHtml='';
           if(response.status === true){
               var courseList=response.all_course_list;
+              var courese_index = 0;
               courseList.forEach((val, key) => {
                     courseHtml += `
                         <div class="course-box" data-index="${key}">
@@ -214,17 +215,100 @@
                             <input type="hidden" data-name="courses[${key}][course_image]" value="${val.image}">
                             <input type="hidden" data-name="courses[${key}][description]" value="${val.description}">
                             <input type="hidden" data-name="courses[${key}][course_id]" value="${val.course_id}">
+                            <input type="hidden" data-name="courses[${key}][table_id]" value="" class="table_id_input">
+                            
+                        </div>
+                    `;
+                    courese_index = key;
+                });
+                courseHtml += `
+                        <div class="course-box" data-index="${courese_index+1}">
+                            <label>
+                                <input type="checkbox" class="course_qualificationsOther">Other
+                            </label>
+                        </div>
+                    `;
+                // <input type="file" class="qual_upload" data-name="courses[${key}][certificate]" disabled>
+          }
+          $(".su_usercheckbox-grid").html(courseHtml);
+          getCarerList(function(){
+              if (callback) callback();
+          });
+          // if (callback) callback();
+        },
+        error: function(xhr) {
+            console.log("Error", xhr);
+        }
+    });
+  }
+  function getCarerList(callback = null){
+    
+    $.ajax({
+        url: "{{ url('/roster/carer-list') }}",
+        type: "post",
+        success: function(response) {
+          // console.log(response);
+          // return false;
+          var carersHtml='';
+          if(response.status === true){
+              var carerList=response.data;
+              carerList.forEach((val, key) => {
+                    carersHtml += `
+                        <div class="carer-box" data-index="${key}">
+                            <label>
+                                <input type="checkbox" class="carer_checkbox" data-id="${val.id}">${val.name}
+                            </label>
+                            <input type="hidden" data-name="carers[${key}][id]" value="${val.id}">
+                            <input type="hidden" data-name="carers[${key}][table_id]" value="" class="table_carer_id">
                             
                         </div>
                     `;
                 });
-                // <input type="file" class="qual_upload" data-name="courses[${key}][certificate]" disabled>
+                
           }
-          $(".su_usercheckbox-grid").html(courseHtml);
+          $(".carer_checkbox-html").html(carersHtml);
           if (callback) callback();
         },
         error: function(xhr) {
             console.log("Error", xhr);
+        }
+    });
+  }
+  let deletedCarerIds = [];
+  $(document).on('change','.carer_checkbox',function(){
+    var carer_box = $(this).closest('.carer-box');
+    var tableId = carer_box.find('.table_carer_id').val();
+    if($(this).is(':checked')){
+      carer_box.find('[data-name]').each(function () {
+          $(this).attr('name', $(this).data('name'));
+      });
+      if (tableId) {
+          deletedCarerIds = deletedCarerIds.filter(id => id != tableId);
+      }
+    }else{
+      carer_box.find('[data-name]').each(function () {
+            $(this).removeAttr('name');
+        });
+        if (tableId) {
+            deletedCarerIds.push(tableId);
+        }
+    }
+    $('#deleted_carerIds').val(JSON.stringify(deletedCarerIds));
+  });
+  function autoCheckCarers(selectedCarers){
+    // console.log("carers::: ",selectedCarers);
+    $('.carer_checkbox').each(function () {
+        let carerCheckbox = $(this);
+        let id = carerCheckbox.data('id');
+        let carerMatched = selectedCarers.find(carer => carer.carer_id == id);
+        if (carerMatched) {
+            carerCheckbox.prop('checked', true);
+            let carerbox = carerCheckbox.closest('.carer-box');
+            carerbox.find('[data-name]').each(function () {
+                $(this).attr('name', $(this).data('name'));
+            });
+
+            carerbox.find('.table_carer_id').val(carerMatched.id);
         }
     });
   }

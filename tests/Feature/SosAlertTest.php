@@ -301,4 +301,147 @@ class SosAlertTest extends TestCase
 
         $response->assertStatus(422);
     }
+
+    public function test_trigger_with_middleware()
+    {
+        $admin = $this->loginAsAdmin();
+        $homeId = $this->getAdminHomeId($admin);
+
+        $this->withSession([]);
+        $token = csrf_token();
+
+        $admin->session_token = $token;
+        $admin->save();
+
+        $response = $this->post('/roster/sos-alert/trigger', [
+            '_token' => $token,
+            'message' => 'Middleware test emergency',
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJson(['success' => true]);
+    }
+
+    public function test_manager_bypass_middleware()
+    {
+        $manager = User::where('user_type', 'M')->where('is_deleted', 0)->first();
+        if (!$manager) {
+            $this->markTestSkipped('No manager user available');
+        }
+
+        $this->actingAs($manager);
+
+        $this->withSession([]);
+        $token = csrf_token();
+
+        $manager->session_token = $token;
+        $manager->save();
+
+        $response = $this->post('/roster/sos-alert/trigger', [
+            '_token' => $token,
+            'message' => 'Manager bypass test',
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJson(['success' => true]);
+    }
+
+    // === 5: API Endpoints Tests ===
+
+    public function test_api_trigger_creates_alert()
+    {
+        $admin = User::where('user_type', 'A')->where('is_deleted', 0)->first();
+        $homeId = $this->getAdminHomeId($admin);
+
+        $response = $this->postJson('/api/staff/sos-alert/trigger', [
+            'staff_id' => $admin->id,
+            'message' => 'API test emergency',
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJson(['success' => true]);
+
+        $this->assertDatabaseHas('sos_alerts', [
+            'staff_id' => $admin->id,
+            'home_id' => $homeId,
+            'message' => 'API test emergency',
+        ]);
+    }
+
+    public function test_api_list_returns_alerts()
+    {
+        $admin = User::where('user_type', 'A')->where('is_deleted', 0)->first();
+        $homeId = $this->getAdminHomeId($admin);
+
+        // Ensure at least one alert exists
+        $alert = sosAlert::create([
+            'staff_id' => $admin->id,
+            'home_id' => $homeId,
+            'location' => 'API Test Location',
+            'message' => 'API Temp Alert',
+            'status' => 1,
+        ]);
+
+        $response = $this->postJson('/api/staff/sos-alert/list', [
+            'home_id' => $homeId,
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJson(['success' => true]);
+        $response->assertJsonStructure([
+            'success',
+            'data' => [
+                '*' => ['id', 'staff_id', 'home_id', 'message', 'status']
+            ]
+        ]);
+
+        $data = $response->json('data');
+        $found = false;
+        foreach ($data as $item) {
+            if ($item['id'] == $alert->id) {
+                $this->assertEquals('Active', $item['status']);
+                $found = true;
+                break;
+            }
+        }
+        $this->assertTrue($found);
+
+        $alert->delete();
+    }
+
+    public function test_api_acknowledge_and_resolve()
+    {
+        $admin = User::where('user_type', 'A')->where('is_deleted', 0)->first();
+        $homeId = $this->getAdminHomeId($admin);
+
+        $alert = sosAlert::create([
+            'staff_id' => $admin->id,
+            'home_id' => $homeId,
+            'location' => 'Test API Location',
+            'status' => 1,
+        ]);
+
+        // Acknowledge
+        $response = $this->postJson('/api/staff/sos-alert/acknowledge', [
+            'id' => $alert->id,
+            'staff_id' => $admin->id,
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJson(['success' => true, 'message' => 'Alert acknowledged.']);
+        $this->assertEquals(2, sosAlert::find($alert->id)->status);
+
+        // Resolve
+        $response = $this->postJson('/api/staff/sos-alert/resolve', [
+            'id' => $alert->id,
+            'staff_id' => $admin->id,
+            'notes' => 'API resolve notes',
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJson(['success' => true, 'message' => 'Alert resolved.']);
+        $this->assertEquals(3, sosAlert::find($alert->id)->status);
+
+        $alert->delete();
+    }
 }

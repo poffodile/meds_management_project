@@ -815,8 +815,8 @@
                         <i class="fa fa-cloud-upload" style="font-size:36px;color:#999;"></i>
                         <p style="margin:10px 0 5px;">Drag & drop files here or click to browse</p>
                         <p class="text-muted" style="font-size:12px;">PDF or Word (.docx) &bull; Max 10MB each &bull; Multiple files allowed</p>
-                        <input type="file" id="nciFileInput" multiple accept=".pdf,.docx,.doc" style="display:none;">
                     </div>
+                    <input type="file" id="nciFileInput" multiple accept=".pdf,.docx,.doc" style="display:none;">
 
                     <div id="nciFileList" style="margin-top:15px;display:none;">
                         <h5>Uploaded Files</h5>
