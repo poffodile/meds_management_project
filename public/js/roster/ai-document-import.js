@@ -54,6 +54,10 @@ $(document).ready(function() {
         $('#pdfFileInput').click();
     });
 
+    $('#pdfFileInput').on('click', function(e) {
+        e.stopPropagation();
+    });
+
     dropZone.on('dragover', function(e) {
         e.preventDefault();
         e.stopPropagation();

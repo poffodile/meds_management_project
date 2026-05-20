@@ -34,6 +34,13 @@
             document.getElementById('nciFileInput').click();
         });
 
+        var fileInput = document.getElementById('nciFileInput');
+        if (fileInput) {
+            fileInput.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+        }
+
         dropZone.addEventListener('dragover', function(e) {
             e.preventDefault();
             e.stopPropagation();
