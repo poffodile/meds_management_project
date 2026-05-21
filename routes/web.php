@@ -374,6 +374,8 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 		Route::get('/child-courses/{childId}', [ClientController::class, 'child_courses']);
 		Route::post('/client-delete', [ClientController::class, 'client_delete']);
 		Route::post('/client-search', [ClientController::class, 'client_search']);
+		Route::post('/client/emergency-contact/save', [ClientController::class, 'emergency_contact_save'])->name('roster.client.emergency_contact.save');
+		Route::post('/client/emergency-contact/delete', [ClientController::class, 'emergency_contact_delete'])->name('roster.client.emergency_contact.delete');
 		Route::get('/care-task-add', [ClientController::class, 'care_task_add']);
 		Route::get('/care-task-edit', [ClientController::class, 'care_task_add']);
 		Route::post('/care-task-save', [ClientController::class, 'care_task_save']);
@@ -382,7 +384,7 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 		Route::post('/client/medication-log-save', [ClientController::class, 'medication_log_save'])->middleware('throttle:30,1');
 		Route::post('/client/medication-log-list', [ClientController::class, 'medication_log_list'])->middleware('throttle:30,1');
 		Route::post('/client/medication-log-delete', [ClientController::class, 'medication_log_delete'])->middleware('throttle:20,1');
-
+		Route::post('/client_active_status', [ClientController::class, 'client_active_status'])->name('roster.client_active_status');
 		// Client Alerts
 		Route::post('/client-alert-save', [ClientController::class, 'client_alert_save']);
 		Route::post('/client-alert-edit', [ClientController::class, 'client_alert_save']); // Uses same save method
@@ -478,6 +480,11 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 		Route::post('staffonboarding/loadUserDetails', [staffonboardingController::class, 'loadUserDetails'])->name('roster.staffonboarding.loadUserDetails');
 		Route::post('staffonboarding/loadforms', [staffonboardingController::class, 'loadforms'])->name('roster.staffonboarding.loadforms');
 		Route::post('staffonboarding/loadforms/save', [staffonboardingController::class, 'saveforms'])->name('roster.staffonboarding.saveforms');
+
+		// clientonboarding
+		Route::get('clientonboarding', [clientonboardingController::class, 'index']);
+		Route::get('clientonboarding/loadData', [clientonboardingController::class, 'loadData'])->name('roster.clientonboarding.loadData');
+		Route::post('clientonboarding/loadUserDetails', [clientonboardingController::class, 'loadUserDetails'])->name('roster.clientonboarding.loadUserDetails');
 	});
 
 	// Domiciliary Care Section

@@ -230,7 +230,7 @@
         <div class="topHeaderCont">
             <div>
                 <h1>{{$clientDetails['name']}}</h1>
-                <p class="header-subtitle"><span class="careBadg greenBadges me-2">active</span>
+                <p class="header-subtitle"><span class="careBadg greenBadges me-2">{{ $status }}</span>
                     <span>{{$status}}</span> local authority
                 </p>
             </div>
@@ -361,1075 +361,1210 @@
                                 <div class="medicationManagement" id="availabilityTab">
                                     <div class="availabilityTabs">
                                         <div class="availabilityTabs__nav">
-                                            <button class="availabilityTabs__tab borderBtn active" data-target="OnboardingTabPanel1" id="marSheetBtn">Client Progress </button>
-                                            <button class="availabilityTabs__tab borderBtn" data-target="OnboardingTabPanel2" id="onboardingForm">Onboarding Form</button>
+                                            <button class="availabilityTabs__tab borderBtn active"
+                                                data-target="OnboardingTabPanel1" id="marSheetBtn">Client Progress
+                                            </button>
+                                            <button class="availabilityTabs__tab borderBtn"
+                                                data-target="OnboardingTabPanel2" id="onboardingForm">Onboarding
+                                                Form</button>
                                         </div>
                                         <div class="availabilityTabs__content">
                                             <div class="availabilityTabs__panel active" id="OnboardingTabPanel1">
 
-                                                <div class="d-flex justify-content-between">
-                                                    <h5>Client Onboarding Progress </h5>
+                                                {{-- <div class="d-flex justify-content-between">
+                                                <h5>Client Onboarding Progress </h5>
+                                                <div>
+                                                    <span class="careBadg">Complete</span>
+                                                </div>
+                                            </div>
+                                            <div class="occupancyBox">
+                                                <div class="topRow">
+                                                    <span>Overall Progress</span>
+                                                    <span class="value" style="color:#272727">3/3 Complete</span>
+                                                </div>
+
+                                                <div class="progressBar">
+                                                    <div class="progressFill" style="width:100%;background:#2563eb"></div>
+                                                </div>
+                                            </div> --}}
+                                                <div class="bg-blue-50 rounded8 shadowp p-4">
+                                                    <div class="occupancyBox" style="border: none;">
+                                                        <div class="topRow">
+                                                            <span class="fs16 font600">Onboarding Progress</span>
+                                                            <span class="value f20 onboardingformprogresspercentage"
+                                                                style="color: #3376f2;">0%</span>
+                                                        </div>
+                                                        <div class="progressBar">
+                                                            <div class="progressFill onboardingformprogressfill"
+                                                                style="width:0%; background:#3376f2"></div>
+                                                        </div>
+                                                    </div>
+                                                    <p class="textGray500 fs13 onboardingformprogresstext">
+                                                    </p>
+                                                </div>
+                                                <div class="rounded8 shadowp p24 mt20 bg-greenp-50 d-none"
+                                                    id="activate_client_wrapper">
+                                                    <div class="flexBw">
+                                                        <div class="dFlexGap align-items-start">
+                                                            <i class="bx bx-check-circle greenText fs23"></i>
+                                                            <div class="greenText">
+                                                                <h6 class="h6Head font700 darkGreenTextp">Client
+                                                                    onboarding complete!
+                                                                    All stages approved.</h6>
+                                                                <p class="fs13 mb-0">Client can now be activated</p>
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <button class="bgBtn pgreenBtn activateClientBtn">Activate
+                                                                Client</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="recordSec" id="loadStagesData">
+
+                                                </div>
+                                                {{-- <div class="onboardingBox boardingToggle p-4 mt-4">
+                                                <div class="d-flex justify-content-between align-items-center">
                                                     <div>
-                                                        <span class="careBadg">Complete</span>
-                                                    </div>
-                                                </div>
-                                                <div class="occupancyBox">
-                                                    <div class="topRow">
-                                                        <span>Overall Progress</span>
-                                                        <span class="value" style="color:#272727">3/3 Complete</span>
-                                                    </div>
-
-                                                    <div class="progressBar">
-                                                        <div class="progressFill" style="width:100%;background:#2563eb"></div>
-                                                    </div>
-                                                </div>
-                                                <div class="onboardingBox boardingToggle p-4 mt-4">
-                                                    <div class="d-flex justify-content-between align-items-center">
-                                                        <div>
-                                                            <div class="d-flex gap-3">
-                                                                <div>
-                                                                    <i class="bx  bx-check-circle greenText"></i>
-                                                                </div>
-                                                                <div>
-                                                                    <h6 class="m-0">Consent & Capacity</h6>
-                                                                    <p class="header-subtitle mb-0">Completed: 09/01/2026</p>
-                                                                </div>
-
-                                                            </div>
-                                                        </div>
-                                                        <div class="d-flex gap-4 align-items-center">
+                                                        <div class="d-flex gap-3">
                                                             <div>
-                                                                <span class="careBadg">Complete</span>
+                                                                <i class="bx  bx-check-circle greenText"></i>
                                                             </div>
-                                                            <div class="eyeOnboard">
-                                                                <i class='bx  bx-eye'></i>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <!-- boarding click  Consent & Capacity -->
-                                                <div class="onboardContent d-none p-3">
-                                                    <div class="careTaskstbbg sectionWhiteBgAllUse p-0">
-                                                        <header class="panel-heading headingCapitilize greanHeaderbgClr">
-                                                            <div class="clientHeadung">
-                                                                <div class="onlyheadingmain"><i class='bx  bx-file greenText'></i> Consent Management </div>
-                                                                <p>Track client agreements and permissions</p>
-                                                            </div>
-
-                                                            <div class="actions mt-0">
-                                                                <button class="btn aiBtnThrd addConsentBtn" data-formType="add"> <i class='bx  bx-plus'></i> Add Consent</button>
-                                                            </div>
-                                                        </header>
-
-                                                        <div class="p-20">
-                                                            <div class="clientFilterform greanHeaderbgClr consentManagementSec consentRecordSectionFirst" style="display:none">
-
-                                                                <div class="createNewAlert"><i class='bx  bx-file'></i> Add New Consent Record </div>
-
-                                                                <form action="" class="addAlertForm">
-                                                                    <div class="row">
-                                                                        <div class="col-md-6">
-                                                                            <div class="form-group">
-                                                                                <label>Consent Type *</label>
-                                                                                <select class="form-control">
-                                                                                    <option>Single Day</option>
-                                                                                </select>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div class="col-md-6">
-                                                                            <div class="form-group">
-                                                                                <label>Consent Title *</label>
-                                                                                <input type="text" class="form-control" name="" placeholder="e.g., Consent to Administer Medication">
-                                                                            </div>
-                                                                        </div>
-                                                                        <div class="col-md-12">
-                                                                            <div class="form-group">
-                                                                                <label> Description *</label>
-                                                                                <textarea name="short_description" class="form-control" rows="3" cols="20" placeholder="Detailed description of what is being consented to"></textarea>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div class="col-md-6">
-                                                                            <div class="form-group">
-                                                                                <label>Status *</label>
-                                                                                <select class="form-control">
-                                                                                    <option>Single Day</option>
-                                                                                </select>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div class="col-md-6">
-                                                                            <div class="form-group">
-                                                                                <label>Date Granted</label>
-                                                                                <input type="date" class="form-control" name="" placeholder="">
-                                                                            </div>
-                                                                        </div>
-                                                                        <div class="col-md-6">
-                                                                            <div class="form-group">
-                                                                                <label>Expiry Date (Optional)</label>
-                                                                                <input type="date" class="form-control" name="" placeholder="">
-                                                                            </div>
-                                                                        </div>
-                                                                        <div class="col-md-6">
-                                                                            <div class="form-group">
-                                                                                <label>Granted By *</label>
-                                                                                <input type="text" class="form-control" name="" placeholder="Logan Jones">
-                                                                            </div>
-                                                                        </div>
-                                                                        <div class="col-md-6">
-                                                                            <div class="form-group">
-                                                                                <label>Relationship to Client</label>
-                                                                                <input type="text" class="form-control" name="" placeholder="">
-                                                                            </div>
-                                                                        </div>
-                                                                        <div class="col-md-6">
-                                                                            <div class="form-group">
-                                                                                <label>Witness Name (if applicable)</label>
-                                                                                <input type="text" class="form-control" name="" placeholder="">
-                                                                            </div>
-                                                                        </div>
-                                                                        <div class="col-md-6">
-                                                                            <div class="form-group">
-                                                                                <label>Witness Role</label>
-                                                                                <input type="text" class="form-control" name="" placeholder="">
-                                                                            </div>
-                                                                        </div>
-                                                                        <div class="col-md-12">
-                                                                            <div class="form-group">
-                                                                                <label>Additional Notes</label>
-                                                                                <textarea name="short_description" required="" class="form-control" rows="2" cols="20" placeholder="Specific actions staff should take..."></textarea>
-                                                                            </div>
-                                                                        </div>
-
-
-                                                                        <div class="col-md-12">
-                                                                            <div class="header-actions">
-                                                                                <button class="btn allbuttonDarkClr " type="submit"> Save Consent </button>
-                                                                                <button class="btn borderBtn closeConsentRecordBtn" type="button"> Cancel </button>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </form>
-                                                            </div>
-
-                                                            <div class="carePlanWrapper consentRecordSectionSecond">
-                                                                <div class="planCard greenLeftBorder m-t-20">
-                                                                    <div class="planTop">
-                                                                        <div class="planTitle">
-                                                                            Management
-                                                                            <span class="roundTag greenShowbtn">granted</span>
-                                                                            <span class="inactive roundTag">medication</span>
-                                                                        </div>
-                                                                        <div class="planActions IconFontSize">
-                                                                            <span><i class='bx  bx-check-circle greenText'></i></span>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="planMeta">
-                                                                        <div>Taken for one week during</div>
-                                                                    </div>
-                                                                    <div class="row medicationSheet">
-                                                                        <div class="col-md-6">
-                                                                            <div class="reasonBox">
-                                                                                <strong>Granted by:</strong> Logan Jonesdvv (selfdvdsv)
-                                                                            </div>
-                                                                        </div>
-                                                                        <div class="col-md-6">
-                                                                            <div class="reasonBox">
-                                                                                <strong>Date:</strong> Jan 7, 2026
-                                                                            </div>
-                                                                        </div>
-                                                                        <div class="col-md-6">
-                                                                            <div class="reasonBox">
-                                                                                <strong>Expires:</strong> Jan 14, 2026
-                                                                            </div>
-                                                                        </div>
-                                                                        <div class="col-md-6">
-                                                                            <div class="reasonBox">
-                                                                                <strong>Witnessed by:</strong> Taken for onen holiday.
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-
-                                                                    <div class="medicationSheet">
-                                                                        <div class="reasonBox">
-                                                                            <strong>Notes:</strong> Taken for one week during August to delay period whilst on holiday.
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="planCard greenLeftBorder m-t-20">
-                                                                    <div class="planTop">
-                                                                        <div class="planTitle">
-                                                                            Management
-                                                                            <span class="roundTag radShowbtn">refused</span>
-                                                                            <span class="inactive roundTag">other</span>
-                                                                        </div>
-                                                                        <div class="radIconClr IconFontSize ">
-                                                                            <span><i class='bx  bx-x-circle'></i> </span>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="planMeta">
-                                                                        <div>Taken for one week during</div>
-                                                                    </div>
-                                                                    <div class="row medicationSheet">
-                                                                        <div class="col-md-6">
-                                                                            <div class="reasonBox">
-                                                                                <strong>Granted by:</strong> Logan Jonesdvv (selfdvdsv)
-                                                                            </div>
-                                                                        </div>
-                                                                        <div class="col-md-6">
-                                                                            <div class="reasonBox">
-                                                                                <strong>Date:</strong> Jan 7, 2026
-                                                                            </div>
-                                                                        </div>
-                                                                        <div class="col-md-6">
-                                                                            <div class="reasonBox">
-                                                                                <strong>Expires:</strong> Jan 14, 2026
-                                                                            </div>
-                                                                        </div>
-                                                                        <div class="col-md-6">
-                                                                            <div class="reasonBox">
-                                                                                <strong>Witnessed by:</strong> Taken for onen holiday.
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-
-                                                                    <div class="medicationSheet">
-                                                                        <div class="reasonBox">
-                                                                            <strong>Notes:</strong> Taken for one week during August to delay period whilst on holiday.
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <!-- boarding click  Consent & Capacity end -->
-                                                <div class="onboardingBox boardingToggle p-4 mt-4">
-                                                    <div class="d-flex justify-content-between align-items-center">
-                                                        <div>
-                                                            <div class="d-flex gap-3">
-                                                                <div>
-                                                                    <i class="bx  bx-check-circle greenText"></i>
-                                                                </div>
-                                                                <div>
-                                                                    <h6 class="m-0">Care Assessment</h6>
-                                                                    <p class="header-subtitle mb-0">Completed: 09/01/2026</p>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="d-flex gap-4 align-items-center">
                                                             <div>
-                                                                <span class="careBadg">Complete</span>
+                                                                <h6 class="m-0">Consent & Capacity</h6>
+                                                                <p class="header-subtitle mb-0">Completed: 09/01/2026</p>
                                                             </div>
-                                                            <div class="eyeOnboard">
-                                                                <i class='bx  bx-eye'></i>
-                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                    <div class="d-flex gap-4 align-items-center">
+                                                        <div>
+                                                            <span class="careBadg">Complete</span>
+                                                        </div>
+                                                        <div class="eyeOnboard">
+                                                            <i class='bx  bx-eye'></i>
                                                         </div>
                                                     </div>
                                                 </div>
-
-                                                <!-- boarding click risk Assessment  -->
-                                                <div class="onboardContent d-none p-3">
-
-                                                    <div class="carePlanTabCont riskAssessmentSectionFirst">
-                                                        <div class="workHoursHeader">
-                                                            <div class="title"> Risk Assessments</div>
-                                                            <div class="actions">
-                                                                <button class="addAssessmentBtn"> <i class='bx  bx-plus'></i>Add Assessment</button>
-                                                            </div>
+                                            </div>
+                                            <!-- boarding click  Consent & Capacity -->
+                                            <div class="onboardContent d-none p-3">
+                                                <div class="careTaskstbbg sectionWhiteBgAllUse p-0">
+                                                    <header class="panel-heading headingCapitilize greanHeaderbgClr">
+                                                        <div class="clientHeadung">
+                                                            <div class="onlyheadingmain"><i class='bx  bx-file greenText'></i> Consent Management </div>
+                                                            <p>Track client agreements and permissions</p>
                                                         </div>
 
-                                                        <div class="carePlanWrapper">
-                                                            @forelse($risks ?? [] as $risk)
-                                                            @php
-                                                            $statusMap = [
-                                                            '1' => ['label' => 'historic', 'cls' => 'roundTag yellow'],
-                                                            '2' => ['label' => 'live', 'cls' => 'roundTag radShowbtn'],
-                                                            '3' => ['label' => 'no risk', 'cls' => 'roundTag greenTag'],
-                                                            ];
-                                                            $riskStatus = $statusMap[(string) $risk->status] ?? ['label' => 'unknown', 'cls' => 'roundTag'];
-                                                            $assessedDate = $risk->created_at ? date('M j, Y', strtotime($risk->created_at)) : '—';
-                                                            @endphp
-                                                            <div class="planCard borderleftOrange">
+                                                        <div class="actions mt-0">
+                                                            <button class="btn aiBtnThrd addConsentBtn" data-formType="add"> <i class='bx  bx-plus'></i> Add Consent</button>
+                                                        </div>
+                                                    </header>
+
+                                                    <div class="p-20">
+                                                        <div class="clientFilterform greanHeaderbgClr consentManagementSec consentRecordSectionFirst" style="display:none">
+
+                                                            <div class="createNewAlert"><i class='bx  bx-file'></i> Add New Consent Record </div>
+
+                                                            <form action="" class="addAlertForm">
+                                                                <div class="row">
+                                                                    <div class="col-md-6">
+                                                                        <div class="form-group">
+                                                                            <label>Consent Type *</label>
+                                                                            <select class="form-control">
+                                                                                <option>Single Day</option>
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <div class="form-group">
+                                                                            <label>Consent Title *</label>
+                                                                            <input type="text" class="form-control" name="" placeholder="e.g., Consent to Administer Medication">
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-12">
+                                                                        <div class="form-group">
+                                                                            <label> Description *</label>
+                                                                            <textarea name="short_description" class="form-control" rows="3" cols="20" placeholder="Detailed description of what is being consented to"></textarea>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <div class="form-group">
+                                                                            <label>Status *</label>
+                                                                            <select class="form-control">
+                                                                                <option>Single Day</option>
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <div class="form-group">
+                                                                            <label>Date Granted</label>
+                                                                            <input type="date" class="form-control" name="" placeholder="">
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <div class="form-group">
+                                                                            <label>Expiry Date (Optional)</label>
+                                                                            <input type="date" class="form-control" name="" placeholder="">
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <div class="form-group">
+                                                                            <label>Granted By *</label>
+                                                                            <input type="text" class="form-control" name="" placeholder="Logan Jones">
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <div class="form-group">
+                                                                            <label>Relationship to Client</label>
+                                                                            <input type="text" class="form-control" name="" placeholder="">
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <div class="form-group">
+                                                                            <label>Witness Name (if applicable)</label>
+                                                                            <input type="text" class="form-control" name="" placeholder="">
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <div class="form-group">
+                                                                            <label>Witness Role</label>
+                                                                            <input type="text" class="form-control" name="" placeholder="">
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-12">
+                                                                        <div class="form-group">
+                                                                            <label>Additional Notes</label>
+                                                                            <textarea name="short_description" required="" class="form-control" rows="2" cols="20" placeholder="Specific actions staff should take..."></textarea>
+                                                                        </div>
+                                                                    </div>
+
+
+                                                                    <div class="col-md-12">
+                                                                        <div class="header-actions">
+                                                                            <button class="btn allbuttonDarkClr " type="submit"> Save Consent </button>
+                                                                            <button class="btn borderBtn closeConsentRecordBtn" type="button"> Cancel </button>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+
+                                                        <div class="carePlanWrapper consentRecordSectionSecond">
+                                                            <div class="planCard greenLeftBorder m-t-20">
                                                                 <div class="planTop">
                                                                     <div class="planTitle">
-                                                                        <span class="statIcon heartIcon iconorange"><i class="bx  bx-alert-triangle"></i> </span>
-                                                                        {{ $risk->description }}
-                                                                        <span class="{{ $riskStatus['cls'] }}">{{ $riskStatus['label'] }}</span>
+                                                                        Management
+                                                                        <span class="roundTag greenShowbtn">granted</span>
+                                                                        <span class="inactive roundTag">medication</span>
                                                                     </div>
-                                                                    <div class="planActions">
-                                                                        <button class="realRiskBodyMapBtn" data-su-risk-id="{{ $risk->id }}" title="Open Body Map"><i class="bx  bx-body"></i> </button>
+                                                                    <div class="planActions IconFontSize">
+                                                                        <span><i class='bx  bx-check-circle greenText'></i></span>
                                                                     </div>
                                                                 </div>
                                                                 <div class="planMeta">
-                                                                    <div><strong>Assessed: </strong> {{ $assessedDate }}</div>
+                                                                    <div>Taken for one week during</div>
                                                                 </div>
-                                                            </div>
-                                                            @empty
-                                                            <div class="planCard">
-                                                                <div class="planFooter">
-                                                                    <span>No risk assessments recorded for this client yet.</span>
-                                                                </div>
-                                                            </div>
-                                                            @endforelse
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="riskAssessmentSectionSecond" style="display:none">
-
-                                                        <div class="topHeaderCont">
-                                                            <div>
-                                                                <button class="btn borderBtn backBtn" id="riskAssesmentBackBtn"><i class='bx  bx-arrow-left-stroke'></i> Back </button>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="generalRiskAssessment">
-                                                            <!-- Header -->
-                                                            <div class="riskHeader">
-                                                                <div class="titleWrap">
-                                                                    <span class="warnIcon">⚠</span>
-                                                                    <h2>General Risk Assessment</h2>
-                                                                </div>
-                                                                <span class="riskLevel">high risk</span>
-                                                            </div>
-                                                            <div class="riskMeta">
-                                                                <div>
-                                                                    <p><strong>Assessed:</strong> December 16th, 2025</p>
-                                                                    <p><strong>Review Date:</strong> March 16th, 2026</p>
-                                                                </div>
-                                                                <div>
-                                                                    <p><strong>By:</strong> AI Import</p>
-                                                                    <p><strong>Status:</strong> active</p>
-                                                                </div>
-                                                            </div>
-                                                            <div class="riskSection">
-                                                                <h4>Risk Identified</h4>
-                                                                <div class="infoBox">
-                                                                    <p> Substance misuse: Concerns around purchasing and taking various substances, an incident regarding substance misuse in July.
-                                                                        Vaping (e-cigarette use) with declining cessation support. ADHD medication is withheld due to substance concerns. </p>
-                                                                </div>
-                                                            </div>
-                                                            <div class="riskSection">
-                                                                <h4>Existing Controls</h4>
-                                                                <div class="controlItem">
-                                                                    <p>Ongoing YPDAAT support and keywork sessions</p>
-                                                                    <span class="statusTag">effective</span>
-                                                                </div>
-                                                                <div class="controlItem">
-                                                                    <p>Education on risks of substance misuse</p>
-                                                                    <span class="statusTag">effective</span>
-                                                                </div>
-                                                                <div class="controlItem">
-                                                                    <p>Support attending health appointments related to substance misuse</p>
-                                                                    <span class="statusTag">effective</span>
-                                                                </div>
-                                                                <div class="controlItem">
-                                                                    <p>Liaison with Alex Fanning from YPDAAT</p>
-                                                                    <span class="statusTag">effective</span>
-                                                                </div>
-                                                                <div class="controlItem">
-                                                                    <p>Withholding ADHD medication</p>
-                                                                    <span class="statusTag">effective</span>
-                                                                </div>
-                                                                <div class="controlItem">
-                                                                    <p>Not supporting time with certain friends (Liv, Sophie, Lilly, Maggie, Stevie, Mia, Ellie)</p>
-                                                                    <span class="statusTag">effective</span>
-                                                                </div>
-                                                            </div>
-                                                            <div class="riskSection">
-                                                                <h4>Additional Controls Required</h4>
-                                                            </div>
-                                                        </div>
-
-                                                    </div>
-
-
-
-                                                </div>
-                                                <!-- boarding click risk Assessment end  -->
-
-                                                <div class="onboardingBox boardingToggle p-4 mt-4">
-                                                    <div class="d-flex justify-content-between align-items-center">
-                                                        <div>
-                                                            <div class="d-flex gap-3">
-                                                                <div>
-                                                                    <i class="bx  bx-check-circle greenText"></i>
-                                                                </div>
-                                                                <div>
-                                                                    <h6 class="m-0">Care Plan</h6>
-                                                                    <p class="header-subtitle mb-0">Completed: 09/01/2026</p>
-                                                                </div>
-
-                                                            </div>
-                                                        </div>
-                                                        <div class="d-flex gap-4 align-items-center">
-                                                            <div>
-                                                                <span class="careBadg">Complete</span>
-                                                            </div>
-                                                            <div class="eyeOnboard">
-                                                                <i class='bx  bx-eye'></i>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <!-- boarding click Care plan  -->
-                                                <div class="onboardContent d-none p-3">
-
-
-
-                                                    <div class="carePlanTabCont carePlanBtnSectionFirst">
-                                                        <div class="workHoursHeader">
-                                                            <div class="title"><i class='bx  bx-heart'></i> Care Plans</div>
-                                                            <div class="actions">
-                                                                <button class="allBtnUseColor" data-toggle="modal" data-target="#addcreateCarePlanModal"> <i class='bx  bx-plus'></i> Create Care Plan</button>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="carePlanWrapper">
-
-                                                            <!-- Active Plan Summary -->
-                                                            <div class="activePlanCard">
-                                                                <div class="activePlanHeader">
-                                                                    <div class="leftInfo">
-                                                                        <span class="activeBadge">Active Plan</span>
-                                                                        <span class="assessedDate">Assessed Dec 19, 2025</span>
+                                                                <div class="row medicationSheet">
+                                                                    <div class="col-md-6">
+                                                                        <div class="reasonBox">
+                                                                            <strong>Granted by:</strong> Logan Jonesdvv (selfdvdsv)
+                                                                        </div>
                                                                     </div>
-                                                                    <button class="viewPlanBtn">
-                                                                        View Full Plan <span>›</span>
-                                                                    </button>
+                                                                    <div class="col-md-6">
+                                                                        <div class="reasonBox">
+                                                                            <strong>Date:</strong> Jan 7, 2026
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <div class="reasonBox">
+                                                                            <strong>Expires:</strong> Jan 14, 2026
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <div class="reasonBox">
+                                                                            <strong>Witnessed by:</strong> Taken for onen holiday.
+                                                                        </div>
+                                                                    </div>
                                                                 </div>
 
+                                                                <div class="medicationSheet">
+                                                                    <div class="reasonBox">
+                                                                        <strong>Notes:</strong> Taken for one week during August to delay period whilst on holiday.
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="planCard greenLeftBorder m-t-20">
+                                                                <div class="planTop">
+                                                                    <div class="planTitle">
+                                                                        Management
+                                                                        <span class="roundTag radShowbtn">refused</span>
+                                                                        <span class="inactive roundTag">other</span>
+                                                                    </div>
+                                                                    <div class="radIconClr IconFontSize ">
+                                                                        <span><i class='bx  bx-x-circle'></i> </span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="planMeta">
+                                                                    <div>Taken for one week during</div>
+                                                                </div>
+                                                                <div class="row medicationSheet">
+                                                                    <div class="col-md-6">
+                                                                        <div class="reasonBox">
+                                                                            <strong>Granted by:</strong> Logan Jonesdvv (selfdvdsv)
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <div class="reasonBox">
+                                                                            <strong>Date:</strong> Jan 7, 2026
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <div class="reasonBox">
+                                                                            <strong>Expires:</strong> Jan 14, 2026
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <div class="reasonBox">
+                                                                            <strong>Witnessed by:</strong> Taken for onen holiday.
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="medicationSheet">
+                                                                    <div class="reasonBox">
+                                                                        <strong>Notes:</strong> Taken for one week during August to delay period whilst on holiday.
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- boarding click  Consent & Capacity end -->
+                                            <div class="onboardingBox boardingToggle p-4 mt-4">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <div class="d-flex gap-3">
+                                                            <div>
+                                                                <i class="bx  bx-check-circle greenText"></i>
+                                                            </div>
+                                                            <div>
+                                                                <h6 class="m-0">Care Assessment</h6>
+                                                                <p class="header-subtitle mb-0">Completed: 09/01/2026</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="d-flex gap-4 align-items-center">
+                                                        <div>
+                                                            <span class="careBadg">Complete</span>
+                                                        </div>
+                                                        <div class="eyeOnboard">
+                                                            <i class='bx  bx-eye'></i>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- boarding click risk Assessment  -->
+                                            <div class="onboardContent d-none p-3">
+
+                                                <div class="carePlanTabCont riskAssessmentSectionFirst">
+                                                    <div class="workHoursHeader">
+                                                        <div class="title"> Risk Assessments</div>
+                                                        <div class="actions">
+                                                            <button class="addAssessmentBtn"> <i class='bx  bx-plus'></i>Add Assessment</button>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="carePlanWrapper">
+                                                        <div class="planCard borderleftOrange">
+                                                            <div class="planTop">
+                                                                <div class="planTitle">
+                                                                    <!-- <span class="heartIcon"><i class="bx  bx-heart"></i></span> -->
+                                                                    <span class="statIcon heartIcon iconorange"><i class="bx  bx-alert-triangle"></i> </span>
+                                                                    general
+                                                                    <span class="roundTag radShowbtn">high</span>
+                                                                </div>
+                                                                <div class="planActions">
+                                                                    <button class="riskAssessmentDeatils"><i class="bx  bx-eye"></i> </button>
+                                                                    <button class="danger"><i class="bx  bx-trash"></i> </button>
+                                                                </div>
+                                                            </div>
+                                                            <div class="planFooter">
+                                                                <span>Substance misuse: Concerns around purchasing and taking various substances, an incident regarding substance misuse in July. Vaping (e-cigarette use) with declining cessation support. ADHD medication is withheld due to substance concerns.</span>
+                                                            </div>
+                                                            <div class="planMeta">
+                                                                <div><strong>Assessed: </strong> Dec 16, 2025</div>
+                                                                <div><strong>Review: </strong> Mar 16, 2026</div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="planCard borderleftOrange">
+                                                            <div class="planTop">
+                                                                <div class="planTitle">
+                                                                    <!-- <span class="heartIcon"><i class="bx  bx-heart"></i></span> -->
+                                                                    <span class="statIcon heartIcon iconorange"><i class="bx  bx-alert-triangle"></i> </span>
+                                                                    general
+                                                                    <span class="roundTag yellow">medium</span>
+                                                                </div>
+                                                                <div class="planActions">
+                                                                    <button class="riskAssessmentDeatils"><i class="bx  bx-eye"></i> </button>
+                                                                    <button class="danger"><i class="bx  bx-trash"></i> </button>
+                                                                </div>
+                                                            </div>
+                                                            <div class="planFooter">
+                                                                <span>Dental health: Overdue for dental check-ups and has refused recent reviews due to a fear of the dentist. History of multiple dental procedures.</span>
+                                                            </div>
+                                                            <div class="planMeta">
+                                                                <div><strong>Assessed: </strong> Dec 16, 2025</div>
+                                                                <div><strong>Review: </strong> Mar 16, 2026</div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="planCard borderleftOrange">
+                                                            <div class="planTop">
+                                                                <div class="planTitle">
+                                                                    <!-- <span class="heartIcon"><i class="bx  bx-heart"></i></span> -->
+                                                                    <span class="statIcon heartIcon iconorange"><i class="bx  bx-alert-triangle"></i> </span>
+                                                                    general
+                                                                    <span class="roundTag radShowbtn">high</span>
+                                                                </div>
+                                                                <div class="planActions">
+                                                                    <button class="riskAssessmentDeatils"><i class="bx  bx-eye"></i> </button>
+                                                                    <button class="danger"><i class="bx  bx-trash"></i> </button>
+                                                                </div>
+                                                            </div>
+                                                            <div class="planFooter">
+                                                                <span>Substance misuse: Concerns around purchasing and taking various substances, an incident regarding substance misuse in July. Vaping (e-cigarette use) with declining cessation support. ADHD medication is withheld due to substance concerns.</span>
+                                                            </div>
+                                                            <div class="planMeta">
+                                                                <div><strong>Assessed: </strong> Dec 16, 2025</div>
+                                                                <div><strong>Review: </strong> Mar 16, 2026</div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="planCard borderleftOrange">
+                                                            <div class="planTop">
+                                                                <div class="planTitle">
+                                                                    <!-- <span class="heartIcon"><i class="bx  bx-heart"></i></span> -->
+                                                                    <span class="statIcon heartIcon iconorange"><i class="bx  bx-alert-triangle"></i> </span>
+                                                                    general
+                                                                    <span class="roundTag yellow">medium</span>
+                                                                </div>
+                                                                <div class="planActions">
+                                                                    <button class="riskAssessmentDeatils"><i class="bx  bx-eye"></i> </button>
+                                                                    <button class="danger"><i class="bx  bx-trash"></i> </button>
+                                                                </div>
+                                                            </div>
+                                                            <div class="planFooter">
+                                                                <span>Dental health: Overdue for dental check-ups and has refused recent reviews due to a fear of the dentist. History of multiple dental procedures.</span>
+                                                            </div>
+                                                            <div class="planMeta">
+                                                                <div><strong>Assessed: </strong> Dec 16, 2025</div>
+                                                                <div><strong>Review: </strong> Mar 16, 2026</div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="planCard borderleftOrange">
+                                                            <div class="planTop">
+                                                                <div class="planTitle">
+                                                                    <!-- <span class="heartIcon"><i class="bx  bx-heart"></i></span> -->
+                                                                    <span class="statIcon heartIcon iconorange"><i class="bx  bx-alert-triangle"></i> </span>
+                                                                    general
+                                                                    <span class="roundTag radShowbtn">high</span>
+                                                                </div>
+                                                                <div class="planActions">
+                                                                    <button class="riskAssessmentDeatils"><i class="bx  bx-eye"></i> </button>
+                                                                    <button class="danger"><i class="bx  bx-trash"></i> </button>
+                                                                </div>
+                                                            </div>
+                                                            <div class="planFooter">
+                                                                <span>Substance misuse: Concerns around purchasing and taking various substances, an incident regarding substance misuse in July. Vaping (e-cigarette use) with declining cessation support. ADHD medication is withheld due to substance concerns.</span>
+                                                            </div>
+                                                            <div class="planMeta">
+                                                                <div><strong>Assessed: </strong> Dec 16, 2025</div>
+                                                                <div><strong>Review: </strong> Mar 16, 2026</div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="planCard borderleftOrange">
+                                                            <div class="planTop">
+                                                                <div class="planTitle">
+                                                                    <!-- <span class="heartIcon"><i class="bx  bx-heart"></i></span> -->
+                                                                    <span class="statIcon heartIcon iconorange"><i class="bx  bx-alert-triangle"></i> </span>
+                                                                    general
+                                                                    <span class="roundTag yellow">medium</span>
+                                                                </div>
+                                                                <div class="planActions">
+                                                                    <button class="riskAssessmentDeatils"><i class="bx  bx-eye"></i> </button>
+                                                                    <button class="danger"><i class="bx  bx-trash"></i> </button>
+                                                                </div>
+                                                            </div>
+                                                            <div class="planFooter">
+                                                                <span>Dental health: Overdue for dental check-ups and has refused recent reviews due to a fear of the dentist. History of multiple dental procedures.</span>
+                                                            </div>
+                                                            <div class="planMeta">
+                                                                <div><strong>Assessed: </strong> Dec 16, 2025</div>
+                                                                <div><strong>Review: </strong> Mar 16, 2026</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="riskAssessmentSectionSecond" style="display:none">
+
+                                                    <div class="topHeaderCont">
+                                                        <div>
+                                                            <button class="btn borderBtn backBtn" id="riskAssesmentBackBtn"><i class='bx  bx-arrow-left-stroke'></i> Back </button>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="generalRiskAssessment">
+                                                        <!-- Header -->
+                                                        <div class="riskHeader">
+                                                            <div class="titleWrap">
+                                                                <span class="warnIcon">⚠</span>
+                                                                <h2>General Risk Assessment</h2>
+                                                            </div>
+                                                            <span class="riskLevel">high risk</span>
+                                                        </div>
+                                                        <div class="riskMeta">
+                                                            <div>
+                                                                <p><strong>Assessed:</strong> December 16th, 2025</p>
+                                                                <p><strong>Review Date:</strong> March 16th, 2026</p>
+                                                            </div>
+                                                            <div>
+                                                                <p><strong>By:</strong> AI Import</p>
+                                                                <p><strong>Status:</strong> active</p>
+                                                            </div>
+                                                        </div>
+                                                        <div class="riskSection">
+                                                            <h4>Risk Identified</h4>
+                                                            <div class="infoBox">
+                                                                <p> Substance misuse: Concerns around purchasing and taking various substances, an incident regarding substance misuse in July.
+                                                                    Vaping (e-cigarette use) with declining cessation support. ADHD medication is withheld due to substance concerns. </p>
+                                                            </div>
+                                                        </div>
+                                                        <div class="riskSection">
+                                                            <h4>Existing Controls</h4>
+                                                            <div class="controlItem">
+                                                                <p>Ongoing YPDAAT support and keywork sessions</p>
+                                                                <span class="statusTag">effective</span>
+                                                            </div>
+                                                            <div class="controlItem">
+                                                                <p>Education on risks of substance misuse</p>
+                                                                <span class="statusTag">effective</span>
+                                                            </div>
+                                                            <div class="controlItem">
+                                                                <p>Support attending health appointments related to substance misuse</p>
+                                                                <span class="statusTag">effective</span>
+                                                            </div>
+                                                            <div class="controlItem">
+                                                                <p>Liaison with Alex Fanning from YPDAAT</p>
+                                                                <span class="statusTag">effective</span>
+                                                            </div>
+                                                            <div class="controlItem">
+                                                                <p>Withholding ADHD medication</p>
+                                                                <span class="statusTag">effective</span>
+                                                            </div>
+                                                            <div class="controlItem">
+                                                                <p>Not supporting time with certain friends (Liv, Sophie, Lilly, Maggie, Stevie, Mia, Ellie)</p>
+                                                                <span class="statusTag">effective</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="riskSection">
+                                                            <h4>Additional Controls Required</h4>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+
+
+
+                                            </div>
+                                            <!-- boarding click risk Assessment end  -->
+
+                                            <div class="onboardingBox boardingToggle p-4 mt-4">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <div class="d-flex gap-3">
+                                                            <div>
+                                                                <i class="bx  bx-check-circle greenText"></i>
+                                                            </div>
+                                                            <div>
+                                                                <h6 class="m-0">Care Plan</h6>
+                                                                <p class="header-subtitle mb-0">Completed: 09/01/2026</p>
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                    <div class="d-flex gap-4 align-items-center">
+                                                        <div>
+                                                            <span class="careBadg">Complete</span>
+                                                        </div>
+                                                        <div class="eyeOnboard">
+                                                            <i class='bx  bx-eye'></i>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- boarding click Care plan  -->
+                                            <div class="onboardContent d-none p-3">
+
+
+
+                                                <div class="carePlanTabCont carePlanBtnSectionFirst">
+                                                    <div class="workHoursHeader">
+                                                        <div class="title"><i class='bx  bx-heart'></i> Care Plans</div>
+                                                        <div class="actions">
+                                                            <button class="allBtnUseColor" data-toggle="modal" data-target="#addcreateCarePlanModal"> <i class='bx  bx-plus'></i> Create Care Plan</button>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="carePlanWrapper">
+
+                                                        <!-- Active Plan Summary -->
+                                                        <div class="activePlanCard">
+                                                            <div class="activePlanHeader">
+                                                                <div class="leftInfo">
+                                                                    <span class="activeBadge">Active Plan</span>
+                                                                    <span class="assessedDate">Assessed Dec 19, 2025</span>
+                                                                </div>
+                                                                <button class="viewPlanBtn">
+                                                                    View Full Plan <span>›</span>
+                                                                </button>
+                                                            </div>
+
+                                                            <div class="activePlanStats">
+                                                                <div class="statItem">
+                                                                    <span class="statIcon iconblue"><i class='bx  bx-radio-circle-marked'></i> </span>
+                                                                    <div>
+                                                                        <div class="statLabel">Objectives</div>
+                                                                        <div class="statValue">5</div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="statItem">
+                                                                    <span class="statIcon iconpurple"><i class='bx  bx-checklist'></i> </span>
+                                                                    <div>
+                                                                        <div class="statLabel">Tasks</div>
+                                                                        <div class="statValue">5</div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="statItem">
+                                                                    <span class="statIcon iconpink"><i class='bx  bx-pill'></i> </span>
+                                                                    <div>
+                                                                        <div class="statLabel">Medications</div>
+                                                                        <div class="statValue">6</div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="statItem">
+                                                                    <span class="statIcon iconorange"><i class='bx  bx-alert-triangle'></i> </span>
+                                                                    <div>
+                                                                        <div class="statLabel">Risk Factors</div>
+                                                                        <div class="statValue">4</div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- Care Plan Card -->
+                                                        <div class="planCard">
+                                                            <div class="planTop">
+                                                                <div class="planTitle">
+                                                                    <span class="heartIcon"><i class='bx  bx-heart'></i></span>
+                                                                    Initial Care Plan
+                                                                    <span class="draftBadge">draft</span>
+                                                                </div>
+                                                                <div class="planActions">
+                                                                    <button class="viewPlanBtn"><i class='bx  bx-eye'></i> </button>
+                                                                    <button><i class='bx  bx-pencil'></i> </button>
+                                                                    <button class="danger"><i class='bx  bx-trash'></i> </button>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="planMeta">
+                                                                <div><strong>Setting:</strong> residential</div>
+                                                                <div><strong>Assessed:</strong> Jan 3, 2026</div>
+                                                                <div><strong>By:</strong> Pratima Pathak</div>
+                                                                <div><strong>Review:</strong> Apr 3, 2026</div>
+                                                            </div>
+
+                                                            <div class="planFooter">
+                                                                <span><i class='bx  bx-radio-circle-marked'></i> 5 objectives</span>
+                                                                <span><i class='bx  bx-list'></i> 0 tasks</span>
+                                                                <span><i class='bx  bx-pill'></i> 6 medications</span>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="planCard">
+                                                            <div class="planTop">
+                                                                <div class="planTitle">
+                                                                    <span class="heartIcon"><i class='bx  bx-heart'></i></span>
+                                                                    Initial Care Plan
+                                                                    <span class="draftBadge">draft</span>
+                                                                </div>
+
+                                                                <div class="planActions">
+                                                                    <button class="viewPlanBtn"><i class='bx  bx-eye'></i> </button>
+                                                                    <button><i class='bx  bx-pencil'></i> </button>
+                                                                    <button class="danger"><i class='bx  bx-trash'></i> </button>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="planMeta">
+                                                                <div><strong>Setting:</strong> residential</div>
+                                                                <div><strong>Assessed:</strong> Jan 3, 2026</div>
+                                                                <div><strong>By:</strong> Pratima Pathak</div>
+                                                                <div><strong>Review:</strong> Apr 3, 2026</div>
+                                                            </div>
+
+                                                            <div class="planFooter">
+                                                                <span><i class='bx  bx-radio-circle-marked'></i> 5 objectives</span>
+                                                                <span><i class='bx  bx-list'></i> 0 tasks</span>
+                                                                <span><i class='bx  bx-pill'></i> 6 medications</span>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="planCard">
+                                                            <div class="planTop">
+                                                                <div class="planTitle">
+                                                                    <span class="heartIcon"><i class='bx  bx-heart'></i></span>
+                                                                    Initial Care Plan
+                                                                    <span class="draftBadge">draft</span>
+                                                                </div>
+
+                                                                <div class="planActions">
+                                                                    <button class="viewPlanBtn"><i class='bx  bx-eye'></i> </button>
+                                                                    <button><i class='bx  bx-pencil'></i> </button>
+                                                                    <button class="danger"><i class='bx  bx-trash'></i> </button>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="planMeta">
+                                                                <div><strong>Setting:</strong> residential</div>
+                                                                <div><strong>Assessed:</strong> Jan 3, 2026</div>
+                                                                <div><strong>By:</strong> Pratima Pathak</div>
+                                                                <div><strong>Review:</strong> Apr 3, 2026</div>
+                                                            </div>
+
+                                                            <div class="planFooter">
+                                                                <span><i class='bx  bx-radio-circle-marked'></i> 5 objectives</span>
+                                                                <span><i class='bx  bx-list'></i> 0 tasks</span>
+                                                                <span><i class='bx  bx-pill'></i> 6 medications</span>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="planCard">
+                                                            <div class="planTop">
+                                                                <div class="planTitle">
+                                                                    <span class="heartIcon"><i class='bx  bx-heart'></i></span>
+                                                                    Initial Care Plan
+                                                                    <span class="draftBadge">draft</span>
+                                                                </div>
+
+                                                                <div class="planActions">
+                                                                    <button><i class='bx  bx-eye'></i> </button>
+                                                                    <button><i class='bx  bx-pencil'></i> </button>
+                                                                    <button class="danger"><i class='bx  bx-trash'></i> </button>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="planMeta">
+                                                                <div><strong>Setting:</strong> residential</div>
+                                                                <div><strong>Assessed:</strong> Jan 3, 2026</div>
+                                                                <div><strong>By:</strong> Pratima Pathak</div>
+                                                                <div><strong>Review:</strong> Apr 3, 2026</div>
+                                                            </div>
+
+                                                            <div class="planFooter">
+                                                                <span><i class='bx  bx-radio-circle-marked'></i> 5 objectives</span>
+                                                                <span><i class='bx  bx-list'></i> 0 tasks</span>
+                                                                <span><i class='bx  bx-pill'></i> 6 medications</span>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="planCard">
+                                                            <div class="planTop">
+                                                                <div class="planTitle">
+                                                                    <span class="heartIcon"><i class='bx  bx-heart'></i></span>
+                                                                    Initial Care Plan
+                                                                    <span class="draftBadge">draft</span>
+                                                                </div>
+
+                                                                <div class="planActions">
+                                                                    <button><i class='bx  bx-eye'></i> </button>
+                                                                    <button><i class='bx  bx-pencil'></i> </button>
+                                                                    <button class="danger"><i class='bx  bx-trash'></i> </button>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="planMeta">
+                                                                <div><strong>Setting:</strong> residential</div>
+                                                                <div><strong>Assessed:</strong> Jan 3, 2026</div>
+                                                                <div><strong>By:</strong> Pratima Pathak</div>
+                                                                <div><strong>Review:</strong> Apr 3, 2026</div>
+                                                            </div>
+
+                                                            <div class="planFooter">
+                                                                <span><i class='bx  bx-radio-circle-marked'></i> 5 objectives</span>
+                                                                <span><i class='bx  bx-list'></i> 0 tasks</span>
+                                                                <span><i class='bx  bx-pill'></i> 6 medications</span>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="planCard">
+                                                            <div class="planTop">
+                                                                <div class="planTitle">
+                                                                    <span class="heartIcon"><i class='bx  bx-heart'></i></span>
+                                                                    Initial Care Plan
+                                                                    <span class="draftBadge">draft</span>
+                                                                </div>
+
+                                                                <div class="planActions">
+                                                                    <button><i class='bx  bx-eye'></i> </button>
+                                                                    <button><i class='bx  bx-pencil'></i> </button>
+                                                                    <button class="danger"><i class='bx  bx-trash'></i> </button>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="planMeta">
+                                                                <div><strong>Setting:</strong> residential</div>
+                                                                <div><strong>Assessed:</strong> Jan 3, 2026</div>
+                                                                <div><strong>By:</strong> Pratima Pathak</div>
+                                                                <div><strong>Review:</strong> Apr 3, 2026</div>
+                                                            </div>
+
+                                                            <div class="planFooter">
+                                                                <span><i class='bx  bx-radio-circle-marked'></i> 5 objectives</span>
+                                                                <span><i class='bx  bx-list'></i> 0 tasks</span>
+                                                                <span><i class='bx  bx-pill'></i> 6 medications</span>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+
+                                                </div>
+
+
+                                                <div class="carePlanBtnSectionSecond" style="display: none;">
+                                                    <div class="topHeaderCont">
+                                                        <div>
+                                                            <button class="btn borderBtn backBtn" id="planBackBtn"><i class='bx  bx-arrow-left-stroke'></i> Back to Care Plans</button>
+                                                        </div>
+                                                        <div class="header-actions addnewicons">
+                                                            <button class="btn allbuttonDarkClr"> Standard View</button>
+                                                            <button class="btn borderBtn purpleBorderBtn"> CQC Print Format</button>
+                                                            <button class="btn borderBtn blueBorderBtn"><i class='bx  bx-printer'></i> Print </button>
+                                                            <button class="btn borderBtn greenBorderBtn"><i class='bx  bx-arrow-in-up-square-half'></i> Export PDF </button>
+                                                            <button class="btn allBtnUseColor"><i class='bx  bx-edit'></i> Edit Plan</button>
+                                                        </div>
+                                                    </div>
+                                                    <div class="CarePlanAllObjective" style="display: ;">
+                                                        <div class="assessmentDetails leave-card p-0">
+                                                            <header class="panel-heading headingCapitilize careTaskheader">
+                                                                <div class="clientHeadung">
+                                                                    <div class="onlyheadingmain blueIconClr"><i class='bx  bx-heart'></i> Care Plan - Logan Jones </div>
+                                                                    <p>initial Assessment • residential care</p>
+                                                                </div>
+                                                                <div class="actions mt-0">
+                                                                    <span class="roundBtntag greenShowbtn"> Active </span>
+                                                                </div>
+                                                            </header>
+                                                            <div class="assessmentDateAndVersion carePlanWrapper">
                                                                 <div class="activePlanStats">
                                                                     <div class="statItem">
-                                                                        <span class="statIcon iconblue"><i class='bx  bx-radio-circle-marked'></i> </span>
                                                                         <div>
-                                                                            <div class="statLabel">Objectives</div>
-                                                                            <div class="statValue">5</div>
+                                                                            <div class="statLabel">Assessment Date</div>
+                                                                            <div class="statValue">December 19th, 2025</div>
                                                                         </div>
                                                                     </div>
                                                                     <div class="statItem">
-                                                                        <span class="statIcon iconpurple"><i class='bx  bx-checklist'></i> </span>
                                                                         <div>
-                                                                            <div class="statLabel">Tasks</div>
-                                                                            <div class="statValue">5</div>
+                                                                            <div class="statLabel">Assessed By</div>
+                                                                            <div class="statValue">m.carter</div>
                                                                         </div>
                                                                     </div>
                                                                     <div class="statItem">
-                                                                        <span class="statIcon iconpink"><i class='bx  bx-pill'></i> </span>
                                                                         <div>
-                                                                            <div class="statLabel">Medications</div>
-                                                                            <div class="statValue">6</div>
+                                                                            <div class="statLabel">Next Review</div>
+                                                                            <div class="statValue">March 19th, 2026</div>
                                                                         </div>
                                                                     </div>
                                                                     <div class="statItem">
-                                                                        <span class="statIcon iconorange"><i class='bx  bx-alert-triangle'></i> </span>
                                                                         <div>
-                                                                            <div class="statLabel">Risk Factors</div>
-                                                                            <div class="statValue">4</div>
+                                                                            <div class="statLabel">Version</div>
+                                                                            <div class="statValue">v1</div>
                                                                         </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
+                                                        </div> <!-- ****************************************************** -->
 
-                                                            <!-- Care Plan Card -->
-                                                            <div class="planCard">
-                                                                <div class="planTop">
-                                                                    <div class="planTitle">
-                                                                        <span class="heartIcon"><i class='bx  bx-heart'></i></span>
-                                                                        Initial Care Plan
-                                                                        <span class="draftBadge">draft</span>
-                                                                    </div>
-                                                                    <div class="planActions">
-                                                                        <button class="viewPlanBtn"><i class='bx  bx-eye'></i> </button>
-                                                                        <button><i class='bx  bx-pencil'></i> </button>
-                                                                        <button class="danger"><i class='bx  bx-trash'></i> </button>
-                                                                    </div>
+                                                        <div class="careDetailsWrapper">
+                                                            <!-- Care Objectives -->
+                                                            <div class="careSection">
+                                                                <div class="sectionHeader">
+                                                                    <span class="icon blue">◎</span>
+                                                                    <h3>Care Objectives</h3>
                                                                 </div>
 
-                                                                <div class="planMeta">
-                                                                    <div><strong>Setting:</strong> residential</div>
-                                                                    <div><strong>Assessed:</strong> Jan 3, 2026</div>
-                                                                    <div><strong>By:</strong> Pratima Pathak</div>
-                                                                    <div><strong>Review:</strong> Apr 3, 2026</div>
+                                                                <div class="objectiveCard">
+                                                                    <div class="objectiveTop">
+                                                                        <strong>Objective 1</strong>
+                                                                        <span class="statusBadge gray">not started</span>
+                                                                    </div>
+                                                                    <p class="objectiveText">
+                                                                        Increase school attendance to 80% by attending at least 4 out of 5 school days weekly.
+                                                                    </p>
+                                                                    <p class="metaLine">
+                                                                        <strong>Success measures:</strong> School attendance records, feedback from school.
+                                                                    </p>
+                                                                    <p class="metaLine">
+                                                                        <strong>Target:</strong> Jan 31, 2024
+                                                                    </p>
                                                                 </div>
-
-                                                                <div class="planFooter">
-                                                                    <span><i class='bx  bx-radio-circle-marked'></i> 5 objectives</span>
-                                                                    <span><i class='bx  bx-list'></i> 0 tasks</span>
-                                                                    <span><i class='bx  bx-pill'></i> 6 medications</span>
+                                                                <div class="objectiveCard">
+                                                                    <div class="objectiveTop">
+                                                                        <strong>Objective 2</strong>
+                                                                        <span class="statusBadge gray">not started</span>
+                                                                    </div>
+                                                                    <p class="objectiveText">
+                                                                        Increase school attendance to 80% by attending at least 4 out of 5 school days weekly.
+                                                                    </p>
+                                                                    <p class="metaLine">
+                                                                        <strong>Success measures:</strong> School attendance records, feedback from school.
+                                                                    </p>
+                                                                    <p class="metaLine">
+                                                                        <strong>Target:</strong> Jan 31, 2024
+                                                                    </p>
                                                                 </div>
                                                             </div>
 
-                                                            <div class="planCard">
-                                                                <div class="planTop">
-                                                                    <div class="planTitle">
-                                                                        <span class="heartIcon"><i class='bx  bx-heart'></i></span>
-                                                                        Initial Care Plan
-                                                                        <span class="draftBadge">draft</span>
-                                                                    </div>
-
-                                                                    <div class="planActions">
-                                                                        <button class="viewPlanBtn"><i class='bx  bx-eye'></i> </button>
-                                                                        <button><i class='bx  bx-pencil'></i> </button>
-                                                                        <button class="danger"><i class='bx  bx-trash'></i> </button>
-                                                                    </div>
+                                                            <!-- Care Tasks & Interventions -->
+                                                            <div class="careSection">
+                                                                <div class="sectionHeader">
+                                                                    <span class="icon purple">≡</span>
+                                                                    <h3>Care Tasks & Interventions</h3>
                                                                 </div>
-
-                                                                <div class="planMeta">
-                                                                    <div><strong>Setting:</strong> residential</div>
-                                                                    <div><strong>Assessed:</strong> Jan 3, 2026</div>
-                                                                    <div><strong>By:</strong> Pratima Pathak</div>
-                                                                    <div><strong>Review:</strong> Apr 3, 2026</div>
+                                                                <div class="taskCard">
+                                                                    <div class="taskHeader">
+                                                                        <span class="pill blue">Emotional Support</span>
+                                                                        <span class="taskTime">🕒 weekly · 60 mins</span>
+                                                                    </div>
+                                                                    <h4>Emotional support session with counselor</h4>
+                                                                    <div class="instructionBox">
+                                                                        <strong>Special Instructions:</strong>
+                                                                        Ensure Logan feels comfortable and safe to express feelings.
+                                                                    </div>
+                                                                    <p class="preferredTime"> Preferred time: Monday 3 PM </p>
                                                                 </div>
-
-                                                                <div class="planFooter">
-                                                                    <span><i class='bx  bx-radio-circle-marked'></i> 5 objectives</span>
-                                                                    <span><i class='bx  bx-list'></i> 0 tasks</span>
-                                                                    <span><i class='bx  bx-pill'></i> 6 medications</span>
+                                                                <div class="taskCard">
+                                                                    <div class="taskHeader">
+                                                                        <span class="pill blue">Emotional Support</span>
+                                                                        <span class="taskTime">🕒 weekly · 60 mins</span>
+                                                                    </div>
+                                                                    <h4>Emotional support session with counselor</h4>
+                                                                    <div class="instructionBox">
+                                                                        <strong>Special Instructions:</strong>
+                                                                        Ensure Logan feels comfortable and safe to express feelings.
+                                                                    </div>
+                                                                    <p class="preferredTime"> Preferred time: Monday 3 PM </p>
                                                                 </div>
                                                             </div>
 
-                                                            <div class="planCard">
-                                                                <div class="planTop">
-                                                                    <div class="planTitle">
-                                                                        <span class="heartIcon"><i class='bx  bx-heart'></i></span>
-                                                                        Initial Care Plan
-                                                                        <span class="draftBadge">draft</span>
+                                                            <!-- Risk Factors -->
+                                                            <div class="careSection">
+                                                                <div class="sectionHeader">
+                                                                    <span class="icon orange">⚠</span>
+                                                                    <h3>Risk Factors</h3>
+                                                                </div>
+
+                                                                <div class="riskCard">
+                                                                    <div class="riskTop">
+                                                                        <strong>Increased anxiety about dental visits</strong>
+
+                                                                        <div class="riskBadges">
+                                                                            <span class="riskBadge danger">Likelihood: high</span>
+                                                                            <span class="riskBadge danger">Impact: high</span>
+                                                                        </div>
                                                                     </div>
 
-                                                                    <div class="planActions">
-                                                                        <button class="viewPlanBtn"><i class='bx  bx-eye'></i> </button>
-                                                                        <button><i class='bx  bx-pencil'></i> </button>
-                                                                        <button class="danger"><i class='bx  bx-trash'></i> </button>
+                                                                    <div class="controlBox">
+                                                                        <strong>Control Measures:</strong>
+                                                                        Prepare Logan ahead of appointments, use relaxation techniques prior to visits.
                                                                     </div>
                                                                 </div>
+                                                                <div class="riskCard">
+                                                                    <div class="riskTop">
+                                                                        <strong>Increased anxiety about dental visits</strong>
 
-                                                                <div class="planMeta">
-                                                                    <div><strong>Setting:</strong> residential</div>
-                                                                    <div><strong>Assessed:</strong> Jan 3, 2026</div>
-                                                                    <div><strong>By:</strong> Pratima Pathak</div>
-                                                                    <div><strong>Review:</strong> Apr 3, 2026</div>
-                                                                </div>
-
-                                                                <div class="planFooter">
-                                                                    <span><i class='bx  bx-radio-circle-marked'></i> 5 objectives</span>
-                                                                    <span><i class='bx  bx-list'></i> 0 tasks</span>
-                                                                    <span><i class='bx  bx-pill'></i> 6 medications</span>
-                                                                </div>
-                                                            </div>
-
-                                                            <div class="planCard">
-                                                                <div class="planTop">
-                                                                    <div class="planTitle">
-                                                                        <span class="heartIcon"><i class='bx  bx-heart'></i></span>
-                                                                        Initial Care Plan
-                                                                        <span class="draftBadge">draft</span>
+                                                                        <div class="riskBadges">
+                                                                            <span class="riskBadge danger">Likelihood: high</span>
+                                                                            <span class="riskBadge danger">Impact: high</span>
+                                                                        </div>
                                                                     </div>
 
-                                                                    <div class="planActions">
-                                                                        <button><i class='bx  bx-eye'></i> </button>
-                                                                        <button><i class='bx  bx-pencil'></i> </button>
-                                                                        <button class="danger"><i class='bx  bx-trash'></i> </button>
+                                                                    <div class="controlBox">
+                                                                        <strong>Control Measures:</strong>
+                                                                        Prepare Logan ahead of appointments, use relaxation techniques prior to visits.
                                                                     </div>
-                                                                </div>
-
-                                                                <div class="planMeta">
-                                                                    <div><strong>Setting:</strong> residential</div>
-                                                                    <div><strong>Assessed:</strong> Jan 3, 2026</div>
-                                                                    <div><strong>By:</strong> Pratima Pathak</div>
-                                                                    <div><strong>Review:</strong> Apr 3, 2026</div>
-                                                                </div>
-
-                                                                <div class="planFooter">
-                                                                    <span><i class='bx  bx-radio-circle-marked'></i> 5 objectives</span>
-                                                                    <span><i class='bx  bx-list'></i> 0 tasks</span>
-                                                                    <span><i class='bx  bx-pill'></i> 6 medications</span>
-                                                                </div>
-                                                            </div>
-
-                                                            <div class="planCard">
-                                                                <div class="planTop">
-                                                                    <div class="planTitle">
-                                                                        <span class="heartIcon"><i class='bx  bx-heart'></i></span>
-                                                                        Initial Care Plan
-                                                                        <span class="draftBadge">draft</span>
-                                                                    </div>
-
-                                                                    <div class="planActions">
-                                                                        <button><i class='bx  bx-eye'></i> </button>
-                                                                        <button><i class='bx  bx-pencil'></i> </button>
-                                                                        <button class="danger"><i class='bx  bx-trash'></i> </button>
-                                                                    </div>
-                                                                </div>
-
-                                                                <div class="planMeta">
-                                                                    <div><strong>Setting:</strong> residential</div>
-                                                                    <div><strong>Assessed:</strong> Jan 3, 2026</div>
-                                                                    <div><strong>By:</strong> Pratima Pathak</div>
-                                                                    <div><strong>Review:</strong> Apr 3, 2026</div>
-                                                                </div>
-
-                                                                <div class="planFooter">
-                                                                    <span><i class='bx  bx-radio-circle-marked'></i> 5 objectives</span>
-                                                                    <span><i class='bx  bx-list'></i> 0 tasks</span>
-                                                                    <span><i class='bx  bx-pill'></i> 6 medications</span>
-                                                                </div>
-                                                            </div>
-
-                                                            <div class="planCard">
-                                                                <div class="planTop">
-                                                                    <div class="planTitle">
-                                                                        <span class="heartIcon"><i class='bx  bx-heart'></i></span>
-                                                                        Initial Care Plan
-                                                                        <span class="draftBadge">draft</span>
-                                                                    </div>
-
-                                                                    <div class="planActions">
-                                                                        <button><i class='bx  bx-eye'></i> </button>
-                                                                        <button><i class='bx  bx-pencil'></i> </button>
-                                                                        <button class="danger"><i class='bx  bx-trash'></i> </button>
-                                                                    </div>
-                                                                </div>
-
-                                                                <div class="planMeta">
-                                                                    <div><strong>Setting:</strong> residential</div>
-                                                                    <div><strong>Assessed:</strong> Jan 3, 2026</div>
-                                                                    <div><strong>By:</strong> Pratima Pathak</div>
-                                                                    <div><strong>Review:</strong> Apr 3, 2026</div>
-                                                                </div>
-
-                                                                <div class="planFooter">
-                                                                    <span><i class='bx  bx-radio-circle-marked'></i> 5 objectives</span>
-                                                                    <span><i class='bx  bx-list'></i> 0 tasks</span>
-                                                                    <span><i class='bx  bx-pill'></i> 6 medications</span>
                                                                 </div>
                                                             </div>
 
                                                         </div>
-
                                                     </div>
 
-
-                                                    <div class="carePlanBtnSectionSecond" style="display: none;">
-                                                        <div class="topHeaderCont">
-                                                            <div>
-                                                                <button class="btn borderBtn backBtn" id="planBackBtn"><i class='bx  bx-arrow-left-stroke'></i> Back to Care Plans</button>
-                                                            </div>
-                                                            <div class="header-actions addnewicons">
-                                                                <button class="btn allbuttonDarkClr"> Standard View</button>
-                                                                <button class="btn borderBtn purpleBorderBtn"> CQC Print Format</button>
-                                                                <button class="btn borderBtn blueBorderBtn"><i class='bx  bx-printer'></i> Print </button>
-                                                                <button class="btn borderBtn greenBorderBtn"><i class='bx  bx-arrow-in-up-square-half'></i> Export PDF </button>
-                                                                <button class="btn allBtnUseColor"><i class='bx  bx-edit'></i> Edit Plan</button>
-                                                            </div>
-                                                        </div>
-                                                        <div class="CarePlanAllObjective" style="display: ;">
-                                                            <div class="assessmentDetails leave-card p-0">
-                                                                <header class="panel-heading headingCapitilize careTaskheader">
-                                                                    <div class="clientHeadung">
-                                                                        <div class="onlyheadingmain blueIconClr"><i class='bx  bx-heart'></i> Care Plan - Logan Jones </div>
-                                                                        <p>initial Assessment • residential care</p>
-                                                                    </div>
-                                                                    <div class="actions mt-0">
-                                                                        <span class="roundBtntag greenShowbtn"> Active </span>
-                                                                    </div>
-                                                                </header>
-                                                                <div class="assessmentDateAndVersion carePlanWrapper">
-                                                                    <div class="activePlanStats">
-                                                                        <div class="statItem">
-                                                                            <div>
-                                                                                <div class="statLabel">Assessment Date</div>
-                                                                                <div class="statValue">December 19th, 2025</div>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div class="statItem">
-                                                                            <div>
-                                                                                <div class="statLabel">Assessed By</div>
-                                                                                <div class="statValue">m.carter</div>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div class="statItem">
-                                                                            <div>
-                                                                                <div class="statLabel">Next Review</div>
-                                                                                <div class="statValue">March 19th, 2026</div>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div class="statItem">
-                                                                            <div>
-                                                                                <div class="statLabel">Version</div>
-                                                                                <div class="statValue">v1</div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
+                                                    <div class="CQCCompliantDocumentationPDF" style="background: #fff; padding: 30px 0; margin-top:30px; display:none">
+                                                        <div>
+                                                            <div class="bg-white text-black" style="font-family: Arial, sans-serif;">
+                                                                <div style="border-bottom: 4px solid rgb(30, 64, 175); padding-bottom: 20px; margin-bottom: 30px; text-align: center;">
+                                                                    <h1 style="font-size: 32px; font-weight: bold; color: rgb(30, 64, 175); margin: 0px 0px 10px; text-transform: uppercase; letter-spacing: 2px;">RESIDENTIAL CARE PLAN</h1>
+                                                                    <p style="font-size: 14px; color: rgb(107, 114, 128); margin: 0px;">CQC Compliant Documentation</p>
                                                                 </div>
-                                                            </div> <!-- ****************************************************** -->
-
-                                                            <div class="careDetailsWrapper">
-                                                                <!-- Care Objectives -->
-                                                                <div class="careSection">
-                                                                    <div class="sectionHeader">
-                                                                        <span class="icon blue">◎</span>
-                                                                        <h3>Care Objectives</h3>
-                                                                    </div>
-
-                                                                    <div class="objectiveCard">
-                                                                        <div class="objectiveTop">
-                                                                            <strong>Objective 1</strong>
-                                                                            <span class="statusBadge gray">not started</span>
-                                                                        </div>
-                                                                        <p class="objectiveText">
-                                                                            Increase school attendance to 80% by attending at least 4 out of 5 school days weekly.
-                                                                        </p>
-                                                                        <p class="metaLine">
-                                                                            <strong>Success measures:</strong> School attendance records, feedback from school.
-                                                                        </p>
-                                                                        <p class="metaLine">
-                                                                            <strong>Target:</strong> Jan 31, 2024
-                                                                        </p>
-                                                                    </div>
-                                                                    <div class="objectiveCard">
-                                                                        <div class="objectiveTop">
-                                                                            <strong>Objective 2</strong>
-                                                                            <span class="statusBadge gray">not started</span>
-                                                                        </div>
-                                                                        <p class="objectiveText">
-                                                                            Increase school attendance to 80% by attending at least 4 out of 5 school days weekly.
-                                                                        </p>
-                                                                        <p class="metaLine">
-                                                                            <strong>Success measures:</strong> School attendance records, feedback from school.
-                                                                        </p>
-                                                                        <p class="metaLine">
-                                                                            <strong>Target:</strong> Jan 31, 2024
-                                                                        </p>
-                                                                    </div>
-                                                                </div>
-
-                                                                <!-- Care Tasks & Interventions -->
-                                                                <div class="careSection">
-                                                                    <div class="sectionHeader">
-                                                                        <span class="icon purple">≡</span>
-                                                                        <h3>Care Tasks & Interventions</h3>
-                                                                    </div>
-                                                                    <div class="taskCard">
-                                                                        <div class="taskHeader">
-                                                                            <span class="pill blue">Emotional Support</span>
-                                                                            <span class="taskTime">🕒 weekly · 60 mins</span>
-                                                                        </div>
-                                                                        <h4>Emotional support session with counselor</h4>
-                                                                        <div class="instructionBox">
-                                                                            <strong>Special Instructions:</strong>
-                                                                            Ensure Logan feels comfortable and safe to express feelings.
-                                                                        </div>
-                                                                        <p class="preferredTime"> Preferred time: Monday 3 PM </p>
-                                                                    </div>
-                                                                    <div class="taskCard">
-                                                                        <div class="taskHeader">
-                                                                            <span class="pill blue">Emotional Support</span>
-                                                                            <span class="taskTime">🕒 weekly · 60 mins</span>
-                                                                        </div>
-                                                                        <h4>Emotional support session with counselor</h4>
-                                                                        <div class="instructionBox">
-                                                                            <strong>Special Instructions:</strong>
-                                                                            Ensure Logan feels comfortable and safe to express feelings.
-                                                                        </div>
-                                                                        <p class="preferredTime"> Preferred time: Monday 3 PM </p>
-                                                                    </div>
-                                                                </div>
-
-                                                                <!-- Risk Factors -->
-                                                                <div class="careSection">
-                                                                    <div class="sectionHeader">
-                                                                        <span class="icon orange">⚠</span>
-                                                                        <h3>Risk Factors</h3>
-                                                                    </div>
-
-                                                                    <div class="riskCard">
-                                                                        <div class="riskTop">
-                                                                            <strong>Increased anxiety about dental visits</strong>
-
-                                                                            <div class="riskBadges">
-                                                                                <span class="riskBadge danger">Likelihood: high</span>
-                                                                                <span class="riskBadge danger">Impact: high</span>
-                                                                            </div>
-                                                                        </div>
-
-                                                                        <div class="controlBox">
-                                                                            <strong>Control Measures:</strong>
-                                                                            Prepare Logan ahead of appointments, use relaxation techniques prior to visits.
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="riskCard">
-                                                                        <div class="riskTop">
-                                                                            <strong>Increased anxiety about dental visits</strong>
-
-                                                                            <div class="riskBadges">
-                                                                                <span class="riskBadge danger">Likelihood: high</span>
-                                                                                <span class="riskBadge danger">Impact: high</span>
-                                                                            </div>
-                                                                        </div>
-
-                                                                        <div class="controlBox">
-                                                                            <strong>Control Measures:</strong>
-                                                                            Prepare Logan ahead of appointments, use relaxation techniques prior to visits.
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="CQCCompliantDocumentationPDF" style="background: #fff; padding: 30px 0; margin-top:30px; display:none">
-                                                            <div>
-                                                                <div class="bg-white text-black" style="font-family: Arial, sans-serif;">
-                                                                    <div style="border-bottom: 4px solid rgb(30, 64, 175); padding-bottom: 20px; margin-bottom: 30px; text-align: center;">
-                                                                        <h1 style="font-size: 32px; font-weight: bold; color: rgb(30, 64, 175); margin: 0px 0px 10px; text-transform: uppercase; letter-spacing: 2px;">RESIDENTIAL CARE PLAN</h1>
-                                                                        <p style="font-size: 14px; color: rgb(107, 114, 128); margin: 0px;">CQC Compliant Documentation</p>
-                                                                    </div>
-                                                                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 30px; padding: 20px; background-color: rgb(248, 250, 252); border: 1px solid rgb(226, 232, 240); border-radius: 8px;">
-                                                                        <div>
-                                                                            <h2 style="font-size: 24px; font-weight: bold; color: rgb(30, 64, 175); margin-top: 0px; margin-bottom: 15px;">Client Name: Logan Jones</h2>
-                                                                            <table style="width: 100%; font-size: 14px; border-collapse: collapse;">
-                                                                                <tbody>
-                                                                                    <tr style="border-bottom: 1px solid rgb(226, 232, 240);">
-                                                                                        <td style="padding: 8px 0px; font-weight: 600; color: rgb(100, 116, 139); width: 180px;">Date of Birth:</td>
-                                                                                        <td style="padding: 8px 0px;">29.10.2009</td>
-                                                                                    </tr>
-                                                                                    <tr style="border-bottom: 1px solid rgb(226, 232, 240);">
-                                                                                        <td style="padding: 8px 0px; font-weight: 600; color: rgb(100, 116, 139);">NHS Number:</td>
-                                                                                        <td style="padding: 8px 0px;">Not recorded</td>
-                                                                                    </tr>
-                                                                                    <tr style="border-bottom: 1px solid rgb(226, 232, 240);">
-                                                                                        <td style="padding: 8px 0px; font-weight: 600; color: rgb(100, 116, 139);">Room Number:</td>
-                                                                                        <td style="padding: 8px 0px;">Not assigned</td>
-                                                                                    </tr>
-                                                                                    <tr style="border-bottom: 1px solid rgb(226, 232, 240);">
-                                                                                        <td style="padding: 8px 0px; font-weight: 600; color: rgb(100, 116, 139);">Care Plan Start Date:</td>
-                                                                                        <td style="padding: 8px 0px;">19/12/2025</td>
-                                                                                    </tr>
-                                                                                    <tr>
-                                                                                        <td style="padding: 8px 0px; font-weight: 600; color: rgb(100, 116, 139);">Care Manager:</td>
-                                                                                        <td style="padding: 8px 0px;">m.carter</td>
-                                                                                    </tr>
-                                                                                </tbody>
-                                                                            </table>
-                                                                        </div>
-                                                                        <div style="border: 2px dashed rgb(203, 213, 225); border-radius: 8px; display: flex; align-items: center; justify-content: center; min-height: 200px; background-color: rgb(241, 245, 249); padding: 20px; text-align: center;">
-                                                                            <div>
-                                                                                <p style="font-size: 12px; color: rgb(100, 116, 139); margin: 0px;">CLIENT PHOTOGRAPH<br>(To be inserted with consent)</p>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div style="margin-bottom: 25px; break-inside: avoid; border-left: 3px solid rgb(59, 130, 246); padding-left: 15px;">
-                                                                        <h3 style="font-size: 16px; font-weight: 700; margin-top: 0px; margin-bottom: 12px; color: rgb(30, 41, 59);">1. Personal Details &amp; Contact Information</h3>
-                                                                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; margin-bottom: 12px;">
-                                                                            <div style="font-size: 13px;">
-                                                                                <p style="margin: 0px 0px 4px; font-weight: 600; color: rgb(100, 116, 139);">Preferred Name:</p>
-                                                                                <p style="margin: 0px; color: rgb(31, 41, 55);">Logan Jones</p>
-                                                                            </div>
-                                                                            <div style="font-size: 13px;">
-                                                                                <p style="margin: 0px 0px 4px; font-weight: 600; color: rgb(100, 116, 139);">Gender:</p>
-                                                                                <p style="margin: 0px; color: rgb(31, 41, 55);">Not recorded</p>
-                                                                            </div>
-                                                                            <div style="font-size: 13px;">
-                                                                                <p style="margin: 0px 0px 4px; font-weight: 600; color: rgb(100, 116, 139);">Legal Status:</p>
-                                                                                <p style="margin: 0px; color: rgb(31, 41, 55);">Informal</p>
-                                                                            </div>
-                                                                            <div style="font-size: 13px;">
-                                                                                <p style="margin: 0px 0px 4px; font-weight: 600; color: rgb(100, 116, 139);">GP Practice:</p>
-                                                                                <p style="margin: 0px; color: rgb(31, 41, 55);">Not recorded</p>
-                                                                            </div>
-                                                                            <div style="font-size: 13px;">
-                                                                                <p style="margin: 0px 0px 4px; font-weight: 600; color: rgb(100, 116, 139);">Language:</p>
-                                                                                <p style="margin: 0px; color: rgb(31, 41, 55);">English</p>
-                                                                            </div>
-                                                                            <div style="font-size: 13px;">
-                                                                                <p style="margin: 0px 0px 4px; font-weight: 600; color: rgb(100, 116, 139);">Religion:</p>
-                                                                                <p style="margin: 0px; color: rgb(31, 41, 55);">Not recorded</p>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div style="margin-top: 15px;">
-                                                                            <h4 style="font-size: 14px; font-weight: 600; margin-bottom: 10px; color: rgb(71, 85, 105);">Next of Kin / Emergency Contact</h4>
-                                                                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; margin-bottom: 12px;">
-                                                                                <div style="font-size: 13px;">
-                                                                                    <p style="margin: 0px 0px 4px; font-weight: 600; color: rgb(100, 116, 139);">Name:</p>
-                                                                                    <p style="margin: 0px; color: rgb(31, 41, 55);">Carolanne Jones</p>
-                                                                                </div>
-                                                                                <div style="font-size: 13px;">
-                                                                                    <p style="margin: 0px 0px 4px; font-weight: 600; color: rgb(100, 116, 139);">Relationship:</p>
-                                                                                    <p style="margin: 0px; color: rgb(31, 41, 55);">Mum</p>
-                                                                                </div>
-                                                                                <div style="font-size: 13px;">
-                                                                                    <p style="margin: 0px 0px 4px; font-weight: 600; color: rgb(100, 116, 139);">Contact Number:</p>
-                                                                                    <p style="margin: 0px; color: rgb(31, 41, 55);"></p>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div style="margin-bottom: 25px; break-inside: avoid; border-left: 3px solid rgb(59, 130, 246); padding-left: 15px;">
-                                                                        <h3 style="font-size: 16px; font-weight: 700; margin-top: 0px; margin-bottom: 12px; color: rgb(30, 41, 59);">2. Capacity, Consent &amp; Legal Framework</h3>
-                                                                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; margin-bottom: 12px;">
-                                                                            <div style="font-size: 13px;">
-                                                                                <p style="margin: 0px 0px 4px; font-weight: 600; color: rgb(100, 116, 139);">Mental Capacity Assessment:</p>
-                                                                                <p style="margin: 0px; color: rgb(31, 41, 55);">To be assessed</p>
-                                                                            </div>
-                                                                            <div style="font-size: 13px;">
-                                                                                <p style="margin: 0px 0px 4px; font-weight: 600; color: rgb(100, 116, 139);">Capacity to Consent to Care:</p>
-                                                                                <p style="margin: 0px; color: rgb(31, 41, 55);">✗ No</p>
-                                                                            </div>
-                                                                            <div style="font-size: 13px;">
-                                                                                <p style="margin: 0px 0px 4px; font-weight: 600; color: rgb(100, 116, 139);">LPA/Deputyship:</p>
-                                                                                <p style="margin: 0px; color: rgb(31, 41, 55);">None in place</p>
-                                                                            </div>
-                                                                            <div style="font-size: 13px;">
-                                                                                <p style="margin: 0px 0px 4px; font-weight: 600; color: rgb(100, 116, 139);">DNACPR:</p>
-                                                                                <p style="margin: 0px; color: rgb(31, 41, 55);">Not in place</p>
-                                                                            </div>
-                                                                        </div>
-                                                                        <p style="font-size: 13px; margin-top: 10px; font-style: italic; color: rgb(100, 116, 139);">Client has been involved in the development of this care plan and has given informed consent.</p>
-                                                                    </div>
-                                                                    <div style="margin-bottom: 25px; break-inside: avoid; border-left: 3px solid rgb(59, 130, 246); padding-left: 15px;">
-                                                                        <h3 style="font-size: 16px; font-weight: 700; margin-top: 0px; margin-bottom: 12px; color: rgb(30, 41, 59);">6. Personal Care</h3>
-                                                                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; margin-bottom: 12px;">
-                                                                            <div style="font-size: 13px;">
-                                                                                <p style="margin: 0px 0px 4px; font-weight: 600; color: rgb(100, 116, 139);">Washing/Bathing:</p>
-                                                                                <p style="margin: 0px; color: rgb(31, 41, 55);">Requires prompts only</p>
-                                                                            </div>
-                                                                            <div style="font-size: 13px;">
-                                                                                <p style="margin: 0px 0px 4px; font-weight: 600; color: rgb(100, 116, 139);">Dressing:</p>
-                                                                                <p style="margin: 0px; color: rgb(31, 41, 55);">Independent with choices</p>
-                                                                            </div>
-                                                                            <div style="font-size: 13px;">
-                                                                                <p style="margin: 0px 0px 4px; font-weight: 600; color: rgb(100, 116, 139);">Continence:</p>
-                                                                                <p style="margin: 0px; color: rgb(31, 41, 55);">Continent</p>
-                                                                            </div>
-                                                                            <div style="font-size: 13px;">
-                                                                                <p style="margin: 0px 0px 4px; font-weight: 600; color: rgb(100, 116, 139);">Skin Integrity:</p>
-                                                                                <p style="margin: 0px; color: rgb(31, 41, 55);">Intact</p>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div style="margin-top: 15px; padding: 12px; background-color: rgb(239, 246, 255); border-left: 4px solid rgb(59, 130, 246); border-radius: 4px;">
-                                                                            <p style="font-size: 13px; margin: 0px; color: rgb(30, 64, 175);"><strong>Care Approach:</strong> Respect privacy and dignity. Offer choice and promote independence.</p>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div style="margin-bottom: 25px; break-inside: avoid; border-left: 3px solid rgb(59, 130, 246); padding-left: 15px;">
-                                                                        <h3 style="font-size: 16px; font-weight: 700; margin-top: 0px; margin-bottom: 12px; color: rgb(30, 41, 59);">11. Risk Assessments (Summary)</h3>
-                                                                        <div style="margin-bottom: 10px;">
-                                                                            <p style="font-size: 13px; margin: 0px 0px 4px;"><strong>Increased anxiety about dental visits</strong> –<span style="margin-left: 8px; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; background-color: rgb(254, 242, 242); color: rgb(220, 38, 38);">high risk</span></p>
-                                                                        </div>
-                                                                        <div style="margin-bottom: 10px;">
-                                                                            <p style="font-size: 13px; margin: 0px 0px 4px;"><strong>Medication nonadherence due to side effects or refusal</strong> –<span style="margin-left: 8px; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; background-color: rgb(254, 252, 232); color: rgb(202, 138, 4);">medium risk</span></p>
-                                                                        </div>
-                                                                        <div style="margin-bottom: 10px;">
-                                                                            <p style="font-size: 13px; margin: 0px 0px 4px;"><strong>Substance misuse (vaping) impacting health</strong> –<span style="margin-left: 8px; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; background-color: rgb(254, 252, 232); color: rgb(202, 138, 4);">medium risk</span></p>
-                                                                        </div>
-                                                                        <div style="margin-bottom: 10px;">
-                                                                            <p style="font-size: 13px; margin: 0px 0px 4px;"><strong>Skin reactions due to new products or environmental factors</strong> –<span style="margin-left: 8px; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; background-color: rgb(254, 252, 232); color: rgb(202, 138, 4);">medium risk</span></p>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div style="margin-bottom: 25px; break-inside: avoid; border-left: 3px solid rgb(59, 130, 246); padding-left: 15px;">
-                                                                        <h3 style="font-size: 16px; font-weight: 700; margin-top: 0px; margin-bottom: 12px; color: rgb(30, 41, 59);">12. Safeguarding</h3>
-                                                                        <p style="font-size: 13px; margin: 0px; color: rgb(31, 41, 55);">No current safeguarding concerns identified.</p>
-                                                                        <p style="font-size: 13px; margin-top: 10px; color: rgb(100, 116, 139);">Staff to follow safeguarding policy and whistleblowing procedures. All concerns must be reported immediately.</p>
-                                                                    </div>
-                                                                    <div style="margin-bottom: 25px; break-inside: avoid; border-left: 3px solid rgb(59, 130, 246); padding-left: 15px;">
-                                                                        <h3 style="font-size: 16px; font-weight: 700; margin-top: 0px; margin-bottom: 12px; color: rgb(30, 41, 59);">13. Emergency Information</h3>
-                                                                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; margin-bottom: 12px;">
-                                                                            <div style="font-size: 13px;">
-                                                                                <p style="margin: 0px 0px 4px; font-weight: 600; color: rgb(100, 116, 139);">Emergency Contact:</p>
-                                                                                <p style="margin: 0px; color: rgb(31, 41, 55);">Carolanne Jones (Mum)</p>
-                                                                            </div>
-                                                                            <div style="font-size: 13px;">
-                                                                                <p style="margin: 0px 0px 4px; font-weight: 600; color: rgb(100, 116, 139);">Hospital Preference:</p>
-                                                                                <p style="margin: 0px; color: rgb(31, 41, 55);">Local NHS Trust</p>
-                                                                            </div>
-                                                                            <div style="font-size: 13px;">
-                                                                                <p style="margin: 0px 0px 4px; font-weight: 600; color: rgb(100, 116, 139);">DNACPR Status:</p>
-                                                                                <p style="margin: 0px; color: rgb(31, 41, 55);">Not in place</p>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div style="margin-bottom: 25px; break-inside: avoid; border-left: 3px solid rgb(59, 130, 246); padding-left: 15px;">
-                                                                        <h3 style="font-size: 16px; font-weight: 700; margin-top: 0px; margin-bottom: 12px; color: rgb(30, 41, 59);">14. Review &amp; Monitoring</h3>
-                                                                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; margin-bottom: 12px;">
-                                                                            <div style="font-size: 13px;">
-                                                                                <p style="margin: 0px 0px 4px; font-weight: 600; color: rgb(100, 116, 139);">Care Plan Review Date:</p>
-                                                                                <p style="margin: 0px; color: rgb(31, 41, 55);">19/03/2026</p>
-                                                                            </div>
-                                                                            <div style="font-size: 13px;">
-                                                                                <p style="margin: 0px 0px 4px; font-weight: 600; color: rgb(100, 116, 139);">Reviewed By:</p>
-                                                                                <p style="margin: 0px; color: rgb(31, 41, 55);">m.carter</p>
-                                                                            </div>
-                                                                            <div style="font-size: 13px;">
-                                                                                <p style="margin: 0px 0px 4px; font-weight: 600; color: rgb(100, 116, 139);">Client Involvement:</p>
-                                                                                <p style="margin: 0px; color: rgb(31, 41, 55);">Yes</p>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div style="margin-bottom: 25px; break-inside: avoid; border-left: 3px solid rgb(59, 130, 246); padding-left: 15px;">
-                                                                        <h3 style="font-size: 16px; font-weight: 700; margin-top: 0px; margin-bottom: 12px; color: rgb(30, 41, 59);">15. Signatures</h3>
-                                                                        <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px;">
-                                                                            <thead>
-                                                                                <tr style="background-color: rgb(241, 245, 249);">
-                                                                                    <th style="padding: 10px; text-align: left; border: 1px solid rgb(203, 213, 225); font-weight: 600;">Role</th>
-                                                                                    <th style="padding: 10px; text-align: left; border: 1px solid rgb(203, 213, 225); font-weight: 600;">Name</th>
-                                                                                    <th style="padding: 10px; text-align: left; border: 1px solid rgb(203, 213, 225); font-weight: 600;">Signature</th>
-                                                                                    <th style="padding: 10px; text-align: left; border: 1px solid rgb(203, 213, 225); font-weight: 600;">Date</th>
-                                                                                </tr>
-                                                                            </thead>
+                                                                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 30px; padding: 20px; background-color: rgb(248, 250, 252); border: 1px solid rgb(226, 232, 240); border-radius: 8px;">
+                                                                    <div>
+                                                                        <h2 style="font-size: 24px; font-weight: bold; color: rgb(30, 64, 175); margin-top: 0px; margin-bottom: 15px;">Client Name: Logan Jones</h2>
+                                                                        <table style="width: 100%; font-size: 14px; border-collapse: collapse;">
                                                                             <tbody>
-                                                                                <tr>
-                                                                                    <td style="padding: 15px; border: 1px solid rgb(203, 213, 225);">Client</td>
-                                                                                    <td style="padding: 15px; border: 1px solid rgb(203, 213, 225);">Logan Jones</td>
-                                                                                    <td style="padding: 15px; border: 1px solid rgb(203, 213, 225);">__________</td>
-                                                                                    <td style="padding: 15px; border: 1px solid rgb(203, 213, 225);">______</td>
+                                                                                <tr style="border-bottom: 1px solid rgb(226, 232, 240);">
+                                                                                    <td style="padding: 8px 0px; font-weight: 600; color: rgb(100, 116, 139); width: 180px;">Date of Birth:</td>
+                                                                                    <td style="padding: 8px 0px;">29.10.2009</td>
                                                                                 </tr>
-                                                                                <tr style="background-color: rgb(248, 250, 252);">
-                                                                                    <td style="padding: 15px; border: 1px solid rgb(203, 213, 225);">Key Worker</td>
-                                                                                    <td style="padding: 15px; border: 1px solid rgb(203, 213, 225);"></td>
-                                                                                    <td style="padding: 15px; border: 1px solid rgb(203, 213, 225);">__________</td>
-                                                                                    <td style="padding: 15px; border: 1px solid rgb(203, 213, 225);">______</td>
+                                                                                <tr style="border-bottom: 1px solid rgb(226, 232, 240);">
+                                                                                    <td style="padding: 8px 0px; font-weight: 600; color: rgb(100, 116, 139);">NHS Number:</td>
+                                                                                    <td style="padding: 8px 0px;">Not recorded</td>
+                                                                                </tr>
+                                                                                <tr style="border-bottom: 1px solid rgb(226, 232, 240);">
+                                                                                    <td style="padding: 8px 0px; font-weight: 600; color: rgb(100, 116, 139);">Room Number:</td>
+                                                                                    <td style="padding: 8px 0px;">Not assigned</td>
+                                                                                </tr>
+                                                                                <tr style="border-bottom: 1px solid rgb(226, 232, 240);">
+                                                                                    <td style="padding: 8px 0px; font-weight: 600; color: rgb(100, 116, 139);">Care Plan Start Date:</td>
+                                                                                    <td style="padding: 8px 0px;">19/12/2025</td>
                                                                                 </tr>
                                                                                 <tr>
-                                                                                    <td style="padding: 15px; border: 1px solid rgb(203, 213, 225);">Manager</td>
-                                                                                    <td style="padding: 15px; border: 1px solid rgb(203, 213, 225);">m.carter</td>
-                                                                                    <td style="padding: 15px; border: 1px solid rgb(203, 213, 225);">__________</td>
-                                                                                    <td style="padding: 15px; border: 1px solid rgb(203, 213, 225);">______</td>
+                                                                                    <td style="padding: 8px 0px; font-weight: 600; color: rgb(100, 116, 139);">Care Manager:</td>
+                                                                                    <td style="padding: 8px 0px;">m.carter</td>
                                                                                 </tr>
                                                                             </tbody>
                                                                         </table>
                                                                     </div>
-                                                                    <div style="margin-top: 40px; padding: 20px; background-color: rgb(241, 245, 249); border-radius: 8px; text-align: center; break-inside: avoid;">
-                                                                        <h4 style="font-size: 14px; font-weight: 600; margin-top: 0px; margin-bottom: 10px; color: rgb(30, 64, 175);">CQC Key Lines of Enquiry (KLOEs) Addressed</h4>
-                                                                        <div style="display: flex; justify-content: center; gap: 15px; font-size: 13px; flex-wrap: wrap;">
-                                                                            <span style="padding: 6px 12px; background-color: rgb(30, 64, 175); color: white; border-radius: 4px; font-weight: 600;">✓ Safe</span>
-                                                                            <span style="padding: 6px 12px; background-color: rgb(30, 64, 175); color: white; border-radius: 4px; font-weight: 600;">✓ Effective</span>
-                                                                            <span style="padding: 6px 12px; background-color: rgb(30, 64, 175); color: white; border-radius: 4px; font-weight: 600;">✓ Caring</span>
-                                                                            <span style="padding: 6px 12px; background-color: rgb(30, 64, 175); color: white; border-radius: 4px; font-weight: 600;">✓ Responsive</span>
-                                                                            <span style="padding: 6px 12px; background-color: rgb(30, 64, 175); color: white; border-radius: 4px; font-weight: 600;">✓ Well-led</span>
+                                                                    <div style="border: 2px dashed rgb(203, 213, 225); border-radius: 8px; display: flex; align-items: center; justify-content: center; min-height: 200px; background-color: rgb(241, 245, 249); padding: 20px; text-align: center;">
+                                                                        <div>
+                                                                            <p style="font-size: 12px; color: rgb(100, 116, 139); margin: 0px;">CLIENT PHOTOGRAPH<br>(To be inserted with consent)</p>
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                            </div>
-                                                        </div> <!-- CQCCompliantDocumentationPDF -->
-
-
-                                                    </div>
-                                                </div>
-                                                <!-- boarding click Care plan end  -->
-                                                <div class="onboardingBox p-4 mt-4">
-                                                    <div class="d-flex justify-content-between align-items-center">
-                                                        <div>
-                                                            <div class="d-flex gap-3 align-items-center">
-                                                                <div>
-                                                                    <i class="bx  bx-check-circle greenText"></i>
+                                                                <div style="margin-bottom: 25px; break-inside: avoid; border-left: 3px solid rgb(59, 130, 246); padding-left: 15px;">
+                                                                    <h3 style="font-size: 16px; font-weight: 700; margin-top: 0px; margin-bottom: 12px; color: rgb(30, 41, 59);">1. Personal Details &amp; Contact Information</h3>
+                                                                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; margin-bottom: 12px;">
+                                                                        <div style="font-size: 13px;">
+                                                                            <p style="margin: 0px 0px 4px; font-weight: 600; color: rgb(100, 116, 139);">Preferred Name:</p>
+                                                                            <p style="margin: 0px; color: rgb(31, 41, 55);">Logan Jones</p>
+                                                                        </div>
+                                                                        <div style="font-size: 13px;">
+                                                                            <p style="margin: 0px 0px 4px; font-weight: 600; color: rgb(100, 116, 139);">Gender:</p>
+                                                                            <p style="margin: 0px; color: rgb(31, 41, 55);">Not recorded</p>
+                                                                        </div>
+                                                                        <div style="font-size: 13px;">
+                                                                            <p style="margin: 0px 0px 4px; font-weight: 600; color: rgb(100, 116, 139);">Legal Status:</p>
+                                                                            <p style="margin: 0px; color: rgb(31, 41, 55);">Informal</p>
+                                                                        </div>
+                                                                        <div style="font-size: 13px;">
+                                                                            <p style="margin: 0px 0px 4px; font-weight: 600; color: rgb(100, 116, 139);">GP Practice:</p>
+                                                                            <p style="margin: 0px; color: rgb(31, 41, 55);">Not recorded</p>
+                                                                        </div>
+                                                                        <div style="font-size: 13px;">
+                                                                            <p style="margin: 0px 0px 4px; font-weight: 600; color: rgb(100, 116, 139);">Language:</p>
+                                                                            <p style="margin: 0px; color: rgb(31, 41, 55);">English</p>
+                                                                        </div>
+                                                                        <div style="font-size: 13px;">
+                                                                            <p style="margin: 0px 0px 4px; font-weight: 600; color: rgb(100, 116, 139);">Religion:</p>
+                                                                            <p style="margin: 0px; color: rgb(31, 41, 55);">Not recorded</p>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div style="margin-top: 15px;">
+                                                                        <h4 style="font-size: 14px; font-weight: 600; margin-bottom: 10px; color: rgb(71, 85, 105);">Next of Kin / Emergency Contact</h4>
+                                                                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; margin-bottom: 12px;">
+                                                                            <div style="font-size: 13px;">
+                                                                                <p style="margin: 0px 0px 4px; font-weight: 600; color: rgb(100, 116, 139);">Name:</p>
+                                                                                <p style="margin: 0px; color: rgb(31, 41, 55);">Carolanne Jones</p>
+                                                                            </div>
+                                                                            <div style="font-size: 13px;">
+                                                                                <p style="margin: 0px 0px 4px; font-weight: 600; color: rgb(100, 116, 139);">Relationship:</p>
+                                                                                <p style="margin: 0px; color: rgb(31, 41, 55);">Mum</p>
+                                                                            </div>
+                                                                            <div style="font-size: 13px;">
+                                                                                <p style="margin: 0px 0px 4px; font-weight: 600; color: rgb(100, 116, 139);">Contact Number:</p>
+                                                                                <p style="margin: 0px; color: rgb(31, 41, 55);"></p>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
                                                                 </div>
-                                                                <div>
-                                                                    <p class="boardingStatus">Client onboarding complete! All stages approved.</p>
+                                                                <div style="margin-bottom: 25px; break-inside: avoid; border-left: 3px solid rgb(59, 130, 246); padding-left: 15px;">
+                                                                    <h3 style="font-size: 16px; font-weight: 700; margin-top: 0px; margin-bottom: 12px; color: rgb(30, 41, 59);">2. Capacity, Consent &amp; Legal Framework</h3>
+                                                                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; margin-bottom: 12px;">
+                                                                        <div style="font-size: 13px;">
+                                                                            <p style="margin: 0px 0px 4px; font-weight: 600; color: rgb(100, 116, 139);">Mental Capacity Assessment:</p>
+                                                                            <p style="margin: 0px; color: rgb(31, 41, 55);">To be assessed</p>
+                                                                        </div>
+                                                                        <div style="font-size: 13px;">
+                                                                            <p style="margin: 0px 0px 4px; font-weight: 600; color: rgb(100, 116, 139);">Capacity to Consent to Care:</p>
+                                                                            <p style="margin: 0px; color: rgb(31, 41, 55);">✗ No</p>
+                                                                        </div>
+                                                                        <div style="font-size: 13px;">
+                                                                            <p style="margin: 0px 0px 4px; font-weight: 600; color: rgb(100, 116, 139);">LPA/Deputyship:</p>
+                                                                            <p style="margin: 0px; color: rgb(31, 41, 55);">None in place</p>
+                                                                        </div>
+                                                                        <div style="font-size: 13px;">
+                                                                            <p style="margin: 0px 0px 4px; font-weight: 600; color: rgb(100, 116, 139);">DNACPR:</p>
+                                                                            <p style="margin: 0px; color: rgb(31, 41, 55);">Not in place</p>
+                                                                        </div>
+                                                                    </div>
+                                                                    <p style="font-size: 13px; margin-top: 10px; font-style: italic; color: rgb(100, 116, 139);">Client has been involved in the development of this care plan and has given informed consent.</p>
                                                                 </div>
-
+                                                                <div style="margin-bottom: 25px; break-inside: avoid; border-left: 3px solid rgb(59, 130, 246); padding-left: 15px;">
+                                                                    <h3 style="font-size: 16px; font-weight: 700; margin-top: 0px; margin-bottom: 12px; color: rgb(30, 41, 59);">6. Personal Care</h3>
+                                                                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; margin-bottom: 12px;">
+                                                                        <div style="font-size: 13px;">
+                                                                            <p style="margin: 0px 0px 4px; font-weight: 600; color: rgb(100, 116, 139);">Washing/Bathing:</p>
+                                                                            <p style="margin: 0px; color: rgb(31, 41, 55);">Requires prompts only</p>
+                                                                        </div>
+                                                                        <div style="font-size: 13px;">
+                                                                            <p style="margin: 0px 0px 4px; font-weight: 600; color: rgb(100, 116, 139);">Dressing:</p>
+                                                                            <p style="margin: 0px; color: rgb(31, 41, 55);">Independent with choices</p>
+                                                                        </div>
+                                                                        <div style="font-size: 13px;">
+                                                                            <p style="margin: 0px 0px 4px; font-weight: 600; color: rgb(100, 116, 139);">Continence:</p>
+                                                                            <p style="margin: 0px; color: rgb(31, 41, 55);">Continent</p>
+                                                                        </div>
+                                                                        <div style="font-size: 13px;">
+                                                                            <p style="margin: 0px 0px 4px; font-weight: 600; color: rgb(100, 116, 139);">Skin Integrity:</p>
+                                                                            <p style="margin: 0px; color: rgb(31, 41, 55);">Intact</p>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div style="margin-top: 15px; padding: 12px; background-color: rgb(239, 246, 255); border-left: 4px solid rgb(59, 130, 246); border-radius: 4px;">
+                                                                        <p style="font-size: 13px; margin: 0px; color: rgb(30, 64, 175);"><strong>Care Approach:</strong> Respect privacy and dignity. Offer choice and promote independence.</p>
+                                                                    </div>
+                                                                </div>
+                                                                <div style="margin-bottom: 25px; break-inside: avoid; border-left: 3px solid rgb(59, 130, 246); padding-left: 15px;">
+                                                                    <h3 style="font-size: 16px; font-weight: 700; margin-top: 0px; margin-bottom: 12px; color: rgb(30, 41, 59);">11. Risk Assessments (Summary)</h3>
+                                                                    <div style="margin-bottom: 10px;">
+                                                                        <p style="font-size: 13px; margin: 0px 0px 4px;"><strong>Increased anxiety about dental visits</strong> –<span style="margin-left: 8px; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; background-color: rgb(254, 242, 242); color: rgb(220, 38, 38);">high risk</span></p>
+                                                                    </div>
+                                                                    <div style="margin-bottom: 10px;">
+                                                                        <p style="font-size: 13px; margin: 0px 0px 4px;"><strong>Medication nonadherence due to side effects or refusal</strong> –<span style="margin-left: 8px; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; background-color: rgb(254, 252, 232); color: rgb(202, 138, 4);">medium risk</span></p>
+                                                                    </div>
+                                                                    <div style="margin-bottom: 10px;">
+                                                                        <p style="font-size: 13px; margin: 0px 0px 4px;"><strong>Substance misuse (vaping) impacting health</strong> –<span style="margin-left: 8px; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; background-color: rgb(254, 252, 232); color: rgb(202, 138, 4);">medium risk</span></p>
+                                                                    </div>
+                                                                    <div style="margin-bottom: 10px;">
+                                                                        <p style="font-size: 13px; margin: 0px 0px 4px;"><strong>Skin reactions due to new products or environmental factors</strong> –<span style="margin-left: 8px; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; background-color: rgb(254, 252, 232); color: rgb(202, 138, 4);">medium risk</span></p>
+                                                                    </div>
+                                                                </div>
+                                                                <div style="margin-bottom: 25px; break-inside: avoid; border-left: 3px solid rgb(59, 130, 246); padding-left: 15px;">
+                                                                    <h3 style="font-size: 16px; font-weight: 700; margin-top: 0px; margin-bottom: 12px; color: rgb(30, 41, 59);">12. Safeguarding</h3>
+                                                                    <p style="font-size: 13px; margin: 0px; color: rgb(31, 41, 55);">No current safeguarding concerns identified.</p>
+                                                                    <p style="font-size: 13px; margin-top: 10px; color: rgb(100, 116, 139);">Staff to follow safeguarding policy and whistleblowing procedures. All concerns must be reported immediately.</p>
+                                                                </div>
+                                                                <div style="margin-bottom: 25px; break-inside: avoid; border-left: 3px solid rgb(59, 130, 246); padding-left: 15px;">
+                                                                    <h3 style="font-size: 16px; font-weight: 700; margin-top: 0px; margin-bottom: 12px; color: rgb(30, 41, 59);">13. Emergency Information</h3>
+                                                                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; margin-bottom: 12px;">
+                                                                        <div style="font-size: 13px;">
+                                                                            <p style="margin: 0px 0px 4px; font-weight: 600; color: rgb(100, 116, 139);">Emergency Contact:</p>
+                                                                            <p style="margin: 0px; color: rgb(31, 41, 55);">Carolanne Jones (Mum)</p>
+                                                                        </div>
+                                                                        <div style="font-size: 13px;">
+                                                                            <p style="margin: 0px 0px 4px; font-weight: 600; color: rgb(100, 116, 139);">Hospital Preference:</p>
+                                                                            <p style="margin: 0px; color: rgb(31, 41, 55);">Local NHS Trust</p>
+                                                                        </div>
+                                                                        <div style="font-size: 13px;">
+                                                                            <p style="margin: 0px 0px 4px; font-weight: 600; color: rgb(100, 116, 139);">DNACPR Status:</p>
+                                                                            <p style="margin: 0px; color: rgb(31, 41, 55);">Not in place</p>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div style="margin-bottom: 25px; break-inside: avoid; border-left: 3px solid rgb(59, 130, 246); padding-left: 15px;">
+                                                                    <h3 style="font-size: 16px; font-weight: 700; margin-top: 0px; margin-bottom: 12px; color: rgb(30, 41, 59);">14. Review &amp; Monitoring</h3>
+                                                                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; margin-bottom: 12px;">
+                                                                        <div style="font-size: 13px;">
+                                                                            <p style="margin: 0px 0px 4px; font-weight: 600; color: rgb(100, 116, 139);">Care Plan Review Date:</p>
+                                                                            <p style="margin: 0px; color: rgb(31, 41, 55);">19/03/2026</p>
+                                                                        </div>
+                                                                        <div style="font-size: 13px;">
+                                                                            <p style="margin: 0px 0px 4px; font-weight: 600; color: rgb(100, 116, 139);">Reviewed By:</p>
+                                                                            <p style="margin: 0px; color: rgb(31, 41, 55);">m.carter</p>
+                                                                        </div>
+                                                                        <div style="font-size: 13px;">
+                                                                            <p style="margin: 0px 0px 4px; font-weight: 600; color: rgb(100, 116, 139);">Client Involvement:</p>
+                                                                            <p style="margin: 0px; color: rgb(31, 41, 55);">Yes</p>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div style="margin-bottom: 25px; break-inside: avoid; border-left: 3px solid rgb(59, 130, 246); padding-left: 15px;">
+                                                                    <h3 style="font-size: 16px; font-weight: 700; margin-top: 0px; margin-bottom: 12px; color: rgb(30, 41, 59);">15. Signatures</h3>
+                                                                    <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px;">
+                                                                        <thead>
+                                                                            <tr style="background-color: rgb(241, 245, 249);">
+                                                                                <th style="padding: 10px; text-align: left; border: 1px solid rgb(203, 213, 225); font-weight: 600;">Role</th>
+                                                                                <th style="padding: 10px; text-align: left; border: 1px solid rgb(203, 213, 225); font-weight: 600;">Name</th>
+                                                                                <th style="padding: 10px; text-align: left; border: 1px solid rgb(203, 213, 225); font-weight: 600;">Signature</th>
+                                                                                <th style="padding: 10px; text-align: left; border: 1px solid rgb(203, 213, 225); font-weight: 600;">Date</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            <tr>
+                                                                                <td style="padding: 15px; border: 1px solid rgb(203, 213, 225);">Client</td>
+                                                                                <td style="padding: 15px; border: 1px solid rgb(203, 213, 225);">Logan Jones</td>
+                                                                                <td style="padding: 15px; border: 1px solid rgb(203, 213, 225);">__________</td>
+                                                                                <td style="padding: 15px; border: 1px solid rgb(203, 213, 225);">______</td>
+                                                                            </tr>
+                                                                            <tr style="background-color: rgb(248, 250, 252);">
+                                                                                <td style="padding: 15px; border: 1px solid rgb(203, 213, 225);">Key Worker</td>
+                                                                                <td style="padding: 15px; border: 1px solid rgb(203, 213, 225);"></td>
+                                                                                <td style="padding: 15px; border: 1px solid rgb(203, 213, 225);">__________</td>
+                                                                                <td style="padding: 15px; border: 1px solid rgb(203, 213, 225);">______</td>
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <td style="padding: 15px; border: 1px solid rgb(203, 213, 225);">Manager</td>
+                                                                                <td style="padding: 15px; border: 1px solid rgb(203, 213, 225);">m.carter</td>
+                                                                                <td style="padding: 15px; border: 1px solid rgb(203, 213, 225);">__________</td>
+                                                                                <td style="padding: 15px; border: 1px solid rgb(203, 213, 225);">______</td>
+                                                                            </tr>
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+                                                                <div style="margin-top: 40px; padding: 20px; background-color: rgb(241, 245, 249); border-radius: 8px; text-align: center; break-inside: avoid;">
+                                                                    <h4 style="font-size: 14px; font-weight: 600; margin-top: 0px; margin-bottom: 10px; color: rgb(30, 64, 175);">CQC Key Lines of Enquiry (KLOEs) Addressed</h4>
+                                                                    <div style="display: flex; justify-content: center; gap: 15px; font-size: 13px; flex-wrap: wrap;">
+                                                                        <span style="padding: 6px 12px; background-color: rgb(30, 64, 175); color: white; border-radius: 4px; font-weight: 600;">✓ Safe</span>
+                                                                        <span style="padding: 6px 12px; background-color: rgb(30, 64, 175); color: white; border-radius: 4px; font-weight: 600;">✓ Effective</span>
+                                                                        <span style="padding: 6px 12px; background-color: rgb(30, 64, 175); color: white; border-radius: 4px; font-weight: 600;">✓ Caring</span>
+                                                                        <span style="padding: 6px 12px; background-color: rgb(30, 64, 175); color: white; border-radius: 4px; font-weight: 600;">✓ Responsive</span>
+                                                                        <span style="padding: 6px 12px; background-color: rgb(30, 64, 175); color: white; border-radius: 4px; font-weight: 600;">✓ Well-led</span>
+                                                                    </div>
+                                                                </div>
                                                             </div>
                                                         </div>
+                                                    </div> <!-- CQCCompliantDocumentationPDF -->
 
-                                                    </div>
+
                                                 </div>
+                                            </div>
+                                            <!-- boarding click Care plan end  -->
+                                            <div class="onboardingBox p-4 mt-4">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <div class="d-flex gap-3 align-items-center">
+                                                            <div>
+                                                                <i class="bx  bx-check-circle greenText"></i>
+                                                            </div>
+                                                            <div>
+                                                                <p class="boardingStatus">Client onboarding complete! All stages approved.</p>
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </div> --}}
 
                                             </div>
                                             <div class="availabilityTabs__panel" id="OnboardingTabPanel2">
@@ -1440,7 +1575,10 @@
                                                             <div class="col-md-12">
                                                                 <div class="flexBw">
                                                                     <label>Billing Details</label>
-                                                                    <button type="button" class="bgBtn onboardingDetailsBtn" data-type="manage"><i class="bx bx-edit"></i> Manage Funding </button>
+                                                                    <button type="button"
+                                                                        class="bgBtn onboardingDetailsBtn"
+                                                                        data-type="manage"><i class="bx bx-edit"></i>
+                                                                        Manage Funding </button>
 
                                                                 </div>
                                                             </div>
@@ -1461,10 +1599,11 @@
                                                         </div>
                                                     </div>
 
-                                                    <div class="carePlanWrapper dolsSectionSecond" id="dolsRenderList" style="display: none;">
+                                                    <!-- <div class="carePlanWrapper dolsSectionSecond" id="dolsRenderList"
+                                                            style="display: none;">
 
-                                                    </div>
-                                                    <div id="dolsPagination"></div>
+                                                        </div>
+                                                        <div id="dolsPagination"></div> -->
                                                 </div>
                                             </div>
                                         </div>
@@ -4687,7 +4826,267 @@
                         </div> -->
                     </div>
                 </div>
-                <div class="content" id="clientEmergencyTab">
+                 <div class="content" id="clientEmergencyTab">
+                    <style>
+                        #clientEmergencyTab .emergencyMain {
+                            border: 1px solid #e2e8f0 !important;
+                            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.06) !important;
+                            border-radius: 12px !important;
+                            background: #ffffff !important;
+                            overflow: hidden !important;
+                        }
+
+                        #clientEmergencyTab .emergencyHeader {
+                            background: #fff5f3 !important; /* Light peach/coral background */
+                            border-bottom: 1px solid #fee2e2 !important; /* Very light pinkish border */
+                            padding: 24px !important;
+                        }
+
+                        #clientEmergencyTab .radIconClr i {
+                            color: #c20a30 !important; /* Crimson red icon */
+                        }
+
+                        #clientEmergencyTab .emergencyContent h3 {
+                            color: #1e293b !important;
+                            font-weight: 700 !important;
+                            font-size: 16px !important;
+                            margin: 0 !important;
+                        }
+
+                        #clientEmergencyTab .emergencyContent p small {
+                            color: #64748b !important;
+                            font-size: 13px !important;
+                        }
+
+                        #clientEmergencyTab .editBtn {
+                            background-color: #ffffff !important;
+                            border: 1px solid #cbd5e1 !important;
+                            color: #1e293b !important;
+                            font-weight: 600 !important;
+                            border-radius: 6px !important;
+                            padding: 8px 16px !important;
+                            display: inline-flex !important;
+                            align-items: center !important;
+                            gap: 8px !important;
+                            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+                            transition: all 0.15s ease-in-out !important;
+                        }
+
+                        #clientEmergencyTab .editBtn:hover {
+                            background-color: #f8fafc !important;
+                            border-color: #cbd5e1 !important;
+                            color: #0f172a !important;
+                        }
+
+                        /* Edit Mode Containers */
+                        #clientEmergencyTab #editableContactsContainer {
+                            padding: 24px 24px 0 24px !important;
+                        }
+
+                        #clientEmergencyTab .formFooter {
+                            padding: 0 24px 24px 24px !important;
+                            border-top: none !important; /* Ensure no line separating the footer buttons */
+                        }
+
+                        #clientEmergencyTab .contact-row {
+                            background-color: #f8fafc !important;
+                            border: 1px solid #e2e8f0 !important;
+                            border-radius: 12px !important;
+                            padding: 24px !important;
+                            margin-bottom: 20px !important;
+                            position: relative !important;
+                        }
+
+                        #clientEmergencyTab .contact-row .contact-number-label {
+                            font-size: 15px !important;
+                            font-weight: 700 !important;
+                            color: #1e293b !important;
+                            margin: 0 !important;
+                        }
+
+                        #clientEmergencyTab .contact-row .remove-contact-row {
+                            color: #dc2626 !important;
+                            cursor: pointer !important;
+                            transition: color 0.15s ease-in-out !important;
+                        }
+
+                        #clientEmergencyTab .contact-row .remove-contact-row:hover {
+                            color: #991b1b !important;
+                        }
+
+                        #clientEmergencyTab .contact-row .form-label {
+                            font-size: 13px !important;
+                            font-weight: 600 !important;
+                            color: #334155 !important;
+                            margin-bottom: 6px !important;
+                            display: block !important;
+                        }
+
+                        #clientEmergencyTab .contact-row .form-control {
+                            height: 40px !important;
+                            border-radius: 6px !important;
+                            border: 1px solid #cbd5e1 !important;
+                            box-shadow: none !important;
+                            font-size: 14px !important;
+                            background-color: #ffffff !important;
+                            color: #0f172a !important;
+                            transition: border-color 0.15s ease-in-out !important;
+                        }
+
+                        #clientEmergencyTab .contact-row .form-control:focus {
+                            border-color: #c20a30 !important;
+                            outline: none !important;
+                        }
+
+                        #clientEmergencyTab #addContactBtn {
+                            width: 100% !important;
+                            border: 1px dashed #cbd5e1 !important;
+                            background-color: #ffffff !important;
+                            color: #475569 !important;
+                            padding: 12px !important;
+                            font-weight: 600 !important;
+                            border-radius: 6px !important;
+                            display: flex !important;
+                            align-items: center !important;
+                            justify-content: center !important;
+                            gap: 8px !important;
+                            transition: all 0.15s ease-in-out !important;
+                            margin-bottom: 24px !important;
+                        }
+
+                        #clientEmergencyTab #addContactBtn:hover {
+                            background-color: #f8fafc !important;
+                            border-color: #94a3b8 !important;
+                            color: #0f172a !important;
+                        }
+
+                        #clientEmergencyTab #saveContactsBtn {
+                            background-color: #c20a30 !important;
+                            color: #ffffff !important;
+                            border: 1px solid #c20a30 !important;
+                            padding: 10px 20px !important;
+                            font-weight: 600 !important;
+                            border-radius: 6px !important;
+                            transition: all 0.15s ease-in-out !important;
+                        }
+
+                        #clientEmergencyTab #saveContactsBtn:hover {
+                            background-color: #a80825 !important;
+                            border-color: #a80825 !important;
+                        }
+
+                        #clientEmergencyTab #cancelContactsBtn {
+                            background-color: #ffffff !important;
+                            color: #475569 !important;
+                            border: 1px solid #cbd5e1 !important;
+                            padding: 10px 20px !important;
+                            font-weight: 600 !important;
+                            border-radius: 6px !important;
+                            transition: all 0.15s ease-in-out !important;
+                        }
+
+                        #clientEmergencyTab #cancelContactsBtn:hover {
+                            background-color: #f8fafc !important;
+                            color: #0f172a !important;
+                            border-color: #94a3b8 !important;
+                        }
+
+                        /* Styling read-only cards to match mockup 1 */
+                        #clientEmergencyTab .legacy-contact-card,
+                        #clientEmergencyTab .contact-card {
+                            margin: 24px !important;
+                            border: 1px solid #e2e8f0 !important;
+                            border-radius: 12px !important;
+                            background-color: #ffffff !important;
+                            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05) !important;
+                            padding: 24px !important;
+                        }
+
+                        #clientEmergencyTab .icon__pp {
+                            background: #ff7a59 !important; /* solid color avatar background */
+                            border-radius: 50% !important;
+                            width: 40px !important;
+                            height: 40px !important;
+                            display: flex !important;
+                            align-items: center !important;
+                            justify-content: center !important;
+                            color: #ffffff !important;
+                            font-size: 16px !important;
+                        }
+
+                        #clientEmergencyTab .legacy-contact-card h2,
+                        #clientEmergencyTab .contact-card h2 {
+                            font-weight: 700 !important;
+                            font-size: 16px !important;
+                            color: #1e293b !important;
+                            margin: 0 0 6px 0 !important;
+                        }
+
+                        #clientEmergencyTab .title {
+                            display: inline-block !important;
+                            background-color: #f8fafc !important;
+                            border: 1px solid #cbd5e1 !important;
+                            border-radius: 6px !important;
+                            padding: 2px 8px !important;
+                            font-size: 12px !important;
+                            font-weight: 600 !important;
+                            color: #475569 !important;
+                            margin-top: 4px !important;
+                            margin-bottom: 6px !important;
+                        }
+
+                        #clientEmergencyTab .contact-phone-row {
+                            font-size: 14px !important;
+                            color: #475569 !important;
+                            font-weight: 500 !important;
+                            display: flex !important;
+                            align-items: center !important;
+                            gap: 8px !important;
+                            margin-top: 8px !important;
+                            margin-bottom: 0 !important;
+                        }
+
+                        #clientEmergencyTab .contact-phone-row i {
+                            color: #64748b !important;
+                            font-size: 14px !important;
+                        }
+
+                        #clientEmergencyTab .call-now-btn {
+                            background-color: #22c55e !important;
+                            border-color: #22c55e !important;
+                            font-weight: 600 !important;
+                            border-radius: 6px !important;
+                            display: inline-flex !important;
+                            align-items: center !important;
+                            gap: 8px !important;
+                            padding: 8px 16px !important;
+                            color: #ffffff !important;
+                            text-decoration: none !important;
+                            transition: all 0.15s ease-in-out !important;
+                        }
+
+                        #clientEmergencyTab .call-now-btn:hover {
+                            background-color: #16a34a !important;
+                            border-color: #16a34a !important;
+                        }
+
+                        #clientEmergencyTab .emergency-priority-banner {
+                            margin: 16px 0 0 0 !important;
+                            font-size: 13px !important;
+                            color: #991b1b !important;
+                            background-color: #fdf1f1 !important;
+                            border: 1px solid #fecaca !important;
+                            border-radius: 6px !important;
+                            padding: 10px 16px !important;
+                            display: block !important;
+                            width: 100% !important;
+                            font-weight: 400 !important;
+                        }
+
+                        #clientEmergencyTab .emergency-priority-banner strong {
+                            font-weight: 700 !important;
+                        }
+                    </style>
                     <div class="emergencyMain">
                         <div id="emergencyAller">
                             <div class="emergencyHeader">
@@ -4695,79 +5094,158 @@
                                     <div class="emergencyContent">
                                         <div class="gap-3 d-flex align-items-center radIconClr">
                                             <i class="fas fa-phone-volume"></i>
-                                            <h3>Emergency Contacts </h3>
+                                            <h3>Emergency Contacts</h3>
                                         </div>
                                         <p class="mt-1"><small>Manage client emergency contact information</small></p>
                                     </div>
-                                    <div class="emergencyBtn">
-                                        <button class="borderBtn editBtn">
+                                    <div class="emergencyBtn d-flex gap-2">
+                                        <button class="borderBtn editBtn" id="editContactsBtn">
                                             <i class="fas fa-pencil-alt"></i>
-                                            <span> Edit</span>
+                                            <span>Edit</span>
                                         </button>
                                     </div>
                                 </div>
                             </div>
-                            <div class="emergencybottom p-4">
-                                <div class="userMum">
-                                    <div class="d-flex gap-3">
-                                        <div class="icon__pp"><i class="fa fa-user-o" aria-hidden="true"></i></div>
-                                        <div>
-                                            <h2>Carolanne Jones</h2>
-                                            <span class="title">Mum</span>
+                            
+                            <div class="emergencyListContainer">
+                                @php
+                                    $hasLegacy = !empty($clientDetails['em_name']) || !empty($clientDetails['em_phone']) || !empty($clientDetails['relationship']);
+                                    $hasNew = !empty($clientDetails['emergency_contacts']);
+                                    $hasAny = $hasLegacy || $hasNew;
+                                    $priorityCounter = 1;
+                                @endphp
+
+                                @if(!$hasAny)
+                                    <div class="p-5 text-center no-contacts-msg" style="padding: 40px; color: #64748b;">
+                                        <i class="fas fa-phone-slash" style="font-size: 48px; margin-bottom: 15px; color: #cbd5e1;"></i>
+                                        <p style="font-size: 16px; font-weight: 500;">No emergency contact information exists for this client.</p>
+                                        <button class="btn btn-primary btn-sm mt-3 add-first-contact-btn" style="background-color: #c20a30; border-color: #c20a30;">
+                                            <i class="fa fa-plus"></i> Add Emergency Contact
+                                        </button>
+                                    </div>
+                                @else
+                                    @if($hasLegacy)
+                                        <div class="emergencybottom p-4 legacy-contact-card">
+                                            <div class="d-flex justify-content-between align-items-center" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                                                <div class="userMum">
+                                                    <div class="d-flex gap-3" style="display: flex; gap: 15px; align-items: center;">
+                                                        <div class="icon__pp"><i class="fa-regular fa-user" aria-hidden="true"></i></div>
+                                                        <div>
+                                                            <h2>{{ $clientDetails['em_name'] ?? 'N/A' }}</h2>
+                                                            <span class="title">{{ $clientDetails['relationship'] ?? 'N/A' }}</span>
+                                                            @if(!empty($clientDetails['em_phone']))
+                                                                <p class="contact-phone-row"><i class="fa fa-phone"></i> {{ $clientDetails['em_phone'] }}</p>
+                                                            @endif
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                @if(!empty($clientDetails['em_phone']))
+                                                    <div class="callBtn">
+                                                        <a href="tel:{{ $clientDetails['em_phone'] }}" class="call-now-btn">
+                                                            <i class="fa fa-phone"></i> Call Now
+                                                        </a>
+                                                    </div>
+                                                @endif
+                                            </div>
+                                            <div class="emergencyError">
+                                                <p class="emergency-priority-banner">
+                                                    <strong>Priority Contact {{ $priorityCounter++ }}</strong> - This contact will be reached in case of emergencies
+                                                </p>
+                                            </div>
+                                        </div>
+                                    @endif
+
+                                    @if($hasNew)
+                                        @foreach($clientDetails['emergency_contacts'] as $index => $contact)
+                                            <div class="emergencybottom p-4 contact-card" id="contact-card-{{ $contact['id'] }}">
+                                                <div class="d-flex justify-content-between align-items-center" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                                                    <div class="userMum">
+                                                        <div class="d-flex gap-3" style="display: flex; gap: 15px; align-items: center;">
+                                                            <div class="icon__pp"><i class="fa-regular fa-user" aria-hidden="true"></i></div>
+                                                            <div>
+                                                                <h2>{{ $contact['name'] ?? 'N/A' }}</h2>
+                                                                <span class="title">{{ $contact['relationship'] ?? 'N/A' }}</span>
+                                                                @if(!empty($contact['phone_no']))
+                                                                    <p class="contact-phone-row"><i class="fa fa-phone"></i> {{ $contact['phone_no'] }}</p>
+                                                                @endif
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    @if(!empty($contact['phone_no']))
+                                                        <div class="callBtn">
+                                                            <a href="tel:{{ $contact['phone_no'] }}" class="call-now-btn">
+                                                                <i class="fa fa-phone"></i> Call Now
+                                                            </a>
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                                <div class="emergencyError">
+                                                    <p class="emergency-priority-banner">
+                                                        <strong>Priority Contact {{ $priorityCounter++ }}</strong> - This contact will be reached in case of emergencies
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    @endif
+                                @endif
+                            </div>
+                        </div>
+
+                        <!-- Template row for dynamically cloning contacts during edit -->
+                        <div id="contactRowTemplate" style="display: none;">
+                            <div class="contactMain p-4 contact-row">
+                                <div class="d-flex justify-content-between align-items-center" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                                    <h3 class="contact-number-label">Contact #</h3>
+                                    <div class="deleteIcon remove-contact-row">
+                                        <i class="fa-regular fa-trash-can" aria-hidden="true"></i>
+                                    </div>
+                                </div>
+                                <input type="hidden" class="contact-id" name="contacts[INDEX][id]" value="">
+                                <div class="emergencyForm">
+                                    <div class="row" style="margin-top: 15px;">
+                                        <div class="col-md-4 col-sm-4 col-xs-12">
+                                            <label class="form-label">Full Name</label>
+                                            <input class="form-control contact-name" name="contacts[INDEX][name]" type="text" placeholder="Enter name" required>
                                         </div>
 
-                                    </div>
+                                        <div class="col-md-4 col-sm-4 col-xs-12">
+                                            <label class="form-label">Phone Number</label>
+                                            <input class="form-control contact-phone" name="contacts[INDEX][phone_no]" type="text" placeholder="Enter phone">
+                                        </div>
 
-                                </div>
-                                <div class="emergencyError">
-                                    <p><strong>Priority Contact 1- </strong> - This contact will be reached in case of emergencies</p>
+                                        <div class="col-md-4 col-sm-4 col-xs-12">
+                                            <label class="form-label">Relationship</label>
+                                            <input class="form-control contact-relationship" name="contacts[INDEX][relationship]" type="text" placeholder="e.g., Daughter, Son" required>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div id="contactWrapper">
-                            <div class="contactMain p-4">
-                                <div class="d-flex justify-content-between">
-                                    <h3>Contact #</h3>
-                                    <div class="deleteIcon"> <i class="fa fa-trash-o" aria-hidden="true"></i>
 
-                                    </div>
+                        <div id="contactWrapper" style="display: none;">
+                            <form id="emergencyContactsForm">
+                                @csrf
+                                <input type="hidden" name="service_user_id" value="{{ $client_id }}">
+                                
+                                <div id="editableContactsContainer">
+                                    <!-- Dynamic contact forms will be appended here -->
                                 </div>
 
-                                <div class="emergencyForm">
-                                    <div class="row mt-4">
-                                        <div class="col-lg-4">
-                                            <label class="form-label">Full Name</label>
-                                            <input class="form-control" type="text" placeholder="Enter Full Name">
-                                        </div>
-
-                                        <div class="col-lg-4">
-                                            <label class="form-label">Phone Number</label>
-                                            <input class="form-control" type="text" placeholder="Enter Phone Number">
-                                        </div>
-
-                                        <div class="col-lg-4">
-                                            <label class="form-label">Relationship</label>
-                                            <input class="form-control" type="text" placeholder="Mother">
+                                <div class="formFooter">
+                                    <div class="contactBtn" style="margin-top: 10px;">
+                                        <button type="button" id="addContactBtn" class="btn btn-default">
+                                            <i class="fa fa-plus" style="margin-right: 8px;"></i>
+                                            <span>Add Another Contact</span>
+                                        </button>
+                                    </div>
+                                    <div style="margin-top: 20px;">
+                                        <div class="d-flex gap-3" style="display: flex; gap: 12px;">
+                                            <button type="submit" class="redBtn" id="saveContactsBtn">Save Contacts</button>
+                                            <button type="button" class="borderBtn cancelBtn" id="cancelContactsBtn">Cancel</button>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-
-                            <div class="formFooter">
-                                <div class="contactBtn d-flex gap-4">
-                                    <button type="button" id="addContactBtn">
-                                        <i class="fa fa-plus me-3"></i>
-                                        <span>Add Another Contact</span>
-                                    </button>
-                                </div>
-                                <div style="border-top: 1px solid var(--borderColor); margin-top:20px; padding-top:20px">
-
-                                    <div class="d-flex gap-3">
-                                        <button class="redBtn">Save Contacts</button>
-                                        <button class="borderBtn cancelBtn" onclick="showEmergency()">Cancel</button>
-                                    </div>
-                                </div>
-                            </div>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -7653,6 +8131,9 @@
                 tab.classList.add("active");
 
                 let tabName = tab.getAttribute("data-tab");
+                if (tabName == 'clientOnboardingTab') {
+                    loadOnboardingData()
+                }
 
                 contents.forEach(content => {
                     content.classList.remove("active");
@@ -7704,47 +8185,171 @@
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script src="https://jqueryniceselect.hernansartorio.com/js/jquery.nice-select.min.js"></script>
     <script>
-        const wrapper = document.getElementById("contactWrapper");
-
-        const originalContact = wrapper.querySelector(".contactMain");
-        const editBtn = document.querySelector(".editBtn");
-
-        document.querySelector(".editBtn").addEventListener("click", function() {
-            wrapper.style.display = "block";
-            editBtn.style.display = "none"
-        });
-
-        function showEmergency() {
-            wrapper.style.display = "none";
-            editBtn.style.display = "block";
-
-            wrapper.querySelectorAll(".contactMain").forEach((contact, index) => {
-                if (index !== 0) contact.remove(); // Keep first one
+        function reindexContacts() {
+            $('#editableContactsContainer .contact-row').each(function(index) {
+                // Update the contact label title
+                $(this).find('.contact-number-label').text('Contact #' + (index + 1));
+                // Update name attributes for inputs
+                $(this).find('input').each(function() {
+                    var nameAttr = $(this).attr('name');
+                    if (nameAttr) {
+                        var newName = nameAttr.replace(/contacts\[(INDEX|\d+)\]/g, 'contacts[' + index + ']');
+                        $(this).attr('name', newName);
+                    }
+                });
             });
-            originalContact.querySelectorAll("input").forEach(input => input.value = "");
-
         }
 
-        document.getElementById("addContactBtn").addEventListener("click", function() {
-            const newContact = originalContact.cloneNode(true);
+        function addBlankContactRow() {
+            var templateHtml = $('#contactRowTemplate').html();
+            var $newRow = $(templateHtml);
+            $newRow.find('input').val('');
+            $('#editableContactsContainer').append($newRow);
+            reindexContacts();
+        }
 
-            newContact.querySelectorAll("input").forEach(input => input.value = "");
+        function populateEditForm(focusId) {
+            $('#editableContactsContainer').empty();
+            
+            var contacts = [];
+            var details = typeof clientDetails !== 'undefined' ? clientDetails : (window.clientDetails || null);
+            if (details && details.emergency_contacts) {
+                contacts = details.emergency_contacts;
+            }
+            
+            if (contacts.length > 0) {
+                contacts.forEach(function(contact) {
+                    var templateHtml = $('#contactRowTemplate').html();
+                    var $newRow = $(templateHtml);
+                    
+                    $newRow.find('.contact-id').val(contact.id);
+                    $newRow.find('.contact-name').val(contact.name);
+                    $newRow.find('.contact-phone').val(contact.phone_no);
+                    $newRow.find('.contact-relationship').val(contact.relationship);
+                    
+                    $('#editableContactsContainer').append($newRow);
+                });
+                reindexContacts();
+            } else {
+                addBlankContactRow();
+            }
 
-            const footer = wrapper.querySelector(".formFooter");
-            wrapper.insertBefore(newContact, footer);
+            if (focusId) {
+                // Find the row containing this ID and focus on its name input
+                var $row = $('#editableContactsContainer').find('.contact-id[value="' + focusId + '"]').closest('.contact-row');
+                if ($row.length > 0) {
+                    $row.find('.contact-name').focus();
+                    $('html, body').animate({
+                        scrollTop: $row.offset().top - 100
+                    }, 500);
+                }
+            }
+        }
+
+        $(document).on('click', '#editContactsBtn', function() {
+            $('#emergencyAller .emergencyBtn').hide();
+            $('#emergencyAller .emergencyListContainer').hide();
+            $('#contactWrapper').show();
+            populateEditForm();
         });
 
+        $(document).on('click', '.add-first-contact-btn', function() {
+            $('#emergencyAller .emergencyBtn').hide();
+            $('#emergencyAller .emergencyListContainer').hide();
+            $('#contactWrapper').show();
+            populateEditForm();
+        });
 
-        wrapper.addEventListener("click", function(e) {
-            if (e.target.closest(".deleteIcon")) {
-                const contact = e.target.closest(".contactMain");
+        $(document).on('click', '#addContactBtn', function() {
+            addBlankContactRow();
+        });
 
-                if (contact !== originalContact) {
-                    contact.remove();
-                } else {
+        $(document).on('click', '.remove-contact-row', function() {
+            $(this).closest('.contact-row').remove();
+            if ($('#editableContactsContainer .contact-row').length === 0) {
+                addBlankContactRow();
+            } else {
+                reindexContacts();
+            }
+        });
 
-                    contact.querySelectorAll("input").forEach(input => input.value = "");
+        $(document).on('click', '#cancelContactsBtn', function() {
+            $('#contactWrapper').hide();
+            $('#emergencyAller .emergencyBtn').show();
+            $('#emergencyAller .emergencyListContainer').show();
+        });
+
+        $('#emergencyContactsForm').on('submit', function(e) {
+            e.preventDefault();
+            
+            var $saveBtn = $('#saveContactsBtn');
+            $saveBtn.prop('disabled', true).text('Saving...');
+            
+            $.ajax({
+                type: "POST",
+                url: "{{ route('roster.client.emergency_contact.save') }}",
+                data: $(this).serialize(),
+                success: function(response) {
+                    if (response.success) {
+                        toastr.success(response.message);
+                        setTimeout(function() {
+                            location.reload();
+                        }, 1000);
+                    } else {
+                        toastr.error(response.message);
+                        $saveBtn.prop('disabled', false).text('Save Contacts');
+                    }
+                },
+                error: function(xhr) {
+                    var msg = 'Something went wrong. Please try again.';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        msg = xhr.responseJSON.message;
+                    }
+                    toastr.error(msg);
+                    $saveBtn.prop('disabled', false).text('Save Contacts');
                 }
+            });
+        });
+
+        $(document).on('click', '.edit-single-contact', function() {
+            var contactId = $(this).data('id');
+            $('#emergencyAller .emergencyBtn').hide();
+            $('#emergencyAller .emergencyListContainer').hide();
+            $('#contactWrapper').show();
+            populateEditForm(contactId);
+        });
+
+        $(document).on('click', '.delete-single-contact', function() {
+            var contactId = $(this).data('id');
+            if (confirm('Are you sure you want to delete this emergency contact?')) {
+                $.ajax({
+                    type: "POST",
+                    url: "{{ route('roster.client.emergency_contact.delete') }}",
+                    data: {
+                        id: contactId,
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            toastr.success(response.message);
+                            $('#contact-card-' + contactId).fadeOut(function() {
+                                $(this).remove();
+                                if ($('.contact-card').length === 0 && !$('.legacy-contact-card').length) {
+                                    location.reload();
+                                }
+                            });
+                        } else {
+                            toastr.error(response.message);
+                        }
+                    },
+                    error: function(xhr) {
+                        var msg = 'Something went wrong. Please try again.';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            msg = xhr.responseJSON.message;
+                        }
+                        toastr.error(msg);
+                    }
+                });
             }
         });
     </script>
@@ -9095,6 +9700,299 @@
             $('#expense_id').val('');
             $('.modal-title').html('<i class="bx bx-plus"></i> Add Expense');
         });
+        //---------------- ONBOARDING FORM-----------------
+            let STAGE_FORM_ID = null;
+            let STAGE_ID = null;
+
+            function loadOnboardingData() {
+                $.ajax({
+                    url: "{{ route('roster.clientonboarding.loadUserDetails') }}", // URL to send the request to
+                    type: 'POST',
+                    data: {
+                        user_id: "{{ $clientDetails['id'] }}",
+                        _token: "{{ @csrf_token() }}"
+                    },
+                    beforeSend: function() {},
+                    success: function(res) {
+                        $("#activate_client_wrapper").addClass('d-none');
+                        if (typeof isAuthenticated === "function") {
+                            if (isAuthenticated(res) == false) {
+                                return false;
+                            }
+                        }
+                        if (res.status) {
+                            if (res.workflowData) {
+                                HOME_ID = res.workflowData.home_id;
+                                if (res.workflowData.form_percentage === 100) {
+                                    $("#activate_client_wrapper").removeClass('d-none');
+                                }
+
+
+
+                                let userData = res.userData;
+
+                                $("#manageModalClient .modal-title").html(`<i class="bx bx-user-check blueText blueText fs23"></i>Client
+                                        Onboarding: ${userData.name}`)
+                                let onboardingformprogresstext =
+                                    `${res.workflowData.onboardingforms_count} of ${res.workflowData.getstages_count } stages completed`;
+                                let onboardingformprogresspercentage =
+                                    `${res.workflowData.form_percentage}%`;
+                                $(".onboardingformprogresstext").html(onboardingformprogresstext);
+                                $(".onboardingformprogresspercentage").html(
+                                    onboardingformprogresspercentage);
+                                $(".onboardingformprogressfill").css('width',
+                                    onboardingformprogresspercentage)
+                                $("#loadStagesData").html(`<div class="noData mt-2" id="noworkflowdata">
+                                            <div>
+                                                <i class="bx bx-cog"></i>
+                                                <p class="mb-0">No Stages Found !!</p>
+                                            </div>
+                                        </div>`);
+                                // return;
+                                if (res.workflowStages.length > 0) {
+                                    let html = '';
+                                    $.each(res.workflowStages, function(key, val) {
+                                        let stageformid = val.onboardingforms ? val
+                                            .onboardingforms.id : "";
+                                        let STATUS_VAL = stageformid ? 'Completed' :
+                                            (val.required_stage == 1 ? 'Required' :
+                                                "Pending");
+                                        let HEADER_STATUS = stageformid ?
+                                            '<span class="careBadg redbadges ms-2">Required</span>' :
+                                            (val.required_stage == 1 ?
+                                                '<span class="careBadg redbadges ms-2">Required</span>' :
+                                                '<span class="borderBadg ms-2">Optional</span>'
+                                            );
+
+                                        html += `<div class="recordCard"><div class="rounded8 shadowp p24 mt20 recordBtn cursorPointer"
+                                                                                        ${stageformid ? 'style="border: 1px solid #86efac;"':''} type="button">
+                                                                                        <div class="flexBw recordBtn1">
+                                                                                            <div>
+                                                                                                <div class="dFlexGap mb-3 align-items-start">
+                                                                                                    <div>
+                                                                                                        <i class="bx ${stageformid?'bx-check-circle greenText':'bx-circle'} fs23"></i>
+                                                                                                    </div>
+                                                                                                    <div>
+                                                                                                        <h6 class="h6Head">${val.order_no}. ${val.stage_name} ${HEADER_STATUS}
+                                                                                                        </h6>
+                                                                                                        <p class="fs13 textGray500 mb-0">${val.description}</p>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                            <div>
+                                                                                                <span class="careBadg ${stageformid?'darkGreenBadges':'darkMuteBadg'}">${STATUS_VAL}</span>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="recordContent" data-stageid="${val.id}" data-stageformid="${stageformid}">
+                                                                                            <h6 class="fs13 font600 dynamic_form_title"></h6>
+                                                                                            <form id="saveForms" class="mt-2 saveForms">
+                                                                                                <div class="alert alert-danger d-none stage_error_msg"></div>
+                                                                                                <div id="loadStagesFormData-${val.id}" class="loadStagesFormData">
+                                                                                                    Loading...
+                                                                                                </div>
+                                                                                                <div class="row">
+                                                                                                    <div class="col-md-12">
+                                                                                                        <button class="bgBtn w100 mt-4 pgreenBtn submitBtn" type="button"
+                                                                                                            id="submitBtn"><i class="bx bx-check-circle f18"></i>Save
+                                                                                                            Form</button>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </form>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>`;
+                                    });
+                                    $("#loadStagesData").html(html);
+                                } else {
+                                    $("#loadStagesData").html(`<div class="noData mt-2" id="noworkflowdata">
+                                            <div>
+                                                <i class="bx bx-cog"></i>
+                                                <p class="mb-0">No Stages Found !!</p>
+                                            </div>
+                                        </div>`);
+                                }
+                            } else {
+                                $("#loadStagesData").html(`<div class="noData mt-2" id="noworkflowdata">
+                                            <div>
+                                                <i class="bx bx-cog"></i>
+                                                <p class="mb-0">No Onboarding Configured !!</p>
+                                            </div>
+                                        </div>`);
+                            }
+                        }
+                    },
+                    error: function(xhr, ajaxOptions, thrownError) {
+                        console.log('error');
+
+                    }
+                });
+            }
+            $(".activateClientBtn").click(function() {
+                $.ajax({
+                    url: "{{ route('roster.client_active_status') }}", // URL to send the request to
+                    type: 'POST', // or 'POST'
+                    data: {
+                        id: "{{ $clientDetails['id'] }}",
+                        status: 1,
+                        _token: "<?= csrf_token() ?>"
+                    }, // Data to send with the request
+                    beforeSend: function() {},
+                    success: function(res) {
+                        if (typeof isAuthenticated === "function") {
+                            if (isAuthenticated(res) == false) {
+                                return false;
+                            }
+                        }
+                        alertMsg('suc', res.message)
+                    },
+                    error: function(xhr, ajaxOptions, thrownError) {
+                        alertMsg('err', 'Status Not Updated');
+                    }
+                });
+            });
+            function alertMsg(selector = 'err', msg) {
+                $('.ajax-alert-' + selector).find('.msg').text(
+                    msg);
+                $('.ajax-alert-' + selector).show();
+
+                setTimeout(function() {
+                    $(".ajax-alert-" + selector).fadeOut()
+                }, 5000);
+            }
+            $(".recordSec").on("click", ".recordBtn1", function() {
+
+                let card = $(this).closest(".recordCard");
+
+
+                let content = card.find(".recordContent");
+
+                if (!content.length) return;
+
+                // close all
+                $(".recordSec .recordContent").each(function() {
+                    // console.log(this);
+                    $(this).hide();
+                    $(this).removeClass('activeForm');
+                });
+                $(".loadStagesFormData").html('');
+
+                // open current
+                STAGE_ID = content.attr('data-stageid');
+                STAGE_FORM_ID = content.attr('data-stageformid');
+                content.addClass('activeForm');
+                viewdatawithvalueFormios()
+                content.show();
+            });
+            function viewdatawithvalueFormios() {
+                var token = "<?= csrf_token() ?>";
+                var settings = {
+                    "url": "{{ route('roster.staffonboarding.loadforms') }}",
+                    "method": "POST",
+                    "data": {
+                        stage_id: STAGE_ID,
+                        stage_form_id: STAGE_FORM_ID,
+                        _token: token
+                    },
+                    //dataType: "json",
+                };
+                $.ajax(settings).done(function(response) {
+                    if (typeof isAuthenticated === "function") {
+                        if (isAuthenticated(response) == false) {
+                            return false;
+                        }
+                    }
+                    $(".dynamic_form_title").html(response.title)
+                    Formio.createForm(document.getElementById('loadStagesFormData-' + STAGE_ID), {
+                        components: JSON.parse(response.pattern)
+                    }, {
+                        readOnly: false
+                    }).then(function(form) {
+                        if (response.pattern_value) {
+                            form.submission = {
+                                data: JSON.parse(response.pattern_value)
+                            }
+                        }
+                    });
+                });
+            }
+            $(document).on('click', ".submitBtn", function() {
+
+                let form = $(this).closest("form");
+
+                if (!form.length) return false;
+
+                let isValid = true;
+
+                let fields = form.find('[aria-required="true"]');
+
+                console.log("Total required fields:", fields.length);
+                let errHtml = '';
+                fields.each(function() {
+
+                    let field = $(this);
+                    let val = field.val();
+
+                    if (!val || val.trim() === "") {
+                        errHtml += 'Please fill all required fields';
+                        field.addClass("error");
+                        isValid = false;
+                    } else {
+                        field.removeClass("error");
+                    }
+                });
+                if (!isValid) {
+                    form.find('.stage_error_msg')
+                        .html('Please fill all required fields')
+                        .removeClass('d-none');
+                    // alert("Please fill all required fields");
+                    return false;
+                }
+                let USER_ID = "{{ $clientDetails['id'] }}";
+                let formData = new FormData(form[0]);
+                console.log(`STAGE_ID : ${STAGE_ID}`,
+                    `STAGE_FORM_ID: ${STAGE_FORM_ID}  , USER_ID: ${USER_ID}`);
+                // return;
+                // extra params append karo
+                formData.append('_token', "<?= csrf_token() ?>");
+                formData.append('stage_id', STAGE_ID);
+                formData.append('stage_form_id', STAGE_FORM_ID);
+                formData.append('user_id', USER_ID);
+                let fileInput = document.querySelector('input[type=file]');
+                if (fileInput.files.length > 0) {
+                    formData.append('file', fileInput.files[0]);
+                }
+                $.ajax({
+                    url: "{{ route('roster.staffonboarding.saveforms') }}",
+                    type: 'POST',
+                    data: formData,
+
+                    // 👇 IMPORTANT for FormData
+                    processData: false,
+                    contentType: false,
+
+                    beforeSend: function() {},
+
+                    success: function(res) {
+                        if (typeof isAuthenticated === "function") {
+                            if (isAuthenticated(res) == false) {
+                                return false;
+                            }
+                        }
+                        if (res.success) {
+                            STAGE_FORM_ID = res.data.id;
+                            alertMsg('suc', res.message);
+
+                            // optional reload
+                            location.reload();
+                        }
+                    },
+
+                    error: function() {
+                        alertMsg('err', 'Form Not Saved');
+                    }
+                });
+
+            });
 
         // Body Map — header button opens the modal in aggregated read-only
         // mode (every active injury for this client, across all risks).

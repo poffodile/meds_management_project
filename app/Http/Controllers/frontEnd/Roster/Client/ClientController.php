@@ -4,11 +4,10 @@ namespace App\Http\Controllers\frontend\roster\Client;
 
 use App\AccessLevel;
 use App\DynamicFormBuilder;
-use App\Home;
 use App\Http\Controllers\Controller;
 use App\Models\AlertType;
-use App\Models\ClientTaskCategory;
-use App\Models\ClientTaskType;
+use App\Models\clientTaskCategory;
+use App\Models\clientTaskType;
 use App\Models\EducationType;
 use App\Models\SuEducationProfile, App\Models\SuEducationStaffAssignment, App\Models\SuEducationTask, App\Models\SuEducationAttendance, App\Models\SuEducationNote, App\Models\SuEducationResource;
 use App\Models\suUserCourse;
@@ -17,12 +16,12 @@ use App\Services\Staff\ClientCareTaskService;
 use App\Services\Staff\ClientManagementService;
 use App\Services\Staff\StaffService;
 use App\ServiceUser;
+use App\Models\ClientCarePlan;
 use Auth, DB, Session;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
-use App\Models\ClientCarePlan;
 
 class ClientController extends Controller
 {
@@ -52,47 +51,9 @@ class ClientController extends Controller
         return view('frontEnd.roster.client.client', $data);
     }
 
-    // public function client_details($client_id)
-    // {
-    //     $home_ids = Auth::user()->home_id;
-    //     $ex_home_ids = explode(',', $home_ids);
-    //     $home_id = $ex_home_ids[0];
-
-    //     $clientData = $this->child_courses($client_id);
-    //     $responseData = $clientData->getData(true);
-    //     $data['clientDetails'] = $responseData['data'];
-    //     if ($data['clientDetails']['status'] == 1) {
-    //         $status = 'Active';
-    //     } else if ($data['clientDetails']['status'] == 0) {
-    //         $status = 'Inactive';
-    //     } else {
-    //         $status = 'Archived';
-    //     }
-    //     $data['status'] = $status;
-    //     $requestData['user_id'] = Auth::user()->id;
-    //     $data['client_id'] = $client_id;
-    //     $data['alert_type'] = AlertType::where('status', 1)->get();
-    //     $data['task_category'] = clientTaskCategory::where('status', 1)->get();
-    //     $data['education_type'] = EducationType::where('status', 1)->get();
-    //     $data['dynamic_form_builder'] = DynamicFormBuilder::getFormList
-
-    //     // Education Data
-    //     $data['education_profile'] = SuEducationProfile::where('service_user_id', $client_id)->where('status', 1)->first();
-    //     $data['assigned_staff'] = SuEducationStaffAssignment::with('staff')->where('service_user_id', $client_id)->where('status', 1)->get();
-    //     $data['users'] = DB::table('user')->where('home_id', $home_id)->where('is_deleted', 0)->get()->toArray();
-    //     $data['service_user_id'] = $client_id;
-
-    //     $data['education_tasks'] = SuEducationTask::with('staff')->where('service_user_id', $client_id)->orderBy('due_date', 'asc')->get();
-    //     $data['education_attendance'] = SuEducationAttendance::with('staff')->where('service_user_id', $client_id)->orderBy('date', 'desc')->get();
-    //     $data['education_notes'] = SuEducationNote::with('staff')->where('service_user_id', $client_id)->orderBy('created_at', 'desc')->get();
-    //     $data['education_resources'] = SuEducationResource::where('service_user_id', $client_id)->orderBy('created_at', 'desc')->get();
-
-
-    //     return view('frontEnd.roster.client.client_details', $data);
-    // }
-
     public function client_details($client_id)
     {
+        $home_id = explode(',', Auth::user()->home_id)[0];
         $clientData = $this->child_courses($client_id);
         $responseData = $clientData->getData(true);
         $data['clientDetails'] = $responseData['data'];
@@ -108,12 +69,8 @@ class ClientController extends Controller
         $data['client_id'] = $client_id;
         $data['alert_type'] = AlertType::where('status', 1)->get();
         $data['task_category'] = clientTaskCategory::where('status', 1)->get();
-        $home_ids = Auth::user()->home_id;
-        $ex_home_ids = explode(',', $home_ids);
-        $home_id = $ex_home_ids[0];
-        $data['home_details'] = Home::find($home_id);
+        // echo "<pre>";print_r($data['clientCareTask']);die;
         $data['access_level'] = AccessLevel::select('id', 'name')->where('home_id', $home_id)->where('is_deleted', 0)->get();
-
         // Education Data
         $data['education_profile'] = SuEducationProfile::where('service_user_id', $client_id)->where('status', 1)->first();
         $data['assigned_staff'] = SuEducationStaffAssignment::with('staff')->where('service_user_id', $client_id)->where('status', 1)->get();
@@ -125,14 +82,13 @@ class ClientController extends Controller
         $data['education_notes'] = SuEducationNote::with('staff')->where('service_user_id', $client_id)->orderBy('created_at', 'desc')->get();
         $data['education_resources'] = SuEducationResource::where('service_user_id', $client_id)->orderBy('created_at', 'desc')->get();
 
+
         return view('frontEnd.roster.client.client_details', $data);
     }
-
-
     public function child_courses($childId)
     {
         // $all_courses = suUserCourse::where('su_user_id',$childId)->get();
-        $all_courses = ServiceUser::with(['courses', 'carers'])->where('id', $childId)->first();
+        $all_courses = ServiceUser::with(['courses', 'carers', 'emergencyContacts'])->where('id', $childId)->first();
         return response()->json(['success' => true, 'data' => $all_courses]);
     }
     public function client_delete(Request $request)
@@ -258,13 +214,12 @@ class ClientController extends Controller
         $home_ids = Auth::user()->home_id;
         $ex_home_ids = explode(',', $home_ids);
         $home_id = $ex_home_ids[0];
-        $data['task_type'] = ClientTaskType::where('status', 1)->get();
-        $data['task_category'] = ClientTaskCategory::where('status', 1)->get();
+        $data['task_type'] = clientTaskType::where('status', 1)->get();
+        $data['task_category'] = clientTaskCategory::where('status', 1)->get();
         $data['child'] = ServiceUser::select('id', 'home_id', 'earning_scheme_label_id', 'name', 'user_name', 'phone_no', 'date_of_birth', 'child_type', 'room_type', 'current_location', 'street', 'care_needs', 'suFundingType', 'status', 'is_deleted')
             ->where(['home_id' => $home_id, 'is_deleted' => 0, 'status' => 1])->get();
         $data['carer'] = $this->staffService->activeStaff($home_id)->get();
         $data['care_plans'] = ClientCarePlan::where(['home_id' => $home_id, 'status' => 1])->get();
-
         $clientCareTask = '';
         if ($task_id) {
             $clientCareTask = $this->clientCareTaskService->details($task_id);
@@ -481,15 +436,19 @@ class ClientController extends Controller
         // echo "<pre>";print_r($request->all());die;
         $requestData = $request->all();
         $requestData['user_id'] = Auth::user()->id;
-        $alerts = $this->clientAlertService->list($requestData);
+        $query = $this->clientAlertService->list($requestData);
+        $alerts = $query->paginate(10);
+        // return response()->json(['data'=>$alerts->first_page_url()]);
         return response()->json([
             'success' => true,
             'message' => 'Alerts List',
             'data' => $alerts->items(),
             'total' => $alerts->total(),
+            'is_header_alert'=>$request->is_header_alert ?? 0,
             'pagination' => [
                 'next_page_url' => $alerts->nextPageUrl(),
                 'prev_page_url' => $alerts->previousPageUrl(),
+                'first_page_url' => $alerts->url(1),
             ]
         ]);
     }
@@ -584,5 +543,102 @@ class ClientController extends Controller
             'success' => true,
             'message' => 'Status updated successfully'
         ]);
+    }
+
+    public function emergency_contact_save(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'service_user_id' => 'required|exists:service_user,id',
+            'contacts' => 'nullable|array',
+            'contacts.*.name' => 'required|string|max:255',
+            'contacts.*.phone_no' => 'nullable|string|max:50',
+            'contacts.*.relationship' => 'required|string|max:100',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first()
+            ], 422);
+        }
+
+        try {
+            $serviceUserId = $request->service_user_id;
+            $contactsData = $request->input('contacts', []);
+
+            $activeIds = [];
+            foreach ($contactsData as $contactData) {
+                if (!empty($contactData['id'])) {
+                    // Update existing
+                    $contact = \App\Models\ServiceUserEmergencyContact::where('service_user_id', $serviceUserId)
+                        ->where('id', $contactData['id'])
+                        ->first();
+                    if ($contact) {
+                        $contact->update([
+                            'name' => $contactData['name'],
+                            'phone_no' => $contactData['phone_no'] ?? null,
+                            'relationship' => $contactData['relationship'],
+                        ]);
+                        $activeIds[] = $contact->id;
+                    }
+                } else {
+                    // Create new
+                    $contact = \App\Models\ServiceUserEmergencyContact::create([
+                        'service_user_id' => $serviceUserId,
+                        'name' => $contactData['name'],
+                        'phone_no' => $contactData['phone_no'] ?? null,
+                        'relationship' => $contactData['relationship'],
+                    ]);
+                    $activeIds[] = $contact->id;
+                }
+            }
+
+            // Delete contacts that are no longer present
+            \App\Models\ServiceUserEmergencyContact::where('service_user_id', $serviceUserId)
+                ->whereNotIn('id', $activeIds)
+                ->delete();
+
+            $updatedContacts = \App\Models\ServiceUserEmergencyContact::where('service_user_id', $serviceUserId)->get();
+
+            Session::flash('success', 'Emergency contacts saved successfully.');
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Emergency contacts saved successfully.',
+                'data' => $updatedContacts
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function emergency_contact_delete(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|exists:service_user_emergency_contacts,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first()
+            ], 422);
+        }
+
+        try {
+            \App\Models\ServiceUserEmergencyContact::where('id', $request->id)->delete();
+            return response()->json([
+                'success' => true,
+                'message' => 'Emergency contact deleted successfully.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }
