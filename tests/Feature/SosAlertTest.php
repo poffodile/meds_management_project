@@ -373,13 +373,37 @@ class SosAlertTest extends TestCase
         $admin = User::where('user_type', 'A')->where('is_deleted', 0)->first();
         $homeId = $this->getAdminHomeId($admin);
 
-        // Ensure at least one alert exists
-        $alert = sosAlert::create([
+        // 1. Create an active alert
+        $activeAlert = sosAlert::create([
             'staff_id' => $admin->id,
             'home_id' => $homeId,
-            'location' => 'API Test Location',
-            'message' => 'API Temp Alert',
+            'location' => 'API Test Location Active',
+            'message' => 'API Active Alert',
             'status' => 1,
+        ]);
+
+        // 2. Create an acknowledged alert
+        $ackAlert = sosAlert::create([
+            'staff_id' => $admin->id,
+            'home_id' => $homeId,
+            'location' => 'API Test Location Ack',
+            'message' => 'API Ack Alert',
+            'status' => 2,
+            'acknowledged_by' => $admin->id,
+            'acknowledged_at' => now(),
+        ]);
+
+        // 3. Create a resolved alert
+        $resolvedAlert = sosAlert::create([
+            'staff_id' => $admin->id,
+            'home_id' => $homeId,
+            'location' => 'API Test Location Resolved',
+            'message' => 'API Resolved Alert',
+            'status' => 3,
+            'acknowledged_by' => $admin->id,
+            'acknowledged_at' => now(),
+            'resolved_by' => $admin->id,
+            'resolved_at' => now(),
         ]);
 
         $response = $this->postJson('/api/staff/sos-alert/list', [
@@ -391,22 +415,39 @@ class SosAlertTest extends TestCase
         $response->assertJsonStructure([
             'success',
             'data' => [
-                '*' => ['id', 'staff_id', 'home_id', 'message', 'status']
+                '*' => ['id', 'staff_id', 'home_id', 'message', 'status', 'created_at', 'acknowledged_by', 'resolved_by']
             ]
         ]);
 
         $data = $response->json('data');
-        $found = false;
-        foreach ($data as $item) {
-            if ($item['id'] == $alert->id) {
-                $this->assertEquals('Active', $item['status']);
-                $found = true;
-                break;
-            }
-        }
-        $this->assertTrue($found);
 
-        $alert->delete();
+        // Verify active alert formatting
+        $foundActive = collect($data)->firstWhere('id', $activeAlert->id);
+        $this->assertNotNull($foundActive);
+        $this->assertEquals('Active', $foundActive['status']);
+        $this->assertEquals($admin->name, $foundActive['staff_id']);
+        $this->assertNull($foundActive['acknowledged_by']);
+        $this->assertNull($foundActive['resolved_by']);
+        $this->assertMatchesRegularExpression('/^\d{1,2}\/\d{1,2}\/\d{4},\s\d{1,2}:\d{2}:\d{2}\s(AM|PM)$/', $foundActive['created_at']);
+
+        // Verify acknowledged alert formatting
+        $foundAck = collect($data)->firstWhere('id', $ackAlert->id);
+        $this->assertNotNull($foundAck);
+        $this->assertEquals('Acknowledged', $foundAck['status']);
+        $this->assertEquals($admin->name, $foundAck['acknowledged_by']);
+        $this->assertNull($foundAck['resolved_by']);
+
+        // Verify resolved alert formatting
+        $foundResolved = collect($data)->firstWhere('id', $resolvedAlert->id);
+        $this->assertNotNull($foundResolved);
+        $this->assertEquals('Resolved', $foundResolved['status']);
+        $this->assertEquals($admin->name, $foundResolved['acknowledged_by']);
+        $this->assertEquals($admin->name, $foundResolved['resolved_by']);
+
+        // Clean up
+        $activeAlert->delete();
+        $ackAlert->delete();
+        $resolvedAlert->delete();
     }
 
     public function test_api_acknowledge_and_resolve()

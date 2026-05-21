@@ -74,6 +74,28 @@ class SosAlertController extends Controller
                 } else {
                     $alertsArray[$key]['status'] = 'Unknown';
                 }
+
+                // 1. created date format - 5/20/2026, 6:12:07 PM
+                if (isset($alert['created_at'])) {
+                    $alertsArray[$key]['created_at'] = \Carbon\Carbon::parse($alert['created_at'])->format('n/j/Y, g:i:s A');
+                }
+
+                // 2. instead of staff_id name of the staff "staff_id": 25,
+                $alertsArray[$key]['staff_id'] = $alert['staff']['name'] ?? 'Unknown';
+
+                // 3. When "acknowledged_by": null, data pass then the name of the staff pass 
+                if (!empty($alert['acknowledged_by'])) {
+                    $alertsArray[$key]['acknowledged_by'] = $alert['acknowledged_by_user']['name'] ?? 'Unknown';
+                } else {
+                    $alertsArray[$key]['acknowledged_by'] = null;
+                }
+
+                // 4. if resolved by passing in the API "resolved_by": null, then the name of the user who resolved the status
+                if (!empty($alert['resolved_by'])) {
+                    $alertsArray[$key]['resolved_by'] = $alert['resolved_by_user']['name'] ?? 'Unknown';
+                } else {
+                    $alertsArray[$key]['resolved_by'] = null;
+                }
             }
 
             return response()->json([
