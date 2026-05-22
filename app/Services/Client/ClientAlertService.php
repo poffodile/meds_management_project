@@ -43,12 +43,20 @@ class ClientAlertService
         if (!empty($filters['user_id'])) {
             $query->where('user_id', $filters['user_id']);
         }
+        if(!empty($filters['severity']) && $filters['severity'] != 1){
+            $query->where('severity', $filters['severity']);
+        }
+        if(!empty($filters['status']) && $filters['status'] != 0){
+            $query->where('status', $filters['status']);
+        }
+        if(!empty($filters['type']) && $filters['type'] != 0){
+            $query->where('alert_type_id', $filters['type']);
+        }
+        // if($filters['sort_by'] != 1){
+            
+        // }
 
-        $alerts = $query
-            ->with('alert_types:id,title')
-            ->orderBy('id')
-            ->paginate(10);
-        return $alerts;
+       return $query->with('alert_types:id,title')->orderBy('id','DESC');
     }
     public function details($id){
         return ClientAlert::find($id);
@@ -86,7 +94,7 @@ class ClientAlertService
             DB::rollBack();
             Log::error('Error increase in acknowledge :', [
                 'error' => $e->getMessage(),
-                'data'  => $data
+                'id'  => $id
             ]);
             throw $e;
         }
@@ -96,6 +104,7 @@ class ClientAlertService
         try{
             $clientAlert = ClientAlert::find($id);
             $clientAlert->resolve_date = date('Y-m-d H:i');
+            $clientAlert->status =2;
             $clientAlert->save();
             DB::commit();
             return $clientAlert;
@@ -103,7 +112,7 @@ class ClientAlertService
             DB::rollBack();
             Log::error('Error alert resolved :', [
                 'error' => $e->getMessage(),
-                'data'  => $data
+                'id'  => $id
             ]);
             throw $e;
         } 
@@ -120,9 +129,33 @@ class ClientAlertService
             DB::rollBack();
             Log::error('Error alert archived :', [
                 'error' => $e->getMessage(),
-                'data'  => $data
+                'id'  => $id
             ]);
             throw $e;
         } 
+    }
+    public function alert_increase_all_acknowledge(){
+         DB::beginTransaction();
+
+        try {
+
+            $data = ClientAlert::where('status', 1)
+                ->where('requires_staff_acknowledgment', 1)
+                ->increment('staff_acknowledgment_count');
+
+            DB::commit();
+
+            return $data;
+
+        } catch (\Exception $e) {
+
+            DB::rollBack();
+
+            Log::error('Error increase in all acknowledge :', [
+                'error' => $e->getMessage()
+            ]);
+
+            throw $e;
+        }
     }
 }

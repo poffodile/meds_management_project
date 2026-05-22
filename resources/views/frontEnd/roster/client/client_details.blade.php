@@ -237,7 +237,6 @@
             <div class="header-actions addnewicons">
                 <button class="btn borderBtn editClient" data-toggle="modal" data-target="#addServiceUserModal" data-child_id="{{$clientDetails['id']}}"><i class='bx  bx-edit'></i> Edit Client</button>
                 <button class="btn borderBtn openBodyMapProfile" data-service-user-id="{{ $client_id }}"><i class='bx  bx-body'></i> Body Map</button>
-                <!-- <button class="btn borderBtn"><i class='bx  bx-arrow-in-up-square-half'></i> Import Documents</button> -->
                 <button class="btn borderBtn" onclick="openImportModal({{ $client_id }})"><i class='bx  bx-arrow-in-up-square-half'></i> Import Documents</button>
                 <button class="btn allBtnUseColor" data-toggle="modal" data-target="#generateCarePlanModal"><i class='bx  bx-sparkles'></i> Generate Care Plan</button>
             </div>
@@ -284,7 +283,7 @@
                     <button class="tab" data-tab="clientDoLSTab" onclick="showDolsList()"> DoLS </button>
                     <button class="tab" data-tab="clientDNACPRTab"> DNACPR </button>
                     <button class="tab" data-tab="clientSafeguardingTab"> Safeguarding </button>
-                    <button class="tab" data-tab="clientConsentTab"> Consent </button>
+                    <button class="tab" data-tab="clientConsentTab" onclick="showConsentList()"> Consent </button>
                     <button class="tab" data-tab="clientEmergencyTab"> Emergency </button>
                     <button class="tab" data-tab="clientDocumentsTab"> Documents </button>
                     <button class="tab" data-tab="clientProgressReportTab"> Progress Report </button>
@@ -1592,18 +1591,10 @@
                                                                         <th>Percentage</th>
                                                                     </tr>
                                                                 </thead>
-                                                                <tbody id="onboardingDetailsListHtml">
-
-                                                                </tbody>
+                                                                <tbody id="onboardingDetailsListHtml"></tbody>
                                                             </table>
                                                         </div>
                                                     </div>
-
-                                                    <!-- <div class="carePlanWrapper dolsSectionSecond" id="dolsRenderList"
-                                                            style="display: none;">
-
-                                                        </div>
-                                                        <div id="dolsPagination"></div> -->
                                                 </div>
                                             </div>
                                         </div>
@@ -1657,175 +1648,8 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="p-20 p-t-0" id="renderHtmlClientCareTask">
-
-                        </div>
-                        <!-- <div class="p-20 p-t-0">
-                            <div class="caretasknameandnumber m-b-10">
-                                Personal Care <span>2</span>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="profile-card careTasksCard redborderleft mb-0">
-                                        <div class="card-header">
-                                            <div class="user">
-                                                <div class="info">
-                                                    <div class="name"><a href="#!">Static Data</a></div>
-                                                    
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="sectionCarer">
-                                            <div class="tags">
-                                                <span class="radShowbtn">critical</span>
-                                                <span class="inactive">Weekly</span>
-                                            </div>
-                                        </div>
-                                        <div class="details">
-                                            <div class="item">
-                                                <i class='bx  bx-clock'></i> <span>30 minutes</span>
-                                            </div>
-                                            <div class="item redalrttext">
-                                                <i class='bx  bx-alert-circle'></i> <span>Alerts: Missed</span>
-                                            </div>
-                                        </div>
-                                        <div class="dFlexGap">
-                                            <button class="borderBtn flex1" data-id="120"> <i class="fa-regular fa-pen-to-square"></i> Edit </button>
-                                            <button class="borderBtn deletewithBorder" data-id="120"> <i class="fa-regular fa-trash-can redText"></i> </button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="profile-card careTasksCard blueborderleft mb-0">
-                                        <div class="card-header">
-                                            <div class="user">
-                                                <div class="info">
-                                                    <div class="name"><a href="#!">Daily emotional support check-in</a></div>
-                                                    
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="sectionCarer">
-                                            <div class="tags">
-                                                <span class="yellow">critical</span>
-                                                <span class="inactive">Weekly</span>
-                                            </div>
-                                        </div>
-                                        <div class="details">
-                                            <div class="item">
-                                                <i class='bx  bx-clock'></i> <span>30 minutes</span>
-                                            </div>
-                                            <div class="item redalrttext">
-                                                <i class='bx  bx-alert-circle'></i> <span>Alerts: Missed</span>
-                                            </div>
-                                        </div>
-                                        <div class="actions">
-                                            <button class="edit" data-id="120"> <i class="fa-regular fa-pen-to-square"></i> Edit </button>
-                                            <button class="delete" data-id="120"> <i class="fa-regular fa-trash-can"></i> </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div> -->
+                        <div class="p-20 p-t-0" id="renderHtmlClientCareTask"></div>
                         <div id="clientCareTaskPagination"></div>
-                        <!-- <div class="p-20 p-t-0">
-                            <div class="caretasknameandnumber m-b-10">
-                                Nutrition
-                                <span>3</span>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="profile-card careTasksCard redborderleft m-b-15">
-                                        <div class="card-header">
-                                            <div class="user">
-                                                <div class="info">
-                                                    <div class="name"><a href="#!">Meal planning with nutrients focusing on balanced diet</a></div>
-                                                    
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="sectionCarer">
-                                            <div class="tags">
-                                                <span class="yellow">critical</span>
-                                                <span class="inactive">Weekly</span>
-                                            </div>
-                                        </div>
-                                        <div class="details">
-                                            <div class="item">
-                                                <i class='bx  bx-clock'></i> <span>30 minutes</span>
-                                            </div>
-                                            <div class="item redalrttext">
-                                                <i class='bx  bx-alert-circle'></i> <span>Alerts: Missed</span>
-                                            </div>
-                                        </div>
-                                        <div class="actions">
-                                            <button class="edit" data-id="120"> <i class="fa-regular fa-pen-to-square"></i> Edit </button>
-                                            <button class="delete" data-id="120"> <i class="fa-regular fa-trash-can"></i> </button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="profile-card careTasksCard blueborderleft m-b-15">
-                                        <div class="card-header">
-                                            <div class="user">
-                                                <div class="info">
-                                                    <div class="name"><a href="#!">Follow healthy diet plan</a></div>
-                                                    
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="sectionCarer">
-                                            <div class="tags">
-                                                <span class="yellow">critical</span>
-                                                <span class="inactive">Weekly</span>
-                                            </div>
-                                        </div>
-                                        <div class="details">
-                                            <div class="item">
-                                                <i class='bx  bx-clock'></i> <span>30 minutes</span>
-                                            </div>
-                                            <div class="item redalrttext">
-                                                <i class='bx  bx-alert-circle'></i> <span>Alerts: Missed</span>
-                                            </div>
-                                        </div>
-                                        <div class="actions">
-                                            <button class="edit" data-id="120"> <i class="fa-regular fa-pen-to-square"></i> Edit </button>
-                                            <button class="delete" data-id="120"> <i class="fa-regular fa-trash-can"></i> </button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="profile-card careTasksCard blueborderleft m-b-15">
-                                        <div class="card-header">
-                                            <div class="user">
-                                                <div class="info">
-                                                    <div class="name"><a href="#!">Follow healthy diet plan</a></div>
-                                                    
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="sectionCarer">
-                                            <div class="tags">
-                                                <span class="yellow">critical</span>
-                                                <span class="inactive">Weekly</span>
-                                            </div>
-                                        </div>
-                                        <div class="details">
-                                            <div class="item">
-                                                <i class='bx  bx-clock'></i> <span>30 minutes</span>
-                                            </div>
-                                            <div class="item redalrttext">
-                                                <i class='bx  bx-alert-circle'></i> <span>Alerts: Missed</span>
-                                            </div>
-                                        </div>
-                                        <div class="actions">
-                                            <button class="edit" data-id="120"> <i class="fa-regular fa-pen-to-square"></i> Edit </button>
-                                            <button class="delete" data-id="120"> <i class="fa-regular fa-trash-can"></i> </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div> -->
 
                     </div>
                 </div>
@@ -4629,203 +4453,135 @@
                     </div>
                 </div>
                 <div class="content" id="clientConsentTab">
-                    <div class="careTaskstbbg sectionWhiteBgAllUse p-0">
-                        <header class="panel-heading headingCapitilize greanHeaderbgClr">
-                            <div class="clientHeadung">
-                                <div class="onlyheadingmain"><i class='bx  bx-file greenText'></i> Consent Management </div>
-                                <p>Track client agreements and permissions</p>
-                            </div>
-
-                            <div class="actions mt-0">
-                                <button class="btn aiBtnThrd addConsentBtn" data-formType="add"> <i class='bx  bx-plus'></i> Add Consent</button>
-                            </div>
-                        </header>
-
-                        <div class="p-20">
-                            <div class="clientFilterform greanHeaderbgClr consentManagementSec consentRecordSectionFirst" style="display:none">
-
-                                <div class="createNewAlert"><i class='bx  bx-file'></i> Add New Consent Record </div>
-
-                                <form action="" class="addAlertForm">
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label>Consent Type *</label>
-                                                <select class="form-control">
-                                                    <option>Single Day</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label>Consent Title *</label>
-                                                <input type="text" class="form-control" name="" placeholder="e.g., Consent to Administer Medication">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-12">
-                                            <div class="form-group">
-                                                <label> Description *</label>
-                                                <textarea name="short_description" class="form-control" rows="3" cols="20" placeholder="Detailed description of what is being consented to"></textarea>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label>Status *</label>
-                                                <select class="form-control">
-                                                    <option>Single Day</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label>Date Granted</label>
-                                                <input type="date" class="form-control" name="" placeholder="">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label>Expiry Date (Optional)</label>
-                                                <input type="date" class="form-control" name="" placeholder="">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label>Granted By *</label>
-                                                <input type="text" class="form-control" name="" placeholder="Logan Jones">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label>Relationship to Client</label>
-                                                <input type="text" class="form-control" name="" placeholder="">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label>Witness Name (if applicable)</label>
-                                                <input type="text" class="form-control" name="" placeholder="">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label>Witness Role</label>
-                                                <input type="text" class="form-control" name="" placeholder="">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-12">
-                                            <div class="form-group">
-                                                <label>Additional Notes</label>
-                                                <textarea name="short_description" required="" class="form-control" rows="2" cols="20" placeholder="Specific actions staff should take..."></textarea>
-                                            </div>
-                                        </div>
-
-
-                                        <div class="col-md-12">
-                                            <div class="header-actions">
-                                                <button class="btn allbuttonDarkClr " type="submit"> Save Consent </button>
-                                                <button class="btn borderBtn closeConsentRecordBtn" type="button"> Cancel </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-
-                            <div class="carePlanWrapper consentRecordSectionSecond">
-                                <div class="planCard greenLeftBorder m-t-20">
-                                    <div class="planTop">
-                                        <div class="planTitle">
-                                            Management
-                                            <span class="roundTag greenShowbtn">granted</span>
-                                            <span class="inactive roundTag">medication</span>
-                                        </div>
-                                        <div class="planActions IconFontSize">
-                                            <span><i class='bx  bx-check-circle greenText'></i></span>
-                                        </div>
-                                    </div>
-                                    <div class="planMeta">
-                                        <div>Taken for one week during</div>
-                                    </div>
-                                    <div class="row medicationSheet">
-                                        <div class="col-md-6">
-                                            <div class="reasonBox">
-                                                <strong>Granted by:</strong> Logan Jonesdvv (selfdvdsv)
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="reasonBox">
-                                                <strong>Date:</strong> Jan 7, 2026
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="reasonBox">
-                                                <strong>Expires:</strong> Jan 14, 2026
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="reasonBox">
-                                                <strong>Witnessed by:</strong> Taken for onen holiday.
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="medicationSheet">
-                                        <div class="reasonBox">
-                                            <strong>Notes:</strong> Taken for one week during August to delay period whilst on holiday.
-                                        </div>
-                                    </div>
+                        <div class="careTaskstbbg sectionWhiteBgAllUse p-0">
+                            <header class="panel-heading headingCapitilize greanHeaderbgClr">
+                                <div class="clientHeadung">
+                                    <div class="onlyheadingmain"><i class='bx  bx-file greenText'></i> Consent
+                                        Management </div>
+                                    <p>Track client agreements and permissions</p>
                                 </div>
-                                <div class="planCard greenLeftBorder m-t-20">
-                                    <div class="planTop">
-                                        <div class="planTitle">
-                                            Management
-                                            <span class="roundTag radShowbtn">refused</span>
-                                            <span class="inactive roundTag">other</span>
-                                        </div>
-                                        <div class="radIconClr IconFontSize ">
-                                            <span><i class='bx  bx-x-circle'></i> </span>
-                                        </div>
-                                    </div>
-                                    <div class="planMeta">
-                                        <div>Taken for one week during</div>
-                                    </div>
-                                    <div class="row medicationSheet">
-                                        <div class="col-md-6">
-                                            <div class="reasonBox">
-                                                <strong>Granted by:</strong> Logan Jonesdvv (selfdvdsv)
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="reasonBox">
-                                                <strong>Date:</strong> Jan 7, 2026
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="reasonBox">
-                                                <strong>Expires:</strong> Jan 14, 2026
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="reasonBox">
-                                                <strong>Witnessed by:</strong> Taken for onen holiday.
-                                            </div>
-                                        </div>
+
+                                <div class="actions mt-0">
+                                    <button class="btn aiBtnThrd addConsentBtn" data-formType="add"> <i
+                                            class='bx  bx-plus'></i> Add Consent</button>
+                                </div>
+                            </header>
+
+                            <div class="p-20">
+                                <div class="clientFilterform greanHeaderbgClr consentManagementSec consentRecordSectionFirst"
+                                    style="display:none">
+
+                                    <div class="createNewAlert"><i class='bx  bx-file'></i> Add New Consent Record
                                     </div>
 
-                                    <div class="medicationSheet">
-                                        <div class="reasonBox">
-                                            <strong>Notes:</strong> Taken for one week during August to delay period whilst on holiday.
+                                    <form class="addAlertForm" id="consentForm_id">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label>Consent Type <span class="radStar">*</span></label>
+                                                    <select class="form-control consentRequiredField" id="consent_type" name="consent_type">
+                                                        <option value="Care Plan">Care Plan</option>
+                                                        <option value="Medication">Medication</option>
+                                                        <option value="Data Sharing">Data Sharing</option>
+                                                        <option value="Photography">Photography</option>
+                                                        <option value="Medical Treatment">Medical Treatment</option>
+                                                        <option value="Emergency Contact">Emergency Contact</option>
+                                                        <option value="Personal Care">Personal Care</option>
+                                                        <option value="Financial">Financial</option>
+                                                        <option value="Other">Other</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label>Consent Title <span class="radStar">*</span></label>
+                                                    <input type="text" class="form-control consentRequiredField" name="consent_title" id="consent_title" placeholder="e.g., Consent to Administer Medication">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <label> Description <span class="radStar">*</span></label>
+                                                    <textarea name="description" id="consentDescription" class="form-control consentRequiredField" rows="3" cols="20" placeholder="Detailed description of what is being consented to"></textarea>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label>Status <span class="radStar">*</span></label>
+                                                    <select class="form-control consentRequiredField" name="status" id="consentStatus">
+                                                        <option value="Pending">Pending</option>
+                                                        <option value="Granted">Granted</option>
+                                                        <option value="Refused">Refused</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label>Date Granted</label>
+                                                    <input type="date" class="form-control" id="consentDate_granted" name="date_granted" value="{{ now()->format('Y-m-d') }}">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label>Expiry Date (Optional)</label>
+                                                    <input type="date" class="form-control" name="expiry_date" id="consentExpiry_date">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label>Granted By <span class="radStar">*</span></label>
+                                                    <input type="text" class="form-control consentRequiredField" name="granted_by" id="consentGranted_by" placeholder="Name of person granting consent" value="{{ $clientDetails['name'] }}">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label>Relationship to Client</label>
+                                                    <input type="text" class="form-control" name="relationship_client" id="consentRelationship_client" placeholder="e.g., self, daughter, guardian">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label>Witness Name (if applicable)</label>
+                                                    <input type="text" class="form-control" name="witness_name" id="consentWitness_name" placeholder="Name of witness">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label>Witness Role</label>
+                                                    <input type="text" class="form-control" name="witness_role" id="consentWitness_role" placeholder="e.g., Care Manager, Family Member">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <label>Additional Notes</label>
+                                                    <textarea name="additional_notes" id="consentAdditional_notes" class="form-control" rows="2" cols="20" placeholder="Any conditions or additional information"></textarea>
+                                                </div>
+                                            </div>
+
+
+                                            <div class="col-md-12">
+                                                <div class="header-actions">
+                                                    <button class="btn allbuttonDarkClr saveConsentBtn" type="button"> Save Consent
+                                                    </button>
+                                                    <button class="btn borderBtn closeConsentRecordBtn" type="button">
+                                                        Cancel </button>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
+                                    </form>
                                 </div>
+
+                                <div class="carePlanWrapper consentRecordSectionSecond" id="consentRenderList">
+
+                                </div>
+                                <div id="consentPagination"></div>
                             </div>
+
+                            <!-- <div class="leavebanktabCont">
+                                            <i class='bx  bx-alert-triangle'></i>
+                                            <p>No alerts match the selected filters</p>
+                                        </div> -->
                         </div>
-
-                        <!-- <div class="leavebanktabCont">
-                            <i class='bx  bx-alert-triangle'></i> 
-                            <p>No alerts match the selected filters</p>
-                        </div> -->
                     </div>
-                </div>
                  <div class="content" id="clientEmergencyTab">
                     <style>
                         #clientEmergencyTab .emergencyMain {
@@ -8112,6 +7868,11 @@
         var clientCarePlanRiskDeleteUrl = "{{url('roster/client/care-plan-risk-delete')}}";
         var get_document_ai_response = "{{url('roster/get-document-ai-response')}}";
         var docImportBaseUrl = '{{ url("roster/ai-document-import") }}';
+
+        var saveConsentUrl = "{{ url('roster/client/consent-save') }}";
+        var consentListUrl = "{{ url('roster/client/consent-list') }}";
+        var consentDeleteUrl = "{{ url('roster/client/consent-delete') }}";
+        var consentStatusChangeUrl = "{{ url('roster/client/consent-status-change') }}";
     </script>
     <!-- end here -->
     <script src="{{ url('public/js/roster/client/client_details.js')}}" defer></script>
@@ -8121,6 +7882,7 @@
     <script src="{{ url('public/js/roster/client/mar_grid.js')}}" defer></script>
     <script src="{{ url('public/js/roster/client/care_plan.js')}}" defer></script>
     <script src="{{ url('public/js/roster/ai-document-import.js') }}"></script>
+    <script src="{{ url('public/js/roster/client/consent.js') }}" defer></script>
     <script>
         const tabs = document.querySelectorAll(".tab");
         const contents = document.querySelectorAll(".content");
@@ -8266,11 +8028,7 @@
 
         $(document).on('click', '.remove-contact-row', function() {
             $(this).closest('.contact-row').remove();
-            if ($('#editableContactsContainer .contact-row').length === 0) {
-                addBlankContactRow();
-            } else {
-                reindexContacts();
-            }
+            reindexContacts();
         });
 
         $(document).on('click', '#cancelContactsBtn', function() {
@@ -9895,26 +9653,210 @@
                     },
                     //dataType: "json",
                 };
+                // $.ajax(settings).done(function(response) {
+                //     if (typeof isAuthenticated === "function") {
+                //         if (isAuthenticated(response) == false) {
+                //             return false;
+                //         }
+                //     }
+                //     $(".dynamic_form_title").html(response.title)
+                //     Formio.createForm(document.getElementById('loadStagesFormData-' + STAGE_ID), {
+                //         components: JSON.parse(response.pattern)
+                //     }, {
+                //         readOnly: false
+                //     }).then(function(form) {
+                //         if (response.pattern_value) {
+                //             form.submission = {
+                //                 data: JSON.parse(response.pattern_value)
+                //             }
+                //         }
+                //     });
+                // });
                 $.ajax(settings).done(function(response) {
+
                     if (typeof isAuthenticated === "function") {
                         if (isAuthenticated(response) == false) {
                             return false;
                         }
                     }
-                    $(".dynamic_form_title").html(response.title)
-                    Formio.createForm(document.getElementById('loadStagesFormData-' + STAGE_ID), {
-                        components: JSON.parse(response.pattern)
-                    }, {
-                        readOnly: false
-                    }).then(function(form) {
+
+                    $(".dynamic_form_title").html(response.title);
+                    console.log(JSON.stringify(response.pattern));
+                    let parsedPattern = JSON.parse(response.pattern);
+
+                    let formSchema = {};
+
+                    // OLD FORMIO FORMAT
+                    if (Array.isArray(parsedPattern)) {
+
+                        formSchema = {
+                            components: parsedPattern
+                        };
+
+                    } else {
+
+                        // NEW CUSTOM FORMAT
+                        formSchema = convertToFormioSchema(parsedPattern);
+                    }
+
+                    Formio.createForm(
+                        document.getElementById('loadStagesFormData-' + STAGE_ID),
+                        formSchema,
+                        {
+                            readOnly: false
+                        }
+                    ).then(function(form) {
+
                         if (response.pattern_value) {
+
                             form.submission = {
                                 data: JSON.parse(response.pattern_value)
-                            }
+                            };
                         }
                     });
+
                 });
             }
+            function convertToFormioSchema(data) {
+
+                let components = [];
+
+                data.sections.forEach((section, index) => {
+
+                    let panel = {
+                        title: section.title,
+                        type: "panel",
+                        key: "section_" + index,
+                        input: false,
+                        components: []
+                    };
+
+                    section.fields.forEach(field => {
+
+                        let component = {
+                            label: field.label,
+                            key: field.id,
+                            type: mapFieldType(field.type),
+                            input: true,
+                            validate: {
+                                required: field.required || false
+                            }
+                        };
+
+                        panel.components.push(component);
+                    });
+
+                    components.push(panel);
+                });
+
+                return {
+                    display: "form",
+                    components: components
+                };
+            }
+            function mapFieldType(type) {
+
+                switch(type) {
+
+                    case 'text':
+                        return 'textfield';
+
+                    case 'email':
+                        return 'email';
+
+                    case 'textarea':
+                        return 'textarea';
+
+                    case 'checkbox':
+                        return 'checkbox';
+
+                    default:
+                        return 'textfield';
+                }
+            }
+//             function convertToFormioSchema(customSchema) {
+//     let components = [];
+
+//     for (const [key, field] of Object.entries(customSchema)) {
+
+//         let component = {
+//             key: key,
+//             label: field.label,
+//             type: field.fieldType,
+//             input: true,
+//             tableView: true,
+//             validate: {
+//                 required: field.isRequired ? true : false
+//             },
+//         };
+
+//         // TEXT FIELDS
+//         if (field.fieldType === "text" || field.fieldType === "email") {
+//             component.type = "textfield";
+//             component.as = "default";
+//         }
+
+//         // TEXTAREA
+//         if (field.fieldType === "textarea") {
+//             component.type = "textarea";
+//             component.as = "default";
+//         }
+
+//         // NUMBER
+//         if (field.fieldType === "number") {
+//             component.type = "number";
+//             component.decimal = true;
+//             component.as = "default";
+//         }
+
+//         // SELECT
+//         if (field.fieldType === "select") {
+//             component.type = "select";
+//             component.data = {
+//                 values: field.choices.map(c => ({
+//                     label: c.text,
+//                     value: c.value
+//                 }))
+//             };
+//             component.as = "default";
+//         }
+
+//         //RADIO
+//         if (field.fieldType === "radio") {
+//             component.type = "radio";
+//             component.data = {
+//                 values: field.choices.map(c => ({
+//                     label: c.text,
+//                     value: c.value
+//                 }))
+//             };
+//         }
+
+//         //CHECKBOX
+//         if (field.fieldType === "checkbox") {
+//             component.type = "checkbox";
+//             component.as = "default";
+//         }
+
+//         //DATE
+//         if (field.fieldType === "date") {
+//             component.type = "datetime";
+//             component.datePicker.disableTime = true;
+//             component.format = "yyyy-MM-dd";
+//             component.as = "default";
+//         }
+
+//         // FILE
+//         if (field.fieldType === "file") {
+//             component.type = "file";
+//             component.as = "default";
+//         }
+
+//         components.push(component);
+//     }
+
+//     return { components };
+// }
             $(document).on('click', ".submitBtn", function() {
 
                 let form = $(this).closest("form");

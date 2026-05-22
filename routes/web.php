@@ -389,6 +389,8 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 		Route::post('/client-alert-save', [ClientController::class, 'client_alert_save']);
 		Route::post('/client-alert-edit', [ClientController::class, 'client_alert_save']); // Uses same save method
 		Route::post('/client/alert-type', [ClientController::class, 'client_alert_type']);
+
+		
 		Route::post('/client/alert-increase-acknowledge', [ClientController::class, 'alert_increase_acknowledge']);
 		Route::post('/client/alert-resolve', [ClientController::class, 'client_alert_resolve']);
 		Route::post('/client/alert-archived', [ClientController::class, 'client_alert_archived']);
