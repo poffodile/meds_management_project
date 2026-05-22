@@ -98,10 +98,12 @@ class ServiceUserController extends StaffManagementController
             //     $notif_query = $notif_query->limit($limit);
             // }
 
-            $notifications = $notif_query->where('status', 0)->orderBy('n.created_at', 'desc')->paginate(20);
+            $notifications = $notif_query->where(function ($q) {
+                $q->whereNull('n.sticky_master_ack')->orWhere('n.sticky_master_ack', 0);
+            })->orderBy('n.created_at', 'desc')->paginate(20);
             // return count($notifications);
             foreach ($notifications as $notification) {
-                DB::table('notification')->where('id', $notification->id)->update(['status' => 1]);
+                DB::table('notification')->where('id', $notification->id)->update(['sticky_master_ack' => 1]);
                 $created_at = $notification->created_at;
                 $created_at1 = Carbon::parse($created_at);
                 $diff = $created_at1->diffForHumans();

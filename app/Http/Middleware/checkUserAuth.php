@@ -158,6 +158,21 @@ class checkUserAuth
                     'roster/ai-new-client-import/confirm'
                 );
 
+                // Whitelist Workflow Automation routes
+                // array_push($allowed_path,
+                //     'roster/workflows',
+                //     'roster/workflows/list',
+                //     'roster/workflows/store',
+                //     'roster/workflows/update',
+                //     'roster/workflows/toggle',
+                //     'roster/workflows/delete',
+                //     'roster/workflows/run-all',
+                //     'roster/workflows/run-single',
+                //     'roster/workflows/executions',
+                //     'roster/workflows/templates',
+                //     'roster/workflows/install-template'
+                // );
+
                // Whitelist check supporting exact match, prefix match, and dynamic placeholders
                 $is_allowed = false;
                 foreach ($allowed_path as $ap) {

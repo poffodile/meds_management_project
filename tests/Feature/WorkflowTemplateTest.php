@@ -17,7 +17,15 @@ class WorkflowTemplateTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->adminUser = \App\User::where('user_name', 'komal')->first();
+        $user = \App\User::where('user_name', 'komal')->first() ?: \App\User::where('is_deleted', 0)->first();
+        if ($user) {
+            $homeIds = explode(',', $user->home_id);
+            $homeIds = array_diff($homeIds, [(string)$this->homeId]);
+            array_unshift($homeIds, (string)$this->homeId);
+            $user->home_id = implode(',', $homeIds);
+            $user->save();
+            $this->adminUser = $user;
+        }
     }
 
     protected function tearDown(): void

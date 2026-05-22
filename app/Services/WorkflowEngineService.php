@@ -650,12 +650,13 @@ class WorkflowEngineService
 
         DB::table('notification')->insert([
             'home_id' => (string) $workflow->home_id,
+            'service_user_id' => 0,
             'event_id' => $workflow->id,
             'notification_event_type_id' => 25,
             'event_action' => 'WORKFLOW',
             'message' => $message,
             'is_sticky' => $isSticky,
-            'status' => 0,
+            'sticky_master_ack' => 0,
             'created_at' => now(),
             'updated_at' => now(),
         ]);

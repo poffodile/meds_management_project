@@ -14,7 +14,7 @@ class NotificationTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->user = User::where('user_name', 'komal')->first();
+        $this->user = User::where('user_name', 'komal')->first() ?: User::where('is_deleted', 0)->first();
     }
 
     protected function actingAsUser()
@@ -108,13 +108,13 @@ class NotificationTest extends TestCase
         DB::table('notification')
             ->whereRaw('FIND_IN_SET(?, home_id)', [$homeId])
             ->limit(5)
-            ->update(['status' => 0]);
+            ->update(['sticky_master_ack' => 0]);
 
         $countBefore = $this->actingAsUser()->postJson('/roster/notifications/unread-count')->json('count');
 
         $notif = DB::table('notification')
             ->whereRaw('FIND_IN_SET(?, home_id)', [$homeId])
-            ->where('status', 0)
+            ->where('sticky_master_ack', 0)
             ->first();
 
         $this->actingAsUser()->postJson('/roster/notifications/mark-read', ['id' => $notif->id]);
@@ -130,7 +130,7 @@ class NotificationTest extends TestCase
         DB::table('notification')
             ->whereRaw('FIND_IN_SET(?, home_id)', [$homeId])
             ->limit(3)
-            ->update(['status' => 0]);
+            ->update(['sticky_master_ack' => 0]);
 
         $this->actingAsUser()->postJson('/roster/notifications/mark-all-read');
 
@@ -139,7 +139,7 @@ class NotificationTest extends TestCase
 
         DB::table('notification')
             ->whereRaw('FIND_IN_SET(?, home_id)', [$homeId])
-            ->update(['status' => 0]);
+            ->update(['sticky_master_ack' => 0]);
     }
 
     // 4c. IDOR tests
@@ -184,13 +184,13 @@ class NotificationTest extends TestCase
         $id = DB::table('notification')->insertGetId([
             'home_id' => (string) $homeId,
             'user_id' => $this->user->id,
-            'service_user_id' => null,
+            'service_user_id' => 0,
             'event_id' => 1,
             'notification_event_type_id' => 1,
             'event_action' => 'TEST',
             'message' => '<script>alert("xss")</script>',
             'is_sticky' => 0,
-            'status' => 0,
+            'sticky_master_ack' => 0,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
