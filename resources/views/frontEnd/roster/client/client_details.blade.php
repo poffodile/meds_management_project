@@ -237,6 +237,7 @@
             <div class="header-actions addnewicons">
                 <button class="btn borderBtn editClient" data-toggle="modal" data-target="#addServiceUserModal" data-child_id="{{$clientDetails['id']}}"><i class='bx  bx-edit'></i> Edit Client</button>
                 <button class="btn borderBtn openBodyMapProfile" data-service-user-id="{{ $client_id }}"><i class='bx  bx-body'></i> Body Map</button>
+                <!-- <button class="btn borderBtn"><i class='bx  bx-arrow-in-up-square-half'></i> Import Documents</button> -->
                 <button class="btn borderBtn" onclick="openImportModal({{ $client_id }})"><i class='bx  bx-arrow-in-up-square-half'></i> Import Documents</button>
                 <button class="btn allBtnUseColor" data-toggle="modal" data-target="#generateCarePlanModal"><i class='bx  bx-sparkles'></i> Generate Care Plan</button>
             </div>
@@ -281,7 +282,7 @@
                     <button class="tab" data-tab="clientEducationTab"> Education </button>
                     <button class="tab" data-tab="clientMentalCapacityTab"> Mental Capacity </button>
                     <button class="tab" data-tab="clientDoLSTab" onclick="showDolsList()"> DoLS </button>
-                    <button class="tab" data-tab="clientDNACPRTab"> DNACPR </button>
+                    <button class="tab" data-tab="clientDNACPRTab" onclick="showDncprList()"> DNACPR </button>
                     <button class="tab" data-tab="clientSafeguardingTab"> Safeguarding </button>
                     <button class="tab" data-tab="clientConsentTab" onclick="showConsentList()"> Consent </button>
                     <button class="tab" data-tab="clientEmergencyTab"> Emergency </button>
@@ -1591,10 +1592,18 @@
                                                                         <th>Percentage</th>
                                                                     </tr>
                                                                 </thead>
-                                                                <tbody id="onboardingDetailsListHtml"></tbody>
+                                                                <tbody id="onboardingDetailsListHtml">
+
+                                                                </tbody>
                                                             </table>
                                                         </div>
                                                     </div>
+
+                                                    <!-- <div class="carePlanWrapper dolsSectionSecond" id="dolsRenderList"
+                                                            style="display: none;">
+
+                                                        </div>
+                                                        <div id="dolsPagination"></div> -->
                                                 </div>
                                             </div>
                                         </div>
@@ -1648,8 +1657,175 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="p-20 p-t-0" id="renderHtmlClientCareTask"></div>
+                        <div class="p-20 p-t-0" id="renderHtmlClientCareTask">
+
+                        </div>
+                        <!-- <div class="p-20 p-t-0">
+                            <div class="caretasknameandnumber m-b-10">
+                                Personal Care <span>2</span>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="profile-card careTasksCard redborderleft mb-0">
+                                        <div class="card-header">
+                                            <div class="user">
+                                                <div class="info">
+                                                    <div class="name"><a href="#!">Static Data</a></div>
+                                                    
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="sectionCarer">
+                                            <div class="tags">
+                                                <span class="radShowbtn">critical</span>
+                                                <span class="inactive">Weekly</span>
+                                            </div>
+                                        </div>
+                                        <div class="details">
+                                            <div class="item">
+                                                <i class='bx  bx-clock'></i> <span>30 minutes</span>
+                                            </div>
+                                            <div class="item redalrttext">
+                                                <i class='bx  bx-alert-circle'></i> <span>Alerts: Missed</span>
+                                            </div>
+                                        </div>
+                                        <div class="dFlexGap">
+                                            <button class="borderBtn flex1" data-id="120"> <i class="fa-regular fa-pen-to-square"></i> Edit </button>
+                                            <button class="borderBtn deletewithBorder" data-id="120"> <i class="fa-regular fa-trash-can redText"></i> </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="profile-card careTasksCard blueborderleft mb-0">
+                                        <div class="card-header">
+                                            <div class="user">
+                                                <div class="info">
+                                                    <div class="name"><a href="#!">Daily emotional support check-in</a></div>
+                                                    
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="sectionCarer">
+                                            <div class="tags">
+                                                <span class="yellow">critical</span>
+                                                <span class="inactive">Weekly</span>
+                                            </div>
+                                        </div>
+                                        <div class="details">
+                                            <div class="item">
+                                                <i class='bx  bx-clock'></i> <span>30 minutes</span>
+                                            </div>
+                                            <div class="item redalrttext">
+                                                <i class='bx  bx-alert-circle'></i> <span>Alerts: Missed</span>
+                                            </div>
+                                        </div>
+                                        <div class="actions">
+                                            <button class="edit" data-id="120"> <i class="fa-regular fa-pen-to-square"></i> Edit </button>
+                                            <button class="delete" data-id="120"> <i class="fa-regular fa-trash-can"></i> </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> -->
                         <div id="clientCareTaskPagination"></div>
+                        <!-- <div class="p-20 p-t-0">
+                            <div class="caretasknameandnumber m-b-10">
+                                Nutrition
+                                <span>3</span>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="profile-card careTasksCard redborderleft m-b-15">
+                                        <div class="card-header">
+                                            <div class="user">
+                                                <div class="info">
+                                                    <div class="name"><a href="#!">Meal planning with nutrients focusing on balanced diet</a></div>
+                                                    
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="sectionCarer">
+                                            <div class="tags">
+                                                <span class="yellow">critical</span>
+                                                <span class="inactive">Weekly</span>
+                                            </div>
+                                        </div>
+                                        <div class="details">
+                                            <div class="item">
+                                                <i class='bx  bx-clock'></i> <span>30 minutes</span>
+                                            </div>
+                                            <div class="item redalrttext">
+                                                <i class='bx  bx-alert-circle'></i> <span>Alerts: Missed</span>
+                                            </div>
+                                        </div>
+                                        <div class="actions">
+                                            <button class="edit" data-id="120"> <i class="fa-regular fa-pen-to-square"></i> Edit </button>
+                                            <button class="delete" data-id="120"> <i class="fa-regular fa-trash-can"></i> </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="profile-card careTasksCard blueborderleft m-b-15">
+                                        <div class="card-header">
+                                            <div class="user">
+                                                <div class="info">
+                                                    <div class="name"><a href="#!">Follow healthy diet plan</a></div>
+                                                    
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="sectionCarer">
+                                            <div class="tags">
+                                                <span class="yellow">critical</span>
+                                                <span class="inactive">Weekly</span>
+                                            </div>
+                                        </div>
+                                        <div class="details">
+                                            <div class="item">
+                                                <i class='bx  bx-clock'></i> <span>30 minutes</span>
+                                            </div>
+                                            <div class="item redalrttext">
+                                                <i class='bx  bx-alert-circle'></i> <span>Alerts: Missed</span>
+                                            </div>
+                                        </div>
+                                        <div class="actions">
+                                            <button class="edit" data-id="120"> <i class="fa-regular fa-pen-to-square"></i> Edit </button>
+                                            <button class="delete" data-id="120"> <i class="fa-regular fa-trash-can"></i> </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="profile-card careTasksCard blueborderleft m-b-15">
+                                        <div class="card-header">
+                                            <div class="user">
+                                                <div class="info">
+                                                    <div class="name"><a href="#!">Follow healthy diet plan</a></div>
+                                                    
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="sectionCarer">
+                                            <div class="tags">
+                                                <span class="yellow">critical</span>
+                                                <span class="inactive">Weekly</span>
+                                            </div>
+                                        </div>
+                                        <div class="details">
+                                            <div class="item">
+                                                <i class='bx  bx-clock'></i> <span>30 minutes</span>
+                                            </div>
+                                            <div class="item redalrttext">
+                                                <i class='bx  bx-alert-circle'></i> <span>Alerts: Missed</span>
+                                            </div>
+                                        </div>
+                                        <div class="actions">
+                                            <button class="edit" data-id="120"> <i class="fa-regular fa-pen-to-square"></i> Edit </button>
+                                            <button class="delete" data-id="120"> <i class="fa-regular fa-trash-can"></i> </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> -->
 
                     </div>
                 </div>
@@ -4307,130 +4483,114 @@
                         </header>
                         <div class="p-20">
                             <div class="carer-form DnaCprSectionFirst" style="display:none">
-                                <form>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <label>Status *</label>
-                                            <select class="form-control">
-                                                <option>Screening Required</option>
-                                                <option>Inactive</option>
-                                            </select>
-                                        </div>
+                                 <form id="dnaCprForm_id">
+                                        @csrf
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label>Status <span class="radStar">*</span></label>
+                                                <select class="form-control dnaCprRequiredField" id="dnaCprStatus" name="status">
+                                                    <option value="Active">Active</option>
+                                                    <option value="Expired">Expired</option>
+                                                    <option value="Withdrawn">Withdrawn</option>
+                                                    <option value="Under Review">Under Review</option>
+                                                    <option value="Not In Place">Not In Place</option>
+                                                </select>
+                                            </div>
 
-                                        <div class="col-md-6">
-                                            <label>Decision Date *</label>
-                                            <input type="date" name="" id="" class="form-control">
-                                        </div>
-                                        <div class="col-md-6 m-t-10">
-                                            <label>Review Date</label>
-                                            <input type="date" name="" id="" class="form-control">
-                                        </div>
+                                            <div class="col-md-6">
+                                                <label>Decision Date <span class="radStar">*</span></label>
+                                                <input type="date" name="decision_date" id="dnaCprDecisionDate" class="form-control dnaCprRequiredField">
+                                            </div>
+                                            <div class="col-md-6 m-t-10">
+                                                <label>Review Date</label>
+                                                <input type="date" name="review_date" id="dnaCprReviewDate" class="form-control">
+                                            </div>
 
-                                        <div class="col-md-6  m-t-10">
-                                            <label>Expiry Date</label>
-                                            <input type="date" name="" id="" class="form-control">
-                                        </div>
-                                        <div class="col-md-6  m-t-10">
-                                            <label>Decision Made By *</label>
-                                            <input type="date" name="" id="" class="form-control">
-                                        </div>
-                                        <div class="col-md-6  m-t-10">
-                                            <label>Decision Maker Role</label>
-                                            <input type="number" name="" id="" class="form-control">
-                                        </div>
-                                        <div class="col-md-6  m-t-10">
-                                            <label>GMC Number</label>
-                                            <input type="number" name="" id="" class="form-control">
-                                        </div>
-                                        <div class="col-md-6 m-t-10">
-                                            <label>Mental Capacity</label>
-                                            <select class="form-control">
-                                                <option>Standard</option>
-                                                <option>Part Time</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-md-12 m-t-10">
-                                            <label>Patient Involvement</label>
-                                            <select class="form-control">
-                                                <option>Select</option>
-                                                <option>Part Time</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-md-12 m-t-10">
-                                            <label>Clinical Reasons</label>
-                                            <textarea name="reason" required="" class="form-control" rows="4" cols="20" placeholder="Clinical reasons for DNACPR decision..."></textarea>
-                                        </div>
-                                        <div class="col-md-12 m-t-10">
-                                            <label>Anticipated Circumstances</label>
-                                            <textarea name="reason" required="" class="form-control" rows="3" cols="20" placeholder="Circumstances in which DNACPR applies..."></textarea>
-                                        </div>
-                                        <div class="col-md-12 m-t-10">
-                                            <label>Other Emergency Treatments</label>
-                                            <textarea name="reason" required="" class="form-control" rows="3" cols="20" placeholder="Other treatments that should/shouldn't be given..."></textarea>
-                                        </div>
-                                        <div class="col-md-12 m-t-10">
-                                            <label>Patient Wishes</label>
-                                            <textarea name="reason" required="" class="form-control" rows="3" cols="20" placeholder=""></textarea>
-                                        </div>
-                                        <div class="col-md-6 m-t-10">
-                                            <label>Form Location</label>
-                                            <input type="text" name="" id="" class="form-control" placeholder="Physical location of signed form">
-                                        </div>
-                                        <div class="col-md-12 mt-3">
-                                            <div class="DoLSCheckList">
-                                                <label><input type="checkbox"> Discussion Held with Patient</label>
-                                                <label><input type="checkbox"> Family/LPA/IMCA Involved</label>
-                                                <label><input type="checkbox"> Emergency Services Made Aware</label>
-                                                <label><input type="checkbox"> Care Plan Updated</label>
-                                                <label><input type="checkbox"> All Staff Briefed</label>
-                                                <label><input type="checkbox"> GP Notified</label>
+                                            <div class="col-md-6  m-t-10">
+                                                <label>Expiry Date</label>
+                                                <input type="date" name="expiry_date" id="dnaCprExpiryDate" class="form-control">
+                                            </div>
+                                            <div class="col-md-6  m-t-10">
+                                                <label>Decision Made By <span class="radStar">*</span></label>
+                                                <input type="text" name="decision_made_by" id="dnaCprDecisionMadeBy" class="form-control dnaCprRequiredField">
+                                            </div>
+                                            <div class="col-md-6  m-t-10">
+                                                <label>Decision Maker Role</label>
+                                                <input type="text" name="decision_maker_role" id="dnaCprDecisionMakerRole" class="form-control">
+                                            </div>
+                                            <div class="col-md-6  m-t-10">
+                                                <label>GMC Number</label>
+                                                <input type="text" name="gmc_number" id="dnaCprGMCNumber" class="form-control">
+                                            </div>
+                                            <div class="col-md-6 m-t-10">
+                                                <label>Mental Capacity</label>
+                                                <select class="form-control" id="dnaCprMentalCapacity" name="mental_capacity">
+                                                    <option selected disabled>Select</option>
+                                                    <option value="Has Capacity">Has Capacity</option>
+                                                    <option value="Lacks Capacity for This Decision">Lacks Capacity for This Decision</option>
+                                                    <option value="Fluctuating Capacity">Fluctuating Capacity</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-12 m-t-10">
+                                                <label>Patient Involvement</label>
+                                                <select class="form-control" id="dnaCprPatientInvolvement" name="patient_involvement">
+                                                    <option selected disabled>Select</option>
+                                                    <option value="Patient Has Capacity and Agrees">Patient Has Capacity and Agrees</option>
+                                                    <option value="Patient Has Capacity and Disagrees">Patient Has Capacity and Disagrees</option>
+                                                    <option value="Patient Lacks Capacity">Patient Lacks Capacity</option>
+                                                    <option value="Patient Not Informed - Clinical Reasons">Patient Not Informed - Clinical Reasons</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-12 m-t-10">
+                                                <label>Clinical Reasons <span class="radStar">*</span></label>
+                                                <textarea name="clinical_reasons" id="dnaCprClinicalReasons" class="form-control dnaCprRequiredField" rows="4" cols="20" placeholder="Clinical reasons for DNACPR decision..."></textarea>
+                                            </div>
+                                            <div class="col-md-12 m-t-10">
+                                                <label>Anticipated Circumstances</label>
+                                                <textarea name="anticipated_circumstances" id="dnaCprAnticipatedCircumstances" class="form-control" rows="3" cols="20" placeholder="Circumstances in which DNACPR applies..."></textarea>
+                                            </div>
+                                            <div class="col-md-12 m-t-10">
+                                                <label>Other Emergency Treatments</label>
+                                                <textarea name="other_emergency_treatments" id="dnaCprOtherEmergencyTreatments" class="form-control" rows="3" cols="20" placeholder="Other treatments that should/shouldn't be given..."></textarea>
+                                            </div>
+                                            <div class="col-md-12 m-t-10">
+                                                <label>Patient Wishes</label>
+                                                <textarea name="patient_wishes" id="dnaCprPatientWishes" class="form-control" rows="3" cols="20" placeholder=""></textarea>
+                                            </div>
+                                            <div class="col-md-6 m-t-10">
+                                                <label>Form Location</label>
+                                                <input type="text" name="form_location" id="dnaCprFormLocation" class="form-control" placeholder="Physical location of signed form">
+                                            </div>
+                                            <div class="col-md-12 mt-3">
+                                                <div class="DoLSCheckList">
+                                                    <label><input type="checkbox" value="0" name="discussion_held_check" id="dnaCprDiscussionHeld" class="dnaCprCheckbox"> Discussion Held with Patient</label>
+                                                    <label><input type="checkbox" value="0" name="involved_check" id="dnaCprFamilyInvolved" class="dnaCprCheckbox"> Family/LPA/IMCA Involved</label>
+                                                    <label><input type="checkbox" value="0" name="emergency_services_check" id="dnaCprEmergencyServicesAware" class="dnaCprCheckbox"> Emergency Services Made Aware</label>
+                                                    <label><input type="checkbox" value="0" name="care_plan_updated_check" id="dnaCprCarePlanUpdated" class="dnaCprCheckbox"> Care Plan Updated</label>
+                                                    <label><input type="checkbox" value="0" name="all_staff_briefed_check" id="dnaCprAllStaffBriefed" class="dnaCprCheckbox"> All Staff Briefed</label>
+                                                    <label><input type="checkbox" value="0" name="gp_notified_check" id="dnaCprGPNotified" class="dnaCprCheckbox"> GP Notified</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-12 m-t-10">
+                                                <label>Additional Notes</label>
+                                                <textarea name="additional_notes" id="dnaCprAdditionalNotes" class="form-control" rows="3" cols="20" placeholder="How is this risk being managed?"></textarea>
+                                            </div>
+                                            <div class="col-md-12 m-t-10">
+                                                <div class="header-actions addnewicons">
+                                                    <input type="hidden" id="dncprId" name="id">
+                                                    <button class="btn addAssessmentBtn saveDnaCprBtn" type="button"> Save DNACPR</button>
+                                                    <button class="btn borderBtn closeDnaCprBtn" type="button"> Cancel</button>
+                                                </div>
                                             </div>
                                         </div>
-
-                                        <div class="col-md-12 m-t-10">
-                                            <label>Additional Notes</label>
-                                            <textarea name="reason" required="" class="form-control" rows="3" cols="20" placeholder="How is this risk being managed?"></textarea>
-                                        </div>
-                                        <div class="col-md-12 m-t-10">
-                                            <div class="header-actions addnewicons">
-                                                <button class="btn addAssessmentBtn"> Save DNACPR</button>
-                                                <button class="btn borderBtn closeDnaCprBtn"> Cancel</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </form>
+                                    </form>
                             </div>
 
-                            <div class="carePlanWrapper DnaCprSectionSecond">
-                                <div class="planCard borderleftOrange">
-                                    <div class="planTop">
-                                        <div class="planTitle">
-                                            <span class="roundTag yellow">EXPIRED</span>
-                                            <span class="inactive roundTag">has capacity</span>
-                                        </div>
-                                        <div class="planActions">
-                                            <button class="addDnaCprBtn" data-formType="edit"><i class='bx  bx-edit'></i> </button>
-                                        </div>
-                                    </div>
-
-                                    <div class="planMeta">
-                                        <div><strong>Decision Date: </strong> January 5th, 2026</div>
-                                        <div><strong>Review Date: </strong> January 14th, 2026</div>
-                                    </div>
-
-                                    <div class="planFooter">
-                                        <span><strong> Decision Maker: </strong> Taken for one week during August to delay period whilst on holiday.</span>
-                                    </div>
-                                    <div class="planFooter">
-                                        <span><strong> Patient Involvement: </strong> patient has capacity and agrees</span>
-                                    </div>
-                                    <div class="medicationSheet">
-                                        <div class="reasonBox">
-                                            <strong>Clinical Reasons:</strong> August to delay period whilst on holiday.
-                                        </div>
-                                    </div>
-                                </div>
+                            <div class="carePlanWrapper DnaCprSectionSecond" id="dnaCprRenderList">
+                                
                             </div>
+                            <div id="dnaCprPagination"></div>
                         </div>
                     </div>
                 </div>
@@ -7873,6 +8033,11 @@
         var consentListUrl = "{{ url('roster/client/consent-list') }}";
         var consentDeleteUrl = "{{ url('roster/client/consent-delete') }}";
         var consentStatusChangeUrl = "{{ url('roster/client/consent-status-change') }}";
+
+        var saveDnaCprUrl = "{{ url('roster/client/dna-cpr-save') }}";
+        var dnaCprListUrl = "{{ url('roster/client/dna-cpr-list') }}";
+        var dnaCprDeleteUrl = "{{ url('roster/client/dna-cpr-delete') }}";
+        var dnaCprDetailsUrl = "{{ url('roster/client/dna-cpr-details') }}";
     </script>
     <!-- end here -->
     <script src="{{ url('public/js/roster/client/client_details.js')}}" defer></script>
@@ -7883,6 +8048,7 @@
     <script src="{{ url('public/js/roster/client/care_plan.js')}}" defer></script>
     <script src="{{ url('public/js/roster/ai-document-import.js') }}"></script>
     <script src="{{ url('public/js/roster/client/consent.js') }}" defer></script>
+    <script src="{{ url('public/js/roster/client/dnaCpr.js') }}" defer></script>
     <script>
         const tabs = document.querySelectorAll(".tab");
         const contents = document.querySelectorAll(".content");
@@ -9706,11 +9872,16 @@
                             readOnly: false
                         }
                     ).then(function(form) {
-
+                        currentForm = form;
                         if (response.pattern_value) {
+                            let parsedData = JSON.parse(response.pattern_value);
+
+                            if (typeof parsedData === "string") {
+                                parsedData = JSON.parse(parsedData);
+                            }
 
                             form.submission = {
-                                data: JSON.parse(response.pattern_value)
+                                data: parsedData
                             };
                         }
                     });
@@ -9721,58 +9892,139 @@
 
                 let components = [];
 
-                data.sections.forEach((section, index) => {
+                data.sections.forEach((section, sectionIndex) => {
 
-                    let panel = {
-                        title: section.title,
-                        type: "panel",
-                        key: "section_" + index,
-                        input: false,
-                        components: []
-                    };
+                    let sectionComponents = [];
 
                     section.fields.forEach(field => {
 
                         let component = {
-                            label: field.label,
-                            key: field.id,
-                            type: mapFieldType(field.type),
+                            label: field.label || '',
+                            key: field.id || '',
                             input: true,
+                            tableView: true,
                             validate: {
                                 required: field.required || false
-                            }
+                            },
+                            placeholder: field.hint || ''
                         };
 
-                        panel.components.push(component);
+                        switch(field.type) {
+
+                            // TEXT
+                            case 'text':
+                            case 'tel':
+                            case 'email':
+
+                                component.type = 'textfield';
+                                break;
+
+                            // TEXTAREA
+                            case 'textarea':
+
+                                component.type = 'textarea';
+                                break;
+
+                            // DATE
+                            case 'date':
+
+                                component.type = 'datetime';
+                                component.enableDate = true;
+                                component.enableTime = false;
+                                component.format = 'yyyy-MM-dd';
+
+                                break;
+
+                            // RADIO
+                            case 'radio':
+
+                                component.type = 'radio';
+                                component.values = field.options.map(opt => ({
+                                    label: opt,
+                                    value: opt
+                                }));
+
+                                break;
+
+                            // CHECKBOX
+                            case 'checkbox':
+
+                                // multiple checkbox options
+                                if (field.options && field.options.length) {
+
+                                    component.type = 'selectboxes';
+
+                                    component.values = field.options.map(opt => ({
+                                        label: opt,
+                                        value: opt
+                                    }));
+
+                                } else {
+
+                                    component.type = 'checkbox';
+                                }
+
+                                break;
+
+                            // SIGNATURE
+                            case 'signature':
+
+                                component.type = 'signature';
+
+                                break;
+
+                            // INFO / HTML CONTENT
+                            case 'info':
+
+                                component.type = 'content';
+                                component.html = `
+                                    <div class="alert alert-info">
+                                        ${field.content || ''}
+                                    </div>
+                                `;
+
+                                delete component.input;
+
+                                break;
+
+                            // TABLE
+                            case 'table':
+
+                                component.type = 'datagrid';
+
+                                component.components = field.columns.map(col => ({
+                                    label: col,
+                                    key: col.toLowerCase()
+                                            .replace(/\s+/g, '_')
+                                            .replace(/[^\w]/g, ''),
+                                    type: 'textfield',
+                                    input: true
+                                }));
+
+                                break;
+
+                            default:
+
+                                component.type = 'textfield';
+                        }
+
+                        sectionComponents.push(component);
                     });
 
-                    components.push(panel);
+                    components.push({
+                        title: section.title,
+                        type: 'panel',
+                        key: 'section_' + sectionIndex,
+                        input: false,
+                        collapsible: false,
+                        components: sectionComponents
+                    });
                 });
 
                 return {
-                    display: "form",
+                    display: 'form',
                     components: components
                 };
-            }
-            function mapFieldType(type) {
-
-                switch(type) {
-
-                    case 'text':
-                        return 'textfield';
-
-                    case 'email':
-                        return 'email';
-
-                    case 'textarea':
-                        return 'textarea';
-
-                    case 'checkbox':
-                        return 'checkbox';
-
-                    default:
-                        return 'textfield';
-                }
             }
 //             function convertToFormioSchema(customSchema) {
 //     let components = [];
@@ -9857,79 +10109,155 @@
 
 //     return { components };
 // }
+            // $(document).on('click', ".submitBtn", function() {
+
+            //     let form = $(this).closest("form");
+
+            //     if (!form.length) return false;
+
+            //     let isValid = true;
+
+            //     let fields = form.find('[aria-required="true"]');
+
+            //     console.log("Total required fields:", fields.length);
+            //     let errHtml = '';
+            //     fields.each(function() {
+
+            //         let field = $(this);
+            //         let val = field.val();
+
+            //         if (!val || val.trim() === "") {
+            //             errHtml += 'Please fill all required fields';
+            //             field.addClass("error");
+            //             isValid = false;
+            //         } else {
+            //             field.removeClass("error");
+            //         }
+            //     });
+            //     if (!isValid) {
+            //         form.find('.stage_error_msg')
+            //             .html('Please fill all required fields')
+            //             .removeClass('d-none');
+            //         // alert("Please fill all required fields");
+            //         return false;
+            //     }
+            //     let USER_ID = "{{ $clientDetails['id'] }}";
+            //     let formData = new FormData(form[0]);
+            //     console.log(`STAGE_ID : ${STAGE_ID}`,
+            //         `STAGE_FORM_ID: ${STAGE_FORM_ID}  , USER_ID: ${USER_ID}`);
+            //     // return;
+            //     // extra params append karo
+            //     formData.append('_token', "<?= csrf_token() ?>");
+            //     formData.append('stage_id', STAGE_ID);
+            //     formData.append('stage_form_id', STAGE_FORM_ID);
+            //     formData.append('user_id', USER_ID);
+            //     let fileInput = document.querySelector('input[type=file]');
+            //     if (fileInput.files.length > 0) {
+            //         formData.append('file', fileInput.files[0]);
+            //     }
+            //     $.ajax({
+            //         url: "{{ route('roster.staffonboarding.saveforms') }}",
+            //         type: 'POST',
+            //         data: formData,
+
+            //         // 👇 IMPORTANT for FormData
+            //         processData: false,
+            //         contentType: false,
+
+            //         beforeSend: function() {},
+
+            //         success: function(res) {
+            //             if (typeof isAuthenticated === "function") {
+            //                 if (isAuthenticated(res) == false) {
+            //                     return false;
+            //                 }
+            //             }
+            //             if (res.success) {
+            //                 STAGE_FORM_ID = res.data.id;
+            //                 alertMsg('suc', res.message);
+
+            //                 // optional reload
+            //                 location.reload();
+            //             }
+            //         },
+
+            //         error: function() {
+            //             alertMsg('err', 'Form Not Saved');
+            //         }
+            //     });
+
+            // });
+            let currentForm = null;
             $(document).on('click', ".submitBtn", function() {
 
-                let form = $(this).closest("form");
-
-                if (!form.length) return false;
-
-                let isValid = true;
-
-                let fields = form.find('[aria-required="true"]');
-
-                console.log("Total required fields:", fields.length);
-                let errHtml = '';
-                fields.each(function() {
-
-                    let field = $(this);
-                    let val = field.val();
-
-                    if (!val || val.trim() === "") {
-                        errHtml += 'Please fill all required fields';
-                        field.addClass("error");
-                        isValid = false;
-                    } else {
-                        field.removeClass("error");
-                    }
-                });
-                if (!isValid) {
-                    form.find('.stage_error_msg')
-                        .html('Please fill all required fields')
-                        .removeClass('d-none');
-                    // alert("Please fill all required fields");
+                if (!currentForm) {
+                    alert('Form not loaded');
                     return false;
                 }
+
+                // FORMIO VALIDATION
+                let isValid = currentForm.checkValidity(
+                    currentForm.submission.data,
+                    true
+                );
+
+                console.log("VALID ?", isValid);
+
+                console.log(currentForm.errors);
+
+                if (!isValid) {
+
+                    let messages = currentForm.errors.map(err => err.message);
+
+                    $('.stage_error_msg')
+                        .html(messages.join('<br>'))
+                        .removeClass('d-none');
+
+                    return false;
+                }
+
                 let USER_ID = "{{ $clientDetails['id'] }}";
-                let formData = new FormData(form[0]);
-                console.log(`STAGE_ID : ${STAGE_ID}`,
-                    `STAGE_FORM_ID: ${STAGE_FORM_ID}  , USER_ID: ${USER_ID}`);
-                // return;
-                // extra params append karo
+
+                let formData = new FormData();
+
+                formData.append(
+                    'pattern_value',
+                    JSON.stringify(currentForm.submission.data)
+                );
+
                 formData.append('_token', "<?= csrf_token() ?>");
                 formData.append('stage_id', STAGE_ID);
                 formData.append('stage_form_id', STAGE_FORM_ID);
                 formData.append('user_id', USER_ID);
-                let fileInput = document.querySelector('input[type=file]');
-                if (fileInput.files.length > 0) {
-                    formData.append('file', fileInput.files[0]);
-                }
+                // console.log("FORMDATA", formData);
+                // return false;
                 $.ajax({
+
                     url: "{{ route('roster.staffonboarding.saveforms') }}",
+
                     type: 'POST',
+
                     data: formData,
 
-                    // 👇 IMPORTANT for FormData
                     processData: false,
+
                     contentType: false,
 
-                    beforeSend: function() {},
-
                     success: function(res) {
-                        if (typeof isAuthenticated === "function") {
-                            if (isAuthenticated(res) == false) {
-                                return false;
-                            }
-                        }
+                        console.log(res);
+                        // return;
                         if (res.success) {
+
                             STAGE_FORM_ID = res.data.id;
+
                             alertMsg('suc', res.message);
 
-                            // optional reload
                             location.reload();
                         }
                     },
 
                     error: function() {
+
                         alertMsg('err', 'Form Not Saved');
                     }
                 });
