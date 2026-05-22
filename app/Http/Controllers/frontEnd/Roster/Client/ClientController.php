@@ -22,7 +22,6 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
-use Exception;
 
 class ClientController extends Controller
 {
@@ -419,23 +418,12 @@ class ClientController extends Controller
             $home_ids = Auth::user()->home_id;
             $ex_home_ids = explode(',', $home_ids);
             $home_id = $ex_home_ids[0];
-            $requestData = $request->only([
-                'id',
-                'client_id',
-                'alert_type_id',
-                'severity',
-                'alert_title',
-                'description',
-                'action_required',
-            ]);
+            $requestData = $request->all();
             $requestData['home_id'] = $home_id;
             $requestData['user_id'] = Auth::user()->id;
-            if ($request->has('expiry_date') && !empty($request->expiry_date)) {
+            if ($request->has('expiry_date') && !empty($data['expiry_date'])) {
                 $requestData['expiry_date'] = Carbon::parse($request->expiry_date)->format('Y-m-d');
-            } else {
-                $requestData['expiry_date'] = null;
             }
-            $requestData['requires_staff_acknowledgment'] = $request->has('requires_staff_acknowledgment') ? $request->requires_staff_acknowledgment : 0;
             // echo "<pre>";print_r($requestData);die;
             $clientAlert = $this->clientAlertService->store($requestData);
             return response()->json(['success' => true, 'message' => "Client Alert saved successfully", 'data' => $clientAlert]);
@@ -557,7 +545,7 @@ class ClientController extends Controller
         ]);
     }
 
-    public function emergency_contact_save(Request $request)
+        public function emergency_contact_save(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'service_user_id' => 'required|exists:service_user,id',

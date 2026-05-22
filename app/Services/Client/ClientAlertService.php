@@ -94,7 +94,7 @@ class ClientAlertService
             DB::rollBack();
             Log::error('Error increase in acknowledge :', [
                 'error' => $e->getMessage(),
-                'id'  => $id
+                'data'  => $data
             ]);
             throw $e;
         }
@@ -112,7 +112,7 @@ class ClientAlertService
             DB::rollBack();
             Log::error('Error alert resolved :', [
                 'error' => $e->getMessage(),
-                'id'  => $id
+                'data'  => $data
             ]);
             throw $e;
         } 
@@ -129,7 +129,7 @@ class ClientAlertService
             DB::rollBack();
             Log::error('Error alert archived :', [
                 'error' => $e->getMessage(),
-                'id'  => $id
+                'data'  => $data
             ]);
             throw $e;
         } 
