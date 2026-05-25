@@ -283,7 +283,7 @@
                     <button class="tab" data-tab="clientMentalCapacityTab"> Mental Capacity </button>
                     <button class="tab" data-tab="clientDoLSTab" onclick="showDolsList()"> DoLS </button>
                     <button class="tab" data-tab="clientDNACPRTab" onclick="showDncprList()"> DNACPR </button>
-                    <button class="tab" data-tab="clientSafeguardingTab"> Safeguarding </button>
+                    <!-- <button class="tab" data-tab="clientSafeguardingTab"> Safeguarding </button> -->
                     <button class="tab" data-tab="clientConsentTab" onclick="showConsentList()"> Consent </button>
                     <button class="tab" data-tab="clientEmergencyTab"> Emergency </button>
                     <button class="tab" data-tab="clientDocumentsTab"> Documents </button>
