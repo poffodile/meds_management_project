@@ -63,26 +63,26 @@ $allowed_ids = array_filter(explode(',', str_replace(' ', '', $raw_home_id)));
         <!--logo start-->
         <div class="brand ">
             <a href="{{ url('/roster') }}" class="logo">
-                <img src="{{ url('public/images/n-logo1.jpg') }}">
-                <!-- <span style="color: white;">SCITS </span> -->
+                 <img src="{{ url('public/images/n-logo1.jpg') }}">
+                 <!--<span style="color: white;">SCITS </span> -->
             </a>
         </div>
         <!--logo end-->
-        <!-- <div class="horizontal-menu navbar-collapse collapse">
-            <div class="wlcome-header"> Welcome Back, </div>
-        </div> -->
+        <!--<div class="horizontal-menu navbar-collapse collapse">-->
+        <!--    <div class="wlcome-header"> Welcome Back, </div>-->
+        <!--</div>-->
         <div class="header-dys top-nav hr-top-nav cus-nav">
             <div class="col-md-8 col-sm-8 col-xs-12 col-lg-8">
-                @php
-                $design_layout_id = Auth::check() ? Auth::user()->design_layout : '0';
+                 @php
+                    $design_layout_id = Auth::check() ? Auth::user()->design_layout : '0';
                 @endphp
-                <div class="select-dyslexia">
+               <!-- <div class="select-dyslexia">
                     <select class="form-control sel_design_layout" name="design_layout_id">
                         <option value="0" {{ $design_layout_id == '0' ? 'selected' : '' }}>Default</option>
                         <option value="1" {{ $design_layout_id == '1' ? 'selected' : '' }}>Dyslexia</option>
                     </select>
-                </div>
-
+                </div> -->
+          
                 @if(Auth::check() && count($allowed_ids) > 1)
                 @php
                 $allowed_homes = \App\Home::whereIn('id', $allowed_ids)->get();
@@ -103,9 +103,9 @@ $allowed_ids = array_filter(explode(',', str_replace(' ', '', $raw_home_id)));
                     <li class="dropdown">
                         <a data-toggle="dropdown" class="dropdown-toggle" href="#">
                             @php
-                            $user_image = Auth::user()->image ?: 'default_user.jpg';
-                            $current_path = Request::path();
-                            $user_id = Auth::user()->id;
+                                $user_image = Auth::user()->image ?: 'default_user.jpg';
+                                $current_path = Request::path();
+                                $user_id = Auth::user()->id;
                             @endphp
                             <!-- <img alt="" src="{{ userProfileImagePath.'/'.$user_image }}"> -->
                             <img alt="" src="{{ url('public/images/userProfileImages'.'/'.$user_image) }}">
