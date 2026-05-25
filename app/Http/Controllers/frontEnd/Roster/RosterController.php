@@ -5,6 +5,7 @@ namespace App\Http\Controllers\frontEnd\Roster;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Staffleaves;
 use App\Models\CompanyDepartment;
 use App\User;
 use App\ServiceUser;
@@ -16,9 +17,11 @@ class RosterController extends Controller
 {
     public function index()
     {
+        $home_id = explode(',', Auth::user()->home_id)[0];
         $data['departments'] = CompanyDepartment::getActiveCompanyDepartment();
         $data['serviceUserCount'] = ServiceUser::getServiceUserByResidentialId(1);
         $data['userCount'] = User::getstaffByResidentialId();
+        $data['pendingLeaveCount'] = Staffleaves::where('home_id', $home_id)->where('leave_status', 0)->count();
 
         $data['scheduled_shifts'] = ScheduledShift::with(['client', 'staff'])
             ->where('home_id', Auth::user()->home_id)
@@ -49,8 +52,9 @@ class RosterController extends Controller
         $data['unfilled_shifts_count'] = ScheduledShift::where('home_id', Auth::user()->home_id)
             ->whereNull('staff_id')
             ->count();
-
-		$now = Carbon::now();
+            
+            
+        $now = Carbon::now();
 		$home_id = Auth::user()->home_id;
 
         // Automatically sync missed shifts to ClientAlert table for persistent tracking
@@ -65,7 +69,7 @@ class RosterController extends Controller
 			})
 			->get();
 
-        foreach($missed_shifts_raw as $shift) {
+          foreach($missed_shifts_raw as $shift) {
             // Check if alert already exists for this shift
             $exists = ClientAlert::where('shift_id', $shift->id)->exists();
             if (!$exists && !empty($shift->service_user_id)) {
@@ -103,7 +107,7 @@ class RosterController extends Controller
 			->get();
 
         $data['missed_shifts'] = []; // Cleared to avoid duplicates in view
-        
+
         return view('frontEnd.roster.index', $data);
     }
 
@@ -113,7 +117,7 @@ class RosterController extends Controller
         $data['userCount'] = User::getstaffByResidentialId();
 
         $data['scheduled_shifts'] = ScheduledShift::with(['client', 'staff'])
-            ->homeId()
+            ->where('home_id', Auth::user()->home_id)
             ->orderBy('start_date', 'desc')
             ->limit(10)
             ->get()
@@ -124,8 +128,8 @@ class RosterController extends Controller
             });
 
         $data['today_shifts'] = ScheduledShift::with(['client', 'staff'])
-            ->homeId()
-            ->todayShifts()
+            ->where('home_id', Auth::user()->home_id)
+            ->whereDate('start_date', date('Y-m-d'))
             ->orderBy('start_time', 'asc')
             ->get()
             ->map(function ($shift) {
@@ -134,9 +138,13 @@ class RosterController extends Controller
                 return $shift;
             });
 
-        $data['today_shifts_count'] = ScheduledShift::homeId()->todayShifts()->count();
+        $data['today_shifts_count'] = ScheduledShift::where('home_id', Auth::user()->home_id)
+            ->whereDate('start_date', date('Y-m-d'))
+            ->count();
 
-        $data['unfilled_shifts_count'] = ScheduledShift::homeId()->todayShifts()->unfilledShifts()->count();
+        $data['unfilled_shifts_count'] = ScheduledShift::where('home_id', Auth::user()->home_id)
+            ->whereNull('staff_id')
+            ->count();
 
         return view('frontEnd.roster.dashboard', $data);
     }
