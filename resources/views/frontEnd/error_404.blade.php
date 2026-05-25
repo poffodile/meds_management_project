@@ -14,10 +14,10 @@
               <h2>Page not found</h2>
               <p class="nrml-txt pg-nt-fond">We Couldn’t Find This Page</p>
           </div>
-          <a href="{{ url('/') }}" class="back-btn"><i class="fa fa-home"></i> Back To Home</a>
+          <a href="{{ url('/roster') }}" class="back-btn"><i class="fa fa-home"></i> Back To Home</a>
       </section>
 
     </div>
     
   </body>
-@endsection
+@endsection 
