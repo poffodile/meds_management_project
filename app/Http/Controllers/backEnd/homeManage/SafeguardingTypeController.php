@@ -49,7 +49,7 @@ class SafeguardingTypeController extends Controller
         // echo "<pre>";print_r($request->all());die;
         if (!empty($request->id)) {
             $validator = Validator::make($request->all(), [
-                'id' => 'required|exists:incident_types,id',
+                'id' => 'required|exists:safeguarding_types,id',
                 'type' => 'required',
                 'status' => 'required|boolean',
             ]);
@@ -84,7 +84,7 @@ class SafeguardingTypeController extends Controller
             Log::error('Error saving Safeguarding Type: ' . $e->getMessage());
             return [
                 'success' => false,
-                'message' => 'Error save Safeguarding Type: ' . $e->getMessage(),
+                'message' => 'Error save Safeguarding Type: Something went wrong.',
             ];
         }
     }
@@ -111,7 +111,7 @@ class SafeguardingTypeController extends Controller
             Log::error('Error Safeguarding Type delete: ' . $e->getMessage());
             return [
                 'success' => false,
-                'message' => 'Error Safeguarding Type delete: ' . $e->getMessage(),
+                'message' => 'Error Safeguarding Type delete: Something went wrong.',
             ];
         }
     }
@@ -119,7 +119,7 @@ class SafeguardingTypeController extends Controller
     {
         // echo "<pre>";print_r($request->all());die;
         $validator = Validator::make($request->all(), [
-            'id' => 'required|exists:incident_types,id',
+            'id' => 'required|exists:safeguarding_types,id',
             'status' => 'required|boolean',
         ]);
         if ($validator->fails()) {
@@ -145,7 +145,7 @@ class SafeguardingTypeController extends Controller
             Log::error('Error Safeguarding Type status change: ' . $e->getMessage());
             return [
                 'success' => false,
-                'message' => 'Error Safeguarding Type status change: ' . $e->getMessage(),
+                'message' => 'Error Safeguarding Type status change: Something went wrong.',
             ];
         }
     }

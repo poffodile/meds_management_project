@@ -15,8 +15,11 @@ class SafeguardingTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->user = User::where('user_name', 'komal')->first();
-        $this->crossHomeUser = User::where('home_id', '!=', 8)
+        $this->user = User::where('home_id', 1)->first();
+        if ($this->user) {
+            $this->user->user_type = 'A';
+        }
+        $this->crossHomeUser = User::where('home_id', '!=', 1)
             ->whereNotNull('home_id')
             ->where('home_id', '!=', '')
             ->first();
@@ -265,8 +268,8 @@ class SafeguardingTest extends TestCase
 
         // Verify server-side values used, not injected ones
         $record = DB::table('safeguarding_referrals')->where('id', $id)->first();
-        $this->assertEquals(8, $record->home_id);
-        $this->assertEquals(194, $record->created_by);
+        $this->assertEquals($this->getHomeId(), $record->home_id);
+        $this->assertEquals($this->user->id, $record->created_by);
         $this->assertEquals(0, $record->is_deleted);
 
         // Cleanup

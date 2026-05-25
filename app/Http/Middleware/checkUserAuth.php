@@ -158,6 +158,17 @@ class checkUserAuth
                     'roster/ai-new-client-import/confirm'
                 );
 
+                // Whitelist Safeguarding routes
+                array_push($allowed_path,
+                    'roster/safeguarding',
+                    'roster/safeguarding/list',
+                    'roster/safeguarding/save',
+                    'roster/safeguarding/update',
+                    'roster/safeguarding/details',
+                    'roster/safeguarding/delete',
+                    'roster/safeguarding/status-change'
+                );
+
                 // Whitelist Workflow Automation routes
                 // array_push($allowed_path,
                 //     'roster/workflows',
