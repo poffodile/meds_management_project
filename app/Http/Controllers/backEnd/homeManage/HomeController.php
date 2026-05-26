@@ -122,6 +122,16 @@ class HomeController extends Controller
             }
             
     		if($homelist->save()){
+                // Update home_id in user table for the Owner/System Admin
+                $owner_user = \App\User::where('admn_id', $admin_id)->where('user_type', 'O')->first();
+                if (!empty($owner_user)) {
+                    $existing_homes = array_filter(explode(',', $owner_user->home_id));
+                    if (!in_array($homelist->id, $existing_homes)) {
+                        $existing_homes[] = $homelist->id;
+                        $owner_user->home_id = implode(',', $existing_homes);
+                        $owner_user->save();
+                    }
+                }
                 $update_company_payment = CompanyPayment::where('admin_id',$admin_id)
                                                         ->increment('homes_added');
                 if($update_company_payment){

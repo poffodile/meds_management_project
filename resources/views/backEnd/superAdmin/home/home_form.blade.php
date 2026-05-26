@@ -25,6 +25,10 @@ if (isset($system_admin_home)) {
 	.yes_no_btn .d-flex label {
 		margin-right: 20px;
 	}
+
+	.pac-container {
+		z-index: 10000 !important;
+	}
 </style>
 
 <section id="main-content" class="">
@@ -328,7 +332,8 @@ if (isset($system_admin_home)) {
 	// });
 </script>
 
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBxoFiKEhpV_lzf-i17vjFb9hZZwHSkZGI&libraries=places&callback=initMap" async defer></script>
+<?php $google_map_api_key = env('GOOGLE_MAP_API_KEY'); ?>
+<script src="https://maps.googleapis.com/maps/api/js?key={{ $google_map_api_key }}&libraries=places&callback=initMap" async defer></script>
 <script>
 	let map;
 	let marker;
@@ -361,6 +366,30 @@ if (isset($system_admin_home)) {
 			componentRestrictions: { country: "gb" } // Restrict autocomplete results to the UK
 		});
 		autocomplete.bindTo("bounds", map);
+
+		// Geocode prefilled default address on load if coordinates are not set
+		const initialAddress = input.value.trim();
+		if (initialAddress && !$('#latitude').val()) {
+			geocoder.geocode({ address: initialAddress }, (results, status) => {
+				if (status === "OK" && results[0]) {
+					const place = results[0];
+					$('#latitude').val(place.geometry.location.lat());
+					$('#longitude').val(place.geometry.location.lng());
+					$('#place_id').val(place.place_id || '');
+					
+					map.panTo(place.geometry.location);
+					map.setZoom(15);
+					marker.setPosition(place.geometry.location);
+				}
+			});
+		}
+
+		// Clear coordinates if the user manually changes the address input
+		$(input).on('input', function() {
+			$('#latitude').val('');
+			$('#longitude').val('');
+			$('#place_id').val('');
+		});
 
 		autocomplete.addListener("place_changed", () => {
 			const place = autocomplete.getPlace();

@@ -138,6 +138,16 @@ class HomeController extends Controller
             }
 
             if ($system_admin_home->save()) {
+                // Update home_id in user table for the Owner/System Admin
+                $owner_user = \App\User::where('admn_id', $system_admin_id)->where('user_type', 'O')->first();
+                if (!empty($owner_user)) {
+                    $existing_homes = array_filter(explode(',', $owner_user->home_id));
+                    if (!in_array($system_admin_home->id, $existing_homes)) {
+                        $existing_homes[] = $system_admin_home->id;
+                        $owner_user->home_id = implode(',', $existing_homes);
+                        $owner_user->save();
+                    }
+                }
                 // Save Home Areas
                 if ($request->has('is_home_area') && $request->is_home_area == 1) {
                     if ($request->has('home_area_names')) {

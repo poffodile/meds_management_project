@@ -38,6 +38,7 @@ if (isset($system_admins)) {
                     <header class="panel-heading">
                         {{ $task }} Admin
                     </header>
+                    @include('backEnd.common.alert_messages')
                     <div class="panel-body">
                         <div class="position-center">
                             <form class="form-horizontal" role="form" method="post" action="{{ $action }}" id="{{ $form_id }}" enctype="multipart/form-data">

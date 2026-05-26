@@ -5,7 +5,7 @@ namespace App;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Auth;
+use Auth;
 use App\Home, App\Admin, App\StaffSickLeave;
 use App\Models\PersonalManagement\TimeSheet;
 use Illuminate\Support\Facades\Log;
@@ -25,18 +25,11 @@ class User extends Authenticatable
      *
      * @var array
      */
-
-    protected $casts = [
-        'date_of_joining' => 'date',
-        'date_of_leaving' => 'date',
-        'dbs_expiry_date' => 'date',
-    ];
-
     protected $fillable = [
         'name',
         'email',
         'password',
-        'is_deleted'
+        'is_deleted',
     ];
 
     /**
@@ -54,31 +47,6 @@ class User extends Authenticatable
         return User::where('home_id', $home_id)->select('id', 'name')->where('is_deleted', 0)->get();
     }
 
-    public function scopeByHome($query)
-    {
-        return $query->where('home_id', Auth::user()->home_id);
-    }
-
-    public function scopeActive($query)
-    {
-        return $query->where('status', 1);
-    }
-    public function scopeNotDeleted($query)
-    {
-        return $query->where('is_deleted', 0);
-    }
-
-    public function scopeSelectBasic($query)
-    {
-        return $query->select('id', 'name');
-    }
-
-    public static function getHomeActiveUsers()
-    {
-        return User::byHome()->active()->notDeleted()->selectBasic()->get();
-    }
-
-
     public function access_level()
     {
         return $this->hasOne('App\AccessLevel', 'id', 'access_level');
@@ -88,8 +56,7 @@ class User extends Authenticatable
     {
         return $this->hasMany('App\UserQualification', 'user_id', 'id')->where('is_deleted', 0);
     }
-
-    public function working_hours()
+public function working_hours()
     {
         return $this->hasMany(ClientCareScheduleDay::class, 'carer_id');
     }
@@ -105,7 +72,6 @@ class User extends Authenticatable
     {
         return $this->hasMany(ClientCareUnavailableDate::class, 'carer_id');
     }
-
     //send set password link to user
     public static function sendCredentials($user_id = null)
     {
@@ -135,7 +101,7 @@ class User extends Authenticatable
 
                     $message->to($email, $company_name)
 
-                        ->subject('SCITS set Password Mail');
+                        ->subject('Care One OS set Password Mail');
 
                     $message->from('mobappssolutions153@gmail.com', $company_name);
                 });
@@ -146,6 +112,15 @@ class User extends Authenticatable
             }
         }
         return false;
+    }
+    
+     public function emergencyContacts()
+    {
+        return $this->hasOne(
+            \App\Models\UserEmergencyContact::class,
+            'user_id',
+            'id'
+        );
     }
 
     // public static function saveQualification($data = array(), $user_id = null)
@@ -181,7 +156,7 @@ class User extends Authenticatable
     //         }
     //     }
     // }
-
+    
     public static function saveQualification($data = [], $user_id = null)
     {
         Log::info('saveQualification called', [
@@ -242,7 +217,7 @@ class User extends Authenticatable
             ]);
         }
     }
-
+    
     public static function getstaffByResidentialId()
     {
         return self::where('home_id', Auth::user()->home_id)->where('status', 1)->where('is_deleted', 0)->count();
@@ -347,7 +322,8 @@ class User extends Authenticatable
 
         if (!empty($staff_member->admn_id)) {
 
-            $company_manager = \App\CompanyManagers::where('company_id', $staff_member->admn_id)->first();
+            $company_manager = CompanyManagers::where('company_id', $staff_member->admn_id)->first();
+         
             if (!empty($company_manager)) {
                 $manager_name    = $company_manager->name;
                 $email           = $company_manager->email;
@@ -380,21 +356,34 @@ class User extends Authenticatable
     {
         return $this->hasMany(Timesheet::class);
     }
-
-    public function emergencyContacts()
-    {
-        return $this->hasOne(
-            \App\Models\UserEmergencyContact::class,
-            'user_id',
-            'id'
-        );
-    }
-
-    public function shifts()
+      public function shifts()
     {
         return $this->hasMany(ScheduledShift::class, 'staff_id');
     }
+    
+     public function scopeByHome($query)
+    {
+        return $query->where('home_id', Auth::user()->home_id);
+    }
 
+    public function scopeActive($query)
+    {
+        return $query->where('status', 1);
+    }
+    public function scopeNotDeleted($query)
+    {
+        return $query->where('is_deleted', 0);
+    }
+
+    public function scopeSelectBasic($query)
+    {
+        return $query->select('id', 'name');
+    }
+
+    public static function getHomeActiveUsers()
+    {
+        return User::byHome()->active()->notDeleted()->selectBasic()->get();
+    }
 
 
     // public static function getData($id)
@@ -426,6 +415,7 @@ class User extends Authenticatable
             input password
             press submit the user will be logged in.
     */
+    
     public function getHomeIdAttribute($value)
     {
         if (Session::has('active_home_id')) {
@@ -440,6 +430,10 @@ class User extends Authenticatable
 
     public function getRealHomeIdAttribute()
     {
+        if ($this->user_type == 'O') {
+            $home_ids = \App\Home::where('admin_id', $this->admn_id)->where('is_deleted', 0)->pluck('id')->toArray();
+            return implode(',', $home_ids);
+        }
         return $this->getAttributes()['home_id'];
     }
 }

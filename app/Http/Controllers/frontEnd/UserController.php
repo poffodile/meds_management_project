@@ -394,10 +394,10 @@ class UserController extends Controller
     }*/
 	private function handleManagerSession($selected_home_id)
 	{
-		if (Auth::check() && in_array(Auth::user()->user_type, ['M', 'CM'])) {
+		if (Auth::check() && in_array(Auth::user()->user_type, ['M', 'CM', 'O', 'A'])) {
 			$user = Auth::user();
-			// Get raw home_id from DB
-			$raw_home_id = User::where('id', $user->id)->value('home_id');
+			// Get raw home_id (using real_home_id accessor to support O/A/M/CM dynamically)
+			$raw_home_id = $user->real_home_id;
 			Session::put('allowed_home_ids', explode(',', $raw_home_id));
 			Session::put('active_home_id', $selected_home_id);
 		}

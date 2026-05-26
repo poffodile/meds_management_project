@@ -1,5 +1,5 @@
 <?php
-define('YOUR_CONSTANT_VAR', 'VALUE');
+if (!defined('YOUR_CONSTANT_VAR')) define('YOUR_CONSTANT_VAR', 'VALUE');
 //image paths
 if (!defined('userProfileImagePath')) define('userProfileImagePath', 'public/images/userProfileImages');
 if (!defined('serviceUserProfileImagePath')) define('serviceUserProfileImagePath', 'public/images/serviceUserProfileImages');

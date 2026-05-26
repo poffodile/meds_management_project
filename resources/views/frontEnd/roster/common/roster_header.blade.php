@@ -461,8 +461,8 @@
           <li> <a href="{{ url('/roster/manage-dashboard') }}"><i class='bx bx-grid-alt'></i> <span>Manager Dashboard</span> </a></li>
           <li> <a href="{{ url('/roster/schedule-shift') }}"><i class='bx bx-calendar'></i> <span>Schedule</span> </a></li>
           <li> <a href="{{ url('/roster/carer-availability') }}"><i class='bx bx-calendar'></i> <span>{{ getTerm('Staff') }} Availability</span> </a></li>
-          <li> <a href="{{ url('/roster/carer') }}"><i class='bx bx-group'></i> <span>{{ getTerm('Staff') }}s</span> </a></li>
-          <li> <a href="{{ url('/roster/client') }}"><i class='bx bx-user-circle'></i> <span>{{ getTerm('Service User') }}s</span> </a></li>
+          <li> <a href="{{ url('/roster/carer') }}"><i class='bx bx-group'></i> <span>{{ getTerm('Staff') }}</span> </a></li>
+          <li> <a href="{{ url('/roster/client') }}"><i class='bx bx-user-circle'></i> <span>{{ getTerm('Service User') }}</span> </a></li>
           <li> <a href="{{ url('/roster/daily-log') }}"><i class='bx  bx-clipboard'></i> <span>Daily Log</span></a></li>
 
           <li class="header-menu"> <span>Domiciliary Care</span> </li>

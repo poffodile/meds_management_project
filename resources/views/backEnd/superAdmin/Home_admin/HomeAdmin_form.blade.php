@@ -27,6 +27,7 @@
                         Home Admin
                     </header>
                     <div class="panel-body">
+                        @include('backEnd.common.alert_messages')
                         <div class="position-center">
                             <form class="form-horizontal" role="form" method="post" action="{{ $action }}" id="{{ $form_id }}" enctype="multipart/form-data">
                                 <div class="form-group">
@@ -41,12 +42,7 @@
                                         <input type="text" name="user_name" class="form-control" placeholder="username" value="{{ (isset($admin->user_name)) ? $admin->user_name : '' }}" maxlength="255" {{ (isset($del_status)) ? $disabled: '' }}>
                                     </div>
                                 </div>
-                                <!-- <div class="form-group">
-                                <label class="col-lg-2 control-label">Password</label>
-                                <div class="col-lg-10">
-                                    <input type="text" name="password" class="form-control" placeholder="Password" value="{{ (isset($system_admins->password)) ? $system_admins->password : '' }}" >
-                                </div>
-                            </div>         -->
+                             
                                 <div class="form-group">
                                     <label class="col-lg-3 control-label">Email</label>
                                     <div class="col-lg-9">
@@ -74,20 +70,11 @@
                                         <input type="text" name="post_code" class="form-control" placeholder="post code" value="{{ (isset($admin->post_code)) ? $admin->post_code : '' }}" {{ (isset($del_status)) ? $disabled: '' }}>
                                     </div>
                                 </div>
-
-
-                                <!-- <div class="form-group">
-                                <label class="col-lg-2 control-label">Company</label>
-                                <div class="col-lg-10">
-                                    <input type="text" name="company" class="form-control" placeholder="company" value="{{ (isset($system_admins->company)) ? $system_admins->company : '' }}" maxlength="255">
-                                </div>
-                            </div> 
- -->
                                 <?php
-                                $image = env('ASSETS_URL') . adminImgPath . '/default_user.jpg';
+                                $image = url(adminImgPath . '/default_user.jpg');
                                 if (isset($admin->image)) {
                                     if (!empty($admin->image)) {
-                                        $image = env('ASSETS_URL') . adminImgPath . '/' . $admin->image;
+                                        $image = url(adminImgPath . '/' . $admin->image);
                                     }
                                 }
                                 ?>
