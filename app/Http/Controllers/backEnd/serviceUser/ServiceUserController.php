@@ -8,6 +8,10 @@ use Illuminate\Http\Request;
 
 use App\ServiceUser, App\Home, App\SocialApp, App\ServiceUserSocialApp, App\Ethnicity;
 use Hash, DB, Session;
+use App\Models\ChildSection;
+use App\Models\CompanyDepartment;
+use Carbon\Carbon;
+use Validator;
 
 class ServiceUserController extends Controller
 {
@@ -57,13 +61,13 @@ class ServiceUserController extends Controller
 
     public function add(Request $request)
     {
+        $home_id = Session::get('scitsAdminSession')->home_id;
         if ($request->isMethod('post')) {
             $data = $request->input();
             // echo "<pre>"; print_r($data); die;
             // $social_apps = $data['social_app_name'];
             // echo "<pre>"; print_r($social_apps); die;
 
-            $home_id = Session::get('scitsAdminSession')->home_id;
             // echo $home_id; 
             // dd(Session::get('scitsAdminSession'));
             $date_of_birth = date('Y-m-d', strtotime($data['date_of_birth']));
@@ -81,8 +85,9 @@ class ServiceUserController extends Controller
             $user->password              =  '';
             $user->phone_no              =  $data['phone_no'];
             $user->date_of_birth         =  $date_of_birth;
-            $user->child_type            =  $data['child_type'];
-            $user->room_type             =  $data['room_type'];
+            $user->department            =  $data['department'];   
+            $user->child_type            =  $data['child_type'] ?? null;
+            $user->room_type             =  $data['room_type'] ?? null;
             $user->weekly_rate           =  $data['weekly_rate'];
             $user->subs                  =  $data['subs'];
             $user->extra                 =  $data['extra'];
@@ -93,7 +98,12 @@ class ServiceUserController extends Controller
             $user->admission_number      =  $data['admission_number'];
             $user->ethnicity_id          =  $ethnicity_id;
             $user->short_description     =  nl2br($data['short_description']);
-            $user->height                =  $data['height'];
+            // $user->height                =  $data['height'];
+            // $user->weight                =  $data['weight'];
+            $user->height_unit           =  $data['height_unit'];
+            $user->height_ft             =  $data['height_ft'];
+            $user->height_in             =  $data['height_in'];
+            $user->weight_unit           =  $data['weight_unit'];
             $user->weight                =  $data['weight'];
             $user->hair_and_eyes         =  $data['hair_and_eyes'];
             $user->markings              =  $data['markings'];
@@ -152,8 +162,11 @@ class ServiceUserController extends Controller
 
         $ethnicity = Ethnicity::select('id', 'name')->where('is_deleted', '0')->get();
         // echo "<pre>"; print_r($ethnicity); die;
+        $childSection = ChildSection::where(['home_id'=>$home_id,'status'=>1])->whereNull('deleted_at')->get();
 
-        return view('backEnd.serviceUser.service_user_form', compact('page', 'social_app', 'ethnicity'));
+        $company_departments = CompanyDepartment::getActiveCompanyDepartment();
+
+        return view('backEnd.serviceUser.service_user_form', compact('page', 'social_app', 'ethnicity', 'company_departments', 'childSection'));
     }
 
     public function edit(Request $request, $service_id)
@@ -191,32 +204,37 @@ class ServiceUserController extends Controller
                 $user_old_image         = $user->image;
                 $date_of_birth = date('Y-m-d', strtotime($data['date_of_birth']));
 
-                $user->name             =  $data['name'];
-                $user->user_name        =  $data['user_name'];
-                $user->email            =  $data['email'];
-                $user->phone_no         =  $data['phone_no'];
-                $user->date_of_birth    =  $date_of_birth;
-                $user->section          =  $data['section'];
-                $user->admission_number =  $data['admission_number'];
+                $user->name              =  $data['name'];
+                $user->user_name         =  $data['user_name'];
+                $user->email             =  $data['email']; 
+                $user->phone_no          =  $data['phone_no'];
+                $user->date_of_birth     =  $date_of_birth;
+                $user->department        =  $data['department'];   
+                $user->section           =  $data['section'];
+                $user->admission_number  =  $data['admission_number'];
                 $user->short_description =  $data['short_description'];
-                $user->child_type        =  $data['child_type'];
-                $user->room_type         =  $data['room_type'];
+                $user->child_type        =  $data['child_type'] ?? null;
+                $user->room_type         =  $data['room_type'] ?? null;
                 $user->weekly_rate       =  $data['weekly_rate'];
                 $user->subs              =  $data['subs'];
                 $user->extra             =  $data['extra'];
                 $user->start_date        =  date('Y-m-d', strtotime($data['start_date']));
                 $user->local_authority   =  $data['local_authority'];
                 $user->end_date          =  date('Y-m-d', strtotime($data['end_date']));
-                $user->height           =  $data['height'];
-                $user->weight           =  $data['weight'];
-                $user->hair_and_eyes    =  $data['hair_and_eyes'];
-                $user->markings         =  $data['markings'];
-                $user->status           =  $data['status'];
-                $user->ethnicity_id     =  $ethnicity_id;
-
-                $user->current_location =  nl2br($data['current_location']);
+                // $user->height           =  $data['height'];
+                // $user->weight           =  $data['weight'];
+                $user->height_unit       =  $data['height_unit'];
+                $user->height_ft         =  $data['height_ft'];
+                $user->height_in         =  $data['height_in'];
+                $user->weight_unit       =  $data['weight_unit'];
+                $user->weight            =  $data['weight'];
+                $user->hair_and_eyes     =  $data['hair_and_eyes'];
+                $user->markings          =  $data['markings'];
+                $user->status            =  $data['status'];
+                $user->ethnicity_id      =  $ethnicity_id;
+                $user->current_location  =  nl2br($data['current_location']);
                 $user->previous_location =  nl2br($data['previous_location']);
-                $user->mobile           =  $data['mobile'];
+                $user->mobile            =  $data['mobile'];
                 /* $user->skype            =  $data['skype'];
                 $user->facebook         =  $data['facebook'];
                 $user->twitter          =  $data['twitter'];   */
@@ -306,7 +324,11 @@ class ServiceUserController extends Controller
 
         $page = 'service-users';
 
-        return view('backEnd/serviceUser/service_user_form', compact('page', 'user_info', 'social_app', 'social_app', 'social_app_val', 'ethnicity', 'del_status')); //name of view file*/
+        $childSection=ChildSection::where(['home_id'=>$home_id,'status'=>1])->whereNull('deleted_at')->get();
+
+        $company_departments = CompanyDepartment::getActiveCompanyDepartment();
+
+        return view('backEnd/serviceUser/service_user_form', compact('page', 'user_info', 'social_app', 'social_app', 'social_app_val', 'ethnicity', 'del_status', 'company_departments', 'childSection')); //name of view file*/
     }
 
     public function check_username_exist(Request $request)
@@ -403,4 +425,80 @@ class ServiceUserController extends Controller
             //echo json_encode(true);  //  for jquery validations
         }    
     }*/
+    public function child_sections(Request $request){
+        $home_id = Session::get('scitsAdminSession')->home_id;
+        if (!empty($home_id)) {
+            $section_query = ChildSection::select('id', 'home_id', 'section','status')
+                ->whereNull('deleted_at')
+                ->where('home_id', $home_id);
+            $search = '';
+
+            if (isset($request->limit)) {
+                $limit = $request->limit;
+                Session::put('page_record_limit', $limit);
+            } else {
+                if (Session::has('page_record_limit')) {
+                    $limit = Session::get('page_record_limit');
+                } else {
+                    $limit = 25;
+                }
+            }
+
+            if (isset($request->search)) {
+                $search = trim($request->search);
+                $section_query = $section_query->where('section', 'like', '%' . $search . '%');
+            }
+
+            $section_query = $section_query->paginate($limit);
+        } else {
+            return redirect('admin/')->with('error', UNAUTHORIZE_ERR);
+        }
+
+        //$users = DB::table('user')->select('id','name','user_name', 'email', 'access_level')->paginate(25);
+        $page = 'child_section';
+        return view('backEnd.serviceUser.child_sections', compact('page', 'limit', 'section_query', 'search'));
+    }
+    public function childsection_status_change(Request $request){
+        $table=ChildSection::find($request->id);
+        $table->status=$request->status;
+        if($table->save()){
+            echo "done";
+        }else{
+            echo "error";
+        }
+    }
+    public function child_section_delete($id){
+        $table=ChildSection::find($id);
+        $table->deleted_at = Carbon::now();
+        if($table->save()){
+            return redirect()->back()->with('success','Section is deleted');
+        }else{
+            return redirect()->back()->with('error','Somthing went wrong');
+        }
+    }
+    public function child_section_save(Request $request){
+        // echo "<pre>";print_r($request->all());die;
+        $validator = Validator::make($request->all(), [
+            'section' => 'required',
+            'status' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return redirect()->back()->with('error',$validator->errors()->first());
+            // return response()->json(['error' => $validator->errors()->first()]);
+        }
+        $table=new ChildSection;
+        $message='Save Successfully done';
+        if($request->id){
+            $message='Update Successfully done';
+            $table=ChildSection::find($request->id);
+        }
+        $table->home_id=Session::get('scitsAdminSession')->home_id;
+        $table->section=$request->section;
+        $table->status=$request->status;
+        if($table->save()){
+            return redirect()->back()->with('success',$message);
+        }else{
+            return redirect()->back()->with('error','Something went wrong!');
+        }
+    }
 }

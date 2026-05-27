@@ -24,11 +24,12 @@
                         <div class="adv-table editable-table ">
                             <div class="clearfix">
                                 <div class="btn-group">
-                                    <a href="{{ url('admin/user/sick-leave/add/'.$user_id) }}">
+                                    <h3>Sick Leave</h3>
+                                    {{-- <a href="{{ url('admin/user/sick-leave/add/'.$user_id) }}">
                                         <button id="editable-sample_new" class="btn btn-primary">
                                             Add Sick Leave <i class="fa fa-plus"></i>
                                         </button>
-                                    </a>
+                                    </a> --}}
                                 </div>
                                 @include('backEnd.common.alert_messages')
                             </div>
@@ -64,8 +65,8 @@
                                 <table class="table table-striped table-hover table-bordered" id="editable-sample">
                                     <thead>
                                     <tr>
-                                        <th>Title</th>
                                         <th>Date</th>
+                                        <th>Reason</th>
                                         <th width="20%">Actions</th>
                                     </tr>
                                     </thead>
@@ -84,19 +85,19 @@
                                         {
                                             foreach($u_sick_leave as $key => $value) {
 
-                                            $leave_date = date('d M Y', strtotime($value->leave_date));
+                                            $leave_date = date('d M Y', strtotime($value->start_date));
 
                                         ?>
 
                                         <tr>
-                                            <td>{{ ucfirst($value->title) }}</td>
                                             <td>{{ $leave_date }}</td>
+                                            <td>{{ ucfirst($value->notes) }}</td>
                                             
                                             <td class="action-icn"> <!-- data-toggle="modal" href="#su_care_history_edit" -->
                                                 
                                                 <a href="{{ url('admin/user/sick-leave/edit/'.$value->id) }}" class="edit"><i data-toggle="tooltip" title="Edit" class="fa fa-edit"></i></a>
                                                 <a href="{{ url('admin/user/sick-leave/delete/'.$value->id) }}" class="delete"><i data-toggle="tooltip" title="Delete" class="fa fa-trash-o"></i></a>
-                                                <a href="{{ url('admin/user/sick-leave/sanction/'.$value->id)}}"><i data-toggle="tooltip" title="Sanction Leave" class="fa fa-check-circle"></i></a>
+                                                {{-- <a href="{{ url('admin/user/sick-leave/sanction/'.$value->id)}}"><i data-toggle="tooltip" title="Sanction Leave" class="fa fa-check-circle"></i></a> --}}
 
                                                 <?php //$user_id = base64_encode(convert_uuencode($value->id)); ?>
                                                 

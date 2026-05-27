@@ -94,18 +94,22 @@
     box-shadow: rgb(0 0 0 / 25%) 0px 2px 8px;
   }
 
-  .modal-header {
+  .modal-content .modal-header {
     background-color: #1f88b5;
     color: #fff;
-    display: block;
+    display: flex;
+  }
+
+  .modal-content .modal-header h4.modal-title {
+    color: #fff;
   }
 
   .modal-dialog .close_btn_modal {
     border: none;
     outline: none;
     background-color: inherit;
-    color: #e10078;
-    border: 2px solid #e10078;
+    color: #1f88b5;
+    border: 2px solid #1f88b5;
     padding: 5px 16px;
     border-radius: 5px;
     font-weight: 600;
@@ -113,16 +117,16 @@
   }
 
   .modal-dialog .close_btn_modal:hover {
-    background-color: #ad005c;
+    background-color: #0d688e;
     color: #fff;
-    border: 2px solid #ad005c;
+    border: 2px solid #0d688e;
   }
 
   .modal-dialog .save_btn_modal {
     border: none;
     outline: none;
     padding: 8px 20px;
-    background-color: #e10078;
+    background-color: #1f88b5;
     color: #fff;
     border-radius: 5px;
     font-weight: 600;
@@ -130,8 +134,8 @@
   }
 
   .modal-dialog .save_btn_modal:hover {
-    background-color: #ad005c;
-    border-color: #ad005c;
+    background-color: #0d688e;
+    border-color: #0d688e;
   }
 
   .modal-header .modal_close_btn {
@@ -188,10 +192,9 @@
     height: auto;
   }
 
-  /* .tab-content>.active {
-    display: block;
-    opacity: 1;
-} */
+  .shrink_all .py-2 {
+    white-space: nowrap;
+  }
 </style>
 <!-- Top Bar Info Section End Here -->
 
@@ -236,37 +239,37 @@
                 <button type="button" class="filter_btn">Clear all filter</button>
               </div>
               <div class="col-lg-3 col-md-3">
-                <select name="sortBy" class="form-select form-control">
-                  <option value="Name (A-Z)">Name (A-Z)</option>
-                  <option value="Name (Z-A)">Name (Z-A)</option>
-                  <option value="Start date (Newest first)">Start date (Newest first)</option>
-                  <option value="Start date (Oldest first)">Start date (Oldest first)</option>
+                <select name="sortBy" id="sortBy" class="form-select form-control">
+                  <option value="1">Name (A-Z)</option>
+                  <option value="2">Name (Z-A)</option>
+                  <option value="3">Start date (Newest first)</option>
+                  <option value="4">Start date (Oldest first)</option>
                 </select>
               </div>
               <div id="result"></div>
             </div>
           </form>
           <div class="my-5 publish_rota_content">
-              <div class="d-flex justify-content-between">
-                <div class="d-flex align-items-center">
-                  <h4>Published rotas</h4>
-                  <span class="no_of_rota_publish" id="active_publish_rota_count"></span>
-                </div>
-                <div class="toggle_btns">
-                  <button class="view_all_btn" onclick="showRotaPublish()" id="viewPublish">View all</button>
-                  <button class="show_less_btn" onclick="lessRotaPublish()" id="lessPublish">Show less</button>
-                </div>
+            <div class="d-flex justify-content-between">
+              <div class="d-flex align-items-center">
+                <h4>Published rotas</h4>
+                <span class="no_of_rota_publish" id="active_publish_rota_count"></span>
               </div>
-              <div class="content_about_publish" id="beforePublishRota">
-                 
-                      <h5>In progress</h5>
-                      <div id="new_publish_rota"></div>
-                  
-                  <div class="publishedRotasList p-t-20">
-                      <h5>Future rotas</h5>
-                      <p class="pb-8 radtext">Rotas that are starting in the future will appear here.</p>
-                  </div>
+              <div class="toggle_btns">
+                <button class="view_all_btn" onclick="showRotaPublish()" id="viewPublish">View all</button>
+                <button class="show_less_btn" onclick="lessRotaPublish()" id="lessPublish">Show less</button>
               </div>
+            </div>
+            <div class="content_about_publish" id="beforePublishRota">
+
+              <h5>In progress</h5>
+              <div id="new_publish_rota"></div>
+
+              <div class="publishedRotasList p-t-20">
+                <h5>Future rotas</h5>
+                <p class="pb-8 radtext">Rotas that are starting in the future will appear here.</p>
+              </div>
+            </div>
           </div>
           <div class="unpublish_rota_content">
             <div class="d-flex justify-content-between">
@@ -292,7 +295,7 @@
           </div>
         </div>
         <div id="oldRotas" class="tab-pane">
-            <form class="active-rots-slt-from">
+          <form class="active-rots-slt-from">
             <div class="row">
               <div class="col-lg-12">
                 <h3>Old rotas</h3>
@@ -301,28 +304,28 @@
                 <h4 class="d-none"><a href="#">Create new Rota</a></h4>
               </div> -->
               <div class="col-lg-3 col-md-3">
-                <input type="date" placeholder="Select range..." class="form-control">
+                <input type="date" placeholder="Select range..." id="old_search_date" class="form-control">
               </div>
               <div class="col-lg-3 col-md-3">
-                <input type="text" class="form-control" placeholder="Rota name...">
+                <input type="text" class="form-control" id="old_rota_name_search" placeholder="Rota name...">
               </div>
               <div class="col-md-3">
                 <button type="button" class="filter_btn">Clear all filter</button>
               </div>
               <div class="col-md-3 col-lg-3">
-                  <select name="" class="form-select form-control" id="">
-                    <option value="">Name (A-Z)</option>
-                    <option value="">Name (Z-A )</option>
-                    <option value="">Start date (Newest first)</option>
-                    <option value="">Start date (Oldest first)</option>
-                  </select>
-                </div>
-             
-            </div>
-             <div class="row">
-                
-                
+                <select name="" class="form-select form-control" id="old_sortBy">
+                  <option value="1">Name (A-Z)</option>
+                  <option value="2">Name (Z-A )</option>
+                  <option value="3">Start date (Newest first)</option>
+                  <option value="4">Start date (Oldest first)</option>
+                </select>
               </div>
+
+            </div>
+            <div class="row">
+
+
+            </div>
           </form>
           <div class="row">
             <div class="my-5 publish_rota_content">
@@ -342,27 +345,27 @@
                 </div>
               </div>
             </div>
-          
-          <div class="unpublish_rota_content">
-            <div class="d-flex justify-content-between">
-              <div class="d-flex align-items-center">
-                <h4>Unpublished rotas</h4>
-                <span class="no_of_rota_publish" id="old_unpublish_rota_count"></span>
-              </div>
-              <div class="toggle_btns">
-                <button class="view_all_btn" onclick="unPublishview()" id="viewUnpublish" style="display: none;">View all</button>
-                <button class="show_less_btn" onclick="unPublishless()" id="lessUnpublish">Show less</button>
+
+            <div class="unpublish_rota_content">
+              <div class="d-flex justify-content-between">
+                <div class="d-flex align-items-center">
+                  <h4>Unpublished rotas</h4>
+                  <span class="no_of_rota_publish" id="old_unpublish_rota_count"></span>
+                </div>
+                <div class="toggle_btns">
+                  <button class="view_all_btn" onclick="unPublishview()" id="viewUnpublish" style="display: none;">View all</button>
+                  <button class="show_less_btn" onclick="unPublishless()" id="lessUnpublish">Show less</button>
+                </div>
               </div>
             </div>
-          </div>
-          <div class="col-md-12 col-lg-12" id="unpublish_rota_content_detail">
-            <div id="old_unpublish_rota">
+            <div class="col-md-12 col-lg-12" id="unpublish_rota_content_detail">
+              <div id="old_unpublish_rota">
+              </div>
             </div>
-          </div>
           </div>
         </div>
         <div id="createRota" class="tab-pane">
-           <form action="{{ url('/add-rota-data') }}" method="POST" class="select-rota formOne" id="createRota">
+          <form action="{{ url('/add-rota-data') }}" method="POST" class="select-rota formOne" id="createRota">
             <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">
             <div class="row">
               <div class="col-md-12 mt-4">
@@ -565,21 +568,29 @@
         </div>
       </div>
     </div>
-</div>
+  </div>
 
-  
+
 </section>
 <!-- Rename Modal -->
-<div class="modal fade" id="renameModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
+<div class="modal" id="renameModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-md">
     <div class="modal-content">
       <div class="modal-header">
-        <h1 class="modal-title fs-5" id="exampleModalLabel">Rename rota</h1>
-        <button type="button" class="modal_close_btn" data-bs-dismiss="modal" aria-label="Close"> ✖ </button>
+        <h4 class="modal-title">Rename rota</h4>
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close"> ✖ </button>
       </div>
+
+      <!-- <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Rename rotar</h4>
+        </div> -->
+
       <div class="modal-body">
-        <div class="col-md-5">
-          <input type="text" id="team-name" class="form-control">
+        <div class="col-md-12">
+          <div class="p-t-20 p-b-20">
+            <input type="text" id="team-name" class="form-control">
+          </div>
         </div>
       </div>
       <div class="modal-footer">
@@ -593,7 +604,7 @@
 <!-- Rename Modal End -->
 
 <!-- Publish Modal -->
-<div class="modal fade" id="publishModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal" id="publishModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -616,11 +627,11 @@
 <!-- Publish Modal End-->
 
 <!-- Unpublish Modal -->
-<div class="modal fade" id="unpublishModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal" id="unpublishModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h1 class="modal-title fs-5" id="exampleModalLabel">Are you sure you want to unpublish this rota?</h1>
+        <h4 class="modal-title" id="exampleModalLabel">Are you sure you want to unpublish this rota?</h4>
         <button type="button" class="modal_close_btn" data-bs-dismiss="modal" aria-label="Close"> ✖ </button>
       </div>
       <div class="modal-body">
@@ -638,52 +649,54 @@
 </div>
 <!-- Unpublish Modal End-->
 <!-- Modal View start -->
-<div class="modal fade" id="exampleModalViewDetail" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog" style="max-width: 70rem;">
+<div class="modal" id="exampleModalViewDetail" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h1 class="modal-title fs-5" id="exampleModalLabel">Evening Shift</h1>
+        <h4 class="modal-title" id="exampleModalLabel">Evening Shift</h4>
         <button type="button" class="modal_close_btn" data-bs-dismiss="modal" aria-label="Close"> ✖ </button>
       </div>
       <div class="modal-body">
-        <div class="d-flex align-items-center">
-          <span class="me-3">Select Week</span>
-          <div class="col-md-3 col-lg-3 me-3">
-            <select name="" class="form-select form-control" id="rota_starting_date">
-            </select>
-          </div>
-          <span>Week total our: <strong><span id="week_total"></span> (Incl. breaks)</strong></span>
-        </div>
-        <div class="w_full view_detail_modal">
-          <div class="d-flex align-items-center shrink_all">
-            <div class="w_19 py-2">Employee</div>
-            <div class="w_19 py-2">Current contracted hours</div>
-            <div class="w_19 py-2 ps-2">Days worked</div>
-            <div class="w_19 py-2">
-              <div class="w_full">Breaks</div>
-              <small>(Total)</small>
+        <div class="p-b-30">
+          <div class="d-flex align-items-center">
+            <span class="me-3">Select Week</span>
+            <div class="col-md-4 col-lg-4 me-3">
+              <select name="" class="form-select form-control" id="rota_starting_date">
+              </select>
             </div>
-            <div class="w_19 py-2">
-              <div class="w_full">Total hours</div>
-              <form action="">
-                <small class="d-flex align-items-center">
-                  Incl. breaks?
-                  <label for="break_check">
-                    <input type="checkbox" class="d-none" onchange="add_break(this)" id="break_check" value="1">
-                    <span class="custom_checkbox">
-                      <span class="d-flex align-items-center justify-content-center"><i class="fa fa-check" aria-hidden="true"></i></span>
-                    </span>
-                  </label>
-                </small>
-              </form>
+            <span>Week total our: <strong><span id="week_total"></span> (Incl. breaks)</strong></span>
+          </div>
+          <div class="w_full view_detail_modal">
+            <div class="d-flex align-items-center shrink_all">
+              <div class="py-2">Employee</div>
+              <div class="py-2">Curr. contracted hrs</div>
+              <div class="py-2 ps-2">Days worked</div>
+              <div class="py-2 d-flex">
+                <div class="">Breaks</div>
+                <small>(Total)</small>
+              </div>
+              <div class="py-2 d-flex">
+                <div class="w_full">Total hrs</div>
+                <form action="">
+                  <small class="d-flex align-items-center">
+                    Incl. breaks?
+                    <label for="break_check">
+                      <input type="checkbox" class="d-none" onchange="add_break(this)" id="break_check" value="1">
+                      <span class="custom_checkbox">
+                        <span class="d-flex align-items-center justify-content-center"><i class="fa fa-check" aria-hidden="true"></i></span>
+                      </span>
+                    </label>
+                  </small>
+                </form>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="w_full row_detail" id="add_emp_record">
-          <div class="d-flex align-items-center justify-content-end hour_count">
-            <div class="w_19 m-0 py-3">
-              <p class="fw-bolder hide2" id="total_emp_hour"></p>
-              <p class="fw-bolder hide1" id="total_emp_hour_with_break"></p>
+          <div class="w_full row_detail" id="add_emp_record">
+            <div class="d-flex align-items-center justify-content-end hour_count">
+              <div class="m-0 py-3">
+                <p class="fw-bolder hide2" id="total_emp_hour"></p>
+                <p class="fw-bolder hide1" id="total_emp_hour_with_break"></p>
+              </div>
             </div>
           </div>
         </div>
@@ -692,7 +705,7 @@
   </div>
 </div>
 <!-- Modal View end -->
-@include('rotaStaff.components.footer') 
+@include('rotaStaff.components.footer')
 <script>
   $(document).ready(function() {
 
@@ -726,7 +739,7 @@
       success: function(result) {
         console.log(result);
         if (isAuthenticated(result) == false) {
-            return false;
+          return false;
         }
         document.getElementById('active_publish_rota_count').innerHTML = result.active_publish_rota_count;
         document.getElementById('active_unpublish_rota_count').innerHTML = result.active_unpublish_rota_count;
@@ -788,26 +801,52 @@
 
     const inputHandler = function(e) {
       var search_name = e.target.value;
-      $.ajax({
-        url: "{{ url('/get_record_of_rota') }}",
-        type: "post",
-        dataType: 'json',
-        data: {
-          search_name: search_name,
-          _token: token
-        },
-        success: function(result) {
-          console.log(result);
-          if (isAuthenticated(result) == false) {
-              return false;
-          }
-        }
-      });
-      result.innerHTML = e.target.value;
+      // $.ajax({
+      //   url: "{{ url('/get_record_of_rota') }}",
+      //   type: "post",
+      //   dataType: 'json',
+      //   data: {
+      //     search_name: search_name,
+      //     _token: token
+      //   },
+      //   success: function(result) {
+      //     console.log(result);
+      //     if (isAuthenticated(result) == false) {
+      //         return false;
+      //     }
+      //   }
+      // });
+      // result.innerHTML = e.target.value;
+      filter_data(null, search_name, null, 1);
     }
 
     source.addEventListener('input', inputHandler);
     source.addEventListener('propertychange', inputHandler);
+    $('#sortBy').on('change', function() {
+      var sortBy = $(this).val();
+      filter_data(null, null, sortBy, 1);
+    });
+    $('#search_date').on('change', function() {
+      var search_date = $(this).val();
+      // alert(search_date)
+      filter_data(search_date, null, null, 1);
+    });
+
+    $('#old_search_date').on('change', function() {
+      var old_search_date = $(this).val();
+      // alert(old_search_date)
+      filter_data(old_search_date, null, null, 2);
+    });
+    $('#old_rota_name_search').on('input', function() {
+      var old_rota_name_search = $(this).val();
+      // alert(old_rota_name_search)
+      filter_data(null, old_rota_name_search, null, 2);
+    });
+    $('#old_sortBy').on('change', function() {
+      var old_sortBy = $(this).val();
+      // alert(old_sortBy)
+      filter_data(null, null, old_sortBy, 2);
+    });
 
     $('#rename_save_btn').on('click', function() {
       var rota_id = document.getElementById('renameid').value;
@@ -825,7 +864,7 @@
         success: function(result) {
           console.log(result);
           if (isAuthenticated(result) == false) {
-              return false;
+            return false;
           }
           location.reload();
         }
@@ -845,7 +884,7 @@
         success: function(result) {
           console.log(result);
           if (isAuthenticated(result) == false) {
-              return false;
+            return false;
           }
           location.reload();
         }
@@ -865,7 +904,7 @@
         success: function(result) {
           console.log(result);
           if (isAuthenticated(result) == false) {
-              return false;
+            return false;
           }
           location.reload();
         }
@@ -953,7 +992,7 @@
       success: function(result) {
         console.log(result);
         if (isAuthenticated(result) == false) {
-            return false;
+          return false;
         }
         location.reload();
       }
@@ -974,7 +1013,7 @@
       success: function(result) {
         console.log(result);
         if (isAuthenticated(result) == false) {
-            return false;
+          return false;
         }
         $('#rota_starting_date').append("<option>Week 1 - " + result + "</option>");
       }
@@ -991,103 +1030,77 @@
       },
       success: function(result) {
         console.log(result);
-        if (isAuthenticated(result) == false) {
-            return false;
-        }
-        var total_emp_hours = 0;
-        var total_emp_minutes = 0;
-        var total_emp_minutes_with_break = 0;
 
-        for (let index = 0; index < result.length; index++) {
-          console.log(result[index].name);
-          var startTime = moment(result[index].shift_start_time);
-          var endTime = moment(result[index].shift_end_time);
+        if (isAuthenticated(result) === false) return false;
 
-          // calculate total duration
-          var duration = moment.duration(endTime.diff(startTime));
-          console.log(duration);
-          // duration in hours
-          var hours = parseInt(duration.asHours());
+        // Clear existing records
+        const recordContainer = document.querySelector('#add_emp_record');
+        if (!recordContainer) return console.error('#add_emp_record not found');
+        // $(".shrink_all").html('');
+        $(".dynamic_data").html('');
 
-          var total_emp_hours = total_emp_hours + hours;
-          // duration in minutes
-          var minutes = parseInt(duration.asMinutes()) % 60;
 
-          minutes_with_break = minutes + result[index].break;
+        let total_emp_minutes = 0;
+        let total_emp_minutes_with_break = 0;
+        let total_emp_hours = 0;
 
-          var startDate = moment(result[index].rota_start_date);
-          var endDate = moment(result[index].rota_end_date);
-          var rota_day_date = moment(result[index].rota_day_date);
+        result.forEach((emp, empIndex) => {
+          let emp_total_minutes = 0;
+          let emp_total_break = 0;
 
-          let loopData = '';
+          for (let i = 0; i < emp.shift_start_time.length; i++) {
+            let startTime = moment(emp.shift_start_time[i].shift_start_time);
+            let endTime = moment(emp.shift_end_time[i].shift_end_time);
+            let breakMin = parseInt(emp.break[i].break || 0);
 
-          for (var m = moment(startDate); m.diff(endDate, 'days') <= 0; m.add(1, 'days')) {
-            const dateIsSame = moment(m).isSame(moment(rota_day_date));
-            console.log(`Date is Same: ${dateIsSame}`);
-            if (dateIsSame == true) {
-              loopData += `<p class='ms-2 fw-bolder' style="color:#ad005c;">${m.format('dd').charAt(0)}</p>`;
-            } else {
-              loopData += `<p class='ms-2 fw-bolder'>${m.format('dd').charAt(0)}</p>`;
-            }
+            let duration = moment.duration(endTime.diff(startTime));
+            let minutes = parseInt(duration.asMinutes());
+            emp_total_minutes += minutes;
+            emp_total_break += breakMin;
           }
 
-          total_emp_minutes = total_emp_minutes + minutes;
-          total_emp_minutes_with_break = total_emp_minutes_with_break + minutes_with_break;
+          let durationWithoutBreak = moment.duration(emp_total_minutes, 'minutes');
+          let durationWithBreak = moment.duration(emp_total_minutes + emp_total_break, 'minutes');
 
+          total_emp_minutes += emp_total_minutes;
+          total_emp_minutes_with_break += emp_total_minutes + emp_total_break;
 
-          document.querySelector('#add_emp_record').insertAdjacentHTML(
-            'afterbegin',
-            `<div class="d-flex align-items-center shrink_all">
-                              <div class="w_19 py-2" style="overflow-x: scroll; overflow-y: hidden;">` + result[index].name + `</div>
-                              <div class="w_19 py-2" style="overflow-x: scroll; overflow-y: hidden;">40 hrs</div>
-                              <div class="w_19 py-2 ps-2">
-                                <span class="d-flex">
-                                 ${loopData}
-                                </span>
-                              </div>
-                              <div class="w_19 py-2">
-                                <div class="w_full">${result[index].break} min</div>
-                              </div>
-                              <div class="w_19 py-2">
-                                <div id="without_break">
-                                  <div class="w_full hide2">${hours} hour and ${minutes} minutes.</div>
-                                  <div class="w_full hide1">${hours} hour and ${minutes_with_break} minutes.</div>
-                                </div>
-                                <div id="with_break">
-                                </div>
-                              </div>
-                            </div>`
-          );
-        }
-        console.log(total_emp_minutes_with_break);
+          // rota days loop
+          let loopData = '';
+          let startDate = moment(emp.rota_start_date);
+          let endDate = moment(emp.rota_end_date);
+          let rotaDay = moment(emp.rota_day_date);
 
-        if (total_emp_minutes > 60) {
-          var hours = (total_emp_minutes / 60);
-          var rhours = Math.floor(hours);
-          var minutes = (hours - rhours) * 60;
-          var rminutes = Math.round(minutes);
-          rhours = rhours + total_emp_hours;
-        }
+          for (let m = moment(startDate); m.diff(endDate, 'days') <= 0; m.add(1, 'days')) {
+            const dateIsSame = m.isSame(rotaDay, 'day');
+            loopData += `<p class='ms-2 fw-bolder' ${dateIsSame ? "style='color:#ad005c;'" : ''}>${m.format('dd').charAt(0)}</p>`;
+          }
 
-        if (total_emp_minutes_with_break > 60) {
-          var hours_break = (total_emp_minutes_with_break / 60);
-          var rhours_break = Math.floor(hours_break);
-          var minutes_break = (hours_break - rhours_break) * 60;
-          var rminutes_break = Math.round(minutes_break);
-          rhours_break = rhours_break + total_emp_hours;
-        }
+          recordContainer.insertAdjacentHTML('beforeend', `
+            <div class="d-flex align-items-center shrink_all dynamic_data">
+              <div class="w_19 py-2">${emp.name}</div>
+              <div class="w_19 py-2">${durationWithoutBreak.hours()} hrs</div>
+              <div class="w_19 py-2"><span class="d-flex">${loopData}</span></div>
+              <div class="w_19 py-2">
+                <div class="w_full">${emp_total_break} min</div>
+              </div>
+              <div class="w_19 py-2">
+                <div id="without_break">
+                  <div class="w_full hide2">${durationWithoutBreak.hours()} hrs and ${durationWithoutBreak.minutes()} mins.</div>
+                  <div class="w_full hide1">${durationWithBreak.hours()} hrs and ${durationWithBreak.minutes()} mins.</div>
+                </div>
+              </div>
+            </div>
+          `);
+        });
 
-        if (rhours == undefined || rminutes == undefined) {
-          rhours = total_emp_hours;
-          rminutes = 0;
-        }
-        var total_duration = rhours + ' hour and ' + rminutes + ' minutes.';
-        var total_duration_break = rhours_break + ' hour and ' + rminutes_break + ' minutes.';
+        // Final total calculations
+        const totalWithoutBreak = moment.duration(total_emp_minutes, 'minutes');
+        const totalWithBreak = moment.duration(total_emp_minutes_with_break, 'minutes');
 
-
-        document.getElementById('total_emp_hour').innerHTML = total_duration;
-        document.getElementById('total_emp_hour_with_break').innerHTML = total_duration_break;
-        document.getElementById('week_total').innerHTML = total_duration;
+        document.getElementById('total_emp_hour').innerHTML = `${totalWithoutBreak.hours()} hrs and ${totalWithoutBreak.minutes()} mins.`;
+        document.getElementById('total_emp_hour_with_break').innerHTML = `${totalWithBreak.hours()} hrs and ${totalWithBreak.minutes()} mins.`;
+        document.getElementById('week_total').innerHTML = `${totalWithoutBreak.hours()} hrs and ${totalWithoutBreak.minutes()} mins.`;
       }
     });
 
@@ -1102,5 +1115,75 @@
       $('.hide2').css('display', 'block');
       $('.hide1').css('display', 'none');
     }
+  }
+
+  function filter_data(date = null, name = null, sortBy = null, type) {
+    var token = "<?= csrf_token() ?>";
+    $.ajax({
+      url: "{{ url('/get_all_rota_data') }}",
+      dataType: 'json',
+      data: {
+        date: date,
+        name: name,
+        sortBy: sortBy,
+        type: type,
+        _token: token
+      },
+      success: function(result) {
+        console.log(result);
+        if (isAuthenticated(result) == false) {
+          return false;
+        }
+        document.getElementById('active_publish_rota_count').innerHTML = result.active_publish_rota_count;
+        document.getElementById('active_unpublish_rota_count').innerHTML = result.active_unpublish_rota_count;
+        document.getElementById('old_publish_rota_count').innerHTML = result.old_publish_rota_count;
+        document.getElementById('old_unpublish_rota_count').innerHTML = result.old_unpublish_rota_count;
+
+        if (result.new_active.length === 0) {
+          document.querySelector('#new_publish_rota').innerHTML = '<p class="pb-8">Rotas that are currently active and in progress will appear here.</p>';
+        } else {
+          document.querySelector('#new_publish_rota').innerHTML = '';
+          for (let index = 0; index < result.new_active.length; index++) {
+            document.querySelector('#new_publish_rota').insertAdjacentHTML(
+              'beforeend', result.new_active[index]
+            );
+          }
+        }
+
+        if (result.new_inactive.length === 0) {
+          document.querySelector('#new_unpublish_rota').innerHTML = '<p class="pb-8">Rotas that are currently active and not in progress will appear here.</p>';
+        } else {
+          document.querySelector('#new_unpublish_rota').innerHTML = '';
+          for (let index = 0; index < result.new_inactive.length; index++) {
+            document.querySelector('#new_unpublish_rota').insertAdjacentHTML(
+              'beforeend', result.new_inactive[index]
+            );
+          }
+        }
+
+        if (result.old_active.length === 0) {
+          document.querySelector('#old_publish_rota').innerHTML = '<p class="pb-8">Rotas that are no longer active but are still published will appear here.</p>';
+        } else {
+          document.querySelector('#old_publish_rota').innerHTML = '';
+          for (let index = 0; index < result.old_active.length; index++) {
+            document.querySelector('#old_publish_rota').insertAdjacentHTML(
+              'beforeend', result.old_active[index]
+            );
+          }
+        }
+
+        if (result.old_inactive.length === 0) {
+          document.querySelector('#old_unpublish_rota').innerHTML = '<p class="pb-8">Rotas that are no longer active but are still unpublished will appear here.</p>';
+        } else {
+          document.querySelector('#old_unpublish_rota').innerHTML = '';
+          for (let index = 0; index < result.old_inactive.length; index++) {
+            document.querySelector('#old_unpublish_rota').insertAdjacentHTML(
+              'beforeend', result.old_inactive[index]
+            );
+          }
+        }
+
+      }
+    });
   }
 </script>

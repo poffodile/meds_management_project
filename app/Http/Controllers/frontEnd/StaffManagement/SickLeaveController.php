@@ -11,7 +11,10 @@ class SickLeaveController extends StaffManagementController
     public function index($staff_member_id) {
 
         $sm_home_id = User::where('id',$staff_member_id)->value('home_id');
-        if(Auth::user()->home_id != $sm_home_id){
+        $home_ids = Auth::user()->home_id;
+        $ex_home_ids = explode(',', $home_ids);
+        $home_id = $ex_home_ids[0];
+        if($home_id != $sm_home_id){
             die; 
         }
 
@@ -78,7 +81,10 @@ class SickLeaveController extends StaffManagementController
 
         if($request->isMethod('post')) {
 
-            $home_id = Auth::user()->home_id;
+            // $home_id = Auth::user()->home_id;
+            $home_ids = Auth::user()->home_id;
+            $ex_home_ids = explode(',', $home_ids);
+            $home_id = $ex_home_ids[0];
 
             $sick                  = new StaffSickLeave;
             $sick->home_id         = $home_id;
@@ -105,8 +111,10 @@ class SickLeaveController extends StaffManagementController
         if(!empty($sick_record)) {
 
             $sm_home_id = User::where('id',$sick_record->staff_member_id)->value('home_id');
-
-            if($sm_home_id == Auth::user()->home_id){
+            $home_ids = Auth::user()->home_id;
+            $ex_home_ids = explode(',', $home_ids);
+            $home_id = $ex_home_ids[0];
+            if($sm_home_id == $home_id){
         
                 $res = StaffSickLeave::where('id', $sick_leave_id)->update(['is_deleted' => '1']);
                 echo $res;            
@@ -118,7 +126,10 @@ class SickLeaveController extends StaffManagementController
 
     public function view_sick_record($sick_leave_id = null) {
 
-        $home_id  = Auth::user()->home_id;
+        // $home_id  = Auth::user()->home_id;
+        $home_ids = Auth::user()->home_id;
+        $ex_home_ids = explode(',', $home_ids);
+        $home_id = $ex_home_ids[0];
 
         $sick_record = StaffSickLeave::select('staff_sick_leave.*')
                                     ->where('staff_sick_leave.id', $sick_leave_id)
@@ -199,7 +210,10 @@ class SickLeaveController extends StaffManagementController
         $data = $request->all();
         
         $staff_sick_leaves_id = $data['staff_sick_leave_id'];
-        $home_id  = Auth::user()->home_id;
+        // $home_id  = Auth::user()->home_id;
+        $home_ids = Auth::user()->home_id;
+        $ex_home_ids = explode(',', $home_ids);
+        $home_id = $ex_home_ids[0];
         $edit_record = StaffSickLeave::find($staff_sick_leaves_id);
         if(!empty($edit_record)) {
             $sm_home_id = User::where('id', $edit_record->staff_member_id)->value('home_id');

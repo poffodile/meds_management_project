@@ -18,7 +18,36 @@ body {
     font-size: 13px;
     text-rendering: optimizeLegibility;
 }
-
+.btn-primary{
+    background-color: #2563eb;
+    border-color: #2563eb;
+    color: #FFFFFF;
+}
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active{
+    background-color: #1d54ca;
+    border-color: #1d54ca;
+    color: #FFFFFF;
+}
+.btn-danger, .label-danger {
+    background-color: #ff0000;
+    border-color: #ff0000;
+    color: #FFFFFF;
+}
+.btn-danger:hover, .btn-danger:focus, .btn-danger:active{
+    background-color: #cc0000;
+    border-color: #cc0000;
+    color: #FFFFFF;
+}
+.btn-success {
+    background-color: #00a534;
+    border-color: #00a534;
+    color: #FFFFFF;
+}
+.btn-success:hover, .btn-success:focus, .btn-success:active {
+    background-color: #038d2e;
+    border-color: #038d2e;
+    color: #FFFFFF;
+}
 ul,
 .list-unstyled {
     padding-left: 30px;
@@ -36,12 +65,12 @@ a:focus {
 }
 
 ::selection {
-    background: #1fb5ad;
+    background: #2563eb;
     color: #fff;
 }
 
 ::-moz-selection {
-    background: #1fb5ad;
+    background: #2563eb;
     color: #fff;
 }
 
@@ -173,7 +202,7 @@ a:focus {
     width: 240px;
     height: 100%;
     position: fixed;
-    background: #32323a;
+    background: #ffffff;
     -webkit-transition: all .3s ease-in-out;
     -moz-transition: all .3s ease-in-out;
     -o-transition: all .3s ease-in-out;
@@ -259,6 +288,9 @@ ul.sidebar-menu {
 
 #sidebar .sub-menu>.sub li a {
     padding-left: 46px;
+    font-size: 13px;
+    color: #686868;
+    font-weight: 600;
 }
 
 #sidebar>ul>li.active>ul.sub,
@@ -267,7 +299,7 @@ ul.sidebar-menu {
 }
 
 ul.sidebar-menu li ul.sub li {
-    background: #28282e;
+    background: #fafafa;
     margin-bottom: 0;
     margin-left: 0;
     margin-right: 0;
@@ -287,14 +319,14 @@ ul.sidebar-menu li ul.sub li a {
 
 ul.sidebar-menu li ul.sub li a:hover,
 ul.sidebar-menu li ul.sub li.active a {
-    color: #1fb5ad;
+    color: #000000;
     -webkit-transition: all 0.3s ease;
     -moz-transition: all 0.3s ease;
     -o-transition: all 0.3s ease;
     -ms-transition: all 0.3s ease;
     transition: all 0.3s ease;
     display: block;
-    background: #202025;
+    background: #e1ecfa;;
 }
 
 ul.sidebar-menu li {
@@ -311,13 +343,16 @@ ul.sidebar-menu ul.sub li {
 
 ul.sidebar-menu li a span {
     display: inline-block;
+    font-size: 13px;
+    color: #686868;
+    font-weight: 600;
 }
 
 ul.sidebar-menu li a {
     color: #aeb2b7;
     text-decoration: none;
     display: block;
-    padding: 18px 0 18px 25px;
+    padding: 8px 30px 8px 20px;
     font-size: 12px;
     outline: none;
     -webkit-transition: all 0.3s ease;
@@ -330,8 +365,8 @@ ul.sidebar-menu li a {
 ul.sidebar-menu li a.active,
 ul.sidebar-menu li a:hover,
 ul.sidebar-menu li a:focus {
-    background: #28282e;
-    color: #1fb5ad;
+    background: #eff6ff;
+    color: #2563eb;
     display: block;
     -webkit-transition: all 0.3s ease;
     -moz-transition: all 0.3s ease;
@@ -341,17 +376,26 @@ ul.sidebar-menu li a:focus {
 }
 
 ul.sidebar-menu li a i {
-    font-size: 15px;
-    padding-right: 6px;
+    /* font-size: 15px;
+    padding-right: 6px; */
+    margin-right: 10px;
+    font-size: 16px;
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    border-radius: 4px;
+    background: #1f88b50f;
+    color: #5a5a5a;
 }
 
 ul.sidebar-menu li a:hover i,
 ul.sidebar-menu li a:focus i {
-    color: #1fb5ad;
+    color: #2563eb;
 }
 
 ul.sidebar-menu li a.active i {
-    color: #1fb5ad;
+    color: #2563eb;
 }
 
 .mail-info,
@@ -403,7 +447,7 @@ ul.sidebar-menu li a.active i {
 }
 
 .brand {
-    background: #1fb5ad;
+    background: #2778a5;
     float: left;
     width: 240px;
     height: 80px;
@@ -414,8 +458,12 @@ a.logo {
     font-size: 21px;
     color: #2e2e2e;
     float: left;
-    margin: 20px 0 0 25px;
+    margin: 15px 0 0 5px;
     text-transform: uppercase;
+}
+a.logo img {
+    height: 38px;
+    margin-top: 8px;
 }
 
 a.logo:hover,
@@ -679,7 +727,7 @@ ul.top-menu>li>a:focus {
 }
 
 .dropdown-menu.extended.logout>li>a:hover i {
-    color: #1fb5ad;
+    color: #1f1f1f;
 }
 
 .dropdown-menu.extended.logout>li>a i {
@@ -810,7 +858,7 @@ ul.top-menu>li>a:focus {
     float: left;
     margin-top: 23px;
     margin-left: -15px;
-    background: #1fb5ad;
+    background: #1F88B5;
     border-radius: 50%;
     -webkit-border-radius: 50%;
     width: 32px;
@@ -832,7 +880,7 @@ ul.top-menu>li>a:focus {
 }
 
 .sidebar-toggle-box:hover .fa-bars {
-    color: #1fb5ad;
+    color: #1f88b5;
 }
 
 .hide-left-bar {
@@ -7017,7 +7065,7 @@ div.tagsinput span.tag {
 }
 
 .group-ico {
-    background-color: #1fb5ad;
+    background-color: #1f1f1f;
     /*background-color: #1fb5ad;*/
     border-radius: 4px;
     color: #fff;
@@ -7432,7 +7480,7 @@ canvas#canv1 {
 }
 
 .table-responsive::-webkit-scrollbar-thumb {
-    background: #1fb5ad;
+    background: #8d8d8d;
     border-radius: 10px;
 }
 
@@ -7855,7 +7903,7 @@ td.action-icn {
 }
 
 .action-icn a i {
-    color: #1fb5ad;
+    color: #414141;
 }
 
 .action-icn a.delete i {
@@ -8055,8 +8103,8 @@ td.action-icn {
     height: 34px;
 }
 .dt-buttons button.dt-button {
-    background-color: #1ca59e !important;
-    border-color: #1ca59e !important;
+    background-color: #404040 !important;
+    border-color: #404040  !important;
     color: #FFFFFF !important;
     display: inline-block;
     margin-bottom: 0;
@@ -8075,8 +8123,8 @@ td.action-icn {
 }
 
 .dt-buttons button.dt-button:hover{
-    background-color: #1ca59e !important;
-    border-color: #1ca59e !important;
+    background-color: #1f1f1f !important;
+    border-color: #1f1f1f !important;
     color: #FFFFFF;
 }
 
@@ -8115,4 +8163,33 @@ div.dt-button-collection .dt-button-active:after{
 
 header.panel-heading {
     margin-bottom: 15px;
+    font-size: 15px;
+    font-weight: 600;
 }
+.allBtnUseColor{
+    background-color: #2563eb;
+    color: #fff;
+}
+.cog-btn-main-area {
+    text-align: end;
+}
+.action-icn a .fa-trash-o {
+    color: #FF0000;
+}
+.cog-btn-main-area.open>.dropdown-menu {
+    padding: 0;
+}
+.pagination>.active>a, .pagination>.active>span, .pagination>.active>a:hover, .pagination>.active>span:hover, .pagination>.active>a:focus, .pagination>.active>span:focus {
+    z-index: 2;
+    color: #fff;
+    background-color: #1f1f1f;
+    border-color: #1f1f1f;
+    cursor: default;
+}
+
+.pagination > li > a:hover, .pagination > li > span:hover, .pagination > li > a:focus, .pagination > li > span:focus, .pagination > li.active > a, .pagination > li.active > a:hover {
+    background-color: #1f1f1f;
+    border-color: #1f1f1f;
+    color: #fff;
+}
+

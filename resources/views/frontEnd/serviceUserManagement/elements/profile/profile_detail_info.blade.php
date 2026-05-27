@@ -9,7 +9,7 @@
             <div class="accordion-content full-info">{!! $patient->bereavement_issues !!}</div>
             <h2 class="accordion-header">Drug &amp; alcohol issues <a href="javascript:void(0)" class="info-edit-btn" clmn-name="drug_n_alcohol_issues"><i class="fa fa-pencil profile"></i></a></h2>
             <div class="accordion-content full-info">{!! $patient->drug_n_alcohol_issues !!}</div>
-            <h2 class="accordion-header">Mental Health issue<a href="javascript:void(0)" class="info-edit-btn" clmn-name="mental_health_issues"><i class="fa fa-pencil profile"></i></a></h2>
+            <h2 class="accordion-header">Mental Health issues<a href="javascript:void(0)" class="info-edit-btn" clmn-name="mental_health_issues"><i class="fa fa-pencil profile"></i></a></h2>
             <div class="accordion-content full-info">{!! $patient->mental_health_issues !!}</div>
         </div>
     </div>

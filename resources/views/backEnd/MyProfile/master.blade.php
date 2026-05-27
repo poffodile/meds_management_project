@@ -225,8 +225,7 @@
       printWindow.document.write('<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">');
       printWindow.document.write('<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">');
       printWindow.document.write('<link rel="stylesheet" href="https://cdn.form.io/formiojs/formio.full.min.css">');
-      printWindow.document.write('<link href="{{ url('
-        public / backEnd / css / amarjeet.css ')}}" rel="stylesheet" type="text/css" >');
+      printWindow.document.write('<link href="{{ url("public/backEnd/css/amarjeet.css")}}" rel="stylesheet" type="text/css" >');
       printWindow.document.write('</head><body >');
       printWindow.document.write(divContents);
       printWindow.document.write('</body></html>');
@@ -242,8 +241,7 @@
       printWindow.document.write('<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">');
       printWindow.document.write('<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">');
       printWindow.document.write('<link rel="stylesheet" href="https://cdn.form.io/formiojs/formio.full.min.css">');
-      printWindow.document.write('<link href="{{ url('
-        public / backEnd / css / amarjeet.css ')}}" rel="stylesheet" type="text/css" >');
+      printWindow.document.write('<link href="{{ url("public/backEnd/css/amarjeet.css")}} " rel="stylesheet" type="text/css" >');
       printWindow.document.write('</head><body >');
       printWindow.document.write(divContents);
       printWindow.document.write('</body></html>');

@@ -4,9 +4,12 @@ namespace App\Http\Controllers\frontEnd\ServiceUserManagement;
 
 use App\Http\Controllers\frontEnd\ServiceUserManagementController;
 use Illuminate\Http\Request;
-use App\ServiceUserCareHistory, App\CareTeam, App\ServiceUser, App\FormBuilder, App\Notification, App\ServiceUserAFC, App\HomeLabel, App\LogBook, App\ServiceUserLogBook, App\CareTeamJobTitle, App\ServiceUserCareCenter, App\ServiceUserContacts, App\DynamicFormBuilder, App\DynamicForm, App\SocialApp, App\ServiceUserSocialApp, App\ServiceUserMoney, App\ServiceUserMoneyRequest, App\ServiceUserCareHistoryFile, App\User;
-use DB, Auth, Session;
+use App\ServiceUserCareHistory, App\CareTeam, App\ServiceUser, App\FormBuilder, App\Notification, App\ServiceUserAFC, App\HomeLabel, App\LogBook, App\ServiceUserLogBook, App\CareTeamJobTitle, App\ServiceUserCareCenter, App\ServiceUserContacts, App\DynamicFormBuilder, App\DynamicForm, App\SocialApp, App\ServiceUserSocialApp, App\ServiceUserMoney, App\ServiceUserMoneyRequest, App\ServiceUserCareHistoryFile, App\User, App\Mood;
+use App\Models\SuEducationProfile, App\Models\SuEducationStaffAssignment, App\Models\SuEducationTask, App\Models\SuEducationAttendance, App\Models\SuEducationNote, App\Models\SuEducationResource;
+use DB, Session;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 
 class ProfileController extends ServiceUserManagementController
@@ -17,6 +20,8 @@ class ProfileController extends ServiceUserManagementController
         //$d = DynamicForm::countIncidentReport(1,'29-08-2017','30-08-2017');
         //echo '<prE>'; print_r($d); die;
         // update notify
+
+        $userName = Auth::user()->user_name;
         $home_ids = Auth::user()->home_id;
         $ex_home_ids = explode(',', $home_ids);
         $home_id = $ex_home_ids[0];
@@ -32,16 +37,48 @@ class ProfileController extends ServiceUserManagementController
 
         if (!empty($patient)) {
 
-
-
             if ($patient->home_id != $home_id) {
                 return redirect('/')->with('error', UNAUTHORIZE_ERR);
             }
 
-            $risks = DB::table('risk')->select('id', 'description', 'icon', 'status')
-                ->where('home_id', $home_id)
-                ->where('is_deleted', '0')
+            // $risks = DB::table('risk')->select('id', 'description', 'icon', 'status')
+            //     ->where('home_id', $home_id)
+            //     ->where('is_deleted', '0')
+            //     ->get();
+
+            // subquery that returns latest su_risk.id per risk_id for the given service_user
+            $latest = DB::table('su_risk as s')
+                ->select('s.risk_id', DB::raw('MAX(s.id) as max_id'))
+                ->where('s.service_user_id', $service_user_id)
+                ->groupBy('s.risk_id');
+
+            $risks = DB::table('risk')
+                ->leftJoinSub($latest, 'latest', function ($join) {
+                    $join->on('risk.id', '=', 'latest.risk_id');
+                })
+                ->leftJoin('su_risk as su', function ($join) {
+                    $join->on('su.id', '=', 'latest.max_id');
+                })
+                ->select(
+                    'risk.id as risk_id',
+                    'risk.description',
+                    'risk.icon',
+                    'risk.status as risk_status',        // risk table status (if needed)
+                    'su.id as user_risk_id',             // latest su_risk id for this risk & user (or null)
+                    'su.status as user_status'           // latest su_risk status for this risk & user (or null)
+                )
+                ->where('risk.home_id', $home_id)
+                ->where('risk.is_deleted', '0')
+                ->orderByRaw("
+                        CASE 
+                        WHEN su.status = 2 THEN 0
+                        WHEN su.status = 1 THEN 1
+                        WHEN su.status = 0 THEN 2
+                        ELSE 3
+                        END
+                    ")
                 ->get();
+
             $daily_score   = DB::table('daily_record_score')->get();
             $care_team = DB::table('su_care_team')->select('id', 'job_title_id', 'name', 'email', 'phone_no', 'image', 'address')->where('service_user_id', $service_user_id)->where('is_deleted', '0')->orderBy('id', 'desc')->get();
 
@@ -228,9 +265,34 @@ class ProfileController extends ServiceUserManagementController
                 ->get()
                 ->toArray();
 
+            // Get average rating and count for this service user
+            $ratingStats = DB::table('su_behavior')
+                ->where('service_user_id', $service_user_id)
+                ->select(DB::raw('AVG(rate) as avg_rating'), DB::raw('COUNT(*) as rating_count'))
+                ->first();
+
+            $avg_rating = $ratingStats && $ratingStats->avg_rating ? round($ratingStats->avg_rating, 1) : 0;
+            $rating_count = $ratingStats ? intval($ratingStats->rating_count) : 0;
+
+            $current_moods = DB::table('su_mood')->select('su_mood.*', 'mood.id as mood_id', 'mood.name', 'mood.image')
+            ->where('su_mood.is_deleted', '0')
+            ->where('mood.home_id', $home_id)
+            ->where('su_mood.service_user_id', $service_user_id)
+            ->join('mood', 'mood.id', 'su_mood.mood_id')
+            ->whereDate('su_mood.created_at', Carbon::today())
+            ->orderBy('su_mood.id', 'desc')
+            ->first();
+
+            $moods = Mood::where('home_id', $home_id)->where('is_deleted', '0')->get();
+
+            // Education Data
+            $education_profile = SuEducationProfile::where('service_user_id', $service_user_id)->where('status', 1)->first();
+            $assigned_staff = SuEducationStaffAssignment::with('staff')->where('service_user_id', $service_user_id)->where('status', 1)->get();
+            $education_tasks = SuEducationTask::where('service_user_id', $service_user_id)->orderBy('created_at', 'desc')->get();
+
             //echo "<pre>"; print_r($noti_data); die;
             //print_r($patient); die;
-            return view('frontEnd.serviceUserManagement.profile', compact('patient', 'risks', 'file_category', 'service_user_id', 'care_team', 'care_history', 'daily_score', 'latitude', 'longitude', 'form_pattern', 'notifications', 'afc_status', 'labels', 'care_team_job_title', 'su_in_danger', 'su_req_cb', 'su_contact', 'service_users', 'dynamic_forms', 'social_app', 'social_app_val', 'my_money', 'noti_data', 'users'));
+            return view('frontEnd.serviceUserManagement.profile', compact('patient', 'risks', 'file_category', 'service_user_id', 'care_team', 'care_history', 'daily_score', 'latitude', 'longitude', 'form_pattern', 'notifications', 'afc_status', 'labels', 'care_team_job_title', 'su_in_danger', 'su_req_cb', 'su_contact', 'service_users', 'dynamic_forms', 'social_app', 'social_app_val', 'my_money', 'noti_data', 'users', 'avg_rating', 'rating_count','current_moods', 'moods', 'education_profile', 'assigned_staff', 'education_tasks'));
         } else {
             return view('frontEnd.error_404');
         }
@@ -320,8 +382,10 @@ class ProfileController extends ServiceUserManagementController
             if (!empty($careteam)) {
 
                 $su_home_id  = ServiceUser::where('id', $careteam->service_user_id)->value('home_id');
-                $usr_home_id = Auth::user()->home_id;
-
+                // $usr_home_id = Auth::user()->home_id;
+                $home_ids = Auth::user()->home_id;
+                $ex_home_ids = explode(',', $home_ids);
+                $usr_home_id = $ex_home_ids[0];
                 if ($su_home_id != $usr_home_id) {
                     return redirect('/')->with('error', UNAUTHORIZE_ERR);
                 }
@@ -372,7 +436,10 @@ class ProfileController extends ServiceUserManagementController
         if (!empty($careteam)) {
 
             $su_home_id     = ServiceUser::where('id', $careteam->service_user_id)->value('home_id');
-            if ($su_home_id != Auth::user()->home_id) {
+            $home_ids = Auth::user()->home_id;
+            $ex_home_ids = explode(',', $home_ids);
+            $home_id = $ex_home_ids[0];
+            if ($su_home_id != $home_id) {
                 return redirect('/')->with('error', UNAUTHORIZE_ERR);
             }
 
@@ -632,9 +699,11 @@ class ProfileController extends ServiceUserManagementController
         if (empty($service_user)) {
             return false;
         }
-
+        $home_ids = Auth::user()->home_id;
+        $ex_home_ids = explode(',', $home_ids);
+        $home_id = $ex_home_ids[0];
         $su_home_id = $service_user->home_id;
-        if ($su_home_id != Auth::user()->home_id) {
+        if ($su_home_id != $home_id) {
             echo 'AUTH_ERR';
             die;
         }
@@ -681,7 +750,7 @@ class ProfileController extends ServiceUserManagementController
                 $log_book_record->title   = ucfirst($service_user->name) . ' ' . $log_title;
                 $log_book_record->date    = date('Y-m-d H:i:s');
                 $log_book_record->details = $wear_detail; //clothing info
-                $log_book_record->home_id = Auth::user()->home_id;
+                $log_book_record->home_id = $home_id;
                 $log_book_record->user_id = Auth::user()->id;
                 $log_book_record->category_name = "Attendance";
                 $log_book_record->category_icon = "fa fa-clock-o";
@@ -708,7 +777,7 @@ class ProfileController extends ServiceUserManagementController
             $notification->event_id                   = $su_afc->id;
             $notification->notification_event_type_id = '13';
             $notification->event_action               = 'ADD';
-            $notification->home_id                    = Auth::user()->home_id;
+            $notification->home_id                    = $home_id;
             $notification->user_id                    = Auth::user()->id;
             $notification->save();
 
@@ -894,3 +963,4 @@ class ProfileController extends ServiceUserManagementController
         echo "Hiiiii";
     }
 }
+

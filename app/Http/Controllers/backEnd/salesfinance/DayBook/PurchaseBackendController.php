@@ -200,7 +200,7 @@ class PurchaseBackendController extends Controller
 
     public function purchase_day_book_reclaim_per()
     {
-        return Home::where('id', Session::get('scitsAdminSession')->home_id)->value('is_registered');
+        return 0;
     }
 
     public function reclaimPercantage()

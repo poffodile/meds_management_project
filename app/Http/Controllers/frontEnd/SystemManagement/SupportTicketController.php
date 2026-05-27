@@ -49,12 +49,14 @@ class SupportTicketController extends SystemManagementController
     	if($request->isMethod('post'))
         {
     		$data = $request->all();
-
+            $home_ids = Auth::user()->home_id;
+            $ex_home_ids = explode(',', $home_ids);
+            $home_id=$ex_home_ids[0];
             $ticket                            = new SupportTicket;
             $ticket->user_id                   = $data['user_id'];
             $ticket->title                     = $data['title'];
             $ticket->status                    = 0;
-            $ticket->home_id                   = Auth::user()->home_id;
+            $ticket->home_id                   = $home_id;
             $ticket->save();
         
             $supportTicketMessage              = new SupportTicketMessage;

@@ -11,8 +11,10 @@ class AnnualLeaveController extends StaffManagementController
     public function index($staff_member_id) {
 
         $sm_home_id = User::where('id',$staff_member_id)->value('home_id');
-        
-        if(Auth::user()->home_id != $sm_home_id){
+        $home_ids = Auth::user()->home_id;
+        $ex_home_ids = explode(',', $home_ids);
+        $home_id = $ex_home_ids[0];
+        if($home_id != $sm_home_id){
             die; 
         }
 
@@ -75,7 +77,10 @@ class AnnualLeaveController extends StaffManagementController
 
         if($request->isMethod('post')) {
 
-            $home_id = Auth::user()->home_id;
+            // $home_id = Auth::user()->home_id;
+            $home_ids = Auth::user()->home_id;
+            $ex_home_ids = explode(',', $home_ids);
+            $home_id = $ex_home_ids[0];
 
             $annual                  = new StaffAnnualLeave;
             $annual->home_id         = $home_id;
@@ -97,7 +102,10 @@ class AnnualLeaveController extends StaffManagementController
 
     public function view_annual_record($annual_leave_id = null) {
 
-        $home_id  = Auth::user()->home_id;
+        // $home_id  = Auth::user()->home_id;
+        $home_ids = Auth::user()->home_id;
+        $ex_home_ids = explode(',', $home_ids);
+        $home_id = $ex_home_ids[0];
 
         $annual_record = StaffAnnualLeave::select('staff_annual_leave.*')
                                     ->where('staff_annual_leave.id', $annual_leave_id)
@@ -178,7 +186,10 @@ class AnnualLeaveController extends StaffManagementController
         $data = $request->all();
                 
         $staff_annual_leave_id = $data['staff_annual_leave_id'];
-        $home_id  = Auth::user()->home_id;
+        // $home_id  = Auth::user()->home_id;
+         $home_ids = Auth::user()->home_id;
+        $ex_home_ids = explode(',', $home_ids);
+        $home_id = $ex_home_ids[0];
         $edit_record = StaffAnnualLeave::find($staff_annual_leave_id);
         if(!empty($edit_record)) {
             $sm_home_id = User::where('id', $edit_record->staff_member_id)->value('home_id');
@@ -205,10 +216,13 @@ class AnnualLeaveController extends StaffManagementController
         $annual_record = StaffAnnualLeave::find($annual_leave_id);
 
         if(!empty($annual_record)) {
+            $home_ids = Auth::user()->home_id;
+            $ex_home_ids = explode(',', $home_ids);
+            $home_id = $ex_home_ids[0];
 
             $sm_home_id = User::where('id',$annual_record->staff_member_id)->value('home_id');
 
-            if($sm_home_id == Auth::user()->home_id){
+            if($sm_home_id == $home_id){
         
                 $res = StaffAnnualLeave::where('id', $annual_leave_id)->update(['is_deleted' => '1']);
                 echo $res;            

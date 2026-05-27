@@ -50,28 +50,21 @@ class ContactUsController extends Controller
                 $stm->message     = $data['message'];
             }
             if($stm->save()){
-                return json_encode(array(
-                    'result' => array(
-                        'response' => true ,
-                        'message' => "Contact Query has been sent."
-                    )
+                return response(array(
+                    'success' => true ,
+                    'message' => "Contact Query has been sent."
                 ));
             }    
         }
         else
         {
-            return json_encode(array(
-                'result' => array(
-                    'response' => false,
-                    'message'=>'Fill all fields.',                                    
-                )    
+            return response(array(
+                'success' => false,
+                'message'=>'Fill all fields.',   
             ));
         }
     }
     
 }
-
-
-
 
 ?>

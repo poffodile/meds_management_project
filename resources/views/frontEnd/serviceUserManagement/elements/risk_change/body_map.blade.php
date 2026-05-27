@@ -2,17 +2,29 @@
 @section('title','Body Map')
 @section('content')
 <link href="{{ url('public/frontEnd/css/custom.min.css')}}" rel="stylesheet" type="text/css" >
-<style> 
+<style>
     path.active{
         fill-opacity: 0.7 !important;
         stroke-opacity: 1 !important;
     }
-    /*#frt_spots, #frt_spots_1 {
-        display: none;
-    }*/
     .mapping_back_icon {
         font-size: 22px;
     }
+    .injury-detail-form label { font-weight: 600; margin-top: 8px; }
+    .injury-detail-form select, .injury-detail-form input, .injury-detail-form textarea {
+        width: 100%; padding: 6px 10px; margin-top: 4px; border: 1px solid #ccc; border-radius: 4px;
+    }
+    .injury-badge {
+        display: inline-block; padding: 2px 8px; border-radius: 12px;
+        font-size: 11px; color: #fff; margin-left: 4px;
+    }
+    .injury-badge-bruise { background: #7B1FA2; }
+    .injury-badge-wound { background: #C62828; }
+    .injury-badge-rash { background: #EF6C00; }
+    .injury-badge-burn { background: #D84315; }
+    .injury-badge-swelling { background: #1565C0; }
+    .injury-badge-pressure_sore { background: #AD1457; }
+    .injury-badge-other { background: #455A64; }
 </style>
 <section id="main-content">
     <section class="wrapper">
@@ -193,6 +205,76 @@
                 <div class="clear"></div>
             </div>
         </div><!--preview-->
+
+        {{-- Injury Detail Modal --}}
+        <div class="modal fade" id="injuryDetailModal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Injury Details</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form id="injuryDetailForm" class="injury-detail-form">
+                            @csrf
+                            <input type="hidden" name="sel_body_map_id" id="modal_sel_body_map_id">
+                            <input type="hidden" name="su_risk_id" value="{{ $su_risk_id }}">
+                            <input type="hidden" name="service_user_id" value="{{ $service_user_id }}">
+
+                            <label>Injury Type</label>
+                            <select name="injury_type" id="modal_injury_type">
+                                <option value="">-- Select --</option>
+                                <option value="bruise">Bruise</option>
+                                <option value="wound">Wound</option>
+                                <option value="rash">Rash</option>
+                                <option value="burn">Burn</option>
+                                <option value="swelling">Swelling</option>
+                                <option value="pressure_sore">Pressure Sore</option>
+                                <option value="other">Other</option>
+                            </select>
+
+                            <label>Description</label>
+                            <textarea name="injury_description" id="modal_injury_description" rows="3" placeholder="Describe the injury..."></textarea>
+
+                            <label>Date Discovered</label>
+                            <input type="date" name="injury_date" id="modal_injury_date" value="{{ date('Y-m-d') }}">
+
+                            <label>Size</label>
+                            <input type="text" name="injury_size" id="modal_injury_size" placeholder="e.g. 2cm x 3cm">
+
+                            <label>Colour</label>
+                            <input type="text" name="injury_colour" id="modal_injury_colour" placeholder="e.g. Red, Purple, Yellow">
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" id="saveInjuryBtn">Save Injury</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Injury Info Modal (view existing) --}}
+        <div class="modal fade" id="injuryInfoModal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Injury Information</h4>
+                    </div>
+                    <div class="modal-body" id="injuryInfoBody">
+                        <p>Loading...</p>
+                    </div>
+                    <div class="modal-footer">
+                        @if(isset($isAdmin) && $isAdmin)
+                        <button type="button" class="btn btn-danger" id="removeInjuryBtn">Remove Injury</button>
+                        @endif
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </section>
 </section>
 
@@ -208,195 +290,186 @@
     $(function(){$(document).on( 'scroll', function(){ if ($(window).scrollTop() > 600) {$('.scroll-top').addClass('show');} else {$('.scroll-top').removeClass('show');}});$('.scroll-top').on('click', scrollToTop);});function scrollToTop() {verticalOffset = typeof(verticalOffset) != 'undefined' ? verticalOffset : 0;element = $('body');offset = element.offset();offsetTop = offset.top;$('html, body').animate({scrollTop: offsetTop}, 500, 'linear');}
 </script>
 
-<!-- <script>
-    $(document).on('click', 'path[id*="frt"]', function(e){
-        // var id = "{{Auth::user()->id}}";
-        // alert(id);return false;
-        if($(this).attr('class') == 'active'){
-        
-            $(this).attr('class','');
-
-        } else {
-
-            $(this).attr('class','active');
-            var IDs = [];
-            $("#frt_base").find($(this).attr('class','active')).each(function(){ IDs.push(this.id); });
-
-            $.ajax({
-
-                type : 'post',
-                data : {'zip_code' : IDs},
-                url  : "{{ url('/service/body-map/injury/add/')}}"+zip_code_id,,
-
-                success:function(resp) {
-                    alert(resp);
-                    
-                    
-                } 
-            });
-           
-            // var id = $(this).attr('id');
-            // alert(IDs);
-      }
-    });
-    $(document).on('click', 'path[id*="bck"]', function(e){
-        console.log($(this));
-        if($(this).attr('class') == 'active'){
-
-            $(this).attr('class','');
-        }else{
-
-            $(this).attr('class','active');
-        }
-    });
-</script> -->
-
 <script>
+// HTML-escape user-supplied strings to prevent XSS
+function esc(str) {
+    if (!str) return '';
+    var div = document.createElement('div');
+    div.appendChild(document.createTextNode(str));
+    return div.innerHTML;
+}
 
-    $(document).on('click', 'path[id*="frt"]', function(e){
+var csrfToken = "{{ csrf_token() }}";
+var suRiskId = "{{ $su_risk_id }}";
+var serviceUserId = "{{ $service_user_id }}";
+var isAdmin = {{ isset($isAdmin) && $isAdmin ? 'true' : 'false' }};
 
-        var su_risk_id      = "{{ isset($su_risk_id) ? $su_risk_id : '' }}";
-        var service_user_id = "{{ isset($service_user_id) ? $service_user_id : '' }}";
- 
-        if($(this).attr('class') == 'active'){
+// Map of sel_body_map_id -> DB record id (for existing injuries)
+var injuryMap = {};
+@foreach($sel_injury_parts as $injury)
+    injuryMap["{{ $injury['sel_body_map_id'] }}"] = {{ $injury['id'] }};
+@endforeach
 
-            var result      = confirm("Do you want to remove this ?"); 
+// Set up CSRF for all AJAX calls
+$.ajaxSetup({
+    headers: { 'X-CSRF-TOKEN': csrfToken }
+});
 
-            $(this).attr('class','');
+// Mark existing injuries as active on load
+@foreach($sel_injury_parts as $injury)
+    $('#{{ $injury['sel_body_map_id'] }}').attr('class', 'active');
+@endforeach
 
-            if (result == true) {
+// Click handler for both front (frt) and back (bck) body parts
+$(document).on('click', 'path[id*="frt"], path[id*="bck"]', function(e) {
+    var $path = $(this);
+    var selBodyMapId = $path.attr('id');
 
-                $('.loader-box').show();
-                var sel_body_map_id = $(this).attr('id');
-                $.ajax({
-                        type : 'post',
-                        data : {'sel_body_map_id' : sel_body_map_id},
-                        url  : "{{ url('/service/body-map/injury/remove/')}}"+'/'+su_risk_id,
-                        success:function(resp) {
-                            if(isAuthenticated(resp) == false){
-                                return false;
-                            }
-                        }
+    if ($path.attr('class') === 'active') {
+        // Clicking an active (injured) body part — show info modal
+        var injuryId = injuryMap[selBodyMapId];
+        if (!injuryId) return;
 
-                    });
-                $('.loader').hide();
+        $('#injuryInfoBody').html('<p>Loading...</p>');
+        $('#removeInjuryBtn').data('injury-id', injuryId).data('body-part', selBodyMapId);
+        $('#injuryInfoModal').modal('show');
 
-            } else {
-               $(this).attr('class','active'); 
+        $.ajax({
+            type: 'GET',
+            url: "{{ url('/service/body-map/injury') }}/" + injuryId,
+            success: function(resp) {
+                if (resp.success && resp.data) {
+                    var d = resp.data;
+                    var staffName = esc(d.staff ? d.staff.name : 'Unknown');
+                    var typeVal = d.injury_type ? d.injury_type.replace(/[^a-z_]/g, '') : '';
+                    var typeBadge = typeVal
+                        ? '<span class="injury-badge injury-badge-' + typeVal + '">' + esc(typeVal.replace('_', ' ')) + '</span>'
+                        : '<em>Not specified</em>';
+                    var html = '<table class="table table-bordered">'
+                        + '<tr><td><strong>Body Region</strong></td><td>' + esc(d.sel_body_map_id) + '</td></tr>'
+                        + '<tr><td><strong>Type</strong></td><td>' + typeBadge + '</td></tr>'
+                        + '<tr><td><strong>Description</strong></td><td>' + (d.injury_description ? esc(d.injury_description) : '<em>None</em>') + '</td></tr>'
+                        + '<tr><td><strong>Date Discovered</strong></td><td>' + (d.injury_date ? esc(d.injury_date) : '<em>Not set</em>') + '</td></tr>'
+                        + '<tr><td><strong>Size</strong></td><td>' + (d.injury_size ? esc(d.injury_size) : '<em>Not recorded</em>') + '</td></tr>'
+                        + '<tr><td><strong>Colour</strong></td><td>' + (d.injury_colour ? esc(d.injury_colour) : '<em>Not recorded</em>') + '</td></tr>'
+                        + '<tr><td><strong>Recorded By</strong></td><td>' + staffName + '</td></tr>'
+                        + '<tr><td><strong>Date Recorded</strong></td><td>' + esc(d.created_at) + '</td></tr>'
+                        + '</table>';
+                    $('#injuryInfoBody').html(html);
+                }
+            },
+            error: function() {
+                $('#injuryInfoBody').html('<p class="text-danger">Failed to load injury details.</p>');
             }
-        } else {
+        });
+    } else {
+        // Clicking an empty body part — open add injury modal
+        $('#modal_sel_body_map_id').val(selBodyMapId);
+        $('#modal_injury_type').val('');
+        $('#modal_injury_description').val('');
+        $('#modal_injury_date').val(new Date().toISOString().split('T')[0]);
+        $('#modal_injury_size').val('');
+        $('#modal_injury_colour').val('');
+        $('#injuryDetailModal').modal('show');
+    }
+});
 
-            $(this).attr('class','active');
+// Save new injury
+$('#saveInjuryBtn').on('click', function() {
+    // Client-side validation before submit
+    var description = $('#modal_injury_description').val() || '';
+    var size = $('#modal_injury_size').val() || '';
+    var colour = $('#modal_injury_colour').val() || '';
+    var selBodyMapId = $('#modal_sel_body_map_id').val() || '';
 
-            var result          = confirm("Do you want to add this ?");
-            if (result == true) {
+    if (!selBodyMapId) {
+        alert('No body part selected. Please click a body part first.');
+        return;
+    }
+    if (description.length > 1000) {
+        alert('Description must be 1000 characters or less.');
+        return;
+    }
+    if (size.length > 100) {
+        alert('Size must be 100 characters or less.');
+        return;
+    }
+    if (colour.length > 50) {
+        alert('Colour must be 50 characters or less.');
+        return;
+    }
 
-                // var IDs = [];
-                // $("#frt_base").find($(this).attr('class','active')).each(function(){ IDs.push(this.id); });
-                $('.loader-box').show();
-                var sel_body_map_id = $(this).attr('id');
-                $.ajax({
+    var $btn = $(this);
+    $btn.prop('disabled', true).text('Saving...');
 
-                    type : 'post',
-                    data : { 'sel_body_map_id' : sel_body_map_id, 'su_risk_id' : su_risk_id, 'service_user_id' : service_user_id },
-                    url  : "{{ url('/service/body-map/injury/add/')}}",
-
-                    success:function(resp) {
-                        if(isAuthenticated(resp) == false){
-                            return false;
-                        }
-                    } 
-                });
-                $('.loader-box').hide();
+    $.ajax({
+        type: 'POST',
+        url: "{{ url('/service/body-map/injury/add') }}",
+        data: $('#injuryDetailForm').serialize(),
+        success: function(resp) {
+            if (resp.success) {
+                var selId = $('#modal_sel_body_map_id').val();
+                $('#' + selId).attr('class', 'active');
+                injuryMap[selId] = resp.id;
+                $('#injuryDetailModal').modal('hide');
             } else {
-
-                $(this).attr('class','');
+                alert(resp.message || 'Failed to save injury.');
             }
-            // var id = $(this).attr('id');
-            // alert(IDs);
+        },
+        error: function(xhr) {
+            if (xhr.status === 422) {
+                var errors = xhr.responseJSON.errors || {};
+                var msg = Object.values(errors).flat().join('\n');
+                alert('Validation error:\n' + msg);
+            } else if (xhr.status === 403) {
+                alert(xhr.responseJSON.message || 'Not authorised.');
+            } else {
+                console.error('Add injury error:', xhr);
+                alert('An error occurred. Please try again.');
+            }
+        },
+        complete: function() {
+            $btn.prop('disabled', false).text('Save Injury');
         }
     });
+});
 
-    $(document).on('click', 'path[id*="bck"]', function(e){
+// Remove injury (admin only)
+$('#removeInjuryBtn').on('click', function() {
+    var injuryId = $(this).data('injury-id');
+    var bodyPart = $(this).data('body-part');
+    if (!confirm('Are you sure you want to remove this injury?')) return;
 
-        console.log($(this));
+    var $btn = $(this);
+    $btn.prop('disabled', true).text('Removing...');
 
-        var su_risk_id      = "{{ isset($su_risk_id) ? $su_risk_id : '' }}";
-        var service_user_id = "{{ isset($service_user_id) ? $service_user_id : '' }}";
-
-        if($(this).attr('class') == 'active'){
-
-            var result      = confirm("Do you want to remove this ?"); 
-            $(this).attr('class','');
-            if (result == true) {
-                $('.loader-box').show();
-                var sel_body_map_id = $(this).attr('id');
-                $.ajax({
-
-                        type : 'post',
-                        data : {'sel_body_map_id' : sel_body_map_id},
-                        url  : "{{ url('/service/body-map/injury/remove/')}}"+'/'+su_risk_id,
-
-                        success:function(resp) {
-                            if(isAuthenticated(resp) == false){
-                                return false;
-                            }
-                        } 
-                });
-                $('.loader-box').hide();
-
+    $.ajax({
+        type: 'POST',
+        url: "{{ url('/service/body-map/injury/remove') }}",
+        data: { injury_id: injuryId },
+        success: function(resp) {
+            if (resp.success) {
+                $('#' + bodyPart).attr('class', '');
+                delete injuryMap[bodyPart];
+                $('#injuryInfoModal').modal('hide');
             } else {
-
-                $(this).attr('class','active');
+                alert(resp.message || 'Failed to remove injury.');
             }
-        } else {
-
-            $(this).attr('class','active');
-            var result          = confirm("Do you want to add this ?");
-
-            if (result == true) {
-                $('.loader-box').show();
-                // var IDs = [];
-                // $("#frt_base").find($(this).attr('class','active')).each(function(){ IDs.push(this.id); });
-                var sel_body_map_id = $(this).attr('id');
-                
-                $.ajax({
-
-                    type : 'post',
-                    data : { 'sel_body_map_id' : sel_body_map_id, 'su_risk_id' : su_risk_id, 'service_user_id' : service_user_id },
-                    url  : "{{ url('/service/body-map/injury/add/')}}",
-
-                    success:function(resp) {
-                        if(isAuthenticated(resp) == false){
-                            return false;
-                        }
-                    } 
-                });
-                $('.loader-box').hide();
+        },
+        error: function(xhr) {
+            if (xhr.status === 403) {
+                alert(xhr.responseJSON.message || 'Only administrators can remove injuries.');
             } else {
-
-                $(this).attr('class','');
+                console.error('Remove injury error:', xhr);
+                alert('An error occurred.');
             }
+        },
+        complete: function() {
+            $btn.prop('disabled', false).text('Remove Injury');
         }
     });
+});
 </script>
-
-<?php foreach ($sel_injury_parts as $key => $value) {
-    $sel_body_map_id = $value['sel_body_map_id'];
-?>
-<script type="text/javascript">
-    // alert('1');
-    var sel_body_map_id = "{{$sel_body_map_id}}";
-    $('#'+sel_body_map_id).attr('class','active');
-    
-</script>
-<?php } ?>
-
-<!-- <script type="text/javascript">
-    $(document).on('click','#frt_base',function(){
-        alert($(this).attr('id'));
-    })
-</script> -->
 <!-- <script>
     $('[id*="ft"]').on('click',function(e){
       console.log($(this).attr('alt','headback'));

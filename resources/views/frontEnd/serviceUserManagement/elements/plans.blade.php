@@ -7,9 +7,9 @@
                 <h4 class="modal-title"> Plans </h4>
             </div>
             <div class="modal-body">
-                <div class="row">
-                    <div class="foor-box-wrap foor-plan">
-                        <div class="col-md-5 col-sm-5 col-xs-12 m-t-10">
+                <div class="foor-box-wrap foor-plan">
+                    <div class="row">
+                        <div class="col-md-6 col-sm-6 col-xs-12">
                             <div class="profile-nav alt profile-plan-div">
                                 <a href="{{ url('/service/placement-plans/' . $service_user_id) }}">
                                     <section class="panel text-center profile-square" style="height: 191px">
@@ -25,7 +25,7 @@
                                 </a>
                             </div>
                         </div>
-                        <div class="col-md-5 col-sm-5 col-xs-12 m-t-10 rmp_plan_modal">
+                        <div class="col-md-6 col-sm-6 col-xs-12 rmp_plan_modal">
                             <a href="{{ url('/service/rmp/' . $service_user_id) }}">
                                 <div class="profile-nav alt profile-plan-div">
                                     <section class="panel text-center profile-square" style="height: 191px">
@@ -41,8 +41,7 @@
                                 </div>
                             </a>
                         </div>
-                        <div class="col-md-5 col-sm-5 col-xs-12 m-t-10 m-b-10">
-
+                        <div class="col-md-6 col-sm-6 col-xs-12 m-t-10">
                             <a href="{{ url('/service/bmp/' . $service_user_id) }}">
                                 <div class="profile-nav alt profile-plan-div">
                                     <section class="panel text-center profile-square" style="height: 191px">
@@ -58,7 +57,26 @@
                                 </div>
                             </a>
                         </div>
-                        <div class="col-md-5 col-sm-5 col-xs-12 m-t-10 m-b-10 education-record-list"
+                        {{-- <div class="col-md-6 col-sm-6 col-xs-12 m-t-10">
+                            <?php $encodedUser = base64_encode($userName);
+                                $url = "http://66.116.198.68:8055/Learner/Learner-Dashboard/?key=" . $encodedUser;
+                            ?>
+                            <a href="{{ $url }}" target="_blank">
+                                <div class="profile-nav alt profile-plan-div">
+                                    <section class="panel text-center profile-square" style="height: 191px">
+                                        <div class="plan-user-heading alt wdgt-row label-inverse">
+                                            <i class="{{ $labels['education_record']['icon'] }}"></i>
+                                        </div>
+                                        <div class="panel-body">
+                                            <div class="wdgt-text">
+                                                {{ $labels['education_record']['label'] }}
+                                            </div>
+                                        </div>
+                                    </section>
+                                </div>
+                            </a>
+                        </div> --}}
+                         <div class="col-md-6 col-sm-6 col-xs-12 m-t-10 education-record-list"
                             data-dismiss="modal" aria-hidden="true">
                             <div class="profile-nav alt profile-plan-div">
                                 <section class="panel text-center profile-square" style="height: 191px">
@@ -79,3 +97,27 @@
         </div>
     </div>
 </div>
+
+{{-- <script>
+    $(document).on("click", "#staffLoginBtn", function (e) {
+    e.preventDefault(); // stop link from loading immediately
+
+    let url = $(this).data("url");
+
+    $.ajax({
+        url: url,   // your internal API
+        type: "GET",
+        success: function (response) {
+            // After AJAX is done → redirect to your URL
+            if (response && response.redirect_url) {
+                // url += '/' + response.token; // append token to URL
+                window.open(response.redirect_url, "_blank");
+            }
+        },
+        error: function () {
+            alert("Error while contacting server.");
+        }
+    });
+});
+
+</script> --}}

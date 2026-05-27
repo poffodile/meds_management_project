@@ -3,8 +3,11 @@
 namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Mail;
-use DB,Auth,Hash;
+use DB, Hash;
 use App\ServiceUserAFC;
+use App\Models\suUserCourse;
+use App\Models\SuUserPreferredCarers;
+use Illuminate\Support\Facades\Auth;
 
 class ServiceUser extends Model
 {
@@ -43,7 +46,8 @@ class ServiceUser extends Model
 
         $user->password = Hash::make($random_no);
 
-        $company_name = 'SCITS set Password Mail';
+        // $company_name = 'Care One OS set Password Mail';
+        $company_name = PROJECT_NAME;
         $email        = $user->email;
         $name         = $user->name;
         $user_name    = $user->user_name;        
@@ -56,9 +60,18 @@ class ServiceUser extends Model
         {  
             if (!filter_var($email, FILTER_VALIDATE_EMAIL) === false) 
             {
-                Mail::send('emails.service_user_send_password_mail', ['name'=>$name, 'user_name'=>$user_name, 'password'=>$password,'home_security_policy'=>$home_security_policy], function($message) use ($email,$company_name)
-                {
-                    $message->to($email, $company_name)->subject('SCITS Welcome');
+                // Mail::send('emails.service_user_send_password_mail', ['name'=>$name, 'user_name'=>$user_name, 'password'=>$password,'home_security_policy'=>$home_security_policy], function($message) use ($email,$company_name)
+                // {
+                //     $message->to($email, $company_name)->subject('Care One OS Welcome');
+                // });
+                $arr = ['name'=>$name, 'user_name'=>$user_name, 'password'=>$password,'home_security_policy'=>$home_security_policy];
+                Mail::send('emails.service_user_send_password_mail', $arr, function ($message) use ($arr, $email, $company_name) {
+
+                    $message->to($email, $company_name)
+
+                        ->subject('Care One OS Welcome');
+
+                    $message->from('mobappssolutions153@gmail.com', $company_name);
                 });
                 return true; 
             } 
@@ -88,6 +101,21 @@ class ServiceUser extends Model
         return $location_get_interval;
     }
 
+    public static function getServiceUserByResidentialId($department)
+    {
+        return self::where('home_id', Auth::user()->home_id)->where('status', 1)->where('is_deleted', 0)->count();
+    }
+    public function courses(){
+        return $this->hasMany(suUserCourse::class, 'su_user_id', 'id');
+    }
+    public function carers(){
+        return $this->hasMany(SuUserPreferredCarers::class, 'su_user_id', 'id');
+    }
+
+    public function emergencyContacts()
+    {
+        return $this->hasMany(\App\Models\ServiceUserEmergencyContact::class, 'service_user_id', 'id');
+    }
 
 
 }

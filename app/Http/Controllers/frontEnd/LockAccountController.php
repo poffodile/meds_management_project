@@ -8,11 +8,11 @@ use App\Http\Controllers\Controller;
 
 use Illuminate\Http\Request;
 
-use Session;
-
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Carbon\Carbon;
 use App\User;
-
-use Hash;
 
 
 
@@ -35,14 +35,14 @@ class LockAccountController extends Controller
     {
 
         $this->middleware('auth');
-
     }
 
 
 
     //show lockscreen page
 
-    public function lockscreen(Request $request) {
+    public function lockscreen(Request $request)
+    {
 
         // echo "<pre>"; print_r($request->input()); die;
 
@@ -51,7 +51,6 @@ class LockAccountController extends Controller
         //Session::forget('LAST_ACTIVITY');
 
         return view('frontEnd.lockscreen');
-
     }
 
 
@@ -60,13 +59,14 @@ class LockAccountController extends Controller
 
     //To save the current page which is to open  after entering correct password on lockscreen  
 
-    public function lock(Request $request) {    
+    public function lock(Request $request)
+    {
 
         $data = $request->input();
 
         $pre_path = $data['path'];
 
-        
+
 
         //for managing variable lockscreen managing variable
 
@@ -84,34 +84,33 @@ class LockAccountController extends Controller
 
 
         return redirect('/lockscreen');
-
     }
 
 
 
-    public function unlock(Request $request) {
+    public function unlock(Request $request)
+    {
 
 
 
-        $previous_user_home_ids = \Auth::user()->home_id;
+        $previous_user_home_ids = Auth::user()->home_id;
 
-        if(!empty($previous_user_home_ids)){
+        if (!empty($previous_user_home_ids)) {
 
             $previous_user_home_ids = explode(',', $previous_user_home_ids);
-
         }
 
-        if($request->user_name != \Auth::user()->user_name){
+        if ($request->user_name != Auth::user()->user_name) {
 
             $user_name          = $request->user_name;
 
             $entered_password   = $request->password;
 
-            $password           = User::select('id','password','home_id')
+            $password           = User::select('id', 'password', 'home_id')
 
-                                    ->where('user_name',$user_name)
+                ->where('user_name', $user_name)
 
-                                    ->first();
+                ->first();
 
             //Start 25 sep 2018------------------------------------------
 
@@ -119,59 +118,56 @@ class LockAccountController extends Controller
 
             $home_ids = $password->home_id;
 
-            if(!empty($home_ids)){
+            if (!empty($home_ids)) {
 
-                $home_ids = explode(',',$home_ids);
-
+                $home_ids = explode(',', $home_ids);
             }
 
-            if(!empty($home_ids)){
+            if (!empty($home_ids)) {
 
-                if(!in_array($previous_user_home_ids[0],$home_ids)){
+                if (!in_array($previous_user_home_ids[0], $home_ids)) {
 
-                    return redirect()->back()->with('error','You are not authorized to access this home');
-
+                    return redirect()->back()->with('error', 'You are not authorized to access this home');
                 }
-
             }
 
             //End 25 sep 2018------------------------------------------
 
 
 
-            if(!empty($password)){
+            if (!empty($password)) {
 
 
 
                 $password = json_decode(json_encode($password->password));
 
-                
 
-                if(Hash::check($entered_password, $password)){
+
+                if (Hash::check($entered_password, $password)) {
 
                     User::setUserLogInStatus(0);
 
-                    \Auth::logout();
+                    Auth::logout();
 
                     Session::forget('LAST_ACTIVITY');
 
 
 
-                    if(\Auth::attempt([
+                    if (Auth::attempt([
 
-                                    'user_name'  => $request->user_name,
+                        'user_name'  => $request->user_name,
 
-                                    'password'   => $request->password
+                        'password'   => $request->password
 
-                                ])){
-
-
-
-                        $logged_in = \Auth::user()->logged_in;
+                    ])) {
 
 
 
-                        if($logged_in == '1'){
+                        $logged_in = Auth::user()->logged_in;
+
+
+
+                        if ($logged_in == '1') {
 
 
 
@@ -187,18 +183,13 @@ class LockAccountController extends Controller
 
 
 
-                            if($diff_mint > SESSION_TIMEOUT){ 
-
-
-
-                            } else{ 
+                            if ($diff_mint > SESSION_TIMEOUT) {
+                            } else {
 
                                 Auth::logout();
 
-                                return redirect()->back()->with('error','You are already logged in from some other device.');   
-
+                                return redirect()->back()->with('error', 'You are already logged in from some other device.');
                             }
-
                         }
 
 
@@ -207,23 +198,19 @@ class LockAccountController extends Controller
 
                         User::setUserLogInStatus(1);
 
-                        return redirect('/')->with('success','Welcome back '.\Auth::user()->user_name);
+                        return redirect('/roster')->with('success', 'Welcome back ' . Auth::user()->user_name);
+                        // return redirect('/')->with('success','Welcome back '.\Auth::user()->user_name);
 
                     }
+                } else {
 
-                }else{
-
-                    return back()->with('error','Password does not match. Please try again.');
-
+                    return back()->with('error', 'Password does not match. Please try again.');
                 }
+            } else {
 
-            }else{
-
-                return back()->with('error','User name does not exist. Please try again.');
-
+                return back()->with('error', 'User name does not exist. Please try again.');
             }
-
-        }else{
+        } else {
 
 
 
@@ -237,19 +224,19 @@ class LockAccountController extends Controller
 
 
 
-            if(\Hash::check($password, \Auth::user()->password)){
+            if (Hash::check($password, Auth::user()->password)) {
 
                 $request->session()->forget('LOCKED');
 
 
 
-                Session::put('LAST_ACTIVITY',time());
+                Session::put('LAST_ACTIVITY', time());
 
 
 
                 //redirecting to previous path
 
-                if(Session::has('PREVIOUS_PATH')){ //echo '1';die;
+                if (Session::has('PREVIOUS_PATH')) { //echo '1';die;
 
                     $previous_path = Session::get('PREVIOUS_PATH');
 
@@ -257,26 +244,20 @@ class LockAccountController extends Controller
 
 
 
-                    if($previous_path == '/'){ //only for dashboard page
+                    if ($previous_path == '/') { //only for dashboard page
 
                         $previous_path = '';
-
                     }
 
 
 
-                    return redirect('/'.$previous_path);
-
+                    return redirect('/' . $previous_path);
                 }
 
                 return redirect('/');
-
             }
 
-            return back()->with('error','Password does not match. Please try again.');
-
+            return back()->with('error', 'Password does not match. Please try again.');
         }
-
     }
-
-} 
+}

@@ -24,13 +24,15 @@ class TimeSheetRequest extends FormRequest
         return [
             'time_sheet_id'  => 'nullable',
             'user_id'        => 'required|integer|exists:user,id',
-            'date'           => 'required|date',
+            // 'date'           => 'required|date',
             'hours'          => 'nullable|numeric|min:0|max:24',
-            'sleep'          => 'nullable|numeric|min:0|max:24',
-            'wake_night'     => 'nullable|numeric|min:0|max:24',
-            'disturbance'    => 'nullable|numeric|min:0|max:24',
-            'annual_leave'   => 'nullable|numeric|min:0|max:24',
-            'on_call'        => 'nullable|numeric|min:0|max:24',
+            'category_id'          => 'required',
+            // 'time'          => 'required',
+            // 'sleep'          => 'nullable|numeric|min:0|max:24',
+            // 'wake_night'     => 'nullable|numeric|min:0|max:24',
+            // 'disturbance'    => 'nullable|numeric|min:0|max:24',
+            // 'annual_leave'   => 'nullable|numeric|min:0|max:24',
+            // 'on_call'        => 'nullable|numeric|min:0|max:24',
             'comments'       => 'nullable|string|max:1000',
         ];
     }

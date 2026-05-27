@@ -16,7 +16,7 @@ class Risk extends Model
 								->orderBy('id','desc')
 								->value('status');
 		return $status;
-	}    
+	}   
 
 	public static function overallRiskStatus($service_user_id = null){
 

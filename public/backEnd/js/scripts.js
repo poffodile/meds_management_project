@@ -34,7 +34,7 @@
 
 
             $(".leftside-navigation").niceScroll({
-                cursorcolor: "#1FB5AD",
+                cursorcolor: "#8b8b8b",
                 cursorborder: "0px solid #fff",
                 cursorborderradius: "0px",
                 cursorwidth: "3px"

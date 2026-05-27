@@ -188,8 +188,10 @@ class RiskController extends ServiceUserManagementController
         if($request->isMethod('post')) {
 
             $su_home_id = ServiceUser::where('id',$data['service_user_id'])->value('home_id');
-
-            if($su_home_id != Auth::user()->home_id){
+            $home_ids = Auth::user()->home_id;
+            $ex_home_ids = explode(',', $home_ids);
+            $home_id = $ex_home_ids[0];
+            if($su_home_id != $home_id){
                 //return redirect('/')->with('error',UNAUTHORIZE_ERR); 
                 $result['response'] = 'AUTH_ERR';
                 return $result;
@@ -218,7 +220,7 @@ class RiskController extends ServiceUserManagementController
                 $notification->event_id                   = $risk->id;
                 $notification->notification_event_type_id = '11';
                 $notification->event_action               = 'ADD';      
-                $notification->home_id                    = Auth::user()->home_id;
+                $notification->home_id                    = $home_id;
                 $notification->user_id                    = Auth::user()->id;        
                 $notification->save();
                 //saving notification end
@@ -268,7 +270,10 @@ class RiskController extends ServiceUserManagementController
 
             // echo "<pre>"; print_r($sel_injury_parts); die;
             $risk_home_id = $risk->home_id;
-            if($risk_home_id != Auth::user()->home_id){
+            $home_ids = Auth::user()->home_id;
+            $ex_home_ids = explode(',', $home_ids);
+            $home_id = $ex_home_ids[0];
+            if($risk_home_id != $home_id){
                 $result['response'] = 'AUTH_ERR';
                 return $result;
             }

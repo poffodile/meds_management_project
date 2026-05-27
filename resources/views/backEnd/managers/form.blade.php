@@ -1,6 +1,6 @@
 @extends('backEnd.layouts.master')
 
-@section('title',' :Company Manager Form')
+@section('title',' : Company Manager Form')
 <meta name="csrf-token" content="{{ csrf_token() }}">
 
 @section('content')
@@ -89,6 +89,22 @@ if (isset($user_info)) {
                                     </div>
                                 </div>
 
+                                @if(!isset($user_info))
+                                <div class="form-group">
+                                    <label class="col-lg-3 control-label">Password</label>
+                                    <div class="col-lg-9">
+                                        <input type="password" name="password" class="form-control" placeholder="password" maxlength="255" required>
+                                    </div>
+                                </div>
+                                @else
+                                <div class="form-group">
+                                    <label class="col-lg-3 control-label">Password</label>
+                                    <div class="col-lg-9">
+                                        <input type="password" name="password" class="form-control" placeholder="Leave blank to keep current password" maxlength="255">
+                                    </div>
+                                </div>
+                                @endif
+
                                 <div class="form-group">
                                     <label class="col-lg-3 control-label">Job Title</label>
                                     <div class="col-lg-9">
@@ -123,15 +139,15 @@ if (isset($user_info)) {
                                     </div>
                                 </div>
 
-                                <!-- <input type="hidden" id="selectedHomes" value="{{ (isset($user_info->home_id)) ? $user_info->home_id : '' }}">
+                                <input type="hidden" id="selectedHomes" value="{{ (isset($user_info->home_id)) ? $user_info->home_id : '' }}">
                                 <div class="form-group">
                                     <label for="homes" class=" col-lg-3 control-label">Select Homes:</label>
                                     <div class="col-lg-3">
                                         <label class="control-label"><input class="control-label" type="checkbox" name="allHome" value="0" id="selectAllHomes"> Select All Homes</label>
                                     </div>
-                                    <div class="col-lg-3" id="homesCheckboxList">
+                                    <div class="col-lg-9 col-lg-offset-3" id="homesCheckboxList">
                                     </div>
-                                </div> -->
+                                </div>
 
 
                                 <div class="form-group">

@@ -13,7 +13,6 @@
     .lightRed {
         background: #f38d8d;
     }
-
 </style>
 
 <!--main content start-->
@@ -21,8 +20,8 @@
     <section class="wrapper p-t-80">
         <div class="container p-0">
             <div class="col-md-7 col-sm-7 col-xs-12 p-0">
-            <!-- style="display: none" -->
-             @if(in_array(1, $access_rights))
+                <!-- style="display: none" -->
+                @if(in_array(1, $access_rights))
                 <a href="{{ url('/service-user-management') }}">
                     <div class="col-md-6">
                         <div class="profile-nav alt">
@@ -38,11 +37,11 @@
                         </div>
                     </div>
                 </a>
-            @endif
-            @if(in_array(534, $access_rights))
+                @endif
+                @if(in_array(534, $access_rights))
                 <a href="{{url('service/daily-logs')}}">
-                <div class="col-md-6">
-                    <div class="profile-nav alt">
+                    <div class="col-md-6">
+                        <div class="profile-nav alt">
                             <!-- #PoliProcModal -->
                             <section class="panel text-center">
                                 <div class="user-heading alt wdgt-row lavender_pink"> <i class="fa fa-book"></i></div>
@@ -53,13 +52,13 @@
                                     </div>
                                 </div>
                             </section>
-                        
+
+                        </div>
                     </div>
-                </div>
-            </a>
-            @endif
-            <!-- @if(in_array(535, $access_rights)) -->
-                <a href="{{url('/forms')}}">
+                </a>
+                @endif
+                <!-- @if(in_array(535, $access_rights)) -->
+                <a href="{{ url('/forms') }}">
                     <!-- data-target="#" data-toggle="modal" class="MainNavText"   -->
                     <!-- dynmicFormModal -->
                     <div class="col-md-6">
@@ -76,8 +75,8 @@
                         </div>
                     </div>
                 </a>
-            <!-- @endif -->
-            @if(in_array(67, $access_rights))
+                <!-- @endif -->
+                @if(in_array(67, $access_rights))
                 <a href="{{ url('/system/calendar') }}">
                     <div class="col-md-6">
                         <div class="profile-nav alt">
@@ -93,28 +92,47 @@
                         </div>
                     </div>
                 </a>
-            @endif
-                <?php if($accessRight === true) { ?>
-                <a href="{{ url('/rota_management') }}">
-                    <div class="col-md-6">
-                        <div class="profile-nav alt">
-                            <section class="panel text-center">
-                                <div class="user-heading alt wdgt-row grayish_green"> <i class="fa fa-group"></i> </div>
-                                <div class="panel-body">
-                                    <div class="wdgt-value">
-                                        <h1 class="count">Rota Management</h1>
-                                        <p></p>
+                @endif
+                <?php if ($accessRight === true) { ?>
+                    {{-- <a href="{{ url('/rota_management') }}"> --}}
+                    <a href="{{ url('/roster') }}">
+                        <div class="col-md-6">
+                            <div class="profile-nav alt">
+                                <section class="panel text-center">
+                                    <div class="user-heading alt wdgt-row grayish_green"> <i class="fa fa-group"></i> </div>
+                                    <div class="panel-body">
+                                        <div class="wdgt-value">
+                                            <h1 class="count">Rota Management</h1>
+                                            <p></p>
+                                        </div>
                                     </div>
-                                </div>
-                            </section>
+                                </section>
+                            </div>
                         </div>
-                    </div>
-                </a> <?php } ?>
-                 <div class="col-md-6">
+                    </a> <?php } ?>
+
+                <?php if ($accessRight === true) { ?>
+                    <a href="{{ url('/rota_management') }}">
+                        {{-- <a href="{{ url('/roster') }}"> --}}
+                        <div class="col-md-6">
+                            <div class="profile-nav alt">
+                                <section class="panel text-center">
+                                    <div class="user-heading alt wdgt-row grayish_green"> <i class="fa fa-group"></i> </div>
+                                    <div class="panel-body">
+                                        <div class="wdgt-value">
+                                            <h1 class="count">Rota Management 2</h1>
+                                            <p></p>
+                                        </div>
+                                    </div>
+                                </section>
+                            </div>
+                        </div>
+                    </a> <?php } ?>
+                <div class="col-md-6">
                     <div class="profile-nav alt">
-                    <!-- #PoliProcModal  -->
-                     @if(in_array(211, $access_rights))
-                        <a data-target="#PoliProcModal" data-toggle="modal" class="MainNavText" >   
+                        <!-- #PoliProcModal  -->
+                        @if(in_array(211, $access_rights))
+                        <a data-target="#PoliProcModal" data-toggle="modal" class="MainNavText">
                             <section class="panel text-center">
                                 <div class="user-heading alt wdgt-row terques-bg"> <i class="fa fa-book"></i></div>
                                 <div class="panel-body">
@@ -127,7 +145,7 @@
                         </a>
                         @endif
                     </div>
-                </div> 
+                </div>
                 @if(in_array(159, $access_rights))
                 <a href="{{ url('/staff-management') }}">
                     <div class="col-md-6">
@@ -179,7 +197,7 @@
                 </a>
                 @if(in_array(172, $access_rights))
                 <a href="{{ url('/general-admin') }}">
-                     <div class="col-md-6">
+                    <div class="col-md-6">
                         <div class="profile-nav alt">
                             <section class="panel text-center">
                                 <div class="user-heading alt wdgt-row bg-blue"> <i class="fa fa-cogs"></i></div>
@@ -247,7 +265,7 @@
 
         </div>
     </section>
-</section> 
+</section>
 
 <!--main content end-->
 @endsection

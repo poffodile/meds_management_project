@@ -5,8 +5,8 @@
 
 <style>
     .panel-heading .nav>li.active>a, .panel-heading .nav>li>a:hover {
-    color: #ffffff;
-    background: #1fb5ad;
+    color: #000000;
+    background: #eff6ff;
 }
     
 .tab-bg-dark-navy-blue {
@@ -44,7 +44,7 @@
                             </div>
 
                             <section class="panel">
-                                <header class="panel-heading tab-bg-dark-navy-blue ">
+                                <!-- <header class="panel-heading tab-bg-dark-navy-blue ">
                                     <ul class="nav nav-tabs">
                                         <li class="active">
                                             <a data-toggle="tab" href="#companyOverheads">Company Overheads</a>
@@ -56,7 +56,7 @@
                                             <a data-toggle="tab" href="#directCosts">YP Direct Costs</a>
                                         </li>
                                     </ul>
-                                </header>
+                                </header> -->
                                 <div class="panel-body">
                                     <div class="tab-content">
                                         <div id="companyOverheads" class="tab-pane active">

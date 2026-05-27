@@ -3,11 +3,14 @@ namespace App\Http\Controllers\backEnd\superAdmin;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Session; 
+use Illuminate\Support\Facades\Session;
 use App\Admin, App\CompanyPaymentInformation, App\CompanyPayment; 
-use DB; 
 use Hash;
+use App\Models\CompanyHomeSetting;
+use App\Models\CompanyHomeArea;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class AdminController extends Controller
 {
@@ -58,169 +61,575 @@ class AdminController extends Controller
 
        	return view('backEnd/superAdmin/admin/admins', compact('page','limit','system_admins','search','del_status')); //users.blade.php
     }
-
+    
     public function add(Request $request)
-    { 
-      	if($request->isMethod('post'))
-    	{
-            $admin = Session::get('scitsAdminSession');
-            // $home_id = $admin->home_id; 
-            $address = $request->address;
-            $apiKey = 'AIzaSyAMCKKwljh4nvmKVhFHngldmyw7At9rndg'; // Google maps now requires an API key.
-            // Get JSON results from this request
-            $geo = file_get_contents('https://maps.googleapis.com/maps/api/geocode/json?address='.urlencode($address).'&sensor=false&key='.$apiKey);
-           
-            $geo = json_decode($geo, true); // Convert the JSON to an array
-            
-            if (isset($geo['status']) && ($geo['status'] == 'OK')) {
-              $latitude = $geo['results'][0]['geometry']['location']['lat']; // Latitude
-              $longitude = $geo['results'][0]['geometry']['location']['lng']; // Longitude
-            }
-            
+    {
+        Log::info('ADD FUNCTION STARTED');
 
-    	    $system_admin               = new Admin;
-            // $system_admin->home_id      = $home_id;
-            $system_admin->name         = $request->name;
-            $system_admin->user_name    = $request->user_name;
-            $system_admin->email        = $request->email;
-            $system_admin->company      = $request->company;
-            $system_admin->address      = $request->address; 
-            $system_admin->post_code    = $request->post_code; 
-            $system_admin->latitude     = $latitude; 
-            $system_admin->longitude    = $longitude; 
-            $system_admin->access_type  = 'O';
-            $system_admin->password     = '';
-            //$system_admin->password     = md5($request->password);
-                
-            if(!empty($_FILES['image']['name']))
-            {
-                $tmp_image  =   $_FILES['image']['tmp_name'];
-                $image_info =   pathinfo($_FILES['image']['name']);
-                $ext        =   strtolower($image_info['extension']);
-                $new_name   =   time().'.'.$ext; 
-               
-                if($ext == 'jpg' || $ext == 'jpeg' || $ext == 'png')
-                {
-                    $destination = base_path().adminbasePath; 
-                  
-                    if(move_uploaded_file($tmp_image, $destination.'/'.$new_name))
-                    {
-                        $system_admin->image = $new_name;
+        if ($request->isMethod('post')) {
+
+            DB::beginTransaction();
+            Log::info('Request Data:', $request->all());
+
+            try {
+
+                // =========================
+                // 1. VALIDATION
+                // =========================
+                Log::info('Step 1: Validation started');
+
+                $request->validate([
+                    'name'      => 'required',
+                    'user_name' => 'required|unique:admin,user_name|unique:user,user_name',
+                    'email'     => 'required|email',
+                    'post_code' => 'required',
+                ]);
+
+                Log::info('Step 1: Validation passed');
+
+                // =========================
+                // 2. GET LAT/LONG
+                // =========================
+                Log::info('Step 2: Geocoding started');
+
+                $latitude = null;
+                $longitude = null;
+
+                if (!empty($request->address)) {
+
+                    Log::info('Address found:', ['address' => $request->address]);
+
+                    $apiKey = config('services.google.map_api_key') ?? env('GOOGLE_MAP_API_KEY') ?? 'AIzaSyBQhN-xkQiUIQ9toO-KRdb9wqtc_cGbAqo';
+
+                    $url = 'https://maps.googleapis.com/maps/api/geocode/json?address=' .
+                        urlencode($request->address) . '&key=' . $apiKey;
+
+                    Log::info('Geocode URL:', ['url' => $url]);
+
+                    $geo = @file_get_contents($url);
+
+                    if ($geo) {
+                        $geo = json_decode($geo, true);
+
+                        Log::info('Geocode Response:', $geo);
+
+                        if (isset($geo['status']) && $geo['status'] == 'OK') {
+                            $latitude  = $geo['results'][0]['geometry']['location']['lat'];
+                            $longitude = $geo['results'][0]['geometry']['location']['lng'];
+
+                            Log::info('Lat/Lng Found:', [
+                                'lat' => $latitude,
+                                'lng' => $longitude
+                            ]);
+                        } else {
+                            Log::warning('Geocode failed:', $geo);
+                        }
+                    } else {
+                        Log::error('Geocode API call failed');
                     }
                 }
-            }
-            if(!isset($system_admin->image)) {
-                $system_admin->image = '';
-            }
 
-    		if($system_admin->save())
-                {
-        			return redirect('admin/system-admins')->with('success', 'System Admin added successfully.');
-        		} 
-            else
-                {
-        			 return redirect()->back()->with('error', 'Some error occurred. Please try after sometime.');
-        		}
-    	}
+                // =========================
+                // 3. SAVE ADMIN
+                // =========================
+                Log::info('Step 3: Saving Admin');
+
+                $system_admin = new Admin();
+
+                $system_admin->name       = $request->name;
+                $system_admin->user_name  = $request->user_name;
+                $system_admin->email      = $request->email;
+                $system_admin->company    = $request->company;
+                $system_admin->address    = $request->address;
+                $system_admin->post_code  = $request->post_code;
+                $system_admin->latitude   = $latitude;
+                $system_admin->longitude  = $longitude;
+                $system_admin->access_type = 'O';
+                $system_admin->password   = '';
+
+                // =========================
+                // 4. IMAGE UPLOAD
+                // =========================
+                Log::info('Step 4: Image Upload Check');
+
+                if ($request->hasFile('image')) {
+
+                    $file = $request->file('image');
+                    $ext  = strtolower($file->getClientOriginalExtension());
+
+                    Log::info('Image detected:', ['ext' => $ext]);
+
+                    if (in_array($ext, ['jpg', 'jpeg', 'png'])) {
+
+                        $name = time() . '.' . $ext;
+                        $path = base_path() . adminbasePath;
+
+                        Log::info('Uploading image to:', ['path' => $path]);
+
+                        $file->move($path, $name);
+
+                        $system_admin->image = $name;
+
+                        Log::info('Image uploaded:', ['name' => $name]);
+                    } else {
+                        Log::warning('Invalid image extension');
+                    }
+                } else {
+                    Log::info('No image uploaded');
+                    $system_admin->image = '';
+                }
+
+                $system_admin->save();
+
+                Log::info('Admin saved successfully:', ['id' => $system_admin->id]);
+
+                // Create a default home for the admin
+                $home = new \App\Home();
+                $home->admin_id = $system_admin->id;
+                $home->title = $system_admin->company ? ($system_admin->company . ' Home') : ($system_admin->name . ' Home');
+                $home->address = $request->home_address ?? ($system_admin->address ?? '');
+                $home->home_area = $request->clock_in_range ?? '';
+                $home->latitude = $latitude;
+                $home->longitude = $longitude;
+                $home->place_id = '';
+                $home->is_home_area = $request->is_home_area ?? 0;
+                $home->weekly_allowance_service_users = $request->weekly_allowance_service_users;
+                $home->monthly_allowance_service_users = $request->monthly_allowance_service_users;
+                $home->image = '';
+                $home->is_deleted = '0';
+                $home->save();
+
+                // Save default home areas
+                if ($request->is_home_area == 1 && !empty($request->home_area_names)) {
+                    foreach ($request->home_area_names as $area_name) {
+                        if (!empty(trim($area_name))) {
+                            \App\Models\HomeArea::create([
+                                'home_id' => $home->id,
+                                'name'    => $area_name,
+                                'is_deleted' => 0
+                            ]);
+                        }
+                    }
+                }
+
+                // Create a corresponding user in user table
+                $user = new \App\User();
+                $user->home_id = $home->id;
+                $user->holiday_entitlement = '';
+                $user->description = '';
+                $user->job_title = '';
+                $user->name = $request->name;
+                $user->user_name = $request->user_name;
+                $user->email = $request->email;
+                $user->password = '';
+                $user->user_type = 'O';
+                $user->admn_id = $system_admin->id;
+                $user->status = 1;
+                $user->is_deleted = '0';
+                $user->image = $system_admin->image;
+                $user->save();
+
+                Log::info('User saved successfully in user table:', ['id' => $user->id]);
+
+                // =========================
+                // 5. COMPANY SETTINGS
+                // =========================
+                Log::info('Step 5: Saving Company Settings');
+
+                CompanyHomeSetting::create([
+                    'company_id'                      => $system_admin->id,
+                    'address'                         => $request->home_address,
+                    'is_home_area'                    => $request->is_home_area ?? 0,
+                    'weekly_allowance_service_users'  => $request->weekly_allowance_service_users,
+                    'monthly_allowance_service_users' => $request->monthly_allowance_service_users,
+                    'clock_in_range'                  => $request->clock_in_range,
+                    'staff_term'                      => $request->staff_term ?? 'Staff',
+                    'service_user_term'               => $request->service_user_term ?? 'Service User',
+                ]);
+                
+                // Clear terminology cache for this company
+                \Illuminate\Support\Facades\Cache::forget('terminology_' . $system_admin->id . '_staff_term');
+                \Illuminate\Support\Facades\Cache::forget('terminology_' . $system_admin->id . '_service_user_term');
+
+                Log::info('Company settings saved');
+
+                // =========================
+                // 6. COMPANY AREAS
+                // =========================
+                Log::info('Step 6: Saving Company Areas');
+
+                if ($request->is_home_area == 1 && !empty($request->home_area_names)) {
+
+                    foreach ($request->home_area_names as $area) {
+
+                        if (!empty(trim($area))) {
+
+                            CompanyHomeArea::create([
+                                'company_id' => $system_admin->id,
+                                'area_name'  => $area,
+                            ]);
+
+                            Log::info('Area saved:', ['area' => $area]);
+                        }
+                    }
+                } else {
+                    Log::info('No areas to save');
+                }
+
+                DB::commit();
+                Log::info('Transaction committed successfully');
+
+                return redirect('admin/system-admins')
+                    ->with('success', 'System Admin added successfully.');
+            } catch (\Illuminate\Validation\ValidationException $e) {
+                DB::rollback();
+                throw $e;
+            } catch (\Exception $e) {
+
+                DB::rollback();
+
+                Log::error('ERROR OCCURRED:', [
+                    'message' => $e->getMessage(),
+                    'line'    => $e->getLine(),
+                    'file'    => $e->getFile(),
+                ]);
+
+                return redirect()->back()
+                    ->with('error', $e->getMessage());
+            }
+        }
+
+        Log::info('Loading form view');
+
         $page = 'system-admins';
         return view('backEnd/superAdmin/admin/admin_form', compact('page'));
     }
    			
-   	public function edit(Request $request, $system_admin_id) {       
+   	// public function edit(Request $request, $system_admin_id) {       
         
-        $del_status = '0';
-        if($request->del_status) { //for achive users
-            $del_status = $request->del_status;
-        }
+    //     $del_status = '0';
+    //     if($request->del_status) { //for achive users
+    //         $del_status = $request->del_status;
+    //     }
 
-        if(!Session::has('scitsAdminSession'))
-        {   
+    //     if(!Session::has('scitsAdminSession'))
+    //     {   
+    //         return redirect('admin/login');
+    //     }
+    //     if($request->isMethod('post'))
+    //     {
+    //         $address = $request->address;
+    //         // $apiKey = 'AIzaSyCPmAAbKW3OvAqDoEXdetwiP6X0TF7CJL4'; // Google maps now requires an API key. 
+    //         // $apiKey = 'AIzaSyAMCKKwljh4nvmKVhFHngldmyw7At9rndg'; // Google maps now requires an API key. 
+    //          $apiKey = 'AIzaSyBxoFiKEhpV_lzf-i17vjFb9hZZwHSkZGI';
+    //         // Get JSON results from this request
+    //         $geo = file_get_contents('https://maps.googleapis.com/maps/api/geocode/json?address='.urlencode($address).'&sensor=false&key='.$apiKey);
+    //         $geo = json_decode($geo, true); // Convert the JSON to an array
+            
+    //         if (isset($geo['status']) && ($geo['status'] == 'OK')) {
+    //           $latitude = $geo['results'][0]['geometry']['location']['lat']; // Latitude
+    //           $longitude = $geo['results'][0]['geometry']['location']['lng']; // Longitude
+    //         }
+    //         $system_admin               = Admin::find($system_admin_id);
+    //         // $system_admin->home_id      = $home_id;
+    //         $admin_old_image            = $system_admin->image;
+    //         $system_admin->name         = $request->name;
+    //         $system_admin->user_name    = $request->user_name;
+    //         $system_admin->email        = $request->email;
+    //         $system_admin->company      = $request->company;
+    //         $system_admin->address      = $request->address; 
+    //         $system_admin->post_code    = $request->post_code; 
+    //         $system_admin->latitude     = $latitude; 
+    //         // $system_admin->latitude     = "53.4084"; 
+    //         $system_admin->longitude    = $longitude; 
+    //         // $system_admin->longitude    =   "2.9916"; 
+    //         //$system_admin->password     = $request->password;
+    //         // if(!empty($request->password)){
+    //         //     $system_admin->password = md5($request->password);
+    //         // }
+    //         if(!empty($_FILES['image']['name']))
+    //         {
+    //             $tmp_image  =   $_FILES['image']['tmp_name'];
+    //             $image_info =   pathinfo($_FILES['image']['name']);
+    //             $ext        =   strtolower($image_info['extension']);
+    //             $new_name   =   time().'.'.$ext; 
+               
+    //             if($ext == 'jpg' || $ext == 'jpeg' || $ext == 'png')
+
+    //             {
+    //                 $destination = base_path().adminbasePath; 
+                  
+    //                 if(move_uploaded_file($tmp_image, $destination.'/'.$new_name))
+    //                 {
+    //                     if(!empty($admin_old_image)){
+    //                         if(file_exists($destination.'/'.$admin_old_image))
+    //                         {
+    //                             unlink($destination.'/'.$admin_old_image);
+    //                         }
+    //                     }
+    //                         $system_admin->image = $new_name;
+    //                     //echo "okk";
+
+    //                 //     $system_admin->image = $new_name;
+    //                 //     echo "<pre>";
+    //                 //     print_r($system_admin->image);
+    //                 //     die;
+    //                 // }
+    //                 // else{
+    //                 //     echo "noo";
+    //                 // }
+    //                 // die;
+    //                 }
+    //             }
+    //         }
+            
+    //         if(!isset($system_admin->image)) {
+    //             $system_admin->image = '';
+    //         }
+
+    //         if($system_admin->save())
+    //         {
+    //           return redirect('admin/system-admins')->with('success','System Admin Updated successfully.'); 
+    //         } 
+    //         else
+    //         {
+    //           return redirect()->back()->with('error','System Admin could not be Updated.'); 
+    //         }  
+    //     }
+
+    //   	$system_admins = DB::table('admin')
+    //                         ->where('id', $system_admin_id)
+    //                         ->where('is_deleted', $del_status)
+    //                         ->first();
+    //     $page = 'system-admins';
+    //     return view('backEnd/superAdmin/admin/admin_form', compact('system_admins','page','del_status'));
+    // }
+    
+    public function edit(Request $request, $system_admin_id)
+    {
+        $del_status = $request->del_status ?? '0';
+
+        if (!Session::has('scitsAdminSession')) {
             return redirect('admin/login');
         }
-        if($request->isMethod('post'))
-        {
-            $address = $request->address;
-            $apiKey = 'AIzaSyCPmAAbKW3OvAqDoEXdetwiP6X0TF7CJL4'; // Google maps now requires an API key. 
-            // $apiKey = 'AIzaSyAMCKKwljh4nvmKVhFHngldmyw7At9rndg'; // Google maps now requires an API key. 
-            // Get JSON results from this request
-            $geo = file_get_contents('https://maps.googleapis.com/maps/api/geocode/json?address='.urlencode($address).'&sensor=false&key='.$apiKey);
-            $geo = json_decode($geo, true); // Convert the JSON to an array
-            
-            if (isset($geo['status']) && ($geo['status'] == 'OK')) {
-              $latitude = $geo['results'][0]['geometry']['location']['lat']; // Latitude
-              $longitude = $geo['results'][0]['geometry']['location']['lng']; // Longitude
-            }
-            $system_admin               = Admin::find($system_admin_id);
-            // $system_admin->home_id      = $home_id;
-            $admin_old_image            = $system_admin->image;
-            $system_admin->name         = $request->name;
-            $system_admin->user_name    = $request->user_name;
-            $system_admin->email        = $request->email;
-            $system_admin->company      = $request->company;
-            $system_admin->address      = $request->address; 
-            $system_admin->post_code    = $request->post_code; 
-            $system_admin->latitude     = $latitude; 
-            $system_admin->longitude    = $longitude; 
-            //$system_admin->password     = $request->password;
-            // if(!empty($request->password)){
-            //     $system_admin->password = md5($request->password);
-            // }
-            if(!empty($_FILES['image']['name']))
-            {
-                $tmp_image  =   $_FILES['image']['tmp_name'];
-                $image_info =   pathinfo($_FILES['image']['name']);
-                $ext        =   strtolower($image_info['extension']);
-                $new_name   =   time().'.'.$ext; 
-               
-                if($ext == 'jpg' || $ext == 'jpeg' || $ext == 'png')
 
-                {
-                    $destination = base_path().adminbasePath; 
-                  
-                    if(move_uploaded_file($tmp_image, $destination.'/'.$new_name))
-                    {
-                        if(!empty($admin_old_image)){
-                            if(file_exists($destination.'/'.$admin_old_image))
-                            {
-                                unlink($destination.'/'.$admin_old_image);
-                            }
+        // =========================
+        // POST (UPDATE)
+        // =========================
+        if ($request->isMethod('post')) {
+            Log::info('EDIT POST STARTED', ['id' => $system_admin_id]);
+            Log::info('Request Data:', $request->all());
+
+            DB::beginTransaction();
+
+            try {
+
+                // =========================
+                // 1. VALIDATION
+                // =========================
+                $request->validate([
+                    'name'  => 'required',
+                    'email' => 'required|email',
+                ]);
+                Log::info('Validation passed');
+
+                // =========================
+                // 2. GET LAT/LONG
+                // =========================
+                $latitude = null;
+                $longitude = null;
+
+                if (!empty($request->address)) {
+                    $apiKey = config('services.google.map_api_key') ?? env('GOOGLE_MAP_API_KEY') ?? 'AIzaSyBQhN-xkQiUIQ9toO-KRdb9wqtc_cGbAqo';
+
+                    $geo = @file_get_contents(
+                        'https://maps.googleapis.com/maps/api/geocode/json?address=' .
+                            urlencode($request->address) . '&key=' . $apiKey
+                    );
+
+                    if ($geo) {
+                        $geo = json_decode($geo, true);
+
+                        if (isset($geo['status']) && $geo['status'] == 'OK') {
+                            $latitude  = $geo['results'][0]['geometry']['location']['lat'];
+                            $longitude = $geo['results'][0]['geometry']['location']['lng'];
                         }
-                            $system_admin->image = $new_name;
-                        //echo "okk";
-
-                    //     $system_admin->image = $new_name;
-                    //     echo "<pre>";
-                    //     print_r($system_admin->image);
-                    //     die;
-                    // }
-                    // else{
-                    //     echo "noo";
-                    // }
-                    // die;
                     }
                 }
-            }
-            
-            if(!isset($system_admin->image)) {
-                $system_admin->image = '';
-            }
 
-            if($system_admin->save())
-            {
-               return redirect('admin/system-admins')->with('success','System Admin Updated successfully.'); 
-            } 
-            else
-            {
-               return redirect()->back()->with('error','System Admin could not be Updated.'); 
-            }  
+                // =========================
+                // 3. UPDATE ADMIN
+                // =========================
+                $system_admin = Admin::findOrFail($system_admin_id);
+
+                $old_image = $system_admin->image;
+
+                $system_admin->name      = $request->name;
+                $system_admin->email     = $request->email;
+                $system_admin->company   = $request->company;
+                $system_admin->address   = $request->address;
+                $system_admin->post_code = $request->post_code;
+
+                // Only update username if needed
+                if (!empty($request->user_name)) {
+                    $system_admin->user_name = $request->user_name;
+                }
+
+                // Update lat/long if available
+                if ($latitude && $longitude) {
+                    $system_admin->latitude  = $latitude;
+                    $system_admin->longitude = $longitude;
+                }
+
+                // =========================
+                // 4. IMAGE UPDATE
+                // =========================
+                if ($request->hasFile('image')) {
+
+                    $file = $request->file('image');
+                    $ext  = strtolower($file->getClientOriginalExtension());
+
+                    if (in_array($ext, ['jpg', 'jpeg', 'png'])) {
+
+                        $name = time() . '.' . $ext;
+                        $destination = base_path() . adminbasePath;
+
+                        $file->move($destination, $name);
+
+                        // delete old image
+                        if (!empty($old_image) && file_exists($destination . '/' . $old_image)) {
+                            unlink($destination . '/' . $old_image);
+                        }
+
+                        $system_admin->image = $name;
+                    }
+                }
+
+                $system_admin->save();
+
+                // Update corresponding user in user table
+                \App\User::updateOrCreate(
+                    ['admn_id' => $system_admin_id, 'user_type' => 'O'],
+                    [
+                        'name'      => $request->name,
+                        'user_name' => $request->user_name,
+                        'email'     => $request->email,
+                        'image'     => $system_admin->image,
+                        'is_deleted'=> '0'
+                    ]
+                );
+
+                // =========================
+                // 5. UPDATE COMPANY SETTINGS
+                // =========================
+                CompanyHomeSetting::updateOrCreate(
+                    ['company_id' => $system_admin->id],
+                    [
+                        'address'                         => $request->home_address,
+                        'is_home_area'                    => $request->is_home_area ?? 0,
+                        'weekly_allowance_service_users'  => $request->weekly_allowance_service_users,
+                        'monthly_allowance_service_users' => $request->monthly_allowance_service_users,
+                        'clock_in_range'                  => $request->clock_in_range,
+                        'staff_term'                      => $request->staff_term ?? 'Staff',
+                        'service_user_term'               => $request->service_user_term ?? 'Service User',
+                    ]
+                );
+
+                // Update corresponding default home if it exists
+                $home = \App\Home::where('admin_id', $system_admin->id)->first();
+                if ($home) {
+                    $home->title = $system_admin->company ? ($system_admin->company . ' Home') : ($system_admin->name . ' Home');
+                    $home->address = $request->home_address ?? ($system_admin->address ?? '');
+                    $home->home_area = $request->clock_in_range ?? '';
+                    $home->is_home_area = $request->is_home_area ?? 0;
+                    $home->weekly_allowance_service_users = $request->weekly_allowance_service_users;
+                    $home->monthly_allowance_service_users = $request->monthly_allowance_service_users;
+                    $home->save();
+
+                    // Update corresponding default home areas
+                    \App\Models\HomeArea::where('home_id', $home->id)->update(['is_deleted' => 1]);
+                    if ($request->is_home_area == 1 && !empty($request->home_area_names)) {
+                        foreach ($request->home_area_names as $area_name) {
+                            if (!empty(trim($area_name))) {
+                                \App\Models\HomeArea::create([
+                                    'home_id' => $home->id,
+                                    'name'    => $area_name,
+                                    'is_deleted' => 0
+                                ]);
+                            }
+                        }
+                    }
+                }
+                
+                // Clear terminology cache for this company
+                \Illuminate\Support\Facades\Cache::forget('terminology_' . $system_admin->id . '_staff_term');
+                \Illuminate\Support\Facades\Cache::forget('terminology_' . $system_admin->id . '_service_user_term');
+                
+                Log::info('Company settings updated');
+
+                // =========================
+                // 6. UPDATE COMPANY AREAS
+                // =========================
+                CompanyHomeArea::where('company_id', $system_admin->id)->forceDelete();
+                Log::info('Old home areas force deleted');
+
+                if ($request->is_home_area == 1 && !empty($request->home_area_names)) {
+                    Log::info('Saving new home areas', ['count' => count($request->home_area_names)]);
+
+                    foreach ($request->home_area_names as $area) {
+
+                        if (!empty(trim($area))) {
+
+                            CompanyHomeArea::create([
+                                'company_id' => $system_admin->id,
+                                'area_name'  => $area,
+                            ]);
+                            Log::info('Area saved in Edit:', ['area' => $area]);
+                        }
+                    }
+                }
+
+                DB::commit();
+
+                return redirect('admin/system-admins')
+                    ->with('success', 'System Admin Updated successfully.');
+            } catch (\Illuminate\Validation\ValidationException $e) {
+                DB::rollback();
+                throw $e;
+            } catch (\Exception $e) {
+
+                DB::rollback();
+                Log::error('EDIT FAILED', [
+                    'message' => $e->getMessage(),
+                    'line'    => $e->getLine()
+                ]);
+
+                return redirect()->back()
+                    ->with('error', $e->getMessage());
+            }
         }
 
-       	$system_admins = DB::table('admin')
-                            ->where('id', $system_admin_id)
-                            ->where('is_deleted', $del_status)
-                            ->first();
+        // =========================
+        // GET (EDIT FORM LOAD)
+        // =========================
+        $system_admins = DB::table('admin')
+            ->where('id', $system_admin_id)
+            ->where('is_deleted', $del_status)
+            ->first();
+
+        // 🔥 VERY IMPORTANT: Load settings & areas
+        $system_admin_home = CompanyHomeSetting::where('company_id', $system_admin_id)->first();
+        $home_areas = CompanyHomeArea::where('company_id', $system_admin_id)->get();
+
         $page = 'system-admins';
-        return view('backEnd/superAdmin/admin/admin_form', compact('system_admins','page','del_status'));
+
+        return view('backEnd/superAdmin/admin/admin_form', compact(
+            'system_admins',
+            'page',
+            'del_status',
+            'system_admin_home',
+            'home_areas'
+        ));
     }
 
     public function delete($system_admin_id)
@@ -241,6 +650,7 @@ class AdminController extends Controller
             $updated = DB::table('admin')->where('id', $system_admin_id)->update(['is_deleted' => '1']);
 
             if($updated){
+                DB::table('user')->where('admn_id', $system_admin_id)->where('user_type', 'O')->update(['is_deleted' => '1']);
                 return redirect('admin/system-admins')->with('success','System Admin deleted Successfully.'); 
             } else{
                 return redirect('admin/system-admins')->with('error','System Admin could not be deleted.'); 
@@ -331,6 +741,11 @@ class AdminController extends Controller
         $admin->password =   md5($data['password']);
         
         if($admin->save())  {   
+            // Update in user table too
+            \App\User::where('user_name', $admin->user_name)->update([
+                'password' => \Hash::make($data['password'])
+            ]);
+
             //logging out any previous loggedin admin
             Session::forget('scitsAdminSession');
             return redirect('admin/login')->with('success','You have set your password successfully.');
@@ -374,19 +789,19 @@ class AdminController extends Controller
                                                     ->orderBy('company_payment_information.id','desc')
                                                     ->first();
                                                     // echo "<pre>"; print_r($package_detail); die;
-        if(!empty($package_detail)){
+        if (empty($package_detail)) {
+            return redirect()->back()->with('error', 'No package selected');
+        }
 
-            $home_range = explode('-', $package_detail->home_range);
-            $last_range = $home_range[1];
-            if($package_detail->paid_amount != '0'){
+        $home_range   = explode('-', $package_detail->home_range ?? '');
+        $last_range   = $home_range[1] ?? ''; // safely get 2nd part or fallback to ''
 
-                $amount = explode('%2e', $package_detail->paid_amount);
-                $paid_amount = $amount[0].'.'.$amount[1];
-            }
-        }else{
-            return redirect()->back()->with('error','No package selected');
-            $last_range = '';
-            $paid_amount = '';
+        if (!empty($package_detail->paid_amount) && $package_detail->paid_amount !== '0') {
+            // decode paid_amount safely
+            $amount_parts = explode('%2e', $package_detail->paid_amount);
+            $paid_amount  = $amount_parts[0] . '.' . ($amount_parts[1] ?? '0');
+        } else {
+            $paid_amount = $package_detail->paid_amount ?? '0';
         }
 
         if($request->isMethod('post')){

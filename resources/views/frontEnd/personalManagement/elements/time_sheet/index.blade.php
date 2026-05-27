@@ -26,7 +26,7 @@
                                     <div class="jobsection justify-content-end">
                                         <div>
                                             <select name="" class="form-control editInput selectOptions" id="getDataOnUsers">
-                                                <option value="0">Please Select</option>
+                                                <option selected disabled>Please Select</option>
                                                 @foreach($users as $user)
                                                 <option value="{{ $user->id }}">{{ $user->name }}</option>
                                                 @endforeach
@@ -43,12 +43,9 @@
                                             <th>#</th>
                                             <th>User</th>
                                             <th>Date</th>
-                                            <th>Hours</th>
-                                            <th>Sleep</th>
-                                            <th>Wake Night </th>
-                                            <th>DIsturbance </th>
-                                            <th>Annual Leave</th>
-                                            <th>On Call</th>
+                                            <th>Total Shift Hours</th>
+                                            <th>Category Type</th>
+                                            <th>Extra Hours</th>
                                             <th>Comments </th>
                                             <th>Action</th>
                                         </tr>
@@ -56,11 +53,8 @@
                                         <tr>
                                             <th colspan="3" style="text-align:right">Total:</th>
                                             <th></th> <!-- Hours total -->
-                                            <th></th> <!-- Sleep total -->
-                                            <th></th> <!-- Wake Night total -->
-                                            <th></th> <!-- Disturbance total -->
-                                            <th></th> <!-- Annual Leave total -->
-                                            <th></th> <!-- On Call total -->
+                                            <th></th>
+                                            <th></th>
                                             <th></th>
                                             <th></th>
                                         </tr>
@@ -96,7 +90,7 @@
                                 <div class="col-md-6 form-group">
                                     <input type="hidden" id="time_sheet_id" name="time_sheet_id">
                                     <label> User <span class="radStar">*</span> </label>
-                                    <select name="user_id" id="user_id" class="form-control editInput">
+                                    <select name="user_id" id="user_id" class="form-control editInput checkInput">
                                         @foreach($users as $user)
                                         <option value="{{ $user->id }}">{{ $user->name }}</option>
                                         @endforeach
@@ -104,35 +98,26 @@
                                 </div>
                                 <div class="col-md-6 form-group">
                                     <label> Date <span class="radStar">*</span></label>
-                                    <input type="text" class="form-control editInput" id="timeSheetDt" name="date">
+                                    <input type="text" class="form-control editInput checkInput" id="timeSheetDt" name="date">
                                 </div>
                                 <div class="col-md-6 form-group">
                                     <label> Hours </label>
-                                    <input type="text" class="form-control editInput" id="hours" name="hours">
+                                    <input type="text" class="form-control editInput checkInput" id="hours" name="hours">
                                 </div>
                                 <div class="col-md-6 form-group">
-                                    <label> Sleep </label>
-                                    <input type="text" class="form-control editInput" id="sleep" name="sleep">
-                                </div>
-                                <div class="col-md-6 form-group">
-                                    <label> Wake Night </label>
-                                    <input type="text" class="form-control editInput" id="wake_night" name="wake_night">
-                                </div>
-                                <div class="col-md-6 form-group">
-                                    <label> Disturbance </label>
-                                    <input type="text" class="form-control editInput" id="disturbance" name="disturbance">
-                                </div>
-                                <div class="col-md-6 form-group">
-                                    <label> Annual Leave </label>
-                                    <input type="text" class="form-control editInput" id="annual_leave" name="annual_leave">
-                                </div>
-                                <div class="col-md-6 form-group">
-                                    <label> On Call </label>
-                                    <input type="text" class="form-control editInput" id="on_call" name="on_call">
+                                    <label class="mb-2 col-form-label">Category <span class="radStar">*</span></label>
+                                    <select class="form-control editInput selectOptions checkInput" id="category_id" name="category_id">
+                                        <option selected="" disabled="">Select Category</option>
+                                        <option value="1">Sleep</option>
+                                        <option value="2">Disturbance</option>
+                                        <option value="3">Wake Night</option>
+                                        <option value="4">Annual Leave</option>
+                                        <option value="5">On Call</option>
+                                    </select>
                                 </div>
                                 <div class="col-md-12 form-group">
                                     <label> Comments <span class="radStar">*</span></label>
-                                    <textarea class="form-control textareaInput" placeholder="Type your comments..." rows="3" id="comments" name="comments"></textarea>
+                                    <textarea class="form-control textareaInput checkInput" placeholder="Type your comments..." rows="3" id="comments" name="comments"></textarea>
                                 </div>
                             </div>
                         </div>

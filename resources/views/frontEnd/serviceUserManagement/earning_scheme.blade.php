@@ -318,13 +318,6 @@
 @include('frontEnd.serviceUserManagement.elements.earning_history')
 @include('frontEnd.serviceUserManagement.elements.earning_target')
 @include('frontEnd.serviceUserManagement.elements.earning_incentive_suspend')
-@include('frontEnd.serviceUserManagement.elements.daily_record') 
-@include('frontEnd.serviceUserManagement.elements.living_skill')  
-@include('frontEnd.serviceUserManagement.elements.education_record')  
-@include('frontEnd.serviceUserManagement.elements.mfc') 
-@include('frontEnd.serviceUserManagement.elements.bmp-rmp')
-@include('frontEnd.serviceUserManagement.elements.rmp')
-@include('frontEnd.serviceUserManagement.elements.bmp')
 <!-- include('frontEnd.serviceUserManagement.elements.earning_today_record') -->
 
 <script src="{{ url('public/frontEnd/js/skycons.js') }}"></script>

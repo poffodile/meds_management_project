@@ -21,7 +21,14 @@ class DynamicFormController extends Controller
         $form_builder_id = $request->form_builder_id;
         $service_user_id = $request->service_user_id;
         $form = DynamicForm::showForm($form_builder_id, $service_user_id);
-        //   	dd($form);
+        return $form;
+    }
+
+       public function view_form_pattern_log(Request $request)
+    {
+        $form_builder_id = $request->form_builder_id;
+        $service_user_id = $request->service_user_id;
+        $form = DynamicForm::showFormLog($form_builder_id, $service_user_id);
         return $form;
     }
 
@@ -31,19 +38,15 @@ class DynamicFormController extends Controller
         $data = $request->input();
 
         if (!empty($data)) {
-            // dd($request);
             $home_ids = Auth::user()->home_id;
             $ex_home_ids = explode(',', $home_ids);
             $home_id = $ex_home_ids[0];
             $form_insert_id = DynamicForm::saveForm($data);
-            // dd($form_insert_id);
-            // echo "dfdf"; die;
 
             if ($form_insert_id != 0) {
 
                 //if this dynamic form is mfc form then manage earning points
                 $location_ids = DynamicFormBuilder::where('id', $data['dynamic_form_builder_id'])->value('location_ids');
-                // dd($location_ids);
                 $location_ids_arr = explode(',', $location_ids);
                 if (in_array('5', $location_ids_arr)) {
                     EarningScheme::updateEarning($data['service_user_id']);
@@ -51,7 +54,6 @@ class DynamicFormController extends Controller
                 //update earning scheme in case of mfc form ends here
                 //sourabh log insert
                 $logtype = DynamicFormBuilder::where('id', $data['dynamic_form_builder_id'])->value('logtype');
-                // dd($logtype); 
 
                 $logtype_arr = explode(',', $logtype);
 
@@ -66,6 +68,8 @@ class DynamicFormController extends Controller
                 $currentDate = Carbon::now()->format('Y-m-d');
 
                 foreach ($logtype_arr as $val) {
+
+
                     switch ($val) {
                         case 1:
                             //Daily record
@@ -75,8 +79,7 @@ class DynamicFormController extends Controller
                                 'category_id' => 3,
                                 'category_name' => 'Visitor',
                                 'category_icon' => 'fa fa-users',
-                                'date' => date('Y-m-d H:i:s', strtotime($data['date'])),
-                                'formdata' => json_encode($data['data']),
+                                'date' => date('Y-m-d H:i:s', strtotime($data['date'] . ' ' . $data['time'])),
                                 'details' => $data['details'],
                                 'start_date' => $currentDate,
                                 'home_id' => $home_id,
@@ -108,7 +111,7 @@ class DynamicFormController extends Controller
 
                         case 2:
                             // Weekly Log
-                          
+
                             // Date after 1 week
                             $nextWeek = Carbon::now()->addWeek()->format('Y-m-d');
 
@@ -118,10 +121,9 @@ class DynamicFormController extends Controller
                                 'category_id' => 3,
                                 'category_name' => 'Visitor',
                                 'category_icon' => 'fa fa-users',
-                                'date' => date('Y-m-d H:i:s', strtotime($data['date'])),
+                                'date' => date('Y-m-d H:i:s', strtotime($data['date'] . ' ' . $data['time'])),
                                 'start_date' => $currentDate,
                                 'end_date' => $nextWeek,
-                                'formdata' => json_encode($data['data']),
                                 'details' => $data['details'],
                                 'dynamic_form_id' => $form_insert_id,
                                 'home_id' => $home_id,
@@ -162,10 +164,9 @@ class DynamicFormController extends Controller
                                 'category_id' => 3,
                                 'category_name' => 'Visitor',
                                 'category_icon' => 'fa fa-users',
-                                'date' => date('Y-m-d H:i:s', strtotime($data['date'])),
+                                'date' => date('Y-m-d H:i:s', strtotime($data['date'] . ' ' . $data['time'])),
                                 'start_date' => $currentDate,
                                 'end_date' => $nextMonth,
-                                'formdata' => json_encode($data['data']),
                                 'details' => $data['details'],
                                 'home_id' => $home_id,
                                 'user_id' => Auth::user()->id,
@@ -205,6 +206,7 @@ class DynamicFormController extends Controller
                                 'title' => $data['title'],
                                 'status' => 1,
                                 'details' => $data['details'],
+                                'dynamic_form_id' => $form_insert_id,
                                 'formdata' => json_encode($data['data']),
                                 'is_deleted' => 0,
                                 'created_at' => date('Y-m-d H:i:s'),
@@ -277,6 +279,7 @@ class DynamicFormController extends Controller
                             //Behaviour Management
                             $insert_behaviour_managment = array(
                                 'service_user_id' => $data['service_user_id'],
+                                'dynamic_form_id' => $form_insert_id,
                                 'title' => $data['title'],
                                 'details' => $data['details'],
                                 'sent_to' => 2,
@@ -307,9 +310,6 @@ class DynamicFormController extends Controller
                             break;
                     }
                 }
-
-
-
 
                 // foreach ($logtype_arr as $val) {
 
@@ -353,10 +353,9 @@ class DynamicFormController extends Controller
             $home_id = $ex_home_ids[0];
             // $home_id = Auth::user()->home_id;
             $dynamic_form_id = $request->dynamic_form_id;
-            $form            = DynamicForm::where('dynamic_form.id', $dynamic_form_id)->first();
+            $form = DynamicForm::where('dynamic_form.id', $dynamic_form_id)->first();
             //join('service_user as su','su.id','=','dynamic_form.service_user_id') ->where('su.home_id',$home_id)
-            // echo "<pre>";
-            //  print_r(json_encode($data['data']));
+            // echo "<pre>"; print_r(json_encode($data['data']));
             //($data['data']==null)?"hello" +die() :json_encode($data['data']);
             //  die();
 
@@ -432,44 +431,74 @@ class DynamicFormController extends Controller
         die;
     }
 
-    public function index()
+    public function index(Request $request)
     {
         $home_ids = Auth::user()->home_id;
         $ex_home_ids = explode(',', $home_ids);
         $home_id = $ex_home_ids[0];
 
         //in search case editing start for plan,details and review
-        /*if(isset($_POST)) {
+        if (isset($_POST)) {
             $data = $_POST;
-        }*/
-        //$this_location_id = DynamicFormLocation::getLocationIdByTag('bmp');
-        $dyn_record       = DynamicForm:: //where('location_id',$this_location_id)
-            //whereIn('form_builder_id',$form_bildr_ids)
-            where('home_id', $home_id)
-            ->where('is_deleted', '0')
-            ->orderBy('id', 'desc');
-
-        $pagination = '';
-        if (isset($_GET['search'])) {
-            if (!empty($_GET['search'])) {
-
-                if ($_GET['searchType'] ==  1) {
-                    $dyn_forms = $dyn_record->where('title', 'like', '%' . $_GET['search'] . '%')->get();
-                }
-                if ($_GET['searchType'] ==  2) {
-                    $search_date = date('Y-m-d', strtotime($_GET['search'])) . ' 00:00:00';
-                    $search_date_next = date('Y-m-d', strtotime('+1 day', strtotime($_GET['search']))) . ' 00:00:00';
-                    $dyn_forms = $dyn_record->where('created_at', '>', $search_date)->where('created_at', '<', $search_date_next)->get();
-                }
-            }
-        } else {
-            $dyn_forms = $dyn_record->paginate();
-            if ($dyn_forms->links() != '') {
-                $pagination .= '<div class="m-l-15 position-botm ">'; //bmp_paginate
-                $pagination .= $dyn_forms->links();
-                $pagination .= '</div>';
-            }
         }
+        //$this_location_id = DynamicFormLocation::getLocationIdByTag('bmp');
+
+        $today = Carbon::now()->format('Y-m-d');
+        $oneMonthAgo = Carbon::now()->subMonth()->format('Y-m-d');
+
+        $dyn_record  = DynamicForm:: 
+            //where('location_id',$this_location_id)
+            //whereIn('form_builder_id',$form_bildr_ids)
+            select('dynamic_form.*', 'dynamic_form_builder.title as form_title', 'dynamic_form_builder.send_to')
+            ->join('dynamic_form_builder', 'dynamic_form_builder.id', '=', 'dynamic_form.form_builder_id')
+            ->where('dynamic_form.home_id', $home_id)
+            // ->whereDate('created_at', '=', $today)
+            ->where('dynamic_form.is_deleted', '0')
+            ->orderBy('dynamic_form.id', 'desc');
+
+        // $pagination = '';
+
+        // Check if it's an AJAX filter call
+        if ($request->isMethod('post') && $request->input('filter') == 1) {
+
+            if ($request->filled('staff_member')) {
+                $dyn_record->where('user_id', $request->input('staff_member'));
+            }
+
+            if ($request->filled('service_user')) {
+                $dyn_record->where('service_user_id', $request->input('service_user'));
+            }
+
+            if ($request->filled('category_id') && $request->input('category_id') !== 'all') {
+                $dyn_record->where('category_id', $request->input('category_id'));
+            }
+
+            if ($request->filled('start_date') && $request->filled('end_date')) {
+                $start = Carbon::parse($request->input('start_date'))->startOfDay();
+                $end   = Carbon::parse($request->input('end_date'))->endOfDay();
+
+                $dyn_record->whereBetween('dynamic_form.created_at', [$start, $end]);
+            }
+
+            if ($request->filled('keyword')) {
+                $keyword = $request->input('keyword');
+                $dyn_record->where(function ($query) use ($keyword) {
+                    $query->where('title', 'like', "%{$keyword}%")
+                        ->orWhere('title', 'like', "%{$keyword}%");
+                });
+            }
+
+            $dyn_forms = $dyn_record->get(); // Get filtered data
+
+        } else {
+
+            $today = Carbon::today();
+            $dyn_record->whereDate('dynamic_form.created_at', $today);
+
+            // No filters — get paginated result
+            $dyn_forms = $dyn_record->paginate();
+        }
+
         $loop = 1;
 
         $colors = ['#8fd6d6', '#f57775', '#bda4ec', '#fed65a', '#81b56b'];
@@ -477,19 +506,13 @@ class DynamicFormController extends Controller
 
         // dd($dyn_forms);
         foreach ($dyn_forms as $key => $value) {
-            $form_title = DynamicFormBuilder::where('id', $value->form_builder_id)->value('title');
+            // $form_title = DynamicFormBuilder::where('id', $value->form_builder_id)->value('title');
 
             if ($value->date == '') {
                 $date = '';
             } else {
                 $date = date('d-m-Y', strtotime($value->date));
             }
-
-            // if ($value->created_at == '') {
-            //     $date = '';
-            // } else {
-            //     $date = \Carbon\Carbon::parse($value->created_at)->format('d-m-Y');
-            // }
 
             if ((!empty($date)) || (!empty($value->time))) {
                 $start_brct = '(';
@@ -499,7 +522,7 @@ class DynamicFormController extends Controller
                 $end_brct = '';
             }
 
-            if(!empty($value->time)){
+            if (!empty($value->time)) {
                 $time = $value->time;
             } else {
                 $time = '00:00';
@@ -510,65 +533,70 @@ class DynamicFormController extends Controller
 
             if ($loop % 2 == 0) {
 
-                echo '<div class="col-md-6 col-sm-6 col-xs-6 cog-panel rows">
-                        <div class="form-group col-md-12 col-sm-12 col-xs-12 p-0 add-rcrd">
-                        <!-- <label class="col-md-1 col-sm-1 col-xs-12 p-t-7"></label> -->
-                        <div class="col-md-12 col-sm-11 col-xs-12 r-p-0">
-                            <div class="input-group popovr rightSideInput">
+                echo ' <div class="col-md-6 col-sm-6 col-xs-6 cog-panel rows">
+                            <div class="form-group col-md-12 col-sm-12 col-xs-12 p-0 add-rcrd">
+                                <div class="col-md-12 col-sm-11 col-xs-12 r-p-0">
+                                    <div class="input-group popovr rightSideInput">
+                                        <a href="#" class="ritOrdring one dyn-form-view-data" id="' . $value->id . '">
+                                            <span>
+                                                <input type="text" class="form-control" style="cursor:pointer; background-color: ' . $color . ';" name="" readonly value="' . $value->form_title . ' - ' . $value->title . ' " maxlength="255"/>
+                                            </span>
+                                        </a>
+                                        
+                                        <span class="ritOrdring two input-group-addon cus-inpt-grp-addon clr-blue settings" style="cursor:pointer; background-color: ' . $color . ';">
+                                            <i class="fa fa-cog"></i>
+                                            <div class="pop-notifbox">
+                                                <ul class="pop-notification" type="none">
+                                                    <li> <a href="#" data-dismiss="modal" aria-hidden="true" class="dyn-form-view-data" id="' . $value->id . '"> <span> <i class="fa fa-eye"></i> </span> View/Edit</a> </li>
+                                                    <li> <a href="#" class="dyn_form_del_btn" id="' . $value->id . '"> <span class="color-red"> <i class="fa fa-exclamation-circle"></i> </span> Remove </a> </li>';
 
-                                <!-- <input type="hidden" name="su_bmp_id[]" value="' . $value->id . '" disabled="disabled" class="edit_bmp_id_' . $value->id . '"> -->
+                                                    if($value->send_to == "Y"){
+                                                          echo  '<li> <a href="#" class="dyn_form_daily_log" dyn_form_id="' . $value->id . '" logtype="1"> <span class="color-green"> <i class="fa  fa-plus-circle"></i> </span>Send to Daily Log Book (In development)</a> </li>
+                                                            <li> <a href="#" class="dyn_form_daily_log" dyn_form_id="' . $value->id . '" logtype="2"> <span class="color-green"> <i class="fa fa-plus-circle"></i> </span> Send to Weekly Log Book (In development)</a> </li>
+                                                            <li> <a href="#" class="dyn_form_daily_log" dyn_form_id="' . $value->id . '" logtype="3"> <span class="color-green"> <i class="fa fa-plus-circle"></i> </span> Send to Monthly Log Book (In development)</a> </li>';
+                                                    }
 
-                                <a href="#" class="ritOrdring one dyn-form-view-data" id="' . $value->id . '"><span>
-                                    <input type="text" class="form-control" style="cursor:pointer; background-color: ' . $color . ';" name="" readonly value="' . $form_title.' - '.$value->title . ' " maxlength="255"/></span></a>
-                                
-                                <span class="ritOrdring two input-group-addon cus-inpt-grp-addon clr-blue settings" style="cursor:pointer; background-color: ' . $color . ';">
-                                    <i class="fa fa-cog"></i>
-                                    <div class="pop-notifbox">
-                                        <ul class="pop-notification" type="none">
-                                            <li> <a href="#" data-dismiss="modal" aria-hidden="true" class="dyn-form-view-data" id="' . $value->id . '"> <span> <i class="fa fa-eye"></i> </span> View/Edit</a> </li>
-                                            <li> <a href="#" class="dyn_form_del_btn" id="' . $value->id . '"> <span class="color-red"> <i class="fa fa-exclamation-circle"></i> </span> Remove </a> </li>
-                                            <li> <a href="#" class="dyn_form_daily_log" dyn_form_id="' . $value->id . '" logtype="1"> <span class="color-green"> <i class="fa fa-plus-circle"></i> </span>Send to Daily Log Book (In development)</a> </li>
-                                            <li> <a href="#" class="dyn_form_daily_log" dyn_form_id="' . $value->id . '" logtype="2"> <span class="color-green"> <i class="fa fa-plus-circle"></i> </span> Send to Weekly Log Book (In development)</a> </li>
-                                            <li> <a href="#" class="dyn_form_daily_log" dyn_form_id="' . $value->id . '" logtype="3"> <span class="color-green"> <i class="fa fa-plus-circle"></i> </span> Send to Monthly Log Book (In development)</a> </li>
-                                        </ul>
+                                                echo '</ul>
+                                            </div>
+                                        </span>
+                                        <span class="ritOrdring three rightdate"> ' . $date . ' - ' . $time . '</span>
+                                        <span class="rightArrow"></span>
                                     </div>
-                                </span>
-                                <span class="ritOrdring three rightdate"> ' . $date . ' - '. $time .'</span>
-                                <span class="rightArrow"></span>
+                                </div>
                             </div>
-                        </div>
-                        </div>
-                    </div>  ';
+                        </div>  ';
             } else {
+                echo '  <div class="col-md-6 col-sm-6 col-xs-6 cog-panel rows">
+                            <div class="form-group col-md-12 col-sm-12 col-xs-12 p-0 add-rcrd">
+                                <div class="col-md-12 col-sm-11 col-xs-12 r-p-0">
+                                    <div class="input-group popovr timelineInput">
+                                        <a href="#" class="dyn-form-view-data" id="' . $value->id . '">
+                                            <span class="inputTextLefttoRight">
+                                                <input type="text" class="form-control" style="cursor:pointer; background-color: ' . $color . ';" name="" readonly value="' . $value->form_title . ' - ' . $value->title . '" maxlength="255"/>
+                                            </span>
+                                        </a>
+                                        <span class="timLineDate">' . $date . ' - ' . $time . ' </span>
+                                        <span class="arrow"></span>
 
-                echo '<div class="col-md-6 col-sm-6 col-xs-6 cog-panel rows">
-                        <div class="form-group col-md-12 col-sm-12 col-xs-12 p-0 add-rcrd">
-                        <!-- <label class="col-md-1 col-sm-1 col-xs-12 p-t-7"></label> -->
-                        <div class="col-md-12 col-sm-11 col-xs-12 r-p-0">
-                            <div class="input-group popovr timelineInput">
+                                        <span class="input-group-addon cus-inpt-grp-addon clr-blue settings" style="cursor:pointer; background-color: ' . $color . ';">
+                                            <i class="fa fa-cog"></i>
+                                            <div class="pop-notifbox">
+                                                <ul class="pop-notification" type="none">
+                                                    <li> <a href="#" data-dismiss="modal" aria-hidden="true" class="dyn-form-view-data" id="' . $value->id . '"> <span> <i class="fa fa-eye"></i> </span> View/Edit</a> </li>
+                                                    <li> <a href="#" class="dyn_form_del_btn" id="' . $value->id . '"> <span class="color-red"> <i class="fa fa-exclamation-circle"></i> </span> Remove </a> </li>';
 
-                               <!-- <input type="hidden" name="su_bmp_id[]" value="' . $value->id . '" disabled="disabled" class="edit_bmp_id_' . $value->id . '"> -->
-                                <a href="#" class="dyn-form-view-data" id="' . $value->id . '"><span>
-                                <input type="text" class="form-control" style="cursor:pointer; background-color: ' . $color . ';" name="" readonly value="' .$form_title.' - '.$value->title . '" maxlength="255"/></span></a>
-                                <span class="timLineDate">' . $date . ' - '. $time .'</span>
-                                <span class="arrow"></span>
-
-                                <span class="input-group-addon cus-inpt-grp-addon clr-blue settings" style="cursor:pointer; background-color: ' . $color . ';">
-                                    <i class="fa fa-cog"></i>
-                                    <div class="pop-notifbox">
-                                        <ul class="pop-notification" type="none">
-                                            <li> <a href="#" data-dismiss="modal" aria-hidden="true" class="dyn-form-view-data" id="' . $value->id . '"> <span> <i class="fa fa-eye"></i> </span> View/Edit</a> </li>
-                                            <li> <a href="#" class="dyn_form_del_btn" id="' . $value->id . '"> <span class="color-red"> <i class="fa fa-exclamation-circle"></i> </span> Remove </a> </li>
-                                            <li> <a href="#" class="dyn_form_daily_log" dyn_form_id="' . $value->id . '" logtype="1"> <span class="color-green"> <i class="fa fa-plus-circle"></i> </span>Send to Daily Log Book (In development)</a> </li>
-                                            <li> <a href="#" class="dyn_form_daily_log" dyn_form_id="' . $value->id . '" logtype="2"> <span class="color-green"> <i class="fa fa-plus-circle"></i> </span> Send to Weekly Log Book (In development)</a> </li>
-                                            <li> <a href="#" class="dyn_form_daily_log" dyn_form_id="' . $value->id . '" logtype="3"> <span class="color-green"> <i class="fa fa-plus-circle"></i> </span> Send to Monthly Log Book (In development)</a> </li>
-                                        </ul>
+                                                     if($value->send_to == "Y"){
+                                                            echo '<li> <a href="#" class="dyn_form_daily_log" dyn_form_id="' . $value->id . '" logtype="1"> <span class="color-green"> <i class="fa fa-plus-circle"></i> </span>Send to Daily Log Book (In development)</a> </li>
+                                                            <li> <a href="#" class="dyn_form_daily_log" dyn_form_id="' . $value->id . '" logtype="2"> <span class="color-green"> <i class="fa fa-plus-circle"></i> </span> Send to Weekly Log Book (In development)</a> </li>
+                                                            <li> <a href="#" class="dyn_form_daily_log" dyn_form_id="' . $value->id . '" logtype="3"> <span class="color-green"> <i class="fa fa-plus-circle"></i> </span> Send to Monthly Log Book (In development)</a> </li>';
+                                                     }
+                                                echo '</ul>
+                                            </div>
+                                        </span>
                                     </div>
-                                </span>
+                                </div>
                             </div>
-                        </div>
-                        </div>
-                    </div>  ';
+                        </div> ';
             }
 
             $loop++;
@@ -578,6 +606,7 @@ class DynamicFormController extends Controller
 
     public function su_daily_log_add(Request $request)
     {
+        // dd($request);
         // echo "<pre>"; print_r($request->input()); die;
 
         if ($request->isMethod('post')) {
@@ -618,15 +647,18 @@ class DynamicFormController extends Controller
             $s_category_id = $data['s_category_id'] ?? null;
             $category_data = $s_category_id ? CategoryFrontEnd::where('id', $s_category_id)->first() : null;
 
+            $form = DynamicForm::find($data['dyn_form_id']);
+            // dd($form);
 
-            $form = DynamicForm::showForm($data);
+            $form_insert_id = DynamicForm::saveForm($form);
 
             $log_book                  = new LogBook;
-            $log_book->dynamic_form_id = $data['dyn_form_id'] ?? null;
+            $log_book->dynamic_form_id = $form_insert_id ?? null;
             $log_book->home_id         = $home_id;
             $log_book->user_id         = Auth::user()->id;
             $log_book->title           = $dyn_form->title ?? $title_detail->title;
             $log_book->date            = date('Y-m-d H:i:s');
+
             $log_book->start_date = !empty($data['start_date'])
                 ? Carbon::createFromFormat('d-m-Y', $data['start_date'])->format('Y-m-d')
                 : null;
@@ -634,14 +666,13 @@ class DynamicFormController extends Controller
             $log_book->end_date = !empty($data['end_date'])
                 ? Carbon::createFromFormat('d-m-Y', $data['end_date'])->format('Y-m-d')
                 : null;
+                
             $log_book->details         = $dyn_form->details ?? $title_detail->detail;
-            $log_book->category_id     = $s_category_id;
-            $log_book->category_name   = $category_data ? $category_data->name : null;
-            $log_book->category_icon   = $category_data ? $category_data->icon : null;
-            $log_book->formdata        = $dyn_form->pattern_data;
+            $log_book->category_id     = $s_category_id ?? 3;
+            $log_book->category_name   = $category_data ? $category_data->name : 'Visitor';
+            $log_book->category_icon   = $category_data ? $category_data->icon : 'fa fa-users';
             $log_book->logType         = $data['logtype'] ?? null;
             $log_book->save();
-
 
             $su_log_record                  = new ServiceUserLogBook;
             $su_log_record->user_id         = Auth::user()->id;
@@ -659,7 +690,6 @@ class DynamicFormController extends Controller
             }
             die;
             // echo $response; die;
-
         }
     }
     /*public function edit_details(Request $request) {

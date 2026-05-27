@@ -1,7 +1,5 @@
 @extends('backEnd.layouts.master')
-
 @section('title',' User Annual Leaves')
-
 @section('content')
 
 <!--main content start-->
@@ -24,11 +22,12 @@
                         <div class="adv-table editable-table ">
                             <div class="clearfix">
                                 <div class="btn-group">
-                                    <a href="{{ url('admin/user/annual-leave/add/'.$user_id) }}">
+                                    <h3>Annual Leave</h3>
+                                    {{-- <a href="{{ url('admin/user/annual-leave/add/'.$user_id) }}">
                                         <button id="editable-sample_new" class="btn btn-primary">
                                             Add Annual Leave <i class="fa fa-plus"></i>
                                         </button>
-                                    </a>
+                                    </a> --}}
                                 </div>
                                 @include('backEnd.common.alert_messages')
                             </div>
@@ -64,8 +63,9 @@
                                 <table class="table table-striped table-hover table-bordered" id="editable-sample">
                                     <thead>
                                     <tr>
-                                        <th>Title</th>
                                         <th>Date</th>
+                                        <th>Reason</th>
+                                        <th>Status</th>
                                         <th width="20%">Actions</th>
                                     </tr>
                                     </thead>
@@ -84,13 +84,14 @@
                                         {
                                             foreach($u_annual_leave as $key => $value) {
 
-                                            $leave_date = date('d M Y', strtotime($value->leave_date));
+                                            $leave_date = date('d M Y', strtotime($value->start_date));
 
                                         ?>
 
                                         <tr>
-                                            <td>{{ ucfirst($value->title) }}</td>
                                             <td>{{ $leave_date }}</td>
+                                            <td>{{ ucfirst($value->notes) }}</td>
+                                            <td><?php echo ($value->leave_status == 1) ? 'Approved' : 'Pending';?></td>
                                             
                                             <td class="action-icn"> <!-- data-toggle="modal" href="#su_care_history_edit" -->
                                                 

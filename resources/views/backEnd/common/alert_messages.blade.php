@@ -16,6 +16,19 @@
     </div>
 @endif
 
+@if (count($errors) > 0)
+    <div class="alert ryt alert-danger fade in">
+        <button data-dismiss="alert" class="close close-sm" type="button">
+            <i class="fa fa-times"></i>
+        </button>
+        <ul>
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
 @if(Session::has('undo'))
     <div class="alert1 alert-success fade in">
         <button data-dismiss="alert" class="close close-sm" type="button">

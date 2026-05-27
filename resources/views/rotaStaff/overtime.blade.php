@@ -1,175 +1,170 @@
-@include('rotaStaff.components.header')
-@include('rotaStaff.pyrll_stylsheet')
-<style>
-input[type='checkbox'] {
-  display: none;
-}
-.lbl-toggle {
-  display: block;
-  font-weight: 550;
-  text-align: center;
-  color: #A77B0E;
-  background: #FAE042;
-  cursor: pointer;
-  border-radius: 7px;
-}
-.lbl-toggle:hover {
-  color: #7C5A0B;
-}
-.lbl-toggle::before {
-  content: ' ';
-  display: inline-block;
-  border-top: 5px solid transparent;
-  border-bottom: 5px solid transparent;
-  border-left: 5px solid currentColor;
-  vertical-align: middle;
-  margin-right: .7rem;
-  transform: translateY(-2px);
-  transition: transform .2s ease-out;
-}
-.collapsible-content .content-inner {
-  background: rgba(250, 224, 66, .2);
-  padding: .5rem 1rem;
-}
-.collapsible-content {
-  max-height: 0px;
-  overflow: hidden;
-}
-.toggle:checked + .lbl-toggle + .collapsible-content {
-  max-height: 100vh;
-}
-.toggle:checked + .lbl-toggle::before {
-  transform: rotate(90deg) translateX(-3px);
-}
-.flt_lft_wdth_100_var{
-  
-}
-.tab_ttle{
-  margin: 15px 0px 20px;
-}
-.pmnt_n_emplyee_prnt{
-  width: 100%;
-  margin-bottom: 20px;
-}
-.hw_mny_slct{
-  width: 50%;
-}
-</style>
+@extends('frontEnd.layouts.master')
+<meta name="csrf-token" content="{{ csrf_token() }}">
+@section('title','Staff Timesheet')
+<link rel="stylesheet" type="text/css" href="{{ url('public/frontEnd/jobs/css/custom.css')}}" />
+@section('content')
 
-<ul class="nav nav-tabs rotas" id="myTab" role="tablist">
-  <li class="nav-item" role="presentation">
-    <a href = "{{ url('/payroll') }}"><button class="nav-link active" id="activerotas-tab" data-bs-toggle="tab"
-    data-bs-target="#activerotas" type="button" role="tab" aria-controls="activerotas"
-    aria-selected="true">Payroll Console</button></a>
-  </li>
-  <li class="nav-item" role="presentation">
-    <a href = "{{ url('/information_checker') }}"><button class="nav-link" id="oldrotas-tab" data-bs-toggle="tab" data-bs-target="#oldrotas"
-    type="button" role="tab" aria-controls="oldrotas" aria-selected="false">Information Checker</button></a>
-  </li>
-  <li class="nav-item" role="presentation">
-    <a href = "{{ url('/overtime') }}"><button class="nav-link" id="createrota-tab" data-bs-toggle="tab" data-bs-target="#createrota"
-    type="button" role="tab" aria-controls="createrota" aria-selected="false">Overtime </button></a>
-  </li>
-  <li class="nav-item" role="presentation">
-    <a href = "{{ url('/payroll_glossary') }}"><button class="nav-link" id="oldrotas-tab" data-bs-toggle="tab" data-bs-target="#oldrotas"
-    type="button" role="tab" aria-controls="oldrotas" aria-selected="false">Payroll glossary</button></a>
-  </li>
-</ul>
 
-<div class = "tab_ttle">
-  <h3> Payable Overtime </h3>
-  Set payment dates for overtime claims
-</div>
-<div class="wrap-collabsible">
-  <input id="collapsible" class="toggle" type="checkbox">
-  <label for="collapsible" class="lbl-toggle">More Info</label>
-  <div class="collapsible-content">
-    <div class="content-inner">
-      <p>
-        QUnit is by calling one of the object that are embedded in JavaScript, and faster JavaScript program could also used with
-        its elegant, well documented, and functional programming using JS, HTML pages Modernizr is a popular browsers without
-        plug-ins. Test-Driven Development.
-      </p>
+
+<!--main content start-->
+<section class="wrapper">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12 p-0">
+                <div class="panel">
+                    <header class="panel-heading px-5">
+                        <h4>Overtime</h4>
+                    </header>
+                    <div class="panel-body">
+                        <div class="absenceHistory">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="OvertimeheadingOrBtn">  
+                                        <a href="#!" type="button" class="btn btn-warning">Log overtime</a>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="panel">
+                                        <header class="panel-heading"> Time off in lieu (TOIL) </header>
+                                        <div class="panel-body">
+                                            <div class="overTimeBox">
+                                                <div class="row">                                                
+                                                    <div class="col-md-4">
+                                                        <div class="absenceAdd m-t-20">
+                                                            <label>TOIL logged</label>
+                                                            <div class="timeHrsMinuts m-t-20 m-b-20">
+                                                                <div class="timelist">
+                                                                    <strong>0h 0m</strong>
+                                                                    <span>No approved claims</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <div class="absenceAdd borderLeftRight m-t-20">
+                                                            <label>TOIL taken</label>
+                                                            <div class="timeHrsMinuts m-t-20 m-b-20">
+                                                                <div class="timelist">
+                                                                    <strong>0h 0m </strong>
+                                                                    <span>No TOIL absences</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <div class="absenceAdd m-t-20">
+                                                            <label>TOIL balance</label>
+                                                            <div class="timeHrsMinuts m-t-20 m-b-20">
+                                                                <div class="timelist">
+                                                                    <strong>0h 0m</strong>
+                                                                    <span>Available to take</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-12 m-t-20 text-center">
+                                                        <a href="#!" type="button" class="btn btn-warning">Use TOIL</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="panel">
+                                        <header class="panel-heading"> Payable </header>
+                                        <div class="panel-body">
+                                            <div class="overTimeBox">
+                                                <div class="row">                                                
+                                                    <div class="col-md-4">
+                                                        <div class="absenceAdd m-t-20">
+                                                            <label>Overtime logged</label>
+                                                            <div class="timeHrsMinuts m-t-20 m-b-20">
+                                                                <div class="timelist">
+                                                                    <strong>0h 0m</strong>
+                                                                    <span>No approved claims</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <div class="absenceAdd borderLeftRight m-t-20">
+                                                            <label>Paid</label>
+                                                            <div class="timeHrsMinuts m-t-20 m-b-20">
+                                                                <div class="timelist">
+                                                                    <strong>0h 0m </strong>
+                                                                    <span>Payment scheduled or paid</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <div class="absenceAdd m-t-20">
+                                                            <label>Pending payment</label>
+                                                            <div class="timeHrsMinuts m-t-20 m-b-20">
+                                                                <div class="timelist">
+                                                                    <strong>0h 0m</strong>
+                                                                    <span>Approved awaiting payment</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <!-- <div class="col-md-12 m-t-20 text-center">
+                                                        <a href="#!" type="button" class="btn btn-warning">Use TOIL</a>
+                                                    </div> -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="absenceAccordion">
+                                        <div class="panel-group" id="accordion">
+                                            <div class="panel panel-default">
+                                                <div class="panel-heading">
+                                                    <h4 class="panel-title">
+                                                        <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne">Current & future (0)</a>
+                                                    </h4>
+                                                </div>
+                                                <div id="collapseOne" class="panel-collapse collapse">
+                                                    <div class="panel-body">
+                                                        <div class="row">
+                                                            <div class="col-md-12">
+                                                                Shank fatback pastrami turkey ham hock. Pastrami biltong ham ball tip meatloaf drumstick bacon jowl kielbasa.
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="panel panel-default">
+                                                <div class="panel-heading">
+                                                    <h4 class="panel-title">
+                                                        <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo">History (0)</a>
+                                                    </h4>
+                                                </div>
+                                                <div id="collapseTwo" class="panel-collapse collapse">
+                                                    <div class="panel-body">
+                                                        <div class="row">
+                                                            <div class="col-md-12">
+                                                                Shank fatback pastrami turkey ham hock. Pastrami pork. Turducken cow salami venison, biltong ham ball tip meatloaf drumstick bacon jowl kielbasa.
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
+</section>
 
-<div class = "pmnt_n_emplyee_prnt">
-  <div class = "flt_lft_wdth_100_var" style = "--wdth_prcntge: 25%">
-    Payment type: <br>
-    <select>
-      <option>Payment date not set </option>
-      <option>Payment date set </option>
-      <option>All </option>
-    </select>
-  </div>
-  <div class = "emplyees">
-    Employees <br>
-    <input type = "search">
-  </div>
-</div>
-<div class = "pmnt_n_emplyee_prnt">
-  <div class = "flt_lft_wdth_100_var" style = "--wdth_prcntge: 75%">
-    Date approved:<br>
-    <select>
-      <option>All of time </option>
-      <option>This month </option>
-      <option>Last month </option>
-      <option>Custom dates </option>
-    </select>
-  </div>
-  <div class = "emplyees">
-    Date worked:<br>
-    <select>
-      <option>All of time </option>
-      <option>This month </option>
-      <option>Last month </option>
-      <option>Custom dates </option>
-    </select>
-  </div>
-</div>
-
-<div class = "hw_mny_slct">
-  0 selected
-</div>
-<div class = "dte">
-  <input type = "date">
-</div>
-
-
-No records
-	
-Name
-
-Duration
-
-Pay Rate
-
-Approved by
-
-Payment date
-
-
-<table>
-  <tr>
-    <th>Name</th>
-    <th>Duration</th>
-    <th>Pay Rate</th>
-    <th>End date</th>
-    <th>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</th>
-  </tr>
-  <tr>
-      <td><div class="evry_othr_rprt">Annual leave summary</div></td>
-      <td><div class="evry_othr_rprt">25 Sep 2023, 14:35</div></td>
-      <td><div class="evry_othr_rprt">18 Oct 2023</div></td>
-      <td><div class="evry_othr_rprt">18 Oct 2023</div></td>
-      <td><div class="evry_othr_rprt"><a href = "resources\views\rotaStaff\download_image.png" download="proposed_file_name"><div class="dwnld_btn">Download</div></a></div></td>
-    </div>
-  </tr>
-  <tr>
-    <td>Absence</td>
-    <td>25 Sep 2023, 14:35</td>
-    <td>01 Sep 2023</td>
-    <td>30 Sep 2023</td>
-    <td><a href = "resources\views\rotaStaff\download_image.png" download="proposed_file_name"><div class="dwnld_btn">Download</div></a></td>
-  </tr>
+@endsection

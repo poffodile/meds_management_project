@@ -64,7 +64,6 @@ class FormBuilderController extends Controller
         if ($request->isMethod('post')) {
             // dd($request);
             $data = $request->input();
-            // dd($request);
             // echo "<pre>"; print_r($data); die;
 
             if (isset($data['formdata'])) {
@@ -87,22 +86,20 @@ class FormBuilderController extends Controller
                 $is_imageUpload = null;
             }
 
-
-
-            foreach (explode(',', $data['form_home_ids']) as $homeId) {
-                $home_id            = $homeId;
+            // foreach (explode(',', $data['form_home_ids']) as $homeId) {
+                // $home_id            = $homeId;
                 $form               = new DynamicFormBuilder;
-                $form->home_id      = $home_id;
-                $form->home_ids     = $data['form_home_ids'];
+                $form->home_id      = Session::get('scitsAdminSession')->home_id;
+                // $form->home_ids     = $data['form_home_ids'] ?? '';
                 $form->title        = $data['form_title'];
                 $form->detail       = $data['form_detail'];
                 $form->location_ids = $data['form_location_ids'];
                 $form->pattern      = json_encode($data['formdata']);
-                $form->alert_field  =  $data['alert_field'];
+                $form->alert_field  = $data['alert_field'];
                 $form->is_image     = $is_imageUpload;
-                $form->reminder_day =  $data['form_reminder_day'];
-                $form->send_to      =  $data['send_to'];
-                $form->logtype      =  $data['logtypes'];
+                $form->reminder_day = $data['form_reminder_day'];
+                $form->send_to      = $data['send_to'];
+                $form->logtype      = $data['logtypes'];
 
                 if (!$form->save()) {
                     return redirect()->back()->with('error', 'Some error occurred. Please try again later.');
@@ -113,7 +110,7 @@ class FormBuilderController extends Controller
                 // } else {
                 //     return redirect()->back()->with('error','Some error occurred. Please try after sometime.'); 
                 // }
-            }
+            // }
 
             return redirect('admin/form-builder')->with('success', 'New Form added successfully.');
         }
@@ -173,7 +170,6 @@ class FormBuilderController extends Controller
                 $form->location_ids = $data['form_location_ids'];
                 $form->pattern      = json_encode($data['formdata']);
                 $form->alert_field  =  $data['alert_field'];
-                $form->home_ids     =  $data['form_home_ids'];
                 $form->is_image     =  $is_imageUpload;
                 $form->reminder_day  =  $form_reminder_day;
                 $form->send_to       =  $data['send_to'];

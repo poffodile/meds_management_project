@@ -235,7 +235,6 @@ if (isset($form)) {
                         </div>
                     </div>
 
-
                     <div class="panel-body">
                         <div class="row">
                             <div class="col-md-offset-2 col-md-8 col-sm-offset-1 col-sm-10 col-xs-12 m-t-20">
@@ -248,27 +247,6 @@ if (isset($form)) {
                                             <!-- <span class="group-ico cus-plus-icn add_form_desc">
                                             <i class="fa fa-plus"></i>
                                         </span> -->
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="col-lg-3 control-label">Homes
-                                            <span data-toggle="tooltip" title="Select locations where you want to show this form.">
-                                                <i class="fa fa-info-circle"></i>
-                                            </span>
-                                        </label>
-
-                                        <div class="col-lg-9">
-                                            <?php
-                                                $homeId = App\Home::where('id', Session::get('scitsAdminSession')->home_id)->value('admin_id');
-                                                $homes = App\Home::where('admin_id', $homeId)->where('is_deleted', 0)->get();                                           
-                                                $selected_home_str = (isset($form->home_ids)) ? $form->home_ids : '';
-                                                $selected_home = explode(',', $selected_home_str);  
-                                            ?>
-                                            @foreach($homes as $value)
-                                            <div class="checkbox">
-                                                <label> <input type="checkbox" name="home_ids[]" value="{{ $value['id'] }}" class="home_ids" {{ (in_array($value['id'],$selected_home)) ? 'checked' : '' }} />{{ $value['title'] }}</label>
-                                            </div>
-                                            @endforeach
                                         </div>
                                     </div>
                                     <div class="form-group">

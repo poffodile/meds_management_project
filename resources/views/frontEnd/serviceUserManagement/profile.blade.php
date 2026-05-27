@@ -1,5 +1,5 @@
 @extends('frontEnd.layouts.master')
-@section('title','Child Profile')
+@section('title', 'Child Profile')
 @section('content')
 <style>
     .view_log {
@@ -91,7 +91,7 @@
 
     .location-info .previousAdd {
         color: #767676;
-        background: #f1f2f7;
+        /* background: #f1f2f7; */
         font-family: 'Open Sans', sans-serif;
         font-size: 13px;
         font-weight: 500;
@@ -135,14 +135,15 @@
             top: 8px;
         }
     }
-    .fa.fa-pencil.profile {
-    color: #1fb5ad;
-    font-size: 13px;
 
-}
-span.ps10 {
-    padding-right: 5px;
-}
+    .fa.fa-pencil.profile {
+        color: #1fb5ad;
+        font-size: 13px;
+    }
+
+    span.ps10 {
+        padding-right: 5px;
+    }
 </style>
 <style>
     .dropdown {
@@ -176,6 +177,30 @@ span.ps10 {
     .show {
         display: block;
     }
+
+    .behaviorRatting {
+        display: flex
+    }
+
+    .behaviorRatting .star-rating {
+        font-size: 1.5em;
+        margin-top: 32px;
+        line-height: 0;
+    }
+
+    /* component */
+    .modal-dialog.widthmodelRatting {
+        width: 465px;
+    }
+
+    .starmodelRatting {
+        padding: 50px 20px;
+    }
+
+    .modal-content .modal-header h4.modal-title {
+        font-weight: 300;
+        font-size: 22px;
+    }
 </style>
 
 <!--main content start-->
@@ -183,10 +208,10 @@ span.ps10 {
     <section class="wrapper">
         <!-- page start-->
 
-
         <div class="row">
             <div class="col-md-12">
-                <div class="backIcon"> <a href="{{ url('/service-user-management') }}"><i class="fa fa-arrow-left" aria-hidden="true"></i></a> </div>
+                <div class="backIcon"> <a href="{{ url('/service-user-management') }}"><i class="fa fa-arrow-left"
+                            aria-hidden="true"></i></a> </div>
             </div>
         </div>
         <div class="row">
@@ -208,14 +233,18 @@ span.ps10 {
                             ?>
 
                             <div class="profile-pic text-center">
-                                <img src="{{ env('ASSETS_URL') }}/{{ serviceUserProfileImagePath.'/'.$user_image }}" alt="" class="profile_click {{ $profile_color }}" />
+                                <img src="{{ url(serviceUserProfileImagePath . '/' . $user_image) }}" alt=""
+                                    class="profile_click {{ $profile_color }}" />
                             </div>
                             <div class="contact">
-                                <h3><span><i class="fa fa-map-marker"></i></span> Current location <a href="javascript:void(0)" class="location-edit-btn" clmn-name="current_location"><i class="fa fa-pencil profile"></i> </a> <span class="currentAdd">{!! $patient->current_location !!} </span></h3>
-
+                                <h3><span><i class="fa fa-map-marker"></i></span> Current location <a
+                                        href="javascript:void(0)" class="location-edit-btn"
+                                        clmn-name="current_location"><i class="fa fa-pencil profile"></i> </a> <span
+                                        class="currentAdd">{!! $patient->current_location !!} </span></h3>
                             </div>
                             <div class="location-info">
-                                <strong>Previous Location</strong> <span class="previousAdd">{!! $patient->previous_location !!}</span>
+                                <strong>Previous Location</strong> <span
+                                    class="previousAdd">{!! $patient->previous_location !!}</span>
                             </div>
                         </div>
 
@@ -224,287 +253,411 @@ span.ps10 {
                                 <!-- <a  href="javascript:;" class="reprt_modl reprt-icon" title="Report" srvcUserId="{{ $service_user_id }}">Report &nbsp;<i class="fa fa-file-o"></i></a> -->
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <h1>{{ ucfirst($patient->name) }}</h1>
-                                        <span class="text-muted">{{ date('d/m/Y',strtotime($patient->date_of_birth)) }}</span>
-                                        <div class="location-info contact">
-                                            <h2> <span><i class="fa fa-phone"></i></span> Contacts <a href="javascript:void(0)" class="contact-edit-btn" phone_no="{{ $patient->phone_no }}" mobile="{{ $patient->mobile }}" email="{{ $patient->email }}">&nbsp &nbsp<i class="fa fa-pencil profile"></i></a> </h2>
-                                            <span> <strong style="color:#3399CC; display:inline-block; margin-bottom: 10px;">Phone</strong> <span class="ps10">: {!! $patient->phone_no !!}</span> &nbsp &nbsp &nbsp
-                                                <strong style="color:#3399CC; display:inline-block; margin-bottom: 10px;">Mobile</strong> <span class="ps10"> : {!! $patient->mobile !!}</span>&nbsp &nbsp &nbsp
-                                                <strong style="color:#3399CC; display:inline-block; margin-bottom: 10px;">Email</strong> <span class="ps10"> : {!! $patient->email !!}</span>
-                                            <p>
-                                                <?php foreach ($social_app as $key => $value) {
-                                                    $app_name      = $value['name'];
-                                                    $social_app_id = $value['id'];
-                                                    $icon = $value['icon'];
-                                                    $field_value = (isset($social_app_val[$social_app_id]['value'])) ? $social_app_val[$social_app_id]['value'] : '';
-                                                ?>
-                                                    <strong style="color:#3399CC; display:inline-block; margin-bottom: 10px;">
-                                                        <a href="{{ $field_value }}"><i class="{{ $icon }}"></i></a></strong>
-                                                <?php } ?>
-                                            </p>
-                                            <p class="top-def">{{ $patient->short_description }}</p>
-                                            <p class="info">
-                                                <strong style="color:#3399CC;">Years Old</strong> :
-                                                <?php
-                                                $dob = Carbon\Carbon::parse($patient->date_of_birth);
-                                                echo $age = $dob->diffInYears();
-                                                ?>
-                                                <strong style="color:#3399CC; "> &nbsp &nbsp Admission Number</strong> : {{ $patient->admission_number }}
-                                                <strong style="color:#3399CC;"> &nbsp &nbsp Section</strong> : {{ $patient->section }}
-                                                <?php $risk_status = App\Risk::overallRiskStatus($service_user_id);
-                                                if ($risk_status == 1) {
-                                                    $color = 'orange-clr';
-                                                    $risk_status = 'Historic';
-                                                } else if ($risk_status == 2) {
-                                                    $color = 'red-clr';
-                                                    $risk_status = 'High';
-                                                } else {
-                                                    $color = 'darkgreen-clr';
-                                                    $risk_status = 'No';
-                                                }
-                                                ?>
-                                                <strong style="color:#3399CC;"> &nbsp &nbsp Risk</strong> : {{ $risk_status }}
-                                            </p>
-                                            <p class="info">
-                                                <strong style="color:#3399CC;">Height</strong> : {{ $patient->height }}
-                                                <strong style="color:#3399CC; "> &nbsp &nbsp Weight</strong> : {{ $patient->weight }}
-                                                <strong style="color:#3399CC;"> &nbsp &nbsp Hair & Eyes</strong> : {{ $patient->hair_and_eyes }}
-                                                <strong style="color:#3399CC;"> &nbsp &nbsp Markings</strong> : {{ $patient->markings }}
-                                            </p>
+                                        <div class="behaviorRatting">
+                                            <div>
+                                                <h1 style="display:inline-block; margin-right:10px;">
+                                                    {{ ucfirst($patient->name) }}
+                                                </h1>
+                                                {{-- Rating display --}}
+                                                @php
+                                                $displayAvg = isset($avg_rating) ? (float) $avg_rating : 0;
+                                                $fullStars = floor($displayAvg);
+                                                $hasHalf = $displayAvg - $fullStars >= 0.5 ? true : false;
+                                                @endphp
+                                                <span class="profile-rating" title="{{ $rating_count ?? 0 }} rating(s)"
+                                                    style="vertical-align:middle;">
+                                                    @for ($i = 1; $i <= 5; $i++)
+                                                        @if ($i <=$fullStars)
+                                                        <i class="fa fa-star" style="color:#f90"></i>
+                                                        @elseif ($i == $fullStars + 1 && $hasHalf)
+                                                        <i class="fa fa-star-half-o" style="color:#f90"></i>
+                                                        @else
+                                                        <i class="fa fa-star-o" style="color:#ccc"></i>
+                                                        @endif
+                                                        @endfor
+                                                        <small
+                                                            style="margin-left:6px; color:#666;">({{ $displayAvg }})</small>
+                                                </span>
+                                                <br>
+                                                <span class="text-muted">{{ date('d/m/Y', strtotime($patient->date_of_birth)) }}</span>
+                                                <p>
+                                                    <strong>Today's Mood
+                                                        @if (isset($current_moods))
+                                                        <img src="{{ url(MoodImgPath . '/' . $current_moods->image) }}" style="width: 30px;">
+                                                        @endif
+                                                        <a href="javascript:void(0)" class="openMoodModel" data-action="add"><i class="fa fa-pencil profile"></i></a>
+                                                    </strong>
+                                                </p>
+                                            </div>
+
+                                        </div>
+
+                                        <div class="location-info contact pt-0">
+                                            <h2> <span><i class="fa fa-phone"></i></span> Contacts <a
+                                                    href="javascript:void(0)" class="contact-edit-btn"
+                                                    phone_no="{{ $patient->phone_no }}" mobile="{{ $patient->mobile }}"
+                                                    email="{{ $patient->email }}">&nbsp &nbsp<i
+                                                        class="fa fa-pencil profile"></i></a> </h2>
+                                            <span> <strong
+                                                    style="color:#3399CC; display:inline-block; margin-bottom: 10px;">Phone</strong>
+                                                <span class="ps10">: {!! $patient->phone_no !!}</span> &nbsp &nbsp &nbsp
+                                                <strong
+                                                    style="color:#3399CC; display:inline-block; margin-bottom: 10px;">Mobile</strong>
+                                                <span class="ps10"> : {!! $patient->mobile !!}</span>&nbsp &nbsp &nbsp
+                                                <strong
+                                                    style="color:#3399CC; display:inline-block; margin-bottom: 10px;">Email</strong>
+                                                <span class="ps10"> : {!! $patient->email !!}</span>
+                                                <p>
+                                                    <?php foreach ($social_app as $key => $value) {
+                                                        $app_name      = $value['name'];
+                                                        $social_app_id = $value['id'];
+                                                        $icon = $value['icon'];
+                                                        $field_value = (isset($social_app_val[$social_app_id]['value'])) ? $social_app_val[$social_app_id]['value'] : '';
+                                                    ?>
+                                                        <strong
+                                                            style="color:#3399CC; display:inline-block; margin-bottom: 10px;">
+                                                            <a href="{{ $field_value }}"><i
+                                                                    class="{{ $icon }}"></i></a></strong>
+                                                    <?php } ?>
+                                                </p>
+                                                <p class="top-def">{{ $patient->short_description }}</p>
+                                                <p class="info">
+                                                    <strong style="color:#3399CC;">Years Old</strong> :
+                                                    <?php
+                                                    $dob = Carbon\Carbon::parse($patient->date_of_birth);
+                                                    echo $age = $dob->diffInYears();
+                                                    ?>
+                                                    <strong style="color:#3399CC; "> &nbsp &nbsp Admission
+                                                        Number</strong> : {{ $patient->admission_number }}
+                                                    <strong style="color:#3399CC;"> &nbsp &nbsp Section</strong> :
+                                                    {{ $patient->section }}
+                                                    <?php $risk_status = App\Risk::overallRiskStatus($service_user_id);
+                                                    if ($risk_status == 1) {
+                                                        $color = 'orange-clr';
+                                                        $risk_status = 'Historic';
+                                                    } elseif ($risk_status == 2) {
+                                                        $color = 'red-clr';
+                                                        $risk_status = 'High';
+                                                    } else {
+                                                        $color = 'darkgreen-clr';
+                                                        $risk_status = 'No';
+                                                    }
+                                                    ?>
+                                                    <strong style="color:#3399CC;"> &nbsp &nbsp Risk</strong> :
+                                                    {{ $risk_status }}
+                                                <p class="info">
+                                                    <strong style="color:#3399CC;">Height</strong> :
+                                                    @switch($patient->height_unit)
+                                                    @case('ft_in')
+                                                    {{ $patient->height_ft }} ft {{ $patient->height_in }} in
+                                                    @break
+
+                                                    @case('cm')
+                                                    {{ $patient->height_ft }} cm
+                                                    @break
+
+                                                    @default
+                                                    N/A
+                                                    @endswitch
+
+                                                    <strong style="color:#3399CC;"> &nbsp;&nbsp; Weight</strong> :
+                                                    {{ $patient->weight ?? 'N/A' }}
+                                                    {{ $patient->weight_unit === 'kg' ? 'kg' : ($patient->weight_unit === 'lbs' ? 'lbs' : '') }}
+
+                                                    <strong style="color:#3399CC;"> &nbsp;&nbsp; Hair & Eyes</strong> :
+                                                    {{ $patient->hair_and_eyes ?? 'N/A' }}
+
+                                                    <strong style="color:#3399CC;"> &nbsp;&nbsp; Markings</strong> :
+                                                    {{ $patient->markings ?? 'N/A' }}
+                                                </p>
+
                                         </div>
                                     </div>
                                     <!-- <div class="col-md-6">
-                                    <div class="contact">
-                                        <h2> <span><i class="fa fa-map-marker"></i></span> Current location <a href="javascript:void(0)" class="location-edit-btn" clmn-name="current_location"><i class="fa fa-pencil profile"></i> </a> </h2>
-                                        <div class="location-info current_location"><p>{!! $patient->current_location !!}</p></div>
+                                                                <div class="contact">
+                                                                    <h2> <span><i class="fa fa-map-marker"></i></span> Current location <a href="javascript:void(0)" class="location-edit-btn" clmn-name="current_location"><i class="fa fa-pencil profile"></i> </a> </h2>
+                                                                    <div class="location-info current_location"><p>{!! $patient->current_location !!}</p></div>
 
-                                    </div>
-                                    <div class="location-info ">
-                                        <strong style="color:#3399CC;">Previous Location</strong><br>
-                                        <div class="previous_location"><p>{!! $patient->previous_location !!}</p></div>
-                                    </div>
-                                </div> -->
+                                                                </div>
+                                                                <div class="location-info ">
+                                                                    <strong style="color:#3399CC;">Previous Location</strong><br>
+                                                                    <div class="previous_location"><p>{!! $patient->previous_location !!}</p></div>
+                                                                </div>
+                                                            </div> -->
                                 </div>
                                 <!-- <div class="profile-statistics back-res">
-                               <?php
-                                $dob = Carbon\Carbon::parse($patient->date_of_birth);
-                                $age = $dob->diffInYears();
-                                ?>
-                               <h1>{{ $age }}</h1>
-                               <p>Years Old</p>
-                               <h1>{{ $patient->admission_number }}</h1>
-                               <p>Admission Number</p>
-                               <h1>{{ $patient->section }}</h1>
-                               <p>Section</p>
-                                <?php $risk_status = App\Risk::overallRiskStatus($service_user_id);
-                                if ($risk_status == 1) {
-                                    $color = 'orange-clr';
-                                    $risk_status = 'Historic';
-                                } else if ($risk_status == 2) {
-                                    $color = 'red-clr';
-                                    $risk_status = 'High';
-                                } else {
-                                    $color = 'darkgreen-clr';
-                                    $risk_status = 'No';
-                                }
-                                ?>
-                               <h1 id="su_risk_status" class="{{ $color }}">{{ $risk_status }}</h1>
-                               <p>Risk</p>
-                                <?php
-                                if (isset($noti_data['back_path'])) { ?>
-                                   <div class="cus-back-btn">
-                                       <a href="{{ $noti_data['back_path'] }}" class="btn cus-btn btn-warning">Continue</a>
-                                   </div>
-                                <?php } ?>
-                           </div> -->
+                                                           <?php
+                                                            $dob = Carbon\Carbon::parse($patient->date_of_birth);
+                                                            $age = $dob->diffInYears();
+                                                            ?>
+                                                           <h1>{{ $age }}</h1>
+                                                           <p>Years Old</p>
+                                                           <h1>{{ $patient->admission_number }}</h1>
+                                                           <p>Admission Number</p>
+                                                           <h1>{{ $patient->section }}</h1>
+                                                           <p>Section</p>
+                                                            <?php $risk_status = App\Risk::overallRiskStatus($service_user_id);
+                                                            if ($risk_status == 1) {
+                                                                $color = 'orange-clr';
+                                                                $risk_status = 'Historic';
+                                                            } elseif ($risk_status == 2) {
+                                                                $color = 'red-clr';
+                                                                $risk_status = 'High';
+                                                            } else {
+                                                                $color = 'darkgreen-clr';
+                                                                $risk_status = 'No';
+                                                            }
+                                                            ?>
+                                                           <h1 id="su_risk_status" class="{{ $color }}">{{ $risk_status }}</h1>
+                                                           <p>Risk</p>
+                                                            <?php
+                                                            if (isset($noti_data['back_path'])) { ?>
+                                                               <div class="cus-back-btn">
+                                                                   <a href="{{ $noti_data['back_path'] }}" class="btn cus-btn btn-warning">Continue</a>
+                                                               </div>
+                                                            <?php } ?>
+                                                       </div> -->
                                 <!--<a href="#" class="btn btn-primary">Read Full Profile</a>-->
                             </div>
                         </div>
                         <div>
                             <span class="profile-bigico">
-                                <a href="{{ url('/service/calendar/'.$service_user_id) }}" title="Calendar"><i class="fa fa-calendar"></i></a>
+                                <a href="{{ url('/service/calendar/' . $service_user_id) }}" title="Calendar"><i
+                                        class="fa fa-calendar"></i></a>
+                                <a data-toggle="modal" href="#filemngrModal" title="File Manager"><i
+                                        class="fa fa-folder-open-o" aria-hidden="true"></i></a>
                                 <!-- <a href="" title="{{ $labels['mfc']['label'] }}" class="mfc"><i class="fa fa-user-times"></i></a>
-                                <a href="" title="{{ $labels['living_skill']['label'] }}" class="living-skill-list"><i class="fa fa-child"></i></a>  -->
-                                <a data-toggle="modal" href="#filemngrModal" title="File Manager"><i class="fa fa-folder-open-o" aria-hidden="true"></i></a>
+                                                            <a href="" title="{{ $labels['living_skill']['label'] }}" class="living-skill-list"><i class="fa fa-child"></i></a>  -->
                                 <!-- <a data-toggle="modal" href="#filemngrModal" title="YP Log Book"><i class="fa fa-address-book-o"></i></a> -->
-                                <!-- <a href="javascript:void(0)" class="moneylist" rel="{{$service_user_id}}" title="Money Requests"><i class="fa fa-credit-card"></i></a> -->
+                                <!-- <a href="javascript:void(0)" class="moneylist" rel="{{ $service_user_id }}" title="Money Requests"><i class="fa fa-credit-card"></i></a> -->
                                 <!-- <a data-toggle="modal" href="#careCenterModel" title="Care Center"><i class="fa fa-building-o "></i></a> -->
                                 <!-- <a href="javascript:void(0)" class="eventreq" title="Event Date Change Request"><i class="fa fa-calendar-times-o"></i></a> -->
-                                <!-- <a href="{{ url('/service/location-history/'.$service_user_id) }}" title="Location History"><i class="fa fa-map-marker"></i></a> -->
-                                <a href="{{url('/select/report?key='.base64_encode($service_user_id))}}" class="" title="Report" srvcUserId="{{ $service_user_id }}"><i class="fa fa-file-o"></i></a>
+                                <!-- <a href="{{ url('/service/location-history/' . $service_user_id) }}" title="Location History"><i class="fa fa-map-marker"></i></a> -->
                                 {{-- <a href="#!" onclick="toggleDropdown()" class="" title="Logs" srvcUserId="{{ $service_user_id }}"><i class="fa fa-address-book-o"></i></a> --}}
-                                <div class="dropdown">
-                                    <a href="#!" onclick="toggleDropdown(event)" class="" title="Logs">
-                                        <i class="fa fa-address-book-o"></i>
-                                    </a>
-                                    <div id="myDropdown" class="dropdown-content">
-                                        <a href="{{ url('/service/daily-logs?key='.$service_user_id) }}">Daily Log</a>
-                                        <a href="{{ url('/service/weekly-logs?key='.$service_user_id) }}">Weekly Log</a>
-                                        <a href="{{ url('/service/monthly-logs?key='.$service_user_id) }}">Monthly Log</a>
-                                    </div>
-                                </div>
-                            </span>
+                                <a href="{{ url('/select/report?key=' . base64_encode($service_user_id)) }}"
+                                    title="Report" srvcUserId="{{ $service_user_id }}"><i
+                                        class="fa fa-file-o"></i></a>
+                                <a href="{{ url('/service/daily-logs?key=' . $service_user_id) }}" title="Logs"><i
+                                        class="fa fa-address-book-o"></i></a>
+                                <a href="{{ url('/service/task-management/' . $service_user_id) }}"
+                                    title="Calendar"><i class="fa fa-tasks"></i></a>
+                                {{-- <div class="dropdown">
+                                        <a href="#!" onclick="toggleDropdown(event)" class="" title="Logs"> <i class="fa fa-address-book-o"></i> </a>
+                                        <div id="myDropdown" class="dropdown-content">
+                                            <a href="{{ url('/service/daily-logs?key='.$service_user_id) }}">Daily Log</a>
+                                <a href="{{ url('/service/weekly-logs?key='.$service_user_id) }}">Weekly Log</a>
+                                <a href="{{ url('/service/monthly-logs?key='.$service_user_id) }}">Monthly Log</a>
                         </div>
-                    </div>
-                </section>
+                    </div> --}}
+                    </span>
             </div>
+        </div>
+    </section>
+    </div>
 
-            <div class="col-md-12">
-                <section class="panel">
-                    <header class="panel-heading tab-bg-dark-navy-blue cus-panel-heading">
-                        <ul class="nav nav-tabs nav-justified ">
-                            <li class="active">
-                                <a data-toggle="tab" href="#overview">Overview</a>
-                            </li>
-                            <li><a data-toggle="tab" href="#job-history">Care History</a></li>
-                            <!-- <li><a data-toggle="tab" href="#contacts" class="contact-map">Contacts</a></li> -->
-                            <li><a data-toggle="tab" href="#profile_detail">Full Profile</a></li>
-                        </ul>
-                    </header>
-                    <div class="panel-body">
-                        <div class="tab-content tasi-tab">
-                            <div id="overview" class="tab-pane active">
+    <div class="col-md-12">
+        <section class="panel">
+            <header class="panel-heading tab-bg-dark-navy-blue cus-panel-heading">
+                <ul class="nav nav-tabs nav-justified ">
+                    <li class="active">
+                        <a data-toggle="tab" href="#overview">Overview</a>
+                    </li>
+                    <li><a data-toggle="tab" href="#job-history">Care History</a></li>
+                    <li><a data-toggle="tab" href="#education_tab">Education</a></li>
+                    {{-- <li><a data-toggle="tab" href="#contacts" class="contact-map">Contacts</a></li> --}}
+                    <li><a data-toggle="tab" href="#profile_detail">Full Profile</a></li>
+                </ul>
+            </header>
+            <div class="panel-body">
+                <div class="tab-content tasi-tab">
+                    <div id="overview" class="tab-pane active">
+                        <div class="row">
+                            <div class="col-md-8">
                                 <div class="row">
-                                    <div class="col-md-8">
-                                        <div class="row">
-                                            <!-- new 8  -->
-                                            <div class="foor-box-wrap">
-                                                <div class="col-lg-12 p-r-0 resp-padd-right">
-                                                    <!-- <div class="col-md-3 col-sm-4 col-xs-12 ">
+                                    <!-- new 8  -->
+                                    <div class="foor-box-wrap">
+                                        <div class="col-lg-12 p-r-0 resp-padd-right">
+                                            {{-- Earning Scehma Section start --}}
+                                            {{-- <div class="col-md-3 col-sm-4 col-xs-12 ">
                                                             <div class="profile-nav alt">
-                                                                <a href="{{ url('/service/earning-scheme/'.$service_user_id) }}">
-                                                                    <section class="panel text-center profile-square" style="">
-                                                                        <div class="user-heading alt wdgt-row purple-bg">
-                                                                            <i class="{{ $labels['earning_scheme']['icon'] }}"></i> <!-- fa fa-star-half-o --
-                                                                        </div>
-                                                                        <div class="panel-body">
-                                                                            <div class="wdgt-value">
-                                                                                {{  $labels['earning_scheme']['label'] }}
-                                                                            </div>
-                                                                        </div>
-                                                                    </section>
-                                                                </a>
-                                                            </div>
-                                                        </div> -->
-
-                                                    {{-- <div class="col-md-2 col-sm-4 col-xs-12 ">
+                                                                <a href="{{ url('/service/earning-scheme/' . $service_user_id) }}">
+                                            <section class="panel text-center profile-square" style="">
+                                                <div class="user-heading alt wdgt-row purple-bg">
+                                                    <i class="{{ $labels['earning_scheme']['icon'] }}"></i>
+                                                </div>
+                                                <div class="panel-body">
+                                                    <div class="wdgt-value">
+                                                        {{ $labels['earning_scheme']['label'] }}
+                                                    </div>
+                                                </div>
+                                            </section>
+                                            </a>
+                                        </div>
+                                    </div> --}}
+                                    {{-- Earning Scehma Section End --}}
+                                    {{-- Daily Log Section Start --}}
+                                    {{-- <div class="col-md-2 col-sm-4 col-xs-12 ">
                                                         <div class="profile-nav alt">
                                                             <!-- <a data-toggle="modal" href="#logBookModal"> -->
                                                             <a href="{{ url('/service/daily-logs?key='.$service_user_id) }}">
-                                                                <section class="panel text-center profile-square">
-                                                                    <div class="user-heading alt wdgt-row bg-blue">
-                                                                        <i class="fa fa-address-book-o"></i>
-                                                                    </div>
-                                                                    <div class="panel-body">
-                                                                        <div class="wdgt-value">Daily Log</div>
-                                                                    </div>
-                                                                </section>
-                                                            </a>
-                                                        </div>
-                                                    </div> --}}
-
-                                                    <div class="col-md-2 col-sm-4 col-xs-12">
-                                                        <div class="profile-nav alt">
-                                                            <a href="{{ url('/service/health-records/'.$service_user_id) }}">
-                                                                <section class="panel text-center profile-square">
-                                                                    <div class="user-heading alt wdgt-row terques-bg">
-                                                                        <i class="{{ $labels['health_record']['icon'] }}"></i>
-                                                                        <!-- <i class="fa fa-heartbeat"></i> -->
-                                                                    </div>
-                                                                    <div class="panel-body">
-                                                                        <div class="wdgt-value">{{ $labels['health_record']['label'] }}</div>
-                                                                    </div>
-                                                                </section>
-                                                            </a>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="col-md-2 col-sm-4 col-xs-12">
-                                                        <div class="profile-nav alt">
-                                                            <a data-toggle="modal" href="#planModal">
-                                                                <section class="panel text-center profile-square">
-                                                                    <div class="user-heading alt wdgt-row red-bg">
-                                                                        <i class="fa fa-handshake-o"></i>
-                                                                    </div>
-                                                                    <div class="panel-body">
-                                                                        <div class="wdgt-value">Plans</div>
-                                                                    </div>
-                                                                </section>
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                    <!-- </div> -->
-
-                                                    <div class="col-md-2 col-sm-4 col-xs-12 mfc">
-                                                        <div class="profile-nav alt">
-                                                            <section class="panel text-center profile-square">
-                                                                <div class="user-heading alt wdgt-row label-inverse">
-                                                                    <i class="{{ $labels['mfc']['icon'] }}"></i>
-                                                                    <!-- <i class="fa fa-user-times"></i> -->
-                                                                </div>
-
-                                                                <div class="panel-body">
-                                                                    <div class="wdgt-value">
-                                                                        {{ $labels['mfc']['label'] }}
-                                                                    </div>
-                                                                </div>
-                                                            </section>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="col-md-2 col-sm-4 col-xs-12 living-skill-list">
-                                                        <div class="profile-nav alt">
-                                                            <section class="panel text-center profile-square">
-                                                                <div class="user-heading alt wdgt-row label-success">
-                                                                    <i class="{{ $labels['mfc']['icon'] }}"></i>
-                                                                    <!-- <i class="fa fa-child"></i> -->
-                                                                </div>
-                                                                <div class="panel-body">
-                                                                    <div class="wdgt-value">{{ $labels['living_skill']['label'] }}</div>
-                                                                </div>
-                                                            </section>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="col-md-2 col-sm-4 col-xs-12 incident_plan_modal">
-                                                        <div class="profile-nav alt">
-                                                            <section class="panel text-center profile-square">
-                                                                <div class="user-heading alt wdgt-row label-warning">
-                                                                    <i class="{{ $labels['incident_report']['icon'] }}"></i>
-                                                                </div>
-                                                                <div class="panel-body">
-                                                                    <div class="wdgt-value">
-                                                                        {{ $labels['incident_report']['label'] }}
-                                                                    </div>
-                                                                </div>
-                                                            </section>
-                                                        </div>
-                                                    </div>
-                                                    <!-- Pre Invoice -->
-                                                    <div class="col-md-2 col-sm-4 col-xs-12">
-                                                        <div class="profile-nav alt">
-                                                            <a href="{{ url('/service/invoice/'.$service_user_id) }}">
-                                                                <section class="panel text-center profile-square">
-                                                                    <div class="user-heading alt wdgt-row label-inverse">
-                                                                        <i class="fa fa-file"></i>
-                                                                        <!-- <i class="fa fa-heartbeat"></i> -->
-                                                                    </div>
-                                                                    <div class="panel-body">
-                                                                        <div class="wdgt-value">Pre-Invoice</div>
-                                                                    </div>
-                                                                </section>
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                    <!-- end here -->
-
+                                    <section class="panel text-center profile-square">
+                                        <div class="user-heading alt wdgt-row bg-blue">
+                                            <i class="fa fa-address-book-o"></i>
+                                        </div>
+                                        <div class="panel-body">
+                                            <div class="wdgt-value">Daily Log</div>
+                                        </div>
+                                    </section>
+                                    </a>
+                                </div>
+                            </div> --}}
+                            {{-- Daily Log Section Start --}}
+                            {{-- Health Record Section Start --}}
+                            <div class="col-md-2 col-sm-4 col-xs-12">
+                                <div class="profile-nav alt">
+                                    <a href="{{ url('/service/health-records/' . $service_user_id) }}">
+                                        <section class="panel text-center profile-square">
+                                            <div class="user-heading alt wdgt-row terques-bg">
+                                                <i class="{{ $labels['health_record']['icon'] }}"></i>
+                                                <!-- <i class="fa fa-heartbeat"></i> -->
+                                            </div>
+                                            <div class="panel-body">
+                                                <div class="wdgt-value">
+                                                    {{ $labels['health_record']['label'] }}
                                                 </div>
                                             </div>
+                                        </section>
+                                    </a>
+                                </div>
+                            </div>
+                            {{-- Health Record Section End --}}
+                            {{-- Plans Section Start --}}
+                            <div class="col-md-2 col-sm-4 col-xs-12">
+                                <div class="profile-nav alt">
+                                    <a data-toggle="modal" href="#planModal">
+                                        <section class="panel text-center profile-square">
+                                            <div class="user-heading alt wdgt-row red-bg">
+                                                <i class="fa fa-handshake-o"></i>
+                                            </div>
+                                            <div class="panel-body">
+                                                <div class="wdgt-value">Plans</div>
+                                            </div>
+                                        </section>
+                                    </a>
+                                </div>
+                            </div>
+                            {{-- Plans Section End --}}
+                            <!-- </div> -->
 
-                                            <div class="foor-box-wrap">
-                                                <div class="col-lg-6 p-l-0 resp-padd-left">
+                            <div class="col-md-2 col-sm-4 col-xs-12 ">
+                                <a href="{{ url('/service/missing-care-form-records/' . $service_user_id) }}">
+                                    <div class="profile-nav alt">
+                                        <section class="panel text-center profile-square">
+                                            <div class="user-heading alt wdgt-row label-inverse">
+                                                <i class="{{ $labels['mfc']['icon'] }}"></i>
+                                                <!-- <i class="fa fa-user-times"></i> -->
+                                            </div>
 
-                                                    <!-- <div class="col-md-3 col-sm-4 col-xs-12 mood-chart">
+                                            <div class="panel-body">
+                                                <div class="wdgt-value">
+                                                    {{ $labels['mfc']['label'] }}
+                                                </div>
+                                            </div>
+                                        </section>
+                                    </div>
+                                </a>
+                            </div>
+
+                            <div class="col-md-2 col-sm-4 col-xs-12 living-skill-list">
+                                <div class="profile-nav alt">
+                                    <section class="panel text-center profile-square">
+                                        <div class="user-heading alt wdgt-row label-success">
+                                            <i class="{{ $labels['mfc']['icon'] }}"></i>
+                                            <!-- <i class="fa fa-child"></i> -->
+                                        </div>
+                                        <div class="panel-body">
+                                            <div class="wdgt-value">
+                                                {{ $labels['living_skill']['label'] }}
+                                            </div>
+                                        </div>
+                                    </section>
+                                </div>
+                            </div>
+
+                            <div class="col-md-2 col-sm-4 col-xs-12 "> {{-- incident_plan_modal --}}
+                                <a href="{{ url('service/incident-report/' . $service_user_id) }}">
+                                    <div class="profile-nav alt">
+                                        <section class="panel text-center profile-square">
+                                            <div class="user-heading alt wdgt-row label-warning">
+                                                <i class="{{ $labels['incident_report']['icon'] }}"></i>
+                                            </div>
+                                            <div class="panel-body">
+                                                <div class="wdgt-value">
+                                                    {{ $labels['incident_report']['label'] }}
+                                                </div>
+                                            </div>
+                                        </section>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-md-2 col-sm-4 col-xs-12">
+                                <div class="profile-nav alt">
+                                    <a href="{{ url('service/behavior/'. $service_user_id) }}">
+                                        <section class="panel text-center profile-square">
+                                            <div class="user-heading alt wdgt-row red-bg">
+                                                <i class="fa fa-handshake-o"></i>
+                                            </div>
+                                            <div class="panel-body">
+                                                <div class="wdgt-value"> Behavior</div>
+                                            </div>
+                                        </section>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- Pre Invoice -->
+                            {{-- <div class="col-md-2 col-sm-4 col-xs-12">
+                                                            <div class="profile-nav alt">
+                                                                <a href="{{ url('/service/invoice/' . $service_user_id) }}">
+                            <section class="panel text-center profile-square">
+                                <div
+                                    class="user-heading alt wdgt-row label-inverse">
+                                    <i class="fa fa-file"></i>
+                                    <!-- <i class="fa fa-heartbeat"></i> -->
+                                </div>
+                                <div class="panel-body">
+                                    <div class="wdgt-value">Pre-Invoice</div>
+                                </div>
+                            </section>
+                            </a>
+                        </div>
+                    </div> --}}
+                    <!-- end here -->
+
+                    <div class="col-md-2 col-sm-4 col-xs-12 ">
+                        <a href="{{ url('service/mood/' . $service_user_id) }}">
+                            <div class="profile-nav alt">
+                                <section class="panel text-center profile-square">
+                                    <div
+                                        class="user-heading alt wdgt-row label-warning">
+                                        <i class="fa fa-smile-o"></i>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="wdgt-value">
+                                            Mood
+                                        </div>
+                                    </div>
+                                </section>
+                            </div>
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+
+            {{-- <div class="foor-box-wrap">
+                                                    <div class="col-lg-6 p-l-0 resp-padd-left">
+                                                        <div class="col-md-3 col-sm-4 col-xs-12 mood-chart">
                                                             <div class="profile-nav alt">
                                                                 <section class="panel text-center profile-square">
                                                                     <div class="user-heading alt wdgt-row label-danger">
@@ -518,57 +671,56 @@ span.ps10 {
                                                                     </div>
                                                                 </section>
                                                             </div>
-                                                        </div> -->
+                                                        </div>
+                                                    </div>
+                                                </div> --}}
 
-                                                </div>
-                                            </div>
-
-                                            <div class="col-md-12 col-sm-12 col-xs-12">
-                                                <div class="below-divider"></div>
-                                            </div>
-
-                                            <!-- sagar button -->
-                                            <div class="col-md-12 col-sm-12 col-xs-12">
-                                                <a href="{{ url('/service/risks/'.$service_user_id) }}" class="view_log">Risk Log</a>
-                                                <!-- <a href="https://itdevelopmentservices.com/socialcareitsolutions/service/risks/19" class="view_log">Risk Log</a> -->
-                                            </div>
-                                            <!-- button end -->
-                                            @include('frontEnd.serviceUserManagement.elements.risk_change.risk')
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-4">
-                                        <div class="feed-box text-center"></div>
-                                        <div class="profile-nav alt"></div>
-
-                                        <!-- notification start -->
-                                        <section class="panel m-0">
-                                            <header class="panel-heading"> Notification
-                                                <!-- <span class="tools pull-right">
-                                                <a href="javascript:;" class="fa fa-chevron-down"></a>
-                                                <a href="javascript:;" class="fa fa-cog"></a> <a href="javascript:;" class="fa fa-times"></a>
-                                            </span> -->
-
-                                            </header>
-                                            <div class="panel-body  min-ht-0 srvc_usr_ntf">
-                                                @include('frontEnd.serviceUserManagement.elements.su_profile_notification')
-                                            </div>
-                                        </section>
-
-                                        @include('frontEnd.serviceUserManagement.elements.profile.care_team')
-                                    </div>
-                                </div>
-                            </div>
-                            @include('frontEnd.serviceUserManagement.elements.profile.care_history')
-                            @include('frontEnd.serviceUserManagement.elements.profile.contacts')
-                            @include('frontEnd.serviceUserManagement.elements.profile.profile_detail_info')
-                        </div>
-                    </div>
-                </section>
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="below-divider"></div>
             </div>
-        </div>
-        <!-- page end-->
-    </section>
+
+            <!-- sagar button -->
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                <a href="{{ url('/service/risks/' . $service_user_id) }}"
+                    class="view_log">Risk Log</a>
+                <!-- <a href="https://itdevelopmentservices.com/socialcareitsolutions/service/risks/19" class="view_log">Risk Log</a> -->
+            </div>
+            <!-- button end -->
+            @include('frontEnd.serviceUserManagement.elements.risk_change.risk')
+    </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="feed-box text-center"></div>
+        <div class="profile-nav alt"></div>
+
+        <!-- notification start -->
+        <section class="panel m-0">
+            <header class="panel-heading"> Notification
+                <!-- <span class="tools pull-right">
+                                                                            <a href="javascript:;" class="fa fa-chevron-down"></a>
+                                                                            <a href="javascript:;" class="fa fa-cog"></a> <a href="javascript:;" class="fa fa-times"></a>
+                                                                        </span> -->
+            </header>
+            <div class="panel-body  min-ht-0 srvc_usr_ntf">
+                @include('frontEnd.serviceUserManagement.elements.su_profile_notification')
+                @include('frontEnd.serviceUserManagement.elements.profile.care_team')
+            </div>
+        </section>
+    </div>
+    </div>
+    </div>
+    @include('frontEnd.serviceUserManagement.elements.profile.care_history')
+    @include('frontEnd.serviceUserManagement.elements.profile.education')
+    @include('frontEnd.serviceUserManagement.elements.profile.contacts')
+    @include('frontEnd.serviceUserManagement.elements.profile.profile_detail_info')
+    </div>
+    </div>
+</section>
+</div>
+</div>
+<!-- page end-->
+</section>
 </section>
 <!--main content end-->
 
@@ -579,11 +731,12 @@ span.ps10 {
 @include('frontEnd.serviceUserManagement.elements.bmp-rmp')
 {{-- @include('frontEnd.serviceUserManagement.elements.rmp') --}}
 {{-- @include('frontEnd.serviceUserManagement.elements.bmp') --}}
-@include('frontEnd.serviceUserManagement.elements.mood')
-@include('frontEnd.serviceUserManagement.elements.incident_report')
+{{-- @include('frontEnd.serviceUserManagement.elements.mood') --}}
+@include('frontEnd.serviceUserManagement.elements.add_mood')
+{{-- @include('frontEnd.serviceUserManagement.elements.incident_report') --}}
 @include('frontEnd.serviceUserManagement.elements.living_skill')
 @include('frontEnd.serviceUserManagement.elements.education_record')
-@include('frontEnd.serviceUserManagement.elements.mfc')
+{{-- @include('frontEnd.serviceUserManagement.elements.mfc') --}}
 @include('frontEnd.serviceUserManagement.elements.wear_record')
 @include('frontEnd.serviceUserManagement.elements.log_book')
 @include('frontEnd.serviceUserManagement.elements.my_money')
@@ -638,11 +791,11 @@ span.ps10 {
 </script>
 
 <!-- <script>
-    $('.input-plusbox').hide();
-    $('.input-plus').on('click',function(){
-        $(this).closest('.cog-panel').find('.input-plusbox').toggle();
-    });
-</script> -->
+        $('.input-plusbox').hide();
+        $('.input-plus').on('click', function() {
+            $(this).closest('.cog-panel').find('.input-plusbox').toggle();
+        });
+    </script> -->
 
 <script>
     $(document).ready(function() {
@@ -753,8 +906,7 @@ span.ps10 {
 
 <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&AMP;sensor=false"></script>
 <?php $api_key = env('GOOGLE_MAP_API_KEY'); ?>
-<script async defer src="https://maps.googleapis.com/maps/api/js?key={{ $api_key }}&callback=initMap">
-</script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key={{ $api_key }}&callback=initMap"></script>
 
 <script>
     $(document).ready(function() {
@@ -820,102 +972,102 @@ span.ps10 {
 
 <script>
     /*
-    // profile status change
-    $(document).ready(function(){
-        // $('.sum_profile_click').dblclick(function(){
-        //      // alert(1); return false;
-        //     $(this).addClass('profile_active_status');
-        //     var service_user_id = $(this).attr('id');
-        //     //var service_user_id = "{{ $patient->id }}";
-        //     $('.loader').show();
-        //     $('body').addClass('body-overflow');
-        //     $.ajax({
-        //         type   : 'get',
-        //         url    : "{{ url('/service/user-profile/status/') }}"+'/'+service_user_id,
-        //         success:function(resp){
-        //             if(isAuthenticated(resp) == false){
-        //                 return false;
-        //             }
-        //             if(resp == '1') {
-        //                 if($('.profile_active_status').hasClass('profile_active')) {
-        //                     $('.profile_active_status').removeClass('profile_active');
-        //                     $('.profile_active_status').addClass('profile_inactive');
-        //                 } else {
-        //                     $('.profile_active_status').removeClass('profile_inactive')
-        //                      $('.profile_active_status').addClass('profile_active');
-        //                 }
-        //             } else {
-        //             }
-        //             $('.profile_active_status').removeClass('profile_active_status');
-        //             $('.loader').hide();
-        //             $('body').removeClass('body-overflow');
-        //         }
-        //     });
-        //     return false;
-        // });
+                                // profile status change
+                                $(document).ready(function(){
+                                    // $('.sum_profile_click').dblclick(function(){
+                                    //      // alert(1); return false;
+                                    //     $(this).addClass('profile_active_status');
+                                    //     var service_user_id = $(this).attr('id');
+                                    //     //var service_user_id = "{{ $patient->id }}";
+                                    //     $('.loader').show();
+                                    //     $('body').addClass('body-overflow');
+                                    //     $.ajax({
+                                    //         type   : 'get',
+                                    //         url    : "{{ url('/service/user-profile/status/') }}"+'/'+service_user_id,
+                                    //         success:function(resp){
+                                    //             if(isAuthenticated(resp) == false){
+                                    //                 return false;
+                                    //             }
+                                    //             if(resp == '1') {
+                                    //                 if($('.profile_active_status').hasClass('profile_active')) {
+                                    //                     $('.profile_active_status').removeClass('profile_active');
+                                    //                     $('.profile_active_status').addClass('profile_inactive');
+                                    //                 } else {
+                                    //                     $('.profile_active_status').removeClass('profile_inactive')
+                                    //                      $('.profile_active_status').addClass('profile_active');
+                                    //                 }
+                                    //             } else {
+                                    //             }
+                                    //             $('.profile_active_status').removeClass('profile_active_status');
+                                    //             $('.loader').hide();
+                                    //             $('body').removeClass('body-overflow');
+                                    //         }
+                                    //     });
+                                    //     return false;
+                                    // });
 
-        // $('.sum_profile_click').click(function(){
-        //     var su_id = $(this).attr('id');
-        //     window.location.href = "{{ url('/service/user-profile') }}"+'/'+su_id;
-        // });
+                                    // $('.sum_profile_click').click(function(){
+                                    //     var su_id = $(this).attr('id');
+                                    //     window.location.href = "{{ url('/service/user-profile') }}"+'/'+su_id;
+                                    // });
 
-        //yp photo right click functionality
-        $(function () {
-            $('.profile_click').bind('contextmenu', function (e) {
-                var service_user_id = "{{ $service_user_id }}";
-                $(this).addClass('profile_active_status');
-                $('.loader').show();
-                $('body').addClass('body-overflow');
-            $.ajax({
-                type   : 'get',
-                url    : "{{ url('/service/user-profile/afc-status/update') }}"+'/'+service_user_id,
-                success:function(resp){
-                    if(isAuthenticated(resp) == false){
-                        return false;
-                    }
-                    if(resp == 'true') {
-                        if($('.profile_active_status').hasClass('profile_active')) {
-                            $('.profile_active_status').removeClass('profile_active');
-                            $('.profile_active_status').addClass('profile_inactive');
-                        } else {
-                            $('.profile_active_status').removeClass('profile_inactive')
-                             $('.profile_active_status').addClass('profile_active');
-                        }
-                        //show success message
-                        $('.ajax-alert-suc').find('.msg').text('MFC/AFC status has been changed successfully.');
-                        $('.ajax-alert-suc').show();
-                        setTimeout(function(){$(".ajax-alert-suc").fadeOut()}, 5000);
-                    } else if(resp == 'AUTH_ERR') {
-                        $('.ajax-alert-err').find('.msg').text("{{ UNAUTHORIZE_ERR }}");
-                        $('.ajax-alert-err').show();
-                        setTimeout(function(){$(".ajax-alert-err").fadeOut()}, 5000);
-                    } else {
-                        $('.ajax-alert-err').find('.msg').text('Some Error Occured. Status can not be updated.');
-                        $('.ajax-alert-err').show();
-                        setTimeout(function(){$(".ajax-alert-err").fadeOut()}, 5000);
-                    }
-                    $('.profile_active_status').removeClass('profile_active_status');
-                    $('.loader').hide();
-                    $('body').removeClass('body-overflow');
-                }
-            });
-            return false;
-            e.preventDefault();
-            });
-        });
-    }); */
+                                    //yp photo right click functionality
+                                    $(function () {
+                                        $('.profile_click').bind('contextmenu', function (e) {
+                                            var service_user_id = "{{ $service_user_id }}";
+                                            $(this).addClass('profile_active_status');
+                                            $('.loader').show();
+                                            $('body').addClass('body-overflow');
+                                        $.ajax({
+                                            type   : 'get',
+                                            url    : "{{ url('/service/user-profile/afc-status/update') }}"+'/'+service_user_id,
+                                            success:function(resp){
+                                                if(isAuthenticated(resp) == false){
+                                                    return false;
+                                                }
+                                                if(resp == 'true') {
+                                                    if($('.profile_active_status').hasClass('profile_active')) {
+                                                        $('.profile_active_status').removeClass('profile_active');
+                                                        $('.profile_active_status').addClass('profile_inactive');
+                                                    } else {
+                                                        $('.profile_active_status').removeClass('profile_inactive')
+                                                         $('.profile_active_status').addClass('profile_active');
+                                                    }
+                                                    //show success message
+                                                    $('.ajax-alert-suc').find('.msg').text('MFC/AFC status has been changed successfully.');
+                                                    $('.ajax-alert-suc').show();
+                                                    setTimeout(function(){$(".ajax-alert-suc").fadeOut()}, 5000);
+                                                } else if(resp == 'AUTH_ERR') {
+                                                    $('.ajax-alert-err').find('.msg').text("{{ UNAUTHORIZE_ERR }}");
+                                                    $('.ajax-alert-err').show();
+                                                    setTimeout(function(){$(".ajax-alert-err").fadeOut()}, 5000);
+                                                } else {
+                                                    $('.ajax-alert-err').find('.msg').text('Some Error Occured. Status can not be updated.');
+                                                    $('.ajax-alert-err').show();
+                                                    setTimeout(function(){$(".ajax-alert-err").fadeOut()}, 5000);
+                                                }
+                                                $('.profile_active_status').removeClass('profile_active_status');
+                                                $('.loader').hide();
+                                                $('body').removeClass('body-overflow');
+                                            }
+                                        });
+                                        return false;
+                                        e.preventDefault();
+                                        });
+                                    });
+                                }); */
 </script>
 
 <!-- commom scripts -->
 <!-- <script>
-    $(document).ready(function(){
-        $(document).on('click','.rcd-head', function(){
-            $(this).next('.rcd-content').slideToggle();
-            $(this).find('i').toggleClass('fa-angle-down');
-            $('.input-plusbox').hide();
+        $(document).ready(function() {
+            $(document).on('click', '.rcd-head', function() {
+                $(this).next('.rcd-content').slideToggle();
+                $(this).find('i').toggleClass('fa-angle-down');
+                $('.input-plusbox').hide();
+            });
         });
-    });
-</script> -->
+    </script> -->
 
 <script type="text/javascript">
     $(document).on('click', '.reprt_modl', function() {
@@ -940,5 +1092,4 @@ span.ps10 {
         }
     };
 </script>
-
 @endsection

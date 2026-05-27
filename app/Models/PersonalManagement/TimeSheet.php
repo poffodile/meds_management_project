@@ -12,13 +12,10 @@ class TimeSheet extends Model
     protected $fillable = [
         'home_id',
         'user_id',
+        'category_id',
         'date',
+        'time',
         'hours',
-        'sleep',
-        'wake_night',
-        'disturbance',
-        'annual_leave',
-        'on_call',
         'comments',
         'deleted_at'
     ];

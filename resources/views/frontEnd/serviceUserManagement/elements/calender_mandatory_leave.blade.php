@@ -6,7 +6,6 @@
     }
 ?>
 
-
 <!-- Calendar Add Entry -->
 <div class="modal fade" id="calndrAddMandatoryLeave" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -20,7 +19,7 @@
                     <div class="row">
 
                         <div class="form-group col-md-12 col-sm-12 col-xs-12 p-0">
-                            <label class="col-md-1 col-sm-1 col-xs-12 p-t-7"> User: </label>
+                            <label class="col-md-1 col-sm-1 col-xs-12 p-t-7"> Child: </label>
                             <div class="col-md-11 col-sm-11 col-xs-12">
                                 <div class="select-style">
                                     <?php //echo Auth::user()->home_id; ?>

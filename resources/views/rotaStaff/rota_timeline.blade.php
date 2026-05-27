@@ -8,7 +8,7 @@
     }
 
     .employees-info .save-btn {
-        background-color: #e10078;
+        /* background-color: #e10078; */
         font-weight: 600;
     }
 
@@ -104,18 +104,18 @@
                                         <button type="button" onclick="renamedata(<?= $rota_data->id ?>,'<?= $rota_data->rota_name ?>',<?= $rota_data->status ?>)" class="publish_btn">Publish</button>
                                         @endif
                                         <!-- Publish/Unpublish Modal -->
-                                        <div class="modal fade exampleModalPublish" id="exampleModalPublish" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                        <div class="modal  exampleModalPublish" id="exampleModalPublish" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                             <div class="modal-dialog">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
-                                                        <h1 class="modal-title fs-5" id="exampleModalLabel">Are you sure you want to
+                                                        <h4 class="modal-title" id="exampleModalLabel">Are you sure you want to
                                                             @if($rota_data->status === 0)
                                                             Publish
                                                             @endif
                                                             @if($rota_data->status === 1)
                                                             Unpublish
                                                             @endif this rota?
-                                                        </h1>
+                                                        </h4>
                                                         <button type="button" class="modal_close_btn" data-bs-dismiss="modal" aria-label="Close"> &#10006; </button>
                                                     </div>
                                                     <div class="modal-body">
@@ -194,10 +194,10 @@
                                 <div class="add-color" style="border-bottom: 1px solid rgb(232, 234, 236); width: calc(4.16667%); border-left: 1px solid rgb(232, 234, 236);">
                                 </div>
                             </div>
-                            <div class="accordion" id="accordionPanelsStayOpenExample">
+                            <div class="accordion editRota" id="accordionPanelsStayOpenExample">
                                 <div class="accordion-item">
                                     <h2 class="accordion-header" id="panelsStayOpen-headingOne">
-                                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true" aria-controls="panelsStayOpen-collapseOne">
+                                        <button class="accordion-button" type="button" data-toggle="collapse" data-target="#panelsStayOpen-collapseOne" aria-expanded="true" aria-controls="panelsStayOpen-collapseOne">
                                             {{ date("D j M Y", strtotime($rota_data->rota_start_date)) }} - {{ date("D j M Y", strtotime($rota_data->rota_end_date)) }}
                                         </button>
                                     </h2>
@@ -210,7 +210,7 @@
                                             foreach ($period as $date) {
                                                 $date->format('D j M') . "<br>";
                                             ?>
-                                                <div class="d-flex">
+                                                <div class="addSoftBtmBorder">
                                                     <div class="date-of-shift">
                                                         <strong>{{$date->format('D j M')}}</strong>
                                                     </div>
@@ -232,27 +232,28 @@
                                                     $shift_start = $rota_shifts->shift_start_time;
                                                     $shift_end = $rota_shifts->shift_end_time;
                                                     $description = $rota_shifts->description;
-                                                    $list_emp = App\RotaAssignEmployee::where('rota_id', $rota_data->id)->where('shift_id', $shift_id)->where('status', 1)->get();
-                                                    foreach ($list_emp as $emp_ids) {
-                                                        $userdata[] = App\User::where('id', $emp_ids->emp_id)->get();
-                                                    }
-                                                }
-                                                foreach ($userdata as $user_data) { ?>
+                                                    $list_emp = App\RotaAssignEmployee::where('rota_id', $rota_data->id)->where('shift_id', $shift_id)->where('status', 1)->first();
+                                                    // foreach ($list_emp as $emp_ids) {
+                                                    //     $userdata[] = App\User::where('id', $emp_ids->emp_id)->get();
+                                                    // }
+                                                    $user_data = App\User::where('id', $list_emp->emp_id)->first();
+                                                // }
+                                                // foreach ($userdata as $user_data) { ?>
                                                     <div class="w_full">
                                                         <?php for ($count = 0; $count < 24; $count++) {
                                                             echo  "<div class='hour_box' style='width: calc(4.16667%);'>
                                                                           </div>";
                                                         } ?>
                                                         <!-- Button shift modal -->
-                                                        <button type="button" class="shift_timing_btn" onclick="view_user_data(<?php echo $shift_id; ?>,`<?php echo $user_data[0]['id']; ?>`)" style="width: `+hours*4.16667+`%;  left: `+hours*4.16667+`%;" style="sdisplay: none;" data-testid="Shift card" style="width: 33.3333%; left: 37.5%;">
+                                                        <button type="button" class="shift_timing_btn" onclick="view_user_data(<?php echo $shift_id; ?>,`<?php echo $user_data->id; ?>`)" style="width: `+hours*4.16667+`%;  left: `+hours*4.16667+`%;" style="sdisplay: none;" data-testid="Shift card" style="width: 33.3333%; left: 37.5%;">
                                                             <div class="d-flex align-items-center">
                                                                 <div class="">
                                                                     <div class="name_of_member">
                                                                         <div class="">
                                                                             <?php
-                                                                            $str = str_split($user_data[0]['name']);
+                                                                            $str = str_split($user_data->name);
                                                                             echo strtoupper($str[0]);
-                                                                            $whatIWant = substr($user_data[0]['name'], strpos($user_data[0]['name'], " ") + 1);
+                                                                            $whatIWant = substr($user_data->name, strpos($user_data->name, " ") + 1);
                                                                             $str1 =  str_split($whatIWant);
                                                                             echo strtoupper($str1[0]);
                                                                             ?>
@@ -261,11 +262,11 @@
                                                                 </div>
                                                                 <div class="">
                                                                     <div class="d-flex align-items-center">
-                                                                        <input type="hidden" id="check_user_have" value="{{ $user_data[0]['id'] }}">
-                                                                        <div class="name_of_person">{{ $user_data[0]['name'] }}</div>
+                                                                        <input type="hidden" id="check_user_have" value="{{ $user_data->id }}">
+                                                                        <div class="name_of_person">{{ $user_data->name }}</div>
                                                                         <div class="shift_timeing_duration">{{ \Carbon\Carbon::parse($shift_start)->format('h:i') }} - {{ \Carbon\Carbon::parse($shift_end) ->format('h:i') }}</div>
                                                                     </div>
-                                                                    <div class="">{{ $description }}</div>
+                                                                    <div class="addDiscriptest">{{ $description }}</div>
                                                                 </div>
                                                             </div>
                                                         </button>
@@ -295,11 +296,11 @@
 
 </section>
 <!-- Modal -->
-<div class="modal fade addShift" id="exampleModalAddShift" tabindex="-1" aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
-    <div class="modal-dialog" style="display: block; max-width: 50rem;">
+<div class="modal addShift" id="exampleModalAddShift" tabindex="-1" aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-lg" style="display: block;">
         <div class="modal-content">
             <div class="modal-body">
-                <div class="container remove-padding M-right" id="multiForm" style="display: block;">
+                <div class="remove-padding M-right" id="multiForm" style="display: block;">
                     <form action="" method="post" id="form1select">
                         <div class="row">
                             <div class="col-md-12">
@@ -317,7 +318,7 @@
                                             <span class="s-font">Create shift</span>
                                         </li>
                                         <li class="Address-details detail" id="bg1" style="color: rgb(153, 153, 153); background-color: rgb(255, 255, 255);">
-                                            <span class="s-font">Assign Child</span>
+                                            <span class="s-font">Assign Staff</span>
                                         </li>
                                         <li class="Employment-details detail" id="bg2" style="color: rgb(153, 153, 153); background-color: rgb(255, 255, 255);">
                                             <span class="s-font">Summary</span>
@@ -336,30 +337,30 @@
                                                     <form class="employees-data" onsubmit="return validateform()">
                                                         <div class="row">
                                                             <input type="hidden" id="rota_shift_day_date">
-                                                            <label for="firstName" class="col-sm-2 col-form-label">Shift time</label>
+                                                            <label for="firstName" class="col-sm-3 col-form-label">Shift time</label>
                                                             <!-- <div class="col-sm-5"> -->
-                                                            <div class="col-auto mb-3">
+                                                            <div class="col-sm-4 mb-3">
                                                                 <input type="datetime-local" class="col-sm-2 form-control" id="start_time" aria-describedby="emailHelp" value="<?php echo date('Y-m-d'); ?> 09:00" placeholder="">
                                                             </div>
-                                                            <div class="col-auto">
+                                                            <div class="col-sm-1">
                                                                 <span class="btew-time">to</span>
                                                             </div>
-                                                            <div class="col-auto mb-3">
+                                                            <div class="col-sm-4 mb-3">
                                                                 <input type="datetime-local" class="col-sm-2 form-control" id="end_time" value="<?php echo date('Y-m-d'); ?> 17:00" aria-describedby="emailHelp" placeholder="">
                                                             </div>
                                                             <!-- </div> -->
                                                         </div>
                                                         <div class="row">
-                                                            <label for="lastName" class="col-sm-2 col-form-label">Break duration</label>
-                                                            <div class="col-auto">
+                                                            <label for="lastName" class="col-sm-3 col-form-label">Break duration</label>
+                                                            <div class="col-sm-9">
                                                                 <input type="number" id="break_time" class="form-control" placeholder="Minutes">
                                                                 <p id="lastNamError">
                                                                 </p>
                                                             </div>
                                                         </div>
-                                                        <div class="row">
-                                                            <label for="emailAdd" class="col-sm-2 col-form-label">Add a note</label>
-                                                            <div class="col-md-4">
+                                                        <div class="row m-t-10">
+                                                            <label for="emailAdd" class="col-sm-3 col-form-label">Add a note</label>
+                                                            <div class="col-md-9">
                                                                 <textarea name="" class="form-control" id="shift_notes" cols="40" rows="5"></textarea>
                                                             </div>
                                                         </div>
@@ -376,13 +377,13 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="container remove-padding">
+                                <div class="remove-padding">
                                     <div class="row" id="form2" style="display: none;">
                                         <div class="col-md-12">
                                             <div class="row">
                                                 <div class="col-md-12">
                                                     <h4>Assign Childs to <span id="assign_emp_date"></span>, <span id="shift_time_show"></span></h4>
-                                                    <span class="date-of-weak-shift">Find a Child or a team</span>
+                                                    <span class="date-of-weak-shift">Find a User or a team</span>
                                                 </div>
                                                 <div class="col-sm-3 col-md-4">
                                                     <select class="form-select form-control" aria-label="Default select example">
@@ -477,7 +478,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="container remove-padding">
+                                <div class="remove-padding">
                                     <div class="row" id="form3" style="display: none;">
                                         <div class="col-md-12">
                                             <div class="employment-details">
@@ -512,15 +513,15 @@
     </div>
 </div>
 <!-- shift  Modal start here-->
-<div class="modal fade" id="exampleModalShiftModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+<div class="modal" id="exampleModalShiftModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h1 class="modal-title fs-5" id="exampleModalLabel">Shift details</h1>
+                <h4 class="modal-title" id="exampleModalLabel">Shift details</h4>
                 <button type="button" class="btn_close" data-bs-dismiss="modal" aria-label="Close">&#10006;</button>
             </div>
             <div class="modal-body shift_detail_modal_body">
-                <div class="container remove-padding M-right" id="multiForm" style="display: block;">
+                <div class="remove-padding M-right" id="multiForm" style="display: block;">
                     <div class="row">
                         <div class="col-md-12">
                             <div class="row" id="form1" style="display: block;">
@@ -536,11 +537,11 @@
                                                     <input type="hidden" id="rota_shift_id">
                                                     <div class="row my-2">
                                                         <label for="assign_work" class="col-sm-3 col-form-label">Assigned worker</label>
-                                                        <div class="col-sm-3 col-md-5 position-rel">
+                                                        <div class="col-sm-9 col-md-9 position-rel">
                                                             <div class="position-rel" style="position: relative;">
                                                                 <input type="hidden" id="users_update_id">
                                                                 <input type="" id="show_emp_name" onclick="showSelect(event)" placeholder="Select employee" class="form-control select_employee_btn" id="staticEmail" value="">
-                                                                <span class="position-abs" style="position: absolute;right: 20px; top: 8px; color: #a1a9b3; font-size: 20px;"><i class="fa fa-search" aria-hidden="true"></i></span>
+                                                                <span class="position-abs" style="position: absolute;right: 12px; top: 3px; color: #a1a9b3; font-size: 20px;"><i class="fa fa-search" aria-hidden="true"></i></span>
                                                                 <ul class="customSelect" id="selectDropdown">
 
                                                                 </ul>
@@ -548,36 +549,36 @@
                                                         </div>
                                                     </div>
                                                     <div class="row my-2">
-                                                        <label for="date_of_shift" class="col-sm-3 col-form-label">Shift day</label>
-                                                        <div class="col-md-4">
+                                                        <label for="date_of_shift" class="col-sm-3 col-form-label">Shift AA day</label>
+                                                        <div class="col-md-9">
                                                             <input type="date" class="form-control" id="date_of_shift">
                                                         </div>
                                                     </div>
                                                     <div class="row my-2">
                                                         <label for="edit_start_time" class="col-sm-3 col-form-label">Shift time</label>
                                                         <!-- <div class="col-sm-5"> -->
-                                                        <div class="col-auto">
-                                                            <input type="datetime-local" class="col-sm-2 form-control" id="edit_start_time" aria-describedby="emailHelp" placeholder="">
+                                                        <div class="col-sm-4">
+                                                            <input type="datetime-local" class="form-control" id="edit_start_time" aria-describedby="emailHelp" placeholder="">
                                                         </div>
-                                                        <div class="col-auto">
+                                                        <div class="col-sm-1">
                                                             <span class="btew-time">to</span>
                                                         </div>
-                                                        <div class="col-auto">
-                                                            <input type="datetime-local" class="col-sm-2 form-control" id="edit_end_time" aria-describedby="emailHelp" placeholder="">
+                                                        <div class="col-sm-4">
+                                                            <input type="datetime-local" class="form-control" id="edit_end_time" aria-describedby="emailHelp" placeholder="">
                                                         </div>
                                                         <!-- </div> -->
                                                     </div>
                                                     <div class="row my-2">
                                                         <label for="edit_break_time" class="col-sm-3 col-form-label">Break duration</label>
-                                                        <div class="col-auto">
+                                                        <div class="col-sm-9">
                                                             <input type="number" class="form-control" id="edit_break_time" placeholder="Last name" min="1" max="60">
                                                             <p id="lastNamError">
                                                             </p>
                                                         </div>
                                                     </div>
                                                     <div class="row">
-                                                        <label for="emailAdd" class="col-sm-12">Add a note</label>
-                                                        <div class="col-md-12">
+                                                        <label for="emailAdd" class="col-sm-3">Add a note</label>
+                                                        <div class="col-md-9">
                                                             <textarea name="" class="form-control" id="description" cols="40" rows="3"></textarea>
                                                         </div>
                                                     </div>
@@ -765,28 +766,28 @@
             },
             success: function(result) {
                 console.log(result);
-                console.log(result[0]['rota_day_date']);
+                console.log(result['rota_day_date']);
                 $('#edit_rota_id').val(rota_id);
                 $('#edit_shift_id').val(shift_id);
                 $('#edit_user_id').val(user_id);
-                $('#assigned_user_id').val(result[0]['assigned_id']);
-                $('#rota_shift_id').val(result[0]['rota_shift_id']);
-                $('#date_of_shift').val(result[0]['rota_day_date']);
-                $('#edit_start_time').val(result[0]['shift_start_time']);
-                $('#edit_end_time').val(result[0]['shift_end_time']);
-                $('#edit_break_time').val(result[0]['break']);
-                $('#description').val(result[0]['description']);
-                var start = moment(result[0]['shift_start_time'], "HH:mm:ss").format("HH:mm");
-                var end = moment(result[0]['shift_end_time'], "HH:mm:ss").format("HH:mm");
-                var startTime = moment(result[0]['shift_start_time']);
-                var endTime = moment(result[0]['shift_end_time']);
+                $('#assigned_user_id').val(result['assigned_id']);
+                $('#rota_shift_id').val(result['rota_shift_id']);
+                $('#date_of_shift').val(result['rota_day_date']);
+                $('#edit_start_time').val(result['shift_start_time']);
+                $('#edit_end_time').val(result['shift_end_time']);
+                $('#edit_break_time').val(result['break']);
+                $('#description').val(result['description']);
+                var start = moment(result['shift_start_time'], "HH:mm:ss").format("HH:mm");
+                var end = moment(result['shift_end_time'], "HH:mm:ss").format("HH:mm");
+                var startTime = moment(result['shift_start_time']);
+                var endTime = moment(result['shift_end_time']);
                 // calculate total duration
                 var duration = moment.duration(endTime.diff(startTime));
                 console.log(duration);
                 // duration in hours
                 var hours = parseInt(duration.asHours());
 
-                document.getElementById('duration_of_shift').innerHTML = hours + " hour with " + result[0]['break'] + " mins break";
+                document.getElementById('duration_of_shift').innerHTML = hours + " hour with " + result['break'] + " mins break";
             }
         });
         $('#exampleModalShiftModal').modal('show');
@@ -1280,7 +1281,7 @@
             next2.disabled = true;
             next2.classList.add("disable_btn_nxt2");
         } else {
-            hour_emp.innerHTML = `<p>This shift has <strong>${countE} Childs </strong>working <strong>${Math.abs(show_hour*countE)} hrs</strong></p>`;
+            hour_emp.innerHTML = `<p>This shift has <strong>${countE} users </strong>working <strong>${Math.abs(show_hour*countE)} hrs</strong></p>`;
 
             next2.removeAttribute("disabled");
             next2.classList.remove("disable_btn_nxt2");

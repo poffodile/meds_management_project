@@ -16,7 +16,7 @@
                     </header>
                     <div class="clearfix clearfix_space">
                         <div class="btn-group">
-                            <a href="{{ url('/admin/general-admin/department/add') }}" id="editable-sample_new" class="btn btn-primary"> Add New <i class="fa fa-plus"></i></a>
+                            {{-- <a href="{{ url('/admin/general-admin/department/add') }}" id="editable-sample_new" class="btn btn-primary"> Add New <i class="fa fa-plus"></i></a> --}}
                         </div>
                     </div>
 
@@ -39,8 +39,9 @@
                                     <thead>
                                         <tr>
                                             <th>#</th>
-                                            <th>Department </th>
                                             <th>Date</th>
+                                            <th>Department </th>
+                                            <th>Description</th>
                                             <th>Status</th>
                                             <th width="20%">Actions</th>
                                         </tr>
@@ -48,9 +49,10 @@
                                     <tbody>
                                         @foreach($departments as $dept)
                                         <tr>
-                                            <td>{{ $dept->id }}</td>
-                                            <td>{{ $dept->name }}</td>
+                                            <td>{{ $loop->iteration }}</td>
                                             <td>{{ $dept->created_at->format('d-m-Y') }}</td>
+                                            <td>{{ $dept->name }}</td>
+                                            <td>{{ $dept->description }}</td>
                                             <td>
                                                 <button class="btn btn-xs change-status" data-id="{{ $dept->id }}" data-status="{{ $dept->status }}">
                                                     @if($dept->status == 1)
@@ -62,7 +64,7 @@
                                             </td>
                                             <td>
                                                 <a href="{{ url('admin/general-admin/department/edit/'.$dept->id) }}" class="btn btn-primary btn-xs"><i class="fa fa-pencil"></i></a>
-                                                <a href="{{ url('admin/general-admin/department/delete/'.$dept->id) }}" class="btn btn-danger btn-xs"><i class="fa fa-trash-o "></i></a>
+                                                {{-- <a href="{{ url('admin/general-admin/department/delete/'.$dept->id) }}" class="btn btn-danger btn-xs"><i class="fa fa-trash-o "></i></a> --}}
                                             </td>
                                         </tr>
                                         @endforeach
@@ -71,7 +73,6 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
             <!-- page end-->

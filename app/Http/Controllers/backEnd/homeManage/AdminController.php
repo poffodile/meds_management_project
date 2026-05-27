@@ -60,6 +60,12 @@ class AdminController extends Controller
 
         if($request->isMethod('post'))
         {  
+            $request->validate([
+                'name'      => 'required',
+                'user_name' => 'required|unique:admin,user_name|unique:user,user_name',
+                'email'     => 'required|email',
+            ]);
+
             $admin               = new Admin;
             // $system_admin->home_id      = $home_id;
             $admin->name         = $request->name;
@@ -93,6 +99,23 @@ class AdminController extends Controller
 
             if($admin->save())
                 {
+                    // Create corresponding user in user table
+                    $user = new \App\User();
+                    $user->holiday_entitlement = '';
+                    $user->description = '';
+                    $user->job_title = '';
+                    $user->name = $request->name;
+                    $user->user_name = $request->user_name;
+                    $user->email = $request->email;
+                    $user->password = '';
+                    $user->user_type = 'A';
+                    $user->admn_id = \App\Home::where('id', $home_id)->where('is_deleted', 0)->value('admin_id');
+                    $user->home_id = $home_id;
+                    $user->status = 1;
+                    $user->is_deleted = '0';
+                    $user->image = $admin->image;
+                    $user->save();
+
                     return redirect('admin/homelist/home-admin/'.$home_id)->with('success', 'Home Admin added successfully.');
                 } 
             else
@@ -120,6 +143,14 @@ class AdminController extends Controller
              $company = '';
 
             $admin               = Admin::find($home_admin_id);
+
+            $request->validate([
+                'name'      => 'required',
+                'user_name' => 'required|unique:admin,user_name,' . $home_admin_id . '|unique:user,user_name,' . $admin->user_name . ',user_name',
+                'email'     => 'required|email',
+            ]);
+
+            $old_username        = $admin->user_name;
             // $system_admin->home_id      = $home_id;
             $admin_old_image     = $admin->image;
             $admin->name         = $request->name;
@@ -158,6 +189,17 @@ class AdminController extends Controller
 
             if($admin->save())
             {
+               // Update corresponding user in user table
+               \App\User::updateOrCreate(
+                   ['user_name' => $old_username, 'user_type' => 'A'],
+                   [
+                       'name'      => $request->name,
+                       'user_name' => $request->user_name,
+                       'email'     => $request->email,
+                       'image'     => $admin->image,
+                       'is_deleted'=> '0'
+                   ]
+               );
                return redirect('admin/homelist/home-admin/'.$admin->home_id)->with('success', 'Home Admin updated successfully.'); 
             } 	
             else
@@ -180,9 +222,13 @@ class AdminController extends Controller
        
         if(!empty($user_id))
        {    
+            $admin = DB::table('admin')->where('id', $user_id)->first();
             $updated = DB::table('admin')->where('id', $user_id)->update(['is_deleted' => '1']);
 
             if($updated){
+                if ($admin) {
+                    DB::table('user')->where('user_name', $admin->user_name)->where('user_type', 'A')->update(['is_deleted' => '1']);
+                }
                 return redirect()->back()->with('success','User deleted Successfully.'); 
             } else{
                 return redirect()->back()->with('error',COMMON_ERROR); 
@@ -247,6 +293,11 @@ class AdminController extends Controller
         $super_admin->password =   md5($data['password']);
         
         if($super_admin->save())  {   
+            // Update in user table too
+            \App\User::where('user_name', $user_name)->where('user_type', 'A')->update([
+                'password' => \Hash::make($data['password'])
+            ]);
+
             //logging out any previous loggedin admin
             Session::forget('scitsAdminSession');
             return redirect('admin/login')->with('success','You have set your password successfully.');

@@ -42,35 +42,43 @@ margin:20px 0px 0px 0px;
                     </header>
                     <div class="panel-body">
                         <div class="position-center">
+                            <div class="m-b-15">
+                                {{$u_details->name}} Annual Leave
+                            </div>
                             <form class="form-horizontal" role="form" method="post" action="{{ $action }}" id="{{ $form_id }}" enctype="multipart/form-data">
-                                <div class="form-group">
+                                <!-- <div class="form-group">
                                     <label class="col-lg-2 control-label">Title</label>
                                     <div class="col-lg-10">
                                         <input type="text" name="title" class="form-control" placeholder="title" value="{{ (isset($u_annual_leave->title)) ? $u_annual_leave->title : '' }}" maxlength="255">
                                     </div>
+                                </div> -->
+                                <div class="form-group">
+                                    <label class="col-lg-2 control-label">Start Date</label>
+                                    <div class="col-lg-10">
+                                       <input class="form-control default-date-picker" type="text" value="{{ (isset($u_annual_leave->start_date)) ? date('d-m-Y',strtotime($u_annual_leave->start_date)) : '' }}" placeholder="DD-MM-YYYY" name="start_date" value="" maxlength="10" readonly="">
+                                    </div>
+                                </div>  
+                                <div class="form-group">
+                                    <label class="col-lg-2 control-label">End Date</label>
+                                    <div class="col-lg-10">
+                                       <input class="form-control default-date-picker" type="text" value="{{ (isset($u_annual_leave->end_date)) ? date('d-m-Y',strtotime($u_annual_leave->end_date)) : '' }}" placeholder="DD-MM-YYYY" name="end_date" value="" maxlength="10" readonly="">
+                                    </div>
                                 </div>
 
                                 <div class="form-group">
-                                    <label class="col-lg-2 control-label">Leave Date</label>
+                                    <label class="col-lg-2 control-label">Notes</label>
                                     <div class="col-lg-10">
-                                       <input class="form-control default-date-picker" type="text" value="{{ (isset($u_annual_leave->leave_date)) ? date('d-m-Y',strtotime($u_annual_leave->leave_date)) : '' }}" placeholder="DD-MM-YYYY" name="leave_date" value="" maxlength="10" readonly="">
+                                        <textarea type="text" name="notes" class="form-control" placeholder="Enter reason" maxlength="1000">{{ (isset($u_annual_leave->notes)) ? $u_annual_leave->notes : '' }}</textarea>
                                     </div>
                                 </div>  
 
-                                <div class="form-group">
-                                    <label class="col-lg-2 control-label">Reason</label>
-                                    <div class="col-lg-10">
-                                        <textarea type="text" name="reason" class="form-control" placeholder="Enter reason" maxlength="1000">{{ (isset($u_annual_leave->reason)) ? $u_annual_leave->reason : '' }}</textarea>
-                                    </div>
-                                </div>  
-
-                                <div class="form-group">
+                                <!-- <div class="form-group">
                                     <label class="col-lg-2 control-label">Comment</label>
                                     <div class="col-lg-10">
                                         <textarea type="text" name="comment" class="form-control" placeholder="Enter comments" maxlength="1000">{{ (isset($u_annual_leave->comments)) ? $u_annual_leave->comments : '' }}
                                         </textarea>
                                     </div>
-                                </div>                 
+                                </div>                  -->
                                 
                                 <div class="form-actions">
     								<div class="row">

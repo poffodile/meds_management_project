@@ -19,7 +19,7 @@
 }
 
 .timeline-messages .msg-in.leftmsg .arrow {
-    right: -3px;
+    right: -2px;
     left: inherit;
     border-left: 8px solid #949496 !important;
 }
@@ -37,7 +37,7 @@
     margin-right: 6px;
     display: flex;
     padding: 9px 10px;
-    min-width: 480px;
+    min-width: 434px;
 }
 
 .msg-time-chat .msg-in .text .second p {
@@ -177,24 +177,6 @@ span.timelineIcons {
     display: flow-root;
 }
 
-
-.back_opt {
-    background: #1f88b5;
-    border-radius: 100%;
-    color: #fff;
-    font-size: 20px;
-    padding: 8px 18px;
-    z-index: 999;
-    cursor: pointer;
-    height: 45px;
-    width: 45px;
-    display: inline-block;
-}
-
-.back_opt:hover i {
-    color: #fff;
-}
-
 .timeline .time-show {
     text-align: center;
     margin-right: 0px;
@@ -202,6 +184,10 @@ span.timelineIcons {
 
 .timeline .time-show .btn {
     min-width: 150px;
+    cursor: auto;
+}
+.timeline .time-show .btn:hover{
+    background-color: #1fb5ad;
 }
 
 #logs_articles {
@@ -253,12 +239,13 @@ span.timelineIcons {
 .Select_staff {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    /* justify-content: space-between; */
     flex-wrap: wrap;
 }
 
 .Select_staff_inner {
-    margin: 10px 0;
+    margin: 10px 20px;
+    width: 15%;
 }
 
 @media (max-width:890px) {
@@ -295,6 +282,7 @@ span.timelineIcons {
     margin-left: 6px;
     line-height: 24px;
     position: relative;
+    min-width: 180px;
 }
 
 .rightSideInput {
@@ -326,9 +314,10 @@ span.timelineIcons {
     border-radius: 4px;
     padding: 7px 6px;
     display: block;
-    margin-right: 12px;
+    margin-right: 6px;
     line-height: 24px;
     position: relative;
+    min-width: 180px;
 }
 
 .pop-notifbox.active {
@@ -405,9 +394,9 @@ span.timelineIcons {
     background: #fff;
 }
 
-input#date_range_input {
-    width: 190px;
-}
+/* input#date_range_input {
+    width: 100%;
+} */
 
 .form-group.has-feedback {
     padding: 0px 0px 10px 0px;
@@ -425,69 +414,211 @@ input#date_range_input {
     top: 50px;
 }
 
+.rmpTimeLft .pop-notifbox {
+    right: inherit;
+    left: 0;
+}
 .timelineInput .pop-notification::after {
-    content: "\f0d9";
+    content: "\f0d7";
     font-family: 'fontawesome';
-    right: -8px;
+    left: 10px;
+    right: auto;
     position: absolute;
-    top: 2px;
+    top: -22px;
     color: #fff;
     transform: rotate(180deg);
 }
-
+.pop-notification::after {
+    content: "\f0d8";
+    font-family: "fontawesome";
+    right: 12px;
+    left: auto;
+    position: absolute;
+    top: -24px;
+    color: #fff;
+}
 
 /*  nEW CSS */
 
   /*09 Aug 2018*/
-    .back_opt {
-        background: #1f88b5;
-        border-radius: 100%;
-        color: #fff;
-        font-size: 20px;
-        padding: 8px 18px;
-        z-index: 999;
-        cursor: pointer;
-        height: 45px;
-        width: 45px;
-        display: inline-block;
-    }
+.back_opt {
+    background: #1f88b5;
+    border-radius: 10%;
+    color: #fff;
+    font-size: 20px;
+    padding: 2px 15px;
+    cursor: pointer;
+    height: 34px;
+    width: 40px;
+    display: inline-block;
+}
 
-    .back_opt:hover i {
-        color: #fff;
-    }
+.back_opt:hover i {
+    color: #fff;
+}
+/* 
+i.fa.fa.fa-h-square {
+    color: #1f88b5;
+    font-size: 25px;
+} */
 
-    i.fa.fa.fa-h-square {
-        color: #1f88b5;
-        font-size: 25px;
-    }
+.space_bottom {
+    margin-bottom: 7px !important;
+}
 
-    .space_bottom {
-        margin-bottom: 7px !important;
-    }
+.timeline,
+#logs_articles {
+    border-collapse: collapse;
+    border-spacing: 0;
+    display: table;
+    position: relative;
+    table-layout: fixed;
+    width: 100%;
+    min-height: 50vh;
+}
 
-    .timeline,
-    #logs_articles {
-        border-collapse: collapse;
-        border-spacing: 0;
-        display: table;
-        position: relative;
-        table-layout: fixed;
-        width: 100%;
-        min-height: 50vh;
-    }
+span.viewEditIcon {
+    position: absolute;
+    right: 24px;
+}
 
-    .timeline .time-show {
-        margin-right: 0px;
-        text-align: center;
-    }
+/* Start css rmpTimeline */
 
-   .rmpTimelineright {
+.rmpTimelineright {
     margin-top: 72px;
     margin-bottom: 24px;
 }
 .input-group.popovr.rmpTimeLft {
     justify-content: end;
 }
-.rmpTimeRit{
+.rmpTimeRit .rmpWithPlusInput{
+    display: flex;
+    width: 60%;
+}
+
+
+.rmpTimeRit .timLineDate{
+    order: unset;
+    margin-right: 6px;
+}
+
+.rmpTimeLft .rmpWithPlusInput{
+    display: flex;
+    width: 60%;
+}
+.rmpWithPlusInput input{
+    height: 40px;
+    border: 0;
+    color: #fff;
+}
+
+.rightSideInput.rmpTimeLft, .rightSideInput.rmpTimeRit{
+    margin-top: 0;
+}
+.rightSideInput.rmpTimeLft::after {
+    left: inherit;
+    right: -35px;
+}
+
+.rmpTimeLft .rmpWithPlusInput input {
+    order: 2;
+    padding-left: 46px;
+    color: #fff;
+    text-align: right;
+}
+.rmpTimeRit .rmpWithPlusInput .input-plus {
+    /* left: 152px;
+    right: inherit;
+    top: 4px; 
+       right: 191px;
+    top: 6px;*/
+    color: #fff;
+    font-size: 18px;
+    padding-top: 10px;
+    padding-right: 5px;
+}
+.rmpTimeLft .rmpWithPlusInput .input-plus{
+    left: 206px;
+    top: 6px;
     
+}
+.input-plus{
+    color: #fff;
+    font-size: 18px;
+    padding-top: 10px;
+    padding-left: 5px;
+}
+.input-plusbox.form-group.col-xs-12.p-0.detail{
+     position: absolute;
+    z-index: 8;
+    background: #fff;
+    width: 74%;
+    padding-bottom: 14px !important;
+}
+.detail.leftTextarea {
+    left: 23%;
+    padding-bottom: 14px !important;
+}
+.detail.rightTextarea {
+    right: 23%;
+    padding-bottom: 14px !important;
+}
+.rmpTimeRit .arrow {
+    left: 0;
+    transform: rotate(180deg);
+}
+
+ /* .rightSideDate{
+    padding-left: 120px;
+ }
+ .leftsideDate{
+     padding-right: 120px;
+ } */
+ .logged-mfc-list .rightSideInput::after,  .logged-mfc-list .timelineInput::after {
+   /* display: none; */
+}
+
+.inputTextLefttoRight input{
+    text-align: right;
+}
+
+.leftmsg .pop-notifbox {
+    /* right: 54px; */
+    left: 0;
+    top: 38px;
+}
+.rightmsg .pop-notifbox {
+    right: 0;
+    display: inline-table;
+    left: inherit;
+    top: 38px;
+}
+.leftmsg .pop-notification::after {
+    top: -17px;
+    left: 10px;
+}
+.rightmsg .pop-notification::after{
+    top: -17px;
+}
+.rightmsg  .input-group-addon, .leftmsg  .input-group-addon{
+    color: #fff;
+}
+
+.rightmsg .input-group-addon:before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0px;
+    width: 1px;
+    height: 20px;
+    background: #fff;
+}
+.leftmsg .input-group-addon:before {
+    content: "";
+    position: absolute;
+    right: 0;
+    top: 0px;
+    width: 1px;
+    height: 20px;
+    background: #fff;
 }

@@ -12,11 +12,12 @@ use App\Notification;
 use Exception;
 use DB, Auth;
 // use PDF;
-// use Carbon\Carbon;
+use Carbon\Carbon;
 use App\DynamicForm;
 
 class LogBookController extends ServiceUserManagementController
 {
+
     public function index($service_user_id)
     {
 
@@ -185,13 +186,13 @@ class LogBookController extends ServiceUserManagementController
                     Mail::send(
                         'emails.su_late_entry_mail',
                         [
-                            'staff_name'     => $staff_name,
-                            'service_user_name'     => $service_user->name,
-                            'title'     => $log_book_record->title,
-                            'date'  => $log_book_record->date,
-                            'details'   => $log_book_record->details,
-                            'home_id'   => $log_book_record->home_id,
-                            'user_id'   => $log_book_record->user_id,
+                            'staff_name'        => $staff_name,
+                            'service_user_name' => $service_user->name,
+                            'title'             => $log_book_record->title,
+                            'date'              => $log_book_record->date,
+                            'details'           => $log_book_record->details,
+                            'home_id'           => $log_book_record->home_id,
+                            'user_id'           => $log_book_record->user_id,
                         ],
                         function ($message) use ($staff_email, $staff_name, $service_user) {
                             $message
@@ -207,11 +208,193 @@ class LogBookController extends ServiceUserManagementController
             Log::error($ex);
         }
     }
+    // 28-08-25
+    // public function add(Request $request)
+    // {
+    //     // dd($request);
+    //     // echo "<pre>"; print_r($request->all()); die;
+    //     if ($request->isMethod('post')) {
+    //         //sourabh geo location
+    //         // $ip = '49.35.41.195'; //For static IP address get
+    //         // $ip = request()->ip(); //Dynamic IP address get
+
+    //         $res = file_get_contents('https://api.ipify.org/?format=json');
+    //         $data_value = json_decode($res, true);
+
+    //         if ($data_value !== null && isset($data_value['ip'])) {
+    //             $ip = $data_value['ip'];
+    //         } else {
+    //             $ip = "";
+    //         }
+
+    //         $response = file_get_contents('https://ipinfo.io/' . $ip . '/json?token=babd113378833b');
+
+    //         if ($response === false) {
+    //             $data = "";
+    //         } else {
+    //             $data = json_decode($response, true);
+    //             if ($data !== null) {
+    //                 $coordinates = explode(',', $data['loc']);
+    //                 $latitude = $coordinates[0];
+    //                 $longitude = $coordinates[1];
+    //             } else {
+    //                 $latitude = "";
+    //                 $longitude = "";
+    //             }
+    //         }
+
+    //         // $current_location = \Location::get($ip);
+    //         //sourabh geo location
+    //         $data = $request->all();
+    //         //print_r($data['log_image']);
+    //         /*sourabh image upload*/
+    //         if ($request->hasFile('log_image')) {
+    //             //echo "string";
+    //             $log_image = time() . '.' . request()->log_image->getClientOriginalExtension();
+    //             request()->log_image->move('upload/events/', $log_image);
+    //         } else {
+    //             //echo "false";
+    //             $log_image = '';
+    //         }
+    //         // echo $data['service_user_id'];
+    //         // die;
+    //         /*sourabh*/
+    //         // echo "<pre>"; print_r($data); die;
+
+    //         /*$su_home_id = ServiceUser::where('id',$data['service_user_id'])->value('home_id');
+    //         if(Auth::user()->home_id != $su_home_id){
+    //             echo '0'; die; 
+    //         }*/
+    //         $home_ids = Auth::user()->home_id;
+    //         $searchString = ',';
+    //         //$homde_id = 1,2
+    //         if (strpos(@$home_ids, $searchString) !== false) {
+    //             $home_id =  explode(',', @$home_ids);
+    //             $login_home_id = @$home_id[0];
+    //         } else {
+    //             $login_home_id = @$home_ids;
+    //         }
+
+    //         $form_insert_id = DynamicForm::saveForm($data);
+
+    //         $latest_date  = LogBook::select('log_book.*')->orderBy('date', 'desc')->take(1)->value('date');
+    //         $latest_date  = date('Y-m-d H:i:s', strtotime($latest_date));
+    //         $given_date   = date('Y-m-d H:i:s', strtotime($data['date'] . ' ' . $data['time']));
+    //         // $given_date    = date('d-m-Y H:i:s');
+    //         $latest_date_without_time    = date('Y-m-d', strtotime($latest_date));
+    //         $given_date_without_time    = date('Y-m-d', strtotime($given_date));
+    //         $current_date_without_time    = date('Y-m-d');
+
+
+    //         // $latest_date_value = $latest_date->value('date');
+
+    //         $log_book_record          = new LogBook;
+    //         // echo "<pre>"; print_r($log_book_record); die;
+
+    //         $category_icon = CategoryFrontEnd::where('id', $data['category'])->value('icon');
+    //         $category_name = CategoryFrontEnd::where('id', $data['category'])->value('name');
+
+    //         $log_book_record->title   = $data['title'];
+    //         $log_book_record->category_id = $data['category'];
+    //         $log_book_record->formdata = json_encode($data['data']);
+    //         $log_book_record->start_date =  date('Y-m-d');
+    //         $log_book_record->dynamic_form_id = $form_insert_id;
+    //         $log_book_record->category_name   = $category_name;
+    //         $log_book_record->category_icon   = $category_icon;
+    //         $log_book_record->date    = $given_date;
+    //         $log_book_record->details = $data['details'];
+    //         $log_book_record->home_id = $login_home_id;
+    //         $log_book_record->user_id = Auth::user()->id;
+    //         $log_book_record->image_name = $log_image;
+    //         $log_book_record->latitude = $latitude;
+    //         $log_book_record->longitude = $longitude;
+
+    //         // Log::info($current_date_without_time);
+    //         // Log::info($latest_date_without_time);
+    //         // Log::info('*******');
+
+    //         // Log::info($given_date);
+    //         // Log::info($latest_date);
+    //         // Log::info('*******');
+    //         if ($given_date < $latest_date) {
+    //             $log_book_record->is_late = true;
+    //         } else if ($current_date_without_time > $latest_date_without_time && $given_date_without_time < $current_date_without_time) {
+    //             $log_book_record->is_late = true;
+    //         }
+
+    //         $log_book_record->save();
+    //         if ($log_book_record->save()) {
+
+    //             $su_log_book_record                     =   new ServiceUserLogBook;
+    //             $su_log_book_record->service_user_id    =   $data['service_user_id'];
+    //             $su_log_book_record->log_book_id        =   $log_book_record->id;
+    //             $su_log_book_record->user_id            =   Auth::user()->id;
+    //             //$su_log_book_record->category_id        =   $data['category_id'];
+    //             $su_log_book_record->logType = '1';
+
+    //             if ($given_date < $latest_date) {
+    //                 $su_log_book_record->is_late = true;
+    //                 Log::info("Send notification for late entry ");
+    //                 $this->sendNotification($log_book_record, $su_log_book_record);
+    //                 if ($su_log_book_record->save()) {
+    //                     $result['response'] = true;
+    //                 } else {
+    //                     $result['response'] = false;
+    //                 }
+    //             } else {
+    //                 if ($su_log_book_record->save()) {
+    //                     $result['response'] = true;
+    //                     echo "1";
+    //                 } else {
+    //                     $result['response'] = false;
+    //                     echo "2";
+    //                 }
+    //             }
+    //             // if($su_log_book_record->save()) {
+    //             //     if(strtotime($log_book_record->date) < strtotime('now')) {
+    //             //         Log::info("Send notification for late entry ");
+    //             //         $this->sendNotification($log_book_record, $su_log_book_record);
+    //             //     }
+    //             //     $result['response'] = true;
+    //             // }  else {
+    //             //     $result['response'] = false;  
+    //             // }
+    //         } else {
+
+    //             $result['response'] = false;
+    //             echo "2";
+    //         }
+    //         // if($log_book_record->save()){
+
+    //         //saving notification start
+
+    //         /*$notification                  = new Notification;
+    //             $notification->service_user_id = $data['service_user_id'];
+    //             $notification->event_id        = $records->id;
+    //             $notification->event_type      = 'SU_DR';
+    //             $notification->event_action    = 'ADD';      
+    //             $notification->home_id         = Auth::user()->home_id;
+    //             $notification->user_id         = Auth::user()->id;        
+    //             $notification->save();*/
+
+    //         //saving notification end
+
+    //         /*$res = $this->index();
+    //             echo $res; die;*/
+
+    //         /*return redirect()->back()->with('success','Request submitted successfully.');
+
+    //         }
+    //         else { 
+    //             return redirect()->back()->with('error',COMMON_ERROR);
+    //         }*/
+    //         // return $result;
+    //     }
+    // }
 
     public function add(Request $request)
     {
-        // dd($request);
-        // echo "<pre>"; print_r($request->all());die;
+        // echo "<pre>"; print_r($request->all()); die;
         if ($request->isMethod('post')) {
             //sourabh geo location
             // $ip = '49.35.41.195'; //For static IP address get
@@ -242,132 +425,220 @@ class LogBookController extends ServiceUserManagementController
                 }
             }
 
-            // $current_location = \Location::get($ip);
             //sourabh geo location
+            // $current_location = \Location::get($ip);
+
             $data = $request->all();
-            //print_r($data['log_image']);
-            /*sourabh image upload*/
-            if ($request->hasFile('log_image')) {
-                //echo "string";
-                $log_image = time() . '.' . request()->log_image->getClientOriginalExtension();
-                request()->log_image->move('upload/events/', $log_image);
-            } else {
-                //echo "false";
-                $log_image = '';
-            }
-            // echo $data['service_user_id'];
-            // die;
-            /*sourabh*/
             // echo "<pre>"; print_r($data); die;
 
-            /*$su_home_id = ServiceUser::where('id',$data['service_user_id'])->value('home_id');
-            if(Auth::user()->home_id != $su_home_id){
-                echo '0'; die; 
-            }*/
-            $home_ids = Auth::user()->home_id;
-            $searchString = ',';
-            //$homde_id = 1,2
-            if (strpos(@$home_ids, $searchString) !== false) {
-                $home_id =  explode(',', @$home_ids);
-                $login_home_id = @$home_id[0];
-            } else {
-                $login_home_id = @$home_ids;
-            }
+            if (!empty($data['dynamic_form_log_book_id'])) {
 
-            $form_insert_id = DynamicForm::saveForm($data);
+                /*sourabh image upload*/
+                if ($request->hasFile('log_image')) {
+                    //echo "string";
+                    $log_image = time() . '.' . request()->log_image->getClientOriginalExtension();
+                    request()->log_image->move('upload/events/', $log_image);
+                } else {
+                    //echo "false";
+                    $log_image = '';
+                }
 
-            $latest_date  = LogBook::select('log_book.*')->orderBy('date', 'desc')->take(1)->value('date');
-            $latest_date  = date('Y-m-d H:i:s', strtotime($latest_date));
-            $given_date   = date('Y-m-d H:i:s', strtotime($data['log_date']));
-            // $given_date    = date('Y-m-d H:i:s');
-            $latest_date_without_time    = date('Y-m-d', strtotime($latest_date));
-            $given_date_without_time    = date('Y-m-d', strtotime($given_date));
-            $current_date_without_time    = date('Y-m-d');
+                $dynamic_form_log = null;
 
-
-            // $latest_date_value = $latest_date->value('date');
-
-            $log_book_record          = new LogBook;
-            // echo "<pre>"; print_r($log_book_record); die;
-
-            $category_icon = CategoryFrontEnd::where('id', $data['category'])->value('icon');
-            $category_name = CategoryFrontEnd::where('id', $data['category'])->value('name');
-
-            $log_book_record->title   = $data['log_title'];
-            $log_book_record->category_id = $data['category'];
-            $log_book_record->formdata = json_encode($data['data']);
-            $log_book_record->start_date =  date('Y-m-d');
-            $log_book_record->dynamic_form_id = $form_insert_id;
-            $log_book_record->category_name   = $category_name;
-            $log_book_record->category_icon   = $category_icon;
-            $log_book_record->date    = date('Y-m-d H:i:s', strtotime($data['log_date']));
-            $log_book_record->details = $data['log_detail'];
-            $log_book_record->home_id = $login_home_id;
-            $log_book_record->user_id = Auth::user()->id;
-            $log_book_record->image_name = $log_image;
-            $log_book_record->latitude = $latitude;
-            $log_book_record->longitude = $longitude;
-
-            // Log::info($current_date_without_time);
-            // Log::info($latest_date_without_time);
-            // Log::info('*******');
-
-            // Log::info($given_date);
-            // Log::info($latest_date);
-            // Log::info('*******');
-            if ($given_date < $latest_date) {
-                $log_book_record->is_late = true;
-            } else if ($current_date_without_time > $latest_date_without_time && $given_date_without_time < $current_date_without_time) {
-                $log_book_record->is_late = true;
-            }
-
-            $log_book_record->save();
-            if ($log_book_record->save()) {
-
-                $su_log_book_record                     =   new ServiceUserLogBook;
-                $su_log_book_record->service_user_id    =   $data['service_user_id'];
-                $su_log_book_record->log_book_id        =   $log_book_record->id;
-                $su_log_book_record->user_id            =   Auth::user()->id;
-                //$su_log_book_record->category_id        =   $data['category_id'];
-                $su_log_book_record->logType = '1';
-
-                if ($given_date < $latest_date) {
-                    $su_log_book_record->is_late = true;
-                    Log::info("Send notification for late entry ");
-                    $this->sendNotification($log_book_record, $su_log_book_record);
-                    if ($su_log_book_record->save()) {
-                        $result['response'] = true;
-                    } else {
-                        $result['response'] = false;
+                if (isset($data['log_dynamic_form_id'])) {
+                    $dynamic_form_log = DynamicForm::find($data['log_dynamic_form_id']);
+                    if ($dynamic_form_log) {
+                        $dynamic_form_log->title = $data['title'];
+                        $dynamic_form_log->date = \Carbon\Carbon::createFromFormat('d-m-Y', $data['date'])->format('Y-m-d');
+                        $dynamic_form_log->time = $data['time'];
+                        $dynamic_form_log->details = $data['details'];
+                        $dynamic_form_log->pattern_data = $data['formDataLogs'];
+                        $dynamic_form_log->save();
                     }
                 } else {
-                    if ($su_log_book_record->save()) {
-                        $result['response'] = true;
-                        echo "1";
-                    } else {
-                        $result['response'] = false;
-                        echo "2";
+                    if ($data['dynamic_form_builder_id'] != 0) {
+                        $form_insert_id = DynamicForm::saveForm($data);
                     }
                 }
-                // if($su_log_book_record->save()) {
-                //     if(strtotime($log_book_record->date) < strtotime('now')) {
-                //         Log::info("Send notification for late entry ");
-                //         $this->sendNotification($log_book_record, $su_log_book_record);
-                //     }
-                //     $result['response'] = true;
-                // }  else {
-                //     $result['response'] = false;  
-                // }
+
+
+                // Find existing record
+                $log_book_record = LogBook::find($data['dynamic_form_log_book_id']); // <-- $id should be passed from request
+
+                $category_icon = CategoryFrontEnd::where('id', $data['category'])->value('icon');
+                $category_name = CategoryFrontEnd::where('id', $data['category'])->value('name');
+
+                if ($log_book_record) {
+                    // update fields
+                    $log_book_record->title          = $data['log_title'];
+                    $log_book_record->category_id    = $data['category'];
+                    $log_book_record->start_date     = date('Y-m-d');
+                    $log_book_record->category_name  = $category_name;
+                    $log_book_record->category_icon  = $category_icon;
+                    $log_book_record->dynamic_form_id = $form_insert_id ?? null;
+                    $log_book_record->details        = $data['log_detail'];
+                    $log_book_record->image_name     = $log_image;
+                    $log_book_record->latitude       = $latitude;
+                    $log_book_record->longitude      = $longitude;
+                    // save changes
+                    // $log_book_record->save();
+
+                }
+
+
+                if (($dynamic_form_log && $dynamic_form_log->wasChanged()) || $log_book_record->save()) {
+                    $result['response'] = true;
+                    echo "3";
+                }
             } else {
+                /*sourabh image upload*/
+                if ($request->hasFile('log_image')) {
+                    $log_image = time() . '.' . request()->log_image->getClientOriginalExtension();
+                    request()->log_image->move('upload/events/', $log_image);
+                } else {
+                    $log_image = '';
+                }
 
-                $result['response'] = false;
-                echo "2";
-            }
-            // if($log_book_record->save()){
+                $home_ids = Auth::user()->home_id;
+                $searchString = ',';
+                //$homde_id = 1,2
+                if (strpos(@$home_ids, $searchString) !== false) {
+                    $home_id =  explode(',', @$home_ids);
+                    $login_home_id = @$home_id[0];
+                } else {
+                    $login_home_id = @$home_ids;
+                }
 
-            //saving notification start
 
-            /*$notification                  = new Notification;
+                /*sourabh*/
+                /*$su_home_id = ServiceUser::where('id',$data['service_user_id'])->value('home_id');
+                if(Auth::user()->home_id != $su_home_id){
+                    echo '0'; die; 
+                }*/
+
+                if ($data['dynamic_form_builder_id'] != 0) {
+                    $form_insert_id = DynamicForm::saveForm($data);
+                }
+
+
+                // $latest_date  = LogBook::select('log_book.*')->orderBy('date', 'desc')->take(1)->value('date');
+                // $latest_date  = date('Y-m-d H:i:s', strtotime($latest_date));
+                // $latest_date_without_time    = date('Y-m-d', strtotime($latest_date));
+                // // Log date
+                // $given_date   = date('Y-m-d H:i:s', strtotime($data['log_date']));
+                // $given_date_without_time    = date('Y-m-d', strtotime($given_date));
+                // // current Date
+                // $current_date_without_time    = date('Y-m-d');
+
+                $latest_date = LogBook::orderBy('date', 'desc')->value('date'); // returns datetime
+                $latest_date = Carbon::parse($latest_date);                     // Carbon object
+                $latest_date_without_time = $latest_date->toDateString();       // Y-m-d
+
+                // Log date from input
+                $given_date = Carbon::parse($data['log_date']);                // Carbon object
+                $given_date_without_time = $given_date->toDateString();         // Y-m-d
+
+                // Current date
+                $current_date_without_time = Carbon::now()->toDateString();     // Y-m-d
+
+
+                $category_icon = CategoryFrontEnd::where('id', $data['category'])->value('icon');
+                $category_name = CategoryFrontEnd::where('id', $data['category'])->value('name');
+
+                $log_book_record          = new LogBook;
+                $log_book_record->title   = $data['log_title'];
+                $log_book_record->category_id = $data['category'];
+                $log_book_record->start_date =  Carbon::parse($data['log_date'] ?? Carbon::now())->format('Y-m-d');
+                $log_book_record->dynamic_form_id = $form_insert_id ?? null;
+                $log_book_record->category_name   = $category_name;
+                $log_book_record->category_icon   = $category_icon;
+                $log_book_record->date    = $given_date;
+                $log_book_record->details = $data['log_detail'];
+                $log_book_record->home_id = $login_home_id;
+                $log_book_record->user_id = Auth::user()->id;
+                $log_book_record->image_name = $log_image;
+                $log_book_record->latitude = $latitude;
+                $log_book_record->longitude = $longitude;
+
+                // Log::info($current_date_without_time);
+                // Log::info($latest_date_without_time);
+                // Log::info('*******');
+
+                // Log::info($given_date);
+                // Log::info($latest_date);
+                // Log::info('*******');
+                if ($given_date < $latest_date) {
+                    $log_book_record->is_late = true;
+                } else if ($current_date_without_time > $latest_date_without_time && $given_date_without_time < $current_date_without_time) {
+                    $log_book_record->is_late = true;
+                }
+
+                $log_book_record->save();
+                if ($log_book_record->save()) {
+
+                    $su_log_book_record                     =   new ServiceUserLogBook;
+                    $su_log_book_record->service_user_id    =   $data['service_user_id'];
+                    $su_log_book_record->log_book_id        =   $log_book_record->id;
+                    $su_log_book_record->user_id            =   Auth::user()->id;
+                    $su_log_book_record->logType = '1';
+
+                    // if ($given_date < $latest_date) {
+                    //     $su_log_book_record->is_late = true;
+                    //     Log::info("Send notification for late entry ");
+                    //     $this->sendNotification($log_book_record, $su_log_book_record);
+                    //     if ($su_log_book_record->save()) {
+                    //         $result['response'] = true;
+                    //         echo "1";
+                    //     } else {
+                    //         $result['response'] = false;
+                    //         echo "2";
+                    //     }
+                    // } else {
+                    //     if ($su_log_book_record->save()) {
+                    //         $result['response'] = true;
+                    //         echo "1";
+                    //     } else {
+                    //         $result['response'] = false;
+                    //         echo "2";
+                    //     }
+                    // }
+
+                    if ($given_date < $latest_date) {
+                        $su_log_book_record->is_late = true;
+                        Log::info("Send notification for late entry ");
+                        $this->sendNotification($log_book_record, $su_log_book_record);
+
+                        if ($su_log_book_record->save()) {
+                            return response()->json(['status' => 'late']);
+                        } else {
+                            return response()->json(['status' => 'error']);
+                        }
+                    } else {
+                        if ($su_log_book_record->save()) {
+                            return response()->json(['status' => 'added']);
+                        } else {
+                            return response()->json(['status' => 'error']);
+                        }
+                    }
+                    // if($su_log_book_record->save()) {
+                    //     if(strtotime($log_book_record->date) < strtotime('now')) {
+                    //         Log::info("Send notification for late entry ");
+                    //         $this->sendNotification($log_book_record, $su_log_book_record);
+                    //     }
+                    //     $result['response'] = true;
+                    // }  else {
+                    //     $result['response'] = false;  
+                    // }
+                } else {
+
+                    $result['response'] = false;
+                    echo "2";
+                }
+                // if($log_book_record->save()){
+
+                //saving notification start
+
+                /*$notification                  = new Notification;
                 $notification->service_user_id = $data['service_user_id'];
                 $notification->event_id        = $records->id;
                 $notification->event_type      = 'SU_DR';
@@ -376,24 +647,24 @@ class LogBookController extends ServiceUserManagementController
                 $notification->user_id         = Auth::user()->id;        
                 $notification->save();*/
 
-            //saving notification end
+                //saving notification end
 
-            /*$res = $this->index();
+                /*$res = $this->index();
                 echo $res; die;*/
 
-            /*return redirect()->back()->with('success','Request submitted successfully.');
+                /*return redirect()->back()->with('success','Request submitted successfully.');
 
             }
             else { 
                 return redirect()->back()->with('error',COMMON_ERROR);
             }*/
-            // return $result;
+                // return $result;
+            }
         }
     }
 
     public function view($log_book_id = null)
     {
-
         $home_ids = Auth::user()->home_id;
         $searchString = ',';
         //$homde_id = 1,2
@@ -714,7 +985,8 @@ class LogBookController extends ServiceUserManagementController
         }
     }
 
-    public function forms(){
+    public function forms()
+    {
 
         $home_id = Auth::user()->home_id;
 
@@ -730,12 +1002,12 @@ class LogBookController extends ServiceUserManagementController
 
         $data['dynamic_forms'] = DynamicFormBuilder::getFormList();
 
-        
+
         // dd($dynamic_forms);
 
 
 
 
-        return view('frontEnd.forms', $data);   
+        return view('frontEnd.forms', $data);
     }
 }

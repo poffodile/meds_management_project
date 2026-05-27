@@ -20,11 +20,11 @@ $service_user_id = isset($service_user_id) ? $service_user_id : 0;
                     <div class="add-new-box risk-tabs custm-tabs">
                         <form method="post" action="" id="TopForms">
                             <div class="form-group col-md-12 col-sm-12 col-xs-12 p-0">
-                                <label class="col-md-1 col-sm-1 col-xs-12 p-t-7 text-right">User: </label>
+                                <label class="col-md-1 col-sm-1 col-xs-12 p-t-7 text-right">Child: </label>
                                 <div class="col-md-11 col-sm-11 col-xs-12">
                                     <div class="select-style">
                                         <select name="service_user_id" class="su_n_id">
-                                            <option value=""> Select Child </option>
+                                            <!-- <option selected disabled> Select Child </option> -->
                                             @foreach ($service_users as $value)
                                                 <option value="{{ $value['id'] }}"
                                                     {{ $service_user_id == $value['id'] ? 'selected' : '' }}>
@@ -667,52 +667,6 @@ $service_user_id = isset($service_user_id) ? $service_user_id : 0;
 </script>
 
 <script>
-    $(document).ready(function() {
-        $(document).on('click', '.dyn_form_del_btn', function() {
-
-            if (!confirm('{{ DEL_CONFIRM }}')) {
-                return false;
-            }
-
-            var this_record = $(this);
-            var dyn_form_id = this_record.attr('id');
-
-            $('.loader').show();
-            $('body').addClass('body-overflow');
-
-            $.ajax({
-                type: 'get',
-                url: "{{ url('/service/dynamic-form/delete') }}" + '/' + dyn_form_id,
-                success: function(resp) {
-                    if (isAuthenticated(resp) == false) {
-                        return false;
-                    }
-                    if (resp == 1) {
-                        this_record.closest('.rows').remove();
-
-                        //show success delete message
-                        $('span.popup_success_txt').text("{{ DEL_RECORD }}");
-                        $('.popup_success').show();
-                        setTimeout(function() {
-                            $(".popup_success").fadeOut()
-                        }, 5000);
-                    } else {
-                        //show delete message error
-                        $('span.popup_error_txt').text('{{ COMMON_ERROR }}');
-                        $('.popup_error').show();
-                    }
-
-                    $('.loader').hide();
-                    $('body').removeClass('body-overflow');
-                }
-            });
-
-            return false;
-        });
-    });
-</script>
-
-<script>
     //logged btn click view bmp title
     $(document).ready(function() {
         $(document).on('click', '.logged-dyn-btn', function() {
@@ -792,49 +746,49 @@ $service_user_id = isset($service_user_id) ? $service_user_id : 0;
         });
 
         //when bmp search confirm button is clicked
-        $(document).on('click', '#dynmicFormModal .search-dyn-btn', function() {
-            update_search_list()
-            return false;
-        });
+        // $(document).on('click', '#dynmicFormModal .search-dyn-btn', function() {
+        //     update_search_list()
+        //     return false;
+        // });
 
-        function update_search_list() {
-            var search_input = $('input[name=\'search_dyn_record\']');
-            var search = search_input.val();
+        // function update_search_list() {
+        //     var search_input = $('input[name=\'search_dyn_record\']');
+        //     var search = search_input.val();
 
-            search = jQuery.trim(search);
-            search = search.replace(/[&\/\\#,+()$~%.'":*?<>^@{}]/g, '');
+        //     search = jQuery.trim(search);
+        //     search = search.replace(/[&\/\\#,+()$~%.'":*?<>^@{}]/g, '');
 
-            if (search == '') {
-                search_input.addClass('red_border');
-                return false;
-            } else {
-                search_input.removeClass('red_border');
-            }
+        //     if (search == '') {
+        //         search_input.addClass('red_border');
+        //         return false;
+        //     } else {
+        //         search_input.removeClass('red_border');
+        //     }
 
-            var formdata = $('#searched-dyn-records-form').serialize();
+        //     var formdata = $('#searched-dyn-records-form').serialize();
 
-            $('.loader').show();
-            $('body').addClass('body-overflow');
+        //     $('.loader').show();
+        //     $('body').addClass('body-overflow');
 
-            $.ajax({
-                type: 'post',
-                url: "{{ url('/service/dynamic-forms') }}" + '?search=' + search,
-                data: formdata,
-                success: function(resp) {
-                    if (isAuthenticated(resp) == false) {
-                        return false;
-                    }
-                    if (resp == '') {
-                        $('#searched-dyn-records-form .searched-record').html('No Records found.');
-                    } else {
-                        $('#searched-dyn-records-form .searched-record').html(resp);
-                    }
-                    $('.loader').hide();
-                    $('body').removeClass('body-overflow');
-                }
-            });
-            return false;
-        }
+        //     $.ajax({
+        //         type: 'post',
+        //         url: "{{ url('/service/dynamic-forms') }}" + '?search=' + search,
+        //         data: formdata,
+        //         success: function(resp) {
+        //             if (isAuthenticated(resp) == false) {
+        //                 return false;
+        //             }
+        //             if (resp == '') {
+        //                 $('#searched-dyn-records-form .searched-record').html('No Records found.');
+        //             } else {
+        //                 $('#searched-dyn-records-form .searched-record').html(resp);
+        //             }
+        //             $('.loader').hide();
+        //             $('body').removeClass('body-overflow');
+        //         }
+        //     });
+        //     return false;
+        // }
     });
 </script>
 
@@ -922,20 +876,7 @@ $service_user_id = isset($service_user_id) ? $service_user_id : 0;
     });
 </script>
 
-<script>
-    /*$('.send_to').selectize({
-        maxItems: null,
-        valueField: 'id',
-        labelField: 'title',
-        searchField: 'title',
-        options: [
-            {id: 1, title: 'Spectrometer', url: 'http://en.wikipedia.org/wiki/Spectrometers'},
-            {id: 2, title: 'Star Chart', url: 'http://en.wikipedia.org/wiki/Star_chart'},
-            {id: 3, title: 'Electrical Tape', url: 'http://en.wikipedia.org/wiki/Electrical_tape'}
-        ],
-        create: false
-    });*/
-</script>
+
 
 <!-- <script>
     //making editable click on edit of listing
@@ -950,205 +891,7 @@ $service_user_id = isset($service_user_id) ? $service_user_id : 0;
         });
     });
 </script> -->
-<!-- <script>
-    //saving all editable record
-    $(document).ready(function() {
-        $(document).on('click', '.sbt-edit-dyn-record', function() {
-            var enabled = 0;
-            $('.view-dyn-record .edit_rcrd').each(function(index) {
-                var is_disable = $(this).attr('disabled');
-                if (is_disable == undefined) {
-                    enabled = 1;
-                }
-            });
-            if (enabled == 0) {
-                return false;
-            }
-            var formdata = $('#edit-bmp-form').serialize();
 
-            $('.loader').show();
-            $('body').addClass('body-overflow');
-
-            $.ajax({
-                type: 'post',
-                url: "{{ url('service/dynamic-form/edit-details') }}",
-                data: formdata,
-                success: function(resp) {
-                    if (isAuthenticated(resp) == false) {
-                        return false;
-                    }
-                    $('.view-dyn-record').html(resp);
-                    $('span.popup_success_txt').text('Updated Successsfully');
-                    $('.popup_success').show();
-                    setTimeout(function() {
-                        $(".popup_success").fadeOut()
-                    }, 5000);
-
-                    $('.loader').hide();
-                    $('body').removeClass('body-overflow');
-                }
-            });
-            return false;
-        });
-    });
-</script> -->
 
 <!-- dynamic form end -->
 
-<!-- <script>
-    $(document).ready(function() {
-        $('.dynamic_form_select').on('change', function() {
-
-            var form_select = $(this);
-            var model_id = form_select.closest('.modal').attr('id');
-
-            var form_id = form_select.val();
-            var form_title = $('.dynamic_form_select option:selected').text();
-
-            if (form_id > 0) {
-
-                $('.loader').show();
-                $('body').addClass('body-overflow');
-
-                $.ajax({
-                    type: 'get',
-                    url: "{{ url('/service/dynamic-form/view/pattern') }}" + '/' + form_id,
-                    dataType: "json",
-                    success: function(resp) {
-
-                        if (isAuthenticated(resp) == false) {
-                            return false;
-                        }
-
-                        var response = resp['response'];
-                        if (response == true) {
-
-                            var pattern = resp['pattern'];
-                            $('#' + model_id + ' .dynamic-form-fields').html(pattern);
-                            $('#' + model_id + ' .dynamic_form_h3').html(form_title +
-                                ' Details');
-
-                            $('.dpYears').datepicker({
-                                //format: 'dd/mm/yyyy',
-                            }).on('changeDate', function(e) {
-                                $(this).datepicker('hide');
-                            });
-
-                            //form_select.parent().removeClass('red_border');           
-                        }
-
-                        $('.loader').hide();
-                        $('body').removeClass('body-overflow');
-                    }
-                });
-
-            } else {
-                //$('.dynamic-form-fields').
-                //$('.entry-default-fields').hide();
-            }
-        });
-    });
-</script> -->
-<!-- <script>
-    $(document).ready(function() {
-        $('.sbt-dyn-form-btn').click(function() {
-
-            var model_id = $(this).closest('.modal').attr('id');
-            var service_user = $('#' + model_id + ' .su_n_id');
-            var form_builder = $('#' + model_id + ' .dynamic_form_select');
-            var service_user_id = service_user.val().trim();
-            var form_builder_id = form_builder.val().trim();
-            var err = 0;
-
-            if (service_user_id == 0) {
-                service_user.parent().addClass('red_border');
-                err = 1;
-            } else {
-                service_user.parent().removeClass('red_border');
-            }
-
-            if (form_builder_id == 0) {
-                form_builder.parent().addClass('red_border');
-                err = 1;
-            } else {
-                form_builder.parent().removeClass('red_border');
-            }
-
-            if (err == 1) {
-                return false;
-            } else {
-                return true;
-            }
-
-        });
-    });
-</script>   -->
-<script>
-    let loaddataontable = () => {
-        let formid = $("#formid").val();
-        let home_id = $("#home_id").val();
-        var token = "<?= csrf_token() ?>";
-        //alert(token);
-        var settings = {
-            "url": "{{ url('/service/patterndataformio') }}",
-            "method": "POST",
-            "data": {
-                patterndata: formid,
-                home_id: home_id,
-                _token: token
-            },
-            //dataType: "json",
-        };
-        $.ajax(settings).done(function(response) {
-            if (isAuthenticated(response) == false) {
-                return false;
-            }
-            //console.log(response);
-            Formio.createForm(document.getElementById('formiotest'), {
-                components: JSON.parse(response)
-            });
-        });
-
-
-        // console.log(formid);
-        // console.log(home_id);
-
-        // console.log(pattendata);
-        //console.log($('#getdatamodel').val());
-
-    }
-    let viewdatawithvalueFormio = () => {
-        // console.log($('#dynamic_form_idformio').val());
-        let dynamic_form_idformio = $("#dynamic_form_idformio").val();
-        var token = "<?= csrf_token() ?>";
-        var settings = {
-            "url": "{{ url('/service/patterndataformiovaule') }}",
-            "method": "POST",
-            "data": {
-                dynamic_form_idformio: dynamic_form_idformio,
-                _token: token
-            },
-            //dataType: "json",
-        };
-        $.ajax(settings).done(function(response) {
-            // console.log(response[0].pattern);
-            if (isAuthenticated(response) == false) {
-                return false;
-            }
-
-            Formio.createForm(document.getElementById('formioView'), {
-                components: JSON.parse(response[0].pattern)
-            }, {
-                readOnly: seteditvalueeditable
-            }).then(function(form) {
-                form.submission = {
-                    data: JSON.parse(response[0].pattern_data)
-                }
-                // form.getComponent('email').setValue('rksonkar356@gmail.com');
-            });
-
-        });
-
-
-    }
-</script>

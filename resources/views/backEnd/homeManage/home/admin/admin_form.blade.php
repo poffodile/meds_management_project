@@ -33,7 +33,7 @@
                        } ?>
                        Home Admin
                     </header>
-
+                    @include('backEnd.common.alert_messages')
                     <div class="panel-body">
                         <div class="position-center">
                             <form class="form-horizontal" role="form" method="post" action="{{ $action }}" id="{{ $form_id }}" enctype="multipart/form-data">
@@ -70,10 +70,10 @@
  -->                        
 
                             <?php
-                                $image = adminImgPath.'/default_user.jpg';
+                                $image = url(adminImgPath.'/default_user.jpg');
                                 if(isset($admin->image))
                                 {
-                                    $image = adminImgPath.'/'.$admin->image;
+                                    $image = url(adminImgPath.'/'.$admin->image);
                                 }
                             ?>
 

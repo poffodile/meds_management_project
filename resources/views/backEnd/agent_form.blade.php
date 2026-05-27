@@ -343,14 +343,14 @@
         var now = new Date(nowTemp.getFullYear(), nowTemp.getMonth(), nowTemp.getDate(), 0, 0, 0, 0);
         var joining_date = $('#joining-date').datepicker({
             format: 'dd-mm-yyyy',
-            onRender: function (date) {
-                //to compare "joining_date" and "leaving_date"
-                return date.valueOf();
-            }
+            // onRender: function (date) {
+            //     //to compare "joining_date" and "leaving_date"
+            //     return date.valueOf();
+            // }
         }).on('changeDate', function (ev) {
-            var newDate = new Date(ev.date);
-            newDate.setDate(newDate.getDate() + 1);
-            leaving_date.setValue(newDate);
+            // var newDate = new Date(ev.date);
+            // newDate.setDate(newDate.getDate() + 1);
+            // leaving_date.setValue(newDate);
           
             joining_date.hide();
 
@@ -366,9 +366,9 @@
         //console.log(joining_date);
         var leaving_date = $('#leaving-date').datepicker({
           format: 'dd-mm-yyyy',
-          onRender: function (date) {
-            return date.valueOf() <= joining_date.date.valueOf() ? 'disabled' : '';
-          }
+        //   onRender: function (date) {
+        //     return date.valueOf() <= joining_date.date.valueOf() ? 'disabled' : '';
+        //   }
         }).on('changeDate', function (ev) {
           leaving_date.hide();
         }).data('datepicker');

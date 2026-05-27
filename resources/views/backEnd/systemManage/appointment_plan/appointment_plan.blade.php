@@ -71,7 +71,7 @@
                                             <td>{{ ++$key}}</td>
                                             <td>{{$val->title}}</td>
                                             <td>{{$val->icon}}</td>
-                                            <td>
+                                            <td class="action-icn">
                                                 <a href="{{url('admin/appointment/plans/edit/'.$val->id)}}"  class=""><i class="text-primary fa fa-edit"></i></a> | 
                                                 <a href="{{url('admin/appointment/plans/delete/'.$val->id)}}" class=""><i class="text-danger fa fa-trash-o"></i></a>
                                             </td>

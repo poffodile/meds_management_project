@@ -137,7 +137,7 @@
         // var month = moment().tz("Europe/London").format("MM");
         // var date = moment().tz("Europe/London").format("DD");
 
-        console.log("London: " + moment().tz("Europe/London").format());
+        // console.log("London: " + moment().tz("Europe/London").format());
 
         function update_time() {
 
@@ -149,10 +149,10 @@
             // var date = moment().tz("Europe/London").format("DD");
 
             var today = new Date();
-            console.log(today);
+            // console.log(today);
 
             var hours = today.getUTCHours() + 1 ;
-            console.log(hours);
+            // console.log(hours);
 
             var mins = today.getUTCMinutes();
             var mid = 'am';

@@ -80,14 +80,18 @@ class RiskController extends SystemManagementController
     }
 
     public function delete($risk_id){
- 
-        $risk = Risk::where('id', $risk_id)->where('home_id',Auth::user()->home_id)->update(['is_deleted'=>'1']);
+        $home_ids = Auth::user()->home_id;
+        $ex_home_ids = explode(',', $home_ids);
+        $home_id = $ex_home_ids[0];
+        $risk = Risk::where('id', $risk_id)->where('home_id',$home_id)->update(['is_deleted'=>'1']);
         echo $risk;       
     }
 
     public function update_status($risk_id = null){
-
-        $risks = Risk::where('id', $risk_id)->where('home_id',Auth::user()->home_id)->first();
+        $home_ids = Auth::user()->home_id;
+        $ex_home_ids = explode(',', $home_ids);
+        $home_id = $ex_home_ids[0];
+        $risks = Risk::where('id', $risk_id)->where('home_id',$home_id)->first();
 
         if($risks->status == '0'){
             $new_status = 1;
@@ -128,8 +132,10 @@ class RiskController extends SystemManagementController
     }
 
     public function risk_delete(Request $request){
-        
-        $risk = Risk::whereIn('id', $request->risk_id)->where('home_id',Auth::user()->home_id)->update(['is_deleted'=>'1']);
+        $home_ids = Auth::user()->home_id;
+        $ex_home_ids = explode(',', $home_ids);
+        $home_id = $ex_home_ids[0];
+        $risk = Risk::whereIn('id', $request->risk_id)->where('home_id',$home_id)->update(['is_deleted'=>'1']);
         if($risk){
             echo '1';
         }else{

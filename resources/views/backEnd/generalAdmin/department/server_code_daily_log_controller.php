@@ -11,7 +11,7 @@ use Illuminate\Support\Arr;
 
 class DailyLogsController extends ServiceUserManagementController
 {
-     public function index(Request $request)
+    public function index(Request $request)
     {
         //echo "string";
         //die();
@@ -121,7 +121,7 @@ class DailyLogsController extends ServiceUserManagementController
                 ->orderBy('date', 'desc')->get();
 
             //  echo "<pre>"; print_r($log_book_records); die;
-            
+
             $log_book_records = collect($log_book_records)->map(function ($x) {
                 return (array) $x;
             })->toArray();
@@ -911,4 +911,5 @@ class DailyLogsController extends ServiceUserManagementController
 
         return view('frontEnd.serviceUserManagement.monthly_log', compact('user_id', 'service_user_id', 'service_user_name', 'home_id', 'su_home_id', 'log_book_records', 'su_logs', 'categorys', 'service_users', 'staff_members'));
     }
+
 }

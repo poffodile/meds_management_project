@@ -19,13 +19,21 @@
     {
         color: red;
     }
+    #job-history .timeline-messages{
+        text-align: start;
+    }
+    #job-history .timeline-messages .msg-in .arrow {   
+    right: 49px;
+    left: auto;
+    top: 26px;
+}
 </style>
 
 <!-- 2nd Tab - listing of care history -->
 <div id="job-history" class="tab-pane" >
     <div class="row">
         <div class="col-md-12">
-            <div class="timeline-messages">
+            <div class="timeline-messages ">
                 <h3>Care history timeline<a href="#" class="btn btn-white clr-them-green plus-ryt" data-toggle="modal" data-target="#care_history_"> <i class="fa fa-plus plus-icn"></i></a>  </h3>
              
                 <?php $i=1; foreach($care_history as $care) {

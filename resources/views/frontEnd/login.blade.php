@@ -3,7 +3,7 @@
 @section('content')
 <style>
     .bg_color {
-        background-color: #0877bd !important;
+        background-color: #2778a5 !important;
         border-bottom: 10px solid #1d6797 !important;
     }
 
@@ -32,56 +32,63 @@
         color: #1d6797 !important;
     }
 </style>
-<!-- <div class="form-signin" > -->
-<form method="post" class="form-signin" action="{{ url('/login') }}" method="post" id="login_form" autocomplete="off">
-    @csrf
-    <h2 class="form-signin-heading bg_color">sign in now</h2>
-    <div class="login-wrap">
-        <div class="user-login-info">
 
-            @include('frontEnd.common.popup_alert_messages')
-
-            <!-- This is just for avoid functionaliy of remember password -->
-            <div class="inp-hide">
-                <input type="password" name="password" />
-                <input type="text" name="username" />
-            </div>
-
-            <div class="form-group ">
-                <input type="text" name="company_name" autocomplete="off" class="form-control name_company" placeholder="Company Name" autofocus>
-            </div>
-            <div class="company_error"></div>
-
-            <div class="form-group ">
-                <select name="home" class="form-control inp-hide fnt-size control_form">
-                    <option value="">Select Home</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <input type="text" name="username" style="" required class="form-control inp-hide user_name" placeholder="Username" required autocomplete="off">
-            </div>
-
-            <div class="form-group">
-                <input type="password" name="password" required class="form-control inp-hide user_pass" placeholder="Password" required autocomplete="off">
-            </div>
-
-            <label class="checkbox">
-                <!-- <input type="checkbox" value="remember-me"> Remember me -->
-                <span class="pull-right">
-                    <a data-toggle="modal" class="forget_pas" href="#forgotPasswordModal"> Forgot Password?</a>
-                </span>
-
-            </label>
-
-
-
+<div class="formLoginSignin">
+    <div class="">
+        <div class="loginFormLogo">
+            <img src="{{ asset('public/images/scits1.png') }}" alt="" />
         </div>
-        <div class="c-btn-group">
-            <button class="btn btn-lg btn-login btn-block inp-hide sub_btn" type="submit">Sign in</button>
-        </div>
-</form>
-<!-- <div> -->
+        <form method="post" class="form-signin" action="{{ url('/login') }}" method="post" id="login_form" autocomplete="off">
+            @csrf
+            <h2 class="form-signin-heading bg_color">sign in now</h2>
+            <div class="login-wrap">
+                <div class="user-login-info">
+
+                    @include('frontEnd.common.popup_alert_messages')
+
+                    <!-- This is just for avoid functionaliy of remember password -->
+                    <div class="inp-hide">
+                        <input type="password" name="password" />
+                        <input type="text" name="username" />
+                    </div>
+
+                    <div class="form-group ">
+                        <input type="text" name="company_name" autocomplete="off" class="form-control name_company" placeholder="Company Name" autofocus>
+                    </div>
+                    <div class="company_error"></div>
+
+                    <div class="form-group ">
+                        <select name="home" class="form-control inp-hide fnt-size control_form">
+                            <option value="">Select Home</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="text" name="username" style="" required class="form-control inp-hide user_name" placeholder="Username" required autocomplete="off">
+                    </div>
+
+                    <div class="form-group">
+                        <input type="password" name="password" required class="form-control inp-hide user_pass" placeholder="Password" required autocomplete="off">
+                    </div>
+
+                    <label class="checkbox">
+                        <!-- <input type="checkbox" value="remember-me"> Remember me -->
+                        <span class="pull-right">
+                            <a data-toggle="modal" class="forget_pas" href="#forgotPasswordModal"> Forgot Password?</a>
+                        </span>
+
+                    </label>
+
+
+
+                </div>
+                <div class="c-btn-group">
+                    <button class="btn btn-lg btn-login btn-block inp-hide sub_btn" type="submit">Sign in</button>
+                </div>
+        </form>
+    </div>
+</div>
+
 
 
 <!-- Forgot Password Modal -->
@@ -287,7 +294,7 @@
     //         data: {_token:"{{csrf_token()}}"},
     //         success: function (response) {
     //             console.log(response);
-                
+
     //             if (response.success === true) {
     //             //    alert("Please try to login again");
     //                 location.reload();
@@ -310,27 +317,29 @@
     //         }
     //     });
     // });
-    $("#no_logout").on('click',function(){
-         $.ajax({
+    $("#no_logout").on('click', function() {
+        $.ajax({
             url: "{{url('/no_logout')}}", // Laravel route or API endpoint
             method: "POST",
-            data: {_token:"{{csrf_token()}}"},
-            success: function (response) {
+            data: {
+                _token: "{{csrf_token()}}"
+            },
+            success: function(response) {
                 console.log(response);
-                
+
                 if (response.success === true) {
                     location.reload();
                 } else {
                     alert("Something went wrong");
                 }
             },
-            error: function (xhr) {
+            error: function(xhr) {
                 if (xhr.status === 422) {
-                   
+
                     let errors = xhr.responseJSON.errors;
                     let errorMessages = '';
 
-                    $.each(errors, function (key, value) {
+                    $.each(errors, function(key, value) {
                         errorMessages += value[0] + "\n";
                     });
                     alert(errorMessages);

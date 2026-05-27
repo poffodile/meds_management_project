@@ -185,14 +185,18 @@ class PlanBuilderController extends SystemManagementController
 	}
 
     public function delete($plan_id) {
-
-		$plan = PlanBuilder::where('id', $plan_id)->where('home_id',Auth::user()->home_id)->update(['is_deleted'=>'1']);
+		$home_ids = Auth::user()->home_id;
+		$ex_home_ids = explode(',', $home_ids);
+		$home_id=$ex_home_ids[0];
+		$plan = PlanBuilder::where('id', $plan_id)->where('home_id',$home_id)->update(['is_deleted'=>'1']);
 		echo $plan;
 	}
 	
 	public function delete_plan(Request $request) {
-
-		$plan = PlanBuilder::whereIn('id', $request->plan_id)->where('home_id',Auth::user()->home_id)->update(['is_deleted'=>'1']);
+		$home_ids = Auth::user()->home_id;
+		$ex_home_ids = explode(',', $home_ids);
+		$home_id=$ex_home_ids[0];
+		$plan = PlanBuilder::whereIn('id', $request->plan_id)->where('home_id',$home_id)->update(['is_deleted'=>'1']);
 		if($plan){
 			echo "1";
 		}else{

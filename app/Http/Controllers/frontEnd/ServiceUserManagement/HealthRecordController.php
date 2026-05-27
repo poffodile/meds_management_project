@@ -4,7 +4,8 @@ namespace App\Http\Controllers\frontEnd\ServiceUserManagement;
 
 use App\Http\Controllers\frontEnd\ServiceUserManagementController;
 use Illuminate\Http\Request;
-use DB, Auth;
+use DB;
+use Illuminate\Support\Facades\Auth;
 use App\DynamicFormBuilder, App\DynamicForm, App\ServiceUserHealthRecord, App\Notification, App\ServiceUser, App\User, App\EarningScheme, App\DynamicFormLocation;
 
 class HealthRecordController extends ServiceUserManagementController
@@ -45,13 +46,17 @@ class HealthRecordController extends ServiceUserManagementController
             //                 ->join('user', 'log_book.user_id', '=', 'user.id')
             //                 ->join('category', 'log_book.category_id', '=', 'category.id')
             //                 ->orderBy('date','desc');
-            $log_book_records = DB::table('su_health_record')
-                ->select('su_health_record.*', 'service_user.name as staff_name')
-                ->where('su_health_record.service_user_id', $request->service_user_id)
-                ->where('su_health_record.is_deleted', "0")
-                ->where('su_health_record.home_id', $home_id)
-                ->join('service_user', 'su_health_record.service_user_id', '=', 'service_user.id')
-                ->orderBy('su_health_record.created_at', 'desc');
+
+
+            $log_book_records = DB::table('su_health_record')            
+                                ->select('su_health_record.*', 'service_user.name as staff_name', 'dynamic_form.form_builder_id', 'dynamic_form_builder.title as form_name', 'dynamic_form.title as form_title', 'dynamic_form.date as form_date', 'dynamic_form.time as form_time')
+                                ->leftJoin('dynamic_form', 'dynamic_form.id', '=', 'su_health_record.dynamic_form_id')
+                                ->leftJoin('dynamic_form_builder', 'dynamic_form_builder.id', '=', 'dynamic_form.form_builder_id')  
+                                ->where('su_health_record.service_user_id', $request->service_user_id)
+                                ->where('su_health_record.is_deleted', "0")
+                                ->where('su_health_record.home_id', $home_id)
+                                ->join('service_user', 'su_health_record.service_user_id', '=', 'service_user.id')
+                                ->orderBy('su_health_record.created_at', 'desc');
             //->whereDate('su_health_record.created_at', '=', $today)
 
             if (isset($request->start_date) && $request->start_date != 'null') {
@@ -76,17 +81,20 @@ class HealthRecordController extends ServiceUserManagementController
             $log_book_records = collect($log_book_records)->map(function ($x) {
                 return (array) $x;
             })->toArray();
-            //print_r($log_book_records);
-            //die;
+
+            // dd($log_book_records);
 
             return compact('log_book_records');
         }
 
         //filter    
         $log_book_records = DB::table('su_health_record')
-            ->select('su_health_record.*', 'service_user.name as staff_name')
+            ->select('su_health_record.*', 'service_user.name as staff_name', 'dynamic_form.form_builder_id', 'dynamic_form_builder.title as form_name', 'dynamic_form.title as form_title', 'dynamic_form.date as form_date', 'dynamic_form.time as form_time')
+            ->leftJoin('dynamic_form', 'dynamic_form.id', '=', 'su_health_record.dynamic_form_id')
+            ->leftJoin('dynamic_form_builder', 'dynamic_form_builder.id', '=', 'dynamic_form.form_builder_id')
             ->where('su_health_record.service_user_id', $service_user_id)
             ->where('su_health_record.is_deleted', "0")
+            ->where('dynamic_form.is_deleted', "0")
             ->where('su_health_record.home_id', $home_id)
             ->whereDate('su_health_record.created_at', '=', $today)
             ->join('service_user', 'su_health_record.service_user_id', '=', 'service_user.id')
@@ -145,7 +153,7 @@ class HealthRecordController extends ServiceUserManagementController
             $home_ids = Auth::user()->home_id;
             $ex_home_ids = explode(',', $home_ids);
             $home_id=$ex_home_ids[0];
-            $formdata = json_encode($data);
+            $formdata = json_encode($data['data']);
             $service_user_id        = $data['service_user_id'];
             $form                   = new DynamicForm;
             $form->home_id          = $home_id;
@@ -259,7 +267,8 @@ class HealthRecordController extends ServiceUserManagementController
                         'service_user_id' => $data['service_user_id'],
                         'contact_id' => 0,
                         'care_team_id' => 0,
-                        'title'=>$data['title'],
+                        'dynamic_form_id' => $form->id,
+                        'title'=> $data['title'],
                         'status' => 1,
                         'details'=>$data['details'],
                         'is_deleted' => 0,

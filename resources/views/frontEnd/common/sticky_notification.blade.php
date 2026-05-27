@@ -71,7 +71,14 @@
 
         $title = '';
         $message = '';
-        if($event_type_id == '14'){ //In danger
+        if($event_type_id == '24') { // SOS Alert
+            $staff_id = App\Models\staffManagement\sosAlert::where('id', $event_id)->value('staff_id');
+            $staff_name = App\User::where('id', $staff_id)->value('name') ?? 'Staff';
+            $title = "🚨 SOS Alert";
+            $message = "has triggered an SOS alert " . $created_at . ".";
+            $type = 'SOS_ALERT';
+            $su_name = $staff_name;
+        } else if($event_type_id == '14'){ //In danger
            
             if($event_action == 'ADD'){ 
                 $title   = "In danger";
@@ -230,17 +237,17 @@
 </script>
 <!-- Showing pending risks notification end -->
 
-<form class="temp_noti_data" method="post" action="{{ url('notif/response') }}" >
+<form class="temp_noti_data">
     <input type="hidden" name="event_id"  value="">
     <input type="hidden" name="event_type" value="">
     <input type="hidden" name="su_id" value="">
     <input type="hidden" name="back_path" value="{{ Request::fullUrl() }}">
     {{ csrf_field() }}
-    <input type="submit" name="submit" class="submit" style="display: none">
+    <input type="button" name="submit" class="submit" style="display: none">
 </form>
 
 <script type="text/javascript">
-    $(document).ready(function(){
+     $(document).ready(function(){
         $('.sticky_noti_title').on('click', function(){
             var noti    = $(this);
             var noti_id = noti.attr('id');
@@ -251,11 +258,50 @@
                 $('.temp_noti_data input[name="event_id"]').val(noti_id);
                 $('.temp_noti_data input[name="event_type"]').val(type);
                 $('.temp_noti_data input[name="su_id"]').val(su_id);
-                $('.temp_noti_data .submit').click();
+                // $('.temp_noti_data .submit').click();
                 return false;                
             } else{
                 return false;                
             }
         })
-    })
+     })
+</script>
+<script>
+    $('.sticky_noti_title').on('click', function(e){
+        e.preventDefault();
+
+        var noti    = $(this);
+        var noti_id = noti.attr('id');
+        var su_id   = noti.attr('su_id');
+        var type    = noti.attr('type');
+
+        if(type != ''){
+            var form = $('.temp_noti_data');
+
+            // Hidden fields me value set karo
+            form.find('input[name="event_id"]').val(noti_id);
+            form.find('input[name="event_type"]').val(type);
+            form.find('input[name="su_id"]').val(su_id);
+
+            // AJAX Submit
+            $.ajax({
+                url: "{{ url('notif/response') }}",
+                type: "POST",
+                data: form.serialize(),
+                success: function(response){
+                    console.log("Success:", response);
+
+                    // Laravel se redirect handle karna ho to:
+                    if(response.redirect_url){
+                        window.location.href = response.redirect_url;
+                    }
+                },
+                error: function(xhr){
+                    console.log("Error:", xhr.responseText);
+                }
+            });
+        } else {
+            alert("type nhi hai");
+        }
+    });
 </script>

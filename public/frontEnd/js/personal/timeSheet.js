@@ -24,25 +24,21 @@ function loadTimeSheetTable(userId = '') {
                     <th>#</th>
                     <th>User</th>
                     <th>Date</th>
+                    <th>Total Shift Hours</th>
+                    <th>Category</th>
                     <th>Hours</th>
-                    <th>Sleep</th>
-                    <th>Wake Night</th>
-                    <th>Disturbance</th>
-                    <th>Annual Leave</th>
-                    <th>On Call</th>
                     <th>Comments</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tfoot>
                 <tr>
-                    <th colspan="3" style="text-align:right">Total:</th>
-                    <th></th> <!-- Hours total -->
-                    <th></th> <!-- Sleep total -->
-                    <th></th> <!-- Wake Night total -->
-                    <th></th> <!-- Disturbance total -->
-                    <th></th> <!-- Annual Leave total -->
-                    <th></th> <!-- On Call total -->
+                    <th></th>
+                    <th></th>
+                    <th style="text-align:right">Total:</th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
                     <th></th>
                     <th></th>
                 </tr>
@@ -67,10 +63,10 @@ function loadTimeSheetTable(userId = '') {
                     return meta.row + 1;
                 }
             },
-            { data: 'user.name', defaultContent: '' },
+            { data: 'user', defaultContent: '' },
             {
                 data: 'date',
-                render: function (data, type, row) {
+                render: function (data) {
                     if (!data) return '';
 
                     const date = new Date(data);
@@ -82,42 +78,15 @@ function loadTimeSheetTable(userId = '') {
                 }
             },
             {
+                data: 'total_shift_hours',
+                render: function (data) {
+                    const num = parseFloat(data) || 0;
+                    return (num % 1 === 0) ? parseInt(num) : num.toFixed(2);
+                }
+            },
+            { data: 'category_type' }, // Category name (Sleep, Disturbance, etc.)
+            {
                 data: 'hours',
-                render: function (data) {
-                    const num = parseFloat(data) || 0;
-                    return (num % 1 === 0) ? parseInt(num) : num.toFixed(2);
-                }
-            },
-            {
-                data: 'sleep',
-                render: function (data) {
-                    const num = parseFloat(data) || 0;
-                    return (num % 1 === 0) ? parseInt(num) : num.toFixed(2);
-                }
-            },
-            {
-                data: 'wake_night',
-                render: function (data) {
-                    const num = parseFloat(data) || 0;
-                    return (num % 1 === 0) ? parseInt(num) : num.toFixed(2);
-                }
-            },
-            {
-                data: 'disturbance',
-                render: function (data) {
-                    const num = parseFloat(data) || 0;
-                    return (num % 1 === 0) ? parseInt(num) : num.toFixed(2);
-                }
-            },
-            {
-                data: 'annual_leave',
-                render: function (data) {
-                    const num = parseFloat(data) || 0;
-                    return (num % 1 === 0) ? parseInt(num) : num.toFixed(2);
-                }
-            },
-            {
-                data: 'on_call',
                 render: function (data) {
                     const num = parseFloat(data) || 0;
                     return (num % 1 === 0) ? parseInt(num) : num.toFixed(2);
@@ -131,15 +100,11 @@ function loadTimeSheetTable(userId = '') {
                         <a href="#!" class="openTimeSheetModel"
                             data-action="edit"
                             data-id="${row.id}"
+                            data-user="${row.user}"
                             data-user_id="${row.user_id}"
-                            data-name="${row.user?.name || ''}"
+                            data-category_id="${row.category_id}"
                             data-date="${row.date}"
                             data-hours="${row.hours}"
-                            data-sleep="${row.sleep}"
-                            data-wake_night="${row.wake_night}"
-                            data-disturbance="${row.disturbance}"
-                            data-annual_leave="${row.annual_leave}"
-                            data-on_call="${row.on_call}"
                             data-comments="${row.comments}">
                             <i class="fa fa-pencil" aria-hidden="true"></i>
                         </a> |
@@ -155,7 +120,7 @@ function loadTimeSheetTable(userId = '') {
 
             const getTotal = (columnIndex) => {
                 return api
-                    .column(columnIndex, { page: 'current' }) // use { search: 'applied' } for filtered total
+                    .column(columnIndex, { page: 'current' })
                     .data()
                     .reduce((a, b) => {
                         const val = parseFloat(b);
@@ -167,13 +132,9 @@ function loadTimeSheetTable(userId = '') {
                 return num % 1 === 0 ? parseInt(num) : num.toFixed(2);
             };
 
-            // Set footer cell totals   
-            $(api.column(3).footer()).html(formatTotal(getTotal(3))); // Hours
-            $(api.column(4).footer()).html(formatTotal(getTotal(4))); // Sleep
-            $(api.column(5).footer()).html(formatTotal(getTotal(5))); // Wake Night
-            $(api.column(6).footer()).html(formatTotal(getTotal(6))); // Disturbance
-            $(api.column(7).footer()).html(formatTotal(getTotal(7))); // Annual Leave
-            $(api.column(8).footer()).html(formatTotal(getTotal(8))); // On Call
+            // Set footer cell totals
+            $(api.column(3).footer()).html(formatTotal(getTotal(3))); // Total Shift Hours
+            $(api.column(5).footer()).html(formatTotal(getTotal(5))); // Hours
         }
     });
 
@@ -182,6 +143,7 @@ function loadTimeSheetTable(userId = '') {
         timeSheetTable.columns.adjust();
     });
 }
+
 
 
 
@@ -199,7 +161,22 @@ $('#getDataOnUsers').on('change', function () {
 $(document).ready(function () {
     $('#save_time_sheet').on('click', function (e) {
         e.preventDefault(); // prevent form from submitting normally
-
+        var error=0;
+        $('.checkInput').each(function(){
+            var formfield=$(this).val();
+            if(formfield == '' || formfield == undefined){
+                error=1;
+                $(this).css('border','1px solid red');
+                $(this).focus();
+                return false;
+            }else{
+                $(this).css('border','');
+                error=0;
+            }
+        });
+        if(error == 1){
+            return false;
+        }
         const formArray = $('#time_sheet').serializeArray();
         const formData = {};
         formArray.forEach(item => {
@@ -277,11 +254,7 @@ $(document).on('click', '.openTimeSheetModel', function () {
             $('#timeSheetDt').datepicker('setDate', formattedDate);
         }
         $('#hours').val($(this).data('hours'));
-        $('#sleep').val($(this).data('sleep'));
-        $('#wake_night').val($(this).data('wake_night'));
-        $('#disturbance').val($(this).data('disturbance'));
-        $('#annual_leave').val($(this).data('annual_leave'));
-        $('#on_call').val($(this).data('on_call'));
+        $('#category_id').val($(this).data('category_id'));
         $('#comments').val($(this).data('comments'));
     }
 

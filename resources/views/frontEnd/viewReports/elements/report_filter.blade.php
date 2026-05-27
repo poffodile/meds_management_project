@@ -1,6 +1,9 @@
 
 <div class="col-md-12 col-sm-12 col-xs-12 metro-main">
-    <form class="form-horizontal" method="get" action="{{ url('/user/record') }}">
+    <form class="form-horizontal" method="POST" action="{{ url('/user/record') }}">
+        @csrf
+        {{-- <form id="filterFormDatas" class="form-horizontal"> --}}
+     
         <div class="form-group col-md-6 col-sm-4 col-xs-12 p-0 metro-design">
             <label class="col-md-3 col-sm-3 col-xs-12 control-label"> Report type: </label>
             <div class="col-md-9 col-sm-9 col-xs-12">
@@ -94,9 +97,9 @@
             </div>
         </div>
 
-        <div class="form-group col-md-2 col-sm-2 col-xs-12 text-center" id="confirm_btn">
-            {{ csrf_field() }}
-            <button type="submit" class="btn btn-warning">Confirm</button>
+        <div class="form-group col-md-2 col-sm-2 col-xs-12 text-center" id="">
+            {{-- {{ csrf_field() }} --}}
+            <button type="submit" class="btn btn-warning" id="">Confirm</button>
         </div>
     </form>
 </div>

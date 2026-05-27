@@ -52,7 +52,7 @@ class Handler extends ExceptionHandler
         $this->reportable(function (Throwable $e) {
             if ($e instanceof \Symfony\Component\HttpKernel\Exception\NotFoundHttpException){
                 
-                return response(view('frontEnd.error_404'), 404);
+                return response(view('errors.error_404'), 404);
             }
     
             /*if ($exception instanceof FatalErrorException) {
@@ -88,7 +88,7 @@ class Handler extends ExceptionHandler
     public function render($request, Throwable $exception)
         {
             if ($exception instanceof NotFoundHttpException) {
-                return response()->view('frontEnd.error_404', [], 404);
+                return response()->view('errors.error_404', [], 404);
             }
 
             return parent::render($request, $exception);

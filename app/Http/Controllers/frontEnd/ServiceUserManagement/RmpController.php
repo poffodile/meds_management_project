@@ -5,14 +5,15 @@ namespace App\Http\Controllers\frontEnd\ServiceUserManagement;
 use App\Http\Controllers\frontEnd\ServiceUserManagementController;
 use Illuminate\Http\Request;
 use App\ServiceUser, App\FormBuilder, App\ServiceUserRmp, App\Notification, App\DynamicFormBuilder, App\DynamicForm, App\DynamicFormLocation, App\HomeLabel, App\CareTeamJobTitle, App\ServiceUserCareCenter, App\ServiceUserContacts, App\SocialApp, App\ServiceUserSocialApp, App\User;
-use DB, Auth;
+use DB;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
-
+use Carbon\Carbon;
 
 class RmpController extends ServiceUserManagementController
 {
 
-    public function index($service_user_id = null)
+    public function index($service_user_id = null, Request $request)
     {
 
         $su_home_id = ServiceUser::where('id', $service_user_id)->value('home_id');
@@ -22,7 +23,6 @@ class RmpController extends ServiceUserManagementController
         if ($home_id != $su_home_id) {
             die;
         }
-
         // $home_id   = Auth::user()->home_id;
 
         //in search case editing start for plan,details and review
@@ -56,12 +56,15 @@ class RmpController extends ServiceUserManagementController
         //                             ->orderBy('id','desc')
         //                             ->get();
 
+        // $today = Carbon::now()->format('Y-m-d');
+
         $this_location_id = DynamicFormLocation::getLocationIdByTag('rmp');
         $rmp_title        = DynamicForm::where('location_id', $this_location_id)
             //whereIn('form_builder_id',$form_bildr_ids)
             ->where('service_user_id', $service_user_id)
             ->where('is_deleted', '0')
             ->orderBy('id', 'desc');
+            // ->whereDate('created_at', '=', $today);
 
         // dd($rmp_title);
 
@@ -90,7 +93,51 @@ class RmpController extends ServiceUserManagementController
             }
             $tick_btn_class = "sbt-edit-rmp-record submit-edit-logged-record";
         }
+
+                // Check if it's an AJAX filter call
+        if ($request->isMethod('post') && $request->input('filter') == 1) {
+
+            // if ($request->filled('staff_member')) {
+            //     $bmp_record->where('user_id', $request->input('staff_member'));
+            // }
+
+            if ($request->filled('service_user')) {
+                $rmp_title->where('service_user_id', $request->input('service_user'));
+            }
+
+            if ($request->filled('category_id') && $request->input('category_id') !== 'all') {
+                $rmp_title->where('category_id', $request->input('category_id'));
+            }
+
+            if ($request->filled('start_date') && $request->filled('end_date')) {
+                $start = Carbon::parse($request->input('start_date'))->startOfDay();
+                $end   = Carbon::parse($request->input('end_date'))->endOfDay();
+
+                $rmp_title->whereBetween('dynamic_form.created_at', [$start, $end]);
+            }
+
+            if ($request->filled('keyword')) {
+                $keyword = $request->input('keyword');
+                $rmp_title->where(function ($query) use ($keyword) {
+                    $query->where('title', 'like', "%{$keyword}%")
+                        ->orWhere('title', 'like', "%{$keyword}%");
+                });
+            }
+
+            $rmp_form_title = $rmp_title->get(); // Get filtered data
+
+        } else {
+
+            $today = Carbon::today();
+            $rmp_title->whereDate('dynamic_form.created_at', $today);
+
+            // No filters — get paginated result
+            $rmp_form_title = $rmp_title->paginate();
+        }
+        
         $loop = 1;
+        $colors = ['#8fd6d6', '#f57775', '#bda4ec', '#fed65a', '#81b56b'];
+        shuffle($colors);
 
         foreach ($rmp_form_title as $key => $value) {
 
@@ -100,116 +147,112 @@ class RmpController extends ServiceUserManagementController
             //$plan_check    = (!empty($value->plan)) ? '<i class="fa fa-check"></i>' : '';
             //$review_check  = (!empty($value->review)) ? '<i class ="fa fa-check"></i>' : '';
 
-            // if($value->date == '' ) {  
-            //     $date = '';
-            // }  else {
-            //     $date = date('d-m-Y', strtotime($value->date));
+            // if ((!empty($date)) || (!empty($value->time))) {
+            //     $start_brct = '(';
+            //     $end_brct = ')';
+            // } else {
+            //     $start_brct = '';
+            //     $end_brct = '';
             // }
 
-            if ($value->created_at == '') {
-                $date = '';
-            } else {
-                $date = \Carbon\Carbon::parse($value->created_at)->format('d-m-Y');
-            }
+            $date = !empty($value->date) ? date('d-m-Y', strtotime($value->date)) : '';
+            $time = !empty($value->time) ? $value->time : '';
 
-            if ((!empty($date)) || (!empty($value->time))) {
-                $start_brct = '(';
-                $end_brct = ')';
-            } else {
-                $start_brct = '';
-                $end_brct = '';
-            }
+            $datetime = ($date || $time) ? trim($date . ' : ' . $time, ' :') : '00-00-0000 : 00-00';
 
-            if (!empty($value->time)) {
-                $time = $value->time;
-            } else {
-                $time = '00:00';
-            }
-
+            $color = $colors[$key % count($colors)];
             if ($loop % 2 == 0) {
+
                 echo   '<div class="col-md-6 col-sm-6 col-xs-6 cog-panel delete-row rows rmpTimelineright">
                         <div class="form-group p-0 add-rcrd">
                             <!-- <label class="col-md-1 col-sm-1 col-xs-12 p-t-7"></label> -->
                             <div class="col-md-12 col-sm-11 col-xs-12 r-p-0">
                                 <div class="input-group popovr rightSideInput rmpTimeRit">
-                                <span class="timLineDate">29-07-2025 - 2</span>
-                                <div>
-                                <input type="hidden" name="su_rmp_id[]" value="' . $value->id . '" disabled="disabled" class="edit_rmp_id_' . $value->id . '">
-                                <input type="text" class="form-control" name="rmp_title_name" disabled value="' . $form_title . ' - ' . $value->title . ' ' . $start_brct . $date . ' : ' .
-                    $time . ' ' . $end_brct . '" maxlength="255"/>
-                                <div class="input-plus color-green"> <i class="fa fa-plus"></i> </div>   
-                                    <span class="input-group-addon cus-inpt-grp-addon clr-blue settings">
-                                        <i class="fa fa-cog"></i>
-                                        <div class="pop-notifbox">
-                                            <ul class="pop-notification" type="none">
-                                                <li> <a href="#" data-dismiss="modal" aria-hidden="true" class="dyn-form-view-data" id="' . $value->id . '" > <span> <i class="fa fa-eye"></i> </span> View </a> </li>
-                                                <li> <a href="#" class="edit_rmp_details" su_rmp_id="' . $value->id . '"> <span> <i class="fa fa-pencil"></i> </span> Edit </a> </li>
-                                                <li> <a href="#" class="dyn_form_del_btn" id="' . $value->id . '"> <span class="color-red"> <i class="fa fa-exclamation-circle"></i> </span> Remove </a> </li>
-                                            </ul>
-                                        </div>
-                                    </span>
-                                </div>
+                                <span class="timLineDate">' . $datetime . '</span>
+                                <span class="arrow"></span>
+                                <div class="rmpWithPlusInput">
+                                    <input type="hidden" name="su_rmp_id[]" value="' . $value->id . '" disabled="disabled" class="edit_rmp_id_' . $value->id . '">
+                                    <input type="text" class="form-control" style="background-color: ' . $color . ';" name="rmp_title_name" disabled value="' . $form_title . ' - ' . $value->title . '" maxlength="255"/>  
+                                    <div class="input-plus color-green" style="background-color: ' . $color . ';"> <i class="fa fa-plus"></i> </div>   
+                                        <span class="ritOrdring two input-group-addon cus-inpt-grp-addon clr-blue settings" style="background-color: ' . $color . ';">
+                                            <i class="fa fa-cog"></i>
+                                            <div class="pop-notifbox">
+                                                <ul class="pop-notification" type="none">
+                                                    <li> <a href="#" data-dismiss="modal" aria-hidden="true" class="dyn-form-view-data" id="' . $value->id . '" > <span> <i class="fa fa-eye"></i> </span> View </a> </li>
+                                                    <li> <a href="#" class="edit_rmp_details" su_rmp_id="' . $value->id . '"> <span> <i class="fa fa-pencil"></i> </span> Edit </a> </li>
+                                                    <li> <a href="#" class="dyn_form_del_btn" id="' . $value->id . '"> <span class="color-red"> <i class="fa fa-exclamation-circle"></i> </span> Remove </a> </li>
+                                                </ul>
+                                            </div>
+                                        </span>
+                                    </div>
                                 </div>
 
                             </div>
                         </div>
 
                         <!-- Details textarea -->
-                        <div class="col-xs-12 input-plusbox form-group p-0 detail">
-                            <label class="col-sm-1 col-xs-12 color-themecolor r-p-0"> Details: </label>
-                            <div class="col-sm-11 r-p-0">
+                        <div class="col-xs-12 input-plusbox form-group p-0 detail rightTextarea">
+                        <form method="post" id="edit-rmp-form">
+                        <input type="hidden" name="su_rmp_id[]" value="'.$value->id.'">
+                            <label class="col-sm-12 col-xs-12 color-themecolor r-p-0"> Details: </label>
+                            <div class="col-sm-12 r-p-0">
                                 <div class="input-group">
                                     <textarea class="form-control tick_text edit_rcrd txtarea edit_rmp_details_' . $value->id . '" name="edit_rmp_details[]" disabled rows="5" value="" maxlength="1000">' . $value->details . '</textarea>
-                                    <div class="input-group-addon cus-inpt-grp-addon sbt_tick_area"">
+                                    <div class=" input-group-addon cus-inpt-grp-addon sbt_tick_area"">
                                         <div class="tick_show sbt_btn_tick_div ' . $tick_btn_class . '">' . $details_check . '</div>
                                     </div>
                                    <!--  <span class="input-group-addon cus-inpt-grp-addon color-grey settings tick_show ' . $tick_btn_class . '">' . $details_check . '
                                     </span> -->
                                 </div>
                             </div>
+                            </form>
                         </div>
                     </div>  ';
             } else {
-                echo   '<div class="col-md-6 col-sm-6 col-xs-6 cog-panel delete-row rows rmpTimelineright">
+                echo  '<div class="col-md-6 col-sm-6 col-xs-6 cog-panel delete-row rows ">
                         <div class="form-group p-0 add-rcrd">
                             <!-- <label class="col-md-1 col-sm-1 col-xs-12 p-t-7"></label> -->
                             <div class="col-md-12 col-sm-11 col-xs-12 r-p-0">
-                                <div class="input-group popovr rightSideInput rmpTimeLft">
-                                <span class="timLineDate">29-07-2025 - 2</span>
-                                <div>
-                                <input type="hidden" name="su_rmp_id[]" value="' . $value->id . '" disabled="disabled" class="edit_rmp_id_' . $value->id . '">
-                                <input type="text" class="form-control" name="rmp_title_name" disabled value="' . $form_title . ' - ' . $value->title . ' ' . $start_brct . $date . ' : ' .
-                    $time . ' ' . $end_brct . '" maxlength="255"/>
-                                <div class="input-plus color-green"> <i class="fa fa-plus"></i> </div>   
-                                    <span class="input-group-addon cus-inpt-grp-addon clr-blue settings">
-                                        <i class="fa fa-cog"></i>
-                                        <div class="pop-notifbox">
-                                            <ul class="pop-notification" type="none">
-                                                <li> <a href="#" data-dismiss="modal" aria-hidden="true" class="dyn-form-view-data" id="' . $value->id . '" > <span> <i class="fa fa-eye"></i> </span> View </a> </li>
-                                                <li> <a href="#" class="edit_rmp_details" su_rmp_id="' . $value->id . '"> <span> <i class="fa fa-pencil"></i> </span> Edit </a> </li>
-                                                <li> <a href="#" class="dyn_form_del_btn" id="' . $value->id . '"> <span class="color-red"> <i class="fa fa-exclamation-circle"></i> </span> Remove </a> </li>
-                                            </ul>
-                                        </div>
-                                    </span>
-                                </div>
+                                <div class="input-group popovr timelineInput rmpTimeLft">
+                                    <span class="arrow"></span>
+                                    <span class="timLineDate">' . $datetime . '</span>
+                                    <div class="rmpWithPlusInput">
+                                        <input type="hidden" name="su_rmp_id[]" value="' . $value->id . '" disabled="disabled" class="edit_rmp_id_' . $value->id . '">
+                                        <input type="text" class="form-control" style="background-color: ' . $color . ';" name="rmp_title_name" disabled value="' . $form_title . ' - ' . $value->title . '" maxlength="255"/>
+                                           
+                                        <span class="input-group-addon cus-inpt-grp-addon clr-blue settings" style="background-color: ' . $color . ';">
+                                            <i class="fa fa-cog"></i>
+                                            <div class="pop-notifbox">
+                                                <ul class="pop-notification" type="none">
+                                                    <li> <a href="#" data-dismiss="modal" aria-hidden="true" class="dyn-form-view-data" id="' . $value->id . '" > <span> <i class="fa fa-eye"></i> </span> View </a> </li>
+                                                    <li> <a href="#" class="edit_rmp_details" su_rmp_id="' . $value->id . '"> <span> <i class="fa fa-pencil"></i> </span> Edit </a> </li>
+                                                    <li> <a href="#" class="dyn_form_del_btn" id="' . $value->id . '"> <span class="color-red"> <i class="fa fa-exclamation-circle"></i> </span> Remove </a> </li>
+                                                </ul>
+                                            </div>
+                                        </span>
+                                        <div class="input-plus color-green" style="background-color: ' . $color . ';"> <i class="fa fa-plus"></i> </div>
+                                    </div>
                                 </div>
 
                             </div>
                         </div>
 
                         <!-- Details textarea -->
-                        <div class="col-xs-12 input-plusbox form-group p-0 detail">
-                            <label class="col-sm-1 col-xs-12 color-themecolor r-p-0"> Details: </label>
-                            <div class="col-sm-11 r-p-0">
+                        <div class="col-xs-12 input-plusbox form-group p-0 detail leftTextarea">
+                         <form method="post" id="edit-rmp-form">
+                            <input type="hidden" name="su_rmp_id[]" value="'.$value->id.'">
+                            <label class="col-sm-12 col-xs-12 color-themecolor r-p-0"> Details: </label>
+                            <div class="col-sm-12 r-p-0">
                                 <div class="input-group">
                                     <textarea class="form-control tick_text edit_rcrd txtarea edit_rmp_details_' . $value->id . '" name="edit_rmp_details[]" disabled rows="5" value="" maxlength="1000">' . $value->details . '</textarea>
-                                    <div class="input-group-addon cus-inpt-grp-addon sbt_tick_area"">
+                                    <div class=" input-group-addon cus-inpt-grp-addon sbt_tick_area"">
                                         <div class="tick_show sbt_btn_tick_div ' . $tick_btn_class . '">' . $details_check . '</div>
                                     </div>
                                    <!--  <span class="input-group-addon cus-inpt-grp-addon color-grey settings tick_show ' . $tick_btn_class . '">' . $details_check . '
                                     </span> -->
                                 </div>
                             </div>
+                        </form>
                         </div>
                     </div>  ';
             }
@@ -262,7 +305,7 @@ class RmpController extends ServiceUserManagementController
 
     public function edit(Request $request)
     {
-
+        // dd($request);
         $data = $request->all();
         if (isset($data['su_rmp_id'])) {
             $home_ids = Auth::user()->home_id;
@@ -297,7 +340,7 @@ class RmpController extends ServiceUserManagementController
         }
         $service_user_id = $record->service_user_id;
 
-        $res = $this->index($service_user_id);
+        $res = $this->index($service_user_id, request());
         echo $res;
     }
 

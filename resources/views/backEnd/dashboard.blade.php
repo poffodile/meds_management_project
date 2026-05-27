@@ -275,40 +275,48 @@
 
         <div class="row">
             <div class="col-lg-3 col-md-6 col-sm-12">
-                <div class="mini-stat clearfix">
-                    <span class="mini-stat-icon tar"><i class="fa fa-users"></i></span>
-                    <div class="mini-stat-info">
-                        <span>{{ $count['staff'] }}</span>
-                        Staff
+                <a href="{{ url('admin/users') }}">
+                    <div class="mini-stat clearfix">
+                        <span class="mini-stat-icon tar"><i class="fa fa-users"></i></span>
+                        <div class="mini-stat-info">
+                            <span>{{ $count['staff'] }}</span>
+                            Staff
+                        </div>
                     </div>
-                </div>
+                </a>
             </div>
             <div class="col-lg-3 col-md-6 col-sm-12">
-                <div class="mini-stat clearfix">
-                    <span class="mini-stat-icon orange"><i class="fa fa-user"></i></span>
-                    <div class="mini-stat-info">
-                        <span>{{ $count['yp'] }}</span>
-                        Child
+                <a href="{{ url('admin/service-users') }}">
+                    <div class="mini-stat clearfix">
+                        <span class="mini-stat-icon orange"><i class="fa fa-user"></i></span>
+                        <div class="mini-stat-info">
+                            <span>{{ $count['yp'] }}</span>
+                            Child
+                        </div>
                     </div>
-                </div>
+                </a>
             </div>
             <div class="col-lg-3 col-md-6 col-sm-12">
-                <div class="mini-stat clearfix">
-                    <span class="mini-stat-icon pink"><i class="fa fa-legal"></i></span>
-                    <div class="mini-stat-info">
-                        <span>{{ $count['access'] }}</span>
-                        Access Level
+                <a href="{{ url('admin/home/access-levels') }}">
+                    <div class="mini-stat clearfix">
+                        <span class="mini-stat-icon pink"><i class="fa fa-legal"></i></span>
+                        <div class="mini-stat-info">
+                            <span>{{ $count['access'] }}</span>
+                            Access Level
+                        </div>
                     </div>
-                </div>
+                </a>
             </div>
             <div class="col-lg-3 col-md-6 col-sm-12">
-                <div class="mini-stat clearfix">
-                    <span class="mini-stat-icon green"><i class="fa fa-ticket"></i></span>
-                    <div class="mini-stat-info">
-                        <span>{{ $count['ticket'] }}</span>
-                        Support Ticket
+                <a href="{{ url('admin/support-ticket') }}">
+                    <div class="mini-stat clearfix">
+                        <span class="mini-stat-icon green"><i class="fa fa-ticket"></i></span>
+                        <div class="mini-stat-info">
+                            <span>{{ $count['ticket'] }}</span>
+                            Support Ticket
+                        </div>
                     </div>
-                </div>
+                </a>
             </div>
         </div>
 
@@ -1085,7 +1093,7 @@ if (!empty($check_package_dtl)) {
 
 <script type="text/javascript">
     $(document).ready(function() {
-        var current_date = "{{ $current_date}}";
+        /*var current_date = "{{ $current_date}}";
         var correct_expiry_date = "{{ $expiry_date_next_day}}";
         var check_card_detail = "{{ $check_card_detail }}";
         // console.log(current_date);
@@ -1110,9 +1118,7 @@ if (!empty($check_package_dtl)) {
                     $('#package_modal').modal('show');
                 }
             }
-        }
-
-
+        }*/
     });
 </script>
 

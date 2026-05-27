@@ -94,7 +94,8 @@
                                             <div class="row">                                            
                                                 <div class="col-md-3 col-sm-4 col-xs-12 ">
                                                     <div class="profile-nav alt">
-                                                        <a href="#annualLeaveModal" data-toggle="modal">
+                                                        <!-- <a href="#annualLeaveModal" data-toggle="modal"> -->
+                                                        <a href="{{ url('absence/type=1?staff='.$staff_id) }}" data-toggle="modal">
                                                             <section class="panel text-center" style="border-style:solid; border-color:#cccccc;">
                                                                 <div class="user-heading alt wdgt-row purple-bg">
                                                                     <i class="fa fa-files-o"></i>
@@ -112,7 +113,8 @@
 
                                                 <div class="col-md-3 col-sm-4 col-xs-12 ">
                                                     <div class="profile-nav alt" >
-                                                        <a href="{{ url('/staff/rota/view') }}">
+                                                        <!-- <a href="{{ url('/staff/rota/view') }}"> -->
+                                                        <a href="{{ url('/rota-dashboard?user='.base64_encode($staff_id)) }}">
                                                             <section class="panel text-center" style="border-style:solid; border-color:#cccccc;">
                                                                 <div class="user-heading alt wdgt-row bg-blue">
                                                                     <i class="fa fa-sliders"></i>
@@ -128,7 +130,7 @@
                                                     </div>
                                                 </div>
                                                 <!-- fa-hourglass-end  fa-life-ring  fa-hourglass-half  fa-hourglass-start  fa-clock-o  fa-tachometer  fa-sliders   -->
-                                                <div class="col-md-3 col-sm-4 col-xs-12 ">
+                                                <!-- <div class="col-md-3 col-sm-4 col-xs-12 ">
                                                     <div class="profile-nav alt" >
                                                         <a href="#sickLeaveModal" data-toggle="modal">
                                                             <section class="panel text-center" style="border-style:solid; border-color:#cccccc;">
@@ -144,8 +146,47 @@
                                                             </section>
                                                         </a>
                                                     </div>
+                                                </div> -->
+                                                <div class="col-md-3 col-sm-4 col-xs-12 ">
+                                                    <div class="profile-nav alt" >
+                                                        <a href="{{url('/rota-absence?staff='.base64_encode($staff_id))}}">
+                                                            <section class="panel text-center" style="border-style:solid; border-color:#cccccc;">
+                                                                <div class="user-heading alt wdgt-row terques-bg">
+                                                                    <i class="fa fa-frown-o"></i>
+                                                                </div>
+                                                                <div class="panel-body">
+                                                                    <div class="wdgt-value">
+                                                                        <h4 class="count">Manage<br>Absence</h4>
+                                                                        <p></p>
+                                                                    </div>
+                                                                </div>
+                                                            </section>
+                                                        </a>
+                                                    </div>
                                                 </div>
-
+                                                <div class="col-md-3 col-sm-4 col-xs-12 ">
+                                                    <div class="profile-nav alt" >
+                                                        <a href="{{url('/overtime?staff='.base64_encode($staff_id))}}">
+                                                            <section class="panel text-center" style="border-style:solid; border-color:#cccccc;">
+                                                                <div class="user-heading alt wdgt-row terques-bg">
+                                                                    <i class="fa fa-clock-o"></i>
+                                                                </div>
+                                                                <div class="panel-body">
+                                                                    <div class="wdgt-value">
+                                                                        <h4 class="count">Manage<br>Overtime</h4>
+                                                                        <p></p>
+                                                                    </div>
+                                                                </div>
+                                                            </section>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                <!-- <div class="col-md-12 col-sm-12 col-xs-12">
+                                                    <div class="below-divider"></div>
+                                                </div> -->
+                                            </div> 
+                                            <div class="row">
+                                                
                                                 <div class="col-md-3 col-sm-4 col-xs-12 task-allocation-list">
                                                     <div class="profile-nav alt">
                                                         <section class="panel text-center" style="border-style:solid; border-color:#cccccc;">
@@ -161,11 +202,7 @@
                                                         </section>
                                                     </div>
                                                 </div>
-
-                                                <!-- <div class="col-md-12 col-sm-12 col-xs-12">
-                                                    <div class="below-divider"></div>
-                                                </div> -->
-                                            </div> 
+                                            </div>
                                         </div>
 
                                         <div class="col-md-4">

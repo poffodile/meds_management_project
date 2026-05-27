@@ -1,8 +1,0 @@
-SCIT Optimzation 
-
-1. Models in model folder
-2. in web.php file all routes should set as route url
-3. nested if to switch
-4. simple if else to ternary opertor
-5. using ajax to form save 
-6. remove unused CSS or js file

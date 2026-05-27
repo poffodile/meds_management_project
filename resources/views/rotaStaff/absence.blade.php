@@ -1,450 +1,875 @@
-@include('rotaStaff.components.header')
-@include('rotaStaff.pyrll_user_prfile_tmplte')
-@include('rotaStaff.pyrll_stylsheet')
+@extends('frontEnd.layouts.master')
+<meta name="csrf-token" content="{{ csrf_token() }}">
+@section('title','Staff Timesheet')
+<link rel="stylesheet" type="text/css" href="{{ url('public/frontEnd/jobs/css/custom.css')}}" />
 <style>
-.hr_gap{
-  height: 15px;
-}
-.leave_yr{
-  float: right;
-  margin-right: -390px;
-  width: 50%;
-}
-.fil_ab_n_leave_yr_prnt{
-  width: 100%;
-}
-.uppr_stats{
-  width: 100%;
-  height: 200px;
-  text-align: center;
-  font-size: 23px;
-  font-weight: bold;
-  display: block;
-  float: left;
-}
-.uppr_stat_all_itms{
-  margin-top: 30px;
-  font-size: 17px;
-  font-weight: 500;
-}
-.uppr_stat_itm{
-  width: 33%;
-  float: left;
-  text-align: center;
-  display: block;
-}
-.crrnt_n_ftre{
-  font-size: 16px;
-  float: left;
-  margin-top: 30px;
-}
-.sick_icn{
-  width: 175px;
-  height: 90px;
-  background-color: grey;
-}
-.crrnt_n_ftre_section_1{
-  float: left;
-  width: 100%;
-  margin-top: 8px;
-  height: 150px;
-}
-.crrnt_n_ftre_section_2{
-  float: left;
-  width: 100%;
-  height: 150px;
-}
-.crrnt_n_ftre_section_3{
-  float: left;
-  width: 100%;
-  height: 150px;
-}
-.txt_n_bxes_prnt{
-
-}
-.txt_n_bxes_chld_1{
-  float: left;
-  width: 20%;
-  font-size: 18px;
-  font-weight: 500;
-}
-.txt_n_bxes_chld_2{
-  float: left;
-  width: 20%;
-  font-size: 18px;
-  font-weight: 500;
-}
-.txt_n_bxes_chld_3{
-  float: left;
-  width: 20%;
-  font-size: 18px;
-  font-weight: 500;
-}
-.crrnt_n_ftre_icns{
-  float: right;
-}
-
-.accordion {
-  background-color: #eee;
-  color: black;
-  cursor: pointer;
-  padding: 18px;
-  width: 100%;
-  text-align: left;
-  border: none;
-  outline: none;
-  transition: 0.4s;
-}
-
-/* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
-.active, .accordion:hover {
-  background-color: #ccc;
-}
-
-/* Style the accordion panel. Note: hidden by default */
-.panel {
-  padding: 0 18px;
-  background-color: white;
-  display: none;
-  overflow: hidden;
-}
-.inbetween_block{
-  width: 100%;
-  float: left;
-  height: 20px;
-}
+    .approve {
+        border-radius: 17px !important;
+        width: 100px;
+        height: 25px;
+        margin-top: 10px;
+        line-height: 10px !important;
+    }
 </style>
-
-<hr>
-
-
-<div class = "fil_ab_n_leave_yr_prnt">
-  <div class = "flt_lft_wdth_100_var" style = "--wdth_prcntge: 50%">
-    Filter absences<br>
-    <select>
-     <option value ="All absences">All absences</option>
-     <option value ="Annual leave">Annual leave</option>
-     <option value ="Lateness">Lateness</option>
-     <option value ="Sickness">Sickness</option>
-     <option value ="Furlough">Furlough</option>
-     <option value ="Other">Other</option>
-    </select>
-  </div>
-  <div class = "leave_yr">
-    Leave year<br>
-    <select>
-     <option value ="2016">01 Jan 2016 - 31 Dec 2016</option>
-     <option value ="2017">01 Jan 2017 - 31 Dec 2017</option>
-     <option value ="2018">01 Jan 2018 - 31 Dec 2018</option>
-     <option value ="2019">01 Jan 2019 - 31 Dec 2019</option>
-     <option value ="2020">01 Jan 2020 - 31 Dec 2020</option>
-     <option value ="2021">01 Jan 2021 - 31 Dec 2021</option>
-     <option value ="2022">01 Jan 2022 - 31 Dec 2022</option>
-     <option value ="2023">01 Jan 2023 - 31 Dec 2023</option>
-     <option value ="2024">01 Jan 2024 - 31 Dec 2024</option>
-    </select>
-  </div>
-</div>
-<div class = "uppr_stats">
-  All absences
-  <div class = "uppr_stat_all_itms">
-    <div class = "uppr_stat_itm">
-      Annual leave to take
-      <div class = "occurences">
-        161 hrs 0 mins out of 224 hrs 0 mins
-      </div>
-      <div class = "rptble_btn_1" style = "--bckgrnd_clr: rgb(61,176,241); --wdth_prcntge: 168px;  --margin_: 8px auto">
-        <a href="{{ url('/add_annual_leave') }}">
-        Add annual leave</a>
-      </div>
-    </div>
-    <div class = "uppr_stat_itm"">
-      Sickness
-      <div class = "occurences">
-        2
-        <span style = "color: grey">Occurences</span>
-      </div>
-      <div class = "rptble_btn_1" style = "--bckgrnd_clr: rgb(61,176,241); --wdth_prcntge: 168px;  --margin_: 8px auto">
-        <a href = "{{ url('/add_sickness') }}">
-        Add</a>
-      </div>
-    </div>
-    <div class = "uppr_stat_itm">
-      Lateness
-      <div class = "occurences">
-        0
-        <span style = "color: grey">Occurences</span>
-      </div>
-      <div class = "rptble_btn_1" style = "--bckgrnd_clr: rgb(61,176,241); --wdth_prcntge: 168px;  --margin_: 8px auto">
-        <a href = "{{ url('/add_lateness') }}">
-        Add</a>
-      </div>
-    </div>
-  </div>
-</div>
-</div>
+@section('content')
 
 
-<button class="accordion">Current & future <span style = "font-size: 14">(click to expand)</span></button>
-<div class="panel">
-  <p>
-    <div class = "crrnt_n_ftre">
-    Current & future
-    </div> 
-    <div class = "crrnt_n_ftre_section_1">
-      <div class = "txt_n_bxes_chld_1">
-        <div class = "sick_icn">
-        </div>
-      </div>
-      <div class = "txt_n_bxes_chld_2">
-        <span style = "font-size: 16px; color: rgb(61,176,241)">
-        <a href = "{{ url('/update_sickness') }}">
-        Sickness </a></span><br>
-        <span style = "font-size: 16px">Fri 24 Feb 2023 (Ongoing)</span><br>
-        <span style = "font-size: 14px">hjjkj</span><br>
-        <span style = "font-size: 12px">Logged by michael carter</span>
-      </div>
-      <div class = "crrnt_n_ftre_icns">
-        <i class = "fa fa-file"></i>
-        <i class = "fa fa-file"></i>
-      </div>
-    </div>
-    <div class = "crrnt_n_ftre_section_2">
-      <div class = "txt_n_bxes_chld_1">
-        <div class = "sick_icn">
-        </div>
-      </div>
-      <div class = "txt_n_bxes_chld_2">
-        <span style = "font-size: 16px; color: rgb(61,176,241)">
-        <a href = "{{ url('/update_sickness') }}">
-        Sickness</a></span><br>
-        <span style = "font-size: 15px">Sat 25 Feb 2023 (Ongoing)</span><br>
-        <span style = "font-size: 12px">Logged by michael carter</span>
-      </div>
-      <div class = "crrnt_n_ftre_icns">
-        <i class = "fa fa-file"></i>
-        <i class = "fa fa-file"></i>
-      </div>
-    </div>
-  </p>
-</div>
-
-
-<div class = "inbetween_block">
-</div>
-
-
-<button class="accordion">Absence history</button>
-<div class="panel">
-  <p>
-    <div class = "crrnt_n_ftre">
-    Absence history
-    </div>
-    <div class = "crrnt_n_ftre_section_1">
-      <div class = "txt_n_bxes_chld_1">
-        <div class = "sick_icn">
-        </div>
-      </div>
-      <div class = "txt_n_bxes_chld_2">
-        <span style = "font-size: 16px; color: rgb(61,176,241)">
-        <a href = "{{ url('/update_sickness') }}">
-        Mandatory leave </a></span><br>
-        <span style = "font-size: 16px">Fri 24 Feb 2023 (Ongoing)</span><br>
-        <span style = "font-size: 14px">hjjkj</span><br>
-        <span style = "font-size: 12px">Logged by michael carter</span>
-      </div>
-      <div class = "crrnt_n_ftre_icns">
-        <i class = "fa fa-file"></i>
-        <i class = "fa fa-file"></i>
-      </div>
-    </div>
-  </p>
-</div>
-
-
-<div class = "inbetween_block">
-</div>
-
-
-<button class="accordion">Public holidays</button>
-<div class="panel">
-  <p>
-    <div class = "crrnt_n_ftre">
-    Public Holidays
-    </div>
-    <div class = "crrnt_n_ftre_section_1">
-      <div class = "txt_n_bxes_chld_1">
-        <div class = "sick_icn">
-        </div>
-      </div>
-      <div class = "txt_n_bxes_chld_2">
-        <span style = "font-size: 16px; color: rgb(61,176,241)">
-        <a href = "{{ url('/update_sickness') }}">
-        Public Holiday </a></span><br>
-        <span style = "font-size: 16px">Mon 02 Jan 2023 (7 hrs)</span><br>
-        <span style = "font-size: 12px">New Year's Day (substitute day)</span>
-      </div>
-      <div class = "crrnt_n_ftre_icns">
-        <i class = "fa fa-file"></i>
-        <i class = "fa fa-file"></i>
-      </div>
-    </div>
-    <div class = "crrnt_n_ftre_section_1">
-      <div class = "txt_n_bxes_chld_1">
-        <div class = "sick_icn">
-        </div>
-      </div>
-      <div class = "txt_n_bxes_chld_2">
-        <span style = "font-size: 16px; color: rgb(61,176,241)">
-        <a href = "{{ url('/update_sickness') }}">
-        Public Holiday </a></span><br>
-        <span style = "font-size: 16px">Mon 02 Jan 2023 (7 hrs)</span><br>
-        <span style = "font-size: 12px">New Year's Day (substitute day)</span>
-      </div>
-      <div class = "crrnt_n_ftre_icns">
-        <i class = "fa fa-file"></i>
-        <i class = "fa fa-file"></i>
-      </div>
-    </div>
-    <div class = "crrnt_n_ftre_section_1">
-      <div class = "txt_n_bxes_chld_1">
-        <div class = "sick_icn">
-        </div>
-      </div>
-      <div class = "txt_n_bxes_chld_2">
-        <span style = "font-size: 16px; color: rgb(61,176,241)">
-        <a href = "{{ url('/update_sickness') }}">
-        Public Holiday </a></span><br>
-        <span style = "font-size: 16px">Mon 02 Jan 2023 (7 hrs)</span><br>
-        <span style = "font-size: 12px">New Year's Day (substitute day)</span>
-      </div>
-      <div class = "crrnt_n_ftre_icns">
-        <i class = "fa fa-file"></i>
-        <i class = "fa fa-file"></i>
-      </div>
-    </div>
-    <div class = "crrnt_n_ftre_section_1">
-      <div class = "txt_n_bxes_chld_1">
-        <div class = "sick_icn">
-        </div>
-      </div>
-      <div class = "txt_n_bxes_chld_2">
-        <span style = "font-size: 16px; color: rgb(61,176,241)">
-        <a href = "{{ url('/update_sickness') }}">
-        Public Holiday </a></span><br>
-        <span style = "font-size: 16px">Mon 02 Jan 2023 (7 hrs)</span><br>
-        <span style = "font-size: 12px">New Year's Day (substitute day)</span>
-      </div>
-      <div class = "crrnt_n_ftre_icns">
-        <i class = "fa fa-file"></i>
-        <i class = "fa fa-file"></i>
-      </div>
-    </div>
-    <div class = "crrnt_n_ftre_section_1">
-      <div class = "txt_n_bxes_chld_1">
-        <div class = "sick_icn">
-        </div>
-      </div>
-      <div class = "txt_n_bxes_chld_2">
-        <span style = "font-size: 16px; color: rgb(61,176,241)">
-        <a href = "{{ url('/update_sickness') }}">
-        Public Holiday </a></span><br>
-        <span style = "font-size: 16px">Mon 02 Jan 2023 (7 hrs)</span><br>
-        <span style = "font-size: 12px">New Year's Day (substitute day)</span>
-      </div>
-      <div class = "crrnt_n_ftre_icns">
-        <i class = "fa fa-file"></i>
-        <i class = "fa fa-file"></i>
-      </div>
-    </div>
-    <div class = "crrnt_n_ftre_section_1">
-      <div class = "txt_n_bxes_chld_1">
-        <div class = "sick_icn">
-        </div>
-      </div>
-      <div class = "txt_n_bxes_chld_2">
-        <span style = "font-size: 16px; color: rgb(61,176,241)">
-        <a href = "{{ url('/update_sickness') }}">
-        Public Holiday </a></span><br>
-        <span style = "font-size: 16px">Mon 02 Jan 2023 (7 hrs)</span><br>
-        <span style = "font-size: 12px">New Year's Day (substitute day)</span>
-      </div>
-      <div class = "crrnt_n_ftre_icns">
-        <i class = "fa fa-file"></i>
-        <i class = "fa fa-file"></i>
-      </div>
-    </div>
-    <div class = "crrnt_n_ftre_section_1">
-      <div class = "txt_n_bxes_chld_1">
-        <div class = "sick_icn">
-        </div>
-      </div>
-      <div class = "txt_n_bxes_chld_2">
-        <span style = "font-size: 16px; color: rgb(61,176,241)">
-        <a href = "{{ url('/update_sickness') }}">
-        Public Holiday </a></span><br>
-        <span style = "font-size: 16px">Mon 02 Jan 2023 (7 hrs)</span><br>
-        <span style = "font-size: 12px">New Year's Day (substitute day)</span>
-      </div>
-      <div class = "crrnt_n_ftre_icns">
-        <i class = "fa fa-file"></i>
-        <i class = "fa fa-file"></i>
-      </div>
-    </div>
-    <div class = "crrnt_n_ftre_section_1">
-      <div class = "txt_n_bxes_chld_1">
-        <div class = "sick_icn">
-        </div>
-      </div>
-      <div class = "txt_n_bxes_chld_2">
-        <span style = "font-size: 16px; color: rgb(61,176,241)">
-        <a href = "{{ url('/update_sickness') }}">
-        Public Holiday </a></span><br>
-        <span style = "font-size: 16px">Mon 02 Jan 2023 (7 hrs)</span><br>
-        <span style = "font-size: 12px">New Year's Day (substitute day)</span>
-      </div>
-      <div class = "crrnt_n_ftre_icns">
-        <i class = "fa fa-file"></i>
-        <i class = "fa fa-file"></i>
-      </div>
-    </div>
-    <div class = "crrnt_n_ftre_section_1">
-      <div class = "txt_n_bxes_chld_1">
-        <div class = "sick_icn">
-      </div>
-    </div>
-      <div class = "txt_n_bxes_chld_2">
-        <span style = "font-size: 16px; color: rgb(61,176,241)">
-        <a href = "{{ url('/update_sickness') }}">
-        Public Holiday </a></span><br>
-        <span style = "font-size: 16px">Mon 02 Jan 2023 (7 hrs)</span><br>
-        <span style = "font-size: 12px">New Year's Day (substitute day)</span>
-      </div>
-      <div class = "crrnt_n_ftre_icns">
-        <i class = "fa fa-file"></i>
-        <i class = "fa fa-file"></i>
-      </div>
-    </div>
-  </p>
-</div>
-
-<script>
-  var acc = document.getElementsByClassName("accordion");
-  var i;
-
-  for (i = 0; i < acc.length; i++) {
-    acc[i].addEventListener("click", function() {
-      /* Toggle between adding and removing the "active" class,
-      to highlight the button that controls the panel */
-      this.classList.toggle("active");
-
-      /* Toggle between hiding and showing the active panel */
-      var panel = this.nextElementSibling;
-      if (panel.style.display === "block") {
-        panel.style.display = "none";
-      } else {
-        panel.style.display = "block";
-      }
-    });
+<!--main content start-->
+<?php 
+$action_url=url('rota-absence?manager='.base64_encode($user_id));
+if($user_id_key == 'staff'){
+    $action_url=url('rota-absence?staff='.base64_encode($user_id));
+}
+  function checkLeavType($leave_type){
+    if($leave_type == 1){
+        return $leave_type = 'Annual leave';
+    }else if($leave_type == 2){
+        return $leave_type = 'Sickness';
+    }else if($leave_type == 3){
+        return $leave_type = 'Lateness';
+    }else{
+        return $leave_type = 'Other';
+    }
   }
+?>
+<section class="wrapper">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12 p-0">
+                <div class="panel">
+                    <header class="panel-heading px-5">
+                        <h4>Absence</h4>
+                    </header>
+                    <div class="panel-body">
+                        <div class="absenceFiler">
+                            <div>
+                                <label>Filter absences</label>
+                                <div>
+                                    <select id="absenceFilter" class="form-select form-control">
+                                        <option value="1">All absences</option>
+                                        <option value="2">Annual leave</option>
+                                        <option value="3">Lateness</option>
+                                        <option value="4">Sickness</option>
+                                        <!-- <option value="furloughs">Furloughs</option> -->
+                                        <option value="5">Other absences</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div>
+                                <label>Leave year</label>
+                                <form action="{{$action_url}}" method="post" id="yearForm">
+                                    @csrf
+                                    <div>
+                                        <select class="form-select form-control" id="year" onchange="year_select()" name="year">
+                                            <?php foreach($years as $yearVal){?>
+                                                <option value="{{$yearVal}}" <?php if($reqyear == $yearVal){echo 'selected';}?>>01 Jan {{$yearVal}} - 31 Dec {{$yearVal}}</option>
+                                            <?php }?>
+                                        </select>
+                                    </div>
+                                </form>
+                            </div>
+
+                        </div>
+                        <div class="allAbsences">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class=" text-center">
+                                        <h3>All absences</h3>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="absenceAdd m-t-20">
+                                        <label>Annual leave to take</label>
+                                        <div class="timeHrsMinuts m-t-20 m-b-20">
+                                            <div class="timelist">
+                                                <strong><?php echo $renaming_hour;?></strong>
+                                                <span>hrs</span>
+                                            </div>
+                                            <div class="timelist">
+                                                <strong><?php echo $renaming_min;?></strong>
+                                                <span>mins</span>
+                                            </div>
+                                            <div class="timelist">
+                                                <strong>/</strong>
+                                            </div>
+                                           
+                                            <div class="timelist">
+                                                <strong>{{$allowance_hour}}</strong>
+                                                <span>hrs</span>
+                                            </div>
+                                            <div class="timelist">
+                                                <strong>{{$allowance_min}}</strong>
+                                                <span>mins</span>
+                                            </div>
+                                        </div>
+                                        <!-- <p>(Approx 24 / 32 days) <a href="#!"><i class="fa fa-info-o"></i> </a> </p> -->
+                                        <div class="m-t-20">
+                                            <a href="{{url('absence/type=1?'.$user_id_key.'='.$user_id)}}" type="button" class="btn btn-warning">Add annual leave</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="absenceAdd borderLeftRight m-t-20">
+                                        <label>Sickness</label>
+                                        <div class="timeHrsMinuts m-t-20 m-b-20">
+                                            <div class="timelist">
+                                                <strong id="seekness_occurrences">0</strong>
+                                                <span>occurrences</span>
+                                            </div>
+
+                                        </div>
+                                        <!-- <p>(....?) <a href="#!"><i class="fa fa-info-o"></i> </a> </p> -->
+                                        <div class="m-t-20">
+                                            <a href="{{url('absence/type=2?'.$user_id_key.'='.$user_id)}}" type="button" class="btn btn-warning">Add</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="absenceAdd m-t-20">
+                                        <label>Lateness</label>
+                                        <div class="timeHrsMinuts m-t-20 m-b-20">
+                                            <div class="timelist">
+                                                <strong id="lateness_occurrences">0</strong>
+                                                <span>occurrences</span>
+                                            </div>
+
+                                        </div>
+                                        <!-- <p>(....?) <a href="#!"><i class="fa fa-info-o"></i> </a> </p> -->
+                                        <div class="m-t-20">
+                                            <a href="{{url('absence/type=3?'.$user_id_key.'='.$user_id)}}" type="button" class="btn btn-warning">Add</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="absenceHistory m-t-40">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h3 class="absencehistoryHeading">Absence History</h3>
+                                        <div class="absenceAccordion">
+                                            <div class="panel-group" id="accordion-absence">
+                                                <div class="panel panel-default">
+                                                    <div class="panel-heading">
+                                                        <h4 class="panel-title">
+                                                            <a data-toggle="collapse" data-parent="#accordion-absence" href="#collapseOne">Current & future ({{count($current_future)}})</a>
+                                                        </h4>
+                                                    </div>
+                                                    <div id="collapseOne" class="panel-collapse collapse">
+                                                        <div class="panel-body">
+                                                            <div class="col-md-12">
+                                                                <?php 
+                                                                $annual_cf=0;
+                                                                $seekness_occurrences=0;
+                                                                $lateness_occurrences=0;
+                                                                $other_cf=0;
+                                                                foreach($current_future as $cfVal){
+                                                                    $leave_typeAll_cfVal=checkLeavType($cfVal->leave_type);
+                                                                    if($cfVal->leave_type == 1){
+                                                                        $annual_cf=$annual_cf+1;
+                                                                    }if($cfVal->leave_type == 2){
+                                                                        $seekness_occurrences=$seekness_occurrences+1;
+                                                                    }if($cfVal->leave_type == 3){
+                                                                        $lateness_occurrences=$lateness_occurrences+1;
+                                                                    }if($cfVal->leave_type == 4){
+                                                                        $other_cf=$other_cf+1;
+                                                                    }
+                                                                ?>
+                                                                <div class="row publicHoliday">
+                                                                    <div class="col-md-2">
+                                                                        <div class="sunIcon">
+                                                                            <i class="fa fa-certificate"></i>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-8">
+                                                                        <div class="holidayTitle">
+                                                                            <h4>{{$leave_typeAll_cfVal}}</h4>
+                                                                            <p><strong><?php echo date('D d M', strtotime($cfVal->start_date)) . ' - ' . date('D d M Y',strtotime($cfVal->end_date));?></strong> (0 hrs)</p>
+                                                                            <p><b>logged</b> on <?php echo date('D d M Y', strtotime($cfVal->created_at));?> by <?php echo Auth::user()->name; ?></p>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-2">
+                                                                        <div class="sunIcon">
+                                                                            <a href="{{url('absence/type='.$cfVal->leave_type.'?'.$user_id_key.'='.$user_id.'&leave_id='.$cfVal->id)}}"><i class="fa fa-pencil-square-o"></i></a>
+                                                                            <a href="{{url('absence/type='.$cfVal->leave_type.'?'.$user_id_key.'='.$user_id.'&leave_id='.$cfVal->id)}}"><i class="fa fa-trash-o"></i></a>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <?php }?>
+                                                                <input type="hidden" id="seekness_occurrences_value" value="{{$seekness_occurrences}}">
+                                                                <input type="hidden" id="lateness_occurrences_value" value="{{$lateness_occurrences}}">
+                                                                <!-- <div class="row publicHoliday m-t-15">
+                                                                    <div class="col-md-2">
+                                                                        <div class="sunIcon">
+                                                                            <i class="fa fa-certificate"></i>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-8">
+                                                                        <div class="holidayTitle">
+                                                                            <h4>Public Holiday</h4>
+                                                                            <p><strong>Mon 01 Jan 2018</strong> (7 hrs)</p>
+                                                                            <p>New Year's Day</p>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-2">
+                                                                        <div class="sunIcon">
+                                                                            <a href="#!"><i class="fa fa-pencil-square-o"></i></a>
+                                                                            <a href="#!"><i class="fa fa-trash-o"></i></a>
+                                                                        </div>
+                                                                    </div>
+                                                                </div> -->
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="panel panel-default">
+                                                    <div class="panel-heading">
+                                                        <h4 class="panel-title">
+                                                            <a data-toggle="collapse" data-parent="#accordion-absence" href="#collapseTwo">Absence history ({{count($history)}})</a>
+                                                        </h4>
+                                                    </div>
+                                                    <div id="collapseTwo" class="panel-collapse collapse">
+                                                        <div class="panel-body">
+                                                            <!-- <div class="row">
+                                                                <div class="col-md-12">
+                                                                    Shank fatback pastrami turkey ham hock. Pastrami ball tip brisket pig salami kevin tri-tip sausage venison jowl spare ribs short loin pork chop. Shank pork chop burgdoggen shankle flank. Turducken cow salami venison, biltong ham ball tip meatloaf drumstick bacon jowl kielbasa.
+                                                                </div>
+                                                            </div> -->
+                                                            <?php 
+                                                            $annual_ah=0;
+                                                            $seeckness_ah=0;
+                                                            $lateness_ah=0;
+                                                            $other_ah=0;
+                                                            foreach($history as $all_histroy){
+                                                                $leave_typeAll_histroy=checkLeavType($all_histroy->leave_type);
+                                                                if($all_histroy->leave_type == 1){
+                                                                    $annual_ah=$annual_ah+1;
+                                                                }else if($all_histroy->leave_type == 2){
+                                                                    $seeckness_ah=$seeckness_ah+1;
+                                                                }else if($all_histroy->leave_type == 3){
+                                                                    $lateness_ah=$lateness_ah+1;
+                                                                }else if($all_histroy->leave_type == 4){
+                                                                    $other_ah=$other_ah+1;
+                                                                }
+                                                                ?>
+                                                            <div class="row publicHoliday m-t-15">
+                                                                <div class="col-md-2">
+                                                                    <div class="sunIcon">
+                                                                        <i class="fa fa-certificate"></i>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-8">
+                                                                    <div class="holidayTitle">
+                                                                        <!-- <h4>Public Holiday</h4> -->
+                                                                            <h4>{{$leave_typeAll_histroy}}</h4>
+                                                                        <?php if($all_histroy->leave_type == 4){?>
+                                                                            <p>Other Leave</p>
+                                                                        <?php }?>
+                                                                            <p><strong><?php echo date('D d M', strtotime($all_histroy->start_date)) . ' - ' . date('D d M Y',strtotime($all_histroy->end_date));?></strong> (0 hrs)</p>
+                                                                            <!-- <p>New Year's Day</p> -->
+                                                                            <p><button type="button" class="btn btn-warning approve">APPROVED</button> on <?php echo date('D d M Y', strtotime($all_histroy->created_at));?> by <?php echo Auth::user()->name; ?></p>
+                                                                    </div>
+                                                                </div>
+                                                                <!-- <div class="col-md-2">
+                                                                    <div class="sunIcon">
+                                                                        <a href="#!"><i class="fa fa-pencil-square-o"></i></a>
+                                                                        <a href="#!"><i class="fa fa-trash-o"></i></a>
+                                                                    </div>
+                                                                </div> -->
+                                                            </div>
+                                                            <?php } ?>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> <!-- all Absence  -->
+
+                        <div class="annualLeave">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class=" text-center">
+                                        <h3>Annual leave</h3>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="absenceAdd borderLeftRight m-t-20">
+                                        <label>Remaining</label>
+                                        <div class="timeHrsMinuts m-t-20 m-b-20">
+                                            <div class="timelist">
+                                                <strong><?php echo $renaming_hour;?></strong>
+                                                <span>hrs</span>
+                                            </div>
+                                            <div class="timelist">
+                                                <strong><?php echo $renaming_min;?></strong>
+                                                <span>mins</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="absenceAdd m-t-20">
+                                        <label>Allowance</label>
+                                        <div class="timeHrsMinuts m-t-20 m-b-20">
+                                            <div class="timelist">
+                                                <strong>{{$allowance_hour}}</strong>
+                                                <span>hrs</span>
+                                            </div>
+                                            <div class="timelist">
+                                                <strong>{{$allowance_min}}</strong>
+                                                <span>mins</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 m-t-20 text-center">
+                                    <label>Craig has taken {{$allowance_hour}} hrs of annual leave.</label>
+                                    <a href="{{url('absence/type=1?'.$user_id_key.'='.$user_id)}}" type="button" class="btn btn-warning m-t-20">Add annual leave</a>
+                                </div>
+                            </div>
+                            <div class="absenceHistory m-t-40">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h3 class="absencehistoryHeading">Absence History</h3>
+                                        <div class="absenceAccordion">
+                                            <div class="panel-group" id="accordionAbsence">
+                                                <div class="panel panel-default">
+                                                    <div class="panel-heading">
+                                                        <h4 class="panel-title">
+                                                            <a data-toggle="collapse" data-parent="#accordionAbsence" href="#collapseThree">Current & future ({{$annual_cf}})</a>
+                                                        </h4>
+                                                    </div>
+                                                    <div id="collapseThree" class="panel-collapse collapse">
+                                                        <div class="panel-body">
+                                                            <div class="col-md-12">
+                                                                <?php foreach($current_future as $cfVal){
+                                                                    $leave_typeAll_cfVal=checkLeavType($cfVal->leave_type);
+                                                                ?>
+                                                                <div class="row publicHoliday">
+                                                                    <div class="col-md-2">
+                                                                        <div class="sunIcon">
+                                                                            <i class="fa fa-certificate"></i>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-8">
+                                                                        <div class="holidayTitle">
+                                                                            <h4>{{$leave_typeAll_cfVal}}</h4>
+                                                                            <p><strong><?php echo date('D d M', strtotime($cfVal->start_date)) . ' - ' . date('D d M Y',strtotime($cfVal->end_date));?></strong> (0 hrs)</p>
+                                                                            <p><b>logged</b> on <?php echo date('D d M Y', strtotime($cfVal->created_at));?> by <?php echo Auth::user()->name; ?></p>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-2">
+                                                                        <div class="sunIcon">
+                                                                            <a href="#!"><i class="fa fa-pencil-square-o"></i></a>
+                                                                            <a href="#!"><i class="fa fa-trash-o"></i></a>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <?php }?>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="panel panel-default">
+                                                    <div class="panel-heading">
+                                                        <h4 class="panel-title">
+                                                            <a data-toggle="collapse" data-parent="#accordionAbsence" href="#collapseFour">Absence history ({{$annual_ah}})</a>
+                                                        </h4>
+                                                    </div>
+                                                    <div id="collapseFour" class="panel-collapse collapse">
+                                                        <div class="panel-body">
+                                                            <!-- <div class="row">
+                                                                <div class="col-md-12">
+                                                                    Shank fatback pastrami turkey ham hock. Pastrami ball tip brisket pig salami kevin tri-tip sausage venison jowl spare ribs short loin pork chop. Shank pork chop burgdoggen shankle flank. Turducken cow salami venison, biltong ham ball tip meatloaf drumstick bacon jowl kielbasa.
+                                                                </div>
+                                                            </div> -->
+                                                             <?php 
+                                                            foreach($history as $all_histroy){
+                                                                $leave_typeAll_histroy=checkLeavType($all_histroy->leave_type);
+                                                                ?>
+                                                            <div class="row publicHoliday m-t-15">
+                                                                <div class="col-md-2">
+                                                                    <div class="sunIcon">
+                                                                        <i class="fa fa-certificate"></i>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-8">
+                                                                    <div class="holidayTitle">
+                                                                        <!-- <h4>Public Holiday</h4> -->
+                                                                            <h4>{{$leave_typeAll_histroy}}</h4>
+                                                                        <?php if($all_histroy->leave_type == 4){?>
+                                                                            <p>Other Leave</p>
+                                                                        <?php }?>
+                                                                            <p><strong><?php echo date('D d M', strtotime($all_histroy->start_date)) . ' - ' . date('D d M Y',strtotime($all_histroy->end_date));?></strong> (0 hrs)</p>
+                                                                            <!-- <p>New Year's Day</p> -->
+                                                                            <p><button type="button" class="btn btn-warning approve">APPROVED</button> on <?php echo date('D d M Y', strtotime($all_histroy->created_at));?> by <?php echo Auth::user()->name; ?></p>
+                                                                    </div>
+                                                                </div>
+                                                                <!-- <div class="col-md-2">
+                                                                    <div class="sunIcon">
+                                                                        <a href="#!"><i class="fa fa-pencil-square-o"></i></a>
+                                                                        <a href="#!"><i class="fa fa-trash-o"></i></a>
+                                                                    </div>
+                                                                </div> -->
+                                                            </div>
+                                                            <?php } ?>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="lateness">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class=" text-center">
+                                        <h3>Lateness</h3>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 p-0">
+                                    <div class="absenceAdd borderLeftRight m-t-20">
+                                        <label>Logged</label>
+                                        <div class="timeHrsMinuts m-t-20 m-b-20">
+                                            <div class="timelist">
+                                                <strong>{{count($lateness)}}</strong>
+                                                <span>occurrences</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <?php 
+                                $lateness_hour=0;
+                                $lateness_min=0;
+                                foreach($lateness as $lateVal){
+                                    if (!empty($lateVal->late_by)) {
+                                        $lateParts = explode('::', $lateVal->late_by);
+                                        $lateHour = isset($lateParts[0]) ? (int)$lateParts[0] : 0;
+                                        $lateMin = isset($lateParts[1]) ? (int)$lateParts[1] : 0;
+
+                                        $lateness_hour += $lateHour;
+                                        $lateness_min += $lateMin;
+                                    }
+                                }
+
+                                $extraHoursLate = floor($lateness_min / 60);
+                                $allowanceLate_hour = $lateness_hour+$extraHoursLate;
+                                $allowanceLate_min = $lateness_min % 60;
+                                ?>
+                                <div class="col-md-6">
+                                    <div class="absenceAdd m-t-20">
+                                        <label>Total</label>
+                                        <div class="timeHrsMinuts m-t-20 m-b-20">
+                                            <div class="timelist">
+                                                <strong>{{$allowanceLate_hour}}</strong>
+                                                <span>hrs</span>
+                                            </div>
+                                            <div class="timelist">
+                                                <strong>{{$allowanceLate_min}}</strong>
+                                                <span>mins</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 m-t-20 text-center">
+                                    <a href="{{url('absence/type=3?'.$user_id_key.'='.$user_id)}}" type="button" class="btn btn-warning">Add lateness</a>
+                                </div>
+                            </div>
+                            <div class="absenceHistory m-t-40">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h3 class="absencehistoryHeading">Absence History</h3>
+                                        <div class="absenceAccordion">
+                                            <div class="panel-group" id="accordionLateness">
+                                                <div class="panel panel-default">
+                                                    <div class="panel-heading">
+                                                        <h4 class="panel-title">
+                                                            <a data-toggle="collapse" data-parent="#accordionLateness" href="#collapseLateness">Lateness history ({{$lateness_ah}})</a>
+                                                        </h4>
+                                                    </div>
+                                                    <div id="collapseLateness" class="panel-collapse collapse">
+                                                        <div class="panel-body">
+                                                            <div class="col-md-12">
+                                                                <?php foreach($history as $all_histroy){
+                                                                    if($all_histroy->leave_type == 3){
+                                                                        $leave_typeAll_histroy=checkLeavType($all_histroy->leave_type);
+                                                                ?>
+                                                            <div class="row publicHoliday m-t-15">
+                                                                <div class="col-md-2">
+                                                                    <div class="sunIcon">
+                                                                        <i class="fa fa-certificate"></i>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-8">
+                                                                    <div class="holidayTitle">
+                                                                            <h4>{{$leave_typeAll_histroy}}</h4>
+                                                                            <p><strong><?php echo date('D d M', strtotime($all_histroy->start_date)) . ' - ' . date('D d M Y',strtotime($all_histroy->end_date));?></strong> (0 hrs)</p>
+                                                                            <p><button type="button" class="btn btn-warning approve">APPROVED</button> on <?php echo date('D d M Y', strtotime($all_histroy->created_at));?> by <?php echo Auth::user()->name; ?></p>
+                                                                    </div>
+                                                                </div>
+                                                                <!-- <div class="col-md-2">
+                                                                    <div class="sunIcon">
+                                                                        <a href="#!"><i class="fa fa-pencil-square-o"></i></a>
+                                                                        <a href="#!"><i class="fa fa-trash-o"></i></a>
+                                                                    </div>
+                                                                </div> -->
+                                                            </div>
+                                                            <?php }} ?>
+                                                                
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="sickness">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class=" text-center">
+                                        <h3>Sickness</h3>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 p-0">
+                                    <div class="absenceAdd borderLeftRight m-t-20">
+                                        <label>Logged</label>
+                                        <div class="timeHrsMinuts m-t-20 m-b-20">
+                                            <div class="timelist">
+                                                <strong>{{count($sickness)}}</strong>
+                                                <span>occurrences</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="absenceAdd m-t-20">
+                                        <label>Total</label>
+                                        <?php 
+                                        $sickCount=0;
+                                        foreach($sickness as $sickVal){
+                                            $sickCount=$sickCount+$sickVal->days ?? 1;
+                                        }?>
+                                        <div class="timeHrsMinuts m-t-20 m-b-20">
+                                            <div class="timelist">
+                                                <strong>{{$sickCount}}</strong>
+                                                <span>days</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 m-t-20 text-center">
+                                    <a href="{{url('absence/type=2?'.$user_id_key.'='.$user_id)}}" type="button" class="btn btn-warning">Add Sickness</a>
+                                </div>
+                            </div>
+                            <div class="absenceHistory m-t-40">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h3 class="absencehistoryHeading">Absence History</h3>
+                                        <div class="absenceAccordion">
+                                            <div class="panel-group" id="accordionSickness">
+                                                <div class="panel panel-default">
+                                                    <div class="panel-heading">
+                                                        <h4 class="panel-title">
+                                                            <a data-toggle="collapse" data-parent="#accordionSickness" href="#collapseSickness">Sickness history ({{$seeckness_ah}})</a>
+                                                        </h4>
+                                                    </div>
+                                                    <div id="collapseSickness" class="panel-collapse collapse">
+                                                        <div class="panel-body">
+                                                            <div class="col-md-12">
+                                                                <?php foreach($history as $all_histroy){
+                                                                    if($all_histroy->leave_type == 2){
+                                                                        $leave_typeAll_histroy=checkLeavType($all_histroy->leave_type);
+                                                                ?>
+                                                                <div class="row publicHoliday m-t-15">
+                                                                    <div class="col-md-2">
+                                                                        <div class="sunIcon">
+                                                                            <i class="fa fa-certificate"></i>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-8">
+                                                                        <div class="holidayTitle">
+                                                                                <h4>{{$leave_typeAll_histroy}}</h4>
+                                                                                <p><strong><?php echo date('D d M', strtotime($all_histroy->start_date)) . ' - ' . date('D d M Y',strtotime($all_histroy->end_date));?></strong> (0 hrs)</p>
+                                                                                <p><button type="button" class="btn btn-warning approve">APPROVED</button> on <?php echo date('D d M Y', strtotime($all_histroy->created_at));?> by <?php echo Auth::user()->name; ?></p>
+                                                                        </div>
+                                                                    </div>
+                                                                    <!-- <div class="col-md-2">
+                                                                        <div class="sunIcon">
+                                                                            <a href="#!"><i class="fa fa-pencil-square-o"></i></a>
+                                                                            <a href="#!"><i class="fa fa-trash-o"></i></a>
+                                                                        </div>
+                                                                    </div> -->
+                                                                </div>
+                                                                <?php }} ?>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="furloughs">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class=" text-center">
+                                        <h3>Furloughs</h3>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 m-t-20 text-center">
+                                    <a href="#!" type="button" class="btn btn-warning">Add furlough</a>
+                                </div>
+                            </div>
+                            <div class="absenceHistory m-t-40">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h3 class="absencehistoryHeading">Absence History</h3>
+                                        <div class="absenceAccordion">
+                                            <div class="panel-group" id="accordionfurloughs">
+                                                <div class="panel panel-default">
+                                                    <div class="panel-heading">
+                                                        <h4 class="panel-title">
+                                                            <a data-toggle="collapse" data-parent="#accordionfurloughs" href="#collapsefurloughs">Furloughs current & future (0)</a>
+                                                        </h4>
+                                                    </div>
+                                                    <div id="collapsefurloughs" class="panel-collapse collapse">
+                                                        <div class="panel-body">
+                                                            <div class="col-md-12">
+                                                                <div class="row publicHoliday">
+                                                                    <div class="col-md-2">
+                                                                        <div class="sunIcon">
+                                                                            <i class="fa fa-certificate"></i>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-8">
+                                                                        <div class="holidayTitle">
+                                                                            <h4>Public Holiday</h4>
+                                                                            <p><strong>Mon 01 Jan 2018</strong> (7 hrs)</p>
+                                                                            <p>New Year's Day</p>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-2">
+                                                                        <div class="sunIcon">
+                                                                            <a href="#!"><i class="fa fa-pencil-square-o"></i></a>
+                                                                            <a href="#!"><i class="fa fa-trash-o"></i></a>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="row publicHoliday m-t-15">
+                                                                    <div class="col-md-2">
+                                                                        <div class="sunIcon">
+                                                                            <i class="fa fa-certificate"></i>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-8">
+                                                                        <div class="holidayTitle">
+                                                                            <h4>Public Holiday</h4>
+                                                                            <p><strong>Mon 01 Jan 2018</strong> (7 hrs)</p>
+                                                                            <p>New Year's Day</p>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-2">
+                                                                        <div class="sunIcon">
+                                                                            <a href="#!"><i class="fa fa-pencil-square-o"></i></a>
+                                                                            <a href="#!"><i class="fa fa-trash-o"></i></a>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="otherAbsences">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class=" text-center">
+                                        <h3>Other Absences</h3>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 p-0">
+                                    <div class="absenceAdd borderLeftRight m-t-20">
+                                        <label>Logged</label>
+                                        <div class="timeHrsMinuts m-t-20 m-b-20">
+                                            <div class="timelist">
+                                                <strong>{{count($other)}}</strong>
+                                                <span>occurrences</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="absenceAdd m-t-20">
+                                        <label>Total</label>
+                                        <div class="timeHrsMinuts m-t-20 m-b-20">
+                                            <div class="timelist">
+                                                <strong>{{$allowance_Otherhour}}</strong>
+                                                <span>hrs</span>
+                                            </div>
+                                            <div class="timelist">
+                                                <strong>{{$allowanceOther_min}}</strong>
+                                                <span>min</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 m-t-20 text-center">
+                                    <a href="{{url('absence/type=4?'.$user_id_key.'='.$user_id)}}" type="button" class="btn btn-warning">Request other absence</a>
+                                </div>
+                            </div>
+                            <div class="absenceHistory m-t-40">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h3 class="absencehistoryHeading">Absence History</h3>
+                                        <div class="absenceAccordion">
+                                            <div class="panel-group" id="accordionOther">
+                                                <div class="panel panel-default">
+                                                    <div class="panel-heading">
+                                                        <h4 class="panel-title">
+                                                            <a data-toggle="collapse" data-parent="#accordionOther" href="#collapseOthercf">Other absence current & future ({{$other_cf}})</a>
+                                                        </h4>
+                                                    </div>
+                                                    <div id="collapseOthercf" class="panel-collapse collapse">
+                                                        <div class="panel-body">
+                                                            <div class="col-md-12">
+                                                                <?php 
+                                                                foreach($current_future as $cfVal){
+                                                                if($cfVal->leave_type == 4){
+                                                                    $leave_typeAll_cfVal=checkLeavType($cfVal->leave_type);
+                                                                    ?>
+                                                                <div class="row publicHoliday">
+                                                                    <div class="col-md-2">
+                                                                        <div class="sunIcon">
+                                                                            <i class="fa fa-certificate"></i>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-8">
+                                                                        <div class="holidayTitle">
+                                                                            <h4>{{$leave_typeAll_cfVal}}</h4>
+                                                                            <p><strong><?php echo date('D d M', strtotime($cfVal->start_date)) . ' - ' . date('D d M Y',strtotime($cfVal->end_date));?></strong> (0 hrs)</p>
+                                                                            <p><b>logged</b> on <?php echo date('D d M Y', strtotime($cfVal->created_at));?> by <?php echo Auth::user()->name; ?></p>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-2">
+                                                                        <div class="sunIcon">
+                                                                            <a href="#!"><i class="fa fa-pencil-square-o"></i></a>
+                                                                            <a href="#!"><i class="fa fa-trash-o"></i></a>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <?php }}?>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="panel panel-default">
+                                                    <div class="panel-heading">
+                                                        <h4 class="panel-title">
+                                                            <a data-toggle="collapse" data-parent="#accordionOther" href="#collapseOther">Other absence history ({{$other_ah}})</a>
+                                                        </h4>
+                                                    </div>
+                                                    <div id="collapseOther" class="panel-collapse collapse">
+                                                        <div class="panel-body">
+                                                            <div class="col-md-12">
+                                                                <?php foreach($history as $all_histroy){
+                                                                    if($all_histroy->leave_type == 4){
+                                                                        $leave_typeAll_histroy=checkLeavType($all_histroy->leave_type);
+                                                                ?>
+                                                            <div class="row publicHoliday m-t-15">
+                                                                <div class="col-md-2">
+                                                                    <div class="sunIcon">
+                                                                        <i class="fa fa-certificate"></i>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-8">
+                                                                    <div class="holidayTitle">
+                                                                            <h4>{{$leave_typeAll_histroy}}</h4>
+                                                                            <p><strong><?php echo date('D d M', strtotime($all_histroy->start_date)) . ' - ' . date('D d M Y',strtotime($all_histroy->end_date));?></strong> (0 hrs)</p>
+                                                                            <p><button type="button" class="btn btn-warning approve">APPROVED</button> on <?php echo date('D d M Y', strtotime($all_histroy->created_at));?> by <?php echo Auth::user()->name; ?></p>
+                                                                    </div>
+                                                                </div>
+                                                                <!-- <div class="col-md-2">
+                                                                    <div class="sunIcon">
+                                                                        <a href="#!"><i class="fa fa-pencil-square-o"></i></a>
+                                                                        <a href="#!"><i class="fa fa-trash-o"></i></a>
+                                                                    </div>
+                                                                </div> -->
+                                                            </div>
+                                                            <?php }} ?>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var seekness_occurrences_value=document.getElementById('seekness_occurrences_value').value;
+        document.getElementById('seekness_occurrences').innerHTML=seekness_occurrences_value;
+        var lateness_occurrences_value=document.getElementById('lateness_occurrences_value').value;
+        document.getElementById('lateness_occurrences').innerHTML=lateness_occurrences_value;
+        const selectBox = document.getElementById("absenceFilter");
+        const sections={1:'.allAbsences',2:'.annualLeave',3:'.lateness',4:'.sickness',5:'.otherAbsences',6:'.furloughs'};
+        // console.log(sections[1]);
+        // const sections = document.querySelectorAll(
+        //     ".allAbsences, .annualLeave, .lateness, .sickness, .furloughs, .otherAbsences"
+        // );
+        default_display(sections);
+        // sections.forEach(div => div.style.display = "none");
+        document.querySelector(".allAbsences").style.display = "block";
+
+        selectBox.addEventListener("change", function() {
+            const value = this.value;
+            // console.log(sections);
+            // sections.forEach(div => div.style.display = "none");
+            default_display(sections);
+            // const selectedDiv = document.querySelector("." + value);
+            const selectedDiv = document.querySelector(sections[value]);
+            if (selectedDiv) {
+                selectedDiv.style.display = "block";
+            }
+        });
+    });
+    function default_display(sections){
+        for (let key in sections) {
+            // console.log(`Key: ${key}, Value: ${sections[key]}`);
+             const div = document.querySelector(sections[key]);
+            if (div) {
+                div.style.display = "none";
+            }
+        }
+    }
+    function year_select(){
+        var yearVal=$('#year').val();
+        if(yearVal){
+            $("#yearForm").submit();
+        }
+    }
 </script>
+@endsection

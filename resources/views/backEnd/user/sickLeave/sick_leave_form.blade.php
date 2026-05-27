@@ -28,6 +28,41 @@
  .col-lg-offset-2 .btn.btn-primary {
   margin:0px 10px 0px 0px;  
  }
+
+
+
+ .radio-btn {
+    display: inline-block;
+    margin-right: 10px;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 6px 12px;
+    background: #fff;
+    transition: all 0.2s;
+}
+
+.radio-btn input {
+    /* display: none; */
+}
+
+.radio-btn span {
+    font-size: 14px;
+    color: #333;
+}
+
+/* Selected state */
+.radio-btn input:checked + span {
+    color: #007bff; /* text color */
+    font-weight: 600;
+}
+
+/* Hover effect */
+.radio-btn:hover {
+    background: #f1faff;
+    border-color: #007bff;
+}
+
 </style>
 
  <section id="main-content" class="">
@@ -40,34 +75,74 @@
                     </header>
                     <div class="panel-body">
                         <div class="position-center">
+                            <div class="m-b-15">
+                                {{$u_details->name}} Sick Leave
+                            </div>
                             <form class="form-horizontal" role="form" method="post" action="{{ $action }}" id="{{ $form_id }}" enctype="multipart/form-data">
-                                <div class="form-group">
+                                <!-- <div class="form-group">
                                     <label class="col-lg-2 control-label">Title</label>
                                     <div class="col-lg-10">
                                         <input type="text" name="title" class="form-control" placeholder="title" value="{{ (isset($u_sick_leave->title)) ? $u_sick_leave->title : '' }}" maxlength="255">
                                     </div>
+                                </div> -->
+                                <div class="form-group">
+                                    <label class="col-lg-2 control-label">Ongoing absence</label>
+                                   <div class="col-lg-10">
+                                        <label class="radio-btn">
+                                            <input type="radio" name="ongoing_absence" value="1" <?php if(isset($u_sick_leave->ongoing_absence) && $u_sick_leave->ongoing_absence == 1){echo 'checked';}?>>
+                                            <span>Yes</span>
+                                        </label>
+                                        <label class="radio-btn">
+                                            <input type="radio" name="ongoing_absence" value="0" <?php if(isset($u_sick_leave->ongoing_absence) && $u_sick_leave->ongoing_absence == 0){echo 'checked';}?>>
+                                            <span>No</span>
+                                        </label>
+                                    </div>
                                 </div>
 
                                 <div class="form-group">
-                                    <label class="col-lg-2 control-label">Leave Date</label>
+                                    <label class="col-lg-2 control-label">Start Date</label>
+                                    <div class="col-lg-5">
+                                       <input class="form-control default-date-picker" type="text" value="{{ (isset($u_sick_leave->start_date)) ? date('d-m-Y',strtotime($u_sick_leave->start_date)) : '' }}" placeholder="DD-MM-YYYY" name="start_date" value="" maxlength="10" readonly="">
+                                    </div>
+                                    <div class="col-lg-5">
+                                       <select name="start_date_full_half" id="" class="form-control">
+                                            <option value="1">Full Day</option>
+                                            <option value="2">Half Daye</option>
+                                       </select>
+                                    </div>
+                                </div> 
+                                <div class="form-group">
+                                    <label class="col-lg-2 control-label">End Date</label>
+                                    <div class="col-lg-5">
+                                       <input class="form-control default-date-picker" type="text" value="{{ (isset($u_sick_leave->end_date)) ? date('d-m-Y',strtotime($u_sick_leave->end_date)) : '' }}" placeholder="DD-MM-YYYY" name="end_date" value="" maxlength="10" readonly="">
+                                    </div>
+                                    <div class="col-lg-5">
+                                       <select name="end_date_full_half" id="" class="form-control">
+                                            <option value="1" <?php if(isset($u_sick_leave->end_date_full_half) && $u_sick_leave->end_date_full_half == 1){echo 'selected';}?>>Full Day</option>
+                                            <option value="2" <?php if(isset($u_sick_leave->end_date_full_half) && $u_sick_leave->end_date_full_half == 2){echo 'selected';}?>>Half Daye</option>
+                                       </select>
+                                    </div>
+                                </div> 
+                                <div class="form-group">
+                                    <label class="col-lg-2 control-label">Working days missed</label>
                                     <div class="col-lg-10">
-                                       <input class="form-control default-date-picker" type="text" value="{{ (isset($u_sick_leave->leave_date)) ? date('d-m-Y',strtotime($u_sick_leave->leave_date)) : '' }}" placeholder="DD-MM-YYYY" name="leave_date" value="" maxlength="10" readonly="">
+                                       <input class="form-control" type="number" value="{{ (isset($u_sick_leave->days)) ? $u_sick_leave->days : '' }}" name="days" value="">
+                                    </div>
+                                </div> 
+
+                                <div class="form-group">
+                                    <label class="col-lg-2 control-label">Notes</label>
+                                    <div class="col-lg-10">
+                                        <textarea type="text" name="notes" class="form-control" placeholder="Enter reason" maxlength="1000">{{ (isset($u_sick_leave->notes)) ? $u_sick_leave->notes : '' }}</textarea>
                                     </div>
                                 </div>  
 
-                                <div class="form-group">
-                                    <label class="col-lg-2 control-label">Reason</label>
-                                    <div class="col-lg-10">
-                                        <textarea type="text" name="reason" class="form-control" placeholder="Enter reason" maxlength="1000">{{ (isset($u_sick_leave->reason)) ? $u_sick_leave->reason : '' }}</textarea>
-                                    </div>
-                                </div>  
-
-                                <div class="form-group">
+                                <!-- <div class="form-group">
                                     <label class="col-lg-2 control-label">Comment</label>
                                     <div class="col-lg-10">
                                         <textarea type="text" name="comment" class="form-control" placeholder="Enter comments" maxlength="1000">{{ (isset($u_sick_leave->comments)) ? $u_sick_leave->comments : '' }}</textarea>
                                     </div>
-                                </div>                 
+                                </div>                  -->
                                 
                                 <div class="form-actions">
     								<div class="row">

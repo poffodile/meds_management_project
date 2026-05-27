@@ -23,72 +23,74 @@
   section#container {
     height: auto;
   }
+
   button.fc-button {
     top: 0px;
-}
-.all_leave_with_color {
+  }
+
+  .all_leave_with_color {
     font-size: 14px;
     font-weight: 600;
     color: #333;
-}
-th .fc-scrollgrid-sync-inner {
+  }
+
+  th .fc-scrollgrid-sync-inner {
     background: #f6f6f6;
     padding: 10px;
-}
-.tab-content {
+  }
+
+  .tab-content {
     background: #fff;
     padding: 20px;
-}
+  }
 </style>
 
 
 
 
+<section id="main-content">
+  <!-- @extends('rotaStaff.components.rota_master') -->
+  @section('content')
   <section id="main-content">
-<!-- @extends('rotaStaff.components.rota_master') -->
-@section('content')
- <section id="main-content">
     <div class="wrapper">
       <div class="col-lg-12">
         <div class="row">
           <div class="col-lg-12">
-              <header class="panel-heading tab-bg-dark-navy-blue ">
-                    <ul class="nav nav-tabs calender-Tab">
-                        <li class="active">
-                            <a data-toggle="tab" href="#home">Calendar</a>
-                        </li>
-                        <li class="">
-                            <a data-toggle="tab" href="#about">Pending requests</a>
-                        </li>
-                       
-                    </ul>
-                </header>
-                <div class="">
-                    <div class="tab-content">
-                        <div id="home" class="tab-pane active calendar">
-                            <div class="all_leave_with_color d-flex align-items-center mt-3">
-                              <span class="annual leave"></span>Annual leave
-                              <span class="sick leave"></span>Sickness
-                              <span class="late leave"></span>Lateness
-                              <span class="toil leave"></span>TOIL
-                              <span class="other_leave leave"></span>Other absence
-                            </div>
-                            <!-- <div id='calendar'></div> -->
-                            <div id="calendar" class="has-toolbar"></div>
-                        </div>
-                        <div id="about" class="tab-pane content-info-title">
-                          
-                         <select id="leave_order">
-                            <option value="1">Date raised (Newest first)</option>
-                            <option value="2">Date raised (Oldest first)</option>
-                          </select>
-                          <h2>Pending requests (<span id="leave_count"></span>)</h2>
-                          <div class="row" id="blank_id"></div>
-                        </div>
-                      
-                    </div>
+            <header class="panel-heading tab-bg-dark-navy-blue ">
+              <ul class="nav nav-tabs calender-Tab">
+                <li class="active">
+                  <a data-toggle="tab" href="#home">Calendar</a>
+                </li>
+                <li class="">
+                  <a data-toggle="tab" href="#about">Pending requests</a>
+                </li>
+
+              </ul>
+            </header>
+            <div class="">
+              <div class="tab-content">
+                <div id="home" class="tab-pane active calendar">
+                  <div class="all_leave_with_color d-flex align-items-center mt-3">
+                    <span class="annual leave"></span>Annual leave
+                    <span class="sick leave"></span>Sickness
+                    <span class="late leave"></span>Lateness
+                    <span class="toil leave"></span>TOIL
+                    <span class="other_leave leave"></span>Other absence
+                  </div>
+                  <div id="calendar" class="has-toolbar"></div>
                 </div>
-          
+                <div id="about" class="tab-pane content-info-title">
+                  <select id="leave_order">
+                    <option value="1">Date raised (Newest first)</option>
+                    <option value="2">Date raised (Oldest first)</option>
+                  </select>
+                  <h2>Pending requests (<span id="leave_count"></span>)</h2>
+                  <div class="row" id="blank_id"></div>
+                </div>
+
+              </div>
+            </div>
+
             <!-- <ul class="nav nav-tabs calender-Tab nav-fill" id="myTab" role="tablist">
               <li class="nav-item" role="presentation">
                 <a class="nav-link active" id="calendar-tab" data-toggle="tab" href="#calendarTb" role="tab" aria-controls="calendarTb" aria-selected="true">Calendar</a>
@@ -133,8 +135,8 @@ th .fc-scrollgrid-sync-inner {
       <div class="modal-content content-modal">
         <div class="modal-header modal-head">
           <input type="hidden" id="edit_leave">
-          <h5 class="modal-title" id="exampleModalLabel"><span>Are you sure you want to approve this leave?</span></h5>
-          <button type="button" class=" close-btn" data-bs-dismiss="modal" aria-label="Close"><i class="fa fa-times" aria-hidden="true"></i></button>
+          <h4 class="modal-title" id="exampleModalLabel"><span>Are you sure you want to approve this leave?</span></h4>
+          <button type="button" class=" close-btn" data-dismiss="modal" aria-label="Close"><i class="fa fa-times" aria-hidden="true"></i></button>
         </div>
         <div class="modal-body">
           <div class="col-md-12">
@@ -142,8 +144,82 @@ th .fc-scrollgrid-sync-inner {
           </div>
         </div>
         <div class="modal-footer justify-content-between">
-          <button type="button" class="close-btn" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="close-btn" data-dismiss="modal">Close</button>
           <button type="button" class="approve-btn" id="approve_leave">Approve</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+  <div class="modal fade unapproved_modal_content" id="nameModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="max-width: 50vw;">
+      <div class="modal-content content-modal">
+        <div class="modal-header modal-head">
+          <input type="hidden" id="edit_leave">
+          <h4 class="modal-title" id="exampleModalLabel"><span>Are you sure you want to approve this leave?</span></h4>
+          <button type="button" class=" close-btn" data-dismiss="modal" aria-label="Close"><i class="fa fa-times" aria-hidden="true"></i></button>
+        </div>
+        <div class="modal-body">
+          <div class="leavTable">
+            <div class="productDetailTable table-responsive input_style">
+              <table class="table border-top border-bottom" id="result">
+                <thead>
+                  <tr>
+                    <th>S. N.</th>
+                    <th>Employee Name </th>
+                    <th>Start Date </th>
+                    <th>End Date </th>
+                    <th>Leave Type </th>
+                    <th>Total leave </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>1. </td>
+                    <td>Adand Rathi</td>
+                    <td>04/08/2025</td>
+                    <td>12/08/2025</td>
+                    <td>Half Day</td>
+                    <td>4 leave</td>
+                  </tr>
+                  <tr>
+                    <td>2. </td>
+                    <td>Adand Rathi</td>
+                    <td>04/08/2025</td>
+                    <td>12/08/2025</td>
+                    <td>Half Day</td>
+                    <td>4 leave</td>
+                  </tr>
+                  <tr>
+                    <td>3. </td>
+                    <td>Adand Rathi</td>
+                    <td>04/08/2025</td>
+                    <td>12/08/2025</td>
+                    <td>Half Day</td>
+                    <td>4 leave</td>
+                  </tr>
+                  <tr>
+                    <td>4. </td>
+                    <td>Adand Rathi</td>
+                    <td>04/08/2025</td>
+                    <td>12/08/2025</td>
+                    <td>Half Day</td>
+                    <td>4 leave</td>
+                  </tr>
+                  <tr>
+                    <td>5. </td>
+                    <td>Adand Rathi</td>
+                    <td>04/08/2025</td>
+                    <td>12/08/2025</td>
+                    <td>Half Day</td>
+                    <td>4 leave</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -159,7 +235,7 @@ th .fc-scrollgrid-sync-inner {
 
         if (words.length >= 2) {
           const lastNameInitial = words[words.length - 1][0];
-          return `${firstNameInitial}${lastNameInitial}`;
+          return `${firstNameInitial}${lastNameInitial || ''}`;
         } else {
           return firstNameInitial;
         }
@@ -211,35 +287,35 @@ th .fc-scrollgrid-sync-inner {
               console.log(fs);
               var node = `
               <div class="col-md-6 my-2">
-              <div class="pending_rquest">
-                <div class="parent_div">
-                  <div class="d-flex justify-content-between">
-                    <div class="d-flex flex-column align-items-center justify-content-center col-md-2 date_of_shift_rota">
-                      <div class="short_name">${fs}</div>
-                    </div>
-                    <div class="col-md-10 p-2">
-                      <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                          <a href="./timeline-view.html" class="rota_shift_employee_name">
-                            <h5>${name}</h5>
-                          </a>
-                        </div>
-                        <div>
-                          <button type="button" style="background-color:${result.pending_leave[i]['color']};" onclick="openunapprovemodal(${ result.pending_leave[i]['staffleave_id']}, '${name}');" class="unapproved_btn my-2">Unapproved</button>
-                        </div>
-                        <!-- Button trigger modal -->
+                <div class="pending_rquest">
+                  <div class="parent_div">
+                    <div class="d-flex justify-content-between">
+                      <div class="d-flex flex-column align-items-center justify-content-center col-md-2 date_of_shift_rota">
+                        <div class="short_name">${fs}</div>
                       </div>
-                      <div class="d-flex flex-column">
-                        <div class="start_end_date"><strong>Start:&nbsp;</strong>${ moment(result.pending_leave[i]['start_date']).format('ddd, Do MMM') }<strong>&nbsp;&nbsp;&nbsp;End:&nbsp;</strong>${ moment(result.pending_leave[i]['end_date']).format('ddd, Do MMM')  }</div>
-                        <div class="pe-3">${result.pending_leave[i]["notes"]}</div> 
-                        <div class="order-1">
+                      <div class="col-md-10 p-2">
+                        <div class="d-flex justify-content-between align-items-center">
+                          <div>
+                            <a href="javascript:void(0)" class="rota_shift_employee_name">
+                              <h5 onclick="openNamemodal()">${name}</h5>
+                            </a>
+                          </div>
+                          <div>
+                            <button type="button" style="background-color:${result.pending_leave[i]['color']};" onclick="openunapprovemodal(${ result.pending_leave[i]['staffleave_id']}, '${name}');" class="unapproved_btn my-2">Unapproved</button>
+                          </div>
+                          <!-- Button trigger modal -->
+                        </div>
+                        <div class="d-flex flex-column">
+                          <div class="start_end_date"><strong>Start:&nbsp;</strong>${ moment(result.pending_leave[i]['start_date']).format('ddd, Do MMM') }<strong>&nbsp;&nbsp;&nbsp;End:&nbsp;</strong>${ moment(result.pending_leave[i]['end_date']).format('ddd, Do MMM')  }</div>
+                          <div class="pe-3">${result.pending_leave[i]["notes"]}</div> 
+                          <div class="order-1">
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
             `;
               var theDiv = document.getElementById("blank_id");
               theDiv.innerHTML += node;
@@ -272,9 +348,9 @@ th .fc-scrollgrid-sync-inner {
                 console.log(result.pending_leave[i]['name'][0]);
                 var name = result.pending_leave[i]['name'];
                 var myArray = name.split(' ');
-                first = myArray[0].charAt(0);
-                second = myArray[1].charAt(0);
-                fs = first.concat(second);
+                let first = myArray[0]?.charAt(0) || '';
+                let second = myArray[1]?.charAt(0) || '';
+                let fs = first.concat(second);
                 var node = `<div class="col-md-6 my-2">
               <div class="pending_rquest">
                 <div class="parent_div">
@@ -285,8 +361,8 @@ th .fc-scrollgrid-sync-inner {
                     <div class="col-md-10 p-2">
                       <div class="d-flex justify-content-between align-items-center">
                         <div>
-                          <a href="./timeline-view.html" class="rota_shift_employee_name">
-                            <h5>${name}</h5>
+                          <a href="javascript:void(0)" class="rota_shift_employee_name">
+                            <h5 onclick="openNamemodal()">${name}</h5>
                           </a>
                         </div>
                         <div>
@@ -320,6 +396,11 @@ th .fc-scrollgrid-sync-inner {
       document.getElementById('leave_person').innerHTML = name;
       $('#exampleModalUnapproved').modal('show');
     }
+
+    function openNamemodal() {
+      $('#nameModal').modal('show');
+    }
+
 
     document.addEventListener('DOMContentLoaded', function() {
       var initialLocaleCode = 'en';

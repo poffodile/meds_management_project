@@ -30,5 +30,11 @@ return [
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
+    'ai' => [
+        'bearer_token' => env('AI_BEARER_TOKEN'),
+    ],
+    'google' => [
+        'map_api_key' => env('GOOGLE_MAP_API_KEY', 'AIzaSyBQhN-xkQiUIQ9toO-KRdb9wqtc_cGbAqo'),
+    ],
 
 ];

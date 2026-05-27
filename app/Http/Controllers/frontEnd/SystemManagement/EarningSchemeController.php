@@ -100,7 +100,10 @@ class EarningSchemeController extends SystemManagementController
         if($request->isMethod('post')){
 
             $data = $request->all();
-            $home_id = Auth::user()->home_id;
+            // $home_id = Auth::user()->home_id;
+            $home_ids = Auth::user()->home_id;
+            $ex_home_ids = explode(',', $home_ids);
+            $home_id = $ex_home_ids[0];
 
             $earning  = new EarningScheme;
             $earning->title = $data['title'];
@@ -122,13 +125,15 @@ class EarningSchemeController extends SystemManagementController
     }
 
     public function delete($earn_id){
-
+        $home_ids = Auth::user()->home_id;
+        $ex_home_ids = explode(',', $home_ids);
+        $home_id = $ex_home_ids[0];
         Incentive::where('earning_category_id',$earn_id)->update(['is_deleted'=>'1']);
-        $earn_deleted = EarningScheme::where('id',$earn_id)->where('home_id',Auth::user()->home_id)->update(['is_deleted'=>'1']);
+        $earn_deleted = EarningScheme::where('id',$earn_id)->where('home_id',$home_id)->update(['is_deleted'=>'1']);
         
         $data['response'] = $earn_deleted;
 
-        $earns = EarningScheme::with('incentives')->where('home_id', Auth::user()->home_id)->where('is_deleted','0')->orderBy('id','desc')->get();
+        $earns = EarningScheme::with('incentives')->where('home_id', $home_id)->where('is_deleted','0')->orderBy('id','desc')->get();
         $data['earning_cat_options'] = '';
       
         if(!empty($earns)){
@@ -230,8 +235,10 @@ class EarningSchemeController extends SystemManagementController
         
         if(!empty($incentive)){
             $earn_home_id = EarningScheme::where('id',$incentive->earning_category_id)->value('home_id');
-            
-            if($earn_home_id != Auth::user()->home_id){
+            $home_ids = Auth::user()->home_id;
+            $ex_home_ids = explode(',', $home_ids);
+            $home_id = $ex_home_ids[0];
+            if($earn_home_id != $home_id){
                 echo 'AUTH_ERR'; 
             
             } else{
@@ -249,8 +256,10 @@ class EarningSchemeController extends SystemManagementController
         if(!empty($incentive)){
 
             $earn_home_id = EarningScheme::where('id',$incentive->earning_category_id)->value('home_id');
-            
-            if($earn_home_id != Auth::user()->home_id){
+            $home_ids = Auth::user()->home_id;
+            $ex_home_ids = explode(',', $home_ids);
+            $home_id = $ex_home_ids[0];
+            if($earn_home_id != $home_id){
                 echo 'AUTH_ERR'; 
             
             } else{
@@ -274,7 +283,10 @@ class EarningSchemeController extends SystemManagementController
 
     public function view_incentive($incentive_id) {
 
-        $home_id = Auth::user()->home_id;
+        // $home_id = Auth::user()->home_id;
+        $home_ids = Auth::user()->home_id;
+        $ex_home_ids = explode(',', $home_ids);
+        $home_id = $ex_home_ids[0];
         $incentive = Incentive::select('id','earning_category_id','name','stars','details','url')
                                 ->where('id', $incentive_id)
                                 ->orderBy('id','desc')
@@ -284,7 +296,7 @@ class EarningSchemeController extends SystemManagementController
 
             //home check
             $earn_home_id = EarningScheme::where('id',$incentive->earning_category_id)->value('home_id');
-            if($earn_home_id != Auth::user()->home_id){
+            if($earn_home_id != $home_id){
                 $result['response']         = false;
                 //echo 'AUTH_ERR'; 
             }  else{
@@ -313,7 +325,10 @@ class EarningSchemeController extends SystemManagementController
                 if(!empty($view_incentive)){
                 
                     $earn_home_id = EarningScheme::where('id',$view_incentive->earning_category_id)->value('home_id');
-                    if($earn_home_id == Auth::user()->home_id){
+                    $home_ids = Auth::user()->home_id;
+                    $ex_home_ids = explode(',', $home_ids);
+                    $home_id = $ex_home_ids[0];
+                    if($earn_home_id == $home_id){
                     
                         $view_incentive->stars   = $data['incentive_stars'];
                         $view_incentive->details = $data['incentive_detail'];

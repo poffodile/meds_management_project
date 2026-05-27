@@ -1,12 +1,95 @@
-<style>
-    /* .search_incident_date {
-        display: none;
-    }
+@extends('frontEnd.layouts.master')
+@section('title', 'Incident Report')
+@section('content')
 
-    .search_incident_title {
-        display: none;
-    } */
-</style>
+  <link rel="stylesheet" href="{{ url('public\frontEnd\css\time-line.css') }}">
+
+    <section id="container">
+        <!--main content start-->
+        <section id="main-content">
+            <section class="wrapper">
+                <div class="row">
+                    <div class="pull-right">
+                        <div class="filter_buttons"
+                            style="text-align:right;padding-right:16px;display:inline-block; padding-bottom: 10px;">
+                            <a data-toggle="modal" href="#IncidentAddModal" class="btn btn-primary col-6" id=''>Add New</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- page start-->
+                <div class="row" style="margin-bottom:30px;">
+                    <div class="col-md-1 col-lg-1">
+                        <a class="back_opt col-3" onclick="history.back()">
+                            <i class="fa fa-angle-left"></i>
+                        </a>
+                    </div>
+                    <!-- sourabh -->
+                    <div class="col-md-2 col-lg-2">
+                        <select class="form-control" name="service_user" id="service_user" <?php if (isset($service_user_id)) {
+                            echo 'disabled';
+                        } ?>>
+                            <option value="">Select Child</option>
+                            @foreach ($service_users as $val)
+                                <option <?php if (isset($service_user_id)) {
+                                    if ($service_user_id == $val['id']) {
+                                        echo 'Selected';
+                                    }
+                                } ?> value="{{ $val['id'] }}">{{ $val['name'] }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <!-- sourabh -->
+                    <div class="col-md-2 col-lg-2" style="margin-left: -10px;">
+                        <div class="form-group datepicker-sttng date-sttng">
+                            <div data-date-viewmode="years" data-date-format="dd-mm-yyyy" data-date=""
+                                class="input-group date">
+                                <input id="date_range_input" style="cursor: pointer;" name="daterange"
+                                    value="{{ date('d-m-Y') }} - {{ date('d-m-Y') }}" type="text" value=""
+                                    readonly="" size="16" class="form-control log-book-datetime">
+                                <span class="input-group-btn add-on datetime-picker2">
+                                    <button onclick="showDate()" class="btn btn-primary" type="button"><span
+                                            class="glyphicon glyphicon-calendar"></span></button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- sourabh -->
+                    <div class="col-md-2 col-lg-2" style="padding-bottom:10px; margin-left: 10px;">
+                        <input type="text" class="form-control" id="keywordhr" onKeyPress="hrmyFunctionkey()"
+                            name="keywordhr" placeholder="Keyword">
+                    </div>
+                    <!-- sourabh -->
+
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="timeline">
+                            <article class="timeline-item alt">
+                                <div class="text-right">
+                                    <div class="time-show first">
+                                        <a href="#" class="btn btn-primary" id="today">Today</a>
+                                    </div>
+                                </div>
+                            </article>
+                            <div class="logged_rmp_btn">
+                                <div class="modal-space modal-pading view-incident-record">
+                                    <!-- record shown using Ajax -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- page end-->
+            </section>
+        </section>
+        <!--main content end-->
+
+    </section>
+
 <!-- Add SUIncidentReport Modal -->
 <div class="modal fade my_plan_model" id="IncidentAddModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -17,11 +100,11 @@
             </div>
             <div class="modal-body">
                 <div class="row">
-                    <div class="form-group col-md-12 col-sm-12 col-xs-12 serch-btns text-right">
-                        <button class="btn label-default add-new-btn active" type="button"> Add New </button>
-                        <button class="btn label-default logged-btn active logged-incident-btn" type="button"> Logged Reports </button>
-                        <button class="btn label-default search-btn active" type="button"> Search </button>
-                    </div>
+                    <!--<div class="form-group col-md-12 col-sm-12 col-xs-12 serch-btns text-right">-->
+                    <!--    <button class="btn label-default add-new-btn active" id="IncidentReptView" type="button"> Add New </button>-->
+                    <!--    <button class="btn label-default logged-btn active logged-incident-btn" type="button"> Logged Reports </button>-->
+                    <!--    <button class="btn label-default search-btn active" type="button"> Search </button>-->
+                    <!--</div>-->
 
                     <!-- Add new Details -->
                     <div class="add-new-box risk-tabs custm-tabs">
@@ -49,7 +132,7 @@
                                 </div>
                             </div> -->
                             <div class="form-group col-md-12 col-sm-12 col-xs-12 p-0">
-                                <label class="col-md-1 col-sm-1 col-xs-12 p-t-7 text-right">User: </label>
+                                <label class="col-md-1 col-sm-1 col-xs-12 p-t-7 text-right">Child: </label>
                                 <div class="col-md-11 col-sm-11 col-xs-12">
                                     <div class="select-style">
                                         <select name="service_user_id" class="su_n_id">
@@ -125,7 +208,7 @@
                                 </div>
                             </div>
                             <div class="dynamic-incident-form-fields">
-                                {!! $form_pattern['incident_report'] !!}
+                                {{-- {!! $form_pattern['incident_report'] !!} --}}
                             </div> -->
                             <!-- </div> -->
 
@@ -316,9 +399,48 @@
         $(document).on('click', '.v-inc-bck-btn', function() {
             $('#IncidentAddModal').modal('show');
         });
+    });
 
+     function showDate() {
+            $('#date_range_input').click();
+        }
 
-    })
+        $(function() {
+            $('input[name="daterange"]').daterangepicker({
+                opens: 'left',
+                locale: {
+                    format: 'DD/MM/YYYY'
+                }
+            }, function(start, end, label) {
+                console.log("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end
+                    .format('YYYY-MM-DD'));
+            });
+        });
+
+        
+          function getFormData(data) {
+            var service_user_id = "{{ $service_user_id }}";
+            $.ajax({
+                type: 'post',
+                url: "{{ url('/service/incident-report/views') }}" + '/' + service_user_id,
+                data: data,
+                success: function(resp) {
+                    console.log(resp)
+                    if (isAuthenticated(resp) == false) {
+                        return false;
+                    }
+                    console.log("resp from the ", resp);
+                    if (resp == '') {
+                        $('.view-incident-record').html(
+                            '<div class="text-center p-b-20" style="width:100%">No Records found.</div>'
+                        );
+                    } else {
+                        $('.view-incident-record').html("");
+                        $('.view-incident-record').html(resp);
+                    }
+                }
+            });
+        }
 </script>
 
 
@@ -394,7 +516,7 @@
 <script>
     //logged btn click view incident title
     $(document).ready(function() {
-        $(document).on('click', '.logged-incident-btn', function() {
+        // $(document).on('click', '.logged-incident-btn', function() {
 
             $('.loader').show();
             $('body').addClass('body-overflow');
@@ -420,7 +542,7 @@
                 }
             });
             return false;
-        });
+        // });
     });
 </script>
 
@@ -697,18 +819,120 @@
 
         });
     });
-
-    // $('#search_incident_type').on('change', function() {
-    //     var searchType = document.getElementById('search_incident_type').value;
-    //     if (searchType == 1) {
-    //         $('.search_incident_title').show();
-    //     } else {
-    //         $('.search_incident_title').hide();
-    //     }
-    //     if (searchType == 2) {
-    //         $('.search_incident_date').show();
-    //     } else {
-    //         $('.search_incident_date').hide();
-    //     }
-    // });
 </script>
+
+<!-- Daterange Filter -->
+    <script>
+        $('input[name="daterange"]').on('apply.daterangepicker', function(ev, picker) {
+            let staff_member = $('#staff_member').val();
+            let start_date = picker.startDate.format('DD-MM-YYYY');
+            let end_date = picker.endDate.format('DD-MM-YYYY');
+            let service_user = $('#service_user').val();
+            let keyword = $('#keywordhr').val();
+            $(this).val(start_date + ' - ' + end_date);
+
+            let today = new Date;
+            let todayFormat = ("0" + today.getDate()).slice(-2) + "-" + ("0" + (today.getMonth() + 1)).slice(-2) +  "-" + today.getFullYear();
+
+            if (start_date == todayFormat && end_date == todayFormat) {
+                $('#today').text('Today');
+            } else {
+                $('#today').text(start_date + ' - ' + end_date);
+            }
+
+            let category_id = $("#select_category").val();
+
+            if (category_id && category_id != 'all')
+                data = {
+                    'staff_member': staff_member,
+                    'service_user': service_user,
+                    'start_date': picker.startDate.format('YYYY-MM-DD'),
+                    'end_date': picker.endDate.format('YYYY-MM-DD'),
+                    'category_id': category_id,
+                    'filter': 1,
+                    'keyword': keyword
+                };
+            else
+                data = {
+                    'staff_member': staff_member,
+                    'service_user': service_user,
+                    'start_date': picker.startDate.format('YYYY-MM-DD'),
+                    'end_date': picker.endDate.format('YYYY-MM-DD'),
+                    'filter': 1,
+                    'keyword': keyword
+                };
+
+            getFormData(data);
+            return false;
+
+        });
+    </script>
+
+    <!-- {{-- Filter for child  --}} -->
+    <script type="text/javascript">
+        $('#service_user').change(function() {
+            let staff_member = $('#staff_member').val();
+            let service_user = $('#service_user').val();
+            let category_id = $('#select_category').val();
+            let start_date = $('input[name="daterange"]').data('daterangepicker').startDate;
+            let end_date = $('input[name="daterange"]').data('daterangepicker').endDate;
+            let keyword = $('#keywordhr').val();
+            if (category_id && category_id != 'all')
+                data = {
+                    'staff_member': staff_member,
+                    'service_user': service_user,
+                    'start_date': start_date.format('YYYY-MM-DD'),
+                    'end_date': end_date.format('YYYY-MM-DD'),
+                    'category_id': category_id,
+                    'filter': 1,
+                    'keyword': keyword
+                };
+            else
+                data = {
+                    'staff_member': staff_member,
+                    'service_user': service_user,
+                    'start_date': start_date.format('YYYY-MM-DD'),
+                    'end_date': end_date.format('YYYY-MM-DD'),
+                    'filter': 1,
+                    'keyword': keyword
+                };
+            getFormData(data);
+            return false;
+
+        });
+    </script>
+
+    <!-- {{-- Filter for keyword --}} -->
+    <script>
+        function hrmyFunctionkey() {
+            let staff_member = $('#staff_member').val();
+            let service_user = $('#service_user').val();
+            let category_id = $('#select_category').val();
+            let start_date = $('input[name="daterange"]').data('daterangepicker').startDate;
+            let end_date = $('input[name="daterange"]').data('daterangepicker').endDate;
+            let keyword = $('#keywordhr').val();
+            // alert(keyword)
+            if (category_id && category_id != 'all')
+                data = {
+                    'staff_member': staff_member,
+                    'service_user': service_user,
+                    'start_date': start_date.format('YYYY-MM-DD'),
+                    'end_date': end_date.format('YYYY-MM-DD'),
+                    'category_id': category_id,
+                    'filter': 1,
+                    'keyword': keyword
+                };
+            else
+                data = {
+                    'staff_member': staff_member,
+                    'service_user': service_user,
+                    'start_date': start_date.format('YYYY-MM-DD'),
+                    'end_date': end_date.format('YYYY-MM-DD'),
+                    'filter': 1,
+                    'keyword': keyword
+                };
+            getFormData(data);
+            return false;
+        }
+    </script>
+@endsection

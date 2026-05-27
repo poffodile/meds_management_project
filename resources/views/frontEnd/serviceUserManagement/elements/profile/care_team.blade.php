@@ -44,7 +44,7 @@
                 <form method="post" action="{{ url('/service/care_team/add/'.$service_user_id) }}" enctype="multipart/form-data" id='add_care_team'>
                     <div class="row">
 
-                        <div class="col-md-12 col-sm-12 col-xs-12 cog-panel">
+                        <!-- <div class="col-md-12 col-sm-12 col-xs-12 cog-panel">
                             <div class="form-group col-md-12 col-sm-12 col-xs-12 p-0 add-rcrd">
                                 <label class="col-md-2 col-sm-2 col-xs-12 p-t-7  r-p-0"> Staff Member </label>
                                 <div class="col-md-9 col-sm-10 col-xs-12 r-p-0 ">
@@ -58,7 +58,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
 
                         <div class="col-md-12 col-sm-12 col-xs-12 cog-panel">
                             <div class="form-group col-md-12 col-sm-12 col-xs-12 p-0 add-rcrd">

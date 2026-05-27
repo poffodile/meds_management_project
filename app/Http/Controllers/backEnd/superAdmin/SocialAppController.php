@@ -54,16 +54,16 @@ class SocialAppController extends Controller
 
     	    $social_app          = new SocialApp;
             $social_app->name  = $request->name;
-            $social_app->icon  = $request->icon;
+            $social_app->icon  = $request->icon ?? '';
                 
     		if($social_app->save()) {
-    			return redirect('super-admin/social-apps')->with('success', 'Socail App added successfully.');
+    			return redirect('super-admin/social-apps')->with('success', 'Social App added successfully.');
     		} else {
     			 return redirect()->back()->with('error', 'Some error occurred. Please try after sometime.');
     		}
     	}
         $page = 'social-app';
-        return view('backEnd/superAdmin/social_app/social_app_form', compact('page'));
+        return view('backEnd/superAdmin/social_app/social_app_form', compact('page'));  
     }
    			
    	public function edit(Request $request, $social_app_id) { 
@@ -73,7 +73,7 @@ class SocialAppController extends Controller
             $social_app->name         = $request->name;
             $social_app->icon         = $request->icon;
             if($social_app->save()){
-               return redirect('super-admin/social-apps')->with('success','Socail App Updated successfully.'); 
+               return redirect('super-admin/social-apps')->with('success','Social App Updated successfully.'); 
             } else {
                return redirect()->back()->with('error','Socail App could not be Updated.'); 
             }  

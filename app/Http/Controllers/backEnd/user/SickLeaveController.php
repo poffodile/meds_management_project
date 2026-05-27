@@ -4,7 +4,7 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Session; 
-use App\User, App\StaffSickLeave, App\Home, App\SanctionStaffSickLeave, App\StaffRota, App\RotaShift, App\RotaShiftType;
+use App\User, App\StaffSickLeave, App\Home, App\SanctionStaffSickLeave, App\StaffRota, App\RotaShift, App\RotaShiftType,App\Staffleaves;
 use DB; 
 use Hash;
 
@@ -16,7 +16,8 @@ class SickLeaveController extends Controller
         $home_id = Session::get('scitsAdminSession')->home_id;
         if($home_id == $u_home_id) {
         // echo $u_home_id; die;
-            $u_sick = StaffSickLeave::where('staff_member_id', $user_id)->where('is_deleted','0')->select('id','title', 'leave_date','staff_member_id');
+            // $u_sick = StaffSickLeave::where('staff_member_id', $user_id)->where('is_deleted','0')->select('id','title', 'leave_date','staff_member_id');
+            $u_sick = Staffleaves::where(['user_id'=> $user_id,'leave_type'=>2])->where('is_deleted','1')->select('id','home_id', 'user_id','leave_type','ongoing_absence','start_date','start_date_full_half','end_date','end_date_full_half','notes','days','leave_status');
             // echo "<pre>"; print_r($u_sick); die;
             
             $search = '';
@@ -37,7 +38,7 @@ class SickLeaveController extends Controller
             if(isset($request->search))
             {
                 $search = trim($request->search);
-                $u_sick = $u_sick->where('title','like','%'.$search.'%');             //search by date or title
+                $u_sick = $u_sick->where('notes','like','%'.$search.'%');             //search by date or title
             }
 
             $u_sick_leave = $u_sick->paginate(25);
@@ -53,19 +54,34 @@ class SickLeaveController extends Controller
         
         if($request->isMethod('post')) { 
             $data = $request->input();
-
+            // echo "<pre>";print_r($data);die;
             //compare with su home_id
             $u_home_id = User::where('id',$user_id)->value('home_id');
             $home_id = Session::get('scitsAdminSession')->home_id;
 
             if($home_id == $u_home_id) {
-                $u_sick_leave                  =  new StaffSickLeave;
-                $u_sick_leave->title           =  $data['title'];
-                $u_sick_leave->staff_member_id =  $user_id;
-                $u_sick_leave->home_id         =  $home_id;
-                $u_sick_leave->leave_date      =  date('Y-m-d', strtotime($data['leave_date']));
-                $u_sick_leave->reason          =  $data['reason'];
-                $u_sick_leave->comments        =  $data['comment'];
+                // $u_sick_leave                  =  new StaffSickLeave;
+                // $u_sick_leave->title           =  $data['title'];
+                // $u_sick_leave->staff_member_id =  $user_id;
+                // $u_sick_leave->home_id         =  $home_id;
+                // $u_sick_leave->leave_date      =  date('Y-m-d', strtotime($data['leave_date']));
+                // $u_sick_leave->reason          =  $data['reason'];
+                // $u_sick_leave->comments        =  $data['comment'];
+                $u_sick_leave                  =  new Staffleaves;
+                $u_sick_leave->home_id         =  $u_home_id;
+                $u_sick_leave->user_id         =  $user_id;
+                $u_sick_leave->leave_type      =  2;
+                $u_sick_leave->ongoing_absence =  $data['ongoing_absence'];
+                $u_sick_leave->start_date      =  date('Y-m-d', strtotime($data['start_date']));
+                $u_sick_leave->start_date_full_half =  $data['start_date_full_half'];
+                $u_sick_leave->end_date        =  date('Y-m-d', strtotime($data['end_date']));
+                $u_sick_leave->end_date_full_half   =  $data['end_date_full_half'];
+                $u_sick_leave->notes           =  $data['notes'];
+                $u_sick_leave->days            =   $data['days'];
+                $u_sick_leave->leave_status    =  0;
+                $u_sick_leave->is_deleted      =  1;
+                $u_sick_leave->created_at      =  date("Y-m-d H:i:s");
+                $u_sick_leave->updated_at      =  date("Y-m-d H:i:s");
 
                 if($u_sick_leave->save()) {
                         // return redirect('admin/service-users/care-history/'.$service_user_id)->with('success', 'New Care Timeline added successfully.');
@@ -78,14 +94,16 @@ class SickLeaveController extends Controller
             }
         }
         $page = 'user-sick-leave';
-        return view('backEnd.user.sickLeave.sick_leave_form', compact('page', 'user_id'));
+        $u_details = User::where('id',$user_id)->first();
+        return view('backEnd.user.sickLeave.sick_leave_form', compact('page', 'user_id','u_details'));
     }
             
     public function edit(Request $request, $u_sick_leave_id) {   
 
-        $u_sick_leave    =  StaffSickLeave::find($u_sick_leave_id);
+        // $u_sick_leave    =  StaffSickLeave::find($u_sick_leave_id);
+        $u_sick_leave    =  Staffleaves::find($u_sick_leave_id);
         if(!empty($u_sick_leave)) {
-            $user_id    = $u_sick_leave->staff_member_id;
+            $user_id    = $u_sick_leave->user_id;
 
              //comparing u home_id
             $u_home_id = User::where('id',$user_id)->value('home_id');
@@ -97,10 +115,18 @@ class SickLeaveController extends Controller
             if($request->isMethod('post')) {   
                 $data = $request->input();
                 // echo "<pre>"; print_r($data); die;
-                $u_sick_leave->title           =  $data['title'];
-                $u_sick_leave->leave_date      =  date('Y-m-d', strtotime($data['leave_date']));
-                $u_sick_leave->reason          =  $data['reason'];
-                $u_sick_leave->comments        =  $data['comment'];             
+                // $u_sick_leave->title           =  $data['title'];
+                // $u_sick_leave->leave_date      =  date('Y-m-d', strtotime($data['leave_date']));
+                // $u_sick_leave->reason          =  $data['reason'];
+                // $u_sick_leave->comments        =  $data['comment'];
+                $u_sick_leave->ongoing_absence =  $data['ongoing_absence'];
+                $u_sick_leave->start_date      =  date('Y-m-d', strtotime($data['start_date']));
+                $u_sick_leave->start_date_full_half =  $data['start_date_full_half'];
+                $u_sick_leave->end_date        =  date('Y-m-d', strtotime($data['end_date']));
+                $u_sick_leave->end_date_full_half   =  $data['end_date_full_half'];
+                $u_sick_leave->notes           =  $data['notes'];
+                $u_sick_leave->days            =   $data['days'];
+                $u_sick_leave->updated_at      =  date("Y-m-d H:i:s");
         
                if($u_sick_leave->save()) {
                    return redirect('admin/user/sick-leaves/'.$user_id)->with('success','Sick Leave Updated Successfully.'); 
@@ -112,12 +138,12 @@ class SickLeaveController extends Controller
                 return redirect('admin/')->with('error','Sorry,Sick Leave does not exists');
         }
 
-        $u_sick_leave = StaffSickLeave::where('id', $u_sick_leave_id)
-                        ->first();
+        // $u_sick_leave = StaffSickLeave::where('id', $u_sick_leave_id)->first();
+        $u_sick_leave = Staffleaves::where('id', $u_sick_leave_id)->first();
 
         if(!empty($u_sick_leave)) {
             //compare with su home_id
-            $u_home_id = User::where('id',$u_sick_leave->staff_member_id)->value('home_id');
+            $u_home_id = User::where('id',$u_sick_leave->user_id)->value('home_id');
             $home_id    = Session::get('scitsAdminSession')->home_id;
             if($home_id != $u_home_id) { 
                 return redirect('admin/')->with('error',UNAUTHORIZE_ERR);
@@ -127,16 +153,18 @@ class SickLeaveController extends Controller
         }
 
         $page = 'user-sick-leave';
-        return view('backEnd.user.sickLeave.sick_leave_form', compact('u_sick_leave','page','user_id'));
+        $u_details = User::where('id',$user_id)->first();
+        return view('backEnd.user.sickLeave.sick_leave_form', compact('u_sick_leave','page','user_id','u_details'));
     }
         
     public function delete($u_sick_leave_id) {   
 
         if(!empty($u_sick_leave_id)) {
-           $u_sick_leave =  StaffSickLeave::where('id', $u_sick_leave_id)->first();
+        //    $u_sick_leave =  StaffSickLeave::where('id', $u_sick_leave_id)->first();
+           $u_sick_leave =  Staffleaves::where('id', $u_sick_leave_id)->first();
            
             if(!empty($u_sick_leave)) {
-                $u_home_id = User::where('id',$u_sick_leave->staff_member_id)->value('home_id');
+                $u_home_id = User::where('id',$u_sick_leave->user_id)->value('home_id');
                 $home_id = Session::get('scitsAdminSession')->home_id;
                 
                 //compare with su home_id
@@ -144,7 +172,8 @@ class SickLeaveController extends Controller
                     return redirect('admin/')->with('error',UNAUTHORIZE_ERR);
                 }
 
-                StaffSickLeave::where('id', $u_sick_leave_id)->update(['is_deleted'=>'1']);
+                // StaffSickLeave::where('id', $u_sick_leave_id)->update(['is_deleted'=>'1']);
+                Staffleaves::where('id', $u_sick_leave_id)->update(['is_deleted'=>'0']);
                 return redirect()->back()->with('success','Sick Leave deleted Successfully.'); 
             } else  {
                 return redirect('admin/')->with('error','Sorry,Sick Leave does not exists'); 
@@ -156,9 +185,11 @@ class SickLeaveController extends Controller
     //Sick Leave Sanction 
     public function sanction_leave(Request $request, $u_sick_leave_id){
         $data = $request->input();
-        $sanction_sk_lv_info = SanctionStaffSickLeave::where('staff_sick_leave_id',$u_sick_leave_id)
+        $sanction_sk_lv_info = SanctionStaffSickLeave::where('staff_sick_leave_id',1)
                                                     ->orderBy('id','desc')
                                                     ->first();
+        $staff_rota='';
+        $rota_shift='';
         if(!empty($sanction_sk_lv_info)){
             $staff_rota = StaffRota::where('user_id',$sanction_sk_lv_info->staff_user_id)
                                     ->where('home_id',$sanction_sk_lv_info->home_id)
@@ -181,11 +212,15 @@ class SickLeaveController extends Controller
                         ->where('is_deleted','0')
                         ->get()
                         ->toArray();
-        $sick_leave_info = StaffSickLeave::select('staff_member_id','leave_date')
+        // $sick_leave_info = StaffSickLeave::select('staff_member_id','leave_date')
+        //                                 ->where('id',$u_sick_leave_id)
+        //                                 ->where('is_deleted','0')
+        //                                 ->first();
+        $sick_leave_info = Staffleaves::select('user_id','start_date')
                                         ->where('id',$u_sick_leave_id)
-                                        ->where('is_deleted','0')
+                                        ->where('is_deleted','1')
                                         ->first();
-        $user_id =  $sick_leave_info['staff_member_id'];
+        $user_id =  $sick_leave_info['user_id'];
 
         if($request->isMethod('post')){
              //echo "<pre>"; print_r($request->input());

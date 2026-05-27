@@ -1,0 +1,240 @@
+    #tab-alternate,
+    #tab-specific {
+        display: none;
+    }
+
+ .availabilityScroller {
+    max-height: 600px;
+    overflow-y: auto;
+    padding-right: 6px;
+}
+
+/* helper text */
+.helperText {
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.selectedCount {
+    background: #e8f0ff;
+    color: #2563eb;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    margin-left: 8px;
+}
+
+/* calendar grid */
+.calendarGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+}
+
+.dayCard {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 12px;
+    cursor: pointer;
+}
+
+.dayCard.active {
+    background: #eafff1;
+    border: 2px solid #22c55e;
+}
+
+.dayCard .badge {
+    display: inline-block;
+    margin-top: 6px;
+    padding: 3px 10px;
+    background: #ede9fe;
+    color: #7c3aed;
+    font-size: 12px;
+    border-radius: 999px;
+}
+
+/* divider */
+.divider {
+    margin: 20px 0;
+    border-top: 1px solid #e5e7eb;
+}
+
+/* hours section */
+.sectionTitle {
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+/* hour row */
+.hourRow {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 8px;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.hourRow .dateLabel {
+    width: 160px;
+    font-weight: 500;
+}
+
+.hourRow input {
+    padding: 6px;
+}
+
+.hourRow .hoursBadge {
+    background: #22c55e;
+    color: white;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+}
+
+/* Alternating week info box */
+.alternateInfoBox {
+    background: #fff7e6;
+    border: 1px solid #facc15;
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    font-size: 14px;
+}
+
+.alternateInfoText {
+    color: #92400e;
+    line-height: 1.5;
+}
+
+.alternateInfoText .highlight {
+    color: #b45309;
+}
+
+.alternateDebug {
+    margin-top: 6px;
+    font-size: 12px;
+    color: #b45309;
+}
+
+.schedulePattern {
+    display: flex;
+    gap: 20px; /* Adds space between the columns */
+}
+
+.schedulePattern > div {
+    flex: 1; /* Makes both columns equal width */
+}
+
+/* Row container */
+.dayRow {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    margin-bottom: 14px;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+    background: #ffffff; /* WHITE */
+    transition: background 0.3s ease, border 0.3s ease;
+}
+
+/* Active row */
+.dayRow.active {
+    background: #f1fff6; /* GREEN */
+    border-color: #b9f5cc;
+}
+
+/* Day label */
+.day {
+    min-width: 110px;
+    font-weight: 600;
+    color: #000;
+}
+
+/* Weekend color */
+.dayRow.weekend .day {
+    color: #7c3aed;
+}
+
+/* Toggle */
+.switch {
+    position: relative;
+    width: 42px;
+    height: 22px;
+}
+
+.switch input {
+    display: none;
+}
+
+.slider {
+    position: absolute;
+    inset: 0;
+    background: #e5e7eb;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.slider::before {
+    content: "";
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    left: 2px;
+    bottom: 2px;
+    background: #fff;
+    border-radius: 50%;
+    transition: 0.3s;
+}
+
+.switch input:checked + .slider {
+    background: #111;
+}
+
+.switch input:checked + .slider::before {
+    transform: translateX(20px);
+}
+
+/* Working fields inline */
+.workingFields {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Time inputs */
+.dayTime {
+    width: 140px;
+    padding: 7px 10px;
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+    font-size: 14px;
+}
+
+/* to text */
+.workingFields span {
+    color: #6b7280;
+    font-size: 14px;
+}
+
+/* Hours badge */
+.hours {
+    background: #dcfce7;
+    color: #166534;
+    font-size: 13px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+/* Not working */
+.notWorking {
+    color: #9ca3af;
+    font-size: 14px;
+}
+

@@ -8,6 +8,13 @@ use Illuminate\Support\Facades\Mail;
 use Auth;
 use App\Home, App\Admin, App\StaffSickLeave;
 use App\Models\PersonalManagement\TimeSheet;
+use Illuminate\Support\Facades\Log;
+use App\Models\ScheduledShift;
+use App\Models\ClientCareScheduleDate;
+use App\Models\ClientCareScheduleDay;
+use App\Models\ClientCareWorkPrefer;
+use App\Models\ClientCareUnavailableDate;
+use Illuminate\Support\Facades\Session;
 
 class User extends Authenticatable
 {
@@ -22,6 +29,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'is_deleted',
     ];
 
     /**
@@ -48,7 +56,22 @@ class User extends Authenticatable
     {
         return $this->hasMany('App\UserQualification', 'user_id', 'id')->where('is_deleted', 0);
     }
-
+public function working_hours()
+    {
+        return $this->hasMany(ClientCareScheduleDay::class, 'carer_id');
+    }
+    public function specific_working_hours()
+    {
+        return $this->hasMany(ClientCareScheduleDate::class, 'carer_id');
+    }
+    public function work_preferences()
+    {
+        return $this->hasOne(ClientCareWorkPrefer::class, 'carer_id');
+    }
+    public function work_unavailability()
+    {
+        return $this->hasMany(ClientCareUnavailableDate::class, 'carer_id');
+    }
     //send set password link to user
     public static function sendCredentials($user_id = null)
     {
@@ -78,7 +101,7 @@ class User extends Authenticatable
 
                     $message->to($email, $company_name)
 
-                        ->subject('SCITS set Password Mail');
+                        ->subject('Care One OS set Password Mail');
 
                     $message->from('mobappssolutions153@gmail.com', $company_name);
                 });
@@ -90,39 +113,114 @@ class User extends Authenticatable
         }
         return false;
     }
-
-    public static function saveQualification($data = array(), $user_id = null)
+    
+     public function emergencyContacts()
     {
-        //saving qualification info and certificates images
-        if (isset($data['qualification'])) {
-            foreach ($data['qualification'] as $key => $qualification_name) {
-                if (!empty($qualification_name) && !empty($_FILES['qualifiaction_cert']['name'][$key])) {
+        return $this->hasOne(
+            \App\Models\UserEmergencyContact::class,
+            'user_id',
+            'id'
+        );
+    }
 
-                    $tmp_image  =   $_FILES['qualifiaction_cert']['tmp_name'][$key];
-                    $image_info =   pathinfo($_FILES['qualifiaction_cert']['name'][$key]);
-                    $ext        =   strtolower($image_info['extension']);
-                    $random_no  =   rand(111, 999) . '.' . $ext;
-                    $new_name   =   time() . $random_no . '.' . $ext;
+    // public static function saveQualification($data = array(), $user_id = null)
+    // {
+    //     //saving qualification info and certificates images
+    //     if (isset($data['qualification'])) {
+    //         foreach ($data['qualification'] as $key => $qualification_name) {
+    //             if (!empty($qualification_name) && !empty($_FILES['qualifiaction_cert']['name'][$key])) {
 
-                    $allowed_ext = array('jpg', 'jpeg', 'png', 'pdf', 'doc', 'docx');
+    //                 $tmp_image  =   $_FILES['qualifiaction_cert']['tmp_name'][$key];
+    //                 $image_info =   pathinfo($_FILES['qualifiaction_cert']['name'][$key]);
+    //                 $ext        =   strtolower($image_info['extension']);
+    //                 $random_no  =   rand(111, 999) . '.' . $ext;
+    //                 $new_name   =   time() . $random_no . '.' . $ext;
 
-                    if (in_array($ext, $allowed_ext)) {
-                        $destination = base_path() . '/public/images/userQualification';
+    //                 $allowed_ext = array('jpg', 'jpeg', 'png', 'pdf', 'doc', 'docx');
 
-                        if (move_uploaded_file($tmp_image, $destination . '/' . $new_name)) {
+    //                 if (in_array($ext, $allowed_ext)) {
+    //                     $destination = base_path() . '/public/images/userQualification';
 
-                            $qualification          = new UserQualification;
-                            $qualification->name    = $qualification_name;
-                            $qualification->image   = $new_name;
-                            $qualification->user_id = $user_id;
-                            $qualification->save();
-                        }
-                    }
+    //                     if (move_uploaded_file($tmp_image, $destination . '/' . $new_name)) {
 
-                    $quali[$key]['cert_image'] = $new_name;
-                }
-            }
+    //                         $qualification          = new UserQualification;
+    //                         $qualification->name    = $qualification_name;
+    //                         $qualification->image   = $new_name;
+    //                         $qualification->user_id = $user_id;
+    //                         $qualification->save();
+    //                     }
+    //                 }
+
+    //                 $quali[$key]['cert_image'] = $new_name;
+    //             }
+    //         }
+    //     }
+    // }
+    
+    public static function saveQualification($data = [], $user_id = null)
+    {
+        Log::info('saveQualification called', [
+            'user_id' => $user_id,
+            'data'    => $data
+        ]);
+
+        if (empty($data)) {
+            Log::warning('No qualifications found');
+            return;
         }
+
+        foreach ($data as $key => $qual) {
+
+            Log::info("Processing qualification", ['key' => $key, 'qual' => $qual]);
+
+            // ✅ Only checked courses
+            if (
+                empty($qual['course_id']) ||
+                empty($qual['name'])
+            ) {
+                continue;
+            }
+
+            // ✅ Certificate check
+            if (
+                !isset($qual['cert']) ||
+                !$qual['cert'] instanceof \Illuminate\Http\UploadedFile
+            ) {
+                continue;
+            }
+
+            $file = $qual['cert'];
+            $ext  = strtolower($file->getClientOriginalExtension());
+
+            $allowed_ext = ['jpg', 'jpeg', 'png', 'pdf', 'doc', 'docx'];
+            if (!in_array($ext, $allowed_ext)) {
+                continue;
+            }
+
+            $new_name = time() . rand(111, 999) . '.' . $ext;
+
+            $file->move(
+                public_path('images/userQualification'),
+                $new_name
+            );
+
+            UserQualification::create([
+                'user_id'   => $user_id,
+                'course_id' => $qual['course_id'],
+                'name'      => $qual['name'],
+                'image'     => $new_name,
+            ]);
+
+            Log::info('Saved qualification', [
+                'user_id' => $user_id,
+                'course_id' => $qual['course_id']
+            ]);
+        }
+    }
+    
+    public static function getstaffByResidentialId()
+    {
+        return self::where('home_id', Auth::user()->home_id)->where('status', 1)->where('is_deleted', 0)->count();
     }
 
     //one user login at a time
@@ -225,10 +323,10 @@ class User extends Authenticatable
         if (!empty($staff_member->admn_id)) {
 
             $company_manager = CompanyManagers::where('company_id', $staff_member->admn_id)->first();
-            $manager_name    = $company_manager->name;
-            $email           = $company_manager->email;
-            // $email = $company_manager->email;
+         
             if (!empty($company_manager)) {
+                $manager_name    = $company_manager->name;
+                $email           = $company_manager->email;
                 $company_name = PROJECT_NAME;
                 if (!filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
                     Mail::send('emails.email_to_manager', ['manager_name' => $manager_name, 'user_email' => $user_email, 'user_name' => $user_name], function ($message) use ($email, $company_name) {
@@ -257,6 +355,34 @@ class User extends Authenticatable
     public function timesheets()
     {
         return $this->hasMany(Timesheet::class);
+    }
+      public function shifts()
+    {
+        return $this->hasMany(ScheduledShift::class, 'staff_id');
+    }
+    
+     public function scopeByHome($query)
+    {
+        return $query->where('home_id', Auth::user()->home_id);
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('status', 1);
+    }
+    public function scopeNotDeleted($query)
+    {
+        return $query->where('is_deleted', 0);
+    }
+
+    public function scopeSelectBasic($query)
+    {
+        return $query->select('id', 'name');
+    }
+
+    public static function getHomeActiveUsers()
+    {
+        return User::byHome()->active()->notDeleted()->selectBasic()->get();
     }
 
 
@@ -289,4 +415,25 @@ class User extends Authenticatable
             input password
             press submit the user will be logged in.
     */
+    
+    public function getHomeIdAttribute($value)
+    {
+        if (Session::has('active_home_id')) {
+            return Session::get('active_home_id');
+        }
+
+        if (strpos($value, ',') !== false) {
+            return explode(',', $value)[0];
+        }
+        return $value;
+    }
+
+    public function getRealHomeIdAttribute()
+    {
+        if ($this->user_type == 'O') {
+            $home_ids = \App\Home::where('admin_id', $this->admn_id)->where('is_deleted', 0)->pluck('id')->toArray();
+            return implode(',', $home_ids);
+        }
+        return $this->getAttributes()['home_id'];
+    }
 }

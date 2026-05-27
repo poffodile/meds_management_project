@@ -80,7 +80,7 @@ class ServiceUserManagementController extends Controller
     {
         $data = $request->input();
 
-        //echo '<pre>'; print_r($data); die;
+        // echo '<pre>'; print_r($data); die;
         $noti_data = [];
         $noti_data['event_id']   = $data['event_id'];
         $noti_data['event_type'] = $data['event_type'];
@@ -95,9 +95,19 @@ class ServiceUserManagementController extends Controller
             ($noti_data['event_type'] == 'IN_DANGER') ||
             ($noti_data['event_type'] == 'MONEY_REQ')
         ) {
-            return redirect('service/user-profile/' . $data['su_id']);
+            // return redirect('service/user-profile/' . $data['su_id']);
+            return response()->json([
+                'redirect_url' => url('service/user-profile/' . $data['su_id'])
+            ]);
         } else if ($noti_data['event_type'] == 'LOC_ALERT') {
-            return redirect('service/location-history/' . $data['su_id']);
+            // return redirect('service/location-history/' . $data['su_id']);
+            return response()->json([
+                'redirect_url' => url('service/location-history/' . $data['su_id'])
+            ]);
+        } else if ($noti_data['event_type'] == 'SOS_ALERT') {
+            return response()->json([
+                'redirect_url' => url('roster/dashboard')
+            ]);
         }
     }
 
