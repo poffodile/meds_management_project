@@ -295,7 +295,7 @@
                 <a href="{{ url('roster/leave-request') }}">
                     <div class="quick_action-card">
                         <div class="quick_action-icon" style="background-color: #fc8181; color: white;">📄</div>
-                        <div class="quick_action-label"> Leave Requests</div>
+                        <div class="quick_action-label"> Leave Requests ({{ $pendingLeaveCount }})</div>
                     </div>
                 </a>
             </div>

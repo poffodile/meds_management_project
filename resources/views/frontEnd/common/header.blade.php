@@ -124,7 +124,8 @@ $allowed_ids = array_filter(explode(',', str_replace(' ', '', $raw_home_id)));
         </div>
     </div>
 </header>
-
+<!-- This is for the client add edit modal form -->
+@include('frontEnd.common.add_user')
 <script>
     $(".add_user").click(function() {
         $('#addServiceUserModal').modal('show');

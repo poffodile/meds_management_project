@@ -99,7 +99,7 @@ class AdminController extends Controller
 
                     Log::info('Address found:', ['address' => $request->address]);
 
-                    $apiKey = 'YOUR_GOOGLE_API_KEY';
+                    $apiKey = config('services.google.map_api_key') ?? env('GOOGLE_MAP_API_KEY') ?? 'AIzaSyBQhN-xkQiUIQ9toO-KRdb9wqtc_cGbAqo';
 
                     $url = 'https://maps.googleapis.com/maps/api/geocode/json?address=' .
                         urlencode($request->address) . '&key=' . $apiKey;
@@ -440,7 +440,7 @@ class AdminController extends Controller
                 $longitude = null;
 
                 if (!empty($request->address)) {
-                    $apiKey = 'YOUR_GOOGLE_API_KEY';
+                    $apiKey = config('services.google.map_api_key') ?? env('GOOGLE_MAP_API_KEY') ?? 'AIzaSyBQhN-xkQiUIQ9toO-KRdb9wqtc_cGbAqo';
 
                     $geo = @file_get_contents(
                         'https://maps.googleapis.com/maps/api/geocode/json?address=' .

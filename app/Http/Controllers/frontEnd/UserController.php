@@ -359,7 +359,7 @@ class UserController extends Controller
 		if (Auth::check() && count($allowed_ids) > 1) {
 			if (in_array($request->home, $allowed_ids)) {
 				Session::put('active_home_id', $request->home);
-				return redirect()->back()->with('success', 'Home switched successfully.');
+				return redirect('/roster')->with('success', 'Home switched successfully.');
 			}
 		}
 
@@ -370,7 +370,7 @@ class UserController extends Controller
 
 		User::where('id', Auth::user()->id)->update(['home_id' => $string]);
 
-		return redirect()->route('dashboard');
+		return redirect('/roster');
 	}
 	// code given by Ethan End
 

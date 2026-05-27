@@ -114,7 +114,6 @@ class HomeController extends Controller
             $system_admin_home->longitude                   = $longitude;
             $system_admin_home->place_id                    = $place_id;
             $system_admin_home->is_home_area                = $request->is_home_area ?? 0;
-            $system_admin_home->is_registered               = $data['is_registered'] ?? 0;
             $system_admin_home->weekly_allowance_service_users = $data['weekly_allowance_service_users'] ?? 0;
             $system_admin_home->monthly_allowance_service_users = $data['monthly_allowance_service_users'] ?? 0;
 
@@ -141,7 +140,8 @@ class HomeController extends Controller
                 // Update home_id in user table for the Owner/System Admin
                 $owner_user = \App\User::where('admn_id', $system_admin_id)->where('user_type', 'O')->first();
                 if (!empty($owner_user)) {
-                    $existing_homes = array_filter(explode(',', $owner_user->home_id));
+                    $raw_home_ids = $owner_user->getAttributes()['home_id'] ?? '';
+                    $existing_homes = array_filter(explode(',', $raw_home_ids));
                     if (!in_array($system_admin_home->id, $existing_homes)) {
                         $existing_homes[] = $system_admin_home->id;
                         $owner_user->home_id = implode(',', $existing_homes);
@@ -162,13 +162,8 @@ class HomeController extends Controller
                     }
                 }
 
-                $update_company_payment = CompanyPayment::where('admin_id', $system_admin_id)
-                    ->increment('homes_added');
-                if ($update_company_payment) {
-                    return redirect('admin/system-admin/homes/' . $system_admin_id)->with('success', 'home added successfully.');
-                } else {
-                    return redirect()->back()->with('error', 'Some error occurred. Please try after sometime.');
-                }
+                CompanyPayment::where('admin_id', $system_admin_id)->increment('homes_added');
+                return redirect('admin/system-admin/homes/' . $system_admin_id)->with('success', 'home added successfully.');
             } else {
                 return redirect()->back()->with('error', 'Some error occurred. Please try after sometime.');
             }
@@ -212,7 +207,6 @@ class HomeController extends Controller
                 // $system_admin_home->location_history_duration = $request->location_history_duration;
                 // $system_admin_home->rota_time_format          = $request->rota_time_format;
                 $system_admin_home->is_home_area             = $request->is_home_area ?? 0;
-                $system_admin_home->is_registered             = $request->is_registered;
                 $system_admin_home->weekly_allowance_service_users = $request->weekly_allowance_service_users ?? 0;
                 $system_admin_home->monthly_allowance_service_users = $request->monthly_allowance_service_users ?? 0;
                 $system_admin_home->latitude                  = $latitude;
