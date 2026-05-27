@@ -151,6 +151,13 @@ class ScheduleController extends Controller
 
         $shifts = $shiftsQuery->get();
 
+        // Filter out shifts that have already passed (start time is in the past)
+        $now = \Carbon\Carbon::now();
+        $shifts = $shifts->filter(function ($shift) use ($now) {
+            $shiftStart = \Carbon\Carbon::parse($shift->start_date . ' ' . $shift->start_time);
+            return $shiftStart->greaterThanOrEqualTo($now);
+        });
+
         if ($shifts->isEmpty()) {
             return response()->json([
                 'success' => true,
