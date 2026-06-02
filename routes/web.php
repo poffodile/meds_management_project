@@ -1556,6 +1556,28 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 	Route::match(['get', 'post'], '/handover/daily/log', 'App\Http\Controllers\frontEnd\HandoverController@index');
 	Route::match(['get', 'post'], '/handover/daily/log/edit', 'App\Http\Controllers\frontEnd\HandoverController@handover_log_edit');
 
+	// Medication Management — Shift Handover
+	Route::get('/medication/shift-handover', [\App\Http\Controllers\frontEnd\Medication\ShiftHandoverController::class, 'index'])->name('medication.shift-handover.index');
+	Route::post('/medication/shift-handover', [\App\Http\Controllers\frontEnd\Medication\ShiftHandoverController::class, 'store'])->name('medication.shift-handover.store');
+	Route::post('/medication/shift-handover/{id}/update', [\App\Http\Controllers\frontEnd\Medication\ShiftHandoverController::class, 'update'])->where('id', '[0-9]+')->name('medication.shift-handover.update');
+	Route::post('/medication/shift-handover/{id}/acknowledge', [\App\Http\Controllers\frontEnd\Medication\ShiftHandoverController::class, 'acknowledge'])->where('id', '[0-9]+')->name('medication.shift-handover.acknowledge');
+
+	// Medication Management — Medication Round (reuses the existing /client/mar-administer endpoint to record doses)
+	Route::get('/medication/medication-round', [\App\Http\Controllers\frontEnd\Medication\MedicationRoundController::class, 'index'])->name('medication.medication-round.index');
+	Route::post('/medication/medication-round/record', [\App\Http\Controllers\frontEnd\Medication\MedicationRoundController::class, 'record'])->name('medication.medication-round.record');
+
+	// Medication Management — Controlled Drugs Register (append-only ledger)
+	Route::get('/medication/controlled-drugs', [\App\Http\Controllers\frontEnd\Medication\ControlledDrugRegisterController::class, 'index'])->name('medication.controlled-drugs.index');
+	Route::post('/medication/controlled-drugs', [\App\Http\Controllers\frontEnd\Medication\ControlledDrugRegisterController::class, 'store'])->name('medication.controlled-drugs.store');
+
+	// Medication Management — Medication Stock (overview, alerts, adjust + history)
+	Route::get('/medication/stock', [\App\Http\Controllers\frontEnd\Medication\MedicationStockController::class, 'index'])->name('medication.stock.index');
+	Route::post('/medication/stock/adjust', [\App\Http\Controllers\frontEnd\Medication\MedicationStockController::class, 'adjust'])->name('medication.stock.adjust');
+
+	// Medication Management — Missed Doses Review (missed + not-given doses, with resolve workflow)
+	Route::get('/medication/missed-doses', [\App\Http\Controllers\frontEnd\Medication\MissedDosesController::class, 'index'])->name('medication.missed-doses.index');
+	Route::post('/medication/missed-doses/resolve', [\App\Http\Controllers\frontEnd\Medication\MissedDosesController::class, 'resolve'])->name('medication.missed-doses.resolve');
+
 	//add to weekly
 	Route::match(['get', 'post'], '/weekly/report/{log_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\LogBookController@weekly_report');
 	Route::match(['get', 'post'], '/weekly/rprt/edit/{service_user_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\LogBookController@weekly_report_edit');

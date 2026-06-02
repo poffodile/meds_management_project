@@ -465,6 +465,15 @@
           <li> <a href="{{ url('/roster/client') }}"><i class='bx bx-user-circle'></i> <span>{{ getTerm('Service User') }}</span> </a></li>
           <li> <a href="{{ url('/roster/daily-log') }}"><i class='bx  bx-clipboard'></i> <span>Daily Log</span></a></li>
 
+          @if(in_array(Auth::user()->user_type ?? '', ['N','M','A','CM','O']))
+          <li class="header-menu"> <span>Medications</span> </li>
+          <li> <a href="{{ url('/medication/medication-round') }}"><i class='bx bx-time'></i> <span>Medication Round</span> </a></li>
+          <li> <a href="{{ url('/medication/controlled-drugs') }}"><i class='bx bx-shield'></i> <span>Controlled Drugs</span> </a></li>
+          <li> <a href="{{ url('/medication/stock') }}"><i class='bx bx-package'></i> <span>Medication Stock</span> </a></li>
+          <li> <a href="{{ url('/medication/missed-doses') }}"><i class='bx bx-error'></i> <span>Missed Doses</span> </a></li>
+          <li> <a href="{{ url('/medication/shift-handover') }}"><i class='bx bx-transfer'></i> <span>Shift Handover</span> </a></li>
+          @endif
+
           <li class="header-menu"> <span>Domiciliary Care</span> </li>
           <li> <a href="{{ route('domiciliary.dashboard') }}"><i class='bx bx-grid-alt'></i> <span>Dom Care Dashboard</span></a></li>
           <li> <a href="{{ route('domiciliary.visit_schedule') }}"><i class='bx bx-map-pin'></i> <span>Visit Schedule</span></a></li>
