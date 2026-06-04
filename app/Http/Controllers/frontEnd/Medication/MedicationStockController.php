@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\MARSheet;
 use App\Models\MedicationStockTransaction;
 use App\ServiceUser;
+use Inertia\Inertia;
 
 class MedicationStockController extends Controller
 {
@@ -113,5 +114,77 @@ class MedicationStockController extends Controller
         }
 
         return redirect()->route('medication.stock.index')->with('success', 'Stock updated.');
+    }
+
+    /**
+     * React/Inertia + Mantine pilot of the stock overview.
+     * Same data as index(), shaped into plain arrays for the React page.
+     */
+    public function indexReact(Request $request)
+    {
+        $homeId = $this->getHomeId();
+
+        $sheets = MARSheet::forHome($homeId)
+            ->active()
+            ->currentlyActive()
+            ->orderBy('medication_name')
+            ->get();
+
+        $residentNames = ServiceUser::whereIn('id', $sheets->pluck('client_id')->unique())
+            ->pluck('name', 'id');
+
+        $today = now()->startOfDay();
+
+        $meds = $sheets->map(function ($s) use ($residentNames, $today) {
+            $low = !is_null($s->stock_level) && !is_null($s->reorder_level) && $s->stock_level <= $s->reorder_level;
+            $expired = $s->expiry_date && $s->expiry_date->lt($today);
+
+            return [
+                'id'             => $s->id,
+                'medication_name' => $s->medication_name,
+                'resident'       => $residentNames[$s->client_id] ?? null,
+                'stock_level'    => $s->stock_level,
+                'reorder_level'  => $s->reorder_level,
+                'unit'           => $s->unit ?? null,
+                'expiry_date'    => $s->expiry_date ? $s->expiry_date->format('d M Y') : null,
+                'is_controlled'  => (bool) $s->is_controlled,
+                'cd_schedule'    => $s->cd_schedule,
+                'low'            => $low,
+                'expired'        => $expired,
+            ];
+        })->values();
+
+        $transactions = MedicationStockTransaction::forHome($homeId)
+            ->with('performedByUser:id,name')
+            ->orderByDesc('transaction_date')
+            ->orderByDesc('id')
+            ->limit(150)
+            ->get()
+            ->map(function ($t) {
+                return [
+                    'id'              => $t->id,
+                    'date'            => $t->transaction_date ? $t->transaction_date->format('d M Y H:i') : null,
+                    'type'            => $t->transaction_type,
+                    'medication_name' => $t->medication_name,
+                    'quantity'        => $t->quantity,
+                    'balance_after'   => $t->balance_after,
+                    'unit'            => $t->unit,
+                    'reason'          => $t->reason,
+                    'performed_by'    => $t->performedByUser->name ?? null,
+                ];
+            });
+
+        $stats = [
+            'total'      => $meds->count(),
+            'low'        => $meds->where('low', true)->count(),
+            'expired'    => $meds->where('expired', true)->count(),
+            'controlled' => $meds->where('is_controlled', true)->count(),
+        ];
+
+        return Inertia::render('Medication/Stock', [
+            'meds'         => $meds,
+            'transactions' => $transactions,
+            'stats'        => $stats,
+        ]);
     }
 }

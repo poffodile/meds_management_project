@@ -1,11 +1,20 @@
 import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
+import react from '@vitejs/plugin-react';
+import { fileURLToPath, URL } from 'node:url';
 
 export default defineConfig({
     plugins: [
         laravel({
-            input: ['resources/css/app.css', 'resources/js/app.js'],
+            input: ['resources/js/app.jsx'],
             refresh: true,
         }),
+        react(),
     ],
+    resolve: {
+        alias: {
+            // Shared component library lives in /frontend — import via '@frontend/...'
+            '@frontend': fileURLToPath(new URL('./frontend', import.meta.url)),
+        },
+    },
 });

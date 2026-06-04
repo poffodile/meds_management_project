@@ -1573,6 +1573,8 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 	// Medication Management — Medication Stock (overview, alerts, adjust + history)
 	Route::get('/medication/stock', [\App\Http\Controllers\frontEnd\Medication\MedicationStockController::class, 'index'])->name('medication.stock.index');
 	Route::post('/medication/stock/adjust', [\App\Http\Controllers\frontEnd\Medication\MedicationStockController::class, 'adjust'])->name('medication.stock.adjust');
+	// React/Inertia + Mantine pilot (isolated; legacy page above is untouched)
+	Route::get('/medication/stock-react', [\App\Http\Controllers\frontEnd\Medication\MedicationStockController::class, 'indexReact'])->name('medication.stock.react');
 
 	// Medication Management — Missed Doses Review (missed + not-given doses, with resolve workflow)
 	Route::get('/medication/missed-doses', [\App\Http\Controllers\frontEnd\Medication\MissedDosesController::class, 'index'])->name('medication.missed-doses.index');
