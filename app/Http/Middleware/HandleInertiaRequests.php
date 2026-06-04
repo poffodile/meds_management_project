@@ -35,9 +35,26 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $user = $request->user();
+
+        // Manager-level roles (can edit/approve/override). Everyone else = carer view.
+        // Mirrors App\Models\ShiftHandover::MANAGER_TYPES.
+        $managerTypes = ['M', 'CM', 'A', 'O'];
+
         return [
             ...parent::share($request),
-            //
+            'auth' => [
+                'user' => $user ? [
+                    'id'        => $user->id,
+                    'name'      => $user->name,
+                    'user_type' => $user->user_type,
+                    'role'      => in_array($user->user_type, $managerTypes, true) ? 'manager' : 'carer',
+                ] : null,
+            ],
+            'flash' => [
+                'success' => fn () => $request->session()->get('success'),
+                'error'   => fn () => $request->session()->get('error'),
+            ],
         ];
     }
 }

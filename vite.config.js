@@ -17,4 +17,10 @@ export default defineConfig({
             '@frontend': fileURLToPath(new URL('./frontend', import.meta.url)),
         },
     },
+    server: {
+        // Bind to IPv4 so the browser reliably reaches the dev server (avoids [::1] issues).
+        host: '127.0.0.1',
+        port: 5173,
+        strictPort: true,
+    },
 });

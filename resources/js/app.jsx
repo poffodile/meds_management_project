@@ -1,14 +1,9 @@
 import React from 'react';
 import { createInertiaApp } from '@inertiajs/react';
 import { createRoot } from 'react-dom/client';
-import { MantineProvider, createTheme } from '@mantine/core';
+import { MantineProvider } from '@mantine/core';
 import '@mantine/core/styles.css';
-
-const theme = createTheme({
-    primaryColor: 'indigo',
-    fontFamily: 'Inter, -apple-system, Segoe UI, Roboto, sans-serif',
-    defaultRadius: 'md',
-});
+import { theme } from '@frontend/theme';
 
 createInertiaApp({
     resolve: (name) => {

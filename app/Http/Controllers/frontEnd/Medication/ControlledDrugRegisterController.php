@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ControlledDrugRegister;
 use App\Models\MARSheet;
 use App\ServiceUser;
+use Inertia\Inertia;
 
 class ControlledDrugRegisterController extends Controller
 {
@@ -86,7 +87,85 @@ class ControlledDrugRegisterController extends Controller
         ]);
     }
 
+    /** React/Inertia version of the register. Same data, shaped into plain arrays. */
+    public function indexReact(Request $request)
+    {
+        $homeId = $this->getHomeId();
+
+        $entries = ControlledDrugRegister::forHome($homeId)
+            ->with('createdByUser:id,name')
+            ->orderByDesc('entry_date')
+            ->orderByDesc('entry_time')
+            ->orderByDesc('id')
+            ->limit(300)
+            ->get()
+            ->map(fn ($e) => [
+                'id'              => $e->id,
+                'entry_date'      => $e->entry_date ? \Carbon\Carbon::parse($e->entry_date)->format('d M Y') : null,
+                'entry_time'      => $e->entry_time,
+                'client_name'     => $e->client_name,
+                'medication_name' => $e->medication_name,
+                'cd_schedule'     => $e->cd_schedule,
+                'action_type'     => $e->action_type,
+                'dose_quantity'   => $e->dose_quantity,
+                'unit'            => $e->unit,
+                'balance_after'   => $e->balance_after,
+                'witness_name'    => $e->witness_name,
+                'created_by'      => $e->createdByUser->name ?? null,
+            ]);
+
+        $residents = ServiceUser::where('home_id', $homeId)
+            ->where('status', 1)
+            ->orderBy('name')
+            ->get(['id', 'name'])
+            ->map(fn ($r) => ['id' => $r->id, 'name' => $r->name]);
+
+        $medsByClient = MARSheet::forHome($homeId)
+            ->active()
+            ->currentlyActive()
+            ->orderBy('medication_name')
+            ->get(['id', 'client_id', 'medication_name'])
+            ->groupBy('client_id')
+            ->map(fn ($g) => $g->map(fn ($m) => ['id' => $m->id, 'name' => $m->medication_name])->values());
+
+        $lastBalances = [];
+        ControlledDrugRegister::forHome($homeId)
+            ->orderByDesc('id')
+            ->get(['client_id', 'medication_name', 'balance_after'])
+            ->each(function ($e) use (&$lastBalances) {
+                $key = $e->client_id . '|' . $e->medication_name;
+                if (!array_key_exists($key, $lastBalances)) {
+                    $lastBalances[$key] = $e->balance_after;
+                }
+            });
+
+        return Inertia::render('Medication/ControlledDrugs', [
+            'entries'      => $entries,
+            'residents'    => $residents,
+            'medsByClient' => $medsByClient,
+            'lastBalances' => $lastBalances,
+        ]);
+    }
+
     public function store(Request $request)
+    {
+        $this->createEntry($request);
+
+        return redirect()->route('medication.controlled-drugs.index')
+            ->with('success', 'Controlled drug register entry added.');
+    }
+
+    /** Same create, but returns to the React/Inertia page. */
+    public function storeReact(Request $request)
+    {
+        $this->createEntry($request);
+
+        return redirect()->route('medication.controlled-drugs.react')
+            ->with('success', 'Controlled drug register entry added.');
+    }
+
+    /** Validate + create a register entry. Shared by the legacy + React pages. */
+    private function createEntry(Request $request): void
     {
         $request->validate([
             'client_id'       => 'required|integer',
@@ -127,8 +206,5 @@ class ControlledDrugRegisterController extends Controller
             'notes'              => $request->input('notes'),
             'created_by_user_id' => Auth::id(),
         ]);
-
-        return redirect()->route('medication.controlled-drugs.index')
-            ->with('success', 'Controlled drug register entry added.');
     }
 }

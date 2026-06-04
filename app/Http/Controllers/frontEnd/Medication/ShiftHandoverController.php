@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Controller;
 use App\Models\ShiftHandover;
 use App\ServiceUser;
+use Inertia\Inertia;
 
 class ShiftHandoverController extends Controller
 {
@@ -53,7 +54,81 @@ class ShiftHandoverController extends Controller
         ]);
     }
 
+    /** React/Inertia version of the handover log. */
+    public function indexReact(Request $request)
+    {
+        $request->validate(['date' => 'nullable|date']);
+
+        $homeId = Auth::user()->home_id;
+        $date   = $request->input('date', now()->toDateString());
+        $carbon = \Carbon\Carbon::parse($date);
+
+        $handovers = ShiftHandover::forHome($homeId)
+            ->whereDate('handover_date', $date)
+            ->with(['acknowledgedByUser:id,name', 'createdByUser:id,name'])
+            ->orderByDesc('handover_time')
+            ->get()
+            ->map(fn ($h) => [
+                'id'                  => $h->id,
+                'location'            => $h->location,
+                'handover_date'       => $h->handover_date ? $h->handover_date->format('d M Y') : null,
+                'handover_time'       => $h->handover_time ? \Carbon\Carbon::parse($h->handover_time)->format('H:i') : null,
+                'from_carer_name'     => $h->from_carer_name,
+                'to_carer_name'       => $h->to_carer_name,
+                'general_notes'       => $h->general_notes,
+                'client_updates'      => $h->client_updates ?? [],
+                'medication_concerns' => $h->medication_concerns ?? [],
+                'priority_alerts'     => $h->priority_alerts ?? [],
+                'status'              => $h->status,
+                'acknowledged_by'     => $h->acknowledgedByUser->name ?? null,
+                'acknowledged_at'     => $h->acknowledged_at ? $h->acknowledged_at->format('d M Y H:i') : null,
+                'created_by'          => $h->createdByUser->name ?? null,
+            ]);
+
+        $serviceUsers = ServiceUser::where('home_id', $homeId)
+            ->where('status', 1)
+            ->orderBy('name')
+            ->get(['id', 'name'])
+            ->map(fn ($s) => ['id' => $s->id, 'name' => $s->name]);
+
+        return Inertia::render('Medication/ShiftHandover', [
+            'handovers'    => $handovers,
+            'serviceUsers' => $serviceUsers,
+            'selectedDate' => $date,
+            'prevDate'     => $carbon->copy()->subDay()->toDateString(),
+            'nextDate'     => $carbon->copy()->addDay()->toDateString(),
+            'todayDate'    => now()->toDateString(),
+        ]);
+    }
+
     public function store(Request $request)
+    {
+        $result = $this->persistHandover($request);
+        if ($result instanceof \Illuminate\Http\RedirectResponse) {
+            return $result;
+        }
+
+        return redirect()->route('medication.shift-handover.index')
+            ->with('success', $result === 'submitted' ? 'Handover submitted.' : 'Handover saved as draft.');
+    }
+
+    /** Same create, but returns to the React/Inertia page (keeping the date). */
+    public function storeReact(Request $request)
+    {
+        $result = $this->persistHandover($request);
+        if ($result instanceof \Illuminate\Http\RedirectResponse) {
+            return $result;
+        }
+
+        return redirect()->route('medication.shift-handover.react', ['date' => $request->input('handover_date')])
+            ->with('success', $result === 'submitted' ? 'Handover submitted.' : 'Handover saved as draft.');
+    }
+
+    /**
+     * Validate + create a handover. Returns the action string ('draft'|'submitted') on success,
+     * or a redirect-back response on validation failure. Shared by the legacy + React pages.
+     */
+    private function persistHandover(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'location' => 'nullable|string|max:255',
@@ -82,7 +157,7 @@ class ShiftHandoverController extends Controller
 
         $action = $request->input('submit_action');
 
-        $handover = ShiftHandover::create([
+        ShiftHandover::create([
             'home_id' => Auth::user()->home_id,
             'location' => $request->input('location'),
             'handover_date' => $request->input('handover_date'),
@@ -98,8 +173,7 @@ class ShiftHandoverController extends Controller
             'created_by_user_id' => Auth::id(),
         ]);
 
-        return redirect()->route('medication.shift-handover.index')
-            ->with('success', $action === 'submitted' ? 'Handover submitted.' : 'Handover saved as draft.');
+        return $action;
     }
 
     public function update(Request $request, $id)
@@ -233,10 +307,37 @@ class ShiftHandoverController extends Controller
 
     public function acknowledge($id)
     {
+        $error = $this->runAcknowledge($id);
+
+        if ($error) {
+            return response()->json(['ok' => false, 'message' => $error], 422);
+        }
+
+        $handover = ShiftHandover::forHome(Auth::user()->home_id)->find($id);
+
+        return response()->json([
+            'ok' => true,
+            'acknowledged_at' => $handover->acknowledged_at->toDateTimeString(),
+            'acknowledged_by_name' => Auth::user()->name,
+        ]);
+    }
+
+    /** Same acknowledge, but returns to the React/Inertia page (keeping the date). */
+    public function acknowledgeReact(Request $request, $id)
+    {
+        $error = $this->runAcknowledge($id);
+
+        return redirect()->route('medication.shift-handover.react', ['date' => $request->input('date')])
+            ->with($error ? 'error' : 'success', $error ?? 'Handover acknowledged.');
+    }
+
+    /** Mark a submitted handover acknowledged. Returns an error message, or null on success. */
+    private function runAcknowledge($id): ?string
+    {
         $handover = ShiftHandover::forHome(Auth::user()->home_id)->findOrFail($id);
 
         if ($handover->status !== 'submitted') {
-            return response()->json(['ok' => false, 'message' => 'Only submitted handovers can be acknowledged.'], 422);
+            return 'Only submitted handovers can be acknowledged.';
         }
 
         $handover->update([
@@ -245,10 +346,6 @@ class ShiftHandoverController extends Controller
             'acknowledged_by_user_id' => Auth::id(),
         ]);
 
-        return response()->json([
-            'ok' => true,
-            'acknowledged_at' => $handover->acknowledged_at->toDateTimeString(),
-            'acknowledged_by_name' => Auth::user()->name,
-        ]);
+        return null;
     }
 }

@@ -67,6 +67,27 @@ class MedicationStockController extends Controller
 
     public function adjust(Request $request)
     {
+        $error = $this->runAdjustment($request);
+
+        return redirect()->route('medication.stock.index')
+            ->with($error ? 'error' : 'success', $error ?? 'Stock updated.');
+    }
+
+    /** Same adjustment, but returns to the React/Inertia stock page. */
+    public function adjustReact(Request $request)
+    {
+        $error = $this->runAdjustment($request);
+
+        return redirect()->route('medication.stock.react')
+            ->with($error ? 'error' : 'success', $error ?? 'Stock updated.');
+    }
+
+    /**
+     * Validate and apply a stock adjustment.
+     * Returns an error message, or null on success. Shared by the legacy + React pages.
+     */
+    private function runAdjustment(Request $request): ?string
+    {
         $request->validate([
             'mar_sheet_id'     => 'required|integer',
             'transaction_type' => 'required|in:received,disposed,returned,correction',
@@ -84,7 +105,7 @@ class MedicationStockController extends Controller
         $sheet  = MARSheet::forHome($homeId)->active()->find($request->input('mar_sheet_id'));
 
         if (!$sheet) {
-            return redirect()->route('medication.stock.index')->with('error', 'Medication not found.');
+            return 'Medication not found.';
         }
 
         // Update tracked details (expiry + controlled-drug flag) on the medication.
@@ -113,7 +134,7 @@ class MedicationStockController extends Controller
             );
         }
 
-        return redirect()->route('medication.stock.index')->with('success', 'Stock updated.');
+        return null;
     }
 
     /**

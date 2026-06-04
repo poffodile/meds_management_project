@@ -21,7 +21,9 @@ if errorlevel 1 (
   echo [start-local] MySQL already running.
 )
 
-echo [start-local] App starting at http://127.0.0.1:8000   ^(Ctrl+C to stop^)
-start "" http://127.0.0.1:8000
 cd /d "%~dp0"
+echo [start-local] Starting Vite (frontend) in a separate window - keep it open...
+start "Vite (keep open)" cmd /k npm run dev
+echo [start-local] App at http://127.0.0.1:8000   ^(Ctrl+C here stops the web server^)
+start "" http://127.0.0.1:8000
 "%PHP%" -S 127.0.0.1:8000 serve-local.php

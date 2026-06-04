@@ -1561,24 +1561,38 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 	Route::post('/medication/shift-handover', [\App\Http\Controllers\frontEnd\Medication\ShiftHandoverController::class, 'store'])->name('medication.shift-handover.store');
 	Route::post('/medication/shift-handover/{id}/update', [\App\Http\Controllers\frontEnd\Medication\ShiftHandoverController::class, 'update'])->where('id', '[0-9]+')->name('medication.shift-handover.update');
 	Route::post('/medication/shift-handover/{id}/acknowledge', [\App\Http\Controllers\frontEnd\Medication\ShiftHandoverController::class, 'acknowledge'])->where('id', '[0-9]+')->name('medication.shift-handover.acknowledge');
+	// React/Inertia version (isolated; legacy above untouched)
+	Route::get('/medication/shift-handover-react', [\App\Http\Controllers\frontEnd\Medication\ShiftHandoverController::class, 'indexReact'])->name('medication.shift-handover.react');
+	Route::post('/medication/shift-handover-react', [\App\Http\Controllers\frontEnd\Medication\ShiftHandoverController::class, 'storeReact'])->name('medication.shift-handover.react.store');
+	Route::post('/medication/shift-handover-react/{id}/acknowledge', [\App\Http\Controllers\frontEnd\Medication\ShiftHandoverController::class, 'acknowledgeReact'])->where('id', '[0-9]+')->name('medication.shift-handover.react.acknowledge');
 
 	// Medication Management — Medication Round (reuses the existing /client/mar-administer endpoint to record doses)
 	Route::get('/medication/medication-round', [\App\Http\Controllers\frontEnd\Medication\MedicationRoundController::class, 'index'])->name('medication.medication-round.index');
 	Route::post('/medication/medication-round/record', [\App\Http\Controllers\frontEnd\Medication\MedicationRoundController::class, 'record'])->name('medication.medication-round.record');
+	// React/Inertia version (isolated; legacy above untouched)
+	Route::get('/medication/medication-round-react', [\App\Http\Controllers\frontEnd\Medication\MedicationRoundController::class, 'indexReact'])->name('medication.medication-round.react');
+	Route::post('/medication/medication-round-react/record', [\App\Http\Controllers\frontEnd\Medication\MedicationRoundController::class, 'recordReact'])->name('medication.medication-round.react.record');
 
 	// Medication Management — Controlled Drugs Register (append-only ledger)
 	Route::get('/medication/controlled-drugs', [\App\Http\Controllers\frontEnd\Medication\ControlledDrugRegisterController::class, 'index'])->name('medication.controlled-drugs.index');
 	Route::post('/medication/controlled-drugs', [\App\Http\Controllers\frontEnd\Medication\ControlledDrugRegisterController::class, 'store'])->name('medication.controlled-drugs.store');
+	// React/Inertia version (isolated; legacy above untouched)
+	Route::get('/medication/controlled-drugs-react', [\App\Http\Controllers\frontEnd\Medication\ControlledDrugRegisterController::class, 'indexReact'])->name('medication.controlled-drugs.react');
+	Route::post('/medication/controlled-drugs-react', [\App\Http\Controllers\frontEnd\Medication\ControlledDrugRegisterController::class, 'storeReact'])->name('medication.controlled-drugs.react.store');
 
 	// Medication Management — Medication Stock (overview, alerts, adjust + history)
 	Route::get('/medication/stock', [\App\Http\Controllers\frontEnd\Medication\MedicationStockController::class, 'index'])->name('medication.stock.index');
 	Route::post('/medication/stock/adjust', [\App\Http\Controllers\frontEnd\Medication\MedicationStockController::class, 'adjust'])->name('medication.stock.adjust');
 	// React/Inertia + Mantine pilot (isolated; legacy page above is untouched)
 	Route::get('/medication/stock-react', [\App\Http\Controllers\frontEnd\Medication\MedicationStockController::class, 'indexReact'])->name('medication.stock.react');
+	Route::post('/medication/stock-react/adjust', [\App\Http\Controllers\frontEnd\Medication\MedicationStockController::class, 'adjustReact'])->name('medication.stock.react.adjust');
 
 	// Medication Management — Missed Doses Review (missed + not-given doses, with resolve workflow)
 	Route::get('/medication/missed-doses', [\App\Http\Controllers\frontEnd\Medication\MissedDosesController::class, 'index'])->name('medication.missed-doses.index');
 	Route::post('/medication/missed-doses/resolve', [\App\Http\Controllers\frontEnd\Medication\MissedDosesController::class, 'resolve'])->name('medication.missed-doses.resolve');
+	// React/Inertia version (isolated; legacy above untouched)
+	Route::get('/medication/missed-doses-react', [\App\Http\Controllers\frontEnd\Medication\MissedDosesController::class, 'indexReact'])->name('medication.missed-doses.react');
+	Route::post('/medication/missed-doses-react/resolve', [\App\Http\Controllers\frontEnd\Medication\MissedDosesController::class, 'resolveReact'])->name('medication.missed-doses.react.resolve');
 
 	//add to weekly
 	Route::match(['get', 'post'], '/weekly/report/{log_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\LogBookController@weekly_report');

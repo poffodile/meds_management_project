@@ -10,6 +10,7 @@ use App\Models\MARAdministration;
 use App\Models\MedicationStockTransaction;
 use App\Services\Staff\MARSheetService;
 use App\ServiceUser;
+use Inertia\Inertia;
 
 class MedicationRoundController extends Controller
 {
@@ -132,11 +133,105 @@ class MedicationRoundController extends Controller
         ]);
     }
 
+    /** React/Inertia version of the round grid. Same data, shaped into plain arrays. */
+    public function indexReact(Request $request)
+    {
+        $request->validate(['date' => 'nullable|date']);
+
+        $homeId = $this->getHomeId();
+        $date   = $request->input('date', now()->toDateString());
+
+        $sheets = MARSheet::forHome($homeId)
+            ->active()
+            ->currentlyActive()
+            ->with(['administrations' => function ($q) use ($date) {
+                $q->where('date', $date)->with('administeredByUser:id,name');
+            }])
+            ->orderBy('medication_name')
+            ->get();
+
+        $clientIds = $sheets->pluck('client_id')->unique()->values();
+        $residentNames = ServiceUser::whereIn('id', $clientIds)->pluck('name', 'id');
+
+        $grid = [];
+        foreach (array_keys(self::ROUNDS) as $roundKey) {
+            $grid[$roundKey] = [];
+        }
+
+        foreach ($sheets as $sheet) {
+            $slots = !empty($sheet->time_slots) ? $sheet->time_slots : [null];
+            $adminsBySlot = $sheet->administrations->keyBy('time_slot');
+
+            foreach ($slots as $slot) {
+                $targetRounds = $slot !== null ? [$this->roundForTime($slot)] : array_keys(self::ROUNDS);
+
+                foreach ($targetRounds as $roundKey) {
+                    $clientId = $sheet->client_id;
+                    if (!isset($grid[$roundKey][$clientId])) {
+                        $grid[$roundKey][$clientId] = [
+                            'client_id' => $clientId,
+                            'name'      => $residentNames[$clientId] ?? ('Resident #' . $clientId),
+                            'rows'      => [],
+                        ];
+                    }
+                    $admin = $slot !== null ? $adminsBySlot->get($slot) : null;
+                    $grid[$roundKey][$clientId]['rows'][] = [
+                        'mar_sheet_id'    => $sheet->id,
+                        'medication_name' => $sheet->medication_name,
+                        'dose'            => $sheet->dose,
+                        'slot'            => $slot,
+                        'code'            => $admin->code ?? null,
+                        'dose_given'      => $admin->dose_given ?? null,
+                        'recorded_by'     => ($admin && $admin->administeredByUser) ? $admin->administeredByUser->name : null,
+                    ];
+                }
+            }
+        }
+
+        foreach ($grid as $roundKey => $residents) {
+            $grid[$roundKey] = collect($residents)->sortBy('name')->values()->all();
+        }
+
+        $rounds = [];
+        foreach (self::ROUNDS as $key => $cfg) {
+            $rounds[] = ['key' => $key, 'label' => $cfg['label'], 'window' => $cfg['window']];
+        }
+
+        return Inertia::render('Medication/MedicationRound', [
+            'rounds'       => $rounds,
+            'grid'         => $grid,
+            'date'         => $date,
+            'currentRound' => $this->roundForTime(now()->format('H:i')),
+        ]);
+    }
+
     /**
      * Record an administration via the existing MAR service, and auto-deduct stock when given.
      * Guards against double-deducting if an already-"Given" record is edited.
      */
     public function record(Request $request, MARSheetService $marSheetService)
+    {
+        $ok = $this->applyRecord($request, $marSheetService);
+
+        if (!$ok) {
+            return response()->json(['ok' => false, 'message' => 'Prescription not found'], 404);
+        }
+
+        return response()->json(['ok' => true]);
+    }
+
+    /** Same record, but returns to the React/Inertia round page (keeping the date). */
+    public function recordReact(Request $request, MARSheetService $marSheetService)
+    {
+        $ok   = $this->applyRecord($request, $marSheetService);
+        $date = $request->input('date');
+
+        return redirect()->route('medication.medication-round.react', ['date' => $date])
+            ->with($ok ? 'success' : 'error', $ok ? 'Dose recorded.' : 'Prescription not found.');
+    }
+
+    /** Record an administration + auto-deduct stock on a newly-given dose. Returns false if not found. */
+    private function applyRecord(Request $request, MARSheetService $marSheetService): bool
     {
         $request->validate([
             'mar_sheet_id' => 'required|integer',
@@ -166,7 +261,7 @@ class MedicationRoundController extends Controller
         );
 
         if (!$admin) {
-            return response()->json(['ok' => false, 'message' => 'Prescription not found'], 404);
+            return false;
         }
 
         // Auto-deduct stock only on a newly-given dose.
@@ -186,6 +281,6 @@ class MedicationRoundController extends Controller
             }
         }
 
-        return response()->json(['ok' => true]);
+        return true;
     }
 }
