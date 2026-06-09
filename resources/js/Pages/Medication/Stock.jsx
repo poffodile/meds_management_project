@@ -1,4 +1,5 @@
-import { Head, usePage } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
+import FlashAlerts from '@frontend/components/FlashAlerts';
 import { useDisclosure } from '@mantine/hooks';
 import {
     Container, Text, Group, SimpleGrid, Badge, Button, Tabs, Paper, Alert,
@@ -30,7 +31,6 @@ function stockBar(m) {
 
 export default function Stock({ meds = [], transactions = [], stats = {} }) {
     const role = useRole();
-    const flash = usePage().props.flash ?? {};
     const [adjustOpened, adjust] = useDisclosure(false);
 
     const medColumns = [
@@ -111,8 +111,7 @@ export default function Stock({ meds = [], transactions = [], stats = {} }) {
                     }
                 />
 
-                {flash.success && <Alert color="green" mb="md">{flash.success}</Alert>}
-                {flash.error && <Alert color="red" mb="md">{flash.error}</Alert>}
+                <FlashAlerts />
 
                 <SimpleGrid cols={{ base: 2, sm: 3, lg: 5 }} mb="xl">
                     <StatCard label="Total items" value={stats.total ?? 0} color="indigo" icon={IconBox} sublabel="In this home" />

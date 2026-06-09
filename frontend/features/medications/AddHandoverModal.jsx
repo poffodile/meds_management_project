@@ -1,5 +1,6 @@
 import { Modal, Button, Group, Stack, TextInput, Textarea, Select, Checkbox, Divider, Box } from '@mantine/core';
 import { useForm } from '@inertiajs/react';
+import { pad } from '@frontend/lib/dateUtils';
 
 const PRIORITY_OPTIONS = [
     { value: 'low', label: 'Low' },
@@ -8,7 +9,6 @@ const PRIORITY_OPTIONS = [
     { value: 'urgent', label: 'Urgent' },
 ];
 
-const pad = (n) => String(n).padStart(2, '0');
 const rowStyle = { border: '1px solid var(--mantine-color-gray-3)', borderRadius: 8 };
 
 /**

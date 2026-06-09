@@ -1,6 +1,7 @@
 import { Select, Autocomplete, NumberInput, TextInput, Textarea, Group } from '@mantine/core';
 import { useForm } from '@inertiajs/react';
 import FormModal from '@frontend/components/FormModal';
+import { pad } from '@frontend/lib/dateUtils';
 
 const ACTION_OPTIONS = [
     { value: 'administered', label: 'Administered' },
@@ -9,8 +10,6 @@ const ACTION_OPTIONS = [
     { value: 'returned', label: 'Returned' },
     { value: 'adjustment', label: 'Adjustment' },
 ];
-
-const pad = (n) => String(n).padStart(2, '0');
 
 /**
  * AddCdEntryModal — add a Controlled Drugs register entry.

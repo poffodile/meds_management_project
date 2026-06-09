@@ -1,4 +1,5 @@
-import { Head, usePage } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
+import FlashAlerts from '@frontend/components/FlashAlerts';
 import { useDisclosure } from '@mantine/hooks';
 import { Container, Text, Group, Badge, Button, Paper, Alert, ThemeIcon } from '@mantine/core';
 import { IconPill, IconPlus } from '@tabler/icons-react';
@@ -11,7 +12,6 @@ import AppShell from '@frontend/Layouts/AppShell';
 const num = (v, unit) => (v === null || v === undefined ? '—' : `${v}${unit ? ' ' + unit : ''}`);
 
 export default function ControlledDrugs({ entries = [], residents = [], medsByClient = {}, lastBalances = {} }) {
-    const flash = usePage().props.flash ?? {};
     const [addOpened, add] = useDisclosure(false);
 
     const columns = [
@@ -47,8 +47,7 @@ export default function ControlledDrugs({ entries = [], residents = [], medsByCl
                     actions={<Button leftSection={<IconPlus size={16} />} onClick={add.open}>Add entry</Button>}
                 />
 
-                {flash.success && <Alert color="green" mb="md">{flash.success}</Alert>}
-                {flash.error && <Alert color="red" mb="md">{flash.error}</Alert>}
+                <FlashAlerts />
 
                 <Paper withBorder radius="lg" p="md">
                     <DataTable

@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Head, usePage, router } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
+import FlashAlerts from '@frontend/components/FlashAlerts';
 import { useDisclosure } from '@mantine/hooks';
 import {
     Container, Group, Button, TextInput, SegmentedControl, SimpleGrid, Paper, Alert, Text, Badge,
@@ -18,7 +19,6 @@ import AppShell from '@frontend/Layouts/AppShell';
 export default function MissedDoses({
     items = [], stats = {}, date, prevDate, nextDate, todayDate, statusFilter = 'outstanding',
 }) {
-    const flash = usePage().props.flash ?? {};
     const [resolveItem, setResolveItem] = useState(null);
     const [resolveOpened, resolve] = useDisclosure(false);
 
@@ -59,8 +59,7 @@ export default function MissedDoses({
             <Container size="xl" py="lg">
                 <PageHeader title="Missed Doses Review" subtitle="Missed and not-given doses, with clinical follow-up" />
 
-                {flash.success && <Alert color="green" mb="md">{flash.success}</Alert>}
-                {flash.error && <Alert color="red" mb="md">{flash.error}</Alert>}
+                <FlashAlerts />
 
                 <Group justify="space-between" mb="md" wrap="wrap">
                     <Group gap="xs">

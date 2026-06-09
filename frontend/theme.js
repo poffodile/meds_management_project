@@ -1,15 +1,18 @@
 import { createTheme } from '@mantine/core';
+import { brand, radius, typography } from './tokens';
 
 /**
- * Brand design tokens — the ONE place that controls the whole app's look
- * (colours, fonts, spacing, radius). Change it here, every page updates.
+ * The Mantine theme, built from the design tokens in ./tokens.js — that file
+ * is the one place to change colours/spacing/fonts for the whole app.
  *
- * White-label ready: a per-company theme can later be merged on top of this
- * so each care company can have its own colours/logo.
+ * Tokens are re-exported here, so either `@frontend/theme` or `@frontend/tokens`
+ * can supply them.
  */
 export const theme = createTheme({
-    primaryColor: 'indigo',
-    defaultRadius: 'md',
-    fontFamily: 'Inter, -apple-system, "Segoe UI", Roboto, sans-serif',
-    headings: { fontWeight: '700' },
+    primaryColor: brand.primary,
+    defaultRadius: radius.control,
+    fontFamily: typography.fontFamily,
+    headings: { fontWeight: typography.headingWeight },
 });
+
+export * from './tokens';

@@ -2,21 +2,13 @@ import { useEffect } from 'react';
 import { Select, TextInput, Textarea, Text } from '@mantine/core';
 import { useForm } from '@inertiajs/react';
 import FormModal from '@frontend/components/FormModal';
-
-const CODE_OPTIONS = [
-    { value: 'A', label: 'Given' },
-    { value: 'S', label: 'Sleeping' },
-    { value: 'R', label: 'Refused' },
-    { value: 'W', label: 'Withheld' },
-    { value: 'N', label: 'Not available' },
-    { value: 'O', label: 'Omitted' },
-];
+import { MED_CODES } from '@frontend/lib/medicationCodes';
 
 /**
  * RecordDoseModal — record the outcome of a single dose in the Medication Round.
  * The dose details come from the selected row; "Given" auto-deducts stock server-side.
  */
-export default function RecordDoseModal({ opened, onClose, row, date }) {
+export default function RecordDoseModal({ opened, onClose, row, date, presetCode }) {
     const form = useForm({
         mar_sheet_id: '',
         date: date ?? '',
@@ -32,11 +24,11 @@ export default function RecordDoseModal({ opened, onClose, row, date }) {
             form.setData('mar_sheet_id', row.mar_sheet_id);
             form.setData('date', date);
             form.setData('time_slot', row.slot ?? '');
-            form.setData('code', row.code ?? 'A');
+            form.setData('code', presetCode ?? row.code ?? 'A');
             form.setData('dose_given', row.dose ?? '');
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [row, date]);
+    }, [row, date, presetCode]);
 
     const submit = () => {
         form.post('/medication/medication-round-react/record', {
@@ -61,7 +53,7 @@ export default function RecordDoseModal({ opened, onClose, row, date }) {
             </Text>
             <Select
                 label="Outcome"
-                data={CODE_OPTIONS}
+                data={MED_CODES}
                 value={form.data.code}
                 onChange={(v) => form.setData('code', v)}
                 error={form.errors.code}

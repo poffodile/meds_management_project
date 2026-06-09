@@ -1,4 +1,5 @@
-import { Head, usePage, router } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
+import FlashAlerts from '@frontend/components/FlashAlerts';
 import { useDisclosure } from '@mantine/hooks';
 import {
     Container, Group, Button, TextInput, Paper, Alert, Text, Stack, Badge, Divider,
@@ -77,7 +78,6 @@ function HandoverCard({ h, onAcknowledge }) {
 }
 
 export default function ShiftHandover({ handovers = [], serviceUsers = [], selectedDate, prevDate, nextDate, todayDate }) {
-    const flash = usePage().props.flash ?? {};
     const [newOpened, newHandover] = useDisclosure(false);
     const reload = (date) => router.get('/medication/shift-handover-react', { date }, { preserveScroll: true, preserveState: true });
     const acknowledge = (id) => router.post(`/medication/shift-handover-react/${id}/acknowledge`, { date: selectedDate }, { preserveScroll: true });
@@ -92,8 +92,7 @@ export default function ShiftHandover({ handovers = [], serviceUsers = [], selec
                     actions={<Button leftSection={<IconPlus size={16} />} onClick={newHandover.open}>New handover</Button>}
                 />
 
-                {flash.success && <Alert color="green" mb="md">{flash.success}</Alert>}
-                {flash.error && <Alert color="red" mb="md">{flash.error}</Alert>}
+                <FlashAlerts />
 
                 <Group mb="md" gap="xs">
                     <Button variant="default" px="sm" onClick={() => reload(prevDate)}><IconChevronLeft size={16} /></Button>

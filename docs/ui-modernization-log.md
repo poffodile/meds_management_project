@@ -1,12 +1,14 @@
 # UI Modernization — Discussion & Session Log
 
-> **Status:** 🟡 DISCUSSION phase (deciding the stack). Detailed implementation plan is **deferred** until the stack is agreed.
-> **Last updated:** 2026-06-04
+> **Status:** 🟢 BUILD phase. Stack agreed; M0 (base) + M1 (medication pages) done. Now restyling pages to a new reference design.
+> **Last updated:** 2026-06-09
 >
 > ### ▶ RESUME HERE (next step)
-> **STACK IS DECIDED** (owner deferred to Claude's best call). See "Final stack" below.
-> Next: owner chooses one of → (a) **scan code** for existing API/mobile/tenancy structure, (b) build a **visual pilot** (medication stock page in Inertia+React+Mantine), or (c) **write the detailed plan**.
-> New hard requirement: **multi-tenant SaaS** (many care companies) → needs design system + per-tenant theming (all in chosen stack); heavy tenancy work is backend (app already has home_id/company).
+> M1 medication pages are live at `/medication/*-react` (legacy untouched). On 2026-06-09 the **global shell + Medication Round page** were redesigned to a new reference mock.
+> Open items: guard `/dev-login` before prod; confirm manager/carer split is enough (vs separate Admin/Owner view); decide if/when to wire the rich Medication-Round card fields (needs backend); then continue to the next page / Milestone 2.
+> **See "Session 2026-06-09" at the bottom of this file for the latest.**
+>
+> _(historical discussion-phase notes from 2026-06-04 are kept below for context.)_
 
 ---
 
@@ -101,3 +103,59 @@ Modernize the UI of the whole app, **gradually, page by page**. Current UI looks
 5. **Team size** going forward (solo vs more devs)? Decoupled = more moving parts to maintain.
 6. **What is the mobile app built in** (React Native / Flutter / native)? RN → max reuse with React web (shared API client, types, skills).
 7. **Mobile timeline** — parallel with web revamp, or after? Decides whether the API is built now or web-first.
+
+---
+
+## Session 2026-06-09 — first build sessions: M1 polish, role/login audit, Med Round + shell redesign
+
+**Where we are:** stack is built. M0 (base: theme, AppShell, shared components, testing foundation) and M1 (all 4–5 medication pages in React/Inertia/Mantine) are done. Each React page lives at `/medication/*-react`; the legacy pages are untouched. Now in a **restyle pass** to match a new visual reference the owner provided.
+
+### Done this session
+- **Local run verified.** `start-local.bat` (MySQL :3306 + PHP `serve-local.php` :8000 + Vite :5173). All 5 React medication pages load (auth-gated → 302 to `/login` when logged out). Confirmed Vite serves the client + page modules cleanly.
+- **Frontend test layer completed & committed.** 6 component test files (StatCard, PageHeader, DataTable, FormModal, ConfirmDialog, StatusBadge), **14 Vitest tests passing**. (`npm run test`.)
+- **New reference design** provided for the **Medication Round** page (rich dashboard look). Agreed scope below.
+- **Global shell redesigned** (`frontend/Layouts/AppShell.jsx`): Mantine `layout="alt"` (full-height sidebar); **Care One OS** transparent logo (white text) on a dark **navy band `#16223a`**; grouped nav with **MEDICATIONS** / **DOMICILIARY CARE** section labels; unbuilt items shown as greyed "Coming soon" placeholders; user identity moved to **top-right** header with dark-mode + logout in its menu; **Collapse** control + header burgers.
+- **Medication Round page redesigned** (`resources/js/Pages/Medication/MedicationRound.jsx`): hero (round icon + title + date/window/counts), **4 stat cards** (Due / Completed / Remaining / Round-Progress bar), **vertical timeline** of resident cards (initials avatars, status pills, per-med Administer buttons), round switcher, Start-Next-Round, secure footer. **Frontend-only — no backend change.**
+- **Logo asset** saved to `frontend/assets/logo-careoneos.png` (transparent confirmed via alpha check; "Care One" text is white → needs dark bg).
+
+### Audits (saved to memory)
+- **Role model** → `memory/role-model.md`. **414 users.** Two tiers: (1) `user_type` enum **N**=carer/support-worker (281), **A**=admin (75), **M**=manager (45), **CM**=care-manager (11), **O**=owner (2); (2) per-home **`access_level`** custom roles (82 active, 40 names) built from **814 `access_right`** permissions across **125 homes**. The React UI collapses all of this to **manager** (`M,CM,A,O`) vs **carer** (`N`) in `HandleInertiaRequests.php` — drives the AppShell preview toggle.
+- **Login** is in code: `/login` → `frontEnd/UserController@login` (legacy `login.blade.php`, **left untouched** per plan); separate `admin/login` → `backEnd/AdminController@login`. ⚠️ **`GET /dev-login`** (`web.php:116`) logs in the first non-deleted user **with no password** (sets session home scoping, refreshes CSRF) → handy for local testing but a **security hole**; must be env-guarded/removed before prod.
+
+### Decisions this session
+| Date | Decision | Notes |
+|------|----------|-------|
+| 2026-06-09 | **Restyle scope = page + global shell** (for the Med Round reference) | shell change affects every React page |
+| 2026-06-09 | **Med Round cards: restyle with current data, defer rich fields** | photos / room / DOB / allergies / per-med stock·route·frequency / CD badge all need backend wiring — deferred |
+| 2026-06-09 | **Logo** = transparent "Care One OS" PNG on dark navy band `#16223a`; shell uses `layout="alt"` | white-text logo requires a dark header band |
+| 2026-06-09 | **Frontend test layer complete** (14 Vitest tests, 6 component files) | committed |
+
+### Open items / next
+- [ ] **Guard `/dev-login`** behind `app()->environment('local')` (or remove) before any prod deploy.
+- [ ] Confirm **manager/carer** two-view split is enough, or design a distinct **Admin/Owner** experience.
+- [ ] Decide if/when to **wire the rich Medication-Round card fields** (backend: ServiceUser room/DOB/allergies/photo + MARSheet stock/CD/route/frequency).
+- [ ] Optional polish: logo size / navy band shade vs the teal/orange/green/purple ring.
+- [ ] Then: continue restyling remaining medication pages to the reference, or proceed to **Milestone 2** (Dashboard, Client profile, Daily Log, Schedule) + backend **Track A** (real tenant scoping).
+
+---
+
+## Session 2026-06-09 (cont.) — Medication Round rebuilt on a reusable design system
+
+Owner provided a richer **Medication Round** mockup (resident-centric 3-column workspace) and asked to rebuild it **without duplicating code/colours** — i.e. on a documented, reusable design system with a "global CSS" (tokens). Planned in plan mode (`~/.claude/plans/snug-inventing-token.md`, approved) and built in 7 phases.
+
+**Decisions:** Brand stays **Care One OS** (mockup's "OmegaLife" was a placeholder); **layout-first then phase in data**; **central tokens in `frontend/theme`** (not a separate CSS file); components built generic / mobile-aware; documented in `docs/design-system.md`.
+
+**Built (all verified — `npm run test` 20 passing, Vite transforms, authed controller returns 200):**
+- **Phase 1 — tokens:** `frontend/tokens.js` (brand incl. navy, `statusColors`, `roundTokens`, avatar palette, radius/type); `theme.js` consumes it; `StatusBadge` reads `statusColors`. **Fixed the `low` duplicate-key bug** (stock "low" was rendering grey). Replaced hardcoded `#16223a` in AppShell with `brand.navy`.
+- **Phase 2 — utils/hooks + dedupe:** `lib/{dateUtils,avatarColor,medicationCodes}`, `hooks/{useFlash,usePageReload}`, `components/FlashAlerts`. Removed real duplication: the twice-defined `pad()`, `CODE_OPTIONS` clone, and the flash-Alert block copy-pasted across 4 pages → now shared.
+- **Phase 3 — generic primitives:** `MetricChip, AlertItem, QuickActionItem, RiskFlag, RoundProgressDonut` (+ tests).
+- **Phase 4 — composites:** `ResidentCard, ResidentListItem, MedicationCard` (Administer/Refused/Omitted).
+- **Phase 5 — page:** rebuilt `MedicationRound.jsx` as the 3-column workspace; added **Phase A** fields to `indexReact` (strength/route/instruction/stock/low-stock/CD/Regular-PRN tag; resident dob/allergies/counts).
+- **Phase 6 — derivations (Phase B):** `doseBucket()` derives per-dose **overdue/due_now/upcoming/later/completed** from slot-vs-now; round-progress buckets; overdue-aware resident status; Upcoming-next-2h split; overdue + low-stock + CD alerts; resident **photo** (`public/images/serviceUserProfileImages/`), gender, weight; **generic risk flags** from `care_plan_risks` (surfaced with their `impact` level).
+- **Phase 7 — docs:** `docs/design-system.md` (token + component catalogue + Phase A/B/C data map); this log entry; memory updated.
+
+**Still placeholder (Phase C — no DB source / fragile, documented in design-system.md):** NHS number, room label (no room lookup table), medication form, therapeutic class, conditions, PRN last-given/next-available, care-plan link. Quick actions Scan/Add-PRN/Temp-Absence/MAR-report are stubbed.
+
+**Files:** `frontend/tokens.js`, `frontend/theme.js`, `frontend/{lib,hooks}/*`, `frontend/components/{FlashAlerts,MetricChip,AlertItem,QuickActionItem,RiskFlag,RoundProgressDonut}.jsx`, `frontend/features/medications/{ResidentCard,ResidentListItem,MedicationCard}.jsx`, `resources/js/Pages/Medication/MedicationRound.jsx`, `app/Http/Controllers/frontEnd/Medication/MedicationRoundController.php`, `docs/design-system.md`. New logo asset `frontend/assets/logo-careoneos.png`.
+
+**Open / next:** wire Phase C items when their data is sourced; apply the same design system to the other medication pages; still pending from before — guard `/dev-login`, multi-tenancy Track A, Milestone 2.

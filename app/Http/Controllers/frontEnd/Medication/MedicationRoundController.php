@@ -151,7 +151,31 @@ class MedicationRoundController extends Controller
             ->get();
 
         $clientIds = $sheets->pluck('client_id')->unique()->values();
-        $residentNames = ServiceUser::whereIn('id', $clientIds)->pluck('name', 'id');
+        $residents = ServiceUser::whereIn('id', $clientIds)->get()->keyBy('id');
+
+        // Per-resident regular / PRN medication counts (across all active sheets).
+        $counts = [];
+        foreach ($sheets as $s) {
+            $cid = $s->client_id;
+            if (!isset($counts[$cid])) {
+                $counts[$cid] = ['regular' => 0, 'prn' => 0];
+            }
+            $s->as_required ? $counts[$cid]['prn']++ : $counts[$cid]['regular']++;
+        }
+
+        // Per-resident active risks (generic — surfaced with their impact level).
+        $risksByClient = \DB::table('care_plan_risks')
+            ->whereIn('client_id', $clientIds)
+            ->where('status', 1)
+            ->whereNull('deleted_at')
+            ->get(['client_id', 'description', 'impact'])
+            ->groupBy('client_id');
+
+        // Time context for the due / overdue / upcoming derivation (relative to "now").
+        $today   = now()->toDateString();
+        $isToday = ($date === $today);
+        $isPast  = ($date < $today);
+        $nowMin  = (int) now()->format('H') * 60 + (int) now()->format('i');
 
         $grid = [];
         foreach (array_keys(self::ROUNDS) as $roundKey) {
@@ -168,18 +192,45 @@ class MedicationRoundController extends Controller
                 foreach ($targetRounds as $roundKey) {
                     $clientId = $sheet->client_id;
                     if (!isset($grid[$roundKey][$clientId])) {
+                        $su = $residents->get($clientId);
+                        $allergies = ($su && $su->allergies)
+                            ? array_values(array_filter(array_map('trim', preg_split('/[,;]+/', $su->allergies))))
+                            : [];
+                        $riskFlags = ($risksByClient[$clientId] ?? collect())->map(function ($r) {
+                            return ['label' => $r->description, 'level' => strtolower($r->impact ?: 'medium')];
+                        })->values()->all();
+                        $gender = ($su && $su->gender) ? (['M' => 'Male', 'F' => 'Female'][$su->gender] ?? $su->gender) : null;
                         $grid[$roundKey][$clientId] = [
-                            'client_id' => $clientId,
-                            'name'      => $residentNames[$clientId] ?? ('Resident #' . $clientId),
-                            'rows'      => [],
+                            'client_id'     => $clientId,
+                            'name'          => $su->name ?? ('Resident #' . $clientId),
+                            'photo'         => ($su && $su->image) ? url('public/images/serviceUserProfileImages/' . $su->image) : null,
+                            'dob'           => $su->date_of_birth ?? null,
+                            'gender'        => $gender,
+                            'weight'        => ($su && $su->weight) ? $su->weight : null,
+                            'weight_unit'   => $su->weight_unit ?? null,
+                            'allergies'     => $allergies,
+                            'risk_flags'    => $riskFlags,
+                            'regular_count' => $counts[$clientId]['regular'] ?? 0,
+                            'prn_count'     => $counts[$clientId]['prn'] ?? 0,
+                            'rows'          => [],
                         ];
                     }
                     $admin = $slot !== null ? $adminsBySlot->get($slot) : null;
                     $grid[$roundKey][$clientId]['rows'][] = [
                         'mar_sheet_id'    => $sheet->id,
                         'medication_name' => $sheet->medication_name,
+                        'strength'        => $sheet->dosage,
                         'dose'            => $sheet->dose,
+                        'route'           => $sheet->route,
+                        'instruction'     => $sheet->prn_details ?: $sheet->reason_for_medication,
                         'slot'            => $slot,
+                        'stock'           => $sheet->stock_level,
+                        'low_stock'       => !is_null($sheet->stock_level) && !is_null($sheet->reorder_level) && $sheet->stock_level <= $sheet->reorder_level,
+                        'unit'            => $sheet->unit,
+                        'is_controlled'   => (bool) $sheet->is_controlled,
+                        'cd_schedule'     => $sheet->cd_schedule,
+                        'as_required'     => (bool) $sheet->as_required,
+                        'status'          => $this->doseBucket($slot, $admin->code ?? null, $isToday, $isPast, $nowMin),
                         'code'            => $admin->code ?? null,
                         'dose_given'      => $admin->dose_given ?? null,
                         'recorded_by'     => ($admin && $admin->administeredByUser) ? $admin->administeredByUser->name : null,
@@ -203,6 +254,39 @@ class MedicationRoundController extends Controller
             'date'         => $date,
             'currentRound' => $this->roundForTime(now()->format('H:i')),
         ]);
+    }
+
+    /**
+     * Derive a dose's timing bucket relative to "now" (only meaningful for today):
+     * completed | overdue | due_now (<=60m) | upcoming (<=120m) | later | due (PRN/unscheduled).
+     */
+    private function doseBucket($slot, $code, $isToday, $isPast, $nowMin)
+    {
+        if ($code) {
+            return 'completed';
+        }
+        if ($slot === null || strpos((string) $slot, ':') === false) {
+            return 'due'; // PRN / unscheduled
+        }
+        [$h, $m] = explode(':', $slot);
+        $slotMin = (int) $h * 60 + (int) $m;
+        if ($isPast) {
+            return 'overdue';
+        }
+        if (!$isToday) {
+            return 'later';
+        }
+        $diff = $slotMin - $nowMin;
+        if ($diff < 0) {
+            return 'overdue';
+        }
+        if ($diff <= 60) {
+            return 'due_now';
+        }
+        if ($diff <= 120) {
+            return 'upcoming';
+        }
+        return 'later';
     }
 
     /**
