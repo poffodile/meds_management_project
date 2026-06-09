@@ -3,6 +3,7 @@ import { useDisclosure } from '@mantine/hooks';
 import {
     Container, Group, Button, TextInput, Paper, Alert, Text, Stack, Badge, Divider,
 } from '@mantine/core';
+import { IconPlus, IconCheck, IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 import PageHeader from '@frontend/components/PageHeader';
 import StatusBadge from '@frontend/components/StatusBadge';
 import AddHandoverModal from '@frontend/features/medications/AddHandoverModal';
@@ -19,7 +20,7 @@ function Section({ title, children }) {
 
 function HandoverCard({ h, onAcknowledge }) {
     return (
-        <Paper withBorder radius="md" p="md">
+        <Paper withBorder radius="lg" p="md">
             <Group justify="space-between" mb="xs" wrap="nowrap">
                 <Group gap="sm" wrap="nowrap">
                     <Text fw={700}>{h.handover_time ?? '—'}</Text>
@@ -29,7 +30,7 @@ function HandoverCard({ h, onAcknowledge }) {
                 <Group gap="sm" wrap="nowrap">
                     <StatusBadge status={h.status} label={h.status} />
                     {h.status === 'submitted' && (
-                        <Button size="xs" variant="light" color="green" onClick={() => onAcknowledge(h.id)}>Acknowledge</Button>
+                        <Button size="xs" variant="light" color="green" leftSection={<IconCheck size={14} />} onClick={() => onAcknowledge(h.id)}>Acknowledge</Button>
                     )}
                 </Group>
             </Group>
@@ -84,20 +85,20 @@ export default function ShiftHandover({ handovers = [], serviceUsers = [], selec
     return (
         <>
             <Head title="Shift Handover" />
-            <Container size="lg" py="xl">
+            <Container size="lg" py="lg">
                 <PageHeader
                     title="Shift Handover"
                     subtitle="Notes passed between shifts"
-                    actions={<Button onClick={newHandover.open}>New handover</Button>}
+                    actions={<Button leftSection={<IconPlus size={16} />} onClick={newHandover.open}>New handover</Button>}
                 />
 
                 {flash.success && <Alert color="green" mb="md">{flash.success}</Alert>}
                 {flash.error && <Alert color="red" mb="md">{flash.error}</Alert>}
 
                 <Group mb="md" gap="xs">
-                    <Button variant="default" onClick={() => reload(prevDate)}>◀</Button>
+                    <Button variant="default" px="sm" onClick={() => reload(prevDate)}><IconChevronLeft size={16} /></Button>
                     <TextInput type="date" value={selectedDate} onChange={(e) => reload(e.currentTarget.value)} />
-                    <Button variant="default" onClick={() => reload(nextDate)}>▶</Button>
+                    <Button variant="default" px="sm" onClick={() => reload(nextDate)}><IconChevronRight size={16} /></Button>
                     <Button variant="light" onClick={() => reload(todayDate)}>Today</Button>
                 </Group>
 

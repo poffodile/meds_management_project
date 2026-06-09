@@ -4,6 +4,10 @@ import { useDisclosure } from '@mantine/hooks';
 import {
     Container, Group, Button, TextInput, SegmentedControl, SimpleGrid, Paper, Alert, Text, Badge,
 } from '@mantine/core';
+import {
+    IconAlertTriangle, IconBan, IconAlertCircle, IconCircleCheck,
+    IconChevronLeft, IconChevronRight, IconCheck,
+} from '@tabler/icons-react';
 import PageHeader from '@frontend/components/PageHeader';
 import StatCard from '@frontend/components/StatCard';
 import DataTable from '@frontend/components/DataTable';
@@ -44,7 +48,7 @@ export default function MissedDoses({
         {
             key: 'actions', label: '', sortable: false,
             render: (i) => (!i.resolved
-                ? <Button size="xs" variant="light" onClick={() => openResolve(i)}>Resolve</Button>
+                ? <Button size="xs" variant="light" leftSection={<IconCheck size={14} />} onClick={() => openResolve(i)}>Resolve</Button>
                 : null),
         },
     ];
@@ -52,7 +56,7 @@ export default function MissedDoses({
     return (
         <>
             <Head title="Missed Doses" />
-            <Container size="xl" py="xl">
+            <Container size="xl" py="lg">
                 <PageHeader title="Missed Doses Review" subtitle="Missed and not-given doses, with clinical follow-up" />
 
                 {flash.success && <Alert color="green" mb="md">{flash.success}</Alert>}
@@ -60,9 +64,9 @@ export default function MissedDoses({
 
                 <Group justify="space-between" mb="md" wrap="wrap">
                     <Group gap="xs">
-                        <Button variant="default" onClick={() => reload({ date: prevDate })}>◀</Button>
+                        <Button variant="default" px="sm" onClick={() => reload({ date: prevDate })}><IconChevronLeft size={16} /></Button>
                         <TextInput type="date" value={date} onChange={(e) => reload({ date: e.currentTarget.value })} />
-                        <Button variant="default" onClick={() => reload({ date: nextDate })}>▶</Button>
+                        <Button variant="default" px="sm" onClick={() => reload({ date: nextDate })}><IconChevronRight size={16} /></Button>
                         <Button variant="light" onClick={() => reload({ date: todayDate })}>Today</Button>
                     </Group>
                     <SegmentedControl
@@ -77,13 +81,13 @@ export default function MissedDoses({
                 </Group>
 
                 <SimpleGrid cols={{ base: 2, sm: 4 }} mb="xl">
-                    <StatCard label="Missed" value={stats.missed ?? 0} color="red" />
-                    <StatCard label="Not given" value={stats.not_given ?? 0} color="orange" />
-                    <StatCard label="Outstanding" value={stats.outstanding ?? 0} color="grape" />
-                    <StatCard label="Resolved" value={stats.resolved ?? 0} color="green" />
+                    <StatCard label="Missed" value={stats.missed ?? 0} color="red" icon={IconAlertTriangle} />
+                    <StatCard label="Not given" value={stats.not_given ?? 0} color="orange" icon={IconBan} />
+                    <StatCard label="Outstanding" value={stats.outstanding ?? 0} color="grape" icon={IconAlertCircle} />
+                    <StatCard label="Resolved" value={stats.resolved ?? 0} color="green" icon={IconCircleCheck} />
                 </SimpleGrid>
 
-                <Paper withBorder radius="md" p="md">
+                <Paper withBorder radius="lg" p="md">
                     <DataTable
                         columns={columns}
                         data={items}

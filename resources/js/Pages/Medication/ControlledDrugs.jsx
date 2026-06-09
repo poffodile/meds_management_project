@@ -1,6 +1,7 @@
 import { Head, usePage } from '@inertiajs/react';
 import { useDisclosure } from '@mantine/hooks';
-import { Container, Text, Group, Badge, Button, Paper, Alert } from '@mantine/core';
+import { Container, Text, Group, Badge, Button, Paper, Alert, ThemeIcon } from '@mantine/core';
+import { IconPill, IconPlus } from '@tabler/icons-react';
 import PageHeader from '@frontend/components/PageHeader';
 import DataTable from '@frontend/components/DataTable';
 import StatusBadge from '@frontend/components/StatusBadge';
@@ -20,9 +21,12 @@ export default function ControlledDrugs({ entries = [], residents = [], medsByCl
         {
             key: 'medication_name', label: 'Medication',
             render: (e) => (
-                <Group gap={6} wrap="nowrap">
-                    <Text fw={600} span>{e.medication_name}</Text>
-                    {e.cd_schedule && <Badge size="xs" color="grape" variant="light">{e.cd_schedule}</Badge>}
+                <Group gap="sm" wrap="nowrap">
+                    <ThemeIcon variant="light" color="grape" size={34} radius="xl"><IconPill size={18} /></ThemeIcon>
+                    <div>
+                        <Text fw={600} size="sm">{e.medication_name}</Text>
+                        {e.cd_schedule && <Badge size="xs" color="grape" variant="light">{e.cd_schedule}</Badge>}
+                    </div>
                 </Group>
             ),
         },
@@ -36,17 +40,17 @@ export default function ControlledDrugs({ entries = [], residents = [], medsByCl
     return (
         <>
             <Head title="Controlled Drugs Register" />
-            <Container size="xl" py="xl">
+            <Container size="xl" py="lg">
                 <PageHeader
                     title="Controlled Drugs Register"
                     subtitle="Append-only record of controlled medication actions"
-                    actions={<Button onClick={add.open}>Add entry</Button>}
+                    actions={<Button leftSection={<IconPlus size={16} />} onClick={add.open}>Add entry</Button>}
                 />
 
                 {flash.success && <Alert color="green" mb="md">{flash.success}</Alert>}
                 {flash.error && <Alert color="red" mb="md">{flash.error}</Alert>}
 
-                <Paper withBorder radius="md" p="md">
+                <Paper withBorder radius="lg" p="md">
                     <DataTable
                         columns={columns}
                         data={entries}

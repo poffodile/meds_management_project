@@ -159,6 +159,7 @@ class MedicationStockController extends Controller
         $meds = $sheets->map(function ($s) use ($residentNames, $today) {
             $low = !is_null($s->stock_level) && !is_null($s->reorder_level) && $s->stock_level <= $s->reorder_level;
             $expired = $s->expiry_date && $s->expiry_date->lt($today);
+            $expiringSoon = $s->expiry_date && !$expired && $s->expiry_date->lte($today->copy()->addDays(30));
 
             return [
                 'id'             => $s->id,
@@ -172,6 +173,7 @@ class MedicationStockController extends Controller
                 'cd_schedule'    => $s->cd_schedule,
                 'low'            => $low,
                 'expired'        => $expired,
+                'expiring_soon'  => $expiringSoon,
             ];
         })->values();
 
@@ -196,10 +198,12 @@ class MedicationStockController extends Controller
             });
 
         $stats = [
-            'total'      => $meds->count(),
-            'low'        => $meds->where('low', true)->count(),
-            'expired'    => $meds->where('expired', true)->count(),
-            'controlled' => $meds->where('is_controlled', true)->count(),
+            'total'         => $meds->count(),
+            'low'           => $meds->where('low', true)->count(),
+            'expired'       => $meds->where('expired', true)->count(),
+            'out_of_stock'  => $meds->filter(fn ($m) => $m['stock_level'] !== null && (float) $m['stock_level'] == 0)->count(),
+            'expiring_soon' => $meds->where('expiring_soon', true)->count(),
+            'controlled'    => $meds->where('is_controlled', true)->count(),
         ];
 
         return Inertia::render('Medication/Stock', [
