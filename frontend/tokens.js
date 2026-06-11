@@ -57,6 +57,8 @@ export const avatarColors = ['indigo', 'teal', 'grape', 'cyan', 'orange', 'pink'
 // ---- Layout scale ----
 export const radius = { card: 'lg', control: 'md' };
 export const typography = {
-    fontFamily: 'Inter, -apple-system, "Segoe UI", Roboto, sans-serif',
+    // Global app font. Loaded once in resources/views/app.blade.php; change it
+    // here (one place) and every modern page updates.
+    fontFamily: '"Plus Jakarta Sans", Inter, -apple-system, "Segoe UI", Roboto, sans-serif',
     headingWeight: '700',
 };

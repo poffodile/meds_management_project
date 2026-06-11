@@ -2,12 +2,12 @@ import { useState } from 'react';
 import {
     AppShell as MantineAppShell, Group, Text, Burger, ScrollArea, Avatar, Badge,
     SegmentedControl, ActionIcon, UnstyledButton, Box, Switch, Menu, Divider,
-    useMantineColorScheme,
+    Collapse, Stack, useMantineColorScheme,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { usePage, Link } from '@inertiajs/react';
 import {
-    IconHome, IconNotebook, IconClock, IconShieldLock, IconBox, IconAlertTriangle,
+    IconHome, IconNotebook, IconClock, IconShieldLock, IconBox, IconAlertTriangle, IconPill,
     IconArrowsLeftRight, IconLayoutGrid, IconCalendar, IconCalendarStats, IconUsers,
     IconUserCircle, IconSend, IconReportAnalytics, IconMessage, IconBell, IconMoon,
     IconChevronDown, IconChevronLeft,
@@ -21,11 +21,14 @@ import logoUrl from '@frontend/assets/logo-careoneos.png';
 const NAV = [
     { label: 'Home', icon: IconHome, href: '#' },
     { label: 'Daily Log', icon: IconNotebook, href: '#' },
-    { section: 'Medications' },
-    { label: 'Medication Round', icon: IconClock, href: '/medication/medication-round-react' },
-    { label: 'Controlled Drugs', icon: IconShieldLock, href: '/medication/controlled-drugs-react' },
-    { label: 'Medication Stock', icon: IconBox, href: '/medication/stock-react' },
-    { label: 'Missed Doses', icon: IconAlertTriangle, href: '/medication/missed-doses-react' },
+    {
+        group: 'Medication', icon: IconPill, children: [
+            { label: 'Medication Round', icon: IconClock, href: '/medication/medication-round-react' },
+            { label: 'Medication Stock', icon: IconBox, href: '/medication/stock-react' },
+            { label: 'Controlled Drugs', icon: IconShieldLock, href: '/medication/controlled-drugs-react' },
+            { label: 'Missed Doses', icon: IconAlertTriangle, href: '/medication/missed-doses-react' },
+        ],
+    },
     { label: 'Shift Handover', icon: IconArrowsLeftRight, href: '/medication/shift-handover-react' },
     { section: 'Domiciliary Care' },
     { label: 'Dom Care Dashboard', icon: IconLayoutGrid, href: '#' },
@@ -57,6 +60,50 @@ function NavItem({ item, active, collapsed }) {
     );
     if (disabled) return <Box mb={2} title="Coming soon">{inner}</Box>;
     return <Box component={Link} href={item.href} mb={2} style={{ textDecoration: 'none', display: 'block' }}>{inner}</Box>;
+}
+
+// A sub-nav row: a small dot + a smaller icon + label (the medication children).
+function SubNavItem({ item, active }) {
+    const Icon = item.icon;
+    return (
+        <Box component={Link} href={item.href} style={{ textDecoration: 'none', display: 'block' }}>
+            <Group gap="xs" wrap="nowrap" px="sm" py={7} style={{
+                borderRadius: 8,
+                background: active ? 'var(--mantine-color-indigo-0)' : 'transparent',
+                color: active ? 'var(--mantine-color-indigo-7)' : 'var(--mantine-color-gray-7)',
+            }}>
+                <Box w={5} h={5} style={{ borderRadius: '50%', flexShrink: 0, background: active ? 'var(--mantine-color-indigo-6)' : 'var(--mantine-color-gray-5)' }} />
+                {Icon && <Icon size={15} stroke={1.6} color={active ? 'var(--mantine-color-indigo-6)' : 'currentColor'} />}
+                <Text size="xs" fw={active ? 600 : 500}>{item.label}</Text>
+            </Group>
+        </Box>
+    );
+}
+
+// A collapsible parent (e.g. Medication) with a chevron, holding SubNavItems.
+function NavGroup({ item, url }) {
+    const Icon = item.icon;
+    const childActive = item.children.some((c) => url.startsWith(c.href));
+    const [open, setOpen] = useState(childActive);
+    return (
+        <Box mb={2}>
+            <UnstyledButton onClick={() => setOpen((o) => !o)} w="100%">
+                <Group gap="sm" wrap="nowrap" px="sm" py={9} style={{
+                    borderRadius: 8,
+                    color: childActive ? 'var(--mantine-color-indigo-7)' : 'var(--mantine-color-gray-7)',
+                }}>
+                    <Icon size={20} stroke={1.6} color={childActive ? 'var(--mantine-color-indigo-6)' : 'currentColor'} />
+                    <Text size="sm" fw={childActive ? 600 : 500} style={{ flex: 1 }}>{item.group}</Text>
+                    <IconChevronDown size={15} stroke={1.6} style={{ transform: open ? 'rotate(180deg)' : 'none', transition: 'transform .15s' }} />
+                </Group>
+            </UnstyledButton>
+            <Collapse in={open}>
+                <Stack gap={2} mt={2} pl="lg">
+                    {item.children.map((c) => <SubNavItem key={c.href} item={c} active={url.startsWith(c.href)} />)}
+                </Stack>
+            </Collapse>
+        </Box>
+    );
 }
 
 export default function AppShell({ children }) {
@@ -151,6 +198,7 @@ export default function AppShell({ children }) {
                                         </Text>
                                     );
                                 }
+                                if (item.group) return <NavGroup key={item.group} item={item} url={url} />;
                                 return <NavItem key={item.label} item={item} active={item.href !== '#' && url.startsWith(item.href)} />;
                             })}
                     </MantineAppShell.Section>
