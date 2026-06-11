@@ -3,7 +3,7 @@ import { RingProgress, Text, Group, Stack, Box } from '@mantine/core';
 /**
  * RoundProgressDonut — a segmented ring + legend for round completion
  * (Completed / Due Soon / Overdue / Not Started) with an "N/total Complete"
- * centre label.
+ * centre label. Wraps the legend below the ring when the container is narrow.
  *
  * Props: completed, dueSoon, overdue, notStarted (counts).
  */
@@ -23,27 +23,27 @@ export default function RoundProgressDonut({ completed = 0, dueSoon = 0, overdue
         .map((s) => ({ value: total ? (counts[s.key] / total) * 100 : 0, color: s.color }));
 
     return (
-        <Group align="center" gap="lg" wrap="nowrap">
+        <Group align="center" justify="center" gap="md" wrap="wrap">
             <RingProgress
-                size={120}
-                thickness={12}
+                size={104}
+                thickness={11}
                 roundCaps
                 sections={sections}
                 label={
                     <Box ta="center">
-                        <Text fw={700} fz={20} lh={1}>{completed}/{total}</Text>
+                        <Text fw={700} fz={18} lh={1}>{completed}/{total}</Text>
                         <Text size="xs" c="dimmed">Complete</Text>
                     </Box>
                 }
             />
-            <Stack gap={8} style={{ flex: 1, minWidth: 0 }}>
+            <Stack gap={7} style={{ flex: 1, minWidth: 130 }}>
                 {SEGMENTS.map((s) => (
                     <Group key={s.key} justify="space-between" gap={8} wrap="nowrap">
                         <Group gap={8} wrap="nowrap">
-                            <Box w={9} h={9} style={{ borderRadius: '50%', background: `var(--mantine-color-${s.color}-6)` }} />
+                            <Box w={9} h={9} style={{ borderRadius: '50%', flexShrink: 0, background: `var(--mantine-color-${s.color}-6)` }} />
                             <Text size="sm">{s.label}</Text>
                         </Group>
-                        <Text size="sm" fw={600}>{counts[s.key]} ({pctOf(counts[s.key])}%)</Text>
+                        <Text size="sm" fw={600} style={{ whiteSpace: 'nowrap' }}>{counts[s.key]} ({pctOf(counts[s.key])}%)</Text>
                     </Group>
                 ))}
             </Stack>

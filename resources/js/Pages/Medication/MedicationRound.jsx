@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { useDisclosure } from '@mantine/hooks';
 import {
     Container, Grid, Card, Paper, Group, Stack, Text, Box, TextInput, Button,
-    ScrollArea, Divider, Badge,
+    ScrollArea, Divider, Badge, ThemeIcon,
 } from '@mantine/core';
 import {
     IconCalendar, IconSearch, IconRefresh, IconCircleCheck, IconUsers, IconShieldCheck,
@@ -102,6 +102,23 @@ export default function MedicationRound({ rounds = [], grid = {}, date, currentR
 
     const openRecord = (row, code) => { setRecordRow(row); setRecordCode(code); record.open(); };
 
+    // One-tap "Given" for scheduled, non-controlled meds; everything else (Refused/
+    // Omitted, controlled drugs, PRN) opens the dialog so a reason/witness is captured.
+    const handleAction = (row, code) => {
+        if (code === 'A' && !row.is_controlled && !row.as_required && row.slot) {
+            router.post(`${ENDPOINT}/record`, {
+                mar_sheet_id: row.mar_sheet_id,
+                date,
+                time_slot: row.slot,
+                code: 'A',
+                dose_given: row.dose ?? '',
+                notes: '',
+            }, { preserveScroll: true, preserveState: true });
+        } else {
+            openRecord(row, code);
+        }
+    };
+
     // Selected resident's meds, grouped.
     const selRows = selected?.rows ?? [];
     const scheduled = selRows.filter((r) => !r.as_required);
@@ -117,11 +134,14 @@ export default function MedicationRound({ rounds = [], grid = {}, date, currentR
             <Head title="Medication Round" />
             <Container size="xl" py="md">
                 {/* ---- Page header ---- */}
-                <Group justify="space-between" align="flex-start" mb="md" wrap="nowrap">
-                    <Box>
-                        <Text fz={24} fw={700}>Medication Round</Text>
-                        <Text c="dimmed" size="sm">Record medication administration for your residents</Text>
-                    </Box>
+                <Group justify="space-between" align="center" mb="md" wrap="nowrap">
+                    <Group gap="md" wrap="nowrap" align="center">
+                        <ThemeIcon variant="light" color="indigo" size={48} radius="lg"><IconPill size={26} stroke={1.6} /></ThemeIcon>
+                        <Box>
+                            <Text fz={24} fw={700}>Medication Round</Text>
+                            <Text c="dimmed" size="sm">Record medication administration for your residents</Text>
+                        </Box>
+                    </Group>
                     <Group gap="xs" wrap="nowrap">
                         <Button variant="default" leftSection={<IconRefresh size={16} />} onClick={() => reload({ date })}>Refresh</Button>
                         <Button leftSection={<IconCircleCheck size={16} />} disabled title="Coming soon">End Round</Button>
@@ -236,7 +256,7 @@ export default function MedicationRound({ rounds = [], grid = {}, date, currentR
                                         {dueNow.length === 0
                                             ? <Paper withBorder radius="md" p="md"><Text size="sm" c="dimmed">Nothing due right now.</Text></Paper>
                                             : dueNow.map((row, i) => (
-                                                <MedicationCard key={i} med={toMed(row)} onAction={(code) => openRecord(row, code)} />
+                                                <MedicationCard key={i} med={toMed(row)} onAction={(code) => handleAction(row, code)} />
                                             ))}
                                     </Stack>
                                 </Box>
@@ -249,7 +269,7 @@ export default function MedicationRound({ rounds = [], grid = {}, date, currentR
                                         </Group>
                                         <Stack gap="sm">
                                             {prn.map((row, i) => (
-                                                <MedicationCard key={i} med={toMed(row)} onAction={(code) => openRecord(row, code)} />
+                                                <MedicationCard key={i} med={toMed(row)} onAction={(code) => handleAction(row, code)} />
                                             ))}
                                         </Stack>
                                     </Box>
@@ -265,7 +285,7 @@ export default function MedicationRound({ rounds = [], grid = {}, date, currentR
                                         </Group>
                                         <Stack gap="sm">
                                             {upcoming.map((row, i) => (
-                                                <MedicationCard key={i} med={toMed(row)} onAction={(code) => openRecord(row, code)} />
+                                                <MedicationCard key={i} med={toMed(row)} onAction={(code) => handleAction(row, code)} />
                                             ))}
                                         </Stack>
                                     </Box>

@@ -2,9 +2,9 @@ import { Head, router } from '@inertiajs/react';
 import FlashAlerts from '@frontend/components/FlashAlerts';
 import { useDisclosure } from '@mantine/hooks';
 import {
-    Container, Group, Button, TextInput, Paper, Alert, Text, Stack, Badge, Divider,
+    Container, Group, Button, TextInput, Paper, Card, Text, Stack, Badge, Divider,
 } from '@mantine/core';
-import { IconPlus, IconCheck, IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
+import { IconPlus, IconCheck, IconChevronLeft, IconChevronRight, IconArrowsLeftRight } from '@tabler/icons-react';
 import PageHeader from '@frontend/components/PageHeader';
 import StatusBadge from '@frontend/components/StatusBadge';
 import AddHandoverModal from '@frontend/features/medications/AddHandoverModal';
@@ -89,17 +89,21 @@ export default function ShiftHandover({ handovers = [], serviceUsers = [], selec
                 <PageHeader
                     title="Shift Handover"
                     subtitle="Notes passed between shifts"
+                    icon={IconArrowsLeftRight}
+                    color="teal"
                     actions={<Button leftSection={<IconPlus size={16} />} onClick={newHandover.open}>New handover</Button>}
                 />
 
                 <FlashAlerts />
 
-                <Group mb="md" gap="xs">
-                    <Button variant="default" px="sm" onClick={() => reload(prevDate)}><IconChevronLeft size={16} /></Button>
-                    <TextInput type="date" value={selectedDate} onChange={(e) => reload(e.currentTarget.value)} />
-                    <Button variant="default" px="sm" onClick={() => reload(nextDate)}><IconChevronRight size={16} /></Button>
-                    <Button variant="light" onClick={() => reload(todayDate)}>Today</Button>
-                </Group>
+                <Card withBorder radius="lg" padding="sm" mb="md">
+                    <Group gap="xs">
+                        <Button variant="default" px="sm" onClick={() => reload(prevDate)}><IconChevronLeft size={16} /></Button>
+                        <TextInput type="date" value={selectedDate} onChange={(e) => reload(e.currentTarget.value)} />
+                        <Button variant="default" px="sm" onClick={() => reload(nextDate)}><IconChevronRight size={16} /></Button>
+                        <Button variant="light" onClick={() => reload(todayDate)}>Today</Button>
+                    </Group>
+                </Card>
 
                 {handovers.length === 0
                     ? <Paper withBorder radius="md" p="xl"><Text c="dimmed" ta="center">No handovers for this day.</Text></Paper>

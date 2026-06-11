@@ -1,8 +1,8 @@
 import { Head } from '@inertiajs/react';
 import FlashAlerts from '@frontend/components/FlashAlerts';
 import { useDisclosure } from '@mantine/hooks';
-import { Container, Text, Group, Badge, Button, Paper, Alert, ThemeIcon } from '@mantine/core';
-import { IconPill, IconPlus } from '@tabler/icons-react';
+import { Container, Text, Group, Badge, Button, Paper, ThemeIcon } from '@mantine/core';
+import { IconPill, IconPlus, IconShieldLock } from '@tabler/icons-react';
 import PageHeader from '@frontend/components/PageHeader';
 import DataTable from '@frontend/components/DataTable';
 import StatusBadge from '@frontend/components/StatusBadge';
@@ -44,6 +44,8 @@ export default function ControlledDrugs({ entries = [], residents = [], medsByCl
                 <PageHeader
                     title="Controlled Drugs Register"
                     subtitle="Append-only record of controlled medication actions"
+                    icon={IconShieldLock}
+                    color="grape"
                     actions={<Button leftSection={<IconPlus size={16} />} onClick={add.open}>Add entry</Button>}
                 />
 

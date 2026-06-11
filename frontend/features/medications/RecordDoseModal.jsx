@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Select, TextInput, Textarea, Text } from '@mantine/core';
+import { Select, TextInput, Textarea, Text, Badge } from '@mantine/core';
 import { useForm } from '@inertiajs/react';
 import FormModal from '@frontend/components/FormModal';
 import { MED_CODES } from '@frontend/lib/medicationCodes';
@@ -31,8 +31,14 @@ export default function RecordDoseModal({ opened, onClose, row, date, presetCode
     }, [row, date, presetCode]);
 
     const submit = () => {
+        // Controlled drugs require a witness to administer (also enforced server-side).
+        if (row?.is_controlled && form.data.code === 'A' && !String(form.data.witnessed_by).trim()) {
+            form.setError('witnessed_by', 'A witness is required to administer a controlled drug.');
+            return;
+        }
         form.post('/medication/medication-round-react/record', {
             preserveScroll: true,
+            preserveState: true,
             onSuccess: () => { form.setData('notes', ''); form.setData('witnessed_by', ''); onClose(); },
         });
     };
@@ -51,6 +57,11 @@ export default function RecordDoseModal({ opened, onClose, row, date, presetCode
             <Text size="sm" c="dimmed">
                 {row.medication_name}{row.dose ? ` · ${row.dose}` : ''} · {row.slot}
             </Text>
+            {row.is_controlled && (
+                <Badge color="grape" variant="light" radius="sm">
+                    Controlled drug{row.cd_schedule ? ` · ${row.cd_schedule}` : ''} — witness required
+                </Badge>
+            )}
             <Select
                 label="Outcome"
                 data={MED_CODES}
@@ -67,8 +78,11 @@ export default function RecordDoseModal({ opened, onClose, row, date, presetCode
             />
             <TextInput
                 label="Witnessed by"
+                placeholder={row.is_controlled ? 'Second staff member (required)' : 'Optional'}
+                required={row.is_controlled}
                 value={form.data.witnessed_by}
                 onChange={(e) => form.setData('witnessed_by', e.currentTarget.value)}
+                error={form.errors.witnessed_by}
             />
             <Textarea
                 label="Notes"

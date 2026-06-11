@@ -2,7 +2,7 @@ import { Head } from '@inertiajs/react';
 import FlashAlerts from '@frontend/components/FlashAlerts';
 import { useDisclosure } from '@mantine/hooks';
 import {
-    Container, Text, Group, SimpleGrid, Badge, Button, Tabs, Paper, Alert,
+    Container, Text, Group, SimpleGrid, Badge, Button, Tabs, Paper,
     ThemeIcon, Progress, Box, Menu, ActionIcon,
 } from '@mantine/core';
 import {
@@ -101,6 +101,7 @@ export default function Stock({ meds = [], transactions = [], stats = {} }) {
                 <PageHeader
                     title="Medication Stock"
                     subtitle="View and manage all medication inventory across your locations."
+                    icon={IconBox}
                     actions={
                         <Group gap="sm">
                             <Button variant="default" leftSection={<IconFilter size={16} />}>Filter</Button>

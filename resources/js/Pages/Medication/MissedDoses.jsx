@@ -3,7 +3,7 @@ import { Head, router } from '@inertiajs/react';
 import FlashAlerts from '@frontend/components/FlashAlerts';
 import { useDisclosure } from '@mantine/hooks';
 import {
-    Container, Group, Button, TextInput, SegmentedControl, SimpleGrid, Paper, Alert, Text, Badge,
+    Container, Group, Button, TextInput, SegmentedControl, SimpleGrid, Paper, Card, Text, Badge,
 } from '@mantine/core';
 import {
     IconAlertTriangle, IconBan, IconAlertCircle, IconCircleCheck,
@@ -57,27 +57,34 @@ export default function MissedDoses({
         <>
             <Head title="Missed Doses" />
             <Container size="xl" py="lg">
-                <PageHeader title="Missed Doses Review" subtitle="Missed and not-given doses, with clinical follow-up" />
+                <PageHeader
+                    title="Missed Doses Review"
+                    subtitle="Missed and not-given doses, with clinical follow-up"
+                    icon={IconAlertTriangle}
+                    color="red"
+                />
 
                 <FlashAlerts />
 
-                <Group justify="space-between" mb="md" wrap="wrap">
-                    <Group gap="xs">
-                        <Button variant="default" px="sm" onClick={() => reload({ date: prevDate })}><IconChevronLeft size={16} /></Button>
-                        <TextInput type="date" value={date} onChange={(e) => reload({ date: e.currentTarget.value })} />
-                        <Button variant="default" px="sm" onClick={() => reload({ date: nextDate })}><IconChevronRight size={16} /></Button>
-                        <Button variant="light" onClick={() => reload({ date: todayDate })}>Today</Button>
+                <Card withBorder radius="lg" padding="sm" mb="md">
+                    <Group justify="space-between" wrap="wrap">
+                        <Group gap="xs">
+                            <Button variant="default" px="sm" onClick={() => reload({ date: prevDate })}><IconChevronLeft size={16} /></Button>
+                            <TextInput type="date" value={date} onChange={(e) => reload({ date: e.currentTarget.value })} />
+                            <Button variant="default" px="sm" onClick={() => reload({ date: nextDate })}><IconChevronRight size={16} /></Button>
+                            <Button variant="light" onClick={() => reload({ date: todayDate })}>Today</Button>
+                        </Group>
+                        <SegmentedControl
+                            value={statusFilter}
+                            onChange={(v) => reload({ status: v })}
+                            data={[
+                                { label: 'Outstanding', value: 'outstanding' },
+                                { label: 'Resolved', value: 'resolved' },
+                                { label: 'All', value: 'all' },
+                            ]}
+                        />
                     </Group>
-                    <SegmentedControl
-                        value={statusFilter}
-                        onChange={(v) => reload({ status: v })}
-                        data={[
-                            { label: 'Outstanding', value: 'outstanding' },
-                            { label: 'Resolved', value: 'resolved' },
-                            { label: 'All', value: 'all' },
-                        ]}
-                    />
-                </Group>
+                </Card>
 
                 <SimpleGrid cols={{ base: 2, sm: 4 }} mb="xl">
                     <StatCard label="Missed" value={stats.missed ?? 0} color="red" icon={IconAlertTriangle} />
