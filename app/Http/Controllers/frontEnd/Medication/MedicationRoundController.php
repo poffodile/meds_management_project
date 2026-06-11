@@ -330,6 +330,18 @@ class MedicationRoundController extends Controller
         $homeId = $this->getHomeId();
         $userId = (int) Auth::id();
 
+        $sheet = MARSheet::forHome($homeId)->active()->find($request->input('mar_sheet_id'));
+        if (!$sheet) {
+            return false;
+        }
+
+        // Controlled drugs legally require a witness to administer ("Given").
+        if ($sheet->is_controlled && $request->input('code') === 'A' && trim((string) $request->input('witnessed_by')) === '') {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'witnessed_by' => 'A witness is required to administer a controlled drug.',
+            ]);
+        }
+
         // Was this slot already recorded as Given? (so we don't deduct twice on edit)
         $existing = MARAdministration::where('mar_sheet_id', $request->input('mar_sheet_id'))
             ->where('date', $request->input('date'))
@@ -351,8 +363,7 @@ class MedicationRoundController extends Controller
         // Auto-deduct stock only on a newly-given dose.
         $nowGiven = $request->input('code') === 'A';
         if ($nowGiven && !$wasGiven) {
-            $sheet = MARSheet::forHome($homeId)->active()->find($request->input('mar_sheet_id'));
-            if ($sheet && !is_null($sheet->stock_level)) {
+            if (!is_null($sheet->stock_level)) {
                 $qty = (float) preg_replace('/[^0-9.]/', '', (string) ($request->input('dose_given') ?: $sheet->dose));
                 if ($qty <= 0) {
                     $qty = 1;

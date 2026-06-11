@@ -1,16 +1,13 @@
-import { Card, Group, Text, Avatar, Box, Anchor, Stack } from '@mantine/core';
-import { IconAlertTriangle } from '@tabler/icons-react';
+import { Card, Group, Text, Avatar, Box, Anchor, Stack, Button, ActionIcon } from '@mantine/core';
+import { IconAlertTriangle, IconCalendar, IconMapPin, IconWeight, IconChevronDown } from '@tabler/icons-react';
 import { avatarColor, initials } from '@frontend/lib/avatarColor';
 import MetricChip from '@frontend/components/MetricChip';
 
 /**
  * ResidentCard — the selected resident's clinical header (mockup centre panel):
- * photo + identity (Room · Gender · NHS, DOB/age · Weight), a compact column of
- * MetricChips, and a pink safety banner (allergies / risks / conditions).
- *
- * Fields render only when present, so Phase B/C data can be wired in later
- * without changing this component. Metrics wrap below the identity on narrow
- * widths; the name never overflows.
+ * photo + identity (DOB · gender · NHS / Room · Weight / Allergies / Care Plan),
+ * a column of MetricChips, and a pink safety banner. Fields render only when
+ * present so Phase B/C data can be wired in later without changing this card.
  *
  * Props: resident {...}, metrics:[{icon,label,value,color}], onViewProfile.
  */
@@ -19,35 +16,48 @@ export default function ResidentCard({ resident = {}, metrics = [], onViewProfil
         name, photo, dob, age, gender, nhs, room, weight, weightUnit,
         allergies = [], conditions = [], carePlanHref, riskFlags = [],
     } = resident;
-
-    const line1 = [room && `Room ${room}`, gender, nhs && `NHS ${nhs}`].filter(Boolean);
-    const line2 = [
-        dob && `DOB: ${dob}${age != null ? ` (${age})` : ''}`,
-        weight && `Weight: ${weight}${weightUnit ? ` ${weightUnit}` : ''}`,
-    ].filter(Boolean);
     const hasStrip = allergies.length > 0 || riskFlags.length > 0 || conditions.length > 0;
 
     return (
-        <Card withBorder radius="lg" padding="lg">
+        <Card withBorder radius="lg" padding="lg" style={{ borderLeft: '4px solid var(--mantine-color-indigo-5)' }}>
             <Group align="flex-start" justify="space-between" wrap="wrap" gap="lg">
-                <Group align="flex-start" gap="md" wrap="nowrap" style={{ flex: 1, minWidth: 260 }}>
-                    <Avatar src={photo || undefined} color={avatarColor(name ?? '')} radius="md" size={72}>
+                <Group align="flex-start" gap="md" wrap="nowrap" style={{ flex: 1, minWidth: 280 }}>
+                    <Avatar src={photo || undefined} color={avatarColor(name ?? '')} radius="md" size={88}>
                         {initials(name ?? '')}
                     </Avatar>
                     <Box style={{ minWidth: 0 }}>
-                        <Group gap="xs" wrap="wrap" align="center">
-                            <Text fz={20} fw={700}>{name}</Text>
-                            {(carePlanHref || onViewProfile) && (
-                                <Anchor href={carePlanHref || undefined} onClick={onViewProfile} size="sm">View Profile</Anchor>
-                            )}
+                        <Group gap="xs" align="center" wrap="wrap">
+                            <Text fz={22} fw={700}>{name}</Text>
+                            <Button variant="default" size="xs" radius="md" onClick={onViewProfile}>View Profile</Button>
+                            <ActionIcon variant="default" size="md" radius="md"><IconChevronDown size={16} /></ActionIcon>
                         </Group>
-                        {line1.length > 0 && <Text size="sm" c="dimmed" mt={4}>{line1.join('  ·  ')}</Text>}
-                        {line2.length > 0 && <Text size="sm" c="dimmed" mt={2}>{line2.join('  ·  ')}</Text>}
+
+                        <Group gap="md" mt={8} wrap="wrap">
+                            {dob && <Group gap={5} wrap="nowrap"><IconCalendar size={14} color="var(--mantine-color-gray-6)" /><Text size="sm">DOB: {dob}{age != null ? ` (${age})` : ''}</Text></Group>}
+                            {gender && <Text size="sm" c="dimmed">{gender}</Text>}
+                            {nhs && <Text size="sm" c="dimmed">NHS: {nhs}</Text>}
+                        </Group>
+                        <Group gap="md" mt={4} wrap="wrap">
+                            {room && <Group gap={5} wrap="nowrap"><IconMapPin size={14} color="var(--mantine-color-gray-6)" /><Text size="sm">Room {room}</Text></Group>}
+                            {weight && <Group gap={5} wrap="nowrap"><IconWeight size={14} color="var(--mantine-color-gray-6)" /><Text size="sm">Weight: {weight}{weightUnit ? ` ${weightUnit}` : ''}</Text></Group>}
+                        </Group>
+                        {allergies.length > 0 && (
+                            <Text size="sm" mt={6}>
+                                <Text span c="dimmed">Allergies: </Text>
+                                <Text span c="red.7" fw={600}>{allergies.join(', ')}</Text>
+                            </Text>
+                        )}
+                        {carePlanHref && (
+                            <Group gap={5} mt={4}>
+                                <Text span size="sm" c="dimmed">Care Plan:</Text>
+                                <Anchor href={carePlanHref} size="sm">View Care Plan</Anchor>
+                            </Group>
+                        )}
                     </Box>
                 </Group>
 
                 {metrics.length > 0 && (
-                    <Stack gap={8} style={{ minWidth: 190 }}>
+                    <Stack gap={10} style={{ minWidth: 200 }}>
                         {metrics.map((m, i) => <MetricChip key={i} {...m} />)}
                     </Stack>
                 )}
@@ -64,7 +74,7 @@ export default function ResidentCard({ resident = {}, metrics = [], onViewProfil
                     )}
                     {riskFlags.map((r, i) => <Text key={`r${i}`} size="sm" c="red.7" fw={500}>{r.label}</Text>)}
                     {conditions.map((c, i) => <Text key={`c${i}`} size="sm" c="red.7" fw={500}>{c}</Text>)}
-                    {carePlanHref && <Anchor href={carePlanHref} size="sm" ml="auto">View Full</Anchor>}
+                    {carePlanHref && <Anchor href={carePlanHref} size="sm" ml="auto">View All</Anchor>}
                 </Group>
             )}
         </Card>

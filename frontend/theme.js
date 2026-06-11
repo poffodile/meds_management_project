@@ -13,6 +13,10 @@ export const theme = createTheme({
     defaultRadius: radius.control,
     fontFamily: typography.fontFamily,
     headings: { fontWeight: typography.headingWeight },
+    components: {
+        // Soft shadow on every card → depth instead of flat "boxed" borders.
+        Card: { defaultProps: { shadow: 'sm' } },
+    },
 });
 
 export * from './tokens';

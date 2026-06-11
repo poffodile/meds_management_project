@@ -3,12 +3,12 @@ import { Head, router } from '@inertiajs/react';
 import { useDisclosure } from '@mantine/hooks';
 import {
     Container, Grid, Card, Paper, Group, Stack, Text, Box, TextInput, Button,
-    ScrollArea, Divider, Badge, ThemeIcon,
+    Badge, ThemeIcon, ScrollArea, ActionIcon, SimpleGrid,
 } from '@mantine/core';
 import {
-    IconCalendar, IconSearch, IconRefresh, IconCircleCheck, IconUsers, IconShieldCheck,
-    IconQrcode, IconPlus, IconUserMinus, IconNotes, IconFileText, IconClipboardList,
-    IconAlertTriangle, IconShieldLock, IconPill, IconClock,
+    IconCalendar, IconSearch, IconRefresh, IconCircleCheck, IconClock, IconPill,
+    IconAlertTriangle, IconShieldLock, IconQrcode, IconPlus, IconUserMinus, IconNotes,
+    IconFileText, IconClipboardList, IconX,
 } from '@tabler/icons-react';
 
 import AppShell from '@frontend/Layouts/AppShell';
@@ -23,20 +23,12 @@ import RecordDoseModal from '@frontend/features/medications/RecordDoseModal';
 
 import { roundTokens } from '@frontend/tokens';
 import { ageFromDob, formatDate } from '@frontend/lib/dateUtils';
+import { toMed } from '@frontend/lib/medView';
 import { usePageReload } from '@frontend/hooks/usePageReload';
 
 const ENDPOINT = '/medication/medication-round-react';
 
-// Map a derived dose-timing bucket to a display status + label for MedicationCard.
-const STATUS_DISPLAY = {
-    overdue: { status: 'overdue', label: 'Overdue' },
-    due_now: { status: 'due soon', label: 'Due Now' },
-    upcoming: { status: 'due', label: 'Upcoming' },
-    later: { status: 'due', label: 'Scheduled' },
-    due: { status: 'due', label: 'PRN' },
-};
-
-/** Overall round status for a resident, from their rows' derived buckets. */
+/** Overall round status for a resident, from their rows' recorded codes/buckets. */
 function residentStatus(resident) {
     const rows = resident.rows ?? [];
     if (rows.length === 0) return { status: 'not started', label: 'No meds' };
@@ -47,26 +39,13 @@ function residentStatus(resident) {
     return { status: 'due', label: `${rows.length - completed} due` };
 }
 
-/** Map a payload row into MedicationCard's `med` shape. */
-function toMed(row) {
-    const d = STATUS_DISPLAY[row.status] ?? { status: 'due', label: null };
-    return {
-        name: row.medication_name,
-        strength: row.strength,
-        tags: [{ label: row.as_required ? 'PRN' : 'Regular', color: row.as_required ? 'grape' : 'blue' }],
-        dose: row.dose,
-        route: row.route,
-        instruction: row.instruction,
-        time: row.slot,
-        status: row.code ? 'completed' : d.status,
-        statusLabel: row.code ? null : d.label,
-        stock: row.stock,
-        stockUnit: row.unit,
-        lowStock: row.low_stock,
-        isControlled: row.is_controlled,
-        cdSchedule: row.cd_schedule,
-        code: row.code,
-    };
+function SectionTitle({ color, children, count, unit }) {
+    return (
+        <Group gap={6} mb="sm" align="baseline">
+            <Text fw={700} c={`${color}.7`}>{children}</Text>
+            {count != null && <Text size="sm" c="dimmed">({count} {unit})</Text>}
+        </Group>
+    );
 }
 
 export default function MedicationRound({ rounds = [], grid = {}, date, currentRound = 'morning' }) {
@@ -84,9 +63,13 @@ export default function MedicationRound({ rounds = [], grid = {}, date, currentR
         ? residents.filter((r) => r.name.toLowerCase().includes(query.toLowerCase()))
         : residents;
 
-    const selected = residents.find((r) => r.client_id === selectedId) ?? residents[0] ?? null;
+    // Detail opens only when a resident is explicitly selected (closable).
+    const selected = selectedId != null ? (residents.find((r) => r.client_id === selectedId) ?? null) : null;
+    // Collapse behaviour: the list spreads wide when nothing is open, narrows when a detail opens.
+    const listSpan = selected ? 3 : 8;
+    const rightSpan = selected ? 3 : 4;
 
-    // Round-wide progress (scheduled meds only — PRN aren't "due").
+    // Round-wide progress (scheduled meds only).
     const sched = residents.flatMap((r) => r.rows).filter((r) => !r.as_required);
     const pCompleted = sched.filter((r) => r.code).length;
     const pOverdue = sched.filter((r) => !r.code && r.status === 'overdue').length;
@@ -102,17 +85,11 @@ export default function MedicationRound({ rounds = [], grid = {}, date, currentR
 
     const openRecord = (row, code) => { setRecordRow(row); setRecordCode(code); record.open(); };
 
-    // One-tap "Given" for scheduled, non-controlled meds; everything else (Refused/
-    // Omitted, controlled drugs, PRN) opens the dialog so a reason/witness is captured.
+    // One-tap "Given" for scheduled, non-controlled meds; everything else opens the dialog.
     const handleAction = (row, code) => {
         if (code === 'A' && !row.is_controlled && !row.as_required && row.slot) {
             router.post(`${ENDPOINT}/record`, {
-                mar_sheet_id: row.mar_sheet_id,
-                date,
-                time_slot: row.slot,
-                code: 'A',
-                dose_given: row.dose ?? '',
-                notes: '',
+                mar_sheet_id: row.mar_sheet_id, date, time_slot: row.slot, code: 'A', dose_given: row.dose ?? '', notes: '',
             }, { preserveScroll: true, preserveState: true });
         } else {
             openRecord(row, code);
@@ -125,7 +102,6 @@ export default function MedicationRound({ rounds = [], grid = {}, date, currentR
     const prn = selRows.filter((r) => r.as_required);
     const dueNow = scheduled.filter((r) => r.code || r.status === 'overdue' || r.status === 'due_now');
     const upcoming = scheduled.filter((r) => !r.code && (r.status === 'upcoming' || r.status === 'later' || r.status === 'due'));
-
     const riskFlags = selected?.risk_flags ?? [];
     const hasHighRisk = riskFlags.some((r) => r.level === 'high' || r.level === 'urgent');
 
@@ -139,7 +115,7 @@ export default function MedicationRound({ rounds = [], grid = {}, date, currentR
                         <ThemeIcon variant="light" color="indigo" size={48} radius="lg"><IconPill size={26} stroke={1.6} /></ThemeIcon>
                         <Box>
                             <Text fz={24} fw={700}>Medication Round</Text>
-                            <Text c="dimmed" size="sm">Record medication administration for your residents</Text>
+                            <Text c="dimmed" size="sm">{meta.label} Round{meta.window ? ` • ${meta.window}` : ''}</Text>
                         </Box>
                     </Group>
                     <Group gap="xs" wrap="nowrap">
@@ -153,26 +129,16 @@ export default function MedicationRound({ rounds = [], grid = {}, date, currentR
                 {/* ---- Controls: date + round selector ---- */}
                 <Card withBorder radius="lg" padding="sm" mb="md">
                     <Group justify="space-between" wrap="wrap" gap="sm">
-                        <TextInput
-                            type="date"
-                            value={date}
-                            onChange={(e) => reload({ date: e.currentTarget.value })}
-                            leftSection={<IconCalendar size={16} />}
-                        />
+                        <TextInput type="date" value={date} onChange={(e) => reload({ date: e.currentTarget.value })} leftSection={<IconCalendar size={16} />} />
                         <Group gap="xs" wrap="wrap">
                             {rounds.map((r) => {
                                 const RI = roundTokens[r.key]?.icon ?? IconPill;
                                 const active = r.key === meta.key;
                                 const color = roundTokens[r.key]?.color ?? 'indigo';
                                 return (
-                                    <Button
-                                        key={r.key}
-                                        size="sm"
-                                        variant={active ? 'light' : 'subtle'}
-                                        color={active ? color : 'gray'}
-                                        leftSection={<RI size={16} />}
-                                        onClick={() => { setActiveRound(r.key); setSelectedId(null); }}
-                                    >
+                                    <Button key={r.key} size="sm" variant={active ? 'light' : 'default'} color={active ? color : 'gray'}
+                                        leftSection={<RI size={16} color={`var(--mantine-color-${color}-6)`} />}
+                                        onClick={() => { setActiveRound(r.key); setSelectedId(null); }}>
                                         <Box ta="left">
                                             <Text size="sm" fw={600} lh={1}>{r.label}</Text>
                                             {r.window && <Text size="xs" c="dimmed">{r.window}</Text>}
@@ -187,47 +153,45 @@ export default function MedicationRound({ rounds = [], grid = {}, date, currentR
                 {/* ---- 3-column workspace ---- */}
                 <Grid gutter="md">
                     {/* Left — residents due */}
-                    <Grid.Col span={{ base: 12, md: 3 }}>
-                        <Card withBorder radius="lg" padding="sm">
+                    <Grid.Col span={{ base: 12, md: listSpan }}>
+                        <Card withBorder radius="lg" padding="sm" style={{ borderLeft: '4px solid var(--mantine-color-indigo-5)' }}>
                             <Group justify="space-between" mb="xs">
                                 <Text fw={700}>Residents Due</Text>
                                 <Badge variant="light" color="gray">{residents.length}</Badge>
                             </Group>
-                            <TextInput
-                                placeholder="Search residents…"
-                                leftSection={<IconSearch size={15} />}
-                                value={query}
-                                onChange={(e) => setQuery(e.currentTarget.value)}
-                                mb="sm"
-                            />
-                            <ScrollArea.Autosize mah={580}>
-                                <Stack gap={4}>
-                                    {filtered.length === 0
-                                        ? <Text size="sm" c="dimmed" ta="center" py="md">No residents.</Text>
-                                        : filtered.map((r) => {
-                                            const st = residentStatus(r);
-                                            return (
-                                                <ResidentListItem
-                                                    key={r.client_id}
-                                                    resident={{ name: r.name, room: r.room, photo: r.photo }}
-                                                    status={st.status}
-                                                    statusLabel={st.label}
-                                                    selected={selected?.client_id === r.client_id}
-                                                    onClick={() => setSelectedId(r.client_id)}
-                                                />
-                                            );
-                                        })}
-                                </Stack>
+                            <TextInput placeholder="Search residents…" leftSection={<IconSearch size={15} />} value={query} onChange={(e) => setQuery(e.currentTarget.value)} mb="sm" />
+                            <ScrollArea.Autosize mah={selected ? 620 : 760}>
+                                {filtered.length === 0
+                                    ? <Text size="sm" c="dimmed" ta="center" py="md">No residents.</Text>
+                                    : (
+                                        <SimpleGrid cols={{ base: 1, sm: selected ? 1 : 2, lg: selected ? 1 : 3 }} spacing={8} verticalSpacing={8}>
+                                            {filtered.map((r) => {
+                                                const st = residentStatus(r);
+                                                return (
+                                                    <ResidentListItem key={r.client_id}
+                                                        resident={{ name: r.name, room: r.room, photo: r.photo }}
+                                                        status={st.status} statusLabel={st.label}
+                                                        selected={selected?.client_id === r.client_id}
+                                                        onClick={() => setSelectedId(r.client_id)} />
+                                                );
+                                            })}
+                                        </SimpleGrid>
+                                    )}
                             </ScrollArea.Autosize>
                         </Card>
                     </Grid.Col>
 
-                    {/* Centre — selected resident + medications */}
-                    <Grid.Col span={{ base: 12, md: 6 }}>
-                        {!selected ? (
-                            <Paper withBorder radius="lg" p="xl"><Text c="dimmed" ta="center">No medications in this round.</Text></Paper>
-                        ) : (
+                    {/* Centre — selected resident detail (opens on click, closable) */}
+                    {selected && (
+                        <Grid.Col span={{ base: 12, md: 6 }}>
                             <Stack gap="md">
+                                <Group justify="space-between" align="center">
+                                    <Text fw={700} fz="lg">Resident Detail</Text>
+                                    <ActionIcon variant="subtle" color="gray" onClick={() => setSelectedId(null)} title="Close">
+                                        <IconX size={18} />
+                                    </ActionIcon>
+                                </Group>
+
                                 <ResidentCard
                                     resident={{
                                         name: selected.name,
@@ -248,61 +212,44 @@ export default function MedicationRound({ rounds = [], grid = {}, date, currentR
                                 />
 
                                 <Box>
-                                    <Group gap="xs" mb="xs">
-                                        <Text fw={700}>Due Now</Text>
-                                        <Badge variant="light" color="blue">{dueNow.length}</Badge>
-                                    </Group>
+                                    <SectionTitle color="blue" count={dueNow.length} unit="medications">Due Now</SectionTitle>
                                     <Stack gap="sm">
                                         {dueNow.length === 0
                                             ? <Paper withBorder radius="md" p="md"><Text size="sm" c="dimmed">Nothing due right now.</Text></Paper>
-                                            : dueNow.map((row, i) => (
-                                                <MedicationCard key={i} med={toMed(row)} onAction={(code) => handleAction(row, code)} />
-                                            ))}
+                                            : dueNow.map((row, i) => <MedicationCard key={i} med={toMed(row)} onAction={(code) => handleAction(row, code)} />)}
                                     </Stack>
                                 </Box>
 
                                 {prn.length > 0 && (
                                     <Box>
-                                        <Group gap="xs" mb="xs">
-                                            <Text fw={700}>PRN Medications</Text>
-                                            <Badge variant="light" color="grape">{prn.length}</Badge>
-                                        </Group>
+                                        <SectionTitle color="grape" count={prn.length} unit="available">PRN Medications</SectionTitle>
                                         <Stack gap="sm">
-                                            {prn.map((row, i) => (
-                                                <MedicationCard key={i} med={toMed(row)} onAction={(code) => handleAction(row, code)} />
-                                            ))}
+                                            {prn.map((row, i) => <MedicationCard key={i} med={toMed(row)} onAction={(code) => handleAction(row, code)} />)}
                                         </Stack>
                                     </Box>
                                 )}
 
                                 {upcoming.length > 0 && (
                                     <Box>
-                                        <Group gap="xs" mb="xs">
-                                            <IconClock size={16} />
-                                            <Text fw={700}>Upcoming</Text>
-                                            <Text size="sm" c="dimmed">Next 2 hours</Text>
-                                            <Badge variant="light" color="gray">{upcoming.length}</Badge>
-                                        </Group>
+                                        <SectionTitle color="indigo" count={upcoming.length} unit="medications">Upcoming · Next 2 hours</SectionTitle>
                                         <Stack gap="sm">
-                                            {upcoming.map((row, i) => (
-                                                <MedicationCard key={i} med={toMed(row)} onAction={(code) => handleAction(row, code)} />
-                                            ))}
+                                            {upcoming.map((row, i) => <MedicationCard key={i} med={toMed(row)} onAction={(code) => handleAction(row, code)} />)}
                                         </Stack>
                                     </Box>
                                 )}
                             </Stack>
-                        )}
-                    </Grid.Col>
+                        </Grid.Col>
+                    )}
 
-                    {/* Right — progress, alerts, quick actions */}
-                    <Grid.Col span={{ base: 12, md: 3 }}>
+                    {/* Right — progress, alerts, quick actions (always on) */}
+                    <Grid.Col span={{ base: 12, md: rightSpan }}>
                         <Stack gap="md">
-                            <Card withBorder radius="lg" padding="lg">
+                            <Card withBorder radius="lg" padding="lg" style={{ borderLeft: '4px solid var(--mantine-color-indigo-5)' }}>
                                 <Text fw={700} mb="md">Round Progress</Text>
                                 <RoundProgressDonut completed={pCompleted} dueSoon={pDueSoon} overdue={pOverdue} notStarted={pNotStarted} />
                             </Card>
 
-                            <Card withBorder radius="lg" padding="md">
+                            <Card withBorder radius="lg" padding="md" style={{ borderLeft: '4px solid var(--mantine-color-orange-5)' }}>
                                 <Text fw={700} mb="sm">Alerts</Text>
                                 <Stack gap="xs">
                                     {overdueAlerts.length === 0 && lowStockMeds.length === 0 && cdMeds.length === 0 && (
@@ -321,7 +268,7 @@ export default function MedicationRound({ rounds = [], grid = {}, date, currentR
                                 </Stack>
                             </Card>
 
-                            <Card withBorder radius="lg" padding="md">
+                            <Card withBorder radius="lg" padding="md" style={{ borderLeft: '4px solid var(--mantine-color-teal-5)' }}>
                                 <Text fw={700} mb="sm">Quick Actions</Text>
                                 <Stack gap={2}>
                                     <QuickActionItem icon={IconQrcode} label="Scan Medication" description="Scan barcode to administer" disabled />
@@ -334,12 +281,6 @@ export default function MedicationRound({ rounds = [], grid = {}, date, currentR
                         </Stack>
                     </Grid.Col>
                 </Grid>
-
-                {/* ---- Footer ---- */}
-                <Group justify="center" gap="xl" mt="xl" pt="md" c="dimmed" style={{ borderTop: '1px solid var(--mantine-color-gray-2)' }}>
-                    <Group gap={6}><IconShieldCheck size={15} /><Text size="xs">All medication records are secure and audit-trail enabled</Text></Group>
-                    <Group gap={6}><IconUsers size={15} /><Text size="xs">{residents.length} residents this round · {formatDate(date)}</Text></Group>
-                </Group>
 
                 <RecordDoseModal opened={recordOpened} onClose={record.close} row={recordRow} date={date} presetCode={recordCode} />
             </Container>
