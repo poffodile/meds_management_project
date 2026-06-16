@@ -151,6 +151,12 @@ class MedicationRoundController extends Controller
         return Inertia::render('Medication/MedicationRoundLab2', $this->buildRoundProps($request));
     }
 
+    /** Experimental copy "lab 1.1" of the round page. */
+    public function indexReactLab11(Request $request)
+    {
+        return Inertia::render('Medication/MedicationRoundLab11', $this->buildRoundProps($request));
+    }
+
     /** Builds the shared props for the medication round React pages. */
     private function buildRoundProps(Request $request): array
     {
@@ -349,6 +355,16 @@ class MedicationRoundController extends Controller
         $date = $request->input('date');
 
         return redirect()->route('medication.medication-round.lab2', ['date' => $date])
+            ->with($ok ? 'success' : 'error', $ok ? 'Dose recorded.' : 'Prescription not found.');
+    }
+
+    /** Record + return to the "lab 1.1" round page. */
+    public function recordReactLab11(Request $request, MARSheetService $marSheetService)
+    {
+        $ok   = $this->applyRecord($request, $marSheetService);
+        $date = $request->input('date');
+
+        return redirect()->route('medication.medication-round.lab1-1', ['date' => $date])
             ->with($ok ? 'success' : 'error', $ok ? 'Dose recorded.' : 'Prescription not found.');
     }
 

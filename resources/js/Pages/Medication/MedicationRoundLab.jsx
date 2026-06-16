@@ -1,17 +1,14 @@
-// EXPERIMENTAL copy of the Medication Round page — safe to redesign freely.
-// Served at /medication/medication-round-lab; shares the controller data + record
-// logic with the main page but is otherwise independent.
 import { useState } from 'react';
 import { Head, router } from '@inertiajs/react';
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import {
     Container, Card, Paper, Group, Stack, Text, Box, TextInput, Button,
-    Badge, ThemeIcon, ScrollArea, ActionIcon, SimpleGrid,
+    Badge, ThemeIcon, ScrollArea, ActionIcon, SimpleGrid, Table,
 } from '@mantine/core';
 import {
     IconCalendar, IconSearch, IconRefresh, IconCircleCheck, IconPill,
     IconAlertTriangle, IconShieldLock, IconQrcode, IconPlus, IconUserMinus, IconNotes,
-    IconFileText, IconClipboardList, IconX,
+    IconFileText, IconClipboardList, IconX, IconClock,
 } from '@tabler/icons-react';
 
 import AppShell from '@frontend/Layouts/AppShell';
@@ -29,8 +26,8 @@ import { ageFromDob, formatDate } from '@frontend/lib/dateUtils';
 import { toMed } from '@frontend/lib/medView';
 import { usePageReload } from '@frontend/hooks/usePageReload';
 
+// EXPERIMENTAL copy of the Medication Round page — safe to redesign freely.
 const ENDPOINT = '/medication/medication-round-lab';
-const RECORD_ENDPOINT = '/medication/medication-round-lab/record';
 
 /** Overall round status for a resident, from their rows' recorded codes/buckets. */
 function residentStatus(resident) {
@@ -52,6 +49,40 @@ function SectionTitle({ color, children, count, unit }) {
     );
 }
 
+/**
+ * A sidebar box (Round Progress / Alerts / Quick Actions). Shared on purpose so all
+ * three stay identical — change the styling here and every sidebar box updates.
+ */
+// Status + type lookups for the "Next Medications Due" / "Recent Activity" sections.
+const DUE_STATUS = {
+    overdue: { label: 'Overdue', color: 'red' },
+    due_now: { label: 'Due Soon', color: 'orange' },
+    due: { label: 'Due', color: 'blue' },
+    upcoming: { label: 'Upcoming', color: 'gray' },
+    later: { label: 'Later', color: 'gray' },
+    completed: { label: 'Done', color: 'green' },
+};
+const ACT_CODE = { A: 'given', S: 'self-administered', R: 'refused', W: 'witnessed', N: 'not given', O: 'omitted' };
+const medType = (row) => (row.is_controlled
+    ? { label: 'Controlled', color: 'grape' }
+    : row.as_required ? { label: 'PRN', color: 'teal' } : { label: 'Regular', color: 'blue' });
+
+function SidebarCard({ accent, title, children, align = 'center', headerRight = null }) {
+    return (
+        <Card withBorder radius="lg" padding="sm"
+            style={{ borderLeft: `4px solid var(--mantine-color-${accent}-5)`, minHeight: 170, display: 'flex', flexDirection: 'column' }}>
+            <Group justify="space-between" align="flex-start" wrap="nowrap" gap="xs" mb={6}>
+                <Text fw={700} size="lg">{title}</Text>
+                {headerRight}
+            </Group>
+            {/* min-height keeps a short box looking like a box; content grows past it */}
+            <Box style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: align }}>
+                {children}
+            </Box>
+        </Card>
+    );
+}
+
 export default function MedicationRoundLab({ rounds = [], grid = {}, date, currentRound = 'morning' }) {
     const reload = usePageReload(ENDPOINT);
     const isMobile = useMediaQuery('(max-width: 768px)');
@@ -68,14 +99,37 @@ export default function MedicationRoundLab({ rounds = [], grid = {}, date, curre
         ? residents.filter((r) => r.name.toLowerCase().includes(query.toLowerCase()))
         : residents;
 
+    // Detail opens only when a resident is explicitly selected (closable).
     const selected = selectedId != null ? (residents.find((r) => r.client_id === selectedId) ?? null) : null;
 
+    // Round-wide progress (scheduled meds only).
     const sched = residents.flatMap((r) => r.rows).filter((r) => !r.as_required);
     const pCompleted = sched.filter((r) => r.code).length;
     const pOverdue = sched.filter((r) => !r.code && r.status === 'overdue').length;
     const pDueSoon = sched.filter((r) => !r.code && r.status === 'due_now').length;
     const pNotStarted = sched.length - pCompleted - pOverdue - pDueSoon;
 
+    // Whole-day totals (across every round) — for the overall "% complete" headline.
+    const daySched = Object.values(grid).flat().flatMap((r) => r.rows).filter((r) => !r.as_required);
+    const dayCompleted = daySched.filter((r) => r.code).length;
+    const dayTotal = daySched.length;
+    const dayPct = dayTotal ? Math.round((dayCompleted / dayTotal) * 100) : 0;
+    // Rough estimated completion = the latest time slot still outstanding today.
+    const dayRemainingSlots = daySched.filter((r) => !r.code && r.slot).map((r) => r.slot).sort();
+    const estCompletion = dayRemainingSlots.length ? dayRemainingSlots[dayRemainingSlots.length - 1] : null;
+
+    // For the lists below: every dose in this round tagged with its resident.
+    const roundRows = residents.flatMap((r) => r.rows.map((row) => ({ ...row, resident: r.name })));
+    const nextDue = roundRows
+        .filter((row) => !row.as_required && !row.code)
+        .sort((a, b) => String(a.slot || '').localeCompare(String(b.slot || '')))
+        .slice(0, 6);
+    const recentActivity = roundRows
+        .filter((row) => row.code)
+        .sort((a, b) => String(b.slot || '').localeCompare(String(a.slot || '')))
+        .slice(0, 5);
+
+    // Round-wide alerts.
     const overdueAlerts = residents.flatMap((r) =>
         r.rows.filter((row) => !row.code && row.status === 'overdue')
             .map((row) => ({ resident: r.name, med: row.medication_name, time: row.slot })));
@@ -84,9 +138,10 @@ export default function MedicationRoundLab({ rounds = [], grid = {}, date, curre
 
     const openRecord = (row, code) => { setRecordRow(row); setRecordCode(code); record.open(); };
 
+    // One-tap "Given" for scheduled, non-controlled meds; everything else opens the dialog.
     const handleAction = (row, code) => {
         if (code === 'A' && !row.is_controlled && !row.as_required && row.slot) {
-            router.post(RECORD_ENDPOINT, {
+            router.post(`${ENDPOINT}/record`, {
                 mar_sheet_id: row.mar_sheet_id, date, time_slot: row.slot, code: 'A', dose_given: row.dose ?? '', notes: '',
             }, { preserveScroll: true, preserveState: true });
         } else {
@@ -94,6 +149,7 @@ export default function MedicationRoundLab({ rounds = [], grid = {}, date, curre
         }
     };
 
+    // Selected resident's meds, grouped.
     const selRows = selected?.rows ?? [];
     const scheduled = selRows.filter((r) => !r.as_required);
     const prn = selRows.filter((r) => r.as_required);
@@ -102,18 +158,19 @@ export default function MedicationRoundLab({ rounds = [], grid = {}, date, curre
     const riskFlags = selected?.risk_flags ?? [];
     const hasHighRisk = riskFlags.some((r) => r.level === 'high' || r.level === 'urgent');
 
+    // ---- Panels (rendered into the desktop slide layout or the mobile stack) ----
     const residentsPanel = (
         <Card withBorder radius="lg" padding="sm" style={{ borderLeft: '4px solid var(--mantine-color-indigo-5)' }}>
             <Group justify="space-between" mb="xs">
                 <Text fw={700}>Residents Due</Text>
                 <Badge variant="light" color="gray">{residents.length}</Badge>
             </Group>
-            <TextInput placeholder="Search residents…" leftSection={<IconSearch size={15} />} value={query} onChange={(e) => setQuery(e.currentTarget.value)} mb="sm" />
+            <TextInput placeholder="Search residents…" leftSection={<IconSearch size={15} />} value={query} onChange={(e) => setQuery(e.currentTarget.value)} mb="sm" maw={560} />
             <ScrollArea.Autosize mah={isMobile ? 400 : 640}>
                 {filtered.length === 0
                     ? <Text size="sm" c="dimmed" ta="center" py="md">No residents.</Text>
                     : (
-                        <SimpleGrid cols={(isMobile || selected) ? 1 : 2} spacing={6} verticalSpacing={6}>
+                        <SimpleGrid cols={1} spacing={6} verticalSpacing={6} maw={560}>
                             {filtered.map((r) => {
                                 const st = residentStatus(r);
                                 return (
@@ -188,60 +245,142 @@ export default function MedicationRoundLab({ rounds = [], grid = {}, date, curre
     );
 
     const sidebarPanel = (
-        <Stack gap="md">
-            <Card withBorder radius="lg" padding="lg" style={{ borderLeft: '4px solid var(--mantine-color-indigo-5)' }}>
-                <Text fw={700} mb="md">Round Progress</Text>
-                <RoundProgressDonut completed={pCompleted} dueSoon={pDueSoon} overdue={pOverdue} notStarted={pNotStarted} />
-            </Card>
+        <Stack gap={12}>
+            <SidebarCard accent="indigo" title="Round Progress" align="flex-start">
+                <RoundProgressDonut completed={pCompleted} dueSoon={pDueSoon} overdue={pOverdue} notStarted={pNotStarted} size={92} detailed dayCompleted={dayCompleted} dayTotal={dayTotal} />
+            </SidebarCard>
 
-            <Card withBorder radius="lg" padding="md" style={{ borderLeft: '4px solid var(--mantine-color-orange-5)' }}>
-                <Text fw={700} mb="sm">Alerts</Text>
-                <Stack gap="xs">
+            <SidebarCard accent="orange" title="Alerts" align="flex-start">
+                <Stack gap={9} px={6}>
                     {overdueAlerts.length === 0 && lowStockMeds.length === 0 && cdMeds.length === 0 && (
                         <Text size="sm" c="dimmed">No alerts for this round.</Text>
                     )}
                     {overdueAlerts.slice(0, 4).map((a, i) => (
-                        <AlertItem key={`od-${i}`} severity="danger" icon={IconAlertTriangle}
+                        <AlertItem key={`od-${i}`} compact severity="danger" icon={IconAlertTriangle}
                             title="Overdue Medication" description={`${a.resident} — ${a.med}${a.time ? ` · ${a.time}` : ''}`} />
                     ))}
                     {lowStockMeds.slice(0, 3).map((m) => (
-                        <AlertItem key={`ls-${m}`} severity="warning" icon={IconAlertTriangle} title="Low Stock" description={m} />
+                        <AlertItem key={`ls-${m}`} compact severity="warning" icon={IconAlertTriangle} title="Low Stock" description={m} />
                     ))}
                     {cdMeds.slice(0, 3).map((m) => (
-                        <AlertItem key={`cd-${m}`} severity="info" icon={IconShieldLock} title="Controlled Drug" description={`${m} · requires witness`} />
+                        <AlertItem key={`cd-${m}`} compact severity="info" icon={IconShieldLock} title="Controlled Drug" description={`${m} · requires witness`} />
                     ))}
                 </Stack>
-            </Card>
+            </SidebarCard>
 
-            <Card withBorder radius="lg" padding="md" style={{ borderLeft: '4px solid var(--mantine-color-teal-5)' }}>
-                <Text fw={700} mb="sm">Quick Actions</Text>
+            <SidebarCard accent="teal" title="Quick Actions">
                 <Stack gap={2}>
-                    <QuickActionItem icon={IconQrcode} label="Scan Medication" disabled />
-                    <QuickActionItem icon={IconPlus} label="Add PRN" disabled />
-                    <QuickActionItem icon={IconUserMinus} label="Temporary Absence" disabled />
-                    <QuickActionItem icon={IconNotes} label="View Handover Notes" href="/medication/shift-handover-react" />
-                    <QuickActionItem icon={IconFileText} label="View MAR Report" disabled />
+                    <QuickActionItem compact icon={IconQrcode} label="Scan Medication" disabled />
+                    <QuickActionItem compact icon={IconPlus} label="Add PRN" disabled />
+                    <QuickActionItem compact icon={IconUserMinus} label="Temporary Absence" disabled />
+                    <QuickActionItem compact icon={IconNotes} label="View Handover Notes" href="/medication/shift-handover-react" />
+                    <QuickActionItem compact icon={IconFileText} label="View MAR Report" disabled />
                 </Stack>
-            </Card>
+            </SidebarCard>
         </Stack>
+    );
+
+    const controlsCard = (
+        <Card withBorder radius="lg" padding="sm">
+            <Group gap={44} wrap="nowrap" align="center" pl="md" pr="md">
+                <TextInput type="date" value={date} onChange={(e) => reload({ date: e.currentTarget.value })} leftSection={<IconCalendar size={16} />} w={150} style={{ flexShrink: 0 }} />
+                <Group gap="xs" wrap="nowrap" justify="flex-end" style={{ flex: 1 }}>
+                    {rounds.map((r) => {
+                        const RI = roundTokens[r.key]?.icon ?? IconPill;
+                        const active = r.key === meta.key;
+                        const color = roundTokens[r.key]?.color ?? 'indigo';
+                        return (
+                            <Button key={r.key} size="xs" variant={active ? 'light' : 'default'} color={active ? color : 'gray'}
+                                styles={{ label: { fontWeight: 700 } }}
+                                leftSection={<RI size={15} color={`var(--mantine-color-${color}-6)`} />}
+                                onClick={() => { setActiveRound(r.key); setSelectedId(null); }}
+                                title={r.window}>
+                                {r.label}
+                            </Button>
+                        );
+                    })}
+                </Group>
+            </Group>
+        </Card>
+    );
+
+    const nextDueCard = (
+        <Card withBorder radius="lg" padding="sm">
+            <Group justify="space-between" mb="xs">
+                <Text fw={700} size="sm">Next Medications Due</Text>
+                <Badge variant="light" color="gray">{nextDue.length}</Badge>
+            </Group>
+            {nextDue.length === 0 ? (
+                <Text size="sm" c="dimmed">Nothing left due in this round.</Text>
+            ) : (
+                <Table.ScrollContainer minWidth={300}>
+                <Table verticalSpacing={5} horizontalSpacing={4} fz={10} highlightOnHover>
+                    <Table.Thead>
+                        <Table.Tr>
+                            <Table.Th>Time</Table.Th><Table.Th>Resident</Table.Th>
+                            <Table.Th>Medication</Table.Th><Table.Th>Type</Table.Th><Table.Th>Status</Table.Th>
+                        </Table.Tr>
+                    </Table.Thead>
+                    <Table.Tbody>
+                        {nextDue.map((row, i) => {
+                            const t = medType(row);
+                            const s = DUE_STATUS[row.status] ?? { label: row.status, color: 'gray' };
+                            return (
+                                <Table.Tr key={i}>
+                                    <Table.Td><Text fw={700} c={`${s.color}.7`}>{row.slot || '—'}</Text></Table.Td>
+                                    <Table.Td>{row.resident}</Table.Td>
+                                    <Table.Td>{row.medication_name}</Table.Td>
+                                    <Table.Td><Badge size="xs" variant="light" color={t.color} styles={{ root: { fontSize: 9, paddingInline: 5 } }}>{t.label}</Badge></Table.Td>
+                                    <Table.Td><Badge size="xs" variant="light" color={s.color} styles={{ root: { fontSize: 9, paddingInline: 5 } }}>{s.label}</Badge></Table.Td>
+                                </Table.Tr>
+                            );
+                        })}
+                    </Table.Tbody>
+                </Table>
+                </Table.ScrollContainer>
+            )}
+        </Card>
+    );
+
+    const activityCard = (
+        <Card withBorder radius="lg" padding="sm">
+            <Group gap="xs" mb="xs">
+                <IconClock size={16} color="var(--mantine-color-indigo-6)" />
+                <Text fw={700} size="sm">Recent Activity</Text>
+            </Group>
+            {recentActivity.length === 0 ? (
+                <Text size="sm" c="dimmed">No medications recorded yet this round.</Text>
+            ) : (
+                <Stack gap="md">
+                    {recentActivity.map((row, i) => {
+                        const given = row.code === 'A' || row.code === 'S' || row.code === 'W';
+                        const refused = row.code === 'R' || row.code === 'O' || row.code === 'N';
+                        const color = given ? 'green' : refused ? 'red' : 'gray';
+                        const Icon = given ? IconCircleCheck : IconAlertTriangle;
+                        return (
+                            <Group key={i} gap="sm" wrap="nowrap" align="flex-start">
+                                <Text size="xs" c="dimmed" w={40} ta="right" style={{ flexShrink: 0 }} mt={3}>{row.slot || '—'}</Text>
+                                <ThemeIcon variant="light" color={color} size={26} radius="xl"><Icon size={15} /></ThemeIcon>
+                                <Box style={{ flex: 1, minWidth: 0 }}>
+                                    <Text size="sm" fw={600}>{row.medication_name} {ACT_CODE[row.code] ?? 'recorded'}</Text>
+                                    <Text size="xs" c="dimmed">{row.resident}{row.recorded_by ? ` · by ${row.recorded_by}` : ''}</Text>
+                                </Box>
+                            </Group>
+                        );
+                    })}
+                </Stack>
+            )}
+        </Card>
     );
 
     return (
         <>
             <Head title="Medication Round (Lab)" />
-            <Container size="xl" py="md">
-                {/* Top row — date + actions */}
-                <Group justify="space-between" mb="sm" wrap="wrap">
-                    <TextInput type="date" value={date} onChange={(e) => reload({ date: e.currentTarget.value })} leftSection={<IconCalendar size={16} />} w={170}
-                        styles={{ input: { fontWeight: 600, borderColor: 'var(--mantine-color-indigo-3)' } }} />
-                    <Group gap="xs" wrap="nowrap">
-                        <Button variant="default" leftSection={<IconRefresh size={16} />} onClick={() => reload({ date })}>Refresh</Button>
-                        <Button leftSection={<IconCircleCheck size={16} />} disabled title="Coming soon">End Round</Button>
-                    </Group>
-                </Group>
-
-                <Group gap="md" wrap="nowrap" align="center" mb="md">
-                    <ThemeIcon variant="light" color="indigo" size={48} radius="lg"><IconPill size={26} stroke={1.6} /></ThemeIcon>
+            <Container size={1700} py="md">
+                {/* ---- Page header ---- */}
+                <Group justify="space-between" align="center" mb="xl" wrap="wrap">
+                    <Group gap="md" wrap="nowrap" align="center">
+                        <ThemeIcon variant="light" color="indigo" size={48} radius="lg"><IconPill size={26} stroke={1.6} /></ThemeIcon>
                         <Box>
                             <Group gap="xs" align="center">
                                 <Text fz={24} fw={700}>Medication Round</Text>
@@ -249,48 +388,57 @@ export default function MedicationRoundLab({ rounds = [], grid = {}, date, curre
                             </Group>
                             <Text c="dimmed" size="sm">{meta.label} Round{meta.window ? ` • ${meta.window}` : ''}</Text>
                         </Box>
+                    </Group>
+                    <Group gap="xs" wrap="nowrap">
+                        <Button variant="default" leftSection={<IconRefresh size={16} />} onClick={() => reload({ date })}>Refresh</Button>
+                        <Button leftSection={<IconCircleCheck size={16} />} disabled title="Coming soon">End Round</Button>
+                    </Group>
                 </Group>
 
                 <FlashAlerts />
 
-                <Group justify="flex-end" gap="sm" wrap="wrap" mb="md">
-                    {rounds.map((r) => {
-                        const RI = roundTokens[r.key]?.icon ?? IconPill;
-                        const active = r.key === meta.key;
-                        const color = roundTokens[r.key]?.color ?? 'indigo';
-                        return (
-                            <Button key={r.key} size="md" radius="md" variant={active ? 'light' : 'default'} color={active ? color : 'gray'}
-                                leftSection={<RI size={17} color={`var(--mantine-color-${color}-6)`} />}
-                                onClick={() => { setActiveRound(r.key); setSelectedId(null); }}>
-                                <Box ta="left">
-                                    <Text size="sm" fw={600} lh={1.1}>{r.label}</Text>
-                                    {r.window && <Text size="xs" c="dimmed">{r.window}</Text>}
-                                </Box>
-                            </Button>
-                        );
-                    })}
-                </Group>
-
+                {/* ---- Main (2/3) + sidebar (1/3) ---- */}
                 {isMobile ? (
                     <Stack gap="md">
+                        {controlsCard}
                         {selected ? detailPanel : residentsPanel}
+                        {nextDueCard}
+                        {activityCard}
                         {sidebarPanel}
                     </Stack>
                 ) : (
-                    <Group align="flex-start" gap="md" wrap="nowrap" style={{ overflow: 'hidden' }}>
-                        <Box style={{ flexGrow: selected ? 27 : 62, flexBasis: 0, minWidth: 0, transition: 'flex-grow 0.3s ease' }}>
-                            {residentsPanel}
-                        </Box>
-                        <Box style={{ flexGrow: selected ? 50 : 0, flexBasis: 0, minWidth: 0, overflow: 'hidden', opacity: selected ? 1 : 0, transition: 'flex-grow 0.3s ease, opacity 0.25s ease' }}>
-                            {detailPanel}
-                        </Box>
-                        <Box style={{ flexGrow: selected ? 27 : 38, flexBasis: 0, minWidth: 0, transition: 'flex-grow 0.3s ease' }}>
-                            {sidebarPanel}
-                        </Box>
-                    </Group>
+                    <Stack gap="md">
+                        {controlsCard}
+                        <Group align="flex-start" gap="lg" wrap="wrap">
+                            {/* LEFT — Next Medications Due */}
+                            <Box style={{ flex: '1.05 1 240px', minWidth: 0 }}>
+                                <Stack gap="sm">
+                                    {activityCard}
+                                    {nextDueCard}
+                                </Stack>
+                            </Box>
+                            {/* CENTRE — residents/detail + recent activity */}
+                            <Box style={{ flex: '2.2 1 380px', minWidth: 0 }}>
+                                <Stack gap="md">
+                                    <Group align="flex-start" gap={selected ? 'md' : 0} wrap="nowrap" style={{ overflow: 'hidden' }}>
+                                        <Box style={{ flexGrow: selected ? 34 : 100, flexBasis: 0, minWidth: 0, transition: 'flex-grow 0.3s ease' }}>
+                                            {residentsPanel}
+                                        </Box>
+                                        <Box style={{ flexGrow: selected ? 66 : 0, flexBasis: 0, minWidth: 0, overflow: 'hidden', opacity: selected ? 1 : 0, transition: 'flex-grow 0.3s ease, opacity 0.25s ease' }}>
+                                            {detailPanel}
+                                        </Box>
+                                    </Group>
+                                </Stack>
+                            </Box>
+                            {/* RIGHT — round progress / alerts / quick actions */}
+                            <Box style={{ flex: '0 1 240px', minWidth: 0 }}>
+                                {sidebarPanel}
+                            </Box>
+                        </Group>
+                    </Stack>
                 )}
 
-                <RecordDoseModal opened={recordOpened} onClose={record.close} row={recordRow} date={date} presetCode={recordCode} endpoint={RECORD_ENDPOINT} />
+                <RecordDoseModal opened={recordOpened} onClose={record.close} row={recordRow} date={date} presetCode={recordCode} endpoint={`${ENDPOINT}/record`} />
             </Container>
         </>
     );

@@ -37,6 +37,21 @@ To run it on this computer: `start-local.bat` (starts the database, the web serv
   - Made the box content **fit the box** (centre or top-align as needed) so there's no awkward empty space, and made **Quick Actions compact** so all five fit.
   - **Bigger box headers**, and tuned the internal padding so text isn't jammed against the edges.
   - **Alerts** — trialled two looks (a coloured left-bar vs a compact row) and went with the **compact** style (smaller icon, tighter rows), top-aligned under the header.
+- **~13:40–14:00** — More Lab 2 sidebar fine-tuning: **shortened the boxes** a little (set their tall/wide shape to 4:4.5), added a bit more **space between the boxes**, **tightened the tinted alert rows** (less padding) and **shrank the alert description to one line**.
+- **~14:00** — Logged three more things to **`docs/ISSUES.md`** to fix later: empty **Alerts** box should shrink to a small "no alerts" pill (#2); alerts should be **clickable** to open their detail (#3); the Round Progress **doughnut should be hoverable** to show each segment (#4).
+- **~14:00–14:30** — Made the Lab 2 boxes **size to their content** (no more wasted blank space) with a **minimum height** so a near-empty box still looks like a box; tidied the alert spacing and **inset the tinted alert rows**; bumped the **box-header font**.
+- **~14:30–15:00** — Rebuilt the **Round Progress** box to a richer "dashboard" look (like the owner's reference): **donut on the left**, and a big **"% complete"** + **overdue** summary on the right. Importantly, the headline **% now covers the whole day** (every round), while the **donut still shows the selected round** and changes when you switch Morning/Lunch/Evening/Night. (Tried an "estimated completion time" line too, then removed it.)
+- **~15:00** — Logged two more issues: the **Alerts box should be a collapsible dropdown** (#5) and individual alerts should be **swipe/delete dismissible** (#6).
+- **~15:15–15:45** — On **Lab**: turned it into a **3-column layout** (Next Medications Due + Recent Activity on the left, residents in the middle, the Round Progress/Alerts/Quick Actions block on the right); made the page **fill more of the screen** (and fixed it being pushed off-screen when the nav opens — the table now scrolls and columns wrap); **capped the residents list width** so rows don't stretch; and **shrank the Next Medications table** to fit.
+- **~15:45** — Logged issue #7: clicking a resident should **toggle** the detail open/closed (clicking the same one again closes it).
+- **~16:00** — Created a **third experimental copy, "Lab 1.1"** (`/medication/medication-round-lab1-1`) — a duplicate of Lab with its own routes.
+- **~16:00–16:30** — Reworked **Lab 1.1**'s top area: date/round bar + residents as one left section, the **Round Progress / Alerts / Quick Actions block on the right pulled up the page**, Refresh/End Round aligned above the round tabs, and fine-tuned the box sizes (donut, %, legend, headers) and the spacing between the centre and the right.
+- **~15:00–15:15** — More Round Progress polish (bigger %, nudged the donut and the % into position).
+- **~15:15** — **Added two new sections under the residents list on Lab 2**, built from the data we already have:
+  - **Next Medications Due** — a table (Time · Resident · Medication · Type · Status) of doses still to give this round, soonest first.
+  - **Recent Activity** — a timeline of doses already recorded this round (e.g. "Paracetamol given · resident · by [staff]"), using the real "recorded by" name from the database.
+  - Both update when you switch rounds. (No "Room" column — there's no room data; and the mockup's "round started / witness added" lines need backend event logging we don't have yet.)
+- **~15:15** — Switched the residents list to **stack vertically** (one per row) instead of two across.
 
 ## 2026-06-11
 

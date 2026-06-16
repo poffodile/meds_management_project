@@ -26,8 +26,8 @@ import { ageFromDob, formatDate } from '@frontend/lib/dateUtils';
 import { toMed } from '@frontend/lib/medView';
 import { usePageReload } from '@frontend/hooks/usePageReload';
 
-// EXPERIMENTAL copy #2 of the Medication Round page — safe to redesign freely.
-const ENDPOINT = '/medication/medication-round-lab2';
+// EXPERIMENTAL copy of the Medication Round page — safe to redesign freely.
+const ENDPOINT = '/medication/medication-round-lab1-1';
 
 /** Overall round status for a resident, from their rows' recorded codes/buckets. */
 function residentStatus(resident) {
@@ -71,8 +71,8 @@ function SidebarCard({ accent, title, children, align = 'center', headerRight = 
     return (
         <Card withBorder radius="lg" padding="sm"
             style={{ borderLeft: `4px solid var(--mantine-color-${accent}-5)`, minHeight: 170, display: 'flex', flexDirection: 'column' }}>
-            <Group justify="space-between" align="flex-start" wrap="nowrap" gap="xs" mb={6}>
-                <Text fw={700} size="lg">{title}</Text>
+            <Group justify="space-between" align="flex-start" wrap="nowrap" gap="xs" mb={14}>
+                <Text fw={700} size="xl">{title}</Text>
                 {headerRight}
             </Group>
             {/* min-height keeps a short box looking like a box; content grows past it */}
@@ -83,7 +83,7 @@ function SidebarCard({ accent, title, children, align = 'center', headerRight = 
     );
 }
 
-export default function MedicationRoundLab2({ rounds = [], grid = {}, date, currentRound = 'morning' }) {
+export default function MedicationRoundLab11({ rounds = [], grid = {}, date, currentRound = 'morning' }) {
     const reload = usePageReload(ENDPOINT);
     const isMobile = useMediaQuery('(max-width: 768px)');
     const [activeRound, setActiveRound] = useState(currentRound);
@@ -165,12 +165,12 @@ export default function MedicationRoundLab2({ rounds = [], grid = {}, date, curr
                 <Text fw={700}>Residents Due</Text>
                 <Badge variant="light" color="gray">{residents.length}</Badge>
             </Group>
-            <TextInput placeholder="Search residents…" leftSection={<IconSearch size={15} />} value={query} onChange={(e) => setQuery(e.currentTarget.value)} mb="sm" />
+            <TextInput placeholder="Search residents…" leftSection={<IconSearch size={15} />} value={query} onChange={(e) => setQuery(e.currentTarget.value)} mb="sm" maw={560} />
             <ScrollArea.Autosize mah={isMobile ? 400 : 640}>
                 {filtered.length === 0
                     ? <Text size="sm" c="dimmed" ta="center" py="md">No residents.</Text>
                     : (
-                        <SimpleGrid cols={1} spacing={6} verticalSpacing={6}>
+                        <SimpleGrid cols={1} spacing={6} verticalSpacing={6} maw={560}>
                             {filtered.map((r) => {
                                 const st = residentStatus(r);
                                 return (
@@ -247,7 +247,7 @@ export default function MedicationRoundLab2({ rounds = [], grid = {}, date, curr
     const sidebarPanel = (
         <Stack gap={12}>
             <SidebarCard accent="indigo" title="Round Progress" align="flex-start">
-                <RoundProgressDonut completed={pCompleted} dueSoon={pDueSoon} overdue={pOverdue} notStarted={pNotStarted} size={92} detailed dayCompleted={dayCompleted} dayTotal={dayTotal} />
+                <RoundProgressDonut completed={pCompleted} dueSoon={pDueSoon} overdue={pOverdue} notStarted={pNotStarted} size={84} detailed dayCompleted={dayCompleted} dayTotal={dayTotal} pctSize={31} legendFz={9} />
             </SidebarCard>
 
             <SidebarCard accent="orange" title="Alerts" align="flex-start">
@@ -305,15 +305,16 @@ export default function MedicationRoundLab2({ rounds = [], grid = {}, date, curr
     );
 
     const nextDueCard = (
-        <Card withBorder radius="lg" padding="md">
-            <Group justify="space-between" mb="sm">
-                <Text fw={700}>Next Medications Due</Text>
+        <Card withBorder radius="lg" padding="sm">
+            <Group justify="space-between" mb="xs">
+                <Text fw={700} size="sm">Next Medications Due</Text>
                 <Badge variant="light" color="gray">{nextDue.length}</Badge>
             </Group>
             {nextDue.length === 0 ? (
                 <Text size="sm" c="dimmed">Nothing left due in this round.</Text>
             ) : (
-                <Table verticalSpacing="xs" horizontalSpacing="sm" fz="sm" highlightOnHover>
+                <Table.ScrollContainer minWidth={300}>
+                <Table verticalSpacing={5} horizontalSpacing={4} fz={10} highlightOnHover>
                     <Table.Thead>
                         <Table.Tr>
                             <Table.Th>Time</Table.Th><Table.Th>Resident</Table.Th>
@@ -328,23 +329,24 @@ export default function MedicationRoundLab2({ rounds = [], grid = {}, date, curr
                                 <Table.Tr key={i}>
                                     <Table.Td><Text fw={700} c={`${s.color}.7`}>{row.slot || '—'}</Text></Table.Td>
                                     <Table.Td>{row.resident}</Table.Td>
-                                    <Table.Td>{row.medication_name}{row.dose ? <Text span size="xs" c="dimmed"> · {row.dose}</Text> : null}</Table.Td>
-                                    <Table.Td><Badge size="sm" variant="light" color={t.color}>{t.label}</Badge></Table.Td>
-                                    <Table.Td><Badge size="sm" variant="light" color={s.color}>{s.label}</Badge></Table.Td>
+                                    <Table.Td>{row.medication_name}</Table.Td>
+                                    <Table.Td><Badge size="xs" variant="light" color={t.color} styles={{ root: { fontSize: 9, paddingInline: 5 } }}>{t.label}</Badge></Table.Td>
+                                    <Table.Td><Badge size="xs" variant="light" color={s.color} styles={{ root: { fontSize: 9, paddingInline: 5 } }}>{s.label}</Badge></Table.Td>
                                 </Table.Tr>
                             );
                         })}
                     </Table.Tbody>
                 </Table>
+                </Table.ScrollContainer>
             )}
         </Card>
     );
 
     const activityCard = (
-        <Card withBorder radius="lg" padding="md">
-            <Group gap="xs" mb="sm">
-                <IconClock size={18} color="var(--mantine-color-indigo-6)" />
-                <Text fw={700}>Recent Activity</Text>
+        <Card withBorder radius="lg" padding="sm">
+            <Group gap="xs" mb="xs">
+                <IconClock size={16} color="var(--mantine-color-indigo-6)" />
+                <Text fw={700} size="sm">Recent Activity</Text>
             </Group>
             {recentActivity.length === 0 ? (
                 <Text size="sm" c="dimmed">No medications recorded yet this round.</Text>
@@ -373,24 +375,31 @@ export default function MedicationRoundLab2({ rounds = [], grid = {}, date, curr
 
     return (
         <>
-            <Head title="Medication Round (Lab 2)" />
-            <Container size="xl" py="md">
+            <Head title="Medication Round (Lab 1.1)" />
+            <Container size={1700} py="md">
                 {/* ---- Page header ---- */}
-                <Group justify="space-between" align="center" mb="xl" wrap="wrap">
-                    <Group gap="md" wrap="nowrap" align="center" ml={-36}>
-                        <ThemeIcon variant="light" color="indigo" size={48} radius="lg"><IconPill size={26} stroke={1.6} /></ThemeIcon>
-                        <Box>
-                            <Group gap="xs" align="center">
-                                <Text fz={24} fw={700}>Medication Round</Text>
-                                <Badge color="grape" variant="light">Lab 2</Badge>
+                <Group align="flex-start" gap={40} wrap="wrap" mb="xl">
+                    {/* matches the left section so the buttons land above Night */}
+                    <Box style={{ flex: '2.6 1 440px', minWidth: 0 }}>
+                        <Group justify="space-between" align="center" wrap="wrap">
+                            <Group gap="md" wrap="nowrap" align="center">
+                                <ThemeIcon variant="light" color="indigo" size={48} radius="lg"><IconPill size={26} stroke={1.6} /></ThemeIcon>
+                                <Box>
+                                    <Group gap="xs" align="center">
+                                        <Text fz={24} fw={700}>Medication Round</Text>
+                                        <Badge color="grape" variant="light">Lab 1.1</Badge>
+                                    </Group>
+                                    <Text c="dimmed" size="sm">{meta.label} Round{meta.window ? ` • ${meta.window}` : ''}</Text>
+                                </Box>
                             </Group>
-                            <Text c="dimmed" size="sm">{meta.label} Round{meta.window ? ` • ${meta.window}` : ''}</Text>
-                        </Box>
-                    </Group>
-                    <Group gap="xs" wrap="nowrap">
-                        <Button variant="default" leftSection={<IconRefresh size={16} />} onClick={() => reload({ date })}>Refresh</Button>
-                        <Button leftSection={<IconCircleCheck size={16} />} disabled title="Coming soon">End Round</Button>
-                    </Group>
+                            <Group gap="xs" wrap="nowrap">
+                                <Button variant="default" leftSection={<IconRefresh size={16} />} onClick={() => reload({ date })}>Refresh</Button>
+                                <Button leftSection={<IconCircleCheck size={16} />} disabled title="Coming soon">End Round</Button>
+                            </Group>
+                        </Group>
+                    </Box>
+                    {/* matches the right sidebar (empty above the round progress box) */}
+                    <Box style={{ flex: '0 1 260px', minWidth: 0 }} />
                 </Group>
 
                 <FlashAlerts />
@@ -405,9 +414,9 @@ export default function MedicationRoundLab2({ rounds = [], grid = {}, date, curr
                         {sidebarPanel}
                     </Stack>
                 ) : (
-                    <Group align="flex-start" gap={64} wrap="nowrap">
-                        {/* MAIN — controls + residents/detail (wider), nudged a little left */}
-                        <Box style={{ flex: '3.6 1 0', minWidth: 0, marginLeft: -36 }}>
+                    <Group align="flex-start" gap={40} wrap="wrap">
+                        {/* LEFT SECTION — date/round bar + residents due (+ next due / activity) */}
+                        <Box style={{ flex: '2.6 1 440px', minWidth: 0 }}>
                             <Stack gap="md">
                                 {controlsCard}
                                 <Group align="flex-start" gap={selected ? 'md' : 0} wrap="nowrap" style={{ overflow: 'hidden' }}>
@@ -424,8 +433,8 @@ export default function MedicationRoundLab2({ rounds = [], grid = {}, date, curr
                                 </Group>
                             </Stack>
                         </Box>
-                        {/* SIDEBAR — round progress + alerts + quick actions (narrow column) */}
-                        <Box style={{ flex: '0 0 233px' }}>
+                        {/* RIGHT — round progress / alerts / quick actions block (pulled up the page) */}
+                        <Box style={{ flex: '0 1 260px', minWidth: 0, marginTop: -84 }}>
                             {sidebarPanel}
                         </Box>
                     </Group>
@@ -437,4 +446,4 @@ export default function MedicationRoundLab2({ rounds = [], grid = {}, date, curr
     );
 }
 
-MedicationRoundLab2.layout = (page) => <AppShell>{page}</AppShell>;
+MedicationRoundLab11.layout = (page) => <AppShell>{page}</AppShell>;

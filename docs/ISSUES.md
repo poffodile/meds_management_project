@@ -12,6 +12,9 @@
 - 🔲 **#2** (noticed 2026-06-16) — When there are **no alerts**, the Alerts box still shows as a **big empty white box** (the fixed box height reserves the space). Instead it should **shrink to a small "No alerts" pill/box** rather than a full-size empty card. — *Area: Medication Round sidebar — Alerts box (seen on Lab 2).*
 - 🔲 **#3** (noticed 2026-06-16) — The **alerts aren't clickable**. Clicking an alert should **open/show that alert's details** (e.g. jump to the resident/medication or a popup). — *Area: Medication Round sidebar — Alerts box.*
 - 🔲 **#4** (noticed 2026-06-16) — The **Round Progress doughnut should be hoverable** — hovering a segment should show what it represents (e.g. the count/label for Completed / Overdue / Due Soon / Not Started). — *Area: Medication Round sidebar — Round Progress doughnut.*
+- 🔲 **#5** (noticed 2026-06-16) — The **Alerts box should be a collapsible dropdown** — the alerts list should expand/collapse (e.g. click the "Alerts" header to open/close it) rather than always being fully shown. — *Area: Medication Round sidebar — Alerts box.*
+- 🔲 **#6** (noticed 2026-06-16) — Each alert should be **dismissible** — give the user a way to **swipe or delete** an alert to clear it. — *Area: Medication Round sidebar — Alerts box.*
+- 🔲 **#7** (noticed 2026-06-16) — Clicking a resident should **toggle** the detail panel — clicking the **same resident again should close** the detail (right now it only opens; you have to use the ✕). So one click opens, clicking the same one again closes. — *Area: Medication Round — residents list / resident detail.*
 
 ## Fixed
 
