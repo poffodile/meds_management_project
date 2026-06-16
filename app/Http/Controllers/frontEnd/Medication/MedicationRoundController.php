@@ -136,6 +136,24 @@ class MedicationRoundController extends Controller
     /** React/Inertia version of the round grid. Same data, shaped into plain arrays. */
     public function indexReact(Request $request)
     {
+        return Inertia::render('Medication/MedicationRound', $this->buildRoundProps($request));
+    }
+
+    /** Experimental copy of the round page — for trying alternative UIs without touching the main page. */
+    public function indexReactLab(Request $request)
+    {
+        return Inertia::render('Medication/MedicationRoundLab', $this->buildRoundProps($request));
+    }
+
+    /** Second experimental copy of the round page. */
+    public function indexReactLab2(Request $request)
+    {
+        return Inertia::render('Medication/MedicationRoundLab2', $this->buildRoundProps($request));
+    }
+
+    /** Builds the shared props for the medication round React pages. */
+    private function buildRoundProps(Request $request): array
+    {
         $request->validate(['date' => 'nullable|date']);
 
         $homeId = $this->getHomeId();
@@ -248,12 +266,12 @@ class MedicationRoundController extends Controller
             $rounds[] = ['key' => $key, 'label' => $cfg['label'], 'window' => $cfg['window']];
         }
 
-        return Inertia::render('Medication/MedicationRound', [
+        return [
             'rounds'       => $rounds,
             'grid'         => $grid,
             'date'         => $date,
             'currentRound' => $this->roundForTime(now()->format('H:i')),
-        ]);
+        ];
     }
 
     /**
@@ -311,6 +329,26 @@ class MedicationRoundController extends Controller
         $date = $request->input('date');
 
         return redirect()->route('medication.medication-round.react', ['date' => $date])
+            ->with($ok ? 'success' : 'error', $ok ? 'Dose recorded.' : 'Prescription not found.');
+    }
+
+    /** Record + return to the experimental (lab) round page. */
+    public function recordReactLab(Request $request, MARSheetService $marSheetService)
+    {
+        $ok   = $this->applyRecord($request, $marSheetService);
+        $date = $request->input('date');
+
+        return redirect()->route('medication.medication-round.lab', ['date' => $date])
+            ->with($ok ? 'success' : 'error', $ok ? 'Dose recorded.' : 'Prescription not found.');
+    }
+
+    /** Record + return to the second experimental (lab 2) round page. */
+    public function recordReactLab2(Request $request, MARSheetService $marSheetService)
+    {
+        $ok   = $this->applyRecord($request, $marSheetService);
+        $date = $request->input('date');
+
+        return redirect()->route('medication.medication-round.lab2', ['date' => $date])
             ->with($ok ? 'success' : 'error', $ok ? 'Dose recorded.' : 'Prescription not found.');
     }
 

@@ -26,7 +26,8 @@ import { ageFromDob, formatDate } from '@frontend/lib/dateUtils';
 import { toMed } from '@frontend/lib/medView';
 import { usePageReload } from '@frontend/hooks/usePageReload';
 
-const ENDPOINT = '/medication/medication-round-react';
+// EXPERIMENTAL copy #2 of the Medication Round page — safe to redesign freely.
+const ENDPOINT = '/medication/medication-round-lab2';
 
 /** Overall round status for a resident, from their rows' recorded codes/buckets. */
 function residentStatus(resident) {
@@ -48,7 +49,24 @@ function SectionTitle({ color, children, count, unit }) {
     );
 }
 
-export default function MedicationRound({ rounds = [], grid = {}, date, currentRound = 'morning' }) {
+/**
+ * A sidebar box (Round Progress / Alerts / Quick Actions). Shared on purpose so all
+ * three stay identical — change the styling here and every sidebar box updates.
+ */
+function SidebarCard({ accent, title, children, align = 'center' }) {
+    return (
+        <Card withBorder radius="lg" padding="sm"
+            style={{ borderLeft: `4px solid var(--mantine-color-${accent}-5)`, aspectRatio: '4 / 4.5', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+            <Text fw={700} size="md" mb={6}>{title}</Text>
+            {/* content fills the remaining height; `align` controls top vs centre */}
+            <Box style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: align }}>
+                {children}
+            </Box>
+        </Card>
+    );
+}
+
+export default function MedicationRoundLab2({ rounds = [], grid = {}, date, currentRound = 'morning' }) {
     const reload = usePageReload(ENDPOINT);
     const isMobile = useMediaQuery('(max-width: 768px)');
     const [activeRound, setActiveRound] = useState(currentRound);
@@ -190,54 +208,78 @@ export default function MedicationRound({ rounds = [], grid = {}, date, currentR
     );
 
     const sidebarPanel = (
-        <Stack gap="md">
-            <Card withBorder radius="lg" padding="lg" style={{ borderLeft: '4px solid var(--mantine-color-indigo-5)' }}>
-                <Text fw={700} mb="md">Round Progress</Text>
-                <RoundProgressDonut completed={pCompleted} dueSoon={pDueSoon} overdue={pOverdue} notStarted={pNotStarted} />
-            </Card>
+        <Stack gap={12}>
+            <SidebarCard accent="indigo" title="Round Progress" align="flex-start">
+                <RoundProgressDonut completed={pCompleted} dueSoon={pDueSoon} overdue={pOverdue} notStarted={pNotStarted} size={108} />
+            </SidebarCard>
 
-            <Card withBorder radius="lg" padding="md" style={{ borderLeft: '4px solid var(--mantine-color-orange-5)' }}>
-                <Text fw={700} mb="sm">Alerts</Text>
-                <Stack gap="xs">
+            <SidebarCard accent="orange" title="Alerts" align="flex-start">
+                <Stack gap={6}>
                     {overdueAlerts.length === 0 && lowStockMeds.length === 0 && cdMeds.length === 0 && (
                         <Text size="sm" c="dimmed">No alerts for this round.</Text>
                     )}
                     {overdueAlerts.slice(0, 4).map((a, i) => (
-                        <AlertItem key={`od-${i}`} severity="danger" icon={IconAlertTriangle}
+                        <AlertItem key={`od-${i}`} compact severity="danger" icon={IconAlertTriangle}
                             title="Overdue Medication" description={`${a.resident} — ${a.med}${a.time ? ` · ${a.time}` : ''}`} />
                     ))}
                     {lowStockMeds.slice(0, 3).map((m) => (
-                        <AlertItem key={`ls-${m}`} severity="warning" icon={IconAlertTriangle} title="Low Stock" description={m} />
+                        <AlertItem key={`ls-${m}`} compact severity="warning" icon={IconAlertTriangle} title="Low Stock" description={m} />
                     ))}
                     {cdMeds.slice(0, 3).map((m) => (
-                        <AlertItem key={`cd-${m}`} severity="info" icon={IconShieldLock} title="Controlled Drug" description={`${m} · requires witness`} />
+                        <AlertItem key={`cd-${m}`} compact severity="info" icon={IconShieldLock} title="Controlled Drug" description={`${m} · requires witness`} />
                     ))}
                 </Stack>
-            </Card>
+            </SidebarCard>
 
-            <Card withBorder radius="lg" padding="md" style={{ borderLeft: '4px solid var(--mantine-color-teal-5)' }}>
-                <Text fw={700} mb="sm">Quick Actions</Text>
+            <SidebarCard accent="teal" title="Quick Actions">
                 <Stack gap={2}>
-                    <QuickActionItem icon={IconQrcode} label="Scan Medication" disabled />
-                    <QuickActionItem icon={IconPlus} label="Add PRN" disabled />
-                    <QuickActionItem icon={IconUserMinus} label="Temporary Absence" disabled />
-                    <QuickActionItem icon={IconNotes} label="View Handover Notes" href="/medication/shift-handover-react" />
-                    <QuickActionItem icon={IconFileText} label="View MAR Report" disabled />
+                    <QuickActionItem compact icon={IconQrcode} label="Scan Medication" disabled />
+                    <QuickActionItem compact icon={IconPlus} label="Add PRN" disabled />
+                    <QuickActionItem compact icon={IconUserMinus} label="Temporary Absence" disabled />
+                    <QuickActionItem compact icon={IconNotes} label="View Handover Notes" href="/medication/shift-handover-react" />
+                    <QuickActionItem compact icon={IconFileText} label="View MAR Report" disabled />
                 </Stack>
-            </Card>
+            </SidebarCard>
         </Stack>
+    );
+
+    const controlsCard = (
+        <Card withBorder radius="lg" padding="sm">
+            <Group gap={44} wrap="nowrap" align="center" pl="md" pr="md">
+                <TextInput type="date" value={date} onChange={(e) => reload({ date: e.currentTarget.value })} leftSection={<IconCalendar size={16} />} w={150} style={{ flexShrink: 0 }} />
+                <Group gap="xs" wrap="nowrap" justify="flex-end" style={{ flex: 1 }}>
+                    {rounds.map((r) => {
+                        const RI = roundTokens[r.key]?.icon ?? IconPill;
+                        const active = r.key === meta.key;
+                        const color = roundTokens[r.key]?.color ?? 'indigo';
+                        return (
+                            <Button key={r.key} size="xs" variant={active ? 'light' : 'default'} color={active ? color : 'gray'}
+                                styles={{ label: { fontWeight: 700 } }}
+                                leftSection={<RI size={15} color={`var(--mantine-color-${color}-6)`} />}
+                                onClick={() => { setActiveRound(r.key); setSelectedId(null); }}
+                                title={r.window}>
+                                {r.label}
+                            </Button>
+                        );
+                    })}
+                </Group>
+            </Group>
+        </Card>
     );
 
     return (
         <>
-            <Head title="Medication Round" />
+            <Head title="Medication Round (Lab 2)" />
             <Container size="xl" py="md">
                 {/* ---- Page header ---- */}
-                <Group justify="space-between" align="center" mb="md" wrap="wrap">
-                    <Group gap="md" wrap="nowrap" align="center">
+                <Group justify="space-between" align="center" mb="xl" wrap="wrap">
+                    <Group gap="md" wrap="nowrap" align="center" ml={-36}>
                         <ThemeIcon variant="light" color="indigo" size={48} radius="lg"><IconPill size={26} stroke={1.6} /></ThemeIcon>
                         <Box>
-                            <Text fz={24} fw={700}>Medication Round</Text>
+                            <Group gap="xs" align="center">
+                                <Text fz={24} fw={700}>Medication Round</Text>
+                                <Badge color="grape" variant="light">Lab 2</Badge>
+                            </Group>
                             <Text c="dimmed" size="sm">{meta.label} Round{meta.window ? ` • ${meta.window}` : ''}</Text>
                         </Box>
                     </Group>
@@ -249,54 +291,40 @@ export default function MedicationRound({ rounds = [], grid = {}, date, currentR
 
                 <FlashAlerts />
 
-                {/* ---- Controls: date + round selector ---- */}
-                <Card withBorder radius="lg" padding="sm" mb="md">
-                    <Group justify="space-between" wrap="wrap" gap="sm">
-                        <TextInput type="date" value={date} onChange={(e) => reload({ date: e.currentTarget.value })} leftSection={<IconCalendar size={16} />} />
-                        <Group gap="xs" wrap="wrap">
-                            {rounds.map((r) => {
-                                const RI = roundTokens[r.key]?.icon ?? IconPill;
-                                const active = r.key === meta.key;
-                                const color = roundTokens[r.key]?.color ?? 'indigo';
-                                return (
-                                    <Button key={r.key} size="sm" variant={active ? 'light' : 'default'} color={active ? color : 'gray'}
-                                        leftSection={<RI size={16} color={`var(--mantine-color-${color}-6)`} />}
-                                        onClick={() => { setActiveRound(r.key); setSelectedId(null); }}>
-                                        <Box ta="left">
-                                            <Text size="sm" fw={600} lh={1}>{r.label}</Text>
-                                            {r.window && <Text size="xs" c="dimmed">{r.window}</Text>}
-                                        </Box>
-                                    </Button>
-                                );
-                            })}
-                        </Group>
-                    </Group>
-                </Card>
-
-                {/* ---- Workspace ---- */}
+                {/* ---- Main (2/3) + sidebar (1/3) ---- */}
                 {isMobile ? (
                     <Stack gap="md">
+                        {controlsCard}
                         {selected ? detailPanel : residentsPanel}
                         {sidebarPanel}
                     </Stack>
                 ) : (
-                    <Group align="flex-start" gap="md" wrap="nowrap" style={{ overflow: 'hidden' }}>
-                        <Box style={{ flexGrow: selected ? 27 : 62, flexBasis: 0, minWidth: 0, transition: 'flex-grow 0.3s ease' }}>
-                            {residentsPanel}
+                    <Group align="flex-start" gap={64} wrap="nowrap">
+                        {/* MAIN — controls + residents/detail (wider), nudged a little left */}
+                        <Box style={{ flex: '3.6 1 0', minWidth: 0, marginLeft: -36 }}>
+                            <Stack gap="md">
+                                {controlsCard}
+                                <Group align="flex-start" gap={selected ? 'md' : 0} wrap="nowrap" style={{ overflow: 'hidden' }}>
+                                    <Box style={{ flexGrow: selected ? 34 : 100, flexBasis: 0, minWidth: 0, transition: 'flex-grow 0.3s ease' }}>
+                                        {residentsPanel}
+                                    </Box>
+                                    <Box style={{ flexGrow: selected ? 66 : 0, flexBasis: 0, minWidth: 0, overflow: 'hidden', opacity: selected ? 1 : 0, transition: 'flex-grow 0.3s ease, opacity 0.25s ease' }}>
+                                        {detailPanel}
+                                    </Box>
+                                </Group>
+                            </Stack>
                         </Box>
-                        <Box style={{ flexGrow: selected ? 50 : 0, flexBasis: 0, minWidth: 0, overflow: 'hidden', opacity: selected ? 1 : 0, transition: 'flex-grow 0.3s ease, opacity 0.25s ease' }}>
-                            {detailPanel}
-                        </Box>
-                        <Box style={{ flexGrow: selected ? 27 : 38, flexBasis: 0, minWidth: 0, transition: 'flex-grow 0.3s ease' }}>
+                        {/* SIDEBAR — round progress + alerts + quick actions (narrow column) */}
+                        <Box style={{ flex: '0 0 233px' }}>
                             {sidebarPanel}
                         </Box>
                     </Group>
                 )}
 
-                <RecordDoseModal opened={recordOpened} onClose={record.close} row={recordRow} date={date} presetCode={recordCode} />
+                <RecordDoseModal opened={recordOpened} onClose={record.close} row={recordRow} date={date} presetCode={recordCode} endpoint={`${ENDPOINT}/record`} />
             </Container>
         </>
     );
 }
 
-MedicationRound.layout = (page) => <AppShell>{page}</AppShell>;
+MedicationRoundLab2.layout = (page) => <AppShell>{page}</AppShell>;

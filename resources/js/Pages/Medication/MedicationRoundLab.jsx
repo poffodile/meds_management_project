@@ -1,3 +1,6 @@
+// EXPERIMENTAL copy of the Medication Round page — safe to redesign freely.
+// Served at /medication/medication-round-lab; shares the controller data + record
+// logic with the main page but is otherwise independent.
 import { useState } from 'react';
 import { Head, router } from '@inertiajs/react';
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
@@ -26,7 +29,8 @@ import { ageFromDob, formatDate } from '@frontend/lib/dateUtils';
 import { toMed } from '@frontend/lib/medView';
 import { usePageReload } from '@frontend/hooks/usePageReload';
 
-const ENDPOINT = '/medication/medication-round-react';
+const ENDPOINT = '/medication/medication-round-lab';
+const RECORD_ENDPOINT = '/medication/medication-round-lab/record';
 
 /** Overall round status for a resident, from their rows' recorded codes/buckets. */
 function residentStatus(resident) {
@@ -48,7 +52,7 @@ function SectionTitle({ color, children, count, unit }) {
     );
 }
 
-export default function MedicationRound({ rounds = [], grid = {}, date, currentRound = 'morning' }) {
+export default function MedicationRoundLab({ rounds = [], grid = {}, date, currentRound = 'morning' }) {
     const reload = usePageReload(ENDPOINT);
     const isMobile = useMediaQuery('(max-width: 768px)');
     const [activeRound, setActiveRound] = useState(currentRound);
@@ -64,17 +68,14 @@ export default function MedicationRound({ rounds = [], grid = {}, date, currentR
         ? residents.filter((r) => r.name.toLowerCase().includes(query.toLowerCase()))
         : residents;
 
-    // Detail opens only when a resident is explicitly selected (closable).
     const selected = selectedId != null ? (residents.find((r) => r.client_id === selectedId) ?? null) : null;
 
-    // Round-wide progress (scheduled meds only).
     const sched = residents.flatMap((r) => r.rows).filter((r) => !r.as_required);
     const pCompleted = sched.filter((r) => r.code).length;
     const pOverdue = sched.filter((r) => !r.code && r.status === 'overdue').length;
     const pDueSoon = sched.filter((r) => !r.code && r.status === 'due_now').length;
     const pNotStarted = sched.length - pCompleted - pOverdue - pDueSoon;
 
-    // Round-wide alerts.
     const overdueAlerts = residents.flatMap((r) =>
         r.rows.filter((row) => !row.code && row.status === 'overdue')
             .map((row) => ({ resident: r.name, med: row.medication_name, time: row.slot })));
@@ -83,10 +84,9 @@ export default function MedicationRound({ rounds = [], grid = {}, date, currentR
 
     const openRecord = (row, code) => { setRecordRow(row); setRecordCode(code); record.open(); };
 
-    // One-tap "Given" for scheduled, non-controlled meds; everything else opens the dialog.
     const handleAction = (row, code) => {
         if (code === 'A' && !row.is_controlled && !row.as_required && row.slot) {
-            router.post(`${ENDPOINT}/record`, {
+            router.post(RECORD_ENDPOINT, {
                 mar_sheet_id: row.mar_sheet_id, date, time_slot: row.slot, code: 'A', dose_given: row.dose ?? '', notes: '',
             }, { preserveScroll: true, preserveState: true });
         } else {
@@ -94,7 +94,6 @@ export default function MedicationRound({ rounds = [], grid = {}, date, currentR
         }
     };
 
-    // Selected resident's meds, grouped.
     const selRows = selected?.rows ?? [];
     const scheduled = selRows.filter((r) => !r.as_required);
     const prn = selRows.filter((r) => r.as_required);
@@ -103,7 +102,6 @@ export default function MedicationRound({ rounds = [], grid = {}, date, currentR
     const riskFlags = selected?.risk_flags ?? [];
     const hasHighRisk = riskFlags.some((r) => r.level === 'high' || r.level === 'urgent');
 
-    // ---- Panels (rendered into the desktop slide layout or the mobile stack) ----
     const residentsPanel = (
         <Card withBorder radius="lg" padding="sm" style={{ borderLeft: '4px solid var(--mantine-color-indigo-5)' }}>
             <Group justify="space-between" mb="xs">
@@ -230,50 +228,49 @@ export default function MedicationRound({ rounds = [], grid = {}, date, currentR
 
     return (
         <>
-            <Head title="Medication Round" />
+            <Head title="Medication Round (Lab)" />
             <Container size="xl" py="md">
-                {/* ---- Page header ---- */}
-                <Group justify="space-between" align="center" mb="md" wrap="wrap">
-                    <Group gap="md" wrap="nowrap" align="center">
-                        <ThemeIcon variant="light" color="indigo" size={48} radius="lg"><IconPill size={26} stroke={1.6} /></ThemeIcon>
-                        <Box>
-                            <Text fz={24} fw={700}>Medication Round</Text>
-                            <Text c="dimmed" size="sm">{meta.label} Round{meta.window ? ` • ${meta.window}` : ''}</Text>
-                        </Box>
-                    </Group>
+                {/* Top row — date + actions */}
+                <Group justify="space-between" mb="sm" wrap="wrap">
+                    <TextInput type="date" value={date} onChange={(e) => reload({ date: e.currentTarget.value })} leftSection={<IconCalendar size={16} />} w={170}
+                        styles={{ input: { fontWeight: 600, borderColor: 'var(--mantine-color-indigo-3)' } }} />
                     <Group gap="xs" wrap="nowrap">
                         <Button variant="default" leftSection={<IconRefresh size={16} />} onClick={() => reload({ date })}>Refresh</Button>
                         <Button leftSection={<IconCircleCheck size={16} />} disabled title="Coming soon">End Round</Button>
                     </Group>
                 </Group>
 
+                <Group gap="md" wrap="nowrap" align="center" mb="md">
+                    <ThemeIcon variant="light" color="indigo" size={48} radius="lg"><IconPill size={26} stroke={1.6} /></ThemeIcon>
+                        <Box>
+                            <Group gap="xs" align="center">
+                                <Text fz={24} fw={700}>Medication Round</Text>
+                                <Badge color="grape" variant="light">Lab</Badge>
+                            </Group>
+                            <Text c="dimmed" size="sm">{meta.label} Round{meta.window ? ` • ${meta.window}` : ''}</Text>
+                        </Box>
+                </Group>
+
                 <FlashAlerts />
 
-                {/* ---- Controls: date + round selector ---- */}
-                <Card withBorder radius="lg" padding="sm" mb="md">
-                    <Group justify="space-between" wrap="wrap" gap="sm">
-                        <TextInput type="date" value={date} onChange={(e) => reload({ date: e.currentTarget.value })} leftSection={<IconCalendar size={16} />} />
-                        <Group gap="xs" wrap="wrap">
-                            {rounds.map((r) => {
-                                const RI = roundTokens[r.key]?.icon ?? IconPill;
-                                const active = r.key === meta.key;
-                                const color = roundTokens[r.key]?.color ?? 'indigo';
-                                return (
-                                    <Button key={r.key} size="sm" variant={active ? 'light' : 'default'} color={active ? color : 'gray'}
-                                        leftSection={<RI size={16} color={`var(--mantine-color-${color}-6)`} />}
-                                        onClick={() => { setActiveRound(r.key); setSelectedId(null); }}>
-                                        <Box ta="left">
-                                            <Text size="sm" fw={600} lh={1}>{r.label}</Text>
-                                            {r.window && <Text size="xs" c="dimmed">{r.window}</Text>}
-                                        </Box>
-                                    </Button>
-                                );
-                            })}
-                        </Group>
-                    </Group>
-                </Card>
+                <Group justify="flex-end" gap="sm" wrap="wrap" mb="md">
+                    {rounds.map((r) => {
+                        const RI = roundTokens[r.key]?.icon ?? IconPill;
+                        const active = r.key === meta.key;
+                        const color = roundTokens[r.key]?.color ?? 'indigo';
+                        return (
+                            <Button key={r.key} size="md" radius="md" variant={active ? 'light' : 'default'} color={active ? color : 'gray'}
+                                leftSection={<RI size={17} color={`var(--mantine-color-${color}-6)`} />}
+                                onClick={() => { setActiveRound(r.key); setSelectedId(null); }}>
+                                <Box ta="left">
+                                    <Text size="sm" fw={600} lh={1.1}>{r.label}</Text>
+                                    {r.window && <Text size="xs" c="dimmed">{r.window}</Text>}
+                                </Box>
+                            </Button>
+                        );
+                    })}
+                </Group>
 
-                {/* ---- Workspace ---- */}
                 {isMobile ? (
                     <Stack gap="md">
                         {selected ? detailPanel : residentsPanel}
@@ -293,10 +290,10 @@ export default function MedicationRound({ rounds = [], grid = {}, date, currentR
                     </Group>
                 )}
 
-                <RecordDoseModal opened={recordOpened} onClose={record.close} row={recordRow} date={date} presetCode={recordCode} />
+                <RecordDoseModal opened={recordOpened} onClose={record.close} row={recordRow} date={date} presetCode={recordCode} endpoint={RECORD_ENDPOINT} />
             </Container>
         </>
     );
 }
 
-MedicationRound.layout = (page) => <AppShell>{page}</AppShell>;
+MedicationRoundLab.layout = (page) => <AppShell>{page}</AppShell>;

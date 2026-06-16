@@ -1572,6 +1572,11 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 	// React/Inertia version (isolated; legacy above untouched)
 	Route::get('/medication/medication-round-react', [\App\Http\Controllers\frontEnd\Medication\MedicationRoundController::class, 'indexReact'])->name('medication.medication-round.react');
 	Route::post('/medication/medication-round-react/record', [\App\Http\Controllers\frontEnd\Medication\MedicationRoundController::class, 'recordReact'])->name('medication.medication-round.react.record');
+	// Experimental copy of the round page (for trying alternative UIs; shares the same data + record logic)
+	Route::get('/medication/medication-round-lab', [\App\Http\Controllers\frontEnd\Medication\MedicationRoundController::class, 'indexReactLab'])->name('medication.medication-round.lab');
+	Route::post('/medication/medication-round-lab/record', [\App\Http\Controllers\frontEnd\Medication\MedicationRoundController::class, 'recordReactLab'])->name('medication.medication-round.lab.record');
+	Route::get('/medication/medication-round-lab2', [\App\Http\Controllers\frontEnd\Medication\MedicationRoundController::class, 'indexReactLab2'])->name('medication.medication-round.lab2');
+	Route::post('/medication/medication-round-lab2/record', [\App\Http\Controllers\frontEnd\Medication\MedicationRoundController::class, 'recordReactLab2'])->name('medication.medication-round.lab2.record');
 
 	// Medication Management — Controlled Drugs Register (append-only ledger)
 	Route::get('/medication/controlled-drugs', [\App\Http\Controllers\frontEnd\Medication\ControlledDrugRegisterController::class, 'index'])->name('medication.controlled-drugs.index');

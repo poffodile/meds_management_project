@@ -8,7 +8,7 @@ import { MED_CODES } from '@frontend/lib/medicationCodes';
  * RecordDoseModal — record the outcome of a single dose in the Medication Round.
  * The dose details come from the selected row; "Given" auto-deducts stock server-side.
  */
-export default function RecordDoseModal({ opened, onClose, row, date, presetCode }) {
+export default function RecordDoseModal({ opened, onClose, row, date, presetCode, endpoint = '/medication/medication-round-react/record' }) {
     const form = useForm({
         mar_sheet_id: '',
         date: date ?? '',
@@ -36,7 +36,7 @@ export default function RecordDoseModal({ opened, onClose, row, date, presetCode
             form.setError('witnessed_by', 'A witness is required to administer a controlled drug.');
             return;
         }
-        form.post('/medication/medication-round-react/record', {
+        form.post(endpoint, {
             preserveScroll: true,
             preserveState: true,
             onSuccess: () => { form.setData('notes', ''); form.setData('witnessed_by', ''); onClose(); },

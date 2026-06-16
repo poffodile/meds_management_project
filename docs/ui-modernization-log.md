@@ -1,5 +1,7 @@
 # UI Modernization — Discussion & Session Log
 
+> ➡️ **Superseded by [`docs/DEVELOPMENT-LOG.md`](DEVELOPMENT-LOG.md)** — the single master day-by-day log (this file's content is folded in there). Kept for the detailed 2026-06-04 decision tables; log new work in DEVELOPMENT-LOG.md.
+
 > **Status:** 🟢 BUILD phase. Stack agreed; M0 (base) + M1 (medication pages) done. Now restyling pages to a new reference design.
 > **Last updated:** 2026-06-09
 >

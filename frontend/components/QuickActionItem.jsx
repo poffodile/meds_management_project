@@ -7,12 +7,12 @@ import { Group, Text, ThemeIcon, Box, UnstyledButton } from '@mantine/core';
  *
  * Props: icon, label, description, href, onClick, color, disabled.
  */
-export default function QuickActionItem({ icon: Icon, label, description, href, onClick, color = 'indigo', disabled = false }) {
+export default function QuickActionItem({ icon: Icon, label, description, href, onClick, color = 'indigo', disabled = false, compact = false }) {
     const inner = (
-        <Group gap="sm" wrap="nowrap" px="xs" py={8} style={{ borderRadius: 8, opacity: disabled ? 0.55 : 1 }}>
+        <Group gap="sm" wrap="nowrap" px="xs" py={compact ? 4 : 8} style={{ borderRadius: 8, opacity: disabled ? 0.55 : 1 }}>
             {Icon && (
-                <ThemeIcon variant="light" color={color} size={36} radius="md">
-                    <Icon size={18} stroke={1.6} />
+                <ThemeIcon variant="light" color={color} size={compact ? 28 : 36} radius="md">
+                    <Icon size={compact ? 15 : 18} stroke={1.6} />
                 </ThemeIcon>
             )}
             <Box style={{ flex: 1, minWidth: 0 }}>

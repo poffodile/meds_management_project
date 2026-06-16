@@ -7,7 +7,7 @@ import {
 import { useDisclosure } from '@mantine/hooks';
 import { usePage, Link } from '@inertiajs/react';
 import {
-    IconHome, IconNotebook, IconClock, IconShieldLock, IconBox, IconAlertTriangle, IconPill,
+    IconHome, IconNotebook, IconClock, IconShieldLock, IconBox, IconAlertTriangle, IconPill, IconFlask,
     IconArrowsLeftRight, IconLayoutGrid, IconCalendar, IconCalendarStats, IconUsers,
     IconUserCircle, IconSend, IconReportAnalytics, IconMessage, IconBell, IconMoon,
     IconChevronDown, IconChevronLeft,
@@ -24,6 +24,8 @@ const NAV = [
     {
         group: 'Medication', icon: IconPill, children: [
             { label: 'Medication Round', icon: IconClock, href: '/medication/medication-round-react' },
+            { label: 'Round (Lab)', icon: IconFlask, href: '/medication/medication-round-lab' },
+            { label: 'Round (Lab 2)', icon: IconFlask, href: '/medication/medication-round-lab2' },
             { label: 'Medication Stock', icon: IconBox, href: '/medication/stock-react' },
             { label: 'Controlled Drugs', icon: IconShieldLock, href: '/medication/controlled-drugs-react' },
             { label: 'Missed Doses', icon: IconAlertTriangle, href: '/medication/missed-doses-react' },
