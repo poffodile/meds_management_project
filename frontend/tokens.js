@@ -12,47 +12,58 @@ import { IconSun, IconCoffee, IconSunset, IconMoon } from '@tabler/icons-react';
  */
 
 // ---- Brand ----
+// Official Care One OS brand colours — see docs/brand-guidelines.md.
 export const brand = {
     primary: 'indigo',   // Mantine primaryColor
-    navy: '#16223a',     // dark sidebar logo band (was hardcoded in AppShell)
+    navy: '#13233F',     // Support: Navy — header / sidebar / reverse-logo background
+    teal: '#45C1BF',     // Core
+    orange: '#F58321',   // Core
+    purple: '#795076',   // Core
+    green: '#88B13F',    // Core
+    lightGrey: '#F4F6F8',
+    midGrey: '#DDE4EA',
+    textGrey: '#5F6B76',
 };
 
 // ---- Semantic status / label colours ----
 // ONE place: add a status here and every <StatusBadge> across the app matches.
 // Keys are lowercased status strings. Priority levels are namespaced
 // (`priority_*`) so they don't collide with the stock-level `low`.
+// Brand-aligned: brandGreen = good/given, brandOrange = due/low, brandTeal = info,
+// red kept for danger, gray for neutral (see docs/brand-guidelines.md).
 export const statusColors = {
     // stock / general state
-    ok: 'green', active: 'green', inactive: 'gray',
-    low: 'orange', low_stock: 'orange', 'low stock': 'orange',
+    ok: 'brandGreen', active: 'brandGreen', inactive: 'gray',
+    low: 'brandOrange', low_stock: 'brandOrange', 'low stock': 'brandOrange',
     expired: 'red', 'out of stock': 'red', out_of_stock: 'red',
-    pending: 'yellow', draft: 'gray', submitted: 'blue',
-    acknowledged: 'green', resolved: 'green',
+    pending: 'yellow', draft: 'gray', submitted: 'brandTeal',
+    acknowledged: 'brandGreen', resolved: 'brandGreen',
     // medication transaction types
-    received: 'blue', administered: 'green', given: 'green',
-    disposed: 'orange', returned: 'gray', correction: 'yellow', adjustment: 'yellow',
+    received: 'brandTeal', administered: 'brandGreen', given: 'brandGreen',
+    disposed: 'brandOrange', returned: 'gray', correction: 'yellow', adjustment: 'yellow',
     // MAR / dose codes
-    refused: 'red', omitted: 'orange', withheld: 'orange',
+    refused: 'red', omitted: 'brandOrange', withheld: 'brandOrange',
     sleeping: 'gray', 'not available': 'gray',
-    missed: 'red', not_given: 'orange',
+    missed: 'red', not_given: 'brandOrange',
     // round / dose states
-    due: 'blue', 'due soon': 'orange', due_soon: 'orange',
-    overdue: 'red', completed: 'green',
-    'not started': 'gray', not_started: 'gray', 'all given': 'green',
+    due: 'brandTeal', 'due soon': 'brandOrange', due_soon: 'brandOrange',
+    overdue: 'red', completed: 'brandGreen',
+    'not started': 'gray', not_started: 'gray', 'all given': 'brandGreen',
     // priority levels (namespaced — see note above)
-    priority_low: 'gray', priority_medium: 'yellow', priority_high: 'orange', priority_urgent: 'red',
+    priority_low: 'gray', priority_medium: 'yellow', priority_high: 'brandOrange', priority_urgent: 'red',
 };
 
 // ---- Time-of-day medication rounds ----
+// One brand colour per round (Care One OS core palette).
 export const roundTokens = {
-    morning: { label: 'Morning', icon: IconSun, color: 'orange' },
-    lunchtime: { label: 'Lunchtime', icon: IconCoffee, color: 'yellow' },
-    evening: { label: 'Evening', icon: IconSunset, color: 'grape' },
-    night: { label: 'Night', icon: IconMoon, color: 'indigo' },
+    morning: { label: 'Morning', icon: IconSun, color: 'brandOrange' },
+    lunchtime: { label: 'Lunchtime', icon: IconCoffee, color: 'brandGreen' },
+    evening: { label: 'Evening', icon: IconSunset, color: 'brandPurple' },
+    night: { label: 'Night', icon: IconMoon, color: 'brandTeal' },
 };
 
 // ---- Avatar palette (deterministic initials avatars where there's no photo) ----
-export const avatarColors = ['indigo', 'teal', 'grape', 'cyan', 'orange', 'pink', 'blue'];
+export const avatarColors = ['brandTeal', 'brandOrange', 'brandPurple', 'brandGreen', 'indigo', 'cyan', 'pink'];
 
 // ---- Layout scale ----
 export const radius = { card: 'lg', control: 'md' };

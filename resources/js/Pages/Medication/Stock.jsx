@@ -20,6 +20,7 @@ import StatusBadge from '@frontend/components/StatusBadge';
 import AdjustStockModal from '@frontend/features/medications/AdjustStockModal';
 import AppShell from '@frontend/Layouts/AppShell';
 import { useRole } from '@frontend/lib/role';
+import { downloadCsv } from '@frontend/lib/csv';
 import classes from './Stock.module.css';
 
 const num = (v, unit) => (v === null || v === undefined ? '—' : `${v}${unit ? ' ' + unit : ''}`);
@@ -172,6 +173,17 @@ export default function Stock({ meds = [], transactions = [], stats = {} }) {
         </Group>
     );
     const statusBadgeFor = (m) => { const s = statusMeta(m); return <Badge color={s.color} variant="light" tt="none">{s.label}</Badge>; };
+
+    const exportCsv = () => downloadCsv('medication-stock.csv', [
+        { header: 'Medication', value: (m) => m.medication_name },
+        { header: 'Resident', value: (m) => m.resident },
+        { header: 'Stock', value: (m) => m.stock_level },
+        { header: 'Unit', value: (m) => m.unit },
+        { header: 'Reorder level', value: (m) => m.reorder_level },
+        { header: 'Status', value: (m) => statusMeta(m).label },
+        { header: 'Expiry', value: (m) => m.expiry_date },
+        { header: 'Controlled', value: (m) => (m.is_controlled ? `CD ${m.cd_schedule ?? ''}` : '') },
+    ], sortedMeds);
 
     const reorderColumns = [
         { key: 'medication_name', label: 'Medication' },

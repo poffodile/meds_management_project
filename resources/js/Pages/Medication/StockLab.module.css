@@ -1,0 +1,25 @@
+/* Inventory table polish — Notion-ish row height + hover-reveal row actions. */
+.invTable tbody td {
+    padding-top: 14px;
+    padding-bottom: 14px;
+}
+
+/* Row actions stay hidden until the row is hovered (revealed smoothly). */
+.rowActions {
+    opacity: 0;
+    transition: opacity 120ms ease;
+}
+.invTable tbody tr:hover .rowActions {
+    opacity: 1;
+}
+/* Touch devices have no hover — keep actions visible there. */
+@media (hover: none) {
+    .rowActions { opacity: 1; }
+}
+
+/* Sortable header affordance. */
+.sortTh {
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+}

@@ -1581,6 +1581,21 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 	Route::post('/medication/medication-round-lab1-1/record', [\App\Http\Controllers\frontEnd\Medication\MedicationRoundController::class, 'recordReactLab11'])->name('medication.medication-round.lab1-1.record');
 	Route::get('/medication/medication-round-lab1-2', [\App\Http\Controllers\frontEnd\Medication\MedicationRoundController::class, 'indexReactLab12'])->name('medication.medication-round.lab1-2');
 	Route::post('/medication/medication-round-lab1-2/record', [\App\Http\Controllers\frontEnd\Medication\MedicationRoundController::class, 'recordReactLab12'])->name('medication.medication-round.lab1-2.record');
+	Route::get('/medication/medication-round-lab1-3', [\App\Http\Controllers\frontEnd\Medication\MedicationRoundController::class, 'indexReactLab13'])->name('medication.medication-round.lab1-3');
+	Route::post('/medication/medication-round-lab1-3/record', [\App\Http\Controllers\frontEnd\Medication\MedicationRoundController::class, 'recordReactLab13'])->name('medication.medication-round.lab1-3.record');
+	Route::get('/medication/medication-round-lab1-4', [\App\Http\Controllers\frontEnd\Medication\MedicationRoundController::class, 'indexReactLab14'])->name('medication.medication-round.lab1-4');
+	Route::post('/medication/medication-round-lab1-4/record', [\App\Http\Controllers\frontEnd\Medication\MedicationRoundController::class, 'recordReactLab14'])->name('medication.medication-round.lab1-4.record');
+	Route::get('/medication/medication-round-lab1-4-1', [\App\Http\Controllers\frontEnd\Medication\MedicationRoundController::class, 'indexReactLab141'])->name('medication.medication-round.lab1-4-1');
+	Route::post('/medication/medication-round-lab1-4-1/record', [\App\Http\Controllers\frontEnd\Medication\MedicationRoundController::class, 'recordReactLab141'])->name('medication.medication-round.lab1-4-1.record');
+	Route::get('/medication/medication-round-lab1-4-2', [\App\Http\Controllers\frontEnd\Medication\MedicationRoundController::class, 'indexReactLab142'])->name('medication.medication-round.lab1-4-2');
+	Route::post('/medication/medication-round-lab1-4-2/record', [\App\Http\Controllers\frontEnd\Medication\MedicationRoundController::class, 'recordReactLab142'])->name('medication.medication-round.lab1-4-2.record');
+	Route::post('/medication/medication-round-lab1-4-2/end-round', [\App\Http\Controllers\frontEnd\Medication\MedicationRoundController::class, 'endReactLab142'])->name('medication.medication-round.lab1-4-2.end');
+	Route::post('/medication/medication-round-lab1-4-2/reopen-round', [\App\Http\Controllers\frontEnd\Medication\MedicationRoundController::class, 'reopenReactLab142'])->name('medication.medication-round.lab1-4-2.reopen');
+	Route::post('/medication/medication-round-lab1-4-2/flag-handover', [\App\Http\Controllers\frontEnd\Medication\MedicationRoundController::class, 'flagToHandoverLab142'])->name('medication.medication-round.lab1-4-2.flag-handover');
+	Route::post('/medication/medication-round-lab1-4-2/temporary-absence', [\App\Http\Controllers\frontEnd\Medication\MedicationRoundController::class, 'temporaryAbsenceLab142'])->name('medication.medication-round.lab1-4-2.temporary-absence');
+	Route::get('/medication/mar-report', [\App\Http\Controllers\frontEnd\Medication\MedicationRoundController::class, 'marReport'])->name('medication.mar-report');
+	Route::get('/medication/medication-round-lab1-4-3', [\App\Http\Controllers\frontEnd\Medication\MedicationRoundController::class, 'indexReactLab143'])->name('medication.medication-round.lab1-4-3');
+	Route::post('/medication/medication-round-lab1-4-3/record', [\App\Http\Controllers\frontEnd\Medication\MedicationRoundController::class, 'recordReactLab143'])->name('medication.medication-round.lab1-4-3.record');
 
 	// Medication Management — Controlled Drugs Register (append-only ledger)
 	Route::get('/medication/controlled-drugs', [\App\Http\Controllers\frontEnd\Medication\ControlledDrugRegisterController::class, 'index'])->name('medication.controlled-drugs.index');
@@ -1594,6 +1609,8 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 	Route::post('/medication/stock/adjust', [\App\Http\Controllers\frontEnd\Medication\MedicationStockController::class, 'adjust'])->name('medication.stock.adjust');
 	// React/Inertia + Mantine pilot (isolated; legacy page above is untouched)
 	Route::get('/medication/stock-react', [\App\Http\Controllers\frontEnd\Medication\MedicationStockController::class, 'indexReact'])->name('medication.stock.react');
+	Route::get('/medication/stock-react-lab', [\App\Http\Controllers\frontEnd\Medication\MedicationStockController::class, 'indexReactLab'])->name('medication.stock.react.lab');
+	Route::get('/medication/stock-react-lab-2', [\App\Http\Controllers\frontEnd\Medication\MedicationStockController::class, 'indexReactLab2'])->name('medication.stock.react.lab2');
 	Route::post('/medication/stock-react/adjust', [\App\Http\Controllers\frontEnd\Medication\MedicationStockController::class, 'adjustReact'])->name('medication.stock.react.adjust');
 
 	// Medication Management — Missed Doses Review (missed + not-given doses, with resolve workflow)

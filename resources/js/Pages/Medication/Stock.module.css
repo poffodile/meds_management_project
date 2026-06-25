@@ -1,0 +1,22 @@
+/* Live Stock inventory table — comfortable rows, hover-reveal actions, sortable headers. */
+.invTable tbody td {
+    padding-top: 11px;
+    padding-bottom: 11px;
+}
+
+.rowActions {
+    opacity: 0;
+    transition: opacity 120ms ease;
+}
+.invTable tbody tr:hover .rowActions {
+    opacity: 1;
+}
+@media (hover: none) {
+    .rowActions { opacity: 1; }
+}
+
+.sortTh {
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+}
