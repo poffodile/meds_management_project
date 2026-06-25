@@ -158,6 +158,7 @@ class MARSheetService
                     'administered_by' => $userId,
                     'witnessed_by' => $data['witnessed_by'] ?? null,
                     'code' => $data['code'],
+                    'reason' => $data['reason'] ?? null,
                     'notes' => $data['notes'] ?? null,
                 ]);
                 $admin->save();
@@ -172,6 +173,7 @@ class MARSheetService
                     'administered_by' => $userId,
                     'witnessed_by' => $data['witnessed_by'] ?? null,
                     'code' => $data['code'],
+                    'reason' => $data['reason'] ?? null,
                     'notes' => $data['notes'] ?? null,
                 ]);
                 $admin->home_id = $homeId;

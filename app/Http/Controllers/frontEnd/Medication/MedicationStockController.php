@@ -143,6 +143,30 @@ class MedicationStockController extends Controller
      */
     public function indexReact(Request $request)
     {
+        return Inertia::render('Medication/Stock', $this->stockReactData());
+    }
+
+    /**
+     * Sandbox copy of the React stock page — same data, separate component
+     * so changes can be trialled without touching the live page.
+     */
+    public function indexReactLab(Request $request)
+    {
+        return Inertia::render('Medication/StockLab', $this->stockReactData());
+    }
+
+    /** Second sandbox copy of the React stock page. */
+    public function indexReactLab2(Request $request)
+    {
+        return Inertia::render('Medication/StockLab2', $this->stockReactData());
+    }
+
+    /**
+     * Build the React stock payload (meds, transactions, stats) shared by the
+     * live page and the lab copy.
+     */
+    private function stockReactData(): array
+    {
         $homeId = $this->getHomeId();
 
         $sheets = MARSheet::forHome($homeId)
@@ -206,10 +230,10 @@ class MedicationStockController extends Controller
             'controlled'    => $meds->where('is_controlled', true)->count(),
         ];
 
-        return Inertia::render('Medication/Stock', [
+        return [
             'meds'         => $meds,
             'transactions' => $transactions,
             'stats'        => $stats,
-        ]);
+        ];
     }
 }

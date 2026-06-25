@@ -17,6 +17,7 @@ class MARAdministration extends Model
         'administered_by',
         'witnessed_by',
         'code',
+        'reason',
         'notes',
     ];
 
