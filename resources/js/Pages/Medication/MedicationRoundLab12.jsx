@@ -3,7 +3,7 @@ import { Head, router } from '@inertiajs/react';
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import {
     Container, Card, Paper, Group, Stack, Text, Box, TextInput, Button,
-    Badge, ThemeIcon, ScrollArea, ActionIcon, SimpleGrid, Table, Collapse,
+    Badge, ThemeIcon, ScrollArea, ActionIcon, SimpleGrid, Table,
 } from '@mantine/core';
 import {
     IconCalendar, IconSearch, IconRefresh, IconCircleCheck, IconPill,
@@ -26,8 +26,8 @@ import { ageFromDob, formatDate } from '@frontend/lib/dateUtils';
 import { toMed } from '@frontend/lib/medView';
 import { usePageReload } from '@frontend/hooks/usePageReload';
 
-// EXPERIMENTAL copy of the Medication Round page — safe to redesign freely.
-const ENDPOINT = '/medication/medication-round-lab1-1';
+// EXPERIMENTAL copy (Lab 1.2) — master-detail with an overview default.
+const ENDPOINT = '/medication/medication-round-lab1-2';
 
 /** Overall round status for a resident, from their rows' recorded codes/buckets. */
 function residentStatus(resident) {
@@ -71,8 +71,8 @@ function SidebarCard({ accent, title, children, align = 'center', headerRight = 
     return (
         <Card withBorder radius="lg" padding="sm"
             style={{ borderLeft: `4px solid var(--mantine-color-${accent}-5)`, minHeight: 170, display: 'flex', flexDirection: 'column' }}>
-            <Group justify="space-between" align="flex-start" wrap="nowrap" gap="xs" mb={14}>
-                <Text fw={700} size="xl">{title}</Text>
+            <Group justify="space-between" align="flex-start" wrap="nowrap" gap="xs" mb={6}>
+                <Text fw={700} size="lg">{title}</Text>
                 {headerRight}
             </Group>
             {/* min-height keeps a short box looking like a box; content grows past it */}
@@ -83,7 +83,7 @@ function SidebarCard({ accent, title, children, align = 'center', headerRight = 
     );
 }
 
-export default function MedicationRoundLab11({ rounds = [], grid = {}, date, currentRound = 'morning' }) {
+export default function MedicationRoundLab12({ rounds = [], grid = {}, date, currentRound = 'morning' }) {
     const reload = usePageReload(ENDPOINT);
     const isMobile = useMediaQuery('(max-width: 768px)');
     const [activeRound, setActiveRound] = useState(currentRound);
@@ -159,6 +159,34 @@ export default function MedicationRoundLab11({ rounds = [], grid = {}, date, cur
     const hasHighRisk = riskFlags.some((r) => r.level === 'high' || r.level === 'urgent');
 
     // ---- Panels (rendered into the desktop slide layout or the mobile stack) ----
+    const residentsPanel = (
+        <Card withBorder radius="lg" padding="sm" style={{ borderLeft: '4px solid var(--mantine-color-indigo-5)' }}>
+            <Group justify="space-between" mb="xs">
+                <Text fw={700}>Residents Due</Text>
+                <Badge variant="light" color="gray">{residents.length}</Badge>
+            </Group>
+            <TextInput placeholder="Search residents…" leftSection={<IconSearch size={15} />} value={query} onChange={(e) => setQuery(e.currentTarget.value)} mb="sm" maw={560} />
+            <ScrollArea.Autosize mah={isMobile ? 400 : 640}>
+                {filtered.length === 0
+                    ? <Text size="sm" c="dimmed" ta="center" py="md">No residents.</Text>
+                    : (
+                        <SimpleGrid cols={1} spacing={6} verticalSpacing={6} maw={560}>
+                            {filtered.map((r) => {
+                                const st = residentStatus(r);
+                                return (
+                                    <ResidentListItem key={r.client_id}
+                                        resident={{ name: r.name, room: r.room, photo: r.photo }}
+                                        status={st.status} statusLabel={st.label}
+                                        selected={selected?.client_id === r.client_id}
+                                        onClick={() => setSelectedId(selected?.client_id === r.client_id ? null : r.client_id)} />
+                                );
+                            })}
+                        </SimpleGrid>
+                    )}
+            </ScrollArea.Autosize>
+        </Card>
+    );
+
     const detailPanel = selected && (
         <Stack gap="md">
             <Group justify="space-between" align="center">
@@ -216,43 +244,10 @@ export default function MedicationRoundLab11({ rounds = [], grid = {}, date, cur
         </Stack>
     );
 
-    // Residents list where clicking a resident expands an inline dropdown with their detail.
-    const residentsPanel = (
-        <Card withBorder radius="lg" padding="sm" style={{ borderLeft: '4px solid var(--mantine-color-indigo-5)' }}>
-            <Group justify="space-between" mb="xs">
-                <Text fw={700}>Residents Due</Text>
-                <Badge variant="light" color="gray">{residents.length}</Badge>
-            </Group>
-            <TextInput placeholder="Search residents…" leftSection={<IconSearch size={15} />} value={query} onChange={(e) => setQuery(e.currentTarget.value)} mb="sm" />
-            {filtered.length === 0
-                ? <Text size="sm" c="dimmed" ta="center" py="md">No residents.</Text>
-                : (
-                    <Stack gap={6}>
-                        {filtered.map((r) => {
-                            const st = residentStatus(r);
-                            const isOpen = selectedId === r.client_id;
-                            return (
-                                <Box key={r.client_id}>
-                                    <ResidentListItem
-                                        resident={{ name: r.name, room: r.room, photo: r.photo }}
-                                        status={st.status} statusLabel={st.label}
-                                        selected={isOpen}
-                                        onClick={() => setSelectedId(isOpen ? null : r.client_id)} />
-                                    <Collapse in={isOpen}>
-                                        <Box pt="xs" pl="xs">{isOpen ? detailPanel : null}</Box>
-                                    </Collapse>
-                                </Box>
-                            );
-                        })}
-                    </Stack>
-                )}
-        </Card>
-    );
-
     const sidebarPanel = (
         <Stack gap={12}>
             <SidebarCard accent="indigo" title="Round Progress" align="flex-start">
-                <RoundProgressDonut completed={pCompleted} dueSoon={pDueSoon} overdue={pOverdue} notStarted={pNotStarted} size={84} detailed dayCompleted={dayCompleted} dayTotal={dayTotal} pctSize={31} legendFz={9} />
+                <RoundProgressDonut completed={pCompleted} dueSoon={pDueSoon} overdue={pOverdue} notStarted={pNotStarted} size={92} detailed dayCompleted={dayCompleted} dayTotal={dayTotal} />
             </SidebarCard>
 
             <SidebarCard accent="orange" title="Alerts" align="flex-start">
@@ -380,31 +375,24 @@ export default function MedicationRoundLab11({ rounds = [], grid = {}, date, cur
 
     return (
         <>
-            <Head title="Medication Round (Lab 1.1)" />
+            <Head title="Medication Round (Lab 1.2)" />
             <Container size={1700} py="md">
                 {/* ---- Page header ---- */}
-                <Group align="flex-start" gap={40} wrap="wrap" mb="xl">
-                    {/* spans the far-left + centre columns so the buttons land above Night */}
-                    <Box style={{ flex: '3 1 630px', minWidth: 0 }}>
-                        <Group justify="space-between" align="center" wrap="wrap">
-                            <Group gap="md" wrap="nowrap" align="center">
-                                <ThemeIcon variant="light" color="indigo" size={48} radius="lg"><IconPill size={26} stroke={1.6} /></ThemeIcon>
-                                <Box>
-                                    <Group gap="xs" align="center">
-                                        <Text fz={24} fw={700}>Medication Round</Text>
-                                        <Badge color="grape" variant="light">Lab 1.1</Badge>
-                                    </Group>
-                                    <Text c="dimmed" size="sm">{meta.label} Round{meta.window ? ` • ${meta.window}` : ''}</Text>
-                                </Box>
+                <Group justify="space-between" align="center" mb="xl" wrap="wrap">
+                    <Group gap="md" wrap="nowrap" align="center">
+                        <ThemeIcon variant="light" color="indigo" size={48} radius="lg"><IconPill size={26} stroke={1.6} /></ThemeIcon>
+                        <Box>
+                            <Group gap="xs" align="center">
+                                <Text fz={24} fw={700}>Medication Round</Text>
+                                <Badge color="grape" variant="light">Lab 1.2</Badge>
                             </Group>
-                            <Group gap="xs" wrap="nowrap">
-                                <Button variant="default" leftSection={<IconRefresh size={16} />} onClick={() => reload({ date })}>Refresh</Button>
-                                <Button leftSection={<IconCircleCheck size={16} />} disabled title="Coming soon">End Round</Button>
-                            </Group>
-                        </Group>
-                    </Box>
-                    {/* matches the right sidebar (empty above the round progress box) */}
-                    <Box style={{ flex: '0 1 260px', minWidth: 0 }} />
+                            <Text c="dimmed" size="sm">{meta.label} Round{meta.window ? ` • ${meta.window}` : ''}</Text>
+                        </Box>
+                    </Group>
+                    <Group gap="xs" wrap="nowrap">
+                        <Button variant="default" leftSection={<IconRefresh size={16} />} onClick={() => reload({ date })}>Refresh</Button>
+                        <Button leftSection={<IconCircleCheck size={16} />} disabled title="Coming soon">End Round</Button>
+                    </Group>
                 </Group>
 
                 <FlashAlerts />
@@ -414,31 +402,38 @@ export default function MedicationRoundLab11({ rounds = [], grid = {}, date, cur
                     <Stack gap="md">
                         {controlsCard}
                         {residentsPanel}
+                        {selected && detailPanel}
                         {activityCard}
                         {nextDueCard}
                         {sidebarPanel}
                     </Stack>
                 ) : (
-                    <Group align="flex-start" gap={40} wrap="wrap">
-                        {/* FAR LEFT — Recent Activity on top of Next Medications Due */}
-                        <Box style={{ flex: '1 1 230px', minWidth: 0 }}>
-                            <Stack gap="sm">
-                                {activityCard}
-                                {nextDueCard}
-                            </Stack>
-                        </Box>
-                        {/* CENTRE — date/round bar + residents */}
-                        <Box style={{ flex: '2 1 360px', minWidth: 0 }}>
-                            <Stack gap="md">
-                                {controlsCard}
-                                {residentsPanel}
-                            </Stack>
-                        </Box>
-                        {/* RIGHT — round progress / alerts / quick actions block (pulled up the page) */}
-                        <Box style={{ flex: '0 1 260px', minWidth: 0, marginTop: -84 }}>
-                            {sidebarPanel}
-                        </Box>
-                    </Group>
+                    <Stack gap="md">
+                        {controlsCard}
+                        <Group align="flex-start" gap="lg" wrap="wrap">
+                            {/* LEFT — residents (narrow); the overview tucks under it once a resident is open */}
+                            <Box style={{ flex: selected ? '1 1 300px' : '0 1 340px', minWidth: 0 }}>
+                                <Stack gap="md">
+                                    {residentsPanel}
+                                    {selected && activityCard}
+                                    {selected && nextDueCard}
+                                </Stack>
+                            </Box>
+                            {/* CENTRE — round overview by default; resident detail when one is selected */}
+                            <Box style={{ flex: '2 1 360px', minWidth: 0 }}>
+                                {selected ? detailPanel : (
+                                    <Stack gap="md">
+                                        {activityCard}
+                                        {nextDueCard}
+                                    </Stack>
+                                )}
+                            </Box>
+                            {/* RIGHT — round progress / alerts / quick actions */}
+                            <Box style={{ flex: '0 1 240px', minWidth: 0 }}>
+                                {sidebarPanel}
+                            </Box>
+                        </Group>
+                    </Stack>
                 )}
 
                 <RecordDoseModal opened={recordOpened} onClose={record.close} row={recordRow} date={date} presetCode={recordCode} endpoint={`${ENDPOINT}/record`} />
@@ -447,4 +442,4 @@ export default function MedicationRoundLab11({ rounds = [], grid = {}, date, cur
     );
 }
 
-MedicationRoundLab11.layout = (page) => <AppShell>{page}</AppShell>;
+MedicationRoundLab12.layout = (page) => <AppShell>{page}</AppShell>;

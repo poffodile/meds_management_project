@@ -1579,6 +1579,8 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 	Route::post('/medication/medication-round-lab2/record', [\App\Http\Controllers\frontEnd\Medication\MedicationRoundController::class, 'recordReactLab2'])->name('medication.medication-round.lab2.record');
 	Route::get('/medication/medication-round-lab1-1', [\App\Http\Controllers\frontEnd\Medication\MedicationRoundController::class, 'indexReactLab11'])->name('medication.medication-round.lab1-1');
 	Route::post('/medication/medication-round-lab1-1/record', [\App\Http\Controllers\frontEnd\Medication\MedicationRoundController::class, 'recordReactLab11'])->name('medication.medication-round.lab1-1.record');
+	Route::get('/medication/medication-round-lab1-2', [\App\Http\Controllers\frontEnd\Medication\MedicationRoundController::class, 'indexReactLab12'])->name('medication.medication-round.lab1-2');
+	Route::post('/medication/medication-round-lab1-2/record', [\App\Http\Controllers\frontEnd\Medication\MedicationRoundController::class, 'recordReactLab12'])->name('medication.medication-round.lab1-2.record');
 
 	// Medication Management — Controlled Drugs Register (append-only ledger)
 	Route::get('/medication/controlled-drugs', [\App\Http\Controllers\frontEnd\Medication\ControlledDrugRegisterController::class, 'index'])->name('medication.controlled-drugs.index');
