@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { Select, TextInput, Textarea, Text, Badge } from '@mantine/core';
 import { useForm } from '@inertiajs/react';
 import FormModal from '@frontend/components/FormModal';
-import { MED_CODES } from '@frontend/lib/medicationCodes';
+import { MED_CODES, REASON_REQUIRED_CODES, REFUSAL_REASONS, OMISSION_REASONS } from '@frontend/lib/medicationCodes';
 
 /**
  * RecordDoseModal — record the outcome of a single dose in the Medication Round.
@@ -16,8 +16,12 @@ export default function RecordDoseModal({ opened, onClose, row, date, presetCode
         code: 'A',
         dose_given: '',
         witnessed_by: '',
+        reason: '',
         notes: '',
     });
+
+    const needsReason = REASON_REQUIRED_CODES.includes(form.data.code);
+    const reasonOptions = form.data.code === 'R' ? REFUSAL_REASONS : OMISSION_REASONS;
 
     useEffect(() => {
         if (row) {
@@ -25,7 +29,10 @@ export default function RecordDoseModal({ opened, onClose, row, date, presetCode
             form.setData('date', date);
             form.setData('time_slot', row.slot ?? '');
             form.setData('code', presetCode ?? row.code ?? 'A');
-            form.setData('dose_given', row.dose ?? '');
+            form.setData('dose_given', row.dose_given ?? row.dose ?? '');
+            form.setData('witnessed_by', row.witnessed_by ?? '');
+            form.setData('reason', row.reason ?? '');
+            form.setData('notes', row.notes ?? '');
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [row, date, presetCode]);
@@ -36,10 +43,15 @@ export default function RecordDoseModal({ opened, onClose, row, date, presetCode
             form.setError('witnessed_by', 'A witness is required to administer a controlled drug.');
             return;
         }
+        // Refused / not-given / omitted must carry a reason (also enforced server-side).
+        if (REASON_REQUIRED_CODES.includes(form.data.code) && !String(form.data.reason).trim()) {
+            form.setError('reason', 'Please choose a reason.');
+            return;
+        }
         form.post(endpoint, {
             preserveScroll: true,
             preserveState: true,
-            onSuccess: () => { form.setData('notes', ''); form.setData('witnessed_by', ''); onClose(); },
+            onSuccess: () => { form.setData('notes', ''); form.setData('witnessed_by', ''); form.setData('reason', ''); onClose(); },
         });
     };
 
@@ -66,10 +78,25 @@ export default function RecordDoseModal({ opened, onClose, row, date, presetCode
                 label="Outcome"
                 data={MED_CODES}
                 value={form.data.code}
-                onChange={(v) => form.setData('code', v)}
+                onChange={(v) => {
+                    form.setData('code', v);
+                    if (!REASON_REQUIRED_CODES.includes(v)) form.setData('reason', '');
+                }}
                 error={form.errors.code}
                 required
             />
+            {needsReason && (
+                <Select
+                    label="Reason"
+                    placeholder="Choose a reason"
+                    data={reasonOptions}
+                    value={form.data.reason}
+                    onChange={(v) => form.setData('reason', v ?? '')}
+                    error={form.errors.reason}
+                    required
+                    searchable
+                />
+            )}
             <TextInput
                 label="Dose given"
                 value={form.data.dose_given}

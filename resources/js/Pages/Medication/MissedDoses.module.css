@@ -1,0 +1,16 @@
+/* Missed-doses table — comfortable rows + hover-reveal Resolve action. */
+.invTable tbody td {
+    padding-top: 13px;
+    padding-bottom: 13px;
+}
+
+.rowActions {
+    opacity: 0;
+    transition: opacity 120ms ease;
+}
+.invTable tbody tr:hover .rowActions {
+    opacity: 1;
+}
+@media (hover: none) {
+    .rowActions { opacity: 1; }
+}

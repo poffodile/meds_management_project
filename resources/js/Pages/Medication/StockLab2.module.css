@@ -1,0 +1,53 @@
+/* Inventory table polish — Notion-ish row height + hover-reveal row actions. */
+.invTable tbody td {
+    padding-top: 17px;
+    padding-bottom: 17px;
+}
+
+/* Hovering a row draws a subtle teal left bar (Linear-style). The selected
+   row keeps its stronger inline 4px bar, which wins over this. */
+.invTable tbody tr:hover td:first-child {
+    box-shadow: inset 4px 0 0 0 var(--mantine-color-brandTeal-5);
+}
+
+/* Row actions stay hidden until the row is hovered (revealed smoothly). */
+.rowActions {
+    opacity: 0;
+    transition: opacity 120ms ease;
+}
+.invTable tbody tr:hover .rowActions {
+    opacity: 1;
+}
+/* Touch devices have no hover — keep actions visible there. */
+@media (hover: none) {
+    .rowActions { opacity: 1; }
+}
+
+/* Clickable metric card — subtle lift on hover. */
+.metricClickable {
+    transition: box-shadow 130ms ease, transform 130ms ease;
+}
+.metricClickable:hover {
+    box-shadow: 0 6px 16px rgba(16, 24, 40, 0.10);
+    transform: translateY(-1px);
+}
+
+/* Sortable header affordance. */
+.sortTh {
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+}
+
+/* Row checkbox stays hidden until the row is hovered (or the row is checked,
+   handled inline) — stops the circles floating on every row. */
+.selectCell {
+    opacity: 0;
+    transition: opacity 120ms ease;
+}
+.invTable tbody tr:hover .selectCell {
+    opacity: 1;
+}
+@media (hover: none) {
+    .selectCell { opacity: 1; }
+}

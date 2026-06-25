@@ -29,5 +29,13 @@ export function toMed(row) {
         isControlled: row.is_controlled,
         cdSchedule: row.cd_schedule,
         code: row.code,
+        reason: row.reason,
+        notes: row.notes,
+        witnessedBy: row.witnessed_by,
+        recordedBy: row.recorded_by,
+        recordedAt: row.recorded_at,
+        doseGiven: row.dose_given,
+        asRequired: row.as_required,
+        prn: row.prn,
     };
 }

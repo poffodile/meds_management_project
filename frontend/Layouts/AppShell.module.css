@@ -1,0 +1,31 @@
+/* Shared styling for every left-nav row (items, groups, sub-items).
+   Background lives here — not inline — so a CSS :hover box can show, since
+   inline styles always beat :hover rules. State precedence (source order):
+   base transparent → :hover grey box → [data-active] teal pill. */
+.navRow {
+    --row-bg: transparent;
+    background-color: var(--row-bg);
+    border-radius: 8px;
+    transition: background-color 120ms ease;
+}
+
+.navRow:hover {
+    --row-bg: light-dark(var(--mantine-color-gray-1), var(--mantine-color-dark-5));
+}
+
+/* Nav labels ease in as the rail expands, rather than popping in. */
+.navLabel {
+    white-space: nowrap;
+    animation: navLabelIn 420ms cubic-bezier(0.22, 1, 0.36, 1) 100ms both;
+}
+
+@keyframes navLabelIn {
+    from { opacity: 0; transform: translateX(-6px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+/* Current page / section — a clearly-visible teal box (no left bar).
+   Declared after :hover so an active row keeps its teal while hovered. */
+.navRow[data-active] {
+    --row-bg: var(--mantine-color-brandTeal-2);
+}

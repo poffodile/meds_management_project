@@ -13,8 +13,9 @@ import {
     IconChevronDown, IconChevronLeft,
 } from '@tabler/icons-react';
 import { RoleContext } from '@frontend/lib/role';
-import { brand } from '@frontend/tokens';
-import logoUrl from '@frontend/assets/logo-careoneos.png';
+import BrandLogo from '@frontend/components/BrandLogo';
+import AppFooter from '@frontend/components/AppFooter';
+import classes from './AppShell.module.css';
 
 // The whole left-nav, in render order. `section` rows are the grey group labels.
 // Only the medication items have real routes today; the rest are placeholders (#).
@@ -23,12 +24,25 @@ const NAV = [
     { label: 'Daily Log', icon: IconNotebook, href: '#' },
     {
         group: 'Medication', icon: IconPill, children: [
-            { label: 'Medication Round', icon: IconClock, href: '/medication/medication-round-react' },
-            { label: 'Round (Lab)', icon: IconFlask, href: '/medication/medication-round-lab' },
-            { label: 'Round (Lab 1.1)', icon: IconFlask, href: '/medication/medication-round-lab1-1' },
-            { label: 'Round (Lab 1.2)', icon: IconFlask, href: '/medication/medication-round-lab1-2' },
-            { label: 'Round (Lab 2)', icon: IconFlask, href: '/medication/medication-round-lab2' },
+            // The primary Medication Round is now the polished Lab 1.4.2 build.
+            { label: 'Medication Round', icon: IconClock, href: '/medication/medication-round-lab1-4-2' },
+            // All the other trial versions tucked into one collapsible dropdown.
+            {
+                label: 'Round Versions', icon: IconFlask, children: [
+                    { label: 'Original (React)', href: '/medication/medication-round-react' },
+                    { label: 'Lab', href: '/medication/medication-round-lab' },
+                    { label: 'Lab 1.1', href: '/medication/medication-round-lab1-1' },
+                    { label: 'Lab 1.2', href: '/medication/medication-round-lab1-2' },
+                    { label: 'Lab 1.3', href: '/medication/medication-round-lab1-3' },
+                    { label: 'Lab 1.4', href: '/medication/medication-round-lab1-4' },
+                    { label: 'Lab 1.4.1', href: '/medication/medication-round-lab1-4-1' },
+                    { label: 'Lab 1.4.3', href: '/medication/medication-round-lab1-4-3' },
+                    { label: 'Lab 2', href: '/medication/medication-round-lab2' },
+                ],
+            },
             { label: 'Medication Stock', icon: IconBox, href: '/medication/stock-react' },
+            { label: 'Medication Stock (Lab)', icon: IconFlask, href: '/medication/stock-react-lab' },
+            { label: 'Medication Stock (Lab 2)', icon: IconFlask, href: '/medication/stock-react-lab-2' },
             { label: 'Controlled Drugs', icon: IconShieldLock, href: '/medication/controlled-drugs-react' },
             { label: 'Missed Doses', icon: IconAlertTriangle, href: '/medication/missed-doses-react' },
         ],
@@ -50,19 +64,17 @@ function NavItem({ item, active, collapsed }) {
     const Icon = item.icon;
     const disabled = item.href === '#';
     const inner = (
-        <Group gap="sm" wrap="nowrap" px="sm" py={9} style={{
-            borderRadius: 8,
-            borderLeft: `3px solid ${active ? 'var(--mantine-color-indigo-6)' : 'transparent'}`,
-            background: active ? 'var(--mantine-color-indigo-0)' : 'transparent',
-            color: active ? 'var(--mantine-color-indigo-7)' : 'var(--mantine-color-gray-7)',
-            opacity: disabled ? 0.5 : 1,
-            cursor: disabled ? 'default' : 'pointer',
-        }}>
-            <Icon size={20} stroke={1.6} color={active ? 'var(--mantine-color-indigo-6)' : 'currentColor'} />
-            {!collapsed && <Text size="sm" fw={active ? 600 : 500}>{item.label}</Text>}
+        <Group className={disabled ? undefined : classes.navRow} data-active={active || undefined}
+            gap="sm" wrap="nowrap" px="sm" py={9} justify={collapsed ? 'center' : 'flex-start'} style={{
+                color: active ? 'var(--mantine-color-brandTeal-light-color)' : 'light-dark(var(--mantine-color-gray-7), var(--mantine-color-gray-4))',
+                opacity: disabled ? 0.55 : 1,
+                cursor: disabled ? 'default' : 'pointer',
+            }}>
+            <Icon size={20} stroke={1.6} color={active ? 'var(--mantine-color-brandTeal-light-color)' : 'var(--mantine-color-brandTeal-6)'} />
+            {!collapsed && <Text className={classes.navLabel} size="sm" fw={active ? 700 : 500}>{item.label}</Text>}
         </Group>
     );
-    if (disabled) return <Box mb={2} title="Coming soon">{inner}</Box>;
+    if (disabled) return <Box mb={2} title={collapsed ? item.label : 'Coming soon'}>{inner}</Box>;
     return <Box component={Link} href={item.href} mb={2} style={{ textDecoration: 'none', display: 'block' }}>{inner}</Box>;
 }
 
@@ -71,39 +83,81 @@ function SubNavItem({ item, active }) {
     const Icon = item.icon;
     return (
         <Box component={Link} href={item.href} style={{ textDecoration: 'none', display: 'block' }}>
-            <Group gap="xs" wrap="nowrap" px="sm" py={7} style={{
-                borderRadius: 8,
-                background: active ? 'var(--mantine-color-indigo-0)' : 'transparent',
-                color: active ? 'var(--mantine-color-indigo-7)' : 'var(--mantine-color-gray-7)',
-            }}>
-                <Box w={5} h={5} style={{ borderRadius: '50%', flexShrink: 0, background: active ? 'var(--mantine-color-indigo-6)' : 'var(--mantine-color-gray-5)' }} />
-                {Icon && <Icon size={15} stroke={1.6} color={active ? 'var(--mantine-color-indigo-6)' : 'currentColor'} />}
-                <Text size="xs" fw={active ? 600 : 500}>{item.label}</Text>
+            <Group className={classes.navRow} data-active={active || undefined}
+                gap="xs" wrap="nowrap" px="sm" py={7} style={{
+                    color: active ? 'var(--mantine-color-brandTeal-light-color)' : 'light-dark(var(--mantine-color-gray-6), var(--mantine-color-gray-5))',
+                }}>
+                <Box w={5} h={5} style={{ borderRadius: '50%', flexShrink: 0, background: active ? 'var(--mantine-color-brandTeal-light-color)' : 'var(--mantine-color-gray-4)' }} />
+                {Icon && <Icon size={15} stroke={1.6} color={active ? 'var(--mantine-color-brandTeal-light-color)' : 'var(--mantine-color-brandTeal-6)'} />}
+                <Text className={classes.navLabel} size="xs" fw={active ? 700 : 500}>{item.label}</Text>
             </Group>
         </Box>
     );
 }
 
-// A collapsible parent (e.g. Medication) with a chevron, holding SubNavItems.
-function NavGroup({ item, url }) {
+// A nested collapsible inside a NavGroup (e.g. "Round Versions"), holding SubNavItems.
+// Starts collapsed so the version links stay out of the way until opened.
+function SubNavGroup({ item, path }) {
     const Icon = item.icon;
-    const childActive = item.children.some((c) => url.startsWith(c.href));
+    const childActive = item.children.some((c) => path === c.href);
+    const [open, setOpen] = useState(false);
+    return (
+        <Box>
+            <UnstyledButton onClick={() => setOpen((o) => !o)} w="100%">
+                <Group className={classes.navRow}
+                    gap="xs" wrap="nowrap" px="sm" py={7} style={{
+                        color: childActive ? 'var(--mantine-color-brandTeal-light-color)' : 'light-dark(var(--mantine-color-gray-6), var(--mantine-color-gray-5))',
+                    }}>
+                    <Box w={5} h={5} style={{ borderRadius: '50%', flexShrink: 0, background: childActive ? 'var(--mantine-color-brandTeal-light-color)' : 'var(--mantine-color-gray-4)' }} />
+                    {Icon && <Icon size={15} stroke={1.6} color={childActive ? 'var(--mantine-color-brandTeal-light-color)' : 'var(--mantine-color-brandTeal-6)'} />}
+                    <Text className={classes.navLabel} size="xs" fw={childActive ? 600 : 500} style={{ flex: 1 }}>{item.label}</Text>
+                    <IconChevronDown size={13} stroke={1.6} style={{ transform: open ? 'rotate(180deg)' : 'none', transition: 'transform .15s' }} />
+                </Group>
+            </UnstyledButton>
+            <Collapse in={open}>
+                <Stack gap={2} mt={2} pl="md">
+                    {item.children.map((c) => <SubNavItem key={c.href} item={c} active={path === c.href} />)}
+                </Stack>
+            </Collapse>
+        </Box>
+    );
+}
+
+// A collapsible parent (e.g. Medication) with a chevron, holding SubNavItems / SubNavGroups.
+function NavGroup({ item, url, mini }) {
+    const Icon = item.icon;
+    const path = url.split('?')[0];
+    const childActive = item.children.some((c) => (c.children ? c.children.some((g) => path === g.href) : path === c.href));
     const [open, setOpen] = useState(childActive);
+    if (mini) {
+        return (
+            <Box mb={2} title={item.group}>
+                <Group className={classes.navRow} data-active={childActive || undefined}
+                    justify="center" wrap="nowrap" py={9} style={{
+                        color: childActive ? 'var(--mantine-color-brandTeal-light-color)' : 'light-dark(var(--mantine-color-gray-7), var(--mantine-color-gray-4))',
+                    }}>
+                    <Icon size={20} stroke={1.6} color={childActive ? 'var(--mantine-color-brandTeal-light-color)' : 'var(--mantine-color-brandTeal-6)'} />
+                </Group>
+            </Box>
+        );
+    }
     return (
         <Box mb={2}>
             <UnstyledButton onClick={() => setOpen((o) => !o)} w="100%">
-                <Group gap="sm" wrap="nowrap" px="sm" py={9} style={{
-                    borderRadius: 8,
-                    color: childActive ? 'var(--mantine-color-indigo-7)' : 'var(--mantine-color-gray-7)',
-                }}>
-                    <Icon size={20} stroke={1.6} color={childActive ? 'var(--mantine-color-indigo-6)' : 'currentColor'} />
-                    <Text size="sm" fw={childActive ? 600 : 500} style={{ flex: 1 }}>{item.group}</Text>
+                <Group className={classes.navRow}
+                    gap="sm" wrap="nowrap" px="sm" py={9} style={{
+                        color: childActive ? 'var(--mantine-color-brandTeal-light-color)' : 'light-dark(var(--mantine-color-gray-7), var(--mantine-color-gray-4))',
+                    }}>
+                    <Icon size={20} stroke={1.6} color={childActive ? 'var(--mantine-color-brandTeal-light-color)' : 'var(--mantine-color-brandTeal-6)'} />
+                    <Text className={classes.navLabel} size="sm" fw={childActive ? 600 : 500} style={{ flex: 1 }}>{item.group}</Text>
                     <IconChevronDown size={15} stroke={1.6} style={{ transform: open ? 'rotate(180deg)' : 'none', transition: 'transform .15s' }} />
                 </Group>
             </UnstyledButton>
             <Collapse in={open}>
                 <Stack gap={2} mt={2} pl="lg">
-                    {item.children.map((c) => <SubNavItem key={c.href} item={c} active={url.startsWith(c.href)} />)}
+                    {item.children.map((c) => c.children
+                        ? <SubNavGroup key={c.label} item={c} path={path} />
+                        : <SubNavItem key={c.href} item={c} active={path === c.href} />)}
                 </Stack>
             </Collapse>
         </Box>
@@ -112,7 +166,8 @@ function NavGroup({ item, url }) {
 
 export default function AppShell({ children }) {
     const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
-    const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
+    const [railHover, setRailHover] = useState(false); // sidebar is an icon rail; expands to the full menu on hover
+    const mini = !railHover;
     const { props, url } = usePage();
     const realRole = props?.auth?.user?.role ?? 'carer';
     const userName = props?.auth?.user?.name ?? 'User';
@@ -125,17 +180,16 @@ export default function AppShell({ children }) {
     return (
         <RoleContext.Provider value={previewRole}>
             <MantineAppShell
-                layout="alt"
                 header={{ height: 64 }}
-                navbar={{ width: 264, breakpoint: 'sm', collapsed: { mobile: !mobileOpened, desktop: !desktopOpened } }}
+                navbar={{ width: railHover ? 264 : 76, breakpoint: 'sm', collapsed: { mobile: !mobileOpened, desktop: false } }}
                 padding="lg"
             >
-                {/* ---- Header ---- */}
-                <MantineAppShell.Header>
+                {/* ---- Header — full-width white bar with the hamburger + logo ---- */}
+                <MantineAppShell.Header style={{ background: 'light-dark(#ffffff, var(--mantine-color-dark-7))', borderBottom: '1px solid light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-4))' }}>
                     <Group h="100%" px="lg" justify="space-between" wrap="nowrap">
                         <Group gap="sm" wrap="nowrap">
                             <Burger opened={mobileOpened} onClick={toggleMobile} hiddenFrom="sm" size="sm" />
-                            <Burger opened={desktopOpened} onClick={toggleDesktop} visibleFrom="sm" size="sm" />
+                            <BrandLogo tone="auto" height={24} />
                         </Group>
 
                         <Group gap="md" wrap="nowrap">
@@ -151,7 +205,7 @@ export default function AppShell({ children }) {
 
                             <ActionIcon variant="subtle" color="gray" radius="xl" size="lg" pos="relative">
                                 <IconBell size={20} stroke={1.6} />
-                                <Box pos="absolute" top={10} right={11} w={8} h={8} style={{ background: 'var(--mantine-color-indigo-6)', borderRadius: '50%' }} />
+                                <Box pos="absolute" top={10} right={11} w={8} h={8} style={{ background: 'var(--mantine-color-indigo-4)', borderRadius: '50%' }} />
                             </ActionIcon>
 
                             <Menu position="bottom-end" withArrow width={210}>
@@ -163,7 +217,7 @@ export default function AppShell({ children }) {
                                                 <Text size="sm" fw={600}>{userName}</Text>
                                                 <Text size="xs" c="dimmed">{roleLabel}</Text>
                                             </Box>
-                                            <IconChevronDown size={16} stroke={1.6} />
+                                            <IconChevronDown size={16} stroke={1.6} color="light-dark(var(--mantine-color-gray-7), var(--mantine-color-gray-4))" />
                                         </Group>
                                     </UnstyledButton>
                                 </Menu.Target>
@@ -182,43 +236,45 @@ export default function AppShell({ children }) {
                     </Group>
                 </MantineAppShell.Header>
 
-                {/* ---- Sidebar ---- */}
-                <MantineAppShell.Navbar>
-                    <Group h={64} px="lg" wrap="nowrap" style={{ background: brand.navy }}>
-                        <img src={logoUrl} alt="Care One OS" style={{ height: 28, display: 'block' }} />
-                    </Group>
-                    <Divider />
-
-                    <MantineAppShell.Section grow component={ScrollArea} px="sm" py="md">
+                {/* ---- Sidebar — icon rail under the header; expands to the full menu on hover ---- */}
+                <MantineAppShell.Navbar
+                    onMouseEnter={() => setRailHover(true)}
+                    onMouseLeave={() => setRailHover(false)}
+                    style={{
+                        background: 'light-dark(#ffffff, var(--mantine-color-dark-7))',
+                        borderRight: '1px solid light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-4))',
+                        transition: 'width 400ms cubic-bezier(0.22, 1, 0.36, 1)',
+                        overflow: 'hidden',
+                    }}
+                >
+                    <MantineAppShell.Section grow component={ScrollArea} px="sm" pt="md" pb="md">
                         {NAV
                             .filter((i) => !i.managerOnly || isManager)
                             .map((item, idx) => {
-                                if (item.divider) return <Divider key={`d${idx}`} my="sm" />;
+                                if (item.divider) return <Divider key={`d${idx}`} my="sm" color="light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-4))" />;
                                 if (item.section) {
-                                    return (
-                                        <Text key={`s${idx}`} size="xs" fw={700} c="dimmed" tt="uppercase"
-                                            px="sm" mt="md" mb={6} style={{ letterSpacing: 0.6 }}>
-                                            {item.section}
-                                        </Text>
-                                    );
+                                    return mini
+                                        ? <Divider key={`s${idx}`} my="sm" color="light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-4))" />
+                                        : (
+                                            <Text key={`s${idx}`} size="xs" fw={700} c="dimmed" tt="uppercase"
+                                                px="sm" mt="md" mb={6} style={{ letterSpacing: 0.6 }}>
+                                                {item.section}
+                                            </Text>
+                                        );
                                 }
-                                if (item.group) return <NavGroup key={item.group} item={item} url={url} />;
-                                return <NavItem key={item.label} item={item} active={item.href !== '#' && url.startsWith(item.href)} />;
+                                if (item.group) return <NavGroup key={item.group} item={item} url={url} mini={mini} />;
+                                return <NavItem key={item.label} item={item} active={item.href !== '#' && url.startsWith(item.href)} collapsed={mini} />;
                             })}
-                    </MantineAppShell.Section>
-
-                    <Divider />
-                    <MantineAppShell.Section p="sm">
-                        <UnstyledButton onClick={toggleDesktop} style={{ width: '100%', borderRadius: 8 }}>
-                            <Group gap="sm" px="sm" py={9} c="dimmed">
-                                <IconChevronLeft size={18} stroke={1.6} />
-                                <Text size="sm" fw={500}>Collapse</Text>
-                            </Group>
-                        </UnstyledButton>
                     </MantineAppShell.Section>
                 </MantineAppShell.Navbar>
 
-                <MantineAppShell.Main>{children}</MantineAppShell.Main>
+                <MantineAppShell.Main style={{
+                    display: 'flex', flexDirection: 'column', minHeight: '100dvh',
+                    transition: 'padding 400ms cubic-bezier(0.22, 1, 0.36, 1)',
+                }}>
+                    <Box style={{ flex: 1, minWidth: 0 }}>{children}</Box>
+                    <AppFooter />
+                </MantineAppShell.Main>
             </MantineAppShell>
         </RoleContext.Provider>
     );
