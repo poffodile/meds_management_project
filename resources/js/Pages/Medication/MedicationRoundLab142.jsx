@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Head, router, usePage } from '@inertiajs/react';
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import {
@@ -9,7 +9,7 @@ import {
     IconCalendar, IconSearch, IconRefresh, IconCircleCheck, IconPill,
     IconAlertTriangle, IconShieldLock, IconQrcode, IconPlus, IconUserMinus, IconNotes,
     IconFileText, IconClipboardList, IconX, IconClock, IconCheck, IconBan,
-    IconArrowRight, IconInfoCircle, IconChevronRight, IconChevronDown,
+    IconArrowRight, IconInfoCircle, IconChevronRight, IconChevronDown, IconChevronLeft,
     IconBedFilled, IconUser, IconCake, IconId, IconShieldFilled, IconHeart, IconWeight, IconActivity,
     IconCircleX, IconFlag,
 } from '@tabler/icons-react';
@@ -24,6 +24,7 @@ import { toMed } from '@frontend/lib/medView';
 import { avatarColor, initials } from '@frontend/lib/avatarColor';
 import { CODE_LABELS } from '@frontend/lib/medicationCodes';
 import { usePageReload } from '@frontend/hooks/usePageReload';
+import classes from './MedicationRoundLab142.module.css';
 
 // EXPERIMENTAL copy (Lab 1.4) — single-workspace redesign: calm, minimal,
 // medication-cards-dominant. All markup that diverges from the shared
@@ -67,7 +68,7 @@ const surface = {
     border: '1px solid light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-4))',
     boxShadow: '0 1px 2px rgba(16,24,40,0.04), 0 1px 3px rgba(16,24,40,0.06)',
 };
-const surfacePrimary = { ...surface, borderRadius: 24 };
+const surfacePrimary = { ...surface, borderRadius: 28 };
 const surfaceTertiary = { ...surface, borderRadius: 12 };
 
 /** A section heading used inside the unified panels. */
@@ -604,11 +605,10 @@ export default function MedicationRoundLab142({ rounds = [], grid = {}, date, cu
     const hasConcerns = allergies.length > 0 || riskFlags.length > 0;
 
     // ---------------------------------------------------------------------------
-    // LEFT — one unified panel: Residents Due → Recent Activity → Next Due.
+    // LEFT (default view) — Residents Due (capped) beside Recent Activity + Next Due.
     // ---------------------------------------------------------------------------
-    const leftPanel = (
+    const residentsList = (
         <Box style={surface}>
-            {/* Residents Due */}
             <Box px="md" pt="md" pb="md">
                 <Group justify="space-between" align="center" mb="sm">
                     <Text fw={700} fz="sm" c="light-dark(var(--mantine-color-gray-8), var(--mantine-color-gray-2))">Residents Due</Text>
@@ -616,7 +616,7 @@ export default function MedicationRoundLab142({ rounds = [], grid = {}, date, cu
                 </Group>
                 <TextInput placeholder="Search residents…" leftSection={<IconSearch size={15} />} value={query}
                     onChange={(e) => setQuery(e.currentTarget.value)} mb="sm" radius="md" />
-                <ScrollArea.Autosize mah={isMobile ? 300 : 340} type="auto" offsetScrollbars scrollbarSize={8}>
+                <ScrollArea.Autosize mah={isMobile ? 320 : 520} type="auto" offsetScrollbars scrollbarSize={8}>
                     {filtered.length === 0
                         ? <Text fz="sm" c="dimmed" ta="center" py="md">No residents.</Text>
                         : (
@@ -635,14 +635,18 @@ export default function MedicationRoundLab142({ rounds = [], grid = {}, date, cu
                         )}
                 </ScrollArea.Autosize>
             </Box>
+        </Box>
+    );
 
+    const activityAndDue = (
+        <Box style={surface}>
             {/* Recent Activity */}
             <PanelSection title="Recent Activity" count={recentActivity.length || null}
                 collapsible open={recentOpen} onToggle={toggleRecent}>
                 {recentActivity.length === 0 ? (
                     <Text fz="sm" c="dimmed">No medications recorded yet this round.</Text>
                 ) : (
-                    <ScrollArea.Autosize mah={180} type="auto" offsetScrollbars scrollbarSize={8}>
+                    <ScrollArea.Autosize mah={220} type="auto" offsetScrollbars scrollbarSize={8}>
                     <Stack gap={6}>
                         {recentActivity.map((row, i) => {
                             const given = row.code === 'A' || row.code === 'S' || row.code === 'W';
@@ -671,6 +675,7 @@ export default function MedicationRoundLab142({ rounds = [], grid = {}, date, cu
                 {nextDue.length === 0 ? (
                     <Text fz="sm" c="dimmed">Nothing left due in this round.</Text>
                 ) : (
+                    <ScrollArea.Autosize mah={320} type="auto" offsetScrollbars scrollbarSize={8}>
                     <Stack gap={2}>
                         {nextDue.map((row, i) => {
                             const s = DUE_STATUS[row.status] ?? { label: row.status, color: 'gray' };
@@ -688,9 +693,18 @@ export default function MedicationRoundLab142({ rounds = [], grid = {}, date, cu
                             );
                         })}
                     </Stack>
+                    </ScrollArea.Autosize>
                 )}
             </PanelSection>
         </Box>
+    );
+
+    // Default view: capped residents list beside the activity/due column; wraps on small screens.
+    const defaultView = (
+        <Group align="flex-start" gap="lg" wrap="wrap">
+            <Box style={{ flex: '0 1 300px', maxWidth: 320, minWidth: 220 }}>{activityAndDue}</Box>
+            <Box style={{ flex: '1 1 360px', minWidth: 260 }}>{residentsList}</Box>
+        </Group>
     );
 
     // ---------------------------------------------------------------------------
@@ -874,6 +888,16 @@ export default function MedicationRoundLab142({ rounds = [], grid = {}, date, cu
     );
 
     const centrePanel = selected ? detailPanel : overviewPanel;
+
+    // Master-detail: residents list is the default view; selecting slides the detail in,
+    // "Back" slides the list back and scrolls it to the top.
+    const mdRef = useRef(null);
+    const goBack = () => { setSelectedId(null); requestAnimationFrame(() => mdRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })); };
+    const backBar = (
+        <Button variant="subtle" color="gray" radius="md" mb="sm" leftSection={<IconChevronLeft size={16} />} onClick={goBack}>
+            Back to residents
+        </Button>
+    );
 
     // ---------------------------------------------------------------------------
     // RIGHT SIDEBAR — Round Progress → Alerts → Quick Actions, stacked vertically.
@@ -1140,24 +1164,28 @@ export default function MedicationRoundLab142({ rounds = [], grid = {}, date, cu
                             {header}
                             <FlashAlerts />
                             {closedBanner}
-                            {centrePanel}
-                            {leftPanel}
+                            <Box ref={mdRef}>
+                                {selected
+                                    ? <Box key="detail" className={classes.slideIn}>{backBar}<Box><Box style={{ transform: 'scale(0.94)', transformOrigin: 'top left', width: '100%', marginLeft: 28 }}>{centrePanel}</Box></Box></Box>
+                                    : <Box key="list" className={classes.slideBack}>{defaultView}</Box>}
+                            </Box>
                             {rightPanel}
                         </Stack>
                     ) : (
                         <Group align="flex-start" gap="lg" wrap="nowrap">
-                            {/* LEFT AREA — title bar on top (right edge at the centre, stretches left
-                                over the residents), then the residents + centre columns below it */}
+                            {/* LEFT AREA — master-detail: Residents Due fills the area by default;
+                                selecting a resident slides their detail in over it. */}
                             <Box style={{ flex: '1 1 0%', minWidth: 0 }}>
                                 <Stack gap="lg">
                                     {header}
                                     {/* Flash notification fits within the content column (not full-width) */}
                                     <FlashAlerts />
                                     {closedBanner}
-                                    <Group align="flex-start" gap="lg" wrap="nowrap">
-                                        <Box style={{ flex: '0 0 300px', minWidth: 0 }}>{leftPanel}</Box>
-                                        <Box style={{ flex: '1 1 0%', minWidth: 0 }}>{centrePanel}</Box>
-                                    </Group>
+                                    <Box ref={mdRef} style={{ overflow: 'hidden' }}>
+                                        {selected
+                                            ? <Box key="detail" className={classes.slideIn}>{backBar}<Box><Box style={{ transform: 'scale(0.94)', transformOrigin: 'top left', width: '100%', marginLeft: 28 }}>{centrePanel}</Box></Box></Box>
+                                            : <Box key="list" className={classes.slideBack}>{defaultView}</Box>}
+                                    </Box>
                                 </Stack>
                             </Box>
                             {/* RIGHT — vertical sidebar; scaled down a bit, same proportions */}

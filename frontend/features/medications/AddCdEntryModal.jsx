@@ -54,7 +54,19 @@ export default function AddCdEntryModal({ opened, onClose, residents = [], medsB
         const bal = lastBalances[`${form.data.client_id}|${value}`];
         if (bal !== undefined && bal !== null) {
             form.setData('balance_before', bal);
+            recalcBalance(form.data.action_type, bal, form.data.dose_quantity);
         }
+    };
+
+    // Auto-fill the running balance: out (administered/disposed) subtracts the dose,
+    // in (received/returned) adds it. Adjustment is left for manual entry. Still editable.
+    const recalcBalance = (action, before, dose) => {
+        if (before === '' || before === null || before === undefined) return;
+        const b = Number(before);
+        if (Number.isNaN(b)) return;
+        const d = Number(dose || 0);
+        if (action === 'administered' || action === 'disposed') form.setData('balance_after', b - d);
+        else if (action === 'received' || action === 'returned') form.setData('balance_after', b + d);
     };
 
     const submit = () => {
@@ -98,7 +110,7 @@ export default function AddCdEntryModal({ opened, onClose, residents = [], medsB
                     label="Action"
                     data={ACTION_OPTIONS}
                     value={form.data.action_type}
-                    onChange={(v) => form.setData('action_type', v)}
+                    onChange={(v) => { form.setData('action_type', v); recalcBalance(v, form.data.balance_before, form.data.dose_quantity); }}
                     error={form.errors.action_type}
                     required
                 />
@@ -129,7 +141,7 @@ export default function AddCdEntryModal({ opened, onClose, residents = [], medsB
                 <NumberInput
                     label="Dose given" min={0}
                     value={form.data.dose_quantity}
-                    onChange={(v) => form.setData('dose_quantity', v)}
+                    onChange={(v) => { form.setData('dose_quantity', v); recalcBalance(form.data.action_type, form.data.balance_before, v); }}
                     error={form.errors.dose_quantity}
                 />
                 <TextInput
@@ -142,7 +154,7 @@ export default function AddCdEntryModal({ opened, onClose, residents = [], medsB
                 <NumberInput
                     label="Balance before"
                     value={form.data.balance_before}
-                    onChange={(v) => form.setData('balance_before', v)}
+                    onChange={(v) => { form.setData('balance_before', v); recalcBalance(form.data.action_type, v, form.data.dose_quantity); }}
                     error={form.errors.balance_before}
                 />
                 <NumberInput

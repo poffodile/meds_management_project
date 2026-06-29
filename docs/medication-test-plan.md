@@ -44,6 +44,8 @@ Legend: `[ ]` not tested · `[x]` pass · `[!]` fail (note it).
 - [ ] Stock bars are colour-graded (green/amber/red), status badges correct.
 - [ ] **Adjust stock** (manager) → modal → save updates the stock + adds a transaction.
 - [ ] **Row ⋯ → View history** opens the drawer with that med's transactions (+/− signs, balance, who/when). ✅ built 2026-06-25
+- [ ] **Stat chips** filter the table by status and stay in sync with the Status dropdown; **active chip fills**.
+- [ ] **Bulk select → Export** downloads only the ticked rows; **Transfer/Archive/Print** show "coming soon".
 - [ ] **Filter** button toggles Status/Stock/Expiry selects; filtering narrows the inventory; active-count badge shows; Clear resets; tab count matches. ✅ built 2026-06-25
 
 ## 3. Controlled Drugs
@@ -51,6 +53,7 @@ Legend: `[ ]` not tested · `[x]` pass · `[!]` fail (note it).
 - [ ] Search + Action filter narrow the table; Recent Activity shows latest.
 - [ ] Action icons/badges + dose ± sign render correctly.
 - [ ] **Export** downloads `controlled-drugs-register.csv` matching the filtered rows; disabled when empty. ✅ built 2026-06-25
+- [ ] Add entry: picking med auto-fills **balance before**; choosing action + dose **auto-calculates balance after** (out = −, in = +); still editable; **witness required** to save.
 
 ## 4. Missed Doses
 - [ ] Date nav (← / date / → / Today) reloads.

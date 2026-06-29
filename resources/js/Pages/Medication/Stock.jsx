@@ -5,7 +5,7 @@ import { useDisclosure } from '@mantine/hooks';
 import {
     Container, Text, Group, SimpleGrid, Badge, Button, Box, Menu, ActionIcon,
     ThemeIcon, Progress, Drawer, Stack, Divider, Select, Collapse,
-    SegmentedControl, Checkbox, Table, TextInput, Tooltip,
+    SegmentedControl, Checkbox, Table, TextInput, Tooltip, UnstyledButton,
 } from '@mantine/core';
 import {
     IconBox, IconAlertTriangle, IconCircleX, IconClock, IconCalendar,
@@ -82,6 +82,24 @@ function relTime(ms) {
     const days = Math.floor(h / 24);
     if (days === 1) return 'Yesterday';
     return new Date(ms).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+}
+
+// Pill stat chip — icon + label + count; fills with its colour when active. Doubles as a status filter.
+function StatChip({ icon: Icon, label, count, color, active, onClick }) {
+    return (
+        <UnstyledButton onClick={onClick} style={{
+            display: 'inline-flex', alignItems: 'center', gap: 8, padding: '7px 14px', borderRadius: 999,
+            background: active ? `var(--mantine-color-${color}-6)` : 'light-dark(#ffffff, var(--mantine-color-dark-6))',
+            border: `1px solid ${active ? `var(--mantine-color-${color}-6)` : 'light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-4))'}`,
+            color: active ? '#fff' : 'light-dark(var(--mantine-color-gray-7), var(--mantine-color-gray-3))',
+            boxShadow: active ? '0 2px 8px rgba(16,24,40,0.12)' : '0 1px 2px rgba(16,24,40,0.04)',
+            transition: 'background 120ms ease, border-color 120ms ease, box-shadow 120ms ease', whiteSpace: 'nowrap',
+        }}>
+            <Icon size={16} stroke={1.7} />
+            <Text size="sm" fw={600} span>{label}</Text>
+            <Text size="sm" fw={800} span style={{ opacity: active ? 0.95 : 0.5 }}>{count}</Text>
+        </UnstyledButton>
+    );
 }
 
 // Sortable header cell.
@@ -174,7 +192,7 @@ export default function Stock({ meds = [], transactions = [], stats = {} }) {
     );
     const statusBadgeFor = (m) => { const s = statusMeta(m); return <Badge color={s.color} variant="light" tt="none">{s.label}</Badge>; };
 
-    const exportCsv = () => downloadCsv('medication-stock.csv', [
+    const stockExportColumns = [
         { header: 'Medication', value: (m) => m.medication_name },
         { header: 'Resident', value: (m) => m.resident },
         { header: 'Stock', value: (m) => m.stock_level },
@@ -183,7 +201,9 @@ export default function Stock({ meds = [], transactions = [], stats = {} }) {
         { header: 'Status', value: (m) => statusMeta(m).label },
         { header: 'Expiry', value: (m) => m.expiry_date },
         { header: 'Controlled', value: (m) => (m.is_controlled ? `CD ${m.cd_schedule ?? ''}` : '') },
-    ], sortedMeds);
+    ];
+    const exportCsv = (rows, filename = 'medication-stock.csv') => downloadCsv(filename, stockExportColumns, rows);
+    const exportSelected = () => exportCsv(meds.filter((m) => selected.has(m.id)), 'medication-stock-selected.csv');
 
     const reorderColumns = [
         { key: 'medication_name', label: 'Medication' },
@@ -228,8 +248,6 @@ export default function Stock({ meds = [], transactions = [], stats = {} }) {
                             </Group>
                             <Group gap="sm" wrap="nowrap">
                                 <Text size="xs" c="dimmed" visibleFrom="sm">Updated {updatedAgo}</Text>
-                                <Button variant={filtersOpen || activeFilters ? 'light' : 'default'} radius="md" leftSection={<IconFilter size={16} />}
-                                    onClick={filters.toggle} rightSection={activeFilters ? <Badge size="sm" circle variant="filled">{activeFilters}</Badge> : null}>Filter</Button>
                                 {role === 'manager'
                                     ? <Button radius="md" leftSection={<IconPlus size={16} />} onClick={adjust.open}>Adjust stock</Button>
                                     : <Badge variant="light" color="gray" size="lg" radius="sm">View only</Badge>}
@@ -239,40 +257,41 @@ export default function Stock({ meds = [], transactions = [], stats = {} }) {
 
                     <FlashAlerts />
 
-                    <SimpleGrid cols={{ base: 2, sm: 3, lg: 5 }} mb="lg" spacing="md">
-                        <StatCard label="Total items" value={stats.total ?? 0} color="indigo" icon={IconBox} sublabel="In this home" />
-                        <StatCard label="Low stock" value={stats.low ?? 0} color="orange" icon={IconAlertTriangle} sublabel="Need attention" />
-                        <StatCard label="Out of stock" value={stats.out_of_stock ?? 0} color="red" icon={IconCircleX} sublabel="Require ordering" />
-                        <StatCard label="Expiring soon" value={stats.expiring_soon ?? 0} color="grape" icon={IconClock} sublabel="Within 30 days" />
-                        <StatCard label="Expired" value={stats.expired ?? 0} color="red" icon={IconCalendar} sublabel="Remove from stock" />
-                    </SimpleGrid>
+                    <Group gap="sm" mb="lg" wrap="wrap">
+                        {[
+                            { key: 'all', label: 'All items', count: stats.total ?? 0, color: 'brandTeal', icon: IconBox },
+                            { key: 'low', label: 'Low stock', count: stats.low ?? 0, color: 'orange', icon: IconAlertTriangle },
+                            { key: 'critical', label: 'Out of stock', count: stats.out_of_stock ?? 0, color: 'red', icon: IconCircleX },
+                            { key: 'expiring', label: 'Expiring soon', count: stats.expiring_soon ?? 0, color: 'grape', icon: IconClock },
+                            { key: 'expired', label: 'Expired', count: stats.expired ?? 0, color: 'red', icon: IconCalendar },
+                        ].map((c) => (
+                            <StatChip key={c.key} icon={c.icon} label={c.label} count={c.count} color={c.color}
+                                active={statusFilter === c.key}
+                                onClick={() => { setStatusFilter(c.key); setView('overview'); }} />
+                        ))}
+                    </Group>
+
+                    <SegmentedControl value={view} onChange={setView} radius={12} size="sm" mb="md"
+                        data={[
+                            { value: 'overview', label: tab('Stock Overview', filteredMeds.length) },
+                            { value: 'transactions', label: tab('Transactions', transactions.length) },
+                            { value: 'reorders', label: tab('Reorders', lowList.length) },
+                            { value: 'disposals', label: tab('Disposals', disposals.length) },
+                        ]} />
 
                     <Box style={{ ...surface, padding: '16px 18px' }}>
-                        <SegmentedControl value={view} onChange={setView} radius={12} mb="md"
-                            data={[
-                                { value: 'overview', label: tab('Stock Overview', filteredMeds.length) },
-                                { value: 'transactions', label: tab('Transactions', transactions.length) },
-                                { value: 'reorders', label: tab('Reorders', lowList.length) },
-                                { value: 'disposals', label: tab('Disposals', disposals.length) },
-                            ]} />
-
                         {view === 'overview' && (
                             <>
-                                <Collapse in={filtersOpen}>
-                                    <Group gap="sm" mb="md" wrap="wrap" align="flex-end">
-                                        <Select label="Status" radius="md" w={150} checkIconPosition="right" value={statusFilter} onChange={(v) => setStatusFilter(v ?? 'all')}
-                                            data={[{ value: 'all', label: 'All statuses' }, { value: 'in_stock', label: 'Good' }, { value: 'low', label: 'Low stock' }, { value: 'critical', label: 'Out of stock' }, { value: 'expiring', label: 'Expiring soon' }, { value: 'expired', label: 'Expired' }]} />
-                                        <Select label="Stock level" radius="md" w={150} checkIconPosition="right" value={stockFilter} onChange={(v) => setStockFilter(v ?? 'all')}
-                                            data={[{ value: 'all', label: 'Any stock' }, { value: 'high', label: 'Healthy' }, { value: 'medium', label: 'Getting low' }, { value: 'low', label: 'Critical' }]} />
-                                        <Select label="Expiry" radius="md" w={150} checkIconPosition="right" value={expiryFilter} onChange={(v) => setExpiryFilter(v ?? 'all')}
-                                            data={[{ value: 'all', label: 'Any expiry' }, { value: 'expiring', label: 'Expiring ≤30d' }, { value: 'expired', label: 'Expired' }, { value: 'ok', label: 'In date' }]} />
-                                        {activeFilters > 0 && <Button variant="subtle" color="gray" radius="md" onClick={clearFilters}>Clear</Button>}
-                                    </Group>
-                                </Collapse>
-
-                                <Group gap="sm" mb="md" wrap="wrap">
-                                    <TextInput flex={1} miw={220} radius="md" leftSection={<IconSearch size={16} />}
+                                <Group gap="sm" mb="md" wrap="wrap" align="flex-end" w="100%" maw={1160} mx="auto">
+                                    <TextInput w={260} radius="xl" leftSection={<IconSearch size={16} />}
                                         placeholder="Search meds or resident…" value={search} onChange={(e) => setSearch(e.currentTarget.value)} />
+                                    <Select radius="md" w={146} checkIconPosition="right" value={statusFilter} onChange={(v) => setStatusFilter(v ?? 'all')}
+                                        data={[{ value: 'all', label: 'All statuses' }, { value: 'in_stock', label: 'Good' }, { value: 'low', label: 'Low stock' }, { value: 'critical', label: 'Out of stock' }, { value: 'expiring', label: 'Expiring soon' }, { value: 'expired', label: 'Expired' }]} />
+                                    <Select radius="md" w={134} checkIconPosition="right" value={stockFilter} onChange={(v) => setStockFilter(v ?? 'all')}
+                                        data={[{ value: 'all', label: 'Any stock' }, { value: 'high', label: 'Healthy' }, { value: 'medium', label: 'Getting low' }, { value: 'low', label: 'Critical' }]} />
+                                    <Select radius="md" w={134} checkIconPosition="right" value={expiryFilter} onChange={(v) => setExpiryFilter(v ?? 'all')}
+                                        data={[{ value: 'all', label: 'Any expiry' }, { value: 'expiring', label: 'Expiring ≤30d' }, { value: 'expired', label: 'Expired' }, { value: 'ok', label: 'In date' }]} />
+                                    <Tooltip label="Download CSV of the listed medications" withArrow><Button variant="default" radius="xl" ml="auto" leftSection={<IconDownload size={16} />} onClick={() => exportCsv(sortedMeds)} disabled={!sortedMeds.length}>Export</Button></Tooltip>
                                 </Group>
 
                                 {selected.size > 0 && (
@@ -280,10 +299,10 @@ export default function Stock({ meds = [], transactions = [], stats = {} }) {
                                         style={{ background: 'light-dark(var(--mantine-color-brandTeal-0), var(--mantine-color-dark-5))', border: '1px solid light-dark(var(--mantine-color-brandTeal-2), var(--mantine-color-dark-4))', borderRadius: 12 }}>
                                         <Group gap="xs" wrap="nowrap"><Badge color="brandTeal" variant="filled" radius="sm">{selected.size}</Badge><Text size="sm" fw={600}>selected</Text></Group>
                                         <Group gap="xs" wrap="wrap">
-                                            <Button size="compact-sm" variant="light" color="brandTeal" leftSection={<IconArrowsExchange size={14} />}>Transfer</Button>
-                                            <Button size="compact-sm" variant="light" color="brandTeal" leftSection={<IconDownload size={14} />}>Export</Button>
-                                            <Button size="compact-sm" variant="light" color="brandTeal" leftSection={<IconArchive size={14} />}>Archive</Button>
-                                            <Button size="compact-sm" variant="light" color="brandTeal" leftSection={<IconPrinter size={14} />}>Print</Button>
+                                            <Tooltip label="Transfer — coming soon" withArrow><Button size="compact-sm" variant="light" color="gray" leftSection={<IconArrowsExchange size={14} />} disabled>Transfer</Button></Tooltip>
+                                            <Button size="compact-sm" variant="light" color="brandTeal" leftSection={<IconDownload size={14} />} onClick={exportSelected}>Export</Button>
+                                            <Tooltip label="Archive — coming soon" withArrow><Button size="compact-sm" variant="light" color="gray" leftSection={<IconArchive size={14} />} disabled>Archive</Button></Tooltip>
+                                            <Tooltip label="Print — coming soon" withArrow><Button size="compact-sm" variant="light" color="gray" leftSection={<IconPrinter size={14} />} disabled>Print</Button></Tooltip>
                                             <Button size="compact-sm" variant="subtle" color="gray" leftSection={<IconX size={14} />} onClick={clearSelection}>Clear</Button>
                                         </Group>
                                     </Group>

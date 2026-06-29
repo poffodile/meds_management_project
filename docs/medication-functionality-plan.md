@@ -75,8 +75,32 @@ tabs.
 ---
 
 ## Open decisions
-- [ ] **View Profile (#4):** profile drawer (from existing data) **or** link to legacy client page?
-- [ ] **Export (#1):** CSV download enough, **or** also a Print/printable layout?
+- [x] **View Profile (#4):** chose the **profile drawer** + a "View full record →" link to the legacy client page. ✅
+- [x] **Export (#1):** **CSV download** (no print layout). ✅
 
 ## Recommended sequence
-1 → 2 → 3 → 4 (Tier 1, ~1 day total) → 5 → 6 (Tier 2) → 7 (Tier 3).
+1 → 2 → 3 → 4 (Tier 1, ~1 day total) → 5 → 6 (Tier 2) → 7 (Tier 3). — **all done.**
+
+---
+
+## Functionality audit — save paths verified (2026-06-25)
+
+Walked every core page button-by-button and traced each save path through the controller to the DB. **All 5 pages: every button wired, every write validated server-side, home-scoped, and audited. No dead-ends** (only the labelled "coming soon" placeholders below remain).
+
+| Page | Verified |
+|---|---|
+| **Medication Round** | Record dose, End/Reopen round, Flag-to-handover, Temporary Absence, MAR Report, Scan (stub), View Profile — all wired to real endpoints. |
+| **Medication Stock** | Chips/tabs/search/filters all sync one `statusFilter`/`stockFilter`/`expiryFilter`; Adjust modal saves; View-history drawer; toolbar **Export CSV** + **bulk Export** (selected rows). |
+| **Controlled Drugs** | Add entry → `storeReact`→`createEntry`: validates, **witness required** (UI + server), home-scoped, `created_by`, **append-only**. `balance_after` now **auto-calculates** (out = −dose, in = +dose; editable). |
+| **Missed Doses** | Resolve → `resolveReact`→`runResolve`: `updateOrCreate` a `MedicationDoseReview` (status=resolved) keyed by sheet+date+slot → **idempotent**, home-scoped, audited; row flips to Resolved on reload. |
+| **Shift Handover** | New handover → `storeReact`→`persistHandover`: validated, empty rows stripped, status `draft|submitted`. Acknowledge → `runAcknowledge`: **guarded "only submitted"**, home-scoped, sets acknowledged_by/at. |
+
+### Wins added during the audit
+- **Controlled Drugs:** `balance_after` auto-calculates from balance-before ± dose by action type (prevents arithmetic slips).
+- **Stock:** bulk **Export** wired (selected rows → CSV); Transfer/Archive/Print disabled with "coming soon" tooltips.
+
+### Remaining gaps (product decisions / not bugs)
+- [ ] **Stock — bulk Transfer / Archive / Print.** Need backend + a decision (e.g. transfer stock *to where?*). Currently disabled "coming soon".
+- [ ] **Stock — drawer Transfer / Full history.** Disabled "coming soon".
+- [ ] **Missed Doses — edit a review after resolving.** Resolve is idempotent server-side, but the UI hides the button once resolved (no "Edit review").
+- [ ] **Shift Handover — edit / resume a draft.** React page is create-only; a legacy `/{id}/update` route exists but isn't wired into the new UI, so drafts can't be opened/submitted later.

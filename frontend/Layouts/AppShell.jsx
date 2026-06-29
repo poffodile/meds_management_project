@@ -181,7 +181,7 @@ export default function AppShell({ children }) {
         <RoleContext.Provider value={previewRole}>
             <MantineAppShell
                 header={{ height: 64 }}
-                navbar={{ width: railHover ? 264 : 76, breakpoint: 'sm', collapsed: { mobile: !mobileOpened, desktop: false } }}
+                navbar={{ width: 76, breakpoint: 'sm', collapsed: { mobile: !mobileOpened, desktop: false } }}
                 padding="lg"
             >
                 {/* ---- Header — full-width white bar with the hamburger + logo ---- */}
@@ -241,9 +241,15 @@ export default function AppShell({ children }) {
                     onMouseEnter={() => setRailHover(true)}
                     onMouseLeave={() => setRailHover(false)}
                     style={{
+                        // The layout always reserves 76px (collapsed). On hover the rail expands
+                        // to 264px and *overlays* the page (higher z-index) instead of pushing it,
+                        // so the page content never gets squeezed/clipped.
+                        width: railHover ? 264 : 76,
+                        zIndex: railHover ? 201 : undefined,
                         background: 'light-dark(#ffffff, var(--mantine-color-dark-7))',
                         borderRight: '1px solid light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-4))',
-                        transition: 'width 400ms cubic-bezier(0.22, 1, 0.36, 1)',
+                        boxShadow: railHover ? '4px 0 24px rgba(16,24,40,0.10)' : 'none',
+                        transition: 'width 400ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 300ms ease',
                         overflow: 'hidden',
                     }}
                 >

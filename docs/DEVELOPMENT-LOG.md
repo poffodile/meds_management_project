@@ -44,6 +44,20 @@ To run it on this computer: `start-local.bat` (starts the database, the web serv
   - **Scan Medication** (Round) — a **manual stub**: type/paste a barcode or name → finds the matching dose → confirm (camera scanning left for when devices support it).
 - All **20 automated tests still pass**.
 
+### Functionality pass — making every button work (same run)
+
+- **Brought the live Medication Stock page up to the Lab 2 standard** (it had been the simpler original): segmented tabs (Overview/Transactions/Reorders/Disposals), **tick-box bulk select** with a teal selected-row bar, medication-type icons + form/route/strength, colour-graded stock bars, sortable headers, hover row actions, "last activity", a richer **view-history drawer** (route/form/batch/supplier/last delivery), an **"Updated X ago"** stamp, and inline search + filters + Export. Also fixed the table so it **fits the card neatly** (capped width, centred, columns hide on smaller screens / when the sidebar opens) and turned the summary cards into **clickable filter pills**.
+- **Audited every button on all five medication screens** and wrote it up: `docs/medication-functionality-plan.md` (per-page map + build plan) and a step-by-step **test checklist** `docs/medication-test-plan.md`.
+- **Built the 7 dead-end buttons** the audit found — all now work:
+  - **Export to CSV** on Controlled Drugs, Missed Doses and Stock (downloads exactly what's on screen; Stock also exports just the ticked rows).
+  - **Stock "View history"** (drawer) and **inline Status/Stock/Expiry filters**.
+  - **Round "View Profile"** — a resident summary drawer + a link to the full legacy record.
+  - **Round "Temporary Absence"** — mark a resident away for a date range; their scheduled doses are recorded as omitted with a reason (new server endpoint) so they don't pile up as "missed".
+  - **Round "MAR Report"** — a printable medication chart (medicines × days) in a new tab.
+  - **Round "Scan Medication"** — a manual stand-in (type/scan a name → find the dose → confirm); camera left for later.
+- **Walked the save path of every screen end-to-end** (clicked through the code from button → server → database). Confirmed each write is **validated on the server, limited to the logged-in care home, and stamped with who did it**. Notable: controlled-drug entries **require a witness**; the **balance now auto-calculates** (in/out by action) to avoid maths slips; resolving a missed dose can't create duplicates; handover acknowledge only works on submitted ones.
+- **Result: no dead-end buttons left** on any of the five screens — everything either works or is clearly marked "coming soon". The only outstanding items are small product decisions (bulk Transfer/Archive/Print on Stock, editing a review after it's resolved, editing/submitting a saved handover draft), captured in the plan doc.
+
 ## 2026-06-23
 
 > Covers the run of work since the 2026-06-18 entry: trialling four resident-card designs on their own pages, putting the "extra" resident info **into the database for real**, adding **demo children clients**, and building **Lab 1.4.3** + heavily polishing **Lab 1.4.2**.

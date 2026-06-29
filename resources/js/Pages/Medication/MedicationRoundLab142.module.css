@@ -1,0 +1,44 @@
+/* Master-detail transition on the Medication Round centre area.
+   Opening a resident: the detail sweeps in from the right with a soft fade + a
+   clear scale-up. Going Back: the list eases in from the left the same way.
+   Slower + more dramatic; easeOutExpo curve = fast start, long gentle settle. */
+.slideIn {
+    animation: mdSlideIn 620ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    transform-origin: 50% 0;
+    will-change: transform, opacity;
+}
+@keyframes mdSlideIn {
+    0%   { transform: translateX(72px) scale(0.955); opacity: 0; }
+    55%  { opacity: 1; }
+    100% { transform: translateX(0) scale(1); opacity: 1; }
+}
+
+.slideBack {
+    animation: mdSlideBack 620ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    transform-origin: 50% 0;
+    will-change: transform, opacity;
+}
+@keyframes mdSlideBack {
+    0%   { transform: translateX(-60px) scale(0.955); opacity: 0; }
+    55%  { opacity: 1; }
+    100% { transform: translateX(0) scale(1); opacity: 1; }
+}
+
+/* Inside the opened detail, the blocks reveal in a longer, clearer stagger so it
+   feels composed and deliberate rather than appearing all at once. */
+.slideIn > * {
+    animation: mdRise 640ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.slideIn > *:nth-child(1) { animation-delay: 90ms; }
+.slideIn > *:nth-child(2) { animation-delay: 200ms; }
+.slideIn > *:nth-child(3) { animation-delay: 300ms; }
+.slideIn > *:nth-child(n+4) { animation-delay: 380ms; }
+
+@keyframes mdRise {
+    from { transform: translateY(18px); opacity: 0; }
+    to   { transform: translateY(0); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .slideIn, .slideBack, .slideIn > * { animation: none !important; }
+}
