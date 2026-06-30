@@ -16,10 +16,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('mar_sheets', function (Blueprint $table) {
-            if (!Schema::hasColumn('mar_sheets', 'prn_max_daily')) {
+            if (! Schema::hasColumn('mar_sheets', 'prn_max_daily')) {
                 $table->unsignedSmallInteger('prn_max_daily')->nullable()->after('prn_details');
             }
-            if (!Schema::hasColumn('mar_sheets', 'prn_min_interval_hours')) {
+            if (! Schema::hasColumn('mar_sheets', 'prn_min_interval_hours')) {
                 $table->decimal('prn_min_interval_hours', 4, 1)->nullable()->after('prn_max_daily');
             }
         });

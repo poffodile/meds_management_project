@@ -24,8 +24,9 @@ class DemoChildrenClientsSeeder extends Seeder
         $homeId = 101;
         $template = DB::table('service_user')->where('home_id', $homeId)->first()
             ?? DB::table('service_user')->first();
-        if (!$template) {
+        if (! $template) {
             $this->command?->warn('No template service_user found; aborting.');
+
             return;
         }
         $tpl = (array) $template;
@@ -78,32 +79,32 @@ class DemoChildrenClientsSeeder extends Seeder
                 unset($row['id']);
                 $nhs = str_pad((string) (9500000000 + (($i * 7349) % 1000000000)), 10, '0', STR_PAD_LEFT);
                 $row = array_merge($row, [
-                    'name'            => $c['name'],
-                    'user_name'       => $c['key'],
-                    'email'           => $c['key'] . '@demo.local',
-                    'phone_no'        => '',
-                    'mobile'          => '',
-                    'date_of_birth'   => $c['dob'],
-                    'gender'          => $c['gender'],
-                    'weight'          => $c['weight'],
-                    'weight_unit'     => 'kg',
-                    'height_unit'     => 'cm',
-                    'allergies'       => $c['allergies'],
-                    'room_number'     => $c['room'],
-                    'nhs_number'      => substr($nhs, 0, 3) . ' ' . substr($nhs, 3, 3) . ' ' . substr($nhs, 6),
-                    'diet'            => $c['diet'],
-                    'suMobility'      => $c['mobility'],
-                    'image'           => '',
+                    'name' => $c['name'],
+                    'user_name' => $c['key'],
+                    'email' => $c['key'].'@demo.local',
+                    'phone_no' => '',
+                    'mobile' => '',
+                    'date_of_birth' => $c['dob'],
+                    'gender' => $c['gender'],
+                    'weight' => $c['weight'],
+                    'weight_unit' => 'kg',
+                    'height_unit' => 'cm',
+                    'allergies' => $c['allergies'],
+                    'room_number' => $c['room'],
+                    'nhs_number' => substr($nhs, 0, 3).' '.substr($nhs, 3, 3).' '.substr($nhs, 6),
+                    'diet' => $c['diet'],
+                    'suMobility' => $c['mobility'],
+                    'image' => '',
                     'short_description' => $c['desc'],
-                    'personal_info'   => $c['desc'],
-                    'admission_number' => 'DEMO' . (1000 + $i),
-                    'section'         => '',
-                    'status'          => 1,
-                    'is_deleted'      => 0,
-                    'home_id'         => $homeId,
-                    'security_code'   => Str::random(16),
-                    'created_at'      => $now,
-                    'updated_at'      => $now,
+                    'personal_info' => $c['desc'],
+                    'admission_number' => 'DEMO'.(1000 + $i),
+                    'section' => '',
+                    'status' => 1,
+                    'is_deleted' => 0,
+                    'home_id' => $homeId,
+                    'security_code' => Str::random(16),
+                    'created_at' => $now,
+                    'updated_at' => $now,
                 ]);
                 $clientId = (int) DB::table('service_user')->insertGetId($row);
                 $created++;
@@ -119,38 +120,38 @@ class DemoChildrenClientsSeeder extends Seeder
             // 12:00=lunch, 14:00=evening, 20:00=night.
             $spread = [['08:00', '20:00'], ['12:00'], ['14:00']];
             foreach (($medSets[$c['key']] ?? []) as $idx => $m) {
-                $isPrn = !empty($m['prn']);
-                $isCd  = !empty($m['cd']);
+                $isPrn = ! empty($m['prn']);
+                $isCd = ! empty($m['cd']);
                 DB::table('mar_sheets')->insert([
-                    'home_id'               => $homeId,
-                    'client_id'             => $clientId,
-                    'medication_name'       => $m['name'],
-                    'dosage'                => $m['dosage'],
-                    'dose'                  => $m['dose'],
-                    'route'                 => $m['route'],
-                    'frequency'             => $isPrn ? 'as required' : 'scheduled',
-                    'time_slots'            => json_encode($isPrn ? ($m['slots'] ?? ['08:00']) : $spread[$idx % count($spread)]),
-                    'as_required'           => $isPrn ? 1 : 0,
-                    'prn_details'           => $m['prn_details'] ?? null,
+                    'home_id' => $homeId,
+                    'client_id' => $clientId,
+                    'medication_name' => $m['name'],
+                    'dosage' => $m['dosage'],
+                    'dose' => $m['dose'],
+                    'route' => $m['route'],
+                    'frequency' => $isPrn ? 'as required' : 'scheduled',
+                    'time_slots' => json_encode($isPrn ? ($m['slots'] ?? ['08:00']) : $spread[$idx % count($spread)]),
+                    'as_required' => $isPrn ? 1 : 0,
+                    'prn_details' => $m['prn_details'] ?? null,
                     'reason_for_medication' => $m['reason'] ?? null,
-                    'prescribed_by'         => 'Dr Smith',
-                    'prescriber'            => 'GP',
-                    'pharmacy'              => 'Boots Pharmacy',
-                    'start_date'            => '2026-05-01',
-                    'end_date'              => null,
-                    'expiry_date'           => null,
-                    'is_controlled'         => $isCd ? 1 : 0,
-                    'cd_schedule'           => $m['cd_schedule'] ?? null,
-                    'stock_level'           => $m['stock'] ?? null,
-                    'reorder_level'         => $m['reorder'] ?? null,
-                    'storage_requirements'  => $isCd ? 'CD cabinet' : 'Room temperature',
-                    'allergies_warnings'    => null,
-                    'mar_status'            => 'active',
-                    'discontinued'          => 0,
-                    'created_by'            => 15,
-                    'is_deleted'            => 0,
-                    'created_at'            => $now,
-                    'updated_at'            => $now,
+                    'prescribed_by' => 'Dr Smith',
+                    'prescriber' => 'GP',
+                    'pharmacy' => 'Boots Pharmacy',
+                    'start_date' => '2026-05-01',
+                    'end_date' => null,
+                    'expiry_date' => null,
+                    'is_controlled' => $isCd ? 1 : 0,
+                    'cd_schedule' => $m['cd_schedule'] ?? null,
+                    'stock_level' => $m['stock'] ?? null,
+                    'reorder_level' => $m['reorder'] ?? null,
+                    'storage_requirements' => $isCd ? 'CD cabinet' : 'Room temperature',
+                    'allergies_warnings' => null,
+                    'mar_status' => 'active',
+                    'discontinued' => 0,
+                    'created_by' => 15,
+                    'is_deleted' => 0,
+                    'created_at' => $now,
+                    'updated_at' => $now,
                 ]);
             }
         }

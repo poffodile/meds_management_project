@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\User;
 use Illuminate\Database\Eloquent\Model;
 
 class MARAdministration extends Model
@@ -46,6 +47,6 @@ class MARAdministration extends Model
 
     public function administeredByUser()
     {
-        return $this->belongsTo(\App\User::class, 'administered_by');
+        return $this->belongsTo(User::class, 'administered_by');
     }
 }

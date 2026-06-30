@@ -2,16 +2,18 @@
 
 namespace App\Http\Controllers\frontEnd\Medication;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
-use App\Models\MARSheet;
 use App\Models\MARAdministration;
-use App\Models\MedicationStockTransaction;
+use App\Models\MARSheet;
 use App\Models\MedicationRoundClosure;
+use App\Models\MedicationStockTransaction;
 use App\Models\ShiftHandover;
 use App\Services\Staff\MARSheetService;
 use App\ServiceUser;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
 class MedicationRoundController extends Controller
@@ -24,18 +26,19 @@ class MedicationRoundController extends Controller
      * or from 18:00 onwards counts as Night.
      */
     private const ROUNDS = [
-        'morning'   => ['label' => 'Morning',   'start' => 6,  'end' => 12, 'icon' => 'fa-sun-o',     'window' => '06:00–12:00'],
+        'morning' => ['label' => 'Morning',   'start' => 6,  'end' => 12, 'icon' => 'fa-sun-o',     'window' => '06:00–12:00'],
         'lunchtime' => ['label' => 'Lunchtime', 'start' => 12, 'end' => 14, 'icon' => 'fa-coffee',    'window' => '12:00–14:00'],
-        'evening'   => ['label' => 'Evening',   'start' => 14, 'end' => 18, 'icon' => 'fa-cloud',     'window' => '14:00–18:00'],
-        'night'     => ['label' => 'Night',     'start' => 18, 'end' => 24, 'icon' => 'fa-moon-o',    'window' => '18:00–06:00'],
+        'evening' => ['label' => 'Evening',   'start' => 14, 'end' => 18, 'icon' => 'fa-cloud',     'window' => '14:00–18:00'],
+        'night' => ['label' => 'Night',     'start' => 18, 'end' => 24, 'icon' => 'fa-moon-o',    'window' => '18:00–06:00'],
     ];
 
     public function __construct()
     {
         $this->middleware(function ($request, $next) {
-            if (!Auth::check() || !in_array(Auth::user()->user_type, self::ALLOWED_USER_TYPES, true)) {
+            if (! Auth::check() || ! in_array(Auth::user()->user_type, self::ALLOWED_USER_TYPES, true)) {
                 abort(403, 'You do not have access to medication management.');
             }
+
             return $next($request);
         });
     }
@@ -49,7 +52,7 @@ class MedicationRoundController extends Controller
     /** Which round does an "HH:MM" time fall into? */
     private function roundForTime(?string $time): string
     {
-        if (!$time) {
+        if (! $time) {
             return 'night';
         }
         $hour = (int) substr($time, 0, 2);
@@ -61,6 +64,7 @@ class MedicationRoundController extends Controller
                 return $key;
             }
         }
+
         return 'night';
     }
 
@@ -69,7 +73,7 @@ class MedicationRoundController extends Controller
         $request->validate(['date' => 'nullable|date']);
 
         $homeId = $this->getHomeId();
-        $date   = $request->input('date', now()->toDateString());
+        $date = $request->input('date', now()->toDateString());
 
         // Active prescriptions for this home, with the doses already recorded today.
         $sheets = MARSheet::forHome($homeId)
@@ -93,7 +97,7 @@ class MedicationRoundController extends Controller
         }
 
         foreach ($sheets as $sheet) {
-            $slots = !empty($sheet->time_slots) ? $sheet->time_slots : [null];
+            $slots = ! empty($sheet->time_slots) ? $sheet->time_slots : [null];
             $adminsBySlot = $sheet->administrations->keyBy('time_slot');
 
             foreach ($slots as $slot) {
@@ -103,16 +107,16 @@ class MedicationRoundController extends Controller
 
                 foreach ($targetRounds as $roundKey) {
                     $clientId = $sheet->client_id;
-                    if (!isset($grid[$roundKey][$clientId])) {
+                    if (! isset($grid[$roundKey][$clientId])) {
                         $grid[$roundKey][$clientId] = [
                             'client_id' => $clientId,
-                            'name'      => $residentNames[$clientId] ?? ('Resident #' . $clientId),
-                            'rows'      => [],
+                            'name' => $residentNames[$clientId] ?? ('Resident #'.$clientId),
+                            'rows' => [],
                         ];
                     }
                     $grid[$roundKey][$clientId]['rows'][] = [
                         'sheet' => $sheet,
-                        'slot'  => $slot,
+                        'slot' => $slot,
                         'admin' => $slot !== null ? $adminsBySlot->get($slot) : null,
                     ];
                 }
@@ -128,9 +132,9 @@ class MedicationRoundController extends Controller
         $currentRound = $this->roundForTime(now()->format('H:i'));
 
         return view('frontEnd.medication.medication_round.index', [
-            'rounds'       => self::ROUNDS,
-            'grid'         => $grid,
-            'date'         => $date,
+            'rounds' => self::ROUNDS,
+            'grid' => $grid,
+            'date' => $date,
             'currentRound' => $currentRound,
         ]);
     }
@@ -198,7 +202,7 @@ class MedicationRoundController extends Controller
         $request->validate(['date' => 'nullable|date']);
 
         $homeId = $this->getHomeId();
-        $date   = $request->input('date', now()->toDateString());
+        $date = $request->input('date', now()->toDateString());
 
         $sheets = MARSheet::forHome($homeId)
             ->active()
@@ -216,7 +220,7 @@ class MedicationRoundController extends Controller
         $counts = [];
         foreach ($sheets as $s) {
             $cid = $s->client_id;
-            if (!isset($counts[$cid])) {
+            if (! isset($counts[$cid])) {
                 $counts[$cid] = ['regular' => 0, 'prn' => 0];
             }
             $s->as_required ? $counts[$cid]['prn']++ : $counts[$cid]['regular']++;
@@ -231,10 +235,10 @@ class MedicationRoundController extends Controller
             ->groupBy('client_id');
 
         // Time context for the due / overdue / upcoming derivation (relative to "now").
-        $today   = now()->toDateString();
+        $today = now()->toDateString();
         $isToday = ($date === $today);
-        $isPast  = ($date < $today);
-        $nowMin  = (int) now()->format('H') * 60 + (int) now()->format('i');
+        $isPast = ($date < $today);
+        $nowMin = (int) now()->format('H') * 60 + (int) now()->format('i');
 
         $grid = [];
         foreach (array_keys(self::ROUNDS) as $roundKey) {
@@ -242,28 +246,28 @@ class MedicationRoundController extends Controller
         }
 
         foreach ($sheets as $sheet) {
-            $slots = !empty($sheet->time_slots) ? $sheet->time_slots : [null];
+            $slots = ! empty($sheet->time_slots) ? $sheet->time_slots : [null];
             $adminsBySlot = $sheet->administrations->keyBy('time_slot');
 
             // PRN ("as needed") state: how many given today, last given, next allowed.
             $prn = null;
             if ($sheet->as_required) {
-                $given      = $sheet->administrations->filter(fn ($a) => in_array($a->code, ['A', 'S'], true));
-                $count      = $given->count();
-                $last       = $given->sortByDesc('updated_at')->first()?->updated_at;
-                $intervalH  = (float) ($sheet->prn_min_interval_hours ?? 0);
-                $next       = ($last && $intervalH > 0) ? $last->copy()->addMinutes((int) round($intervalH * 60)) : null;
-                $maxDaily   = $sheet->prn_max_daily;
-                $hitMax     = $maxDaily !== null && $count >= (int) $maxDaily;
-                $tooSoon    = $isToday && $next && now()->lt($next);
+                $given = $sheet->administrations->filter(fn ($a) => in_array($a->code, ['A', 'S'], true));
+                $count = $given->count();
+                $last = $given->sortByDesc('updated_at')->first()?->updated_at;
+                $intervalH = (float) ($sheet->prn_min_interval_hours ?? 0);
+                $next = ($last && $intervalH > 0) ? $last->copy()->addMinutes((int) round($intervalH * 60)) : null;
+                $maxDaily = $sheet->prn_max_daily;
+                $hitMax = $maxDaily !== null && $count >= (int) $maxDaily;
+                $tooSoon = $isToday && $next && now()->lt($next);
                 $prn = [
-                    'max_daily'      => $maxDaily !== null ? (int) $maxDaily : null,
+                    'max_daily' => $maxDaily !== null ? (int) $maxDaily : null,
                     'interval_hours' => $sheet->prn_min_interval_hours !== null ? (float) $sheet->prn_min_interval_hours : null,
-                    'given_today'    => $count,
-                    'last_given'     => $last?->format('H:i'),
+                    'given_today' => $count,
+                    'last_given' => $last?->format('H:i'),
                     'next_available' => $next?->format('H:i'),
-                    'blocked'        => $isToday && ($hitMax || $tooSoon),
-                    'block_reason'   => $hitMax ? 'Daily maximum reached' : ($tooSoon ? ('Not due until ' . $next?->format('H:i')) : null),
+                    'blocked' => $isToday && ($hitMax || $tooSoon),
+                    'block_reason' => $hitMax ? 'Daily maximum reached' : ($tooSoon ? ('Not due until '.$next?->format('H:i')) : null),
                 ];
             }
 
@@ -272,7 +276,7 @@ class MedicationRoundController extends Controller
 
                 foreach ($targetRounds as $roundKey) {
                     $clientId = $sheet->client_id;
-                    if (!isset($grid[$roundKey][$clientId])) {
+                    if (! isset($grid[$roundKey][$clientId])) {
                         $su = $residents->get($clientId);
                         $allergies = ($su && $su->allergies)
                             ? array_values(array_filter(array_map('trim', preg_split('/[,;]+/', $su->allergies))))
@@ -282,48 +286,48 @@ class MedicationRoundController extends Controller
                         })->values()->all();
                         $gender = ($su && $su->gender) ? (['M' => 'Male', 'F' => 'Female'][$su->gender] ?? $su->gender) : null;
                         $grid[$roundKey][$clientId] = [
-                            'client_id'     => $clientId,
-                            'name'          => $su->name ?? ('Resident #' . $clientId),
-                            'photo'         => ($su && $su->image) ? url('public/images/serviceUserProfileImages/' . $su->image) : null,
-                            'dob'           => $su->date_of_birth ?? null,
-                            'gender'        => $gender,
-                            'weight'        => ($su && $su->weight) ? $su->weight : null,
-                            'weight_unit'   => $su->weight_unit ?? null,
-                            'room'          => ($su && $su->room_number) ? $su->room_number : null,
-                            'nhs'           => ($su && $su->nhs_number) ? $su->nhs_number : null,
-                            'mobility'      => ($su && $su->suMobility) ? $su->suMobility : null,
-                            'diet'          => ($su && $su->diet) ? $su->diet : null,
-                            'allergies'     => $allergies,
-                            'risk_flags'    => $riskFlags,
+                            'client_id' => $clientId,
+                            'name' => $su->name ?? ('Resident #'.$clientId),
+                            'photo' => ($su && $su->image) ? url('public/images/serviceUserProfileImages/'.$su->image) : null,
+                            'dob' => $su->date_of_birth ?? null,
+                            'gender' => $gender,
+                            'weight' => ($su && $su->weight) ? $su->weight : null,
+                            'weight_unit' => $su->weight_unit ?? null,
+                            'room' => ($su && $su->room_number) ? $su->room_number : null,
+                            'nhs' => ($su && $su->nhs_number) ? $su->nhs_number : null,
+                            'mobility' => ($su && $su->suMobility) ? $su->suMobility : null,
+                            'diet' => ($su && $su->diet) ? $su->diet : null,
+                            'allergies' => $allergies,
+                            'risk_flags' => $riskFlags,
                             'regular_count' => $counts[$clientId]['regular'] ?? 0,
-                            'prn_count'     => $counts[$clientId]['prn'] ?? 0,
-                            'rows'          => [],
+                            'prn_count' => $counts[$clientId]['prn'] ?? 0,
+                            'rows' => [],
                         ];
                     }
                     $admin = $slot !== null ? $adminsBySlot->get($slot) : null;
                     $grid[$roundKey][$clientId]['rows'][] = [
-                        'mar_sheet_id'    => $sheet->id,
+                        'mar_sheet_id' => $sheet->id,
                         'medication_name' => $sheet->medication_name,
-                        'strength'        => $sheet->dosage,
-                        'dose'            => $sheet->dose,
-                        'route'           => $sheet->route,
-                        'instruction'     => $sheet->prn_details ?: $sheet->reason_for_medication,
-                        'slot'            => $slot,
-                        'stock'           => $sheet->stock_level,
-                        'low_stock'       => !is_null($sheet->stock_level) && !is_null($sheet->reorder_level) && $sheet->stock_level <= $sheet->reorder_level,
-                        'unit'            => $sheet->unit,
-                        'is_controlled'   => (bool) $sheet->is_controlled,
-                        'cd_schedule'     => $sheet->cd_schedule,
-                        'as_required'     => (bool) $sheet->as_required,
-                        'prn'             => $prn,
-                        'status'          => $this->doseBucket($slot, $admin->code ?? null, $isToday, $isPast, $nowMin),
-                        'code'            => $admin->code ?? null,
-                        'reason'          => $admin?->reason,
-                        'notes'           => $admin?->notes,
-                        'witnessed_by'    => $admin?->witnessed_by,
-                        'recorded_at'     => $admin?->updated_at?->format('H:i'),
-                        'dose_given'      => $admin->dose_given ?? null,
-                        'recorded_by'     => ($admin && $admin->administeredByUser) ? $admin->administeredByUser->name : null,
+                        'strength' => $sheet->dosage,
+                        'dose' => $sheet->dose,
+                        'route' => $sheet->route,
+                        'instruction' => $sheet->prn_details ?: $sheet->reason_for_medication,
+                        'slot' => $slot,
+                        'stock' => $sheet->stock_level,
+                        'low_stock' => ! is_null($sheet->stock_level) && ! is_null($sheet->reorder_level) && $sheet->stock_level <= $sheet->reorder_level,
+                        'unit' => $sheet->unit,
+                        'is_controlled' => (bool) $sheet->is_controlled,
+                        'cd_schedule' => $sheet->cd_schedule,
+                        'as_required' => (bool) $sheet->as_required,
+                        'prn' => $prn,
+                        'status' => $this->doseBucket($slot, $admin->code ?? null, $isToday, $isPast, $nowMin),
+                        'code' => $admin->code ?? null,
+                        'reason' => $admin?->reason,
+                        'notes' => $admin?->notes,
+                        'witnessed_by' => $admin?->witnessed_by,
+                        'recorded_at' => $admin?->updated_at?->format('H:i'),
+                        'dose_given' => $admin->dose_given ?? null,
+                        'recorded_by' => ($admin && $admin->administeredByUser) ? $admin->administeredByUser->name : null,
                     ];
                 }
             }
@@ -342,16 +346,16 @@ class MedicationRoundController extends Controller
         $closures = MedicationRoundClosure::where('home_id', $homeId)->where('date', $date)
             ->with('closedByUser:id,name')->get()
             ->mapWithKeys(fn ($c) => [$c->round => [
-                'by'   => $c->closedByUser->name ?? null,
-                'at'   => $c->updated_at?->format('H:i'),
+                'by' => $c->closedByUser->name ?? null,
+                'at' => $c->updated_at?->format('H:i'),
             ]])->all();
 
         return [
-            'rounds'       => $rounds,
-            'grid'         => $grid,
-            'date'         => $date,
+            'rounds' => $rounds,
+            'grid' => $grid,
+            'date' => $date,
             'currentRound' => $this->roundForTime(now()->format('H:i')),
-            'closures'     => $closures,
+            'closures' => $closures,
         ];
     }
 
@@ -372,7 +376,7 @@ class MedicationRoundController extends Controller
         if ($isPast) {
             return 'overdue';
         }
-        if (!$isToday) {
+        if (! $isToday) {
             return 'later';
         }
         $diff = $slotMin - $nowMin;
@@ -385,6 +389,7 @@ class MedicationRoundController extends Controller
         if ($diff <= 120) {
             return 'upcoming';
         }
+
         return 'later';
     }
 
@@ -396,7 +401,7 @@ class MedicationRoundController extends Controller
     {
         $ok = $this->applyRecord($request, $marSheetService);
 
-        if (!$ok) {
+        if (! $ok) {
             return response()->json(['ok' => false, 'message' => 'Prescription not found'], 404);
         }
 
@@ -406,7 +411,7 @@ class MedicationRoundController extends Controller
     /** Same record, but returns to the React/Inertia round page (keeping the date). */
     public function recordReact(Request $request, MARSheetService $marSheetService)
     {
-        $ok   = $this->applyRecord($request, $marSheetService);
+        $ok = $this->applyRecord($request, $marSheetService);
         $date = $request->input('date');
 
         return redirect()->route('medication.medication-round.react', ['date' => $date])
@@ -416,7 +421,7 @@ class MedicationRoundController extends Controller
     /** Record + return to the experimental (lab) round page. */
     public function recordReactLab(Request $request, MARSheetService $marSheetService)
     {
-        $ok   = $this->applyRecord($request, $marSheetService);
+        $ok = $this->applyRecord($request, $marSheetService);
         $date = $request->input('date');
 
         return redirect()->route('medication.medication-round.lab', ['date' => $date])
@@ -426,7 +431,7 @@ class MedicationRoundController extends Controller
     /** Record + return to the second experimental (lab 2) round page. */
     public function recordReactLab2(Request $request, MARSheetService $marSheetService)
     {
-        $ok   = $this->applyRecord($request, $marSheetService);
+        $ok = $this->applyRecord($request, $marSheetService);
         $date = $request->input('date');
 
         return redirect()->route('medication.medication-round.lab2', ['date' => $date])
@@ -436,7 +441,7 @@ class MedicationRoundController extends Controller
     /** Record + return to the "lab 1.1" round page. */
     public function recordReactLab11(Request $request, MARSheetService $marSheetService)
     {
-        $ok   = $this->applyRecord($request, $marSheetService);
+        $ok = $this->applyRecord($request, $marSheetService);
         $date = $request->input('date');
 
         return redirect()->route('medication.medication-round.lab1-1', ['date' => $date])
@@ -446,7 +451,7 @@ class MedicationRoundController extends Controller
     /** Record + return to the "lab 1.2" round page. */
     public function recordReactLab12(Request $request, MARSheetService $marSheetService)
     {
-        $ok   = $this->applyRecord($request, $marSheetService);
+        $ok = $this->applyRecord($request, $marSheetService);
         $date = $request->input('date');
 
         return redirect()->route('medication.medication-round.lab1-2', ['date' => $date])
@@ -456,7 +461,7 @@ class MedicationRoundController extends Controller
     /** Record + return to the "lab 1.3" round page. */
     public function recordReactLab13(Request $request, MARSheetService $marSheetService)
     {
-        $ok   = $this->applyRecord($request, $marSheetService);
+        $ok = $this->applyRecord($request, $marSheetService);
         $date = $request->input('date');
 
         return redirect()->route('medication.medication-round.lab1-3', ['date' => $date])
@@ -466,7 +471,7 @@ class MedicationRoundController extends Controller
     /** Record + return to the "lab 1.4" round page. */
     public function recordReactLab14(Request $request, MARSheetService $marSheetService)
     {
-        $ok   = $this->applyRecord($request, $marSheetService);
+        $ok = $this->applyRecord($request, $marSheetService);
         $date = $request->input('date');
 
         return redirect()->route('medication.medication-round.lab1-4', ['date' => $date])
@@ -475,7 +480,7 @@ class MedicationRoundController extends Controller
 
     public function recordReactLab141(Request $request, MARSheetService $marSheetService)
     {
-        $ok   = $this->applyRecord($request, $marSheetService);
+        $ok = $this->applyRecord($request, $marSheetService);
         $date = $request->input('date');
 
         return redirect()->route('medication.medication-round.lab1-4-1', ['date' => $date])
@@ -484,7 +489,7 @@ class MedicationRoundController extends Controller
 
     public function recordReactLab142(Request $request, MARSheetService $marSheetService)
     {
-        $ok   = $this->applyRecord($request, $marSheetService);
+        $ok = $this->applyRecord($request, $marSheetService);
         $date = $request->input('date');
 
         return redirect()->route('medication.medication-round.lab1-4-2', ['date' => $date])
@@ -495,7 +500,7 @@ class MedicationRoundController extends Controller
     public function endReactLab142(Request $request)
     {
         $request->validate([
-            'date'  => 'required|date',
+            'date' => 'required|date',
             'round' => 'required|string|max:20',
         ]);
 
@@ -512,36 +517,36 @@ class MedicationRoundController extends Controller
     public function flagToHandoverLab142(Request $request)
     {
         $request->validate([
-            'date'            => 'required|date',
-            'concern'         => 'required|string|max:1000',
-            'client_id'       => 'nullable|integer',
-            'client_name'     => 'nullable|string|max:255',
+            'date' => 'required|date',
+            'concern' => 'required|string|max:1000',
+            'client_id' => 'nullable|integer',
+            'client_name' => 'nullable|string|max:255',
             'action_required' => 'nullable|boolean',
         ]);
 
         $homeId = $this->getHomeId();
-        $date   = $request->input('date');
-        $user   = Auth::user();
+        $date = $request->input('date');
+        $user = Auth::user();
 
         // Append to today's handover for this home, creating a draft one if none exists.
         $handover = ShiftHandover::where('home_id', $homeId)->whereDate('handover_date', $date)->orderByDesc('id')->first();
-        if (!$handover) {
+        if (! $handover) {
             $handover = ShiftHandover::create([
-                'home_id'             => $homeId,
-                'handover_date'       => $date,
-                'handover_time'       => now()->format('H:i'),
-                'from_carer_name'     => $user->name,
-                'status'              => 'draft',
+                'home_id' => $homeId,
+                'handover_date' => $date,
+                'handover_time' => now()->format('H:i'),
+                'from_carer_name' => $user->name,
+                'status' => 'draft',
                 'medication_concerns' => [],
-                'created_by_user_id'  => $user->id,
+                'created_by_user_id' => $user->id,
             ]);
         }
 
         $concerns = $handover->medication_concerns ?? [];
         $concerns[] = [
-            'concern'         => $request->input('concern'),
-            'client_id'       => $request->input('client_id'),
-            'client_name'     => $request->input('client_name'),
+            'concern' => $request->input('concern'),
+            'client_id' => $request->input('client_id'),
+            'client_name' => $request->input('client_name'),
             'action_required' => $request->boolean('action_required') ? '1' : '0',
         ];
         $handover->medication_concerns = array_values($concerns);
@@ -555,11 +560,11 @@ class MedicationRoundController extends Controller
     public function reopenReactLab142(Request $request)
     {
         $request->validate([
-            'date'  => 'required|date',
+            'date' => 'required|date',
             'round' => 'required|string|max:20',
         ]);
 
-        if (!in_array(Auth::user()->user_type, ['M', 'CM', 'A', 'O'], true)) {
+        if (! in_array(Auth::user()->user_type, ['M', 'CM', 'A', 'O'], true)) {
             abort(403, 'Only managers can re-open a round.');
         }
 
@@ -582,25 +587,25 @@ class MedicationRoundController extends Controller
     {
         $request->validate([
             'client_id' => 'required|integer',
-            'from'      => 'required|date',
-            'until'     => 'required|date|after_or_equal:from',
-            'reason'    => 'required|string|max:200',
-            'date'      => 'nullable|date',
+            'from' => 'required|date',
+            'until' => 'required|date|after_or_equal:from',
+            'reason' => 'required|string|max:200',
+            'date' => 'nullable|date',
         ]);
 
-        $homeId   = $this->getHomeId();
-        $userId   = (int) Auth::id();
+        $homeId = $this->getHomeId();
+        $userId = (int) Auth::id();
         $clientId = (int) $request->input('client_id');
-        $from     = \Carbon\Carbon::parse($request->input('from'))->startOfDay();
-        $until    = \Carbon\Carbon::parse($request->input('until'))->startOfDay();
+        $from = Carbon::parse($request->input('from'))->startOfDay();
+        $until = Carbon::parse($request->input('until'))->startOfDay();
 
         // Safety cap — never process more than 31 days in one go.
         if ($from->diffInDays($until) > 31) {
             $until = $from->copy()->addDays(31);
         }
-        $reason = 'Temporary absence — ' . trim((string) $request->input('reason'));
+        $reason = 'Temporary absence — '.trim((string) $request->input('reason'));
 
-        $sheets = \App\Models\MARSheet::forHome($homeId)->active()
+        $sheets = MARSheet::forHome($homeId)->active()
             ->where('client_id', $clientId)
             ->get();
 
@@ -645,14 +650,14 @@ class MedicationRoundController extends Controller
     {
         $request->validate([
             'client_id' => 'required|integer',
-            'from'      => 'nullable|date',
-            'to'        => 'nullable|date',
+            'from' => 'nullable|date',
+            'to' => 'nullable|date',
         ]);
 
-        $homeId   = $this->getHomeId();
+        $homeId = $this->getHomeId();
         $clientId = (int) $request->input('client_id');
-        $from = \Carbon\Carbon::parse($request->input('from', now()->startOfMonth()->toDateString()))->startOfDay();
-        $to   = \Carbon\Carbon::parse($request->input('to', now()->endOfMonth()->toDateString()))->startOfDay();
+        $from = Carbon::parse($request->input('from', now()->startOfMonth()->toDateString()))->startOfDay();
+        $to = Carbon::parse($request->input('to', now()->endOfMonth()->toDateString()))->startOfDay();
         if ($from->gt($to)) {
             [$from, $to] = [$to, $from];
         }
@@ -667,7 +672,7 @@ class MedicationRoundController extends Controller
 
         $client = \App\Models\ServiceUser::find($clientId);
 
-        $sheets = \App\Models\MARSheet::forHome($homeId)->active()
+        $sheets = MARSheet::forHome($homeId)->active()
             ->where('client_id', $clientId)
             ->orderBy('medication_name')
             ->get();
@@ -678,40 +683,153 @@ class MedicationRoundController extends Controller
             ->groupBy('mar_sheet_id');
 
         $meds = $sheets->map(function ($s) use ($admins, $days) {
-            $byKey = ($admins->get($s->id) ?? collect())->keyBy(fn ($a) => $a->date . '|' . $a->time_slot);
+            $byKey = ($admins->get($s->id) ?? collect())->keyBy(fn ($a) => $a->date.'|'.$a->time_slot);
             $slots = $s->time_slots ?: ($s->as_required ? ['PRN'] : []);
+
             return [
                 'medication_name' => $s->medication_name,
-                'dosage'          => $s->dosage,
-                'is_controlled'   => (bool) $s->is_controlled,
-                'as_required'     => (bool) $s->as_required,
-                'slots'           => collect($slots)->map(fn ($slot) => [
-                    'slot'  => $slot,
-                    'cells' => collect($days)->map(fn ($day) => optional($byKey->get($day . '|' . $slot))->code)->all(),
+                'dosage' => $s->dosage,
+                'is_controlled' => (bool) $s->is_controlled,
+                'as_required' => (bool) $s->as_required,
+                'slots' => collect($slots)->map(fn ($slot) => [
+                    'slot' => $slot,
+                    'cells' => collect($days)->map(fn ($day) => optional($byKey->get($day.'|'.$slot))->code)->all(),
                 ])->all(),
             ];
         })->values();
 
         return Inertia::render('Medication/MarReport', [
             'resident' => $client ? [
-                'id'   => $client->id,
+                'id' => $client->id,
                 'name' => $client->name,
-                'dob'  => optional($client->date_of_birth)->format('d M Y'),
+                'dob' => optional($client->date_of_birth)->format('d M Y'),
             ] : null,
             'meds' => $meds,
             'days' => $days,
             'from' => $from->toDateString(),
-            'to'   => $to->toDateString(),
+            'to' => $to->toDateString(),
         ]);
     }
 
     public function recordReactLab143(Request $request, MARSheetService $marSheetService)
     {
-        $ok   = $this->applyRecord($request, $marSheetService);
+        $ok = $this->applyRecord($request, $marSheetService);
         $date = $request->input('date');
 
         return redirect()->route('medication.medication-round.lab1-4-3', ['date' => $date])
             ->with($ok ? 'success' : 'error', $ok ? 'Dose recorded.' : 'Prescription not found.');
+    }
+
+    // ---- Medication Round 3 — dashboard-style page (stepper + resident progress table) ----
+
+    /** Dashboard-style medication round: round stepper + per-resident progress table. */
+    public function indexMedsRound3(Request $request)
+    {
+        return Inertia::render('Medication/MedsRound3', $this->buildRoundProps($request));
+    }
+
+    /** Record a dose + return to the Medication Round 3 page (keeping the date). */
+    public function recordMedsRound3(Request $request, MARSheetService $marSheetService)
+    {
+        $ok = $this->applyRecord($request, $marSheetService);
+        $date = $request->input('date');
+
+        return redirect()->route('medication.medication-round.v3', ['date' => $date])
+            ->with($ok ? 'success' : 'error', $ok ? 'Dose recorded.' : 'Prescription not found.');
+    }
+
+    /** Ends (locks) a round for the home + date, recording who closed it. */
+    public function endMedsRound3(Request $request)
+    {
+        $request->validate([
+            'date' => 'required|date',
+            'round' => 'required|string|max:20',
+        ]);
+
+        MedicationRoundClosure::updateOrCreate(
+            ['home_id' => $this->getHomeId(), 'date' => $request->input('date'), 'round' => $request->input('round')],
+            ['closed_by' => (int) Auth::id()]
+        );
+
+        return redirect()->route('medication.medication-round.v3', ['date' => $request->input('date')])
+            ->with('success', 'Round ended.');
+    }
+
+    /** Re-opens (unlocks) an ended round — managers only. */
+    public function reopenMedsRound3(Request $request)
+    {
+        $request->validate([
+            'date' => 'required|date',
+            'round' => 'required|string|max:20',
+        ]);
+
+        if (! in_array(Auth::user()->user_type, ['M', 'CM', 'A', 'O'], true)) {
+            abort(403, 'Only managers can re-open a round.');
+        }
+
+        MedicationRoundClosure::where('home_id', $this->getHomeId())
+            ->where('date', $request->input('date'))
+            ->where('round', $request->input('round'))
+            ->delete();
+
+        return redirect()->route('medication.medication-round.v3', ['date' => $request->input('date')])
+            ->with('success', 'Round re-opened.');
+    }
+
+    // ---- Medication Round 4 — warm/editorial style (serif, donut, schedule timeline) ----
+
+    /** Editorial-style medication round (serif headings, progress donut, schedule timeline). */
+    public function indexMedsRound4(Request $request)
+    {
+        return Inertia::render('Medication/MedsRound4', $this->buildRoundProps($request));
+    }
+
+    /** Record a dose + return to the Medication Round 4 page (keeping the date). */
+    public function recordMedsRound4(Request $request, MARSheetService $marSheetService)
+    {
+        $ok = $this->applyRecord($request, $marSheetService);
+        $date = $request->input('date');
+
+        return redirect()->route('medication.medication-round.v4', ['date' => $date])
+            ->with($ok ? 'success' : 'error', $ok ? 'Dose recorded.' : 'Prescription not found.');
+    }
+
+    /** Ends (locks) a round for the home + date, recording who closed it. */
+    public function endMedsRound4(Request $request)
+    {
+        $request->validate([
+            'date' => 'required|date',
+            'round' => 'required|string|max:20',
+        ]);
+
+        MedicationRoundClosure::updateOrCreate(
+            ['home_id' => $this->getHomeId(), 'date' => $request->input('date'), 'round' => $request->input('round')],
+            ['closed_by' => (int) Auth::id()]
+        );
+
+        return redirect()->route('medication.medication-round.v4', ['date' => $request->input('date')])
+            ->with('success', 'Round ended.');
+    }
+
+    /** Re-opens (unlocks) an ended round — managers only. */
+    public function reopenMedsRound4(Request $request)
+    {
+        $request->validate([
+            'date' => 'required|date',
+            'round' => 'required|string|max:20',
+        ]);
+
+        if (! in_array(Auth::user()->user_type, ['M', 'CM', 'A', 'O'], true)) {
+            abort(403, 'Only managers can re-open a round.');
+        }
+
+        MedicationRoundClosure::where('home_id', $this->getHomeId())
+            ->where('date', $request->input('date'))
+            ->where('round', $request->input('round'))
+            ->delete();
+
+        return redirect()->route('medication.medication-round.v4', ['date' => $request->input('date')])
+            ->with('success', 'Round re-opened.');
     }
 
     /** Record an administration + auto-deduct stock on a newly-given dose. Returns false if not found. */
@@ -719,18 +837,18 @@ class MedicationRoundController extends Controller
     {
         $request->validate([
             'mar_sheet_id' => 'required|integer',
-            'date'         => 'required|date',
-            'time_slot'    => 'required|string|max:10',
-            'code'         => 'required|in:A,S,R,W,N,O',
-            'dose_given'   => 'nullable|string|max:100',
+            'date' => 'required|date',
+            'time_slot' => 'required|string|max:10',
+            'code' => 'required|in:A,S,R,W,N,O',
+            'dose_given' => 'nullable|string|max:100',
             'witnessed_by' => 'nullable|string|max:255',
-            'reason'       => 'nullable|string|max:255',
-            'notes'        => 'nullable|string|max:2000',
+            'reason' => 'nullable|string|max:255',
+            'notes' => 'nullable|string|max:2000',
         ]);
 
         // A refused / not-given / omitted dose must carry a reason (auditable record).
         if (in_array($request->input('code'), ['R', 'N', 'O'], true) && trim((string) $request->input('reason')) === '') {
-            throw \Illuminate\Validation\ValidationException::withMessages([
+            throw ValidationException::withMessages([
                 'reason' => 'Please give a reason when a dose is refused or not given.',
             ]);
         }
@@ -739,21 +857,21 @@ class MedicationRoundController extends Controller
         $userId = (int) Auth::id();
 
         $sheet = MARSheet::forHome($homeId)->active()->find($request->input('mar_sheet_id'));
-        if (!$sheet) {
+        if (! $sheet) {
             return false;
         }
 
         // A round that has been ended is locked — no further recording.
         $round = $this->roundForTime($request->input('time_slot'));
         if (MedicationRoundClosure::where('home_id', $homeId)->where('date', $request->input('date'))->where('round', $round)->exists()) {
-            throw \Illuminate\Validation\ValidationException::withMessages([
+            throw ValidationException::withMessages([
                 'code' => 'This round has been ended and is locked.',
             ]);
         }
 
         // Controlled drugs legally require a witness to administer ("Given").
         if ($sheet->is_controlled && $request->input('code') === 'A' && trim((string) $request->input('witnessed_by')) === '') {
-            throw \Illuminate\Validation\ValidationException::withMessages([
+            throw ValidationException::withMessages([
                 'witnessed_by' => 'A witness is required to administer a controlled drug.',
             ]);
         }
@@ -766,8 +884,8 @@ class MedicationRoundController extends Controller
                 ->where('time_slot', '!=', $request->input('time_slot')) // exclude the dose being (re)recorded
                 ->get();
             if ($sheet->prn_max_daily !== null && $given->count() >= (int) $sheet->prn_max_daily) {
-                throw \Illuminate\Validation\ValidationException::withMessages([
-                    'code' => 'PRN daily maximum (' . (int) $sheet->prn_max_daily . ') already reached for this medication.',
+                throw ValidationException::withMessages([
+                    'code' => 'PRN daily maximum ('.(int) $sheet->prn_max_daily.') already reached for this medication.',
                 ]);
             }
             $intervalH = (float) ($sheet->prn_min_interval_hours ?? 0);
@@ -776,8 +894,8 @@ class MedicationRoundController extends Controller
                 if ($last) {
                     $next = $last->copy()->addMinutes((int) round($intervalH * 60));
                     if (now()->lt($next)) {
-                        throw \Illuminate\Validation\ValidationException::withMessages([
-                            'code' => 'Too soon — the next PRN dose is not due until ' . $next->format('H:i') . '.',
+                        throw ValidationException::withMessages([
+                            'code' => 'Too soon — the next PRN dose is not due until '.$next->format('H:i').'.',
                         ]);
                     }
                 }
@@ -798,14 +916,14 @@ class MedicationRoundController extends Controller
             $userId
         );
 
-        if (!$admin) {
+        if (! $admin) {
             return false;
         }
 
         // Auto-deduct stock only on a newly-given dose.
         $nowGiven = $request->input('code') === 'A';
-        if ($nowGiven && !$wasGiven) {
-            if (!is_null($sheet->stock_level)) {
+        if ($nowGiven && ! $wasGiven) {
+            if (! is_null($sheet->stock_level)) {
                 $qty = (float) preg_replace('/[^0-9.]/', '', (string) ($request->input('dose_given') ?: $sheet->dose));
                 if ($qty <= 0) {
                     $qty = 1;
@@ -813,7 +931,7 @@ class MedicationRoundController extends Controller
                 $resident = ServiceUser::where('id', $sheet->client_id)->first();
                 MedicationStockTransaction::apply($sheet, 'administered', $qty, $userId, [
                     'client_name' => $resident->name ?? null,
-                    'notes'       => 'Auto-deducted on administration (Medication Round)',
+                    'notes' => 'Auto-deducted on administration (Medication Round)',
                 ]);
             }
         }

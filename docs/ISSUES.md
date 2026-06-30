@@ -8,6 +8,7 @@
 
 ## Open
 
+- 🔲 **#12** (noticed 2026-06-30) — **Alerts should be actionable** — make each alert row in the Alerts box **clickable**, and give the carer a way to **resolve / dismiss / swipe it away** (e.g. tap to jump to the resident/med, plus a resolve or swipe-to-clear action so handled alerts leave the list). Right now they're read-only. — *Area: Medication Round 4 (`MedsRound4.jsx`) — Alerts box.*
 - 🔲 **#11** (noticed 2026-06-23) — **Icons look a bit "silly"/playful** in places — the owner wants a more **professional icon set** across the medication screens (e.g. the round/stat/quick-action icons, the pill/box icons). Review and swap to cleaner, more clinical-looking icons (consistent weight/style). — *Area: all medication screens — iconography.*
 
 ## Fixed

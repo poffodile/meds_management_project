@@ -26,6 +26,10 @@ const NAV = [
         group: 'Medication', icon: IconPill, children: [
             // The primary Medication Round is now the polished Lab 1.4.2 build.
             { label: 'Medication Round', icon: IconClock, href: '/medication/medication-round-lab1-4-2' },
+            // Dashboard-style round: stepper + per-resident progress table.
+            { label: 'Medication Round 3', icon: IconLayoutGrid, href: '/medication/medication-round-3' },
+            // Editorial/warm style: serif, progress donut, schedule timeline.
+            { label: 'Medication Round 4', icon: IconLayoutGrid, href: '/medication/medication-round-4' },
             // All the other trial versions tucked into one collapsible dropdown.
             {
                 label: 'Round Versions', icon: IconFlask, children: [

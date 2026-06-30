@@ -2,8 +2,8 @@
 
 namespace App\Services\Staff;
 
-use App\Models\MARSheet;
 use App\Models\MARAdministration;
+use App\Models\MARSheet;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -13,7 +13,7 @@ class MARSheetService
     {
         DB::beginTransaction();
         try {
-            $sheet = new MARSheet();
+            $sheet = new MARSheet;
             $sheet->fill($data);
             $sheet->home_id = $homeId;
             $sheet->created_by = $userId;
@@ -32,7 +32,7 @@ class MARSheetService
             return $sheet;
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error creating MAR sheet: ' . $e->getMessage());
+            Log::error('Error creating MAR sheet: '.$e->getMessage());
             throw $e;
         }
     }
@@ -40,7 +40,7 @@ class MARSheetService
     public function update(int $id, array $data, int $homeId): ?MARSheet
     {
         $sheet = MARSheet::forHome($homeId)->active()->find($id);
-        if (!$sheet) {
+        if (! $sheet) {
             return null;
         }
 
@@ -60,7 +60,7 @@ class MARSheetService
             return $sheet;
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error updating MAR sheet: ' . $e->getMessage());
+            Log::error('Error updating MAR sheet: '.$e->getMessage());
             throw $e;
         }
     }
@@ -99,7 +99,7 @@ class MARSheetService
     public function delete(int $id, int $homeId): bool
     {
         $sheet = MARSheet::forHome($homeId)->active()->find($id);
-        if (!$sheet) {
+        if (! $sheet) {
             return false;
         }
 
@@ -118,7 +118,7 @@ class MARSheetService
     public function discontinue(int $id, array $data, int $homeId): ?MARSheet
     {
         $sheet = MARSheet::forHome($homeId)->active()->currentlyActive()->find($id);
-        if (!$sheet) {
+        if (! $sheet) {
             return null;
         }
 
@@ -140,7 +140,7 @@ class MARSheetService
     public function administer(int $marSheetId, array $data, int $homeId, int $userId): ?MARAdministration
     {
         $sheet = MARSheet::forHome($homeId)->active()->find($marSheetId);
-        if (!$sheet) {
+        if (! $sheet) {
             return null;
         }
 
@@ -163,7 +163,7 @@ class MARSheetService
                 ]);
                 $admin->save();
             } else {
-                $admin = new MARAdministration();
+                $admin = new MARAdministration;
                 $admin->fill([
                     'mar_sheet_id' => $marSheetId,
                     'date' => $data['date'],
@@ -196,7 +196,7 @@ class MARSheetService
             return $admin;
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error recording MAR administration: ' . $e->getMessage());
+            Log::error('Error recording MAR administration: '.$e->getMessage());
             throw $e;
         }
     }
@@ -204,7 +204,7 @@ class MARSheetService
     public function updateStock(int $id, array $data, int $homeId): ?MARSheet
     {
         $sheet = MARSheet::forHome($homeId)->active()->find($id);
-        if (!$sheet) {
+        if (! $sheet) {
             return null;
         }
 
@@ -235,9 +235,9 @@ class MARSheetService
             ->currentlyActive()
             ->with(['administrations' => function ($q) use ($startDate, $endDate) {
                 $q->whereBetween('date', [$startDate, $endDate])
-                  ->with('administeredByUser:id,name')
-                  ->orderBy('date')
-                  ->orderBy('time_slot');
+                    ->with('administeredByUser:id,name')
+                    ->orderBy('date')
+                    ->orderBy('time_slot');
             }])
             ->orderBy('medication_name', 'asc')
             ->get();
