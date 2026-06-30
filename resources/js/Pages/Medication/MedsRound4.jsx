@@ -460,22 +460,22 @@ export default function MedsRound4({ rounds = [], grid = {}, date, currentRound 
                         </Box>
 
                         {/* Quick actions */}
-                        <Box style={card({ padding: 16 })}>
-                            <Text style={{ fontFamily: DISPLAY }} fz={18} fw={600} c={INK} mb={10}>Quick actions</Text>
-                            <Box style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                        <Box style={card({ padding: 14 })}>
+                            <Text style={{ fontFamily: DISPLAY }} fz={16} fw={600} c={INK} mb={8}>Quick actions</Text>
+                            <Box style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                                 {quickActions.map((a) => {
                                     const Icon = a.icon;
                                     const inner = (
-                                        <Box style={{ padding: '12px 10px', borderRadius: 12, background: '#FBFAF5', border: `1px solid ${LINE}`, textAlign: 'center', height: '100%', cursor: 'pointer' }}>
-                                            <Box style={{ width: 36, height: 36, borderRadius: 11, margin: '0 auto 8px', background: `${a.color}1A`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                <Icon size={18} stroke={1.8} color={a.color} />
+                                        <Group gap={8} wrap="nowrap" align="center" style={{ padding: '7px 9px', borderRadius: 10, background: '#FBFAF5', border: `1px solid ${LINE}`, height: '100%', cursor: 'pointer' }}>
+                                            <Box style={{ width: 26, height: 26, borderRadius: 8, flexShrink: 0, background: `${a.color}1A`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                <Icon size={15} stroke={1.8} color={a.color} />
                                             </Box>
-                                            <Text fz={11} fw={600} c={INK} lh={1.2}>{a.label}</Text>
-                                        </Box>
+                                            <Text fz={11} fw={600} c={INK} lh={1.15}>{a.label}</Text>
+                                        </Group>
                                     );
                                     return a.href
                                         ? <Box component="a" key={a.label} href={a.href} style={{ textDecoration: 'none' }}>{inner}</Box>
-                                        : <Box component="button" key={a.label} onClick={a.onClick} style={{ border: 'none', background: 'transparent', padding: 0 }}>{inner}</Box>;
+                                        : <Box component="button" key={a.label} onClick={a.onClick} style={{ border: 'none', background: 'transparent', padding: 0, textAlign: 'left' }}>{inner}</Box>;
                                 })}
                             </Box>
                         </Box>
