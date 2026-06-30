@@ -23,11 +23,18 @@ const NAV = [
     { label: 'Home', icon: IconHome, href: '#' },
     { label: 'Daily Log', icon: IconNotebook, href: '#' },
     {
+        // Demo flow — the four warm/editorial "4.1" pages, in click-through order.
+        group: 'Demo · 4.1', icon: IconLayoutGrid, children: [
+            { label: '1 · Medication Round', icon: IconClock, href: '/medication/medication-round-4' },
+            { label: '2 · Medication Stock', icon: IconBox, href: '/medication/stock-4-1' },
+            { label: '3 · Controlled Drugs', icon: IconShieldLock, href: '/medication/controlled-drugs-4-1' },
+            { label: '4 · Missed Doses', icon: IconAlertTriangle, href: '/medication/missed-doses-4-1' },
+        ],
+    },
+    {
         group: 'Medication', icon: IconPill, children: [
             // The primary Medication Round is now the polished Lab 1.4.2 build.
             { label: 'Medication Round', icon: IconClock, href: '/medication/medication-round-lab1-4-2' },
-            // Dashboard-style round: stepper + per-resident progress table.
-            { label: 'Medication Round 3', icon: IconLayoutGrid, href: '/medication/medication-round-3' },
             // Editorial/warm style: serif, progress donut, schedule timeline.
             { label: 'Medication Round 4', icon: IconLayoutGrid, href: '/medication/medication-round-4' },
             // All the other trial versions tucked into one collapsible dropdown.
@@ -47,8 +54,14 @@ const NAV = [
             { label: 'Medication Stock', icon: IconBox, href: '/medication/stock-react' },
             { label: 'Medication Stock (Lab)', icon: IconFlask, href: '/medication/stock-react-lab' },
             { label: 'Medication Stock (Lab 2)', icon: IconFlask, href: '/medication/stock-react-lab-2' },
+            // Editorial/warm style matching Medication Round 4 (stock counterpart).
+            { label: 'Medication Stock 4.1', icon: IconBox, href: '/medication/stock-4-1' },
             { label: 'Controlled Drugs', icon: IconShieldLock, href: '/medication/controlled-drugs-react' },
+            // Editorial/warm style matching Medication Round 4.
+            { label: 'Controlled Drugs 4.1', icon: IconShieldLock, href: '/medication/controlled-drugs-4-1' },
             { label: 'Missed Doses', icon: IconAlertTriangle, href: '/medication/missed-doses-react' },
+            // Editorial/warm style matching Medication Round 4.
+            { label: 'Missed Doses 4.1', icon: IconAlertTriangle, href: '/medication/missed-doses-4-1' },
         ],
     },
     { label: 'Shift Handover', icon: IconArrowsLeftRight, href: '/medication/shift-handover-react' },

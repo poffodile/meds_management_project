@@ -128,6 +128,31 @@ class MissedDosesController extends Controller
     /** React/Inertia version of the missed-doses review. */
     public function indexReact(Request $request)
     {
+        return Inertia::render('Medication/MissedDoses', $this->missedReactData($request));
+    }
+
+    /**
+     * "Missed Doses 4.1" — warm/editorial review styled to match Medication Round 4
+     * and Meds Stock 4.1 (serif headings, review-progress donut, follow-up alerts +
+     * activity rails). Same shared payload as the other React review page.
+     */
+    public function indexMissedDoses41(Request $request)
+    {
+        return Inertia::render('Medication/MissedDoses41', $this->missedReactData($request));
+    }
+
+    /** Record a dose review, returning to the Missed Doses 4.1 page (keeping the date). */
+    public function resolveMissedDoses41(Request $request)
+    {
+        $error = $this->runResolve($request);
+
+        return redirect()->route('medication.missed-doses.v41', ['date' => $request->input('review_date')])
+            ->with($error ? 'error' : 'success', $error ?? 'Dose reviewed and resolved.');
+    }
+
+    /** Build the React review payload shared by the React + 4.1 pages. */
+    private function missedReactData(Request $request): array
+    {
         $request->validate([
             'date'   => 'nullable|date',
             'status' => 'nullable|in:outstanding,resolved,all',
@@ -210,7 +235,7 @@ class MissedDosesController extends Controller
             return true;
         })->values();
 
-        return Inertia::render('Medication/MissedDoses', [
+        return [
             'items'        => $items,
             'stats'        => $stats,
             'date'         => $date,
@@ -218,7 +243,7 @@ class MissedDosesController extends Controller
             'nextDate'     => $carbon->copy()->addDay()->toDateString(),
             'todayDate'    => $today->toDateString(),
             'statusFilter' => $statusFilter,
-        ]);
+        ];
     }
 
     public function resolve(Request $request)

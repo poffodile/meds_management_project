@@ -90,6 +90,31 @@ class ControlledDrugRegisterController extends Controller
     /** React/Inertia version of the register. Same data, shaped into plain arrays. */
     public function indexReact(Request $request)
     {
+        return Inertia::render('Medication/ControlledDrugs', $this->cdReactData());
+    }
+
+    /**
+     * "Controlled Drugs 4.1" — warm/editorial register styled to match Medication
+     * Round 4 and Meds Stock 4.1 (serif headings, register-health donut, alerts +
+     * activity rails). Same shared payload as the other React register page.
+     */
+    public function indexControlledDrugs41(Request $request)
+    {
+        return Inertia::render('Medication/ControlledDrugs41', $this->cdReactData());
+    }
+
+    /** Add a register entry, returning to the Controlled Drugs 4.1 page. */
+    public function storeControlledDrugs41(Request $request)
+    {
+        $this->createEntry($request);
+
+        return redirect()->route('medication.controlled-drugs.v41')
+            ->with('success', 'Controlled drug register entry added.');
+    }
+
+    /** Build the React register payload shared by the React + 4.1 pages. */
+    private function cdReactData(): array
+    {
         $homeId = $this->getHomeId();
 
         $entries = ControlledDrugRegister::forHome($homeId)
@@ -139,12 +164,12 @@ class ControlledDrugRegisterController extends Controller
                 }
             });
 
-        return Inertia::render('Medication/ControlledDrugs', [
+        return [
             'entries'      => $entries,
             'residents'    => $residents,
             'medsByClient' => $medsByClient,
             'lastBalances' => $lastBalances,
-        ]);
+        ];
     }
 
     public function store(Request $request)

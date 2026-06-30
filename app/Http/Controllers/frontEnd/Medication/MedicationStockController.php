@@ -164,6 +164,25 @@ class MedicationStockController extends Controller
     }
 
     /**
+     * "Meds Stock 4.1" — warm/editorial stock page styled to match Medication
+     * Round 4 (serif headings, stock-health donut, alerts + activity rails).
+     * Same shared payload as the other React stock pages.
+     */
+    public function indexMedsStock41(Request $request)
+    {
+        return Inertia::render('Medication/MedsStock41', $this->stockReactData());
+    }
+
+    /** Stock adjustment that returns to the Meds Stock 4.1 page. */
+    public function adjustMedsStock41(Request $request)
+    {
+        $error = $this->runAdjustment($request);
+
+        return redirect()->route('medication.stock.v41')
+            ->with($error ? 'error' : 'success', $error ?? 'Stock updated.');
+    }
+
+    /**
      * Build the React stock payload (meds, transactions, stats) shared by the
      * live page and the lab copy.
      */

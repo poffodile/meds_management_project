@@ -17,7 +17,7 @@ const ACTION_OPTIONS = [
  * ResolveDoseModal — record the clinical follow-up for a missed/not-given dose.
  * The dose details (sheet, slot, kind, code) come from the selected row.
  */
-export default function ResolveDoseModal({ opened, onClose, item, date }) {
+export default function ResolveDoseModal({ opened, onClose, item, date, action = '/medication/missed-doses-react/resolve' }) {
     const form = useForm({
         mar_sheet_id: '',
         review_date: date ?? '',
@@ -41,7 +41,7 @@ export default function ResolveDoseModal({ opened, onClose, item, date }) {
     }, [item, date]);
 
     const submit = () => {
-        form.post('/medication/missed-doses-react/resolve', {
+        form.post(action, {
             preserveScroll: true,
             onSuccess: () => { form.reset(); onClose(); },
         });

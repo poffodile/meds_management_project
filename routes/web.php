@@ -1589,12 +1589,6 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
     Route::get('/medication/medication-round-lab1-4-3', [MedicationRoundController::class, 'indexReactLab143'])->name('medication.medication-round.lab1-4-3');
     Route::post('/medication/medication-round-lab1-4-3/record', [MedicationRoundController::class, 'recordReactLab143'])->name('medication.medication-round.lab1-4-3.record');
 
-    // Medication Round 3 — dashboard-style (stepper + resident progress table).
-    Route::get('/medication/medication-round-3', [MedicationRoundController::class, 'indexMedsRound3'])->name('medication.medication-round.v3');
-    Route::post('/medication/medication-round-3/record', [MedicationRoundController::class, 'recordMedsRound3'])->name('medication.medication-round.v3.record');
-    Route::post('/medication/medication-round-3/end-round', [MedicationRoundController::class, 'endMedsRound3'])->name('medication.medication-round.v3.end');
-    Route::post('/medication/medication-round-3/reopen-round', [MedicationRoundController::class, 'reopenMedsRound3'])->name('medication.medication-round.v3.reopen');
-
     // Medication Round 4 — warm/editorial style (serif, progress donut, schedule timeline).
     Route::get('/medication/medication-round-4', [MedicationRoundController::class, 'indexMedsRound4'])->name('medication.medication-round.v4');
     Route::post('/medication/medication-round-4/record', [MedicationRoundController::class, 'recordMedsRound4'])->name('medication.medication-round.v4.record');
@@ -1607,6 +1601,9 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
     // React/Inertia version (isolated; legacy above untouched)
     Route::get('/medication/controlled-drugs-react', [ControlledDrugRegisterController::class, 'indexReact'])->name('medication.controlled-drugs.react');
     Route::post('/medication/controlled-drugs-react', [ControlledDrugRegisterController::class, 'storeReact'])->name('medication.controlled-drugs.react.store');
+    // Controlled Drugs 4.1 — warm/editorial style matching Medication Round 4.
+    Route::get('/medication/controlled-drugs-4-1', [ControlledDrugRegisterController::class, 'indexControlledDrugs41'])->name('medication.controlled-drugs.v41');
+    Route::post('/medication/controlled-drugs-4-1', [ControlledDrugRegisterController::class, 'storeControlledDrugs41'])->name('medication.controlled-drugs.v41.store');
 
     // Medication Management — Medication Stock (overview, alerts, adjust + history)
     Route::get('/medication/stock', [MedicationStockController::class, 'index'])->name('medication.stock.index');
@@ -1616,6 +1613,9 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
     Route::get('/medication/stock-react-lab', [MedicationStockController::class, 'indexReactLab'])->name('medication.stock.react.lab');
     Route::get('/medication/stock-react-lab-2', [MedicationStockController::class, 'indexReactLab2'])->name('medication.stock.react.lab2');
     Route::post('/medication/stock-react/adjust', [MedicationStockController::class, 'adjustReact'])->name('medication.stock.react.adjust');
+    // Meds Stock 4.1 — warm/editorial style matching Medication Round 4.
+    Route::get('/medication/stock-4-1', [MedicationStockController::class, 'indexMedsStock41'])->name('medication.stock.v41');
+    Route::post('/medication/stock-4-1/adjust', [MedicationStockController::class, 'adjustMedsStock41'])->name('medication.stock.v41.adjust');
 
     // Medication Management — Missed Doses Review (missed + not-given doses, with resolve workflow)
     Route::get('/medication/missed-doses', [MissedDosesController::class, 'index'])->name('medication.missed-doses.index');
@@ -1623,6 +1623,9 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
     // React/Inertia version (isolated; legacy above untouched)
     Route::get('/medication/missed-doses-react', [MissedDosesController::class, 'indexReact'])->name('medication.missed-doses.react');
     Route::post('/medication/missed-doses-react/resolve', [MissedDosesController::class, 'resolveReact'])->name('medication.missed-doses.react.resolve');
+    // Missed Doses 4.1 — warm/editorial style matching Medication Round 4.
+    Route::get('/medication/missed-doses-4-1', [MissedDosesController::class, 'indexMissedDoses41'])->name('medication.missed-doses.v41');
+    Route::post('/medication/missed-doses-4-1/resolve', [MissedDosesController::class, 'resolveMissedDoses41'])->name('medication.missed-doses.v41.resolve');
 
     // add to weekly
     Route::match(['get', 'post'], '/weekly/report/{log_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\LogBookController@weekly_report');

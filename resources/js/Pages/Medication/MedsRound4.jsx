@@ -321,7 +321,7 @@ export default function MedsRound4({ rounds = [], grid = {}, date, currentRound 
     const quickActions = [
         { label: 'Record PRN', icon: IconBolt, color: '#8C7CC9', onClick: () => residents[0] && setExpandedId(residents[0].client_id) },
         { label: 'Record refusal', icon: IconCircleX, color: '#E1632F', onClick: () => residents[0] && setExpandedId(residents[0].client_id) },
-        { label: 'Report missed dose', icon: IconAlertTriangle, color: '#C99A2E', href: '/medication/missed-doses-react' },
+        { label: 'Report missed dose', icon: IconAlertTriangle, color: '#C99A2E', href: '/medication/missed-doses-4-1' },
         { label: 'Add note', icon: IconFileText, color: '#3B82C4', href: '/medication/shift-handover-react' },
     ];
 
@@ -340,15 +340,25 @@ export default function MedsRound4({ rounds = [], grid = {}, date, currentRound 
                 <style>{`.mr4-scroll{scrollbar-width:thin;scrollbar-color:transparent transparent}.mr4-scroll:hover{scrollbar-color:rgba(33,31,26,0.28) transparent}.mr4-scroll::-webkit-scrollbar{width:6px;height:6px}.mr4-scroll::-webkit-scrollbar-track{background:transparent}.mr4-scroll::-webkit-scrollbar-thumb{background:transparent;border-radius:8px}.mr4-scroll:hover::-webkit-scrollbar-thumb{background:rgba(33,31,26,0.28)}`}</style>
                 <FlashAlerts />
 
-                {/* Header */}
-                <Group justify="space-between" align="flex-start" wrap="wrap" gap="md" mb="lg">
-                    <Box>
-                        <Title order={1} style={{ fontFamily: DISPLAY }} fz={isMobile ? 30 : 40} fw={600} c={INK} lh={1.05}>
-                            {greeting()}, {userName} <span style={{ fontFamily: 'system-ui' }}>👋</span>
-                        </Title>
-                        <Text c="dimmed" fz="sm" mt={6}>Here's the {meta.label.toLowerCase()} medication round — {statusWord.toLowerCase()}.</Text>
-                    </Box>
-                    <Group gap="sm" wrap="wrap">
+                {/* === Macro 2-col: LEFT (greeting · tabs+controls · alerts/schedule + table) and
+                       RIGHT (Today's Progress + Quick actions, pulled up to the top). === */}
+                <Box style={{ display: 'flex', flexWrap: 'wrap', gap: 18, alignItems: 'flex-start' }}>
+                <Box style={{ flex: '1 1 560px', minWidth: 0, order: isMobile ? 2 : 1 }}>
+
+                {/* Greeting */}
+                <Box mb="lg">
+                    <Title order={1} style={{ fontFamily: DISPLAY }} fz={isMobile ? 30 : 40} fw={600} c={INK} lh={1.05}>
+                        {greeting()}, {userName} <span style={{ fontFamily: 'system-ui' }}>👋</span>
+                    </Title>
+                    <Text c="dimmed" fz="sm" mt={6}>Here's the {meta.label.toLowerCase()} medication round — {statusWord.toLowerCase()}.</Text>
+                </Box>
+
+                {/* Round pill-tabs + controls (date / pause / end) on one line */}
+                <Group justify="space-between" align="center" wrap="wrap" gap="md" mb="lg">
+                    <Group gap={10} wrap="wrap">
+                        {rounds.map((r) => <RoundPill key={r.key} round={r} active={r.key === activeRound} onClick={() => { setActiveRound(r.key); setExpandedId(null); }} />)}
+                    </Group>
+                    <Group gap="sm" wrap="wrap" mr={isMobile ? 0 : 180}>
                         <TextInput type="date" value={date || ''} radius="xl" variant="filled"
                             onChange={(e) => reload({ date: e.currentTarget.value })} styles={{ input: { background: '#fff', border: `1px solid ${LINE}` } }} />
                         {roundClosed
@@ -365,16 +375,10 @@ export default function MedsRound4({ rounds = [], grid = {}, date, currentRound 
                     </Group>
                 </Group>
 
-                {/* Round pill-tabs (dates/times kept as-is; the 7/3/2 stats removed). */}
-                <Group gap={10} wrap="wrap" mb="lg">
-                    {rounds.map((r) => <RoundPill key={r.key} round={r} active={r.key === activeRound} onClick={() => { setActiveRound(r.key); setExpandedId(null); }} />)}
-                </Group>
-
-                {/* Main area — Schedule/Alerts (left) · Residents table (middle) · Round Progress (right).
-                    Flex-wrap collapses it cleanly to fewer columns / a single stack on any screen. */}
+                {/* Inner content — Alerts/Schedule + Residents table */}
                 <Box style={{ display: 'flex', flexWrap: 'wrap', gap: 18, alignItems: 'flex-start' }}>
-                    {/* Residents table (middle) */}
-                    <Box style={card({ flex: '4 1 340px', minWidth: 0, order: isMobile ? 1 : 2 })}>
+                    {/* Residents table — sits next to the Alerts column, with extra padding between them. */}
+                    <Box style={card({ flex: '0 1 800px', minWidth: 0, marginLeft: isMobile ? undefined : 28, order: isMobile ? 1 : 2 })}>
                         <Group justify="space-between" align="center" px="md" pt="md" pb="sm" wrap="wrap" gap="sm">
                             <Text style={{ fontFamily: DISPLAY }} fz={22} fw={600} c={INK}>Residents</Text>
                             <TextInput placeholder="Search residents…" leftSection={<IconSearch size={15} />} value={query}
@@ -398,91 +402,8 @@ export default function MedsRound4({ rounds = [], grid = {}, date, currentRound 
                         <Box py={4} />
                     </Box>
 
-                    {/* Right — Round Progress + Quick actions */}
-                    <Stack gap={16} style={{ flex: '1 1 232px', maxWidth: isMobile ? undefined : 300, order: 3 }}>
-                        {/* Round Progress */}
-                        <Box style={card({ padding: 16 })}>
-                            <Group justify="space-between" align="center" mb={4}>
-                                <Text style={{ fontFamily: DISPLAY }} fz={18} fw={600} c={INK}>Today's Progress</Text>
-                                <Badge variant="light" color={dayStats.outstanding ? 'gray' : 'green'} radius="sm" size="sm">{dayStats.outstanding} left</Badge>
-                            </Group>
-                            <Group justify="center" my={6}>
-                                <RingProgress
-                                    size={146} thickness={13} roundCaps
-                                    sections={[
-                                        { value: dseg(dayStats.given), color: C_GIVEN },
-                                        { value: dseg(dayStats.missed), color: C_MISSED },
-                                        { value: dseg(dayStats.outstanding), color: C_DUE },
-                                    ]}
-                                    label={(
-                                        <Box ta="center">
-                                            <Text style={{ fontFamily: DISPLAY }} fz={30} fw={600} c={INK} lh={1}>{dayStats.total}</Text>
-                                            <Text fz={10} c="dimmed">all day · {dayPct}%</Text>
-                                        </Box>
-                                    )}
-                                />
-                            </Group>
-                            <Stack gap={6} mt={2}>
-                                {[
-                                    { c: C_GIVEN, label: 'Given', v: dayStats.given },
-                                    { c: C_DUE, label: 'Outstanding', v: dayStats.outstanding },
-                                    { c: C_MISSED, label: 'Refused / omitted', v: dayStats.missed },
-                                ].map((s) => (
-                                    <Group key={s.label} justify="space-between" wrap="nowrap">
-                                        <Group gap={8} wrap="nowrap"><Box w={10} h={10} style={{ borderRadius: 3, background: s.c }} /><Text fz="sm" c="dimmed">{s.label}</Text></Group>
-                                        <Text fz="sm" fw={700} c={INK}>{s.v}</Text>
-                                    </Group>
-                                ))}
-                            </Stack>
-
-                            {/* By-round countdown — how many doses are left in each round. */}
-                            <Box mt={12} pt={12} style={{ borderTop: `1px solid ${LINE}` }}>
-                                <Text fz={10} fw={700} tt="uppercase" c="dimmed" mb={8} style={{ letterSpacing: 0.5 }}>By round</Text>
-                                <Stack gap={9}>
-                                    {roundBreakdown.map((r) => {
-                                        const done = r.total > 0 && r.left === 0;
-                                        return (
-                                            <Box key={r.key} component="button" onClick={() => { setActiveRound(r.key); setExpandedId(null); }}
-                                                style={{ width: '100%', textAlign: 'left', border: 'none', background: 'transparent', cursor: 'pointer', padding: 0 }}>
-                                                <Group justify="space-between" wrap="nowrap" mb={3}>
-                                                    <Text fz="xs" fw={r.key === activeRound ? 700 : 600} c={r.key === activeRound ? INK : 'dimmed'}>{r.label}</Text>
-                                                    <Text fz="xs" fw={700} c={done ? C_GIVEN : INK}>
-                                                        {r.done}/{r.total}
-                                                    </Text>
-                                                </Group>
-                                                <Progress value={r.total ? (r.done / r.total) * 100 : 0}
-                                                    color={r.color} radius="xl" size={6} />
-                                            </Box>
-                                        );
-                                    })}
-                                </Stack>
-                            </Box>
-                        </Box>
-
-                        {/* Quick actions */}
-                        <Box style={card({ padding: 14 })}>
-                            <Text style={{ fontFamily: DISPLAY }} fz={16} fw={600} c={INK} mb={8}>Quick actions</Text>
-                            <Box style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-                                {quickActions.map((a) => {
-                                    const Icon = a.icon;
-                                    const inner = (
-                                        <Group gap={8} wrap="nowrap" align="center" style={{ padding: '7px 9px', borderRadius: 10, background: '#FBFAF5', border: `1px solid ${LINE}`, height: '100%', cursor: 'pointer' }}>
-                                            <Box style={{ width: 26, height: 26, borderRadius: 8, flexShrink: 0, background: `${a.color}1A`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                <Icon size={15} stroke={1.8} color={a.color} />
-                                            </Box>
-                                            <Text fz={11} fw={600} c={INK} lh={1.15}>{a.label}</Text>
-                                        </Group>
-                                    );
-                                    return a.href
-                                        ? <Box component="a" key={a.label} href={a.href} style={{ textDecoration: 'none' }}>{inner}</Box>
-                                        : <Box component="button" key={a.label} onClick={a.onClick} style={{ border: 'none', background: 'transparent', padding: 0, textAlign: 'left' }}>{inner}</Box>;
-                                })}
-                            </Box>
-                        </Box>
-                    </Stack>
-
                     {/* Left — Alerts on top, Schedule below */}
-                    <Stack gap={16} style={{ flex: '1 1 232px', maxWidth: isMobile ? undefined : 300, order: isMobile ? 2 : 1 }}>
+                    <Stack gap={16} style={{ flex: isMobile ? '1 1 232px' : '0 1 280px', maxWidth: isMobile ? undefined : 300, order: isMobile ? 2 : 1 }}>
                         {/* Alerts */}
                         <Box style={card({ padding: 16 })}>
                             <Group justify="space-between" align="center" mb={alertsOpen ? 8 : 0} style={{ cursor: 'pointer' }} onClick={alertsCtl.toggle}>
@@ -558,6 +479,91 @@ export default function MedsRound4({ rounds = [], grid = {}, date, currentRound 
                             </Collapse>
                     </Box>
                     </Stack>
+                </Box>
+                </Box>
+
+                {/* === RIGHT — Today's Progress + Quick actions (pulled up to the top) === */}
+                <Stack gap={14} style={{ flex: '1 1 240px', maxWidth: isMobile ? undefined : 256, order: isMobile ? 1 : 2 }}>
+                    {/* Round Progress */}
+                    <Box style={card({ padding: 18 })}>
+                        <Group justify="space-between" align="center" mb={6}>
+                            <Text style={{ fontFamily: DISPLAY }} fz={17} fw={600} c={INK}>Today's Progress</Text>
+                            <Badge variant="light" color={dayStats.outstanding ? 'gray' : 'green'} radius="sm" size="sm">{dayStats.outstanding} left</Badge>
+                        </Group>
+                        <Group justify="center" my={12}>
+                            <RingProgress
+                                size={156} thickness={14} roundCaps
+                                sections={[
+                                    { value: dseg(dayStats.given), color: C_GIVEN },
+                                    { value: dseg(dayStats.missed), color: C_MISSED },
+                                    { value: dseg(dayStats.outstanding), color: C_DUE },
+                                ]}
+                                label={(
+                                    <Box ta="center">
+                                        <Text style={{ fontFamily: DISPLAY }} fz={34} fw={600} c={INK} lh={1}>{dayStats.total}</Text>
+                                        <Text fz={11} c="dimmed">all day · {dayPct}%</Text>
+                                    </Box>
+                                )}
+                            />
+                        </Group>
+                        <Stack gap={11} mt={8}>
+                            {[
+                                { c: C_GIVEN, label: 'Given', v: dayStats.given },
+                                { c: C_DUE, label: 'Outstanding', v: dayStats.outstanding },
+                                { c: C_MISSED, label: 'Refused / omitted', v: dayStats.missed },
+                            ].map((s) => (
+                                <Group key={s.label} justify="space-between" wrap="nowrap">
+                                    <Group gap={8} wrap="nowrap"><Box w={9} h={9} style={{ borderRadius: 3, background: s.c }} /><Text fz={12} c="dimmed">{s.label}</Text></Group>
+                                    <Text fz={12} fw={700} c={INK}>{s.v}</Text>
+                                </Group>
+                            ))}
+                        </Stack>
+
+                        {/* By-round countdown — how many doses are left in each round. */}
+                        <Box mt={16} pt={16} style={{ borderTop: `1px solid ${LINE}` }}>
+                            <Text fz={10} fw={700} tt="uppercase" c="dimmed" mb={10} style={{ letterSpacing: 0.5 }}>By round</Text>
+                            <Stack gap={14}>
+                                {roundBreakdown.map((r) => {
+                                    const done = r.total > 0 && r.left === 0;
+                                    return (
+                                        <Box key={r.key} component="button" onClick={() => { setActiveRound(r.key); setExpandedId(null); }}
+                                            style={{ width: '100%', textAlign: 'left', border: 'none', background: 'transparent', cursor: 'pointer', padding: 0 }}>
+                                            <Group justify="space-between" wrap="nowrap" mb={3}>
+                                                <Text fz="xs" fw={r.key === activeRound ? 700 : 600} c={r.key === activeRound ? INK : 'dimmed'}>{r.label}</Text>
+                                                <Text fz="xs" fw={700} c={done ? C_GIVEN : INK}>
+                                                    {r.done}/{r.total}
+                                                </Text>
+                                            </Group>
+                                            <Progress value={r.total ? (r.done / r.total) * 100 : 0}
+                                                color={r.color} radius="xl" size={8} />
+                                        </Box>
+                                    );
+                                })}
+                            </Stack>
+                        </Box>
+                    </Box>
+
+                    {/* Quick actions */}
+                    <Box style={card({ padding: 12 })}>
+                        <Text style={{ fontFamily: DISPLAY }} fz={15} fw={600} c={INK} mb={8}>Quick actions</Text>
+                        <Box style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 7 }}>
+                            {quickActions.map((a) => {
+                                const Icon = a.icon;
+                                const inner = (
+                                    <Group gap={7} wrap="nowrap" align="center" style={{ padding: '6px 8px', borderRadius: 10, background: '#FBFAF5', border: `1px solid ${LINE}`, height: '100%', cursor: 'pointer' }}>
+                                        <Box style={{ width: 24, height: 24, borderRadius: 7, flexShrink: 0, background: `${a.color}1A`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                            <Icon size={14} stroke={1.8} color={a.color} />
+                                        </Box>
+                                        <Text fz={10} fw={600} c={INK} lh={1.15}>{a.label}</Text>
+                                    </Group>
+                                );
+                                return a.href
+                                    ? <Box component="a" key={a.label} href={a.href} style={{ textDecoration: 'none' }}>{inner}</Box>
+                                    : <Box component="button" key={a.label} onClick={a.onClick} style={{ border: 'none', background: 'transparent', padding: 0, textAlign: 'left' }}>{inner}</Box>;
+                            })}
+                        </Box>
+                    </Box>
+                </Stack>
                 </Box>
 
                 {closure?.by && <Text fz="xs" c="dimmed" ta="right" mt="md">Round ended by {closure.by}{closure.at ? ` at ${closure.at}` : ''}.</Text>}

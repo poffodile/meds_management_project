@@ -15,7 +15,7 @@ const ACTION_OPTIONS = [
  * AddCdEntryModal — add a Controlled Drugs register entry.
  * Picks a resident, then their medications; auto-fills the running balance.
  */
-export default function AddCdEntryModal({ opened, onClose, residents = [], medsByClient = {}, lastBalances = {} }) {
+export default function AddCdEntryModal({ opened, onClose, residents = [], medsByClient = {}, lastBalances = {}, action = '/medication/controlled-drugs-react' }) {
     const d = new Date();
     const today = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
     const nowTime = `${pad(d.getHours())}:${pad(d.getMinutes())}`;
@@ -70,7 +70,7 @@ export default function AddCdEntryModal({ opened, onClose, residents = [], medsB
     };
 
     const submit = () => {
-        form.post('/medication/controlled-drugs-react', {
+        form.post(action, {
             preserveScroll: true,
             onSuccess: () => { form.reset(); onClose(); },
         });
