@@ -305,14 +305,16 @@ export default function ControlledDrugs41({ entries = [], residents = [], medsBy
                                 <Box style={{ width: 28 }} />
                             </Group>
                         )}
-                        {filtered.length === 0
-                            ? <Text fz="sm" c="dimmed" ta="center" py="xl">No register entries match.</Text>
-                            : filtered.map((e, i) => (
-                                <EntryRow key={e.id ?? i} e={e} isMobile={isMobile}
-                                    expanded={expandedId === (e.id ?? i)}
-                                    onToggle={() => setExpandedId(expandedId === (e.id ?? i) ? null : (e.id ?? i))} />
-                            ))}
-                        <Box py={4} />
+                        <Box className="cd41-scroll" style={{ maxHeight: isMobile ? undefined : 520, overflowY: 'auto', overflowX: 'hidden' }}>
+                            {filtered.length === 0
+                                ? <Text fz="sm" c="dimmed" ta="center" py="xl">No register entries match.</Text>
+                                : filtered.map((e, i) => (
+                                    <EntryRow key={e.id ?? i} e={e} isMobile={isMobile}
+                                        expanded={expandedId === (e.id ?? i)}
+                                        onToggle={() => setExpandedId(expandedId === (e.id ?? i) ? null : (e.id ?? i))} />
+                                ))}
+                            <Box py={4} />
+                        </Box>
                     </Box>
 
                     {/* Right — Register health + Quick actions */}

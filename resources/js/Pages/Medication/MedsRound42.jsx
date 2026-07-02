@@ -23,11 +23,13 @@ import { avatarColor, initials } from '@frontend/lib/avatarColor';
 import { CODE_LABELS } from '@frontend/lib/medicationCodes';
 import { usePageReload } from '@frontend/hooks/usePageReload';
 
-// "Medication Round 4" — warm/editorial styling modelled on the Crextio + learning
-// dashboard references: cream panel, Fraunces serif display headings & numbers, a
-// yellow accent, soft white cards, pill round-tabs, a round-progress donut, a schedule
-// timeline and an avatar resident table. Same live data as the other round pages.
-const ENDPOINT = '/medication/medication-round-4';
+// "Medication Round 4.2" — a UI-fix duplicate of Medication Round 4 (same live data
+// and backend behaviour); a safe place to iterate on the look without touching Round 4.
+// Original note: warm/editorial styling modelled on the Crextio + learning dashboard
+// references: cream panel, Fraunces serif display headings & numbers, a yellow accent,
+// soft white cards, pill round-tabs, a round-progress donut, a schedule timeline and an
+// avatar resident table. Same live data as the other round pages.
+const ENDPOINT = '/medication/medication-round-4-2';
 
 // Warm palette (page-local — deliberately distinct from the app's teal tokens).
 const CREAM = '#F6F2E8';
@@ -228,7 +230,7 @@ function residentSortMetrics(resident) {
     return { total, done, pct, statusRank };
 }
 
-export default function MedsRound4({ rounds = [], grid = {}, date, currentRound = 'morning', closures = {}, home }) {
+export default function MedsRound42({ rounds = [], grid = {}, date, currentRound = 'morning', closures = {}, home }) {
     const reload = usePageReload(ENDPOINT);
     const isMobile = useMediaQuery('(max-width: 768px)');
     const userName = (usePage().props?.auth?.user?.name ?? 'there').split(' ')[0];
@@ -376,7 +378,7 @@ export default function MedsRound4({ rounds = [], grid = {}, date, currentRound 
 
     return (
         <AppShell>
-            <Head title="Medication Round 4">
+            <Head title="Medication Round 4.2">
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
                 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&display=swap" rel="stylesheet" />

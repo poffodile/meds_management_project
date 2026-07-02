@@ -22,6 +22,8 @@ import classes from './AppShell.module.css';
 const NAV = [
     { label: 'Home', icon: IconHome, href: '#' },
     { label: 'Daily Log', icon: IconNotebook, href: '#' },
+    // Jumps into the separate "Frontend 2" shell — same app, its own sidebar styling.
+    { label: 'Frontend 2', icon: IconLayoutGrid, href: '/frontend2' },
     {
         // Demo flow — the four warm/editorial "4.1" pages, in click-through order.
         group: 'Demo · 4.1', icon: IconLayoutGrid, children: [
@@ -37,6 +39,8 @@ const NAV = [
             { label: 'Medication Round', icon: IconClock, href: '/medication/medication-round-lab1-4-2' },
             // Editorial/warm style: serif, progress donut, schedule timeline.
             { label: 'Medication Round 4', icon: IconLayoutGrid, href: '/medication/medication-round-4' },
+            // UI-fix duplicate of Round 4 — safe to iterate on.
+            { label: 'Medication Round 4.2', icon: IconLayoutGrid, href: '/medication/medication-round-4-2' },
             // All the other trial versions tucked into one collapsible dropdown.
             {
                 label: 'Round Versions', icon: IconFlask, children: [

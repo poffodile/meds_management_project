@@ -1,0 +1,21 @@
+/* Frontend2 sidebar rows — a separate shell from the main /frontend app.
+   Base transparent → :hover grey box → [data-active] accent pill. */
+.navRow {
+    --row-bg: transparent;
+    background-color: var(--row-bg);
+    border-radius: 10px;
+    transition: background-color 120ms ease;
+}
+
+.navRow:hover {
+    --row-bg: light-dark(var(--mantine-color-gray-1), var(--mantine-color-dark-5));
+}
+
+.navLabel {
+    white-space: nowrap;
+}
+
+/* Current page — a clearly-visible accent box. */
+.navRow[data-active] {
+    --row-bg: var(--mantine-color-brandTeal-1);
+}

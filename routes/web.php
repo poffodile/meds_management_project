@@ -42,6 +42,7 @@ use App\Http\Controllers\frontEnd\Domiciliary\ServiceUserFeedbackController as D
 use App\Http\Controllers\frontEnd\Domiciliary\StaffAvailabilityController as DomStaffAvailabilityController;
 use App\Http\Controllers\frontEnd\Domiciliary\StaffController as DomStaffController;
 use App\Http\Controllers\frontEnd\Domiciliary\VisitScheduleController as DomVisitScheduleController;
+use App\Http\Controllers\frontEnd\Frontend2Controller;
 use App\Http\Controllers\frontEnd\Medication\ControlledDrugRegisterController;
 use App\Http\Controllers\frontEnd\Medication\MedicationRoundController;
 use App\Http\Controllers\frontEnd\Medication\MedicationStockController;
@@ -128,7 +129,14 @@ Route::get('clear', function () {
 });
 
 Route::get('dev-login', function () {
-    $user = User::where('is_deleted', 0)->first();
+    // Prefer a user whose PRIMARY (first) home is the demo home 101 — that's where the
+    // medication demo data lives — so the 4.1 screens have live residents/meds. Managers
+    // first for the fullest demo. Falls back to any user if none match.
+    $user = User::where('is_deleted', 0)
+        ->where(fn ($q) => $q->where('home_id', '101')->orWhere('home_id', 'like', '101,%'))
+        ->orderByRaw("FIELD(user_type, 'M', 'CM', 'A', 'N', 'O')")
+        ->first()
+        ?? User::where('is_deleted', 0)->first();
     if (! $user) {
         return 'No user found';
     }
@@ -1594,6 +1602,15 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
     Route::post('/medication/medication-round-4/record', [MedicationRoundController::class, 'recordMedsRound4'])->name('medication.medication-round.v4.record');
     Route::post('/medication/medication-round-4/end-round', [MedicationRoundController::class, 'endMedsRound4'])->name('medication.medication-round.v4.end');
     Route::post('/medication/medication-round-4/reopen-round', [MedicationRoundController::class, 'reopenMedsRound4'])->name('medication.medication-round.v4.reopen');
+
+    // Medication Round 4.2 — UI-fix duplicate of Round 4 (same data + behaviour).
+    Route::get('/medication/medication-round-4-2', [MedicationRoundController::class, 'indexMedsRound42'])->name('medication.medication-round.v42');
+    Route::post('/medication/medication-round-4-2/record', [MedicationRoundController::class, 'recordMedsRound42'])->name('medication.medication-round.v42.record');
+    Route::post('/medication/medication-round-4-2/end-round', [MedicationRoundController::class, 'endMedsRound42'])->name('medication.medication-round.v42.end');
+    Route::post('/medication/medication-round-4-2/reopen-round', [MedicationRoundController::class, 'reopenMedsRound42'])->name('medication.medication-round.v42.reopen');
+
+    // Frontend 2 — a separate app shell with its own sidebar (new section, own React pages).
+    Route::get('/frontend2', [Frontend2Controller::class, 'index'])->name('frontend2.home');
 
     // Medication Management — Controlled Drugs Register (append-only ledger)
     Route::get('/medication/controlled-drugs', [ControlledDrugRegisterController::class, 'index'])->name('medication.controlled-drugs.index');

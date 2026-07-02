@@ -121,6 +121,18 @@ function DoseRow({ i, expanded, onToggle, onResolve, isMobile }) {
     );
 }
 
+/** Clickable sortable column header — chevron shows the active sort + direction. */
+function SortHeader({ label, k, sort, onSort, style, visibleFrom }) {
+    const active = sort.key === k;
+    return (
+        <Box component="button" onClick={() => onSort(k)} visibleFrom={visibleFrom}
+            style={{ display: 'flex', alignItems: 'center', gap: 3, border: 'none', background: 'transparent', cursor: 'pointer', padding: 0, ...style }}>
+            <Text fz={10} fw={700} tt="uppercase" c={active ? INK : 'dimmed'} style={{ letterSpacing: 0.5 }}>{label}</Text>
+            {active && <IconChevronDown size={11} stroke={2.5} color={INK} style={{ transform: sort.dir === 'asc' ? 'rotate(180deg)' : 'none', transition: 'transform .12s' }} />}
+        </Box>
+    );
+}
+
 export default function MissedDoses41({
     items = [], stats = {}, date, prevDate, nextDate, todayDate, statusFilter = 'outstanding',
 }) {
@@ -145,6 +157,24 @@ export default function MissedDoses41({
         const q = query.trim().toLowerCase();
         if (q && !`${i.resident_name} ${i.medication_name}`.toLowerCase().includes(q)) return false;
         return true;
+    });
+
+    // Sortable table — default Time (latest slot) first so the most recent missed meds are on top.
+    const [sort, setSort] = useState({ key: 'slot', dir: 'desc' });
+    const toggleSort = (key) => setSort((s) => (s.key === key
+        ? { key, dir: s.dir === 'asc' ? 'desc' : 'asc' }
+        : { key, dir: key === 'slot' ? 'desc' : 'asc' }));
+    const sortKeyVal = (i) => {
+        if (sort.key === 'resident') return (i.resident_name || '').toLowerCase();
+        if (sort.key === 'issue') return i.kind || '';
+        if (sort.key === 'reason') { const r = reasonOf(i); return r === '—' ? '' : r.toLowerCase(); }
+        if (sort.key === 'status') return i.resolved ? '1' : '0';
+        return i.slot || ''; // slot / time
+    };
+    const sorted = [...filtered].sort((a, b) => {
+        const c = String(sortKeyVal(a)).localeCompare(String(sortKeyVal(b)), undefined, { numeric: true });
+        const tie = c !== 0 ? c : String(a.slot).localeCompare(String(b.slot));
+        return sort.dir === 'asc' ? tie : -tie;
     });
 
     const counts = useMemo(() => ({
@@ -269,24 +299,26 @@ export default function MissedDoses41({
                                 styles={{ input: { background: '#F7F4EC' } }} />
                         </Group>
                         {!isMobile && (
-                            <Group gap="md" wrap="nowrap" px="md" pb={6} c="dimmed">
-                                <Text fz={10} fw={700} tt="uppercase" style={{ flex: '2 1 230px', letterSpacing: 0.5 }}>Resident</Text>
-                                <Text fz={10} fw={700} tt="uppercase" style={{ width: 56, letterSpacing: 0.5 }} visibleFrom="sm">Time</Text>
-                                <Text fz={10} fw={700} tt="uppercase" style={{ flex: '1 1 100px', letterSpacing: 0.5 }} visibleFrom="md">Issue</Text>
-                                <Text fz={10} fw={700} tt="uppercase" style={{ flex: '1 1 110px', letterSpacing: 0.5 }} visibleFrom="md">Reason</Text>
-                                <Text fz={10} fw={700} tt="uppercase" style={{ letterSpacing: 0.5 }}>Status</Text>
+                            <Group gap="md" wrap="nowrap" px="md" pb={6}>
+                                <SortHeader label="Resident" k="resident" sort={sort} onSort={toggleSort} style={{ flex: '2 1 230px' }} />
+                                <SortHeader label="Time" k="slot" sort={sort} onSort={toggleSort} style={{ width: 56 }} visibleFrom="sm" />
+                                <SortHeader label="Issue" k="issue" sort={sort} onSort={toggleSort} style={{ flex: '1 1 100px' }} visibleFrom="md" />
+                                <SortHeader label="Reason" k="reason" sort={sort} onSort={toggleSort} style={{ flex: '1 1 110px' }} visibleFrom="md" />
+                                <SortHeader label="Status" k="status" sort={sort} onSort={toggleSort} />
                                 <Box style={{ width: 28 }} />
                             </Group>
                         )}
-                        {filtered.length === 0
-                            ? <Text fz="sm" c="dimmed" ta="center" py="xl">No dose issues match.</Text>
-                            : filtered.map((i) => (
-                                <DoseRow key={i.id} i={i} isMobile={isMobile}
-                                    expanded={expandedId === i.id}
-                                    onToggle={() => setExpandedId(expandedId === i.id ? null : i.id)}
-                                    onResolve={openResolve} />
-                            ))}
-                        <Box py={4} />
+                        <Box className="md41-scroll" style={{ maxHeight: isMobile ? undefined : 520, overflowY: 'auto', overflowX: 'hidden' }}>
+                            {sorted.length === 0
+                                ? <Text fz="sm" c="dimmed" ta="center" py="xl">No dose issues match.</Text>
+                                : sorted.map((i) => (
+                                    <DoseRow key={i.id} i={i} isMobile={isMobile}
+                                        expanded={expandedId === i.id}
+                                        onToggle={() => setExpandedId(expandedId === i.id ? null : i.id)}
+                                        onResolve={openResolve} />
+                                ))}
+                            <Box py={4} />
+                        </Box>
                     </Box>
 
                     {/* Right — Review progress + Quick actions */}

@@ -149,9 +149,12 @@ class ControlledDrugRegisterController extends Controller
             ->active()
             ->currentlyActive()
             ->orderBy('medication_name')
-            ->get(['id', 'client_id', 'medication_name'])
+            ->get(['id', 'client_id', 'medication_name', 'stock_level', 'cd_schedule', 'dose', 'dosage'])
             ->groupBy('client_id')
-            ->map(fn ($g) => $g->map(fn ($m) => ['id' => $m->id, 'name' => $m->medication_name])->values());
+            ->map(fn ($g) => $g->map(fn ($m) => [
+                'id' => $m->id, 'name' => $m->medication_name, 'stock' => $m->stock_level,
+                'cd_schedule' => $m->cd_schedule, 'dose' => $m->dose, 'dosage' => $m->dosage,
+            ])->values());
 
         $lastBalances = [];
         ControlledDrugRegister::forHome($homeId)

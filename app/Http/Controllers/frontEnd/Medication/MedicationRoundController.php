@@ -356,6 +356,7 @@ class MedicationRoundController extends Controller
             'date' => $date,
             'currentRound' => $this->roundForTime(now()->format('H:i')),
             'closures' => $closures,
+            'home' => \DB::table('home')->where('id', $homeId)->value('title'),
         ];
     }
 
@@ -773,6 +774,62 @@ class MedicationRoundController extends Controller
             ->delete();
 
         return redirect()->route('medication.medication-round.v4', ['date' => $request->input('date')])
+            ->with('success', 'Round re-opened.');
+    }
+
+    // ---- Medication Round 4.2 — UI-fix duplicate of Round 4 (same data + behaviour) ----
+
+    /** UI-fix duplicate of the editorial round page. Same shared props as Round 4. */
+    public function indexMedsRound42(Request $request)
+    {
+        return Inertia::render('Medication/MedsRound42', $this->buildRoundProps($request));
+    }
+
+    /** Record a dose + return to the Medication Round 4.2 page (keeping the date). */
+    public function recordMedsRound42(Request $request, MARSheetService $marSheetService)
+    {
+        $ok = $this->applyRecord($request, $marSheetService);
+        $date = $request->input('date');
+
+        return redirect()->route('medication.medication-round.v42', ['date' => $date])
+            ->with($ok ? 'success' : 'error', $ok ? 'Dose recorded.' : 'Prescription not found.');
+    }
+
+    /** Ends (locks) a round for the home + date, recording who closed it. */
+    public function endMedsRound42(Request $request)
+    {
+        $request->validate([
+            'date' => 'required|date',
+            'round' => 'required|string|max:20',
+        ]);
+
+        MedicationRoundClosure::updateOrCreate(
+            ['home_id' => $this->getHomeId(), 'date' => $request->input('date'), 'round' => $request->input('round')],
+            ['closed_by' => (int) Auth::id()]
+        );
+
+        return redirect()->route('medication.medication-round.v42', ['date' => $request->input('date')])
+            ->with('success', 'Round ended.');
+    }
+
+    /** Re-opens (unlocks) an ended round — managers only. */
+    public function reopenMedsRound42(Request $request)
+    {
+        $request->validate([
+            'date' => 'required|date',
+            'round' => 'required|string|max:20',
+        ]);
+
+        if (! in_array(Auth::user()->user_type, ['M', 'CM', 'A', 'O'], true)) {
+            abort(403, 'Only managers can re-open a round.');
+        }
+
+        MedicationRoundClosure::where('home_id', $this->getHomeId())
+            ->where('date', $request->input('date'))
+            ->where('round', $request->input('round'))
+            ->delete();
+
+        return redirect()->route('medication.medication-round.v42', ['date' => $request->input('date')])
             ->with('success', 'Round re-opened.');
     }
 

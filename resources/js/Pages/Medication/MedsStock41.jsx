@@ -395,9 +395,8 @@ export default function MedsStock41({ meds = [], transactions = [], stats = {} }
                             leftSection={<IconDownload size={16} />} onClick={() => downloadCsv('meds-stock-4-1.csv', exportColumns, filtered)}>
                             Export
                         </Button>
-                        {isManager
-                            ? <Button radius="xl" color="dark" leftSection={<IconPlus size={16} />} onClick={adjust.open}>Adjust stock</Button>
-                            : <Badge variant="light" color="gray" size="lg" radius="sm">View only</Badge>}
+                        <Button radius="xl" color="dark" leftSection={<IconPlus size={16} />} onClick={adjust.open}>Adjust stock</Button>
+                        {!isManager && <Badge variant="light" color="gray" size="lg" radius="sm">View only</Badge>}
                     </Group>
                 </Group>
 
@@ -429,14 +428,16 @@ export default function MedsStock41({ meds = [], transactions = [], stats = {} }
                                 <Box style={{ width: 28 }} />
                             </Group>
                         )}
-                        {filtered.length === 0
-                            ? <Text fz="sm" c="dimmed" ta="center" py="xl">No medications match.</Text>
-                            : filtered.map((m) => (
-                                <MedRow key={m.id} m={m} txns={txByMed[m.medication_name] ?? []} isMobile={isMobile}
-                                    expanded={expandedId === m.id}
-                                    onToggle={() => setExpandedId(expandedId === m.id ? null : m.id)} />
-                            ))}
-                        <Box py={4} />
+                        <Box className="ms41-scroll" style={{ maxHeight: isMobile ? undefined : 520, overflowY: 'auto', overflowX: 'hidden' }}>
+                            {filtered.length === 0
+                                ? <Text fz="sm" c="dimmed" ta="center" py="xl">No medications match.</Text>
+                                : filtered.map((m) => (
+                                    <MedRow key={m.id} m={m} txns={txByMed[m.medication_name] ?? []} isMobile={isMobile}
+                                        expanded={expandedId === m.id}
+                                        onToggle={() => setExpandedId(expandedId === m.id ? null : m.id)} />
+                                ))}
+                            <Box py={4} />
+                        </Box>
                     </Box>
 
                     {/* Right — Stock health + Quick actions */}

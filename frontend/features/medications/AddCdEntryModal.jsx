@@ -3,6 +3,16 @@ import { useForm } from '@inertiajs/react';
 import FormModal from '@frontend/components/FormModal';
 import { pad } from '@frontend/lib/dateUtils';
 
+// Pull the count off a dose string ("1 tablet" -> 1, "10 ml" -> 10).
+const parseDoseQty = (dose) => { const m = String(dose ?? '').match(/[\d.]+/); return m ? Number(m[0]) : ''; };
+// Pull the unit: the word in the dose ("1 tablet" -> "tablet"), else the dosage's unit ("10mg" -> "mg").
+const parseUnit = (dose, dosage) => {
+    const w = String(dose ?? '').replace(/[\d.,\s]+/, '').trim();
+    if (w) return w;
+    const ds = String(dosage ?? '').match(/[a-zA-Z%]+/);
+    return ds ? ds[0] : '';
+};
+
 const ACTION_OPTIONS = [
     { value: 'administered', label: 'Administered' },
     { value: 'received', label: 'Received' },
@@ -51,11 +61,22 @@ export default function AddCdEntryModal({ opened, onClose, residents = [], medsB
         form.setData('medication_name', value);
         const match = meds.find((m) => m.name === value);
         form.setData('mar_sheet_id', match ? String(match.id) : '');
-        const bal = lastBalances[`${form.data.client_id}|${value}`];
-        if (bal !== undefined && bal !== null) {
-            form.setData('balance_before', bal);
-            recalcBalance(form.data.action_type, bal, form.data.dose_quantity);
-        }
+
+        // Auto-fill the dose details from the prescription so they don't need typing.
+        if (match?.cd_schedule) form.setData('cd_schedule', match.cd_schedule);
+        const qty = match ? parseDoseQty(match.dose) : '';
+        const unit = match ? parseUnit(match.dose, match.dosage) : '';
+        if (qty !== '') form.setData('dose_quantity', qty);
+        if (unit) form.setData('unit', unit);
+
+        // Balance before = last register balance if one exists, else the med's current
+        // stock, else 0. Balance after is then derived from the dose.
+        const last = lastBalances[`${form.data.client_id}|${value}`];
+        const before = (last !== undefined && last !== null)
+            ? last
+            : (match && match.stock !== null && match.stock !== undefined ? match.stock : 0);
+        form.setData('balance_before', before);
+        recalcBalance(form.data.action_type, before, qty !== '' ? qty : form.data.dose_quantity);
     };
 
     // Auto-fill the running balance: out (administered/disposed) subtracts the dose,
@@ -159,9 +180,11 @@ export default function AddCdEntryModal({ opened, onClose, residents = [], medsB
                 />
                 <NumberInput
                     label="Balance after"
+                    description={form.data.action_type === 'adjustment' ? 'Enter the recounted balance' : 'Auto-calculated (balance − dose)'}
                     value={form.data.balance_after}
                     onChange={(v) => form.setData('balance_after', v)}
                     error={form.errors.balance_after}
+                    readOnly={form.data.action_type !== 'adjustment'}
                     required
                 />
             </Group>
