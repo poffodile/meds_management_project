@@ -505,7 +505,7 @@ export default function MedicationRoundV2({ rounds = [], grid = {}, date, curren
 
                         {/* Alert */}
                         {alert && !roundClosed && (
-                            <Box style={{ ...card, background: 'light-dark(#FFF7EF, var(--mantine-color-dark-6))', border: '1px solid #F3D9BE', padding: isSm ? '18px 16px' : '20px 22px' }}>
+                            <Box style={{ ...card, border: '1px solid #F4D2B4', padding: isSm ? '18px 16px' : '20px 22px' }}>
                                 <Group gap={9} mb={10} wrap="nowrap">
                                     <Box style={{ width: 32, height: 32, borderRadius: 9, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(245,131,33,0.14)' }}><IconAlertTriangle size={17} color={OVERDUE} /></Box>
                                     <Text fz={16} fw={700} c={TXT}>Alert</Text>

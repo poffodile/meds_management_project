@@ -306,15 +306,15 @@ export default function MedicationRoundSplit({ rounds = [], grid = {}, date, cur
                     {/* Right rail */}
                     <Stack gap={22} align={isMobile ? 'stretch' : 'flex-end'} style={{ flex: '1 1 320px', minWidth: 0, maxWidth: isMobile ? undefined : 350, paddingRight: isMobile ? 0 : 14 }}>
                         <Box style={{ ...card, width: '100%', maxWidth: isMobile ? undefined : 290, padding: isSm ? '18px 16px' : '22px 24px' }}>
-                            <Text fz={16} fw={800} c={TXT} mb={8}>Today</Text>
-                            <Group gap="lg" wrap="nowrap" align="center">
-                                <RingProgress size={104} thickness={11} roundCaps
+                            <Text fz={16} fw={800} c={TXT} mb={16}>Today</Text>
+                            <Group gap={18} wrap="nowrap" align="center">
+                                <RingProgress size={106} thickness={11} roundCaps style={{ flexShrink: 0 }}
                                     sections={[{ value: dseg(day.given), color: GREEN }, { value: dseg(day.overdue), color: ORANGE }, { value: dseg(day.scheduled), color: GRAY }]}
-                                    label={<Box ta="center"><Text fz={18} fw={800} c={TXT} lh={1}>{day.given}/{day.total}</Text><Text fz={9} c="dimmed">given</Text></Box>} />
-                                <Stack gap={8} style={{ flex: 1 }}>
+                                    label={<Box ta="center"><Text fz={17} fw={800} c={TXT} lh={1}>{day.given}/{day.total}</Text><Text fz={9} c="dimmed">given</Text></Box>} />
+                                <Stack gap={11} style={{ flex: 1, minWidth: 0 }}>
                                     {[{ c: GREEN, l: 'Given', v: day.given }, { c: ORANGE, l: 'Overdue', v: day.overdue }, { c: GRAY, l: 'Scheduled', v: day.scheduled }].map((s) => (
-                                        <Group key={s.l} justify="space-between" wrap="nowrap">
-                                            <Group gap={7} wrap="nowrap"><Box w={9} h={9} style={{ borderRadius: '50%', background: s.c }} /><Text fz="sm" c="dimmed">{s.l}</Text></Group>
+                                        <Group key={s.l} justify="space-between" wrap="nowrap" gap={8}>
+                                            <Group gap={8} wrap="nowrap" style={{ minWidth: 0 }}><Box w={9} h={9} style={{ borderRadius: '50%', background: s.c, flexShrink: 0 }} /><Text fz="sm" c="dimmed" truncate>{s.l}</Text></Group>
                                             <Text fz="sm" fw={700} c={TXT}>{s.v}</Text>
                                         </Group>
                                     ))}
@@ -323,28 +323,31 @@ export default function MedicationRoundSplit({ rounds = [], grid = {}, date, cur
                         </Box>
 
                         {alert && !roundClosed && (
-                            <Box style={{ ...card, width: '100%', maxWidth: isMobile ? undefined : 290, padding: isSm ? '18px 16px' : '22px 24px', background: 'light-dark(#FFF7EF, var(--mantine-color-dark-6))', borderColor: '#F3D9BE' }}>
-                                <Group gap={8} mb={6} wrap="nowrap"><IconAlertTriangle size={18} color={ORANGE} /><Text fz={16} fw={800} c={TXT}>Alert</Text></Group>
-                                <Text fz="sm" c="dimmed" lh={1.4}>
+                            <Box style={{ ...card, width: '100%', maxWidth: isMobile ? undefined : 290, padding: isSm ? '18px 16px' : '22px 24px', border: '1px solid #F4D2B4' }}>
+                                <Group gap={9} mb={10} wrap="nowrap">
+                                    <Box style={{ width: 32, height: 32, borderRadius: 9, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(245,131,33,0.14)' }}><IconAlertTriangle size={17} color="#F58321" /></Box>
+                                    <Text fz={16} fw={700} c={TXT}>Alert</Text>
+                                </Group>
+                                <Text fz={12.5} c="#7a8590" lh={1.5} mb={13}>
                                     <b style={{ color: TXT }}>{alert.med}</b> was due at {alert.slot} for {alert.resident} and is now overdue. Record or omit before the round ends.
                                 </Text>
-                                <Button component={Link} href="/frontend2/missed-doses" mt="sm" fullWidth radius="md"
-                                    variant="light" color="orange" rightSection={<IconArrowRight size={16} />}>Resolve now</Button>
+                                <Button component={Link} href="/frontend2/missed-doses" fullWidth radius={12}
+                                    rightSection={<IconChevronRight size={15} />} style={{ background: 'rgba(245,131,33,0.12)', color: '#cf6a12' }}>Resolve now</Button>
                             </Box>
                         )}
 
                         <Box style={{ ...card, width: '100%', maxWidth: isMobile ? undefined : 290, padding: isSm ? '18px 16px' : '22px 24px' }}>
-                            <Text fz={16} fw={800} c={TXT} mb={8}>Recent activity</Text>
+                            <Text fz={16} fw={800} c={TXT} mb={16}>Recent activity</Text>
                             {activity.length === 0
                                 ? <Text fz="sm" c="dimmed">No doses recorded yet today.</Text>
                                 : (
-                                    <Stack gap={12}>
+                                    <Stack gap={14}>
                                         {activity.map((a, i) => (
-                                            <Group key={i} gap={10} wrap="nowrap" align="flex-start">
-                                                <Box w={8} h={8} mt={5} style={{ borderRadius: '50%', flexShrink: 0, background: a.prn ? '#6E5BE6' : a.given ? GREEN : ORANGE }} />
+                                            <Group key={i} gap={11} wrap="nowrap" align="flex-start">
+                                                <Box w={8} h={8} mt={6} style={{ borderRadius: '50%', flexShrink: 0, background: a.prn ? '#6E5BE6' : a.given ? GREEN : ORANGE }} />
                                                 <Box style={{ flex: 1, minWidth: 0 }}>
                                                     <Text fz="sm" fw={600} c={TXT} truncate>{a.med} {a.label}</Text>
-                                                    <Text fz="xs" c="dimmed">{a.at}{a.by ? ` · by ${a.by}` : ''}</Text>
+                                                    <Text fz="xs" c="dimmed" truncate>{a.at}{a.by ? ` · by ${a.by}` : ''}</Text>
                                                 </Box>
                                             </Group>
                                         ))}
