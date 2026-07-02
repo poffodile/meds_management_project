@@ -1,90 +1,192 @@
 import { useState } from 'react';
 import {
-    AppShell as MantineAppShell, Group, Text, Burger, ScrollArea, Avatar, Badge,
-    ActionIcon, UnstyledButton, Box, Switch, Menu, Divider, useMantineColorScheme,
+    AppShell as MantineAppShell, Group, Text, Burger, ScrollArea, Avatar, Box,
+    ActionIcon, UnstyledButton, Menu, Switch, Collapse, Stack, useMantineColorScheme,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { usePage, Link } from '@inertiajs/react';
 import {
-    IconLayoutDashboard, IconChartBar, IconFolder, IconUsers, IconCalendar,
-    IconMessage, IconSettings, IconBell, IconMoon, IconChevronDown, IconArrowLeft,
+    IconLayoutDashboard, IconUsers, IconPill, IconCalendarEvent, IconChartBar,
+    IconFileText, IconSettings, IconBell, IconChevronDown, IconMoon, IconArrowLeft,
+    IconClipboardHeart, IconShieldLock, IconAlertTriangle, IconBox, IconSparkles,
 } from '@tabler/icons-react';
 import { RoleContext } from '@frontend/lib/role';
 import BrandLogo from '@frontend/components/BrandLogo';
-import AppFooter from '@frontend/components/AppFooter';
 import classes from './AppShell.module.css';
 
-// ── Frontend2 ──────────────────────────────────────────────────────────────
-// A SECOND app shell, fully separate from the main /frontend one. Same brand
-// header + footer, but its OWN always-expanded sidebar and its own nav list.
-// This is the base to iterate on — the sidebar contents/styling get tailored
-// to the picture the owner provides. Pages render inside <AppShell2>.
-//
-// NAV2 is a placeholder menu; swap it for the real sections once decided.
-const NAV2 = [
-    { section: 'Overview' },
-    { label: 'Dashboard', icon: IconLayoutDashboard, href: '/frontend2' },
-    { label: 'Analytics', icon: IconChartBar, href: '#' },
-    { section: 'Manage' },
-    { label: 'Projects', icon: IconFolder, href: '#' },
-    { label: 'Team', icon: IconUsers, href: '#' },
-    { label: 'Calendar', icon: IconCalendar, href: '#' },
-    { section: 'Account' },
-    { label: 'Messages', icon: IconMessage, href: '#' },
+// ── Frontend2 — "CLINIK"-style shell ─────────────────────────────────────────
+// A second app shell (separate sidebar) modelled on the clinic dashboard mockup:
+// a full-height blue→indigo gradient sidebar, a light lavender canvas and a white
+// title bar over the content. Same app/login as the main frontend; pages opt in
+// by wrapping themselves in this <AppShell title="…">.
+const ACCENT = '#4C6FFF';
+// Navy brand gradient (base is the official Care One OS navy #13233F) — a deep,
+// slightly-blue top easing into the brand navy at the bottom.
+const GRAD = 'linear-gradient(180deg, #1E355F 0%, #13233F 62%, #0F1C33 100%)';
+const CANVAS = 'light-dark(#EEF1F8, var(--mantine-color-dark-8))';
+
+const NAV = [
+    { label: 'Dashboard', icon: IconLayoutDashboard, href: '/frontend2', exact: true },
+    { label: 'Residents', icon: IconUsers, href: '/frontend2/residents' },
+    {
+        // Collapsible parent — everything medication lives inside here.
+        group: 'Medication', icon: IconPill, children: [
+            { label: 'Medication round', icon: IconClipboardHeart, href: '/frontend2/medication-round' },
+            { label: 'Medications', icon: IconPill, href: '/frontend2/medications' },
+            { label: 'Missed doses', icon: IconAlertTriangle, href: '/frontend2/missed-doses' },
+            { label: 'Controlled drugs', icon: IconShieldLock, href: '/frontend2/controlled-drugs' },
+            { label: 'Stock', icon: IconBox, href: '/frontend2/stock' },
+        ],
+    },
+    {
+        // Second meds area — placeholder pages, to iterate on separately.
+        group: 'Medication 2', icon: IconPill, children: [
+            { label: 'Medication round', icon: IconClipboardHeart, href: '/frontend2/medication-2/round' },
+            { label: 'Medications', icon: IconPill, href: '/frontend2/medication-2/medications' },
+            { label: 'Missed doses', icon: IconAlertTriangle, href: '/frontend2/medication-2/missed-doses' },
+            { label: 'Controlled drugs', icon: IconShieldLock, href: '/frontend2/medication-2/controlled-drugs' },
+            { label: 'Stock', icon: IconBox, href: '/frontend2/medication-2/stock' },
+        ],
+    },
+    { label: 'Scheduled visits', icon: IconCalendarEvent, href: '#' },
+    { label: 'Statistics', icon: IconChartBar, href: '#' },
+    { label: 'Reports', icon: IconFileText, href: '#' },
     { label: 'Settings', icon: IconSettings, href: '#' },
-    { divider: true },
-    // Returns to the main medication app (and its sidebar).
-    { label: 'Back to main app', icon: IconArrowLeft, href: '/medication/medication-round-4' },
 ];
+
+const childActiveFor = (item, path) => item.children.some((c) => c.href !== '#' && (c.exact ? path === c.href : path.startsWith(c.href)));
 
 function NavItem({ item, active }) {
     const Icon = item.icon;
     const disabled = item.href === '#';
+    const color = active ? ACCENT : 'rgba(255,255,255,0.88)';
     const inner = (
         <Group className={disabled ? undefined : classes.navRow} data-active={active || undefined}
-            gap="sm" wrap="nowrap" px="sm" py={10} style={{
-                color: active ? 'var(--mantine-color-brandTeal-light-color)' : 'light-dark(var(--mantine-color-gray-7), var(--mantine-color-gray-4))',
-                opacity: disabled ? 0.55 : 1,
-                cursor: disabled ? 'default' : 'pointer',
+            gap="sm" wrap="nowrap" px="sm" py={10} mb={4} style={{
+                color, opacity: disabled ? 0.6 : 1, cursor: disabled ? 'default' : 'pointer',
             }}>
-            <Icon size={20} stroke={1.6} color={active ? 'var(--mantine-color-brandTeal-light-color)' : 'var(--mantine-color-brandTeal-6)'} />
+            <Icon size={20} stroke={1.7} color={color} />
             <Text className={classes.navLabel} size="sm" fw={active ? 700 : 500}>{item.label}</Text>
         </Group>
     );
-    if (disabled) return <Box mb={2} title="Coming soon">{inner}</Box>;
-    return <Box component={Link} href={item.href} mb={2} style={{ textDecoration: 'none', display: 'block' }}>{inner}</Box>;
+    if (disabled) return <Box title="Coming soon">{inner}</Box>;
+    return <Box component={Link} href={item.href} style={{ textDecoration: 'none', display: 'block' }}>{inner}</Box>;
 }
 
-export default function AppShell({ children }) {
+// A sub-nav row inside a collapsible group (dot + icon + label).
+function SubNavItem({ item, active }) {
+    const Icon = item.icon;
+    const disabled = item.href === '#';
+    const color = active ? ACCENT : 'rgba(255,255,255,0.82)';
+    const inner = (
+        <Group className={disabled ? undefined : classes.navRow} data-active={active || undefined}
+            gap="xs" wrap="nowrap" px="sm" py={8} mb={2} style={{
+                color, opacity: disabled ? 0.6 : 1, cursor: disabled ? 'default' : 'pointer',
+            }}>
+            <Box w={5} h={5} style={{ borderRadius: '50%', flexShrink: 0, background: active ? ACCENT : 'rgba(255,255,255,0.5)' }} />
+            {Icon && <Icon size={16} stroke={1.7} color={color} />}
+            <Text className={classes.navLabel} size="sm" fw={active ? 700 : 500}>{item.label}</Text>
+        </Group>
+    );
+    if (disabled) return <Box title="Coming soon">{inner}</Box>;
+    return <Box component={Link} href={item.href} style={{ textDecoration: 'none', display: 'block' }}>{inner}</Box>;
+}
+
+// Collapsible group (e.g. Medication) — opens automatically when a child is active.
+function NavGroup({ item, path }) {
+    const Icon = item.icon;
+    const isChildActive = (c) => c.href !== '#' && (c.exact ? path === c.href : path.startsWith(c.href));
+    const childActive = childActiveFor(item, path);
+    const [open, setOpen] = useState(childActive);
+    const color = childActive ? '#fff' : 'rgba(255,255,255,0.88)';
+    return (
+        <Box mb={4}>
+            <UnstyledButton onClick={() => setOpen((o) => !o)} w="100%">
+                <Group className={classes.navRow} gap="sm" wrap="nowrap" px="sm" py={10} style={{ color }}>
+                    <Icon size={20} stroke={1.7} color={color} />
+                    <Text className={classes.navLabel} size="sm" fw={childActive ? 700 : 500} style={{ flex: 1 }}>{item.group}</Text>
+                    <IconChevronDown size={15} stroke={1.8} style={{ transform: open ? 'rotate(180deg)' : 'none', transition: 'transform .15s' }} />
+                </Group>
+            </UnstyledButton>
+            <Collapse in={open}>
+                <Stack gap={2} mt={2} pl="md">
+                    {item.children.map((c) => <SubNavItem key={c.label} item={c} active={isChildActive(c)} />)}
+                </Stack>
+            </Collapse>
+        </Box>
+    );
+}
+
+export default function AppShell({ children, title }) {
     const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
     const { props, url } = usePage();
     const role = props?.auth?.user?.role ?? 'carer';
     const userName = props?.auth?.user?.name ?? 'User';
+    const home = props?.home; // shown as a chip in the header when the page provides it
     const { colorScheme, toggleColorScheme } = useMantineColorScheme();
     const path = url.split('?')[0];
+    const isActive = (item) => item.href !== '#' && (item.exact ? path === item.href : path.startsWith(item.href));
 
     return (
         <RoleContext.Provider value={role}>
             <MantineAppShell
-                header={{ height: 64 }}
-                navbar={{ width: 252, breakpoint: 'sm', collapsed: { mobile: !mobileOpened } }}
+                layout="alt"
+                header={{ height: 68 }}
+                navbar={{ width: 236, breakpoint: 'sm', collapsed: { mobile: !mobileOpened } }}
                 padding="lg"
             >
-                {/* Header — brand bar with a "Frontend 2" tag so it's clear which app this is. */}
+                {/* Sidebar — full-height gradient rail (logo → nav → bottom card). */}
+                <MantineAppShell.Navbar style={{ background: GRAD, border: 'none' }}>
+                    <MantineAppShell.Section px="md" pt="lg" pb="xs">
+                        <BrandLogo tone="onDark" height={30} />
+                    </MantineAppShell.Section>
+
+                    <MantineAppShell.Section grow component={ScrollArea} px="sm" pt="md">
+                        {NAV.map((item) => item.group
+                            ? <NavGroup key={item.group} item={item} path={path} />
+                            : <NavItem key={item.label} item={item} active={isActive(item)} />)}
+                    </MantineAppShell.Section>
+
+                    {/* Bottom — Care Copilot AI card (from the mockup) + a temp back link. */}
+                    <MantineAppShell.Section px="sm" pb="md">
+                        <Box p="md" style={{ borderRadius: 16, background: 'rgba(255,255,255,0.10)', border: '1px solid rgba(255,255,255,0.16)' }}>
+                            <Group gap={7} wrap="nowrap" mb={4}>
+                                <IconSparkles size={16} color="#8FE3D4" />
+                                <Text c="#fff" fw={800} fz="sm" lh={1.2}>Care Copilot</Text>
+                            </Group>
+                            <Text c="rgba(255,255,255,0.72)" fz={11} lh={1.35}>Draft care plans and spot risks in minutes, not hours.</Text>
+                            <UnstyledButton component="a" href="#" mt="sm"
+                                style={{ display: 'block', textAlign: 'center', width: '100%', background: '#5FA8A0', color: '#fff', borderRadius: 10, padding: '9px 10px', fontWeight: 700, fontSize: 12, letterSpacing: 0.4 }}>
+                                TRY COPILOT
+                            </UnstyledButton>
+                        </Box>
+                        {/* TEMP — remove later. Quick jump back to the main frontend. */}
+                        <UnstyledButton component={Link} href="/medication/medication-round-4" mt="sm"
+                            style={{ display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'center', width: '100%', color: 'rgba(255,255,255,0.7)', fontSize: 12, fontWeight: 600 }}>
+                            <IconArrowLeft size={14} /> Back to main app (temp)
+                        </UnstyledButton>
+                    </MantineAppShell.Section>
+                </MantineAppShell.Navbar>
+
+                {/* Title bar — white bar over the content only (layout="alt"). */}
                 <MantineAppShell.Header style={{ background: 'light-dark(#ffffff, var(--mantine-color-dark-7))', borderBottom: '1px solid light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-4))' }}>
                     <Group h="100%" px="lg" justify="space-between" wrap="nowrap">
                         <Group gap="sm" wrap="nowrap">
                             <Burger opened={mobileOpened} onClick={toggleMobile} hiddenFrom="sm" size="sm" />
-                            <BrandLogo tone="auto" height={24} />
-                            <Badge variant="light" color="brandTeal" radius="sm" visibleFrom="sm">Frontend 2</Badge>
+                            <Text fw={800} fz={22} c="light-dark(var(--mantine-color-gray-9), var(--mantine-color-gray-1))">{title ?? 'CareOne'}</Text>
                         </Group>
-
                         <Group gap="md" wrap="nowrap">
+                            {home && (
+                                <Group gap={4} wrap="nowrap" visibleFrom="sm">
+                                    <Text fz="sm" fw={700} c="light-dark(var(--mantine-color-gray-8), var(--mantine-color-gray-2))">{home}</Text>
+                                    <IconChevronDown size={14} stroke={1.8} color="var(--mantine-color-gray-5)" />
+                                </Group>
+                            )}
+                            <Text fz="sm" fw={600} c="dimmed" visibleFrom="sm">EN</Text>
                             <ActionIcon variant="subtle" color="gray" radius="xl" size="lg" pos="relative">
                                 <IconBell size={20} stroke={1.6} />
-                                <Box pos="absolute" top={10} right={11} w={8} h={8} style={{ background: 'var(--mantine-color-indigo-4)', borderRadius: '50%' }} />
+                                <Box pos="absolute" top={10} right={11} w={8} h={8} style={{ background: ACCENT, borderRadius: '50%' }} />
                             </ActionIcon>
-
                             <Menu position="bottom-end" withArrow width={210}>
                                 <Menu.Target>
                                     <UnstyledButton>
@@ -92,9 +194,9 @@ export default function AppShell({ children }) {
                                             <Avatar color="indigo" radius="xl" size={36}>{userName.charAt(0).toUpperCase()}</Avatar>
                                             <Box visibleFrom="sm" style={{ lineHeight: 1.1 }}>
                                                 <Text size="sm" fw={600}>{userName}</Text>
-                                                <Text size="xs" c="dimmed">Frontend 2</Text>
+                                                <Text size="xs" c="dimmed">CareOne</Text>
                                             </Box>
-                                            <IconChevronDown size={16} stroke={1.6} color="light-dark(var(--mantine-color-gray-7), var(--mantine-color-gray-4))" />
+                                            <IconChevronDown size={16} stroke={1.6} />
                                         </Group>
                                     </UnstyledButton>
                                 </Menu.Target>
@@ -113,30 +215,8 @@ export default function AppShell({ children }) {
                     </Group>
                 </MantineAppShell.Header>
 
-                {/* Sidebar — always-expanded (a distinct treatment from the main shell's icon rail). */}
-                <MantineAppShell.Navbar style={{
-                    background: 'light-dark(#ffffff, var(--mantine-color-dark-7))',
-                    borderRight: '1px solid light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-4))',
-                }}>
-                    <MantineAppShell.Section grow component={ScrollArea} px="sm" pt="md" pb="md">
-                        {NAV2.map((item, idx) => {
-                            if (item.divider) return <Divider key={`d${idx}`} my="sm" color="light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-4))" />;
-                            if (item.section) {
-                                return (
-                                    <Text key={`s${idx}`} size="xs" fw={700} c="dimmed" tt="uppercase"
-                                        px="sm" mt={idx === 0 ? 0 : 'md'} mb={6} style={{ letterSpacing: 0.6 }}>
-                                        {item.section}
-                                    </Text>
-                                );
-                            }
-                            return <NavItem key={item.label} item={item} active={item.href !== '#' && path === item.href} />;
-                        })}
-                    </MantineAppShell.Section>
-                </MantineAppShell.Navbar>
-
-                <MantineAppShell.Main style={{ display: 'flex', flexDirection: 'column', minHeight: '100dvh' }}>
-                    <Box style={{ flex: 1, minWidth: 0 }}>{children}</Box>
-                    <AppFooter />
+                <MantineAppShell.Main style={{ background: CANVAS, minHeight: '100dvh' }}>
+                    {children}
                 </MantineAppShell.Main>
             </MantineAppShell>
         </RoleContext.Provider>

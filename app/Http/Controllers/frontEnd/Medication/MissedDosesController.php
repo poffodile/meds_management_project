@@ -150,6 +150,21 @@ class MissedDosesController extends Controller
             ->with($error ? 'error' : 'success', $error ?? 'Dose reviewed and resolved.');
     }
 
+    /** Missed-doses review rendered in the frontend2 (CLINIK) shell. */
+    public function indexFrontend2(Request $request)
+    {
+        return Inertia::render('Frontend2/MissedDoses', $this->missedReactData($request));
+    }
+
+    /** Resolve a dose + return to the frontend2 review page (keeping the date). */
+    public function resolveFrontend2(Request $request)
+    {
+        $error = $this->runResolve($request);
+
+        return redirect()->route('frontend2.missed-doses', ['date' => $request->input('review_date')])
+            ->with($error ? 'error' : 'success', $error ?? 'Dose reviewed and resolved.');
+    }
+
     /** Build the React review payload shared by the React + 4.1 pages. */
     private function missedReactData(Request $request): array
     {

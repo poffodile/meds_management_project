@@ -1,21 +1,22 @@
-/* Frontend2 sidebar rows — a separate shell from the main /frontend app.
-   Base transparent → :hover grey box → [data-active] accent pill. */
+/* Frontend2 sidebar rows — CLINIK-style gradient sidebar (white text on blue/indigo).
+   Base transparent → :hover translucent white → [data-active] solid white pill. */
 .navRow {
     --row-bg: transparent;
     background-color: var(--row-bg);
-    border-radius: 10px;
-    transition: background-color 120ms ease;
+    border-radius: 12px;
+    transition: background-color 140ms ease;
 }
 
 .navRow:hover {
-    --row-bg: light-dark(var(--mantine-color-gray-1), var(--mantine-color-dark-5));
+    --row-bg: rgba(255, 255, 255, 0.14);
 }
 
 .navLabel {
     white-space: nowrap;
 }
 
-/* Current page — a clearly-visible accent box. */
+/* Current page — a solid white pill (text is coloured inline). */
 .navRow[data-active] {
-    --row-bg: var(--mantine-color-brandTeal-1);
+    --row-bg: #ffffff;
+    box-shadow: 0 6px 16px rgba(23, 37, 84, 0.18);
 }

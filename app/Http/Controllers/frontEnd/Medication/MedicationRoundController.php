@@ -833,6 +833,56 @@ class MedicationRoundController extends Controller
             ->with('success', 'Round re-opened.');
     }
 
+    // ---- Frontend2 — CLINIK-style "today's round" (renders in the frontend2 shell) ----
+
+    /** Today's round in the frontend2 shell. Same shared props/logic as the other round pages. */
+    public function indexFrontend2(Request $request)
+    {
+        return Inertia::render('Frontend2/MedicationRound', $this->buildRoundProps($request));
+    }
+
+    /** Record a dose + return to the frontend2 round page (keeping the date). */
+    public function recordFrontend2(Request $request, MARSheetService $marSheetService)
+    {
+        $ok = $this->applyRecord($request, $marSheetService);
+        $date = $request->input('date');
+
+        return redirect()->route('frontend2.medication-round', ['date' => $date])
+            ->with($ok ? 'success' : 'error', $ok ? 'Dose recorded.' : 'Prescription not found.');
+    }
+
+    /** Ends (locks) a round for the home + date. */
+    public function endFrontend2(Request $request)
+    {
+        $request->validate(['date' => 'required|date', 'round' => 'required|string|max:20']);
+
+        MedicationRoundClosure::updateOrCreate(
+            ['home_id' => $this->getHomeId(), 'date' => $request->input('date'), 'round' => $request->input('round')],
+            ['closed_by' => (int) Auth::id()]
+        );
+
+        return redirect()->route('frontend2.medication-round', ['date' => $request->input('date')])
+            ->with('success', 'Round ended.');
+    }
+
+    /** Re-opens an ended round — managers only. */
+    public function reopenFrontend2(Request $request)
+    {
+        $request->validate(['date' => 'required|date', 'round' => 'required|string|max:20']);
+
+        if (! in_array(Auth::user()->user_type, ['M', 'CM', 'A', 'O'], true)) {
+            abort(403, 'Only managers can re-open a round.');
+        }
+
+        MedicationRoundClosure::where('home_id', $this->getHomeId())
+            ->where('date', $request->input('date'))
+            ->where('round', $request->input('round'))
+            ->delete();
+
+        return redirect()->route('frontend2.medication-round', ['date' => $request->input('date')])
+            ->with('success', 'Round re-opened.');
+    }
+
     /** Record an administration + auto-deduct stock on a newly-given dose. Returns false if not found. */
     private function applyRecord(Request $request, MARSheetService $marSheetService): bool
     {

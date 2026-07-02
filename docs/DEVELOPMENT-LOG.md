@@ -20,6 +20,17 @@ To run it on this computer: `start-local.bat` (starts the database, the web serv
 
 ---
 
+## 2026-07-02
+
+- **Started a second app "shell" (`frontend2`)** — a separate sidebar/layout that lives inside the *same* app + login (not a separate front-end). You reach it from a **"Frontend 2"** link in the main sidebar; it renders with its own sidebar, and a **"Back to main app"** button returns you. Under the hood it's just a second layout (`frontend2/Layouts/AppShell.jsx`, alias `@frontend2`) that pages opt into — clean, not messy.
+- **Styled `frontend2` on the "CLINIK" clinic mockup the owner shared** — a full-height **blue→indigo gradient sidebar** (logo, nav, bottom card), a light **lavender canvas**, and a **white title bar** over the content (Mantine `layout="alt"`). Nav: Dashboard, Residents, Medications, + placeholders (Scheduled visits, Statistics, Reports, Settings).
+- **Built a Residents section (real data)** modelled on the mockup's *Patient profile*:
+  - **Dashboard** (`/frontend2`) — headline counts (residents, active meds, PRN, controlled) + entry cards.
+  - **Residents list** (`/frontend2/residents`) — searchable cards (photo, age/gender, room, med count).
+  - **Resident profile** (`/frontend2/residents/{id}`) — photo + contact, **General information** (DOB, gender, room, NHS, address, registration), **Health & care** (allergies chips, diet, mobility, weight), a tabbed **Medications** list (All/Scheduled/PRN), and Files/Notes placeholders. Print button works; Edit is a placeholder.
+  - **Medications** (`/frontend2/medications`) — every active prescription with resident link, PRN/CD badges, stock, and All/PRN/Controlled filter.
+  - Back-end: new `Frontend2Controller` (index/residents/resident/medications) reading the same live `service_user` + MAR data; routes `frontend2.*`. Resident fields read defensively (Eloquent returns null for any column the DB doesn't have).
+
 ## 2026-06-30
 
 - **Got the four "4.1" screens demo-ready and tested them end-to-end.**

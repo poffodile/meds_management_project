@@ -112,6 +112,21 @@ class ControlledDrugRegisterController extends Controller
             ->with('success', 'Controlled drug register entry added.');
     }
 
+    /** CD register rendered in the frontend2 (CLINIK) shell. */
+    public function indexFrontend2(Request $request)
+    {
+        return Inertia::render('Frontend2/ControlledDrugs', $this->cdReactData());
+    }
+
+    /** Add a register entry + return to the frontend2 register page. */
+    public function storeFrontend2(Request $request)
+    {
+        $this->createEntry($request);
+
+        return redirect()->route('frontend2.controlled-drugs')
+            ->with('success', 'Controlled drug register entry added.');
+    }
+
     /** Build the React register payload shared by the React + 4.1 pages. */
     private function cdReactData(): array
     {

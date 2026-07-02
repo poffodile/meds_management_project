@@ -182,6 +182,21 @@ class MedicationStockController extends Controller
             ->with($error ? 'error' : 'success', $error ?? 'Stock updated.');
     }
 
+    /** Stock overview rendered in the frontend2 (CLINIK) shell. */
+    public function indexFrontend2(Request $request)
+    {
+        return Inertia::render('Frontend2/Stock', $this->stockReactData());
+    }
+
+    /** Stock adjustment that returns to the frontend2 stock page. */
+    public function adjustFrontend2(Request $request)
+    {
+        $error = $this->runAdjustment($request);
+
+        return redirect()->route('frontend2.stock')
+            ->with($error ? 'error' : 'success', $error ?? 'Stock updated.');
+    }
+
     /**
      * Build the React stock payload (meds, transactions, stats) shared by the
      * live page and the lab copy.
