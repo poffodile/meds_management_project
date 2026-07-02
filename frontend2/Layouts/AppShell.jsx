@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import {
-    AppShell as MantineAppShell, Group, Text, Burger, ScrollArea, Avatar, Box,
+    AppShell as MantineAppShell, Group, Text, Burger, ScrollArea, Box,
     ActionIcon, UnstyledButton, Menu, Switch, Collapse, Stack, useMantineColorScheme,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
@@ -32,6 +32,8 @@ const NAV = [
         // Collapsible parent — everything medication lives inside here.
         group: 'Medication', icon: IconPill, children: [
             { label: 'Medication round', icon: IconClipboardHeart, href: '/frontend2/medication-round' },
+            { label: 'Med round (new)', icon: IconClipboardHeart, href: '/frontend2/medication-round-v2' },
+            { label: 'Med round (split)', icon: IconClipboardHeart, href: '/frontend2/medication-round-split' },
             { label: 'Medications', icon: IconPill, href: '/frontend2/medications' },
             { label: 'Missed doses', icon: IconAlertTriangle, href: '/frontend2/missed-doses' },
             { label: 'Controlled drugs', icon: IconShieldLock, href: '/frontend2/controlled-drugs' },
@@ -170,37 +172,40 @@ export default function AppShell({ children, title }) {
 
                 {/* Title bar — white bar over the content only (layout="alt"). */}
                 <MantineAppShell.Header style={{ background: 'light-dark(#ffffff, var(--mantine-color-dark-7))', borderBottom: '1px solid light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-4))' }}>
-                    <Group h="100%" px="lg" justify="space-between" wrap="nowrap">
+                    <Group h="100%" pl="lg" pr={30} justify="space-between" wrap="nowrap">
                         <Group gap="sm" wrap="nowrap">
                             <Burger opened={mobileOpened} onClick={toggleMobile} hiddenFrom="sm" size="sm" />
                             <Text fw={800} fz={22} c="light-dark(var(--mantine-color-gray-9), var(--mantine-color-gray-1))">{title ?? 'CareOne'}</Text>
                         </Group>
-                        <Group gap="md" wrap="nowrap">
+                        <Group gap={20} wrap="nowrap">
                             {home && (
-                                <Group gap={4} wrap="nowrap" visibleFrom="sm">
-                                    <Text fz="sm" fw={700} c="light-dark(var(--mantine-color-gray-8), var(--mantine-color-gray-2))">{home}</Text>
-                                    <IconChevronDown size={14} stroke={1.8} color="var(--mantine-color-gray-5)" />
+                                <Group gap={8} wrap="nowrap" visibleFrom="sm">
+                                    <Text fz={13.5} fw={700} c="light-dark(#13233F, var(--mantine-color-gray-1))">{home}</Text>
+                                    <IconChevronDown size={14} stroke={2.4} color="#9aa4ae" />
                                 </Group>
                             )}
-                            <Text fz="sm" fw={600} c="dimmed" visibleFrom="sm">EN</Text>
-                            <ActionIcon variant="subtle" color="gray" radius="xl" size="lg" pos="relative">
-                                <IconBell size={20} stroke={1.6} />
-                                <Box pos="absolute" top={10} right={11} w={8} h={8} style={{ background: ACCENT, borderRadius: '50%' }} />
+                            <Text fz={13.5} fw={700} c="#7a8590" visibleFrom="sm">EN</Text>
+                            {/* Bell — boxed (white, rounded, shadow) with an orange unread dot, per the mockup. */}
+                            <ActionIcon variant="default" size={38} radius={11} pos="relative"
+                                style={{ background: 'light-dark(#fff, var(--mantine-color-dark-6))', boxShadow: '0 2px 6px rgba(20,50,80,0.06)' }}>
+                                <IconBell size={18} stroke={1.8} color="#5F6B76" />
+                                <Box pos="absolute" top={8} right={9} w={8} h={8} style={{ background: '#F58321', borderRadius: '50%', border: '1.5px solid #fff' }} />
                             </ActionIcon>
                             <Menu position="bottom-end" withArrow width={210}>
                                 <Menu.Target>
-                                    <UnstyledButton>
-                                        <Group gap="sm" wrap="nowrap">
-                                            <Avatar color="indigo" radius="xl" size={36}>{userName.charAt(0).toUpperCase()}</Avatar>
-                                            <Box visibleFrom="sm" style={{ lineHeight: 1.1 }}>
-                                                <Text size="sm" fw={600}>{userName}</Text>
-                                                <Text size="xs" c="dimmed">CareOne</Text>
-                                            </Box>
-                                            <IconChevronDown size={16} stroke={1.6} />
-                                        </Group>
+                                    {/* Bare "P" badge (mockup), but still opens the dropdown. */}
+                                    <UnstyledButton aria-label="Account menu">
+                                        <Box style={{ width: 38, height: 38, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(58,124,165,0.16)', color: '#3A7CA5', fontSize: 13, fontWeight: 700 }}>
+                                            {userName.charAt(0).toUpperCase()}
+                                        </Box>
                                     </UnstyledButton>
                                 </Menu.Target>
                                 <Menu.Dropdown>
+                                    <Box px="sm" pt={8} pb={4} style={{ lineHeight: 1.2 }}>
+                                        <Text size="sm" fw={700}>{userName}</Text>
+                                        <Text size="xs" c="dimmed">CareOne</Text>
+                                    </Box>
+                                    <Menu.Divider />
                                     <Box px="sm" py={6}>
                                         <Group justify="space-between">
                                             <Group gap={8}><IconMoon size={16} stroke={1.6} /><Text size="sm">Dark mode</Text></Group>
