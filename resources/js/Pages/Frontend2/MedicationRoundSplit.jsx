@@ -3,17 +3,20 @@ import { Head, Link, router, usePage } from '@inertiajs/react';
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import {
     Box, Group, Stack, Text, Badge, Avatar, Button, ActionIcon, ThemeIcon,
-    Progress, Tooltip, RingProgress, Divider, Transition,
+    Progress, Tooltip, RingProgress, Divider, Transition, SegmentedControl, ScrollArea,
 } from '@mantine/core';
 import {
     IconChevronRight, IconAlertTriangle, IconLock, IconLockOpen, IconPlayerPause,
     IconPlayerPlay, IconClockHour4, IconArrowRight, IconX, IconUser,
+    IconPill, IconPencil, IconCheck, IconFileText,
 } from '@tabler/icons-react';
 import AppShell from '@frontend2/Layouts/AppShell';
 import RecordDoseModal from '@frontend/features/medications/RecordDoseModal';
+import AdministerModal from './AdministerModal';
 import { avatarColor, initials } from '@frontend/lib/avatarColor';
+import { CODE_LABELS } from '@frontend/lib/medicationCodes';
 import {
-    V1THEME, metrics, statusOf, cleanAllergies, fmtDate, ageFromDob, isGiven, MedLine, RoundTab,
+    V1THEME, metrics, statusOf, cleanAllergies, fmtDate, ageFromDob, isGiven, RoundTab,
 } from './MedicationRound';
 
 const ENDPOINT = '/frontend2/medication-round-split';
@@ -31,6 +34,23 @@ const DETAIL_TRANSITION = {
 // Keyframe for the staggered cascade of the detail's contents.
 const STAGGER_CSS = '@keyframes splitFadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}';
 const rise = (delay) => ({ animation: `splitFadeUp .45s ${SPRING} both`, animationDelay: `${delay}ms` });
+const fmtDob = (d) => { const t = Date.parse(d); return Number.isNaN(t) ? d : new Date(t).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }); };
+
+// A distinct badge colour per recorded outcome.
+const OUTCOME_COLORS = {
+    'Given': { c: '#1F8A5B', bg: 'light-dark(#EDF4DD, rgba(31,138,91,0.20))' },
+    'Self-administered': { c: '#2C7E7A', bg: 'light-dark(#E2F4F2, rgba(44,126,122,0.22))' },
+    'Refused': { c: '#795076', bg: 'light-dark(#F1E9EF, rgba(121,80,118,0.26))' },
+    'Vomited': { c: '#7A5AA0', bg: 'light-dark(#EEE9F6, rgba(122,90,160,0.24))' },
+    'Missed': { c: '#B23B30', bg: 'light-dark(#F8E7E5, rgba(178,59,48,0.22))' },
+    'Held': { c: '#B5601A', bg: 'light-dark(#FDEBDB, rgba(181,96,26,0.22))' },
+    'Delayed': { c: '#3E6FB0', bg: 'light-dark(#E6EEF8, rgba(62,111,176,0.22))' },
+    'Resident away': { c: '#69727C', bg: 'light-dark(#EEF1F4, rgba(105,114,124,0.24))' },
+    'Omitted': { c: '#B5601A', bg: 'light-dark(#FDEBDB, rgba(181,96,26,0.22))' },
+    'Withheld': { c: '#8A6D3B', bg: 'light-dark(#F5EEDD, rgba(138,109,59,0.22))' },
+    'Not available': { c: '#69727C', bg: 'light-dark(#EEF1F4, rgba(105,114,124,0.24))' },
+    'Sleeping': { c: '#5B6BB0', bg: 'light-dark(#E9ECF7, rgba(91,107,176,0.22))' },
+};
 
 /** A resident row in the master list. Full columns when wide; compact when the list has shrunk (narrow). */
 function SplitRow({ resident, narrow, active, isNext, isFirst, isSm, onClick }) {
@@ -72,16 +92,100 @@ function SplitRow({ resident, narrow, active, isNext, isFirst, isSm, onClick }) 
     );
 }
 
+/** A medication row in the detail pane. Recorded doses show by/witness + notes + time & outcome badge. */
+function SplitMedLine({ row, locked, onAdminister, isSm, isFirst }) {
+    const recorded = Boolean(row.code);
+    const given = isGiven(row.code);
+    // The administer modal stores the specific outcome as "Outcome — detail"; surface it for a per-outcome badge.
+    const OUTCOME_WORDS = ['Given', 'Self-administered', 'Refused', 'Missed', 'Held', 'Delayed', 'Vomited', 'Resident away', 'Omitted', 'Withheld', 'Not available', 'Sleeping'];
+    const reasonRaw = recorded ? (row.reason || '') : '';
+    const reasonHead = reasonRaw.split(' — ')[0].trim();
+    const specific = OUTCOME_WORDS.includes(reasonHead) ? reasonHead : null;
+    const detail = specific ? reasonRaw.slice(reasonHead.length).replace(/^\s*—\s*/, '').trim() : reasonRaw;
+    const badgeLabel = !recorded ? null
+        : specific || (given ? (CODE_LABELS[row.code] || 'Given') : (row.code === 'R' ? 'Refused' : (CODE_LABELS[row.code] || 'Recorded')));
+    const badge = badgeLabel
+        ? { ...(OUTCOME_COLORS[badgeLabel] || { c: '#B5601A', bg: 'light-dark(#FDEBDB, rgba(181,96,26,0.22))' }), t: badgeLabel }
+        : null;
+    const sub = [row.dose, row.route, row.frequency].filter(Boolean).join(' · ') || [row.strength].filter(Boolean).join(' · ') || '—';
+    const time = row.recorded_at || row.slot || (row.as_required ? 'PRN' : '');
+    const reasonText = recorded && !given ? detail : '';
+    const notesText = recorded ? (row.notes || '') : '';
+
+    // .rc-badge / .rc-btn / "Round ended"
+    const trailing = recorded
+        ? <Box style={{ display: 'inline-flex', alignItems: 'center', padding: '5px 12px', borderRadius: 999, fontSize: 11.5, fontWeight: 700, whiteSpace: 'nowrap', background: badge.bg, color: badge.c }}>{badge.t}</Box>
+        : locked
+            ? <Text fz={11.5} c="#98A1AB">Round ended</Text>
+            : <Box component="button" onClick={() => onAdminister(row)} style={{ border: 'none', cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap', padding: '8px 16px', borderRadius: 9, fontSize: 12.5, fontWeight: 700, background: '#13233F', color: '#fff', boxShadow: '0 4px 10px rgba(19,35,63,0.22)' }}>Administer</Box>;
+
+    return (
+        <Box style={{ borderTop: isFirst ? 'none' : '1px solid light-dark(#E7EAEF, var(--mantine-color-dark-5))' }}>
+            <Group gap={13} wrap="nowrap" align="center" py={12}>
+                {/* .rc-pill */}
+                <Box style={{ width: 34, height: 34, flexShrink: 0, borderRadius: 9, background: 'light-dark(#F4F5F7, var(--mantine-color-dark-5))', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <IconPill size={16} stroke={1.8} color="#6B7682" />
+                </Box>
+                {/* .rc-rowmain */}
+                <Box style={{ flex: 1, minWidth: 0 }}>
+                    <Group gap={7} wrap="nowrap">
+                        <Text fz={13.5} fw={700} c={TXT} truncate>{row.medication_name}</Text>
+                        {row.is_controlled && <Badge size="xs" variant="light" color="grape" radius="sm">CD</Badge>}
+                        {row.as_required && <Badge size="xs" variant="light" color="violet" radius="sm">PRN</Badge>}
+                    </Group>
+                    <Text fz={11.5} c="#98A1AB" truncate mt={2}>{sub}</Text>
+                    {recorded && (row.recorded_by || row.witnessed_by) && (
+                        <Group gap={10} mt={6} wrap="wrap">
+                            {row.recorded_by && (
+                                <Group gap={5} wrap="nowrap"><IconPencil size={12} color="#5B7A9E" /><Text fz={11} fw={600} c="#566A86">{given ? 'Given' : 'Recorded'} by {row.recorded_by}</Text></Group>
+                            )}
+                            {row.witnessed_by && (
+                                <Group gap={5} wrap="nowrap"><IconCheck size={12} stroke={2.6} color="#1F8A5B" /><Text fz={11} fw={600} c="#1F8A5B">Witnessed by {row.witnessed_by}</Text></Group>
+                            )}
+                        </Group>
+                    )}
+                    {recorded && (reasonText || notesText) && (
+                        <Group gap={7} wrap="nowrap" align="flex-start" mt={6} style={{ background: 'light-dark(#F7F8FA, var(--mantine-color-dark-6))', border: '1px solid light-dark(#E4E9EF, var(--mantine-color-dark-4))', borderRadius: 9, padding: '7px 10px' }}>
+                            <IconFileText size={12} color={reasonText ? (badge?.c ?? '#7E90A8') : '#7E90A8'} style={{ flexShrink: 0, marginTop: 2 }} />
+                            <Box style={{ flex: 1, minWidth: 0 }}>
+                                {reasonText && <Text fz={11} fw={600} c={badge?.c ?? '#5F6B7A'} style={{ lineHeight: 1.4 }} truncate>{reasonText}</Text>}
+                                {notesText && <Text fz={11} c="#6B7684" style={{ lineHeight: 1.4 }} mt={reasonText ? 2 : 0}>{notesText}</Text>}
+                            </Box>
+                            {row.recorded_at && <Text fz={10.5} fw={600} c="#98A1AB" style={{ flexShrink: 0, whiteSpace: 'nowrap', marginTop: 1 }}>{row.recorded_at}</Text>}
+                        </Group>
+                    )}
+                    {isSm && (
+                        <Group gap={12} mt={10} justify="flex-end" wrap="nowrap">
+                            {time && <Text fz={12} fw={600} c="#69727C">{time}</Text>}
+                            {trailing}
+                        </Group>
+                    )}
+                </Box>
+                {/* .rc-time + trailing */}
+                {!isSm && time && <Text fz={12} fw={600} c="#69727C" style={{ width: 44, textAlign: 'right', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>{time}</Text>}
+                {!isSm && <Box style={{ flexShrink: 0 }}>{trailing}</Box>}
+            </Group>
+        </Box>
+    );
+}
+
 /** The detail pane that opens beside the shrunken list. */
-function DetailPane({ resident, locked, onGiven, onOutcome, onClose, isSm }) {
+function DetailPane({ resident, locked, onAdminister, onClose, isSm }) {
     const scheduled = (resident.rows ?? []).filter((r) => !r.as_required);
     const prn = (resident.rows ?? []).filter((r) => r.as_required);
     const allergies = cleanAllergies(resident.allergies);
     const age = resident.dob ? ageFromDob(resident.dob) : null;
-    const chips = [
-        ['Age', age ? `${age} yrs` : null], ['Gender', resident.gender], ['NHS no.', resident.nhs],
-        ['Weight', resident.weight], ['Mobility', resident.mobility], ['Diet', resident.diet],
-    ].filter(([, v]) => v);
+    const m = metrics(resident);
+    const pct = m.total ? Math.round((m.done / m.total) * 100) : 0;
+    const barColor = m.total === 0 ? '#E4E8EC' : m.done === m.total ? '#1F8A5B' : '#B5601A';
+    const info = [
+        { k: 'Age', v: age ? `${age} years` : null, sub: resident.dob ? `DOB ${fmtDob(resident.dob)}` : null },
+        { k: 'Gender', v: resident.gender },
+        { k: 'NHS number', v: resident.nhs },
+        { k: 'Weight', v: resident.weight },
+        { k: 'Mobility', v: resident.mobility },
+        { k: 'Diet', v: resident.diet },
+    ].filter((x) => x.v);
     return (
         <Box style={{ background: 'light-dark(#F7F9FC, var(--mantine-color-dark-7))', borderRadius: 18, padding: isSm ? '18px 16px' : '24px 26px' }}>
             <style>{STAGGER_CSS}</style>
@@ -91,6 +195,12 @@ function DetailPane({ resident, locked, onGiven, onOutcome, onClose, isSm }) {
                     <Box style={{ minWidth: 0 }}>
                         <Text fz={19} fw={800} c={TXT} truncate>{resident.name}</Text>
                         <Text fz={13} c="dimmed">{[resident.room && `Room ${resident.room}`, age && `${age} yrs`, resident.gender].filter(Boolean).join(' · ')}</Text>
+                        <Group gap={10} mt={9} wrap="nowrap">
+                            <Box style={{ width: 130, height: 5, borderRadius: 999, background: 'light-dark(#EEF0F3, var(--mantine-color-dark-5))', overflow: 'hidden' }}>
+                                <Box style={{ width: `${pct}%`, height: '100%', borderRadius: 999, background: barColor, transition: 'width .4s ease' }} />
+                            </Box>
+                            <Text fz={11} fw={600} c="#A2AAB4">{m.done} / {m.total} done</Text>
+                        </Group>
                     </Box>
                 </Group>
                 <Group gap={6} wrap="nowrap" style={{ flexShrink: 0 }}>
@@ -105,15 +215,16 @@ function DetailPane({ resident, locked, onGiven, onOutcome, onClose, isSm }) {
                     {(resident.risk_flags ?? []).map((r, i) => <Badge key={`r${i}`} color="orange" variant="light" radius="sm" size="lg">{r}</Badge>)}
                 </Group>
             )}
-            {chips.length > 0 && (
-                <Group gap={10} wrap="wrap" mb="lg" style={rise(140)}>
-                    {chips.map(([k, v]) => (
-                        <Box key={k} style={{ padding: '8px 14px', borderRadius: 11, background: 'light-dark(#ffffff, var(--mantine-color-dark-5))', border: '1px solid light-dark(#EEF1F4, var(--mantine-color-dark-4))' }}>
-                            <Text fz={10} fw={700} c="dimmed" tt="uppercase" style={{ letterSpacing: 0.5 }}>{k}</Text>
-                            <Text fz={13.5} fw={700} c={TXT}>{v}</Text>
+            {info.length > 0 && (
+                <Box mb="lg" style={{ ...rise(140), display: 'flex', flexWrap: 'wrap', background: 'light-dark(#ffffff, var(--mantine-color-dark-6))', border: '1px solid light-dark(#EEF1F4, var(--mantine-color-dark-4))', borderRadius: 16, overflow: 'hidden' }}>
+                    {info.map((f, i) => (
+                        <Box key={f.k} style={{ flex: '1 1 104px', minWidth: 94, padding: '8px 13px', borderLeft: i === 0 ? 'none' : '1px solid light-dark(#EDF0F3, var(--mantine-color-dark-5))' }}>
+                            <Text fz={8.5} fw={700} c="#98A1AB" tt="uppercase" style={{ letterSpacing: 0.5 }}>{f.k}</Text>
+                            <Text fz={12.5} fw={700} c={TXT} mt={3} truncate>{f.v}</Text>
+                            {f.sub && <Text fz={9.5} c="#A2AAB4" mt={1} truncate>{f.sub}</Text>}
                         </Box>
                     ))}
-                </Group>
+                </Box>
             )}
             <Divider label="Medications this round" labelPosition="left" mt={4} mb={6} style={rise(180)} />
             {(resident.rows ?? []).length === 0
@@ -122,7 +233,7 @@ function DetailPane({ resident, locked, onGiven, onOutcome, onClose, isSm }) {
                     <Stack gap={0}>
                         {[...scheduled, ...prn].map((row, i) => (
                             <Box key={i} style={rise(220 + i * 55)}>
-                                <MedLine row={row} locked={locked} onGiven={onGiven} onOutcome={onOutcome} isSm={isSm} />
+                                <SplitMedLine row={row} locked={locked} onAdminister={onAdminister} isSm={isSm} isFirst={i === 0} />
                             </Box>
                         ))}
                     </Stack>
@@ -134,7 +245,9 @@ function DetailPane({ resident, locked, onGiven, onOutcome, onClose, isSm }) {
 export default function MedicationRoundSplit({ rounds = [], grid = {}, date, currentRound = 'morning', closures = {}, home }) {
     const isMobile = useMediaQuery('(max-width: 768px)');
     const isSm = useMediaQuery('(max-width: 576px)');
-    const isManager = usePage().props?.auth?.user?.role === 'manager';
+    const authUser = usePage().props?.auth?.user;
+    const isManager = authUser?.role === 'manager';
+    const adminBy = `${authUser?.name ?? 'You'} · ${isManager ? 'Care Manager' : 'Carer'}`;
 
     const [activeRound, setActiveRound] = useState(currentRound);
     const [openId, setOpenId] = useState(null);
@@ -143,6 +256,8 @@ export default function MedicationRoundSplit({ rounds = [], grid = {}, date, cur
     const [recordRow, setRecordRow] = useState(null);
     const [recordCode, setRecordCode] = useState('A');
     const [recordOpened, record] = useDisclosure(false);
+    const [modalStyle, setModalStyle] = useState('new'); // 'classic' (RecordDoseModal) | 'new' (AdministerModal) — temporary compare toggle
+    const [adminCtx, setAdminCtx] = useState(null);
 
     const meta = rounds.find((r) => r.key === activeRound) ?? rounds[0] ?? { key: activeRound, label: 'Round', window: '' };
     const residents = grid[meta.key] ?? [];
@@ -199,19 +314,18 @@ export default function MedicationRoundSplit({ rounds = [], grid = {}, date, cur
                 at: row.recorded_at, by: row.recorded_by,
             });
         }));
-        return out.sort((a, b) => String(b.at).localeCompare(String(a.at))).slice(0, 6);
+        return out.sort((a, b) => String(b.at).localeCompare(String(a.at))).slice(0, 30);
     }, [grid]);
 
     const statusWord = roundClosed ? 'completed' : paused ? 'paused' : (roundDone === 0 ? 'not started' : roundDone >= roundTotal ? 'review' : 'in progress');
 
     const openRecord = (row, code) => { setRecordRow(row); setRecordCode(code); record.open(); };
-    const giveDose = (row) => {
+    const openAdminister = (row, statusKey) => setAdminCtx({ row, residentName: selected?.name, residentRoom: selected?.room, status: statusKey });
+    const administer = (row) => {
         if (roundClosed) return;
-        if (!row.is_controlled && !row.as_required && row.slot) {
-            router.post(`${ENDPOINT}/record`, { mar_sheet_id: row.mar_sheet_id, date, time_slot: row.slot, code: 'A', dose_given: row.dose ?? '', notes: '' }, { preserveScroll: true, preserveState: true });
-        } else { openRecord(row, 'A'); }
+        if (modalStyle === 'new') { openAdminister(row, 'given'); return; }
+        openRecord(row, 'A');
     };
-    const outcomeDose = (row, code) => { if (!roundClosed) openRecord(row, code); };
     const endRound = () => router.post(`${ENDPOINT}/end-round`, { date, round: meta.key }, { preserveScroll: true });
     const reopenRound = () => router.post(`${ENDPOINT}/reopen-round`, { date, round: meta.key }, { preserveScroll: true });
 
@@ -232,6 +346,10 @@ export default function MedicationRoundSplit({ rounds = [], grid = {}, date, cur
                         </Box>
                     </Group>
                     <Group gap={12} wrap="wrap" style={{ flex: isSm ? '1 1 100%' : undefined, justifyContent: isSm ? 'space-between' : undefined }}>
+                        <Tooltip label="Which administer modal opens when you record a dose (temporary — for comparing)">
+                            <SegmentedControl size="xs" radius="xl" value={modalStyle} onChange={setModalStyle}
+                                data={[{ label: 'Classic', value: 'classic' }, { label: 'New modal', value: 'new' }]} />
+                        </Tooltip>
                         <Group gap={9} wrap="nowrap" style={{ padding: '9px 14px', borderRadius: 12, background: 'light-dark(#ffffff, var(--mantine-color-dark-6))', boxShadow: '0 2px 6px rgba(20,50,80,0.05)' }}>
                             <Text fz={13} fw={600} c="#7a8590">Progress</Text>
                             <Text fz={13.5} fw={800} c="#3A7CA5">{roundDone} / {roundTotal}</Text>
@@ -243,7 +361,7 @@ export default function MedicationRoundSplit({ rounds = [], grid = {}, date, cur
                                     <Button radius={999} variant="default" leftSection={paused ? <IconPlayerPlay size={14} /> : <IconPlayerPause size={14} />} onClick={() => setPaused((p) => !p)}
                                         style={{ border: '1.5px solid #cddbe6', color: '#3A7CA5', paddingInline: 18 }}>{paused ? 'Resume' : 'Pause'}</Button>
                                     <Button radius={999} leftSection={<IconLock size={15} />} onClick={endRound}
-                                        style={{ background: '#3A7CA5', paddingInline: 22, boxShadow: '0 8px 18px rgba(58,124,165,0.28)' }}>End round</Button>
+                                        style={{ background: '#13233F', paddingInline: 22, boxShadow: '0 8px 18px rgba(19,35,63,0.28)' }}>End round</Button>
                                 </>
                             )}
                     </Group>
@@ -296,7 +414,7 @@ export default function MedicationRoundSplit({ rounds = [], grid = {}, date, cur
                             <Transition mounted={!!selected} transition={DETAIL_TRANSITION} duration={380} timingFunction={SPRING}>
                                 {(styles) => (
                                     <Box style={{ ...styles, flex: 1, minWidth: 0 }}>
-                                        {selected && <DetailPane key={selected.client_id} resident={selected} locked={roundClosed} onGiven={giveDose} onOutcome={outcomeDose} onClose={() => setOpenId(null)} isSm={isSm} />}
+                                        {selected && <DetailPane key={selected.client_id} resident={selected} locked={roundClosed} onAdminister={administer} onClose={() => setOpenId(null)} isSm={isSm} />}
                                     </Box>
                                 )}
                             </Transition>
@@ -341,17 +459,19 @@ export default function MedicationRoundSplit({ rounds = [], grid = {}, date, cur
                             {activity.length === 0
                                 ? <Text fz="sm" c="dimmed">No doses recorded yet today.</Text>
                                 : (
-                                    <Stack gap={14}>
-                                        {activity.map((a, i) => (
-                                            <Group key={i} gap={11} wrap="nowrap" align="flex-start">
-                                                <Box w={8} h={8} mt={6} style={{ borderRadius: '50%', flexShrink: 0, background: a.prn ? '#6E5BE6' : a.given ? GREEN : ORANGE }} />
-                                                <Box style={{ flex: 1, minWidth: 0 }}>
-                                                    <Text fz="sm" fw={600} c={TXT} truncate>{a.med} {a.label}</Text>
-                                                    <Text fz="xs" c="dimmed" truncate>{a.at}{a.by ? ` · by ${a.by}` : ''}</Text>
-                                                </Box>
-                                            </Group>
-                                        ))}
-                                    </Stack>
+                                    <ScrollArea.Autosize mah={188} type="auto" offsetScrollbars scrollbarSize={6}>
+                                        <Stack gap={14} pr={activity.length > 4 ? 6 : 0}>
+                                            {activity.map((a, i) => (
+                                                <Group key={i} gap={11} wrap="nowrap" align="flex-start">
+                                                    <Box w={8} h={8} mt={6} style={{ borderRadius: '50%', flexShrink: 0, background: a.prn ? '#6E5BE6' : a.given ? GREEN : ORANGE }} />
+                                                    <Box style={{ flex: 1, minWidth: 0 }}>
+                                                        <Text fz="sm" fw={600} c={TXT} truncate>{a.med} {a.label}</Text>
+                                                        <Text fz="xs" c="dimmed" truncate>{a.at}{a.by ? ` · by ${a.by}` : ''}</Text>
+                                                    </Box>
+                                                </Group>
+                                            ))}
+                                        </Stack>
+                                    </ScrollArea.Autosize>
                                 )}
                         </Box>
                     </Stack>
@@ -361,6 +481,7 @@ export default function MedicationRoundSplit({ rounds = [], grid = {}, date, cur
             </Box>
 
             <RecordDoseModal opened={recordOpened} onClose={record.close} row={recordRow} date={date} presetCode={recordCode} endpoint={`${ENDPOINT}/record`} />
+            {adminCtx && <AdministerModal ctx={adminCtx} date={date} adminBy={adminBy} endpoint={ENDPOINT} onClose={() => setAdminCtx(null)} />}
         </AppShell>
     );
 }
