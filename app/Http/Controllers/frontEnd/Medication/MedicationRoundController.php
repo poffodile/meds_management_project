@@ -883,6 +883,118 @@ class MedicationRoundController extends Controller
             ->with('success', 'Round re-opened.');
     }
 
+    // ---------------------------------------------------------------
+    // Frontend2 "V2" — an experimental redesign of the round page
+    // (teal theme, expanded med panel, full signature modal). Shares
+    // the same data + record logic; only the route/page name differ.
+    // ---------------------------------------------------------------
+
+    public function indexFrontend2V2(Request $request)
+    {
+        return Inertia::render('Frontend2/MedicationRoundV2', $this->buildRoundProps($request));
+    }
+
+    /** Master–detail split variant (test): full V1 feature set, split transition. */
+    public function indexFrontend2Split(Request $request)
+    {
+        return Inertia::render('Frontend2/MedicationRoundSplit', $this->buildRoundProps($request));
+    }
+
+    public function recordFrontend2Split(Request $request, MARSheetService $marSheetService)
+    {
+        $ok = $this->applyRecord($request, $marSheetService);
+
+        return redirect()->route('frontend2.medication-round-split', ['date' => $request->input('date')])
+            ->with($ok ? 'success' : 'error', $ok ? 'Dose recorded.' : 'Prescription not found.');
+    }
+
+    public function endFrontend2Split(Request $request)
+    {
+        $request->validate(['date' => 'required|date', 'round' => 'required|string|max:20']);
+
+        MedicationRoundClosure::updateOrCreate(
+            ['home_id' => $this->getHomeId(), 'date' => $request->input('date'), 'round' => $request->input('round')],
+            ['closed_by' => (int) Auth::id()]
+        );
+
+        return redirect()->route('frontend2.medication-round-split', ['date' => $request->input('date')])->with('success', 'Round ended.');
+    }
+
+    public function reopenFrontend2Split(Request $request)
+    {
+        $request->validate(['date' => 'required|date', 'round' => 'required|string|max:20']);
+
+        if (! in_array(Auth::user()->user_type, ['M', 'CM', 'A', 'O'], true)) {
+            abort(403, 'Only managers can re-open a round.');
+        }
+
+        MedicationRoundClosure::where('home_id', $this->getHomeId())
+            ->where('date', $request->input('date'))
+            ->where('round', $request->input('round'))
+            ->delete();
+
+        return redirect()->route('frontend2.medication-round-split', ['date' => $request->input('date')])->with('success', 'Round re-opened.');
+    }
+
+    /** Per-resident "give meds" page (V2 test): one client's info + their meds by round. */
+    public function residentRoundV2(Request $request, $client)
+    {
+        $props = $this->buildRoundProps($request);
+        $round = $request->input('round', $props['currentRound']);
+
+        return Inertia::render('Frontend2/MedicationRoundResident', array_merge($props, [
+            'clientId' => (int) $client,
+            'round' => collect($props['rounds'])->firstWhere('key', $round) ?? ($props['rounds'][0] ?? null),
+        ]));
+    }
+
+    public function recordFrontend2V2(Request $request, MARSheetService $marSheetService)
+    {
+        $ok = $this->applyRecord($request, $marSheetService);
+
+        // Allow returning to the per-resident page it was recorded from (internal paths only).
+        $to = $request->input('redirect_to');
+        $back = ($to && str_starts_with($to, '/frontend2'))
+            ? redirect($to)
+            : redirect()->route('frontend2.medication-round-v2', ['date' => $request->input('date')]);
+
+        return $back->with($ok ? 'success' : 'error', $ok ? 'Dose recorded.' : 'Prescription not found.');
+    }
+
+    public function endFrontend2V2(Request $request)
+    {
+        $request->validate(['date' => 'required|date', 'round' => 'required|string|max:20']);
+
+        MedicationRoundClosure::updateOrCreate(
+            ['home_id' => $this->getHomeId(), 'date' => $request->input('date'), 'round' => $request->input('round')],
+            ['closed_by' => (int) Auth::id()]
+        );
+
+        $to = $request->input('redirect_to');
+        $back = ($to && str_starts_with($to, '/frontend2')) ? redirect($to) : redirect()->route('frontend2.medication-round-v2', ['date' => $request->input('date')]);
+
+        return $back->with('success', 'Round ended.');
+    }
+
+    public function reopenFrontend2V2(Request $request)
+    {
+        $request->validate(['date' => 'required|date', 'round' => 'required|string|max:20']);
+
+        if (! in_array(Auth::user()->user_type, ['M', 'CM', 'A', 'O'], true)) {
+            abort(403, 'Only managers can re-open a round.');
+        }
+
+        MedicationRoundClosure::where('home_id', $this->getHomeId())
+            ->where('date', $request->input('date'))
+            ->where('round', $request->input('round'))
+            ->delete();
+
+        $to = $request->input('redirect_to');
+        $back = ($to && str_starts_with($to, '/frontend2')) ? redirect($to) : redirect()->route('frontend2.medication-round-v2', ['date' => $request->input('date')]);
+
+        return $back->with('success', 'Round re-opened.');
+    }
+
     /** Record an administration + auto-deduct stock on a newly-given dose. Returns false if not found. */
     private function applyRecord(Request $request, MARSheetService $marSheetService): bool
     {
