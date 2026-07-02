@@ -15,6 +15,8 @@ export default defineConfig({
         alias: {
             // Shared component library lives in /frontend — import via '@frontend/...'
             '@frontend': fileURLToPath(new URL('./frontend', import.meta.url)),
+            // Second app shell (own sidebar) lives in /frontend2 — import via '@frontend2/...'
+            '@frontend2': fileURLToPath(new URL('./frontend2', import.meta.url)),
         },
     },
     server: {
