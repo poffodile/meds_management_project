@@ -30,7 +30,11 @@ class checkUserAuth
             // echo "<br>";
             $saved_token = Auth::user()->session_token;
             // print_r($current_token); die;
-            if ($current_token != $saved_token) {
+            // Single-session lock: log out if this session's CSRF token no longer matches the
+            // one stored on the user row (users.session_token, set at login). Skipped in local/dev
+            // because the shared demo user + the /dev-login screenshot flow keep overwriting that
+            // column, which would otherwise kick the human tester out on every rebuild.
+            if ($current_token != $saved_token && ! app()->environment('local')) {
                 // echo 'session_expired';
                 Auth::logout();
                 // return redirect('/')->with('success','Your sesion has been expired');

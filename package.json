@@ -22,6 +22,7 @@
         "@mantine/hooks": "^7.17.8",
         "@tabler/icons-react": "^3.44.0",
         "@vitejs/plugin-react": "^4.7.0",
+        "iconsax-react": "^0.0.8",
         "postcss": "^8.5.15",
         "postcss-preset-mantine": "^1.18.0",
         "postcss-simple-vars": "^7.0.1",

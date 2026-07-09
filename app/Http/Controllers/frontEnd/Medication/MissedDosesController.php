@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\MARSheet;
 use App\Models\MedicationDoseReview;
+use App\Models\MedicationDoseReviewLog;
 use App\ServiceUser;
 use Inertia\Inertia;
 
@@ -153,7 +154,12 @@ class MissedDosesController extends Controller
     /** Missed-doses review rendered in the frontend2 (CLINIK) shell. */
     public function indexFrontend2(Request $request)
     {
-        return Inertia::render('Frontend2/MissedDoses', $this->missedReactData($request));
+        // Load the FULL list so the tabs/stats (Refused / Omitted / Overdue / follow-ups) derive client-side.
+        $request->merge(['status' => 'all']);
+        $data = $this->missedReactData($request);
+        $data['home'] = \DB::table('home')->where('id', $this->getHomeId())->value('title');
+
+        return Inertia::render('Frontend2/MissedDoses', $data);
     }
 
     /** Resolve a dose + return to the frontend2 review page (keeping the date). */
@@ -162,6 +168,30 @@ class MissedDosesController extends Controller
         $error = $this->runResolve($request);
 
         return redirect()->route('frontend2.missed-doses', ['date' => $request->input('review_date')])
+            ->with($error ? 'error' : 'success', $error ?? 'Dose reviewed and resolved.');
+    }
+
+    public function unresolveFrontend2(Request $request)
+    {
+        $error = $this->runUnresolve($request);
+
+        return redirect()->route('frontend2.missed-doses', ['date' => $request->input('review_date')])
+            ->with($error ? 'error' : 'success', $error ?? 'Resolution removed.');
+    }
+
+    /** Redesigned frontend2 "Missed & refused doses" page (test). Loads the FULL list so the tabs/stats
+     *  (Refused / Omitted / Overdue / follow-ups) can be derived client-side; adds the home name. */
+    public function indexFrontend2MissedB(Request $request)
+    {
+        // Alias — kept working until the owner confirms removing the duplicate route/sidebar link.
+        return $this->indexFrontend2($request);
+    }
+
+    public function resolveFrontend2MissedB(Request $request)
+    {
+        $error = $this->runResolve($request);
+
+        return redirect()->route('frontend2.missed-doses-b', ['date' => $request->input('review_date')])
             ->with($error ? 'error' : 'success', $error ?? 'Dose reviewed and resolved.');
     }
 
@@ -190,13 +220,22 @@ class MissedDosesController extends Controller
             ->orderBy('medication_name')
             ->get();
 
-        $residentNames = ServiceUser::whereIn('id', $sheets->pluck('client_id')->unique())->pluck('name', 'id');
+        $residents     = ServiceUser::whereIn('id', $sheets->pluck('client_id')->unique())->get(['id', 'name', 'room_number'])->keyBy('id');
+        $residentNames = $residents->map(fn($r) => $r->name);
 
         $reviews = MedicationDoseReview::forHome($homeId)
             ->whereDate('review_date', $date)
             ->with('reviewedByUser:id,name')
             ->get()
             ->keyBy(fn($r) => $r->mar_sheet_id . '|' . $r->time_slot);
+
+        $logsByDose = MedicationDoseReviewLog::forHome($homeId)
+            ->whereDate('review_date', $date)
+            ->with('changedByUser:id,name')
+            ->orderBy('created_at')
+            ->orderBy('id')
+            ->get()
+            ->groupBy(fn($l) => $l->mar_sheet_id . '|' . $l->time_slot);
 
         $all = [];
         foreach ($sheets as $sheet) {
@@ -226,12 +265,22 @@ class MissedDosesController extends Controller
                     'mar_sheet_id'    => $sheet->id,
                     'medication_name' => $sheet->medication_name,
                     'resident_name'   => $residentNames[$sheet->client_id] ?? ('#' . $sheet->client_id),
+                    'room'            => $residents[$sheet->client_id]->room_number ?? null,
                     'slot'            => $slot,
                     'kind'            => $kind,
                     'code'            => $code,
                     'resolved'        => (bool) $review,
                     'clinical_action' => $review->clinical_action ?? null,
+                    'notes'           => $review->notes ?? null,
                     'reviewed_by'     => ($review && $review->reviewedByUser) ? $review->reviewedByUser->name : null,
+                    'reviewed_at'     => ($review && $review->created_at) ? \Carbon\Carbon::parse($review->created_at)->format('d M Y · H:i') : null,
+                    'history'         => collect($logsByDose->get($sheet->id . '|' . $slot, []))->map(fn($l) => [
+                        'action'          => $l->action,
+                        'clinical_action' => $l->clinical_action,
+                        'notes'           => $l->notes,
+                        'by'              => $l->changedByUser->name ?? null,
+                        'at'              => $l->created_at ? \Carbon\Carbon::parse($l->created_at)->format('d M Y · H:i') : null,
+                    ])->values()->all(),
                 ];
             }
         }
@@ -300,7 +349,7 @@ class MissedDosesController extends Controller
 
         $resident = ServiceUser::where('id', $sheet->client_id)->first();
 
-        MedicationDoseReview::updateOrCreate(
+        $review = MedicationDoseReview::updateOrCreate(
             [
                 'mar_sheet_id' => $sheet->id,
                 'review_date'  => $request->input('review_date'),
@@ -319,6 +368,52 @@ class MissedDosesController extends Controller
                 'reviewed_by_user_id' => Auth::id(),
             ]
         );
+
+        // Append to the change log — every resolve/edit is recorded with who + when.
+        MedicationDoseReviewLog::create([
+            'home_id'            => $homeId,
+            'mar_sheet_id'       => $sheet->id,
+            'review_date'        => $request->input('review_date'),
+            'time_slot'          => $request->input('time_slot'),
+            'action'             => $review->wasRecentlyCreated ? 'resolved' : 'edited',
+            'clinical_action'    => $request->input('clinical_action'),
+            'notes'              => $request->input('notes'),
+            'changed_by_user_id' => Auth::id(),
+        ]);
+
+        return null;
+    }
+
+    /** Delete a dose review — reverts the dose back to unresolved. */
+    private function runUnresolve(Request $request): ?string
+    {
+        $request->validate([
+            'mar_sheet_id' => 'required|integer',
+            'review_date'  => 'required|date',
+            'time_slot'    => 'required|string|max:10',
+        ]);
+
+        $homeId = $this->getHomeId();
+        $review = MedicationDoseReview::forHome($homeId)
+            ->where('mar_sheet_id', $request->input('mar_sheet_id'))
+            ->whereDate('review_date', $request->input('review_date'))
+            ->where('time_slot', $request->input('time_slot'))
+            ->first();
+
+        if ($review) {
+            // Record the removal (with a snapshot of what was there) before deleting.
+            MedicationDoseReviewLog::create([
+                'home_id'            => $homeId,
+                'mar_sheet_id'       => $review->mar_sheet_id,
+                'review_date'        => $request->input('review_date'),
+                'time_slot'          => $review->time_slot,
+                'action'             => 'removed',
+                'clinical_action'    => $review->clinical_action,
+                'notes'              => $review->notes,
+                'changed_by_user_id' => Auth::id(),
+            ]);
+            $review->delete();
+        }
 
         return null;
     }

@@ -908,6 +908,90 @@ class MedicationRoundController extends Controller
             ->with($ok ? 'success' : 'error', $ok ? 'Dose recorded.' : 'Prescription not found.');
     }
 
+    /** Split variant "B" (test): same feature set + data, redesigned right rail. */
+    public function indexFrontend2SplitB(Request $request)
+    {
+        return Inertia::render('Frontend2/MedicationRoundSplitB', $this->buildRoundProps($request));
+    }
+
+    public function recordFrontend2SplitB(Request $request, MARSheetService $marSheetService)
+    {
+        $ok = $this->applyRecord($request, $marSheetService);
+
+        return redirect()->route('frontend2.medication-round-split-b', ['date' => $request->input('date')])
+            ->with($ok ? 'success' : 'error', $ok ? 'Dose recorded.' : 'Prescription not found.');
+    }
+
+    public function endFrontend2SplitB(Request $request)
+    {
+        $request->validate(['date' => 'required|date', 'round' => 'required|string|max:20']);
+
+        MedicationRoundClosure::updateOrCreate(
+            ['home_id' => $this->getHomeId(), 'date' => $request->input('date'), 'round' => $request->input('round')],
+            ['closed_by' => (int) Auth::id()]
+        );
+
+        return redirect()->route('frontend2.medication-round-split-b', ['date' => $request->input('date')])->with('success', 'Round ended.');
+    }
+
+    public function reopenFrontend2SplitB(Request $request)
+    {
+        $request->validate(['date' => 'required|date', 'round' => 'required|string|max:20']);
+
+        if (! in_array(Auth::user()->user_type, ['M', 'CM', 'A', 'O'], true)) {
+            abort(403, 'Only managers can re-open a round.');
+        }
+
+        MedicationRoundClosure::where('home_id', $this->getHomeId())
+            ->where('date', $request->input('date'))
+            ->where('round', $request->input('round'))
+            ->delete();
+
+        return redirect()->route('frontend2.medication-round-split-b', ['date' => $request->input('date')])->with('success', 'Round re-opened.');
+    }
+
+    /** Split variant "C" (test): same feature set + data, mockup-sized right rail (profile-shaped quick actions). */
+    public function indexFrontend2SplitC(Request $request)
+    {
+        return Inertia::render('Frontend2/MedicationRoundSplitC', $this->buildRoundProps($request));
+    }
+
+    public function recordFrontend2SplitC(Request $request, MARSheetService $marSheetService)
+    {
+        $ok = $this->applyRecord($request, $marSheetService);
+
+        return redirect()->route('frontend2.medication-round-split-c', ['date' => $request->input('date')])
+            ->with($ok ? 'success' : 'error', $ok ? 'Dose recorded.' : 'Prescription not found.');
+    }
+
+    public function endFrontend2SplitC(Request $request)
+    {
+        $request->validate(['date' => 'required|date', 'round' => 'required|string|max:20']);
+
+        MedicationRoundClosure::updateOrCreate(
+            ['home_id' => $this->getHomeId(), 'date' => $request->input('date'), 'round' => $request->input('round')],
+            ['closed_by' => (int) Auth::id()]
+        );
+
+        return redirect()->route('frontend2.medication-round-split-c', ['date' => $request->input('date')])->with('success', 'Round ended.');
+    }
+
+    public function reopenFrontend2SplitC(Request $request)
+    {
+        $request->validate(['date' => 'required|date', 'round' => 'required|string|max:20']);
+
+        if (! in_array(Auth::user()->user_type, ['M', 'CM', 'A', 'O'], true)) {
+            abort(403, 'Only managers can re-open a round.');
+        }
+
+        MedicationRoundClosure::where('home_id', $this->getHomeId())
+            ->where('date', $request->input('date'))
+            ->where('round', $request->input('round'))
+            ->delete();
+
+        return redirect()->route('frontend2.medication-round-split-c', ['date' => $request->input('date')])->with('success', 'Round re-opened.');
+    }
+
     public function endFrontend2Split(Request $request)
     {
         $request->validate(['date' => 'required|date', 'round' => 'required|string|max:20']);

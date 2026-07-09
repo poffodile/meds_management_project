@@ -36,6 +36,9 @@ export default function ResolveDoseModal({ opened, onClose, item, date, action =
             form.setData('time_slot', item.slot);
             form.setData('dose_kind', item.kind);
             form.setData('code', item.code ?? '');
+            // Pre-fill when editing an already-resolved dose.
+            form.setData('clinical_action', item.clinical_action ?? '');
+            form.setData('notes', item.notes ?? '');
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [item, date]);

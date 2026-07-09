@@ -115,7 +115,10 @@ class ControlledDrugRegisterController extends Controller
     /** CD register rendered in the frontend2 (CLINIK) shell. */
     public function indexFrontend2(Request $request)
     {
-        return Inertia::render('Frontend2/ControlledDrugs', $this->cdReactData());
+        $data = $this->cdReactData();
+        $data['home'] = \DB::table('home')->where('id', $this->getHomeId())->value('title');
+
+        return Inertia::render('Frontend2/ControlledDrugs', $data);
     }
 
     /** Add a register entry + return to the frontend2 register page. */
