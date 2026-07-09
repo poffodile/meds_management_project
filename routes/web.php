@@ -1627,12 +1627,26 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
     Route::post('/frontend2/medication-round-split/record', [MedicationRoundController::class, 'recordFrontend2Split'])->name('frontend2.medication-round-split.record');
     Route::post('/frontend2/medication-round-split/end-round', [MedicationRoundController::class, 'endFrontend2Split'])->name('frontend2.medication-round-split.end');
     Route::post('/frontend2/medication-round-split/reopen-round', [MedicationRoundController::class, 'reopenFrontend2Split'])->name('frontend2.medication-round-split.reopen');
+    // Split variant "B" — same page with a redesigned right rail (Quick actions · stats · Today's outcomes).
+    Route::get('/frontend2/medication-round-split-b', [MedicationRoundController::class, 'indexFrontend2SplitB'])->name('frontend2.medication-round-split-b');
+    Route::post('/frontend2/medication-round-split-b/record', [MedicationRoundController::class, 'recordFrontend2SplitB'])->name('frontend2.medication-round-split-b.record');
+    Route::post('/frontend2/medication-round-split-b/end-round', [MedicationRoundController::class, 'endFrontend2SplitB'])->name('frontend2.medication-round-split-b.end');
+    Route::post('/frontend2/medication-round-split-b/reopen-round', [MedicationRoundController::class, 'reopenFrontend2SplitB'])->name('frontend2.medication-round-split-b.reopen');
+    // Split variant "C" — right rail box sizes copied from the mockup (profile-shaped quick actions · stats · outcomes).
+    Route::get('/frontend2/medication-round-split-c', [MedicationRoundController::class, 'indexFrontend2SplitC'])->name('frontend2.medication-round-split-c');
+    Route::post('/frontend2/medication-round-split-c/record', [MedicationRoundController::class, 'recordFrontend2SplitC'])->name('frontend2.medication-round-split-c.record');
+    Route::post('/frontend2/medication-round-split-c/end-round', [MedicationRoundController::class, 'endFrontend2SplitC'])->name('frontend2.medication-round-split-c.end');
+    Route::post('/frontend2/medication-round-split-c/reopen-round', [MedicationRoundController::class, 'reopenFrontend2SplitC'])->name('frontend2.medication-round-split-c.reopen');
     Route::post('/frontend2/medication-round-v2/record', [MedicationRoundController::class, 'recordFrontend2V2'])->name('frontend2.medication-round-v2.record');
     Route::post('/frontend2/medication-round-v2/end-round', [MedicationRoundController::class, 'endFrontend2V2'])->name('frontend2.medication-round-v2.end');
     Route::post('/frontend2/medication-round-v2/reopen-round', [MedicationRoundController::class, 'reopenFrontend2V2'])->name('frontend2.medication-round-v2.reopen');
     // Missed doses, Controlled drugs and Stock — rendered in the frontend2 shell (reuse existing controllers).
     Route::get('/frontend2/missed-doses', [MissedDosesController::class, 'indexFrontend2'])->name('frontend2.missed-doses');
     Route::post('/frontend2/missed-doses/resolve', [MissedDosesController::class, 'resolveFrontend2'])->name('frontend2.missed-doses.resolve');
+    Route::post('/frontend2/missed-doses/unresolve', [MissedDosesController::class, 'unresolveFrontend2'])->name('frontend2.missed-doses.unresolve');
+    // Redesigned "Missed & refused doses" (test) — mockup layout + Split B soft styling.
+    Route::get('/frontend2/missed-doses-b', [MissedDosesController::class, 'indexFrontend2MissedB'])->name('frontend2.missed-doses-b');
+    Route::post('/frontend2/missed-doses-b/resolve', [MissedDosesController::class, 'resolveFrontend2MissedB'])->name('frontend2.missed-doses-b.resolve');
     Route::get('/frontend2/controlled-drugs', [ControlledDrugRegisterController::class, 'indexFrontend2'])->name('frontend2.controlled-drugs');
     Route::post('/frontend2/controlled-drugs', [ControlledDrugRegisterController::class, 'storeFrontend2'])->name('frontend2.controlled-drugs.store');
     Route::get('/frontend2/stock', [MedicationStockController::class, 'indexFrontend2'])->name('frontend2.stock');

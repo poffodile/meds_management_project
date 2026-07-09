@@ -1,14 +1,14 @@
-import { useState } from 'react';
+import { useState, createContext, useContext } from 'react';
 import {
     AppShell as MantineAppShell, Group, Text, Burger, ScrollArea, Box,
-    ActionIcon, UnstyledButton, Menu, Switch, Collapse, Stack, useMantineColorScheme,
+    ActionIcon, UnstyledButton, Menu, Switch, Collapse, Stack, Anchor, useMantineColorScheme, useComputedColorScheme,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { usePage, Link } from '@inertiajs/react';
 import {
     IconLayoutDashboard, IconUsers, IconPill, IconCalendarEvent, IconChartBar,
     IconFileText, IconSettings, IconBell, IconChevronDown, IconMoon, IconArrowLeft,
-    IconClipboardHeart, IconShieldLock, IconAlertTriangle, IconBox, IconSparkles,
+    IconClipboardHeart, IconShieldLock, IconAlertTriangle, IconBox, IconSparkles, IconCopy,
 } from '@tabler/icons-react';
 import { RoleContext } from '@frontend/lib/role';
 import BrandLogo from '@frontend/components/BrandLogo';
@@ -23,7 +23,32 @@ const ACCENT = '#4C6FFF';
 // Navy brand gradient (base is the official Care One OS navy #13233F) — a deep,
 // slightly-blue top easing into the brand navy at the bottom.
 const GRAD = 'linear-gradient(180deg, #1E355F 0%, #13233F 62%, #0F1C33 100%)';
-const CANVAS = 'light-dark(#EEF1F8, var(--mantine-color-dark-8))';
+const CANVAS = 'light-dark(#ECEFF4, #131E33)';
+
+// ── Sidebar look ─────────────────────────────────────────────────────────────
+// 'navy'  → deep navy gradient rail, light nav text (original brand look)
+// 'warm'  → soft warm-white rail with a warm border (light, on cream theme)
+// 'cream' → same cream as the page, separated only by a subtle divider (seamless)
+const SIDEBAR_MODE = 'navy';
+const LIGHT_SIDEBAR = SIDEBAR_MODE !== 'navy';
+const SIDEBAR_BG = SIDEBAR_MODE === 'navy'
+    ? GRAD
+    : SIDEBAR_MODE === 'warm'
+        ? 'light-dark(#FBF8F1, var(--mantine-color-dark-7))'
+        : 'light-dark(#ECEFF4, #182740)';
+const SIDEBAR_BORDER = SIDEBAR_MODE === 'navy'
+    ? 'none'
+    : '1px solid light-dark(#DCE2EC, var(--mantine-color-dark-4))';
+const NAV_TXT = LIGHT_SIDEBAR ? '#4A5568' : 'rgba(255,255,255,0.88)';
+const NAV_TXT_SUB = LIGHT_SIDEBAR ? '#5A6678' : 'rgba(255,255,255,0.82)';
+const NAV_DOT = LIGHT_SIDEBAR ? '#C2CAD6' : 'rgba(255,255,255,0.5)';
+const NAV_GROUP_ACTIVE = LIGHT_SIDEBAR ? '#13233F' : '#fff';
+
+// Nav colours are provided reactively so the sidebar can flip light↔dark with the
+// colour scheme (dark-mode "swap": light rail on a dark body). Default = navy rail.
+const NAV_TONE_NAVY = { txt: 'rgba(255,255,255,0.88)', sub: 'rgba(255,255,255,0.82)', dot: 'rgba(255,255,255,0.5)', groupActive: '#fff' };
+const NAV_TONE_LIGHT = { txt: '#20304A', sub: '#3A4A66', dot: '#8B98AD', groupActive: '#13233F' };
+const NavToneContext = createContext(NAV_TONE_NAVY);
 
 const NAV = [
     { label: 'Dashboard', icon: IconLayoutDashboard, href: '/frontend2', exact: true },
@@ -32,12 +57,20 @@ const NAV = [
         // Collapsible parent — everything medication lives inside here.
         group: 'Medication', icon: IconPill, children: [
             { label: 'Medication round', icon: IconClipboardHeart, href: '/frontend2/medication-round' },
-            { label: 'Med round (new)', icon: IconClipboardHeart, href: '/frontend2/medication-round-v2' },
-            { label: 'Med round (split)', icon: IconClipboardHeart, href: '/frontend2/medication-round-split' },
             { label: 'Medications', icon: IconPill, href: '/frontend2/medications' },
             { label: 'Missed doses', icon: IconAlertTriangle, href: '/frontend2/missed-doses' },
             { label: 'Controlled drugs', icon: IconShieldLock, href: '/frontend2/controlled-drugs' },
             { label: 'Stock', icon: IconBox, href: '/frontend2/stock' },
+        ],
+    },
+    {
+        // Trial / superseded variants — parked here (not deleted) so the main menu stays clean.
+        group: 'Duplicates', icon: IconCopy, children: [
+            { label: 'Med round (new)', icon: IconClipboardHeart, href: '/frontend2/medication-round-v2' },
+            { label: 'Med round (split)', icon: IconClipboardHeart, href: '/frontend2/medication-round-split' },
+            { label: 'Med round (split B)', icon: IconClipboardHeart, href: '/frontend2/medication-round-split-b' },
+            { label: 'Med round (split C)', icon: IconClipboardHeart, href: '/frontend2/medication-round-split-c' },
+            { label: 'Missed doses (new)', icon: IconAlertTriangle, href: '/frontend2/missed-doses-b' },
         ],
     },
     {
@@ -60,8 +93,9 @@ const childActiveFor = (item, path) => item.children.some((c) => c.href !== '#' 
 
 function NavItem({ item, active }) {
     const Icon = item.icon;
+    const tone = useContext(NavToneContext);
     const disabled = item.href === '#';
-    const color = active ? ACCENT : 'rgba(255,255,255,0.88)';
+    const color = active ? ACCENT : tone.txt;
     const inner = (
         <Group className={disabled ? undefined : classes.navRow} data-active={active || undefined}
             gap="sm" wrap="nowrap" px="sm" py={10} mb={4} style={{
@@ -78,14 +112,15 @@ function NavItem({ item, active }) {
 // A sub-nav row inside a collapsible group (dot + icon + label).
 function SubNavItem({ item, active }) {
     const Icon = item.icon;
+    const tone = useContext(NavToneContext);
     const disabled = item.href === '#';
-    const color = active ? ACCENT : 'rgba(255,255,255,0.82)';
+    const color = active ? ACCENT : tone.sub;
     const inner = (
         <Group className={disabled ? undefined : classes.navRow} data-active={active || undefined}
             gap="xs" wrap="nowrap" px="sm" py={8} mb={2} style={{
                 color, opacity: disabled ? 0.6 : 1, cursor: disabled ? 'default' : 'pointer',
             }}>
-            <Box w={5} h={5} style={{ borderRadius: '50%', flexShrink: 0, background: active ? ACCENT : 'rgba(255,255,255,0.5)' }} />
+            <Box w={5} h={5} style={{ borderRadius: '50%', flexShrink: 0, background: active ? ACCENT : tone.dot }} />
             {Icon && <Icon size={16} stroke={1.7} color={color} />}
             <Text className={classes.navLabel} size="sm" fw={active ? 700 : 500}>{item.label}</Text>
         </Group>
@@ -99,8 +134,9 @@ function NavGroup({ item, path }) {
     const Icon = item.icon;
     const isChildActive = (c) => c.href !== '#' && (c.exact ? path === c.href : path.startsWith(c.href));
     const childActive = childActiveFor(item, path);
+    const tone = useContext(NavToneContext);
     const [open, setOpen] = useState(childActive);
-    const color = childActive ? '#fff' : 'rgba(255,255,255,0.88)';
+    const color = childActive ? tone.groupActive : tone.txt;
     return (
         <Box mb={4}>
             <UnstyledButton onClick={() => setOpen((o) => !o)} w="100%">
@@ -119,13 +155,24 @@ function NavGroup({ item, path }) {
     );
 }
 
-export default function AppShell({ children, title }) {
+export default function AppShell({ children, title, section }) {
     const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
     const { props, url } = usePage();
     const role = props?.auth?.user?.role ?? 'carer';
     const userName = props?.auth?.user?.name ?? 'User';
     const home = props?.home; // shown as a chip in the header when the page provides it
     const { colorScheme, toggleColorScheme } = useMantineColorScheme();
+    const computedScheme = useComputedColorScheme('light');
+    const dark = computedScheme === 'dark';
+    // Dark-mode idea — sidebar & body swap: light mode = navy rail + light body;
+    // dark mode = light rail + dark body (inverts the two).
+    const lightSidebar = dark;
+    const tone = lightSidebar ? NAV_TONE_LIGHT : NAV_TONE_NAVY;
+    // Light rail (dark mode): soft top-lit gradient + a crisp seam and a shadow cast onto
+    // the dark body, so the two zones read as deliberately layered, not glued together.
+    const sidebarBg = lightSidebar ? 'linear-gradient(180deg, #F6F8FC 0%, #E7ECF4 100%)' : GRAD;
+    const sidebarBorder = lightSidebar ? '1px solid #D6DDEA' : 'none';
+    const sidebarShadow = lightSidebar ? '5px 0 22px rgba(6,13,28,0.45)' : 'none';
     const path = url.split('?')[0];
     const isActive = (item) => item.href !== '#' && (item.exact ? path === item.href : path.startsWith(item.href));
 
@@ -135,12 +182,14 @@ export default function AppShell({ children, title }) {
                 layout="alt"
                 header={{ height: 68 }}
                 navbar={{ width: 236, breakpoint: 'sm', collapsed: { mobile: !mobileOpened } }}
+                footer={{ height: 40 }}
                 padding="lg"
             >
-                {/* Sidebar — full-height gradient rail (logo → nav → bottom card). */}
-                <MantineAppShell.Navbar style={{ background: GRAD, border: 'none' }}>
+                {/* Sidebar — navy rail (light mode) / light rail (dark mode swap). */}
+                <MantineAppShell.Navbar className={lightSidebar ? classes.lightNav : undefined} style={{ background: sidebarBg, borderRight: sidebarBorder, boxShadow: sidebarShadow, zIndex: 3 }}>
+                  <NavToneContext.Provider value={tone}>
                     <MantineAppShell.Section px="md" pt="lg" pb="xs">
-                        <BrandLogo tone="onDark" height={30} />
+                        <BrandLogo tone={lightSidebar ? 'onLight' : 'onDark'} height={30} />
                     </MantineAppShell.Section>
 
                     <MantineAppShell.Section grow component={ScrollArea} px="sm" pt="md">
@@ -151,7 +200,7 @@ export default function AppShell({ children, title }) {
 
                     {/* Bottom — Care Copilot AI card (from the mockup) + a temp back link. */}
                     <MantineAppShell.Section px="sm" pb="md">
-                        <Box p="md" style={{ borderRadius: 16, background: 'rgba(255,255,255,0.10)', border: '1px solid rgba(255,255,255,0.16)' }}>
+                        <Box p="md" style={{ borderRadius: 16, background: lightSidebar ? GRAD : 'rgba(255,255,255,0.10)', border: lightSidebar ? 'none' : '1px solid rgba(255,255,255,0.16)' }}>
                             <Group gap={7} wrap="nowrap" mb={4}>
                                 <IconSparkles size={16} color="#8FE3D4" />
                                 <Text c="#fff" fw={800} fz="sm" lh={1.2}>Care Copilot</Text>
@@ -164,18 +213,27 @@ export default function AppShell({ children, title }) {
                         </Box>
                         {/* TEMP — remove later. Quick jump back to the main frontend. */}
                         <UnstyledButton component={Link} href="/medication/medication-round-4" mt="sm"
-                            style={{ display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'center', width: '100%', color: 'rgba(255,255,255,0.7)', fontSize: 12, fontWeight: 600 }}>
+                            style={{ display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'center', width: '100%', color: lightSidebar ? '#6B7684' : 'rgba(255,255,255,0.7)', fontSize: 12, fontWeight: 600 }}>
                             <IconArrowLeft size={14} /> Back to main app (temp)
                         </UnstyledButton>
                     </MantineAppShell.Section>
+                  </NavToneContext.Provider>
                 </MantineAppShell.Navbar>
 
                 {/* Title bar — white bar over the content only (layout="alt"). */}
-                <MantineAppShell.Header style={{ background: 'light-dark(#ffffff, var(--mantine-color-dark-7))', borderBottom: '1px solid light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-4))' }}>
+                <MantineAppShell.Header style={{ background: 'light-dark(#ECEFF4, #182740)', borderBottom: '1px solid light-dark(#DCE2EC, var(--mantine-color-dark-4))' }}>
                     <Group h="100%" pl="lg" pr={30} justify="space-between" wrap="nowrap">
                         <Group gap="sm" wrap="nowrap">
                             <Burger opened={mobileOpened} onClick={toggleMobile} hiddenFrom="sm" size="sm" />
-                            <Text fw={800} fz={22} c="light-dark(var(--mantine-color-gray-9), var(--mantine-color-gray-1))">{title ?? 'CareOne'}</Text>
+                            {section ? (
+                                <Group gap={9} wrap="nowrap" align="center">
+                                    <Text fz={15} fw={500} c="light-dark(#8391A6, #8A97AC)">{section}</Text>
+                                    <Text fz={15} fw={400} c="light-dark(#B4BECC, #667085)">›</Text>
+                                    <Text fz={15} fw={700} c="light-dark(#2F4063, #E4E8EF)">{title}</Text>
+                                </Group>
+                            ) : (
+                                <Text fw={800} fz={22} c="light-dark(var(--mantine-color-gray-9), var(--mantine-color-gray-1))">{title ?? 'CareOne'}</Text>
+                            )}
                         </Group>
                         <Group gap={20} wrap="nowrap">
                             {home && (
@@ -223,6 +281,25 @@ export default function AppShell({ children, title }) {
                 <MantineAppShell.Main style={{ background: CANVAS, minHeight: '100dvh' }}>
                     {children}
                 </MantineAppShell.Main>
+
+                {/* Slim generic footer — copyright + version, quick links, and a system-status pill. */}
+                <MantineAppShell.Footer style={{ background: 'light-dark(#ECEFF4, #182740)', borderTop: '1px solid light-dark(#DCE2EC, var(--mantine-color-dark-4))' }}>
+                    <Group h="100%" px="lg" justify="space-between" wrap="nowrap" gap="sm">
+                        <Group gap={7} wrap="nowrap" style={{ minWidth: 0 }}>
+                            <Text fz={12} fw={700} c="light-dark(#48576E, #A9B6CB)" truncate>© 2026 Care One OS</Text>
+                            <Text fz={12} fw={500} c="light-dark(#8A97AC, #7C899E)" visibleFrom="xs">· v0.9 beta</Text>
+                        </Group>
+                        <Group gap={22} wrap="nowrap" visibleFrom="sm">
+                            <Anchor href="#" fz={12} fw={600} c="light-dark(#586A85, #9AA8BE)" underline="never">Support</Anchor>
+                            <Anchor href="#" fz={12} fw={600} c="light-dark(#586A85, #9AA8BE)" underline="never">Privacy</Anchor>
+                            <Anchor href="#" fz={12} fw={600} c="light-dark(#586A85, #9AA8BE)" underline="never">Terms</Anchor>
+                        </Group>
+                        <Group gap={7} wrap="nowrap">
+                            <Box w={7} h={7} style={{ borderRadius: '50%', background: '#1F9E93', boxShadow: '0 0 0 3px rgba(31,158,147,0.18)' }} />
+                            <Text fz={12} fw={600} c="light-dark(#48576E, #A9B6CB)" truncate>All systems operational</Text>
+                        </Group>
+                    </Group>
+                </MantineAppShell.Footer>
             </MantineAppShell>
         </RoleContext.Provider>
     );

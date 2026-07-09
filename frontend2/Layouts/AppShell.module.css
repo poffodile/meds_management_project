@@ -20,3 +20,15 @@
     --row-bg: #ffffff;
     box-shadow: 0 6px 16px rgba(23, 37, 84, 0.18);
 }
+
+/* Light sidebar variant — dark rows on a light rail. The rail is a light surface even
+   in dark mode (the swap), so these MUST be explicit light values, not light-dark()
+   tokens (which would resolve to dark navy under the dark scheme and look broken). */
+.lightNav .navRow:hover {
+    --row-bg: rgba(19, 35, 63, 0.06);
+}
+
+.lightNav .navRow[data-active] {
+    --row-bg: #E7ECFB;
+    box-shadow: 0 4px 12px rgba(76, 111, 255, 0.18);
+}

@@ -1,0 +1,9 @@
+/* Global overrides layered on top of Mantine's core styles.
+   Imported from resources/js/app.jsx (the sole Vite entry). */
+
+/* Page background in LIGHT mode — applied to the real <body> element only
+   (not the --mantine-color-body token) so cards, modals and dropdowns stay white on it.
+   Dark mode is untouched: it keeps the navy body from the theme's dark scale. */
+[data-mantine-color-scheme='light'] body {
+    background-color: #ECEFF4;
+}

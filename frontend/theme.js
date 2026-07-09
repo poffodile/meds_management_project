@@ -16,6 +16,10 @@ export const theme = createTheme({
         brandOrange: ['#fff0e1', '#ffdcbf', '#ffc394', '#ffa861', '#f99238', '#f58321', '#e06f10', '#b8590a', '#8f4408', '#663005'],
         brandPurple: ['#f6eef5', '#e7d4e5', '#d3b3d0', '#bd8fb9', '#9d6c98', '#795076', '#6a4567', '#573854', '#432b41', '#2f1e2e'],
         brandGreen:  ['#f1f7e4', '#ddecc0', '#c6e096', '#aed26a', '#9bc44e', '#88b13f', '#739838', '#5b7a2d', '#455d23', '#304118'],
+        // Navy-tinted DARK scale, derived from the brand navy (light PRIMARY #1C325A) so dark mode reads
+        // as "deep navy" not "forced black". Keeps Mantine's lightness ramp: [0]=text … [4]=borders …
+        // [6]=card surface, [7]=body bg, [8]=canvas. See docs/brand-guidelines.md (dark palette).
+        dark: ['#E7ECF4', '#C4CCDA', '#94A2B8', '#6E7C93', '#2F4060', '#26375A', '#1E2D4A', '#101B2E', '#0C1524', '#070E1A'],
     },
     defaultRadius: radius.control,
     fontFamily: typography.fontFamily,
