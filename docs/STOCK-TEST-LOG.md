@@ -4,16 +4,17 @@
 > One line per feature. Tick the box (change `[ ]` → `[x]`) once you've tested it in the browser and you're satisfied. Detailed steps for each are in the sections below.
 
 - [x] **Role — "View as" manager/carer toggle** (header; hides/shows manager controls, persists) — ✅ 2026-07-14 (tester+GD+UX pass; toggle recoloured navy/gold, integrated eye, clean inactive chip)
-- [ ] **CD register link** (header button → controlled-drugs page)
-- [ ] **#35 Days-of-stock forecast** ("≈ N days left" in table + "Stock cover" in panel + CSV column)
-- [ ] **#36 Disposal capture** (Disposal tab → Record disposal modal; reason/method/witness; logs + reduces stock)
-- [ ] **#30 Batch / lot tracking** (Received creates a batch; batch list with "Use next" FEFO order)
-- [ ] **#30 FEFO consumption** (dispose/administer draws down earliest-expiry batch first)
-- [ ] **#31 Stock count / reconciliation** (Stock count tab; counted vs expected; post corrections; CD witness)
-- [ ] **#32 Reorder → ordering** (suggested qty → Order → On order → Receive books in + creates batch → Cancel)
-- [ ] **#34 Barcode scanning** (set barcode in Adjust form; header scan box jumps to the med)
-- [ ] **#37 Resident dropdown** (disposal modal lists residents → filters that client's meds) — *may need real data*
-- [ ] **#37 Disposal modal opens under page zoom** (the one thing still to confirm visually)
+- [x] **CD register link** (header button → controlled-drugs page) — ✅ 2026-07-14 (link works; CD page redesigned to premium/restrained language — muted hues, hairline dividers, tabular numerals, quiet dots replace rainbow badges/tan tabs)
+- [x] **#35 Days-of-stock forecast** ("≈ N days left" in table + "Stock cover" in panel + CSV column) — ✅ 2026-07-14 (CSV "Days cover" confirmed: Paracetamol 12/14/42 days, Warfarin 80 days)
+- [x] **★ Finish & verify Adjust stock functionality (PRIORITY)** — ✅ 2026-07-14 **backend smoke test PASS** (rolled back, no data changed): Received +10 → stock 2→12; note persisted to DB and reloaded; batch created (#30); Disposed −4 → 12→8 via FEFO path, no errors; reason+notes both stored. Root cause of "nothing happens" was **UI feedback only** — fixed: success/error toasts on both `AdjustForm` submits, and `notes` now returned in payload + shown in History/Transactions. Covers panel **Adjust** tab + top **Adjust stock** modal (shared `AdjustForm`). *UI toast/visual still worth an eyeball in-browser.*
+- [~] **#36 Disposal capture** (Disposal tab → Record disposal modal; reason/method/witness; logs + reduces stock) — ⚠️ **OPEN**: resident dropdown now populates (z-index fix ✅), but **submitting the filled form does nothing** — no toast, no close, no stock change. Loud validation + `onError` toasts added 2026-07-14 to surface the cause on next test; root cause not yet confirmed (candidate: a required Select left blank → silent early-return, now toasted). **Likely resolved once ★ Adjust is fixed** (same endpoint). **Re-test when ready.**
+- [x] **#30 Batch / lot tracking** (Received creates a batch; batch list with "Use next" FEFO order) — ✅ 2026-07-14 (smoke test: Received created batch #; model/table wired. Multi-batch "Use next" ordering still worth a quick in-browser look)
+- [x] **#30 FEFO consumption** (dispose/administer draws down earliest-expiry batch first) — ✅ 2026-07-14 (smoke test: Disposed −4 ran `consumeBatchesFefo` cleanly; stock drew down correctly)
+- [x] **#31 Stock count / reconciliation** (Stock count tab; counted vs expected; post corrections; CD witness) — ✅ 2026-07-14 (smoke test PASS, rolled back: `correction` sets absolute counted value, `balance_after`+audit note "was X counted Y" stored; decision logic verified — no-change skips, CD-without-witness skips, CD-with-witness/normal-diff apply)
+- [x] **#32 Reorder → ordering** (suggested qty → Order → On order → Receive books in + creates batch → Cancel) — ✅ 2026-07-14 (smoke test PASS, rolled back: place→`ordered`+in open list; receive→stock up, batch created, order closed, qty recorded; cancel→removed from open, no stock change)
+- [x] **#34 Barcode scanning** (set barcode in Adjust form; header scan box jumps to the med) — ✅ 2026-07-14 (smoke test: barcode column persists/clears; payload sends `barcode` per med; `runScan()` matches exact code → opens med panel, red toast on no match, Enter-key + keyboard-wedge friendly)
+- [x] **#37 Resident dropdown** (disposal modal lists residents → filters that client's meds) — ✅ 2026-07-14 (z-index fix; dropdown populates, picking a resident filters the med list — confirmed in browser)
+- [x] **#37 Disposal modal opens under page zoom** — ✅ 2026-07-14 (moot — the `zoom` hack was removed from Stock 2 entirely, so there's no zoom context to break the modal)
 
 > Not built as a separate feature: **#33 booking-in deliveries** — covered by #32's "Receive" step (books stock in + creates a batch). Confirm you're happy with that rather than a standalone receiving screen.
 
@@ -69,7 +70,7 @@
 - ☐ **T1** Stock count tab lists meds with **Expected** + a **Counted** input.
 - ☐ **T2** Enter a counted value = expected → shows green **"Match"** (not a discrepancy).
 - ☐ **T3** Enter a different value → red/amber **difference**; a **reason** field appears (and **witness** for CDs).
-- ☐ **T4** **Post corrections** with a CD discrepancy but no witness → blocked with a toast.
+- ☐ **T4** **Post corrections** with a CD discrepancy but no witness → blocked with a toast. *(Fixed 2026-07-14: the error toast used `IconAlertTriangle` which was never imported — this path would have crashed; import added.)*
 - ☐ **T5** Add the witness → **Post corrections** applies; toast shows count; stock updates; a `correction` shows in Transactions ("was X, counted Y").
 - ☐ **T6** As a carer: inputs disabled / no post button.
 

@@ -7,6 +7,10 @@ import '@mantine/core/styles.css';
 import '@mantine/notifications/styles.css';
 import '../css/app.css';
 import { theme } from '@frontend/theme';
+import { initFont } from '@frontend/lib/font';
+
+// Apply the saved site-wide font choice as early as React boots.
+initFont();
 
 createInertiaApp({
     resolve: (name) => {

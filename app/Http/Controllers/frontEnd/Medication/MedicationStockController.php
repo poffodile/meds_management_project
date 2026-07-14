@@ -378,6 +378,7 @@ class MedicationStockController extends Controller
                     'balance_after' => $t->balance_after,
                     'unit' => $t->unit,
                     'reason' => $t->reason,
+                    'notes' => $t->notes,
                     'performed_by' => $t->performedByUser->name ?? null,
                 ];
             });

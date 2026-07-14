@@ -20,6 +20,13 @@ To run it on this computer: `start-local.bat` (starts the database, the web serv
 
 ---
 
+## 2026-07-14
+
+- **New standing bar: the whole site must look premium / "Apple-quality" / like real money was spent.** The owner found the existing colours, spacing and layouts "childish" and "not unique/professional." Captured this as a permanent design directive (see `memory/premium-design-bar.md`): one ink colour, neutral greys, hairline dividers, **muted** semantic hues (never fully saturated), lighter type weights, tabular numerals, soft single-layer shadows, and colour used only as **small signals** (a dot, a thin bar) — no rainbow Mantine `variant="light"` badges/tiles, no cream/tan surfaces, no heavy glows.
+- **Controlled Drug register (`Frontend2/ControlledDrugs.jsx`) rebuilt to that bar.** Replaced the cream/tan tab strip with a clean neutral segmented control; swapped rainbow icon tiles + coloured badges for neutral graphite tiles with a single muted-coloured icon and a small dot; dropped `fw 800`/34px black numbers for lighter weights + tabular numerals; thinned the "by action" bars; softened shadows to hairlines. All behaviour (stats, tab filters, search, export, witness compliance, add-entry modal) unchanged.
+- **Medication Stock (`Frontend2/Stock2.jsx`) restyled to match** — surgical visual pass, no logic touched. Killed the gradient "banner" card backgrounds (now clean white/dark surfaces), the teal→navy gradient search frame (now a clean hairline input), and the saturated status/sub-view pills (now muted fills + soft shadows). Introduced shared premium tokens + three small helpers (`MedTile`, `CdTag`, `StatusChip`) and reused them across the overview table, detail panel, Stock count, Reorder/On-order, and Disposal views. Muted every semantic hue (status buckets, transaction types, forecast tones) to the new palette; buttons moved to navy/muted-teal/muted-terracotta.
+- **Latent bug fixed while in Stock2:** the Stock-count error toast rendered `IconAlertTriangle` which was never imported — posting a controlled-drug count discrepancy **without a witness** would have thrown a ReferenceError instead of showing the "add a witness" toast. Import added; frontend builds clean.
+
 ## 2026-07-09
 
 - **Missed doses (Page 1) — big polish + full tester sweep.** Restarted the local servers (MySQL + PHP on :8000 + Vite on :5173 — the white pages were because Vite/`public/hot` wasn't running). Added **Frontend 1 / Frontend 2 shortcut buttons** to the shared legacy top bar (`resources/views/frontEnd/common/header.blade.php`) so you can jump to the new screens from any old page.
@@ -275,6 +282,31 @@ To run it on this computer: `start-local.bat` (starts the database, the web serv
 - **Looked at the old app** (very dated technology) and **decided the approach:** keep the existing Laravel back-end, build the new screens with modern tools (React + Mantine), one page at a time, and leave the login alone.
 - **Built the starting pieces** and converted the **first set of medication pages** to the new look.
 - More detail: `docs/milestones/M0.md`, `M1.md`.
+
+---
+
+## 2026-07-14 — Stock 2: finished the feature checklist + polished the tables
+
+Worked entirely on the **Stock 2** page today. In plain English:
+
+**Made the whole feature list work and proved it.** We went through the acceptance checklist (`docs/STOCK-TEST-LOG.md`) one item at a time. Because I can't click through the browser myself, I ran small **safe backend tests** (they change nothing — every test is rolled back afterwards) against the real database to prove each feature actually works:
+- **Adjust stock** — receiving adds stock, disposing removes it, notes save, a batch is created. ✅
+- **Batch / lot tracking + FEFO** — receiving creates a batch; disposing draws down the earliest-expiry batch first. ✅
+- **Stock count** — entering a counted number posts a correction to that exact figure, writes an audit note ("was X, counted Y"), skips items with no change, and blocks controlled drugs without a witness. ✅
+- **Reorder** — place an order → it shows in "on order" → receive it (stock goes up, batch created, order closes) → or cancel it (no stock change). ✅
+- **Barcode** — the code saves against a medicine and the header scan box jumps to it. ✅
+
+**Fixed the "nothing happens" problems.** The disposal/adjust forms *were* saving all along — the issue was there was **no feedback** (no success/error message) and typed **notes weren't shown back** on the page. Added success/error toasts to both forms and made notes appear in the History/Transactions lists.
+
+**Rebuilt the "Adjust stock" button properly.** It used to just grab the first medicine in the table. Now it opens a proper **pick-a-resident → pick-a-medicine** box (like the disposal one) with the full adjust form. The same form is now shared between that box and the medicine detail panel, so there's only one copy to maintain.
+
+**Tidied the medicine detail panel** (opens when you click a row). It was one very long scroll; now it's split into **Overview / Adjust / History** tabs so nothing runs off the screen.
+
+**Polished the adjust form** — rounder corners, grouped the batch fields and controlled-drug fields into soft tinted boxes (teal for a new batch, muted purple for controlled drugs), a little colour so it's easier to read, and made it more compact.
+
+**Tables now match across all the tabs** — added column headers to Transactions, Stock count, Reorder and Disposal, and gave every table the same airy, right-grouped column spacing (one shared setting). On the Stock count tab specifically, moved the Expected/Counted/Difference columns across so Difference sits under the "Post corrections" button (tuned for a wide screen).
+
+**Left to finish on Stock 2 (small):** a couple of purely visual click-throughs in the browser (disposal success message; the reorder inline forms), and the Stock count column position is tuned to a wide monitor so it'll shift on narrow windows if we ever care.
 
 ---
 

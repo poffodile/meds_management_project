@@ -1024,8 +1024,7 @@ export default function MedicationRoundLab142({ rounds = [], grid = {}, date, cu
                                 {alertItems.map((a) => (
                                     <AlertRow key={a.key} color={a.color} icon={a.icon} title={a.title} description={a.description}
                                         onClick={a.clientId ? () => setSelectedId(a.clientId) : undefined}
-                                        onDismiss={() => setDismissedAlerts((prev) => new Set(prev).add(a.key))} />)
-                                )}
+                                        onDismiss={() => setDismissedAlerts((prev) => new Set(prev).add(a.key))} />
                                 ))}
                             </Stack>
                         </ScrollArea.Autosize>
