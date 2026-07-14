@@ -1,16 +1,16 @@
 import { useMemo, useState } from 'react';
 import { Head, router, useForm } from '@inertiajs/react';
-import { useDisclosure, useMediaQuery } from '@mantine/hooks';
+import { useMediaQuery } from '@mantine/hooks';
+import { notifications } from '@mantine/notifications';
 import {
-    Box, Group, Stack, Text, Badge, Button, ThemeIcon, TextInput, ActionIcon, SimpleGrid, Avatar, ScrollArea, Tooltip, RingProgress, Divider, Select, Textarea,
+    Box, Group, Stack, Text, Badge, Button, ThemeIcon, TextInput, ActionIcon, Avatar, ScrollArea, Tooltip, RingProgress, Divider, Select, Textarea,
 } from '@mantine/core';
 import {
     IconAlertTriangle, IconChevronLeft, IconChevronRight, IconDownload, IconCheck,
-    IconShieldCheck, IconAlertCircle, IconX, IconRefresh,
+    IconShieldCheck, IconX, IconRefresh, IconPencil,
     IconSearch, IconSelector, IconChevronUp, IconChevronDown,
 } from '@tabler/icons-react';
 import AppShell from '@frontend2/Layouts/AppShell';
-import ResolveDoseModal from '@frontend/features/medications/ResolveDoseModal';
 import { avatarColor, initials } from '@frontend/lib/avatarColor';
 
 const PAGE = '/frontend2/missed-doses';
@@ -18,6 +18,14 @@ const RESOLVE = '/frontend2/missed-doses/resolve';
 const UNRESOLVE = '/frontend2/missed-doses/unresolve';
 
 const TXT = 'light-dark(#1E2F4D, #E8EBF1)';
+// Soft gradient for the donut card — light: blue-grey tint → white; dark: navy tint → deep navy. Theme-aware per stop.
+const BANNER_GRADIENT = 'linear-gradient(125deg, light-dark(#DCE4F0, #223454) 0%, light-dark(#ECF0F7, #1A2842) 42%, light-dark(#FFFFFF, #141F35) 100%)';
+// Same tint but centred — the table uses this so the tint sits in the middle (edges → tint → edges).
+const BANNER_GRADIENT_REV = 'linear-gradient(125deg, light-dark(#FFFFFF, #131E33) 0%, light-dark(#ECF0F7, #1A2842) 30%, light-dark(#DCE4F0, #223454) 50%, light-dark(#ECF0F7, #1A2842) 70%, light-dark(#FFFFFF, #131E33) 100%)';
+// Soft rose gradient INSIDE the Undo button (rest state) — same banner direction/feel, in the danger colour. Outline stays.
+// Rest Undo — a soft, refined rose tint (solid, not washed-white). Hover deepens it slightly.
+const UNDO_REST_BG  = 'light-dark(#F6DCE0, rgba(176,58,74,0.16))';
+const UNDO_HOVER_BG = 'light-dark(#F0C9CF, rgba(176,58,74,0.24))';
 // Soft card — the same lifted, borderless-ish style as Split B.
 const card = {
     background: 'light-dark(#ffffff, var(--mantine-color-dark-6))',
@@ -56,69 +64,6 @@ function relDay(d, today) {
     return fmtRange(d);
 }
 
-// Number-chip tint per category dot colour → { pale background, dark number }.
-const CHIP = {
-    '#C43D6B': { bg: '#F7DBE6', fg: '#B23461' }, // refused (pink)
-    '#6B4E86': { bg: '#E6DCF1', fg: '#5C4275' }, // omitted (purple)
-    '#E8842B': { bg: '#FBE4CD', fg: '#B9660F' }, // overdue (orange)
-    '#3A7CA5': { bg: '#DAEAF3', fg: '#2E6689' }, // follow-ups (blue)
-};
-
-function StatCard({ label, value, dot, num, highlight, active, onClick, hint }) {
-    const clickable = Boolean(onClick);
-    const chip = CHIP[dot] ?? { bg: '#FFFFFF', fg: '#13233F' };
-    const inner = (
-        <Box onClick={onClick} role={clickable ? 'button' : undefined} tabIndex={clickable ? 0 : undefined}
-            onKeyDown={clickable ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick(); } } : undefined}
-            style={{
-                background: '#13233F', borderRadius: 999,
-                // Outline: subtle by default; the pill's OWN colour when selected (or always, for the
-                // highlighted Overdue); teal only on hover (set in the handlers below).
-                border: `${active ? 2 : 1.5}px solid ${active || highlight ? dot : 'rgba(255,255,255,0.16)'}`,
-                padding: '7px 8px 7px 15px', cursor: clickable ? 'pointer' : 'default',
-                display: 'inline-flex', alignItems: 'center', gap: 10, whiteSpace: 'nowrap',
-                boxShadow: '0 8px 20px -14px rgba(19,35,63,0.5)',
-                transition: 'transform .15s ease, box-shadow .15s ease, border-color .15s ease',
-            }}
-            onMouseEnter={clickable ? (e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 12px 24px -12px rgba(19,35,63,0.6)'; e.currentTarget.style.borderColor = '#45C1BF'; } : undefined}
-            onMouseLeave={clickable ? (e) => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 8px 20px -14px rgba(19,35,63,0.5)'; e.currentTarget.style.borderColor = active || highlight ? dot : 'rgba(255,255,255,0.16)'; } : undefined}>
-            <Box w={9} h={9} style={{ borderRadius: '50%', background: dot, flexShrink: 0 }} />
-            <Text fz={12.5} fw={600} c="#FFFFFF">{label}</Text>
-            <Box style={{ background: chip.bg, borderRadius: 999, minWidth: 24, height: 21, padding: '0 8px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Text fz={13} fw={800} c={chip.fg} lh={1}>{value}</Text>
-            </Box>
-        </Box>
-    );
-    return hint ? <Tooltip label={hint} withArrow openDelay={300}>{inner}</Tooltip> : inner;
-}
-
-// TRIAL — light "white pill" stat variant (Image #9): white pill, coloured left cap, number + label;
-// full colour outline + coloured text when highlighted or selected.
-function PillLite({ label, value, color, highlight, active, onClick, hint }) {
-    const clickable = Boolean(onClick);
-    const on = active || highlight;
-    const rest = 'light-dark(#EAEEF3, var(--mantine-color-dark-4))';
-    const inner = (
-        <Box onClick={onClick} role={clickable ? 'button' : undefined} tabIndex={clickable ? 0 : undefined}
-            onKeyDown={clickable ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick(); } } : undefined}
-            style={{
-                background: 'light-dark(#FFFFFF, var(--mantine-color-dark-6))', borderRadius: 999,
-                border: `1.5px solid ${on ? color : rest}`,
-                boxShadow: '0 6px 16px -12px rgba(20,50,80,0.3)',
-                display: 'inline-flex', alignItems: 'center', gap: 11, padding: '7px 18px 7px 9px',
-                cursor: clickable ? 'pointer' : 'default', whiteSpace: 'nowrap',
-                transition: 'transform .15s ease, border-color .15s ease, box-shadow .15s ease',
-            }}
-            onMouseEnter={clickable ? (e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.borderColor = color; } : undefined}
-            onMouseLeave={clickable ? (e) => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.borderColor = on ? color : rest; } : undefined}>
-            <Box style={{ width: 5, height: 24, borderRadius: 999, background: color, flexShrink: 0 }} />
-            <Text fz={20} fw={800} c={highlight ? color : TXT} lh={1}>{value}</Text>
-            <Text fz={13} fw={600} c={highlight ? color : 'dimmed'}>{label}</Text>
-        </Box>
-    );
-    return hint ? <Tooltip label={hint} withArrow openDelay={300}>{inner}</Tooltip> : inner;
-}
-
 const ACTION_OPTIONS = ['No action needed', 'Re-administered', 'GP informed', 'Family informed', 'Pharmacy informed', 'Recorded for audit', 'Other'];
 
 // Slide-in detail panel — resolve form for outstanding doses, read-only + edit/undo for resolved ones.
@@ -129,8 +74,29 @@ function DosePanel({ item, date, onClose, onDone }) {
         dose_kind: item.kind, code: item.code ?? '',
         clinical_action: item.clinical_action ?? '', notes: item.notes ?? '',
     });
-    const submit = () => form.post(RESOLVE, { preserveScroll: true, onSuccess: onDone });
-    const undo = () => router.post(UNRESOLVE, { mar_sheet_id: item.mar_sheet_id, review_date: date, time_slot: item.slot }, { preserveScroll: true, onSuccess: onDone });
+    // Bold, branded confirmation — navy card + teal check, bottom-centre, so it's impossible to miss.
+    const toast = (message) => notifications.show({
+        message, autoClose: 3500, withBorder: true,
+        icon: <IconCheck size={20} stroke={3} />,
+        styles: {
+            root: { padding: '16px 22px', minWidth: 340, borderRadius: 24, backgroundColor: 'light-dark(#13233F, #18243D)', borderColor: '#1F9E93', boxShadow: '0 22px 48px -12px rgba(19,35,63,0.62)' },
+            icon: { backgroundColor: '#1F9E93', width: 38, height: 38, borderRadius: '50%' },
+            body: { marginInlineStart: 8 },
+            description: { color: '#FFFFFF', fontSize: 15, fontWeight: 700 },
+            closeButton: { color: 'rgba(255,255,255,0.65)' },
+        },
+    });
+    const submit = () => form.post(RESOLVE, { preserveScroll: true, onSuccess: () => { toast(item.resolved ? 'Resolution updated.' : `${item.resident_name}'s dose resolved.`); onDone(); } });
+    // Undo is destructive (deletes the resolution) — require a second click to confirm; auto-reset after 4s.
+    const [confirmUndo, setConfirmUndo] = useState(false);
+    const undo = () => {
+        if (!confirmUndo) {
+            setConfirmUndo(true);
+            setTimeout(() => setConfirmUndo(false), 4000);
+            return;
+        }
+        router.post(UNRESOLVE, { mar_sheet_id: item.mar_sheet_id, review_date: date, time_slot: item.slot }, { preserveScroll: true, onSuccess: () => { toast('Resolution removed.'); onDone(); } });
+    };
     const cap = { fontSize: 10, textTransform: 'uppercase', fontWeight: 700, letterSpacing: 0.5 };
     return (
         <Box style={{ ...card, padding: '18px 20px', width: '100%' }}>
@@ -149,10 +115,10 @@ function DosePanel({ item, date, onClose, onDone }) {
                 <Stack gap={12}>
                     <Text fz={15} fw={800} c={TXT}>{item.resolved ? 'Edit resolution' : 'Resolve dose'}</Text>
                     <Select label="Clinical action" placeholder="What was done?" data={ACTION_OPTIONS} value={form.data.clinical_action} onChange={(v) => form.setData('clinical_action', v ?? '')} error={form.errors.clinical_action} required comboboxProps={{ withinPortal: true }} />
-                    <Textarea label="Notes" autosize minRows={3} value={form.data.notes} onChange={(e) => form.setData('notes', e.currentTarget.value)} />
+                    <Textarea label="Notes" placeholder="Add any notes about this dose (optional)…" autosize minRows={3} value={form.data.notes} onChange={(e) => form.setData('notes', e.currentTarget.value)} />
                     <Group grow mt={4}>
                         {item.resolved && <Button variant="default" radius={10} onClick={() => setEditing(false)}>Cancel</Button>}
-                        <Button radius={10} loading={form.processing} onClick={submit} style={{ background: 'light-dark(#3A7CA5, #1F9E93)', color: '#fff' }}>{item.resolved ? 'Save changes' : 'Mark resolved'}</Button>
+                        <Button radius={10} loading={form.processing} onClick={submit} style={{ background: 'light-dark(#1C325A, #1F9E93)', color: '#fff' }}>{item.resolved ? 'Save changes' : 'Mark resolved'}</Button>
                     </Group>
                 </Stack>
             ) : (
@@ -188,9 +154,9 @@ function DosePanel({ item, date, onClose, onDone }) {
                                         <Box style={{ minWidth: 0 }}>
                                             <Text fz={12.5} c={TXT} lh={1.3}><Text span fw={700} c={m}>{lbl}</Text>{h.by ? ` · ${h.by}` : ''}</Text>
                                             <Text fz={11} c="dimmed" mb={2}>{h.at}</Text>
-                                            <Text fz={11.5} c={TXT} lh={1.35}>{h.clinical_action || '—'}{h.notes ? ` · “${h.notes}”` : ''}</Text>
+                                            <Text fz={11.5} c={TXT} lh={1.35}>{h.clinical_action || 'No action recorded'}{h.notes ? ` · “${h.notes}”` : ''}</Text>
                                             {prev && (actChg || noteChg) && (
-                                                <Text fz={11} c="#98A1AB" lh={1.35} mt={1}>was: {actChg ? (prev.clinical_action || '—') : ''}{actChg && noteChg ? ' · ' : ''}{noteChg ? `“${prev.notes || '—'}”` : ''}</Text>
+                                                <Text fz={11} c="#98A1AB" lh={1.35} mt={1}>was: {actChg ? (prev.clinical_action || 'no action') : ''}{actChg && noteChg ? ' · ' : ''}{noteChg ? (prev.notes ? `“${prev.notes}”` : 'no notes') : ''}</Text>
                                             )}
                                         </Box>
                                     </Group>
@@ -202,9 +168,20 @@ function DosePanel({ item, date, onClose, onDone }) {
                         </Stack>
                         </ScrollArea.Autosize>
                     </Box>
-                    <Group grow mt={4}>
-                        <Button variant="light" color="gray" radius={10} onClick={() => setEditing(true)}>Edit</Button>
-                        <Button variant="light" color="red" radius={10} onClick={undo}>Undo</Button>
+                    <Group grow mt={6} gap={10}>
+                        <Button radius={11} h={40} onClick={() => setEditing(true)} disabled={confirmUndo}
+                            leftSection={<IconPencil size={15} />}
+                            style={{ background: 'light-dark(#FFFFFF, var(--mantine-color-dark-6))', color: 'light-dark(#40506B, #C7D1E0)', border: '1.5px solid light-dark(#E4E9F0, rgba(150,172,205,0.25))', fontWeight: 600, boxShadow: '0 5px 14px -9px rgba(20,50,80,0.5)' }}
+                            onMouseEnter={(e) => { if (!confirmUndo) e.currentTarget.style.background = 'light-dark(#F4F7FB, var(--mantine-color-dark-5))'; }}
+                            onMouseLeave={(e) => { e.currentTarget.style.background = 'light-dark(#FFFFFF, var(--mantine-color-dark-6))'; }}>Edit</Button>
+                        <Button radius={11} h={40} onClick={undo}
+                            style={confirmUndo
+                                ? { background: 'linear-gradient(180deg, #B7414F 0%, #9E3646 100%)', color: '#fff', border: 'none', fontWeight: 600, letterSpacing: 0.2, boxShadow: '0 8px 18px -9px rgba(158,54,70,0.55)' }
+                                : { background: UNDO_REST_BG, color: 'light-dark(#9E2437, #FFD1D8)', border: '1.5px solid light-dark(#E7B0B8, rgba(176,58,74,0.4))', fontWeight: 600, boxShadow: '0 5px 14px -10px rgba(176,58,74,0.5)' }}
+                            onMouseEnter={(e) => { if (!confirmUndo) e.currentTarget.style.background = UNDO_HOVER_BG; }}
+                            onMouseLeave={(e) => { if (!confirmUndo) e.currentTarget.style.background = UNDO_REST_BG; }}>
+                            {confirmUndo ? 'Are you sure?' : 'Undo'}
+                        </Button>
                     </Group>
                 </Stack>
             )}
@@ -227,10 +204,16 @@ export default function MissedDoses({ items = [], date, prevDate, nextDate, toda
     const [sort, setSort] = useState({ key: 'when', dir: 'asc' });
 
     const reload = (params) => router.get(PAGE, { date, ...params }, { preserveScroll: true, preserveState: true });
+    // Doses can't exist in the future — cap forward navigation at today.
+    const atToday = !date || date >= todayDate;
     // Data-freshness stamp — recomputes each time a fresh payload arrives, so the shown time reflects the current data.
     const loadedAt = useMemo(() => new Date(), [items]);
     const loadedTime = loadedAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const openPanel = (i) => { setPanelItem(i); setSelected(i); };
+    // Toggle: clicking the row that's already open closes the panel (back to the full table).
+    const openPanel = (i) => {
+        if (selected && selected.id === i.id) { setSelected(null); return; }
+        setPanelItem(i); setSelected(i);
+    };
     const closePanel = () => setSelected(null);
     const openResolve = openPanel;
     const openView = openPanel;
@@ -250,7 +233,7 @@ export default function MissedDoses({ items = [], date, prevDate, nextDate, toda
 
     const shown = useMemo(() => {
         const q = query.trim().toLowerCase();
-        let list = rows.filter((r) => (tab === 'all' ? true : tab === 'resolved' ? r.resolved : r.key === tab));
+        let list = rows.filter((r) => (tab === 'all' ? true : tab === 'resolved' ? r.resolved : tab === 'outstanding' ? !r.resolved : r.key === tab));
         if (q) list = list.filter((r) => [r.resident_name, r.room ? `room ${r.room}` : '', r.medication_name, r.reason, r.outLabel]
             .some((v) => String(v ?? '').toLowerCase().includes(q)));
         const val = (r) => {
@@ -281,25 +264,12 @@ export default function MissedDoses({ items = [], date, prevDate, nextDate, toda
         );
     };
 
-    // "By reason" — grouped counts with the bucket colour, biggest first.
-    const byReason = useMemo(() => {
-        const m = new Map();
-        rows.forEach((r) => {
-            const cur = m.get(r.reason) || { reason: r.reason, count: 0, color: OUTCOME[r.key].dot };
-            cur.count += 1; m.set(r.reason, cur);
-        });
-        const arr = [...m.values()].sort((a, b) => b.count - a.count);
-        const max = arr.reduce((n, x) => Math.max(n, x.count), 1);
-        return { arr, max };
-    }, [rows]);
-
-    const firstOutstanding = shown.find((r) => !r.resolved) || rows.find((r) => !r.resolved) || null;
-
     const exportCsv = () => {
         const head = ['Resident', 'Room', 'Medication', 'When', 'Outcome', 'Reason', 'Resolved'];
         const esc = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
         const lines = shown.map((r) => [r.resident_name, r.room, r.medication_name, `${r.slot} ${relDay(date, todayDate)}`, r.outLabel, r.reason, r.resolved ? 'Yes' : 'No'].map(esc).join(','));
-        const blob = new Blob([[head.join(','), ...lines].join('\n')], { type: 'text/csv' });
+        // Prepend a UTF-8 BOM so Excel renders accented names correctly.
+        const blob = new Blob(['﻿' + [head.join(','), ...lines].join('\n')], { type: 'text/csv;charset=utf-8' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url; a.download = `missed-doses-${date}.csv`;
@@ -313,7 +283,8 @@ export default function MissedDoses({ items = [], date, prevDate, nextDate, toda
         const esc = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
         const histStr = (r) => (r.history || []).map((h) => `${h.action} by ${h.by || '?'} @ ${h.at || '?'}: ${h.clinical_action || ''}${h.notes ? ' — ' + h.notes : ''}`).join('  |  ');
         const lines = rows.map((r) => [r.resident_name, r.room, r.medication_name, r.slot, date, r.outLabel, r.reason, r.resolved ? 'Yes' : 'No', r.clinical_action, r.notes, r.reviewed_by, r.reviewed_at, histStr(r)].map(esc).join(','));
-        const blob = new Blob([[head.join(','), ...lines].join('\n')], { type: 'text/csv' });
+        // Prepend a UTF-8 BOM so Excel renders accented names correctly.
+        const blob = new Blob(['﻿' + [head.join(','), ...lines].join('\n')], { type: 'text/csv;charset=utf-8' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url; a.download = `missed-doses-audit-${date}.csv`;
@@ -339,71 +310,101 @@ export default function MissedDoses({ items = [], date, prevDate, nextDate, toda
                         <Group gap={13} wrap="nowrap" align="center">
                             <ThemeIcon size={44} radius={13} style={{ background: 'light-dark(#FBE9EC, rgba(196,61,107,0.18))', color: '#C43D6B', flexShrink: 0 }}><IconAlertTriangle size={23} stroke={1.9} /></ThemeIcon>
                             <Box style={{ minWidth: 0 }}>
-                                <Text fz={20} fw={800} c={TXT} lh={1.2}>Missed &amp; refused doses</Text>
+                                <Text fz={27} fw={800} c={TXT} lh={1.2}>Missed doses</Text>
                                 <Text fz={12.5} fw={500} c="light-dark(#586A85, #9AA8BE)" mt={2}>{[relDay(date, todayDate), home, `${stats.followups} need follow-up`].filter(Boolean).join(' · ')}</Text>
                             </Box>
                         </Group>
                         <Group gap={8} wrap="nowrap" style={{ width: 'fit-content', background: 'light-dark(#E3E9F2, rgba(255,255,255,0.05))', borderRadius: 999, padding: '3px 4px 3px 12px' }}>
                             <Box w={7} h={7} style={{ borderRadius: '50%', background: '#1F9E93', boxShadow: '0 0 0 3px rgba(31,158,147,0.18)' }} />
                             <Text fz={11.5} fw={600} c="light-dark(#48576E, #A9B6CB)">Live · data as of {loadedTime}</Text>
-                            <Tooltip label="Refresh now" withArrow><ActionIcon size="sm" variant="filled" radius="xl" aria-label="Refresh data" onClick={() => router.reload()} style={{ background: 'light-dark(#3A7CA5, #1F9E93)' }}><IconRefresh size={13} stroke={2.6} /></ActionIcon></Tooltip>
+                            <Tooltip label="Refresh now" withArrow><ActionIcon size="sm" variant="filled" radius="xl" aria-label="Refresh data" onClick={() => router.reload()} style={{ background: 'light-dark(#1C325A, #1F9E93)' }}><IconRefresh size={13} stroke={2.6} /></ActionIcon></Tooltip>
                         </Group>
                     </Stack>
                     <Group gap={10} wrap="wrap" style={{ flex: isSm ? '1 1 100%' : undefined, justifyContent: isSm ? 'space-between' : undefined }}>
-                        <Group gap={6} wrap="nowrap" style={{ ...card, borderRadius: 12, padding: '5px 6px', boxShadow: '0 2px 6px rgba(20,50,80,0.05)' }}>
+                        <Group gap={4} wrap="nowrap" h={42} style={{ ...card, borderRadius: 14, padding: '0 5px', boxShadow: '0 6px 16px -10px rgba(20,50,80,0.4)' }}>
                             <Tooltip label="Previous day" withArrow><ActionIcon variant="subtle" color="gray" radius="xl" aria-label="Previous day" onClick={() => reload({ date: prevDate })}><IconChevronLeft size={16} /></ActionIcon></Tooltip>
-                            <TextInput variant="unstyled" type="date" size="xs" value={date || ''} onChange={(e) => reload({ date: e.currentTarget.value })} styles={{ input: { fontWeight: 700, fontSize: 13, color: 'var(--mantine-color-text)', width: 132, textAlign: 'center', cursor: 'pointer' } }} />
-                            <Tooltip label="Next day" withArrow><ActionIcon variant="subtle" color="gray" radius="xl" aria-label="Next day" onClick={() => reload({ date: nextDate })}><IconChevronRight size={16} /></ActionIcon></Tooltip>
-                            <Button size="compact-sm" variant="subtle" color="indigo" radius="xl" onClick={() => reload({ date: todayDate })} styles={{ label: { fontSize: 13, fontWeight: 700 } }}>Today</Button>
+                            <TextInput variant="unstyled" type="date" size="xs" value={date || ''} max={todayDate} onChange={(e) => reload({ date: e.currentTarget.value })} styles={{ input: { fontWeight: 700, fontSize: 13, color: 'light-dark(#1C325A, #9DB6E8)', width: 108, textAlign: 'center', cursor: 'pointer' } }} />
+                            <Tooltip label={atToday ? 'No future doses' : 'Next day'} withArrow><ActionIcon variant="subtle" color="gray" radius="xl" aria-label="Next day" disabled={atToday} onClick={() => !atToday && reload({ date: nextDate })}><IconChevronRight size={16} /></ActionIcon></Tooltip>
+                            <Box w={1} h={20} mx={2} style={{ background: 'light-dark(#E3E8EF, rgba(255,255,255,0.12))', flexShrink: 0 }} />
+                            <Button size="compact-sm" variant="subtle" color="indigo" radius="xl" onClick={() => reload({ date: todayDate })} styles={{ root: { paddingLeft: 8, paddingRight: 10 }, label: { fontSize: 13, fontWeight: 700 } }}>Today</Button>
                         </Group>
-                        <Button variant="default" radius={12} leftSection={<IconShieldCheck size={16} />} onClick={exportAudit}>Download audit</Button>
-                        <Button radius={12} leftSection={<IconDownload size={16} />} onClick={exportCsv}
-                            style={{ background: 'light-dark(#3A7CA5, #1F9E93)', paddingInline: 18, boxShadow: 'light-dark(0 8px 18px rgba(58,124,165,0.28), 0 8px 18px rgba(31,158,147,0.35))' }}>Export report</Button>
+                        <Tooltip label="Full audit trail (all events, incl. change log)" withArrow openDelay={300}>
+                            <Button variant="default" h={42} radius={14} leftSection={<IconShieldCheck size={16} />} onClick={exportAudit}
+                                style={{ boxShadow: '0 6px 16px -10px rgba(20,50,80,0.4)' }}>Download audit</Button>
+                        </Tooltip>
+                        <Tooltip label="Export the current filtered view as CSV" withArrow openDelay={300}>
+                            <Button h={42} radius={14} leftSection={<IconDownload size={16} />} onClick={exportCsv}
+                                style={{ background: 'light-dark(#1C325A, #1F9E93)', paddingInline: 20, boxShadow: 'light-dark(0 10px 22px -8px rgba(28,50,90,0.45), 0 10px 22px -8px rgba(31,158,147,0.45))' }}>Export report</Button>
+                        </Tooltip>
                     </Group>
                 </Group>
 
                 {/* Distribution summary — full-width donut + horizontal legend. */}
                 {(() => {
+                    // Outstanding view — the donut shows only doses still needing follow-up. The three reasons
+                    // are mutually exclusive, so they sum cleanly to the total (Follow-ups pending = that total).
+                    const openRefused = rows.filter((r) => r.key === 'refused' && !r.resolved).length;
+                    const openOmitted = rows.filter((r) => r.key === 'omitted' && !r.resolved).length;
+                    const totalOpen = stats.followups; // = openRefused + openOmitted + stats.overdue
                     const SEG = [
-                        { label: 'Refused', count: stats.refused, color: '#C43D6B', tab: 'refused' },
-                        { label: 'Omitted', count: stats.omitted, color: '#6B4E86', tab: 'omitted' },
-                        { label: 'Overdue unresolved', count: stats.overdue, color: '#E8842B', tab: 'overdue' },
-                        { label: 'Follow-ups pending', count: stats.followups, color: '#3A7CA5', tab: 'followups' },
+                        { label: 'Refused', count: openRefused, color: '#C43D6B', tab: 'refused' },
+                        { label: 'Omitted', count: openOmitted, color: '#6B4E86', tab: 'omitted' },
+                        { label: 'Overdue', count: stats.overdue, color: '#E8842B', tab: 'overdue' },
+                        { label: 'Follow-ups pending', count: totalOpen, color: '#3A7CA5', tab: 'followups' },
                     ];
-                    const total = SEG.reduce((n, s) => n + s.count, 0);
-                    const pct = (n) => (total ? Math.round((n / total) * 100) : 0);
-                    const sections = SEG.filter((s) => s.count > 0).map((s) => ({ value: pct(s.count), color: s.color }));
-                    const numColor = (label) => (label === 'Overdue unresolved' ? '#E8842B' : label === 'Follow-ups pending' ? '#3A7CA5' : TXT);
+                    const total = totalOpen;
+                    const pct = (n) => (totalOpen ? Math.round((n / totalOpen) * 100) : 0);
+                    // Ring slices = the three reasons only; Follow-ups pending is their sum, shown as the centre total.
+                    const sections = SEG.filter((s) => s.tab !== 'followups' && s.count > 0).map((s) => ({
+                        value: pct(s.count), color: s.color,
+                        tooltip: `${s.label} — ${s.count} ${s.count === 1 ? 'dose' : 'doses'} (${pct(s.count)}%)`,
+                    }));
+                    const numColor = (label) => (label === 'Overdue' ? '#E8842B' : label === 'Follow-ups pending' ? '#3A7CA5' : TXT);
                     return (
-                        <Box style={{ ...card, marginBottom: 20, padding: isSm ? '13px 14px' : '14px 24px' }}>
+                        <Box style={{ ...card, background: BANNER_GRADIENT, zoom: 0.8, transformOrigin: 'top left', marginBottom: 20, padding: isSm ? '12px 14px' : '13px 24px', boxShadow: '0 10px 26px rgba(19,35,63,0.22)' }}>
                             <Group align="center" gap={isSm ? 16 : 30} wrap="wrap">
-                                <RingProgress
-                                    size={124} thickness={14} roundCaps
-                                    sections={sections.length ? sections : [{ value: 100, color: 'light-dark(#EEF1F5, var(--mantine-color-dark-5))' }]}
-                                    label={<Box ta="center"><Text fz={25} fw={800} c={TXT} lh={1}>{total}</Text><Text fz={11.5} c="dimmed">events</Text></Box>}
-                                />
+                                {/* Hover each coloured slice to see its reason + count (like a pie chart). Clicking anywhere on the ring shows all. */}
+                                <Box role="button" tabIndex={0} aria-label="Outstanding doses by reason — click to show all"
+                                    onClick={() => { setTab('all'); setQuery(''); }}
+                                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTab('all'); setQuery(''); } }}
+                                    style={{ cursor: 'pointer', borderRadius: '50%', lineHeight: 0, transition: 'transform .15s' }}
+                                    onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.04)'; }}
+                                    onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}>
+                                    <RingProgress
+                                        size={162} thickness={17} roundCaps
+                                        sections={sections.length ? sections : [{ value: 100, color: 'light-dark(#EEF1F5, var(--mantine-color-dark-5))' }]}
+                                        label={<Box ta="center"><Text fz={26} fw={800} c={TXT} lh={1}>{total}</Text><Text fz={12} c="dimmed">outstanding</Text></Box>}
+                                    />
+                                </Box>
                                 <Box style={{ flex: 1, minWidth: 0, display: 'flex', flexWrap: 'wrap' }}>
-                                    {SEG.map((s, i) => (
+                                    {SEG.map((s, i) => {
+                                        // Every legend card FILTERS the table. Follow-ups pending (the total) maps to
+                                        // the "outstanding" filter; the others to their own reason. Click again → All.
+                                        const segTab = s.tab === 'followups' ? 'outstanding' : s.tab;
+                                        const segOn = tab === segTab;
+                                        return (
                                         <Box key={s.label} component="button" type="button"
-                                            onClick={() => (s.tab === 'followups' ? (firstOutstanding && openResolve(firstOutstanding)) : setTab(tab === s.tab ? 'all' : s.tab))}
-                                            onMouseEnter={(e) => { if (tab !== s.tab) e.currentTarget.style.background = 'light-dark(#EEF2F7, rgba(255,255,255,0.04))'; }}
-                                            onMouseLeave={(e) => { e.currentTarget.style.background = tab === s.tab ? 'light-dark(#E9EEF5, rgba(255,255,255,0.06))' : 'transparent'; }}
+                                            title={s.tab === 'followups' ? 'Show all outstanding' : `Show ${s.label.toLowerCase()}`}
+                                            onClick={() => setTab(segOn ? 'all' : segTab)}
+                                            onMouseEnter={(e) => { if (!segOn) e.currentTarget.style.background = 'light-dark(rgba(255,255,255,0.55), rgba(255,255,255,0.04))'; }}
+                                            onMouseLeave={(e) => { e.currentTarget.style.background = segOn ? 'light-dark(rgba(255,255,255,0.75), rgba(255,255,255,0.06))' : 'transparent'; }}
                                             style={{
                                                 flex: '1 1 130px', minWidth: 0, textAlign: 'left', cursor: 'pointer', border: 'none', borderRadius: 12,
                                                 padding: isSm ? '8px 12px' : '5px 18px', transition: 'background .14s',
-                                                background: tab === s.tab ? 'light-dark(#E9EEF5, rgba(255,255,255,0.06))' : 'transparent',
-                                                boxShadow: i ? 'inset 1px 0 0 light-dark(#E9ECF1, rgba(255,255,255,0.08))' : 'none',
+                                                background: segOn ? 'light-dark(rgba(255,255,255,0.75), rgba(255,255,255,0.06))' : 'transparent',
+                                                boxShadow: i ? 'inset 1px 0 0 light-dark(rgba(19,35,63,0.08), rgba(255,255,255,0.08))' : 'none',
                                             }}>
                                             <Group gap={8} wrap="nowrap" mb={6} style={{ minWidth: 0 }}>
                                                 <Box w={9} h={9} style={{ borderRadius: '50%', background: s.color, flexShrink: 0 }} />
-                                                <Text fz={14} fw={600} c="light-dark(#586A85, #9AA8BE)" truncate>{s.label}</Text>
+                                                <Text fz={15} fw={600} c="light-dark(#586A85, #9AA8BE)" truncate>{s.label}</Text>
                                             </Group>
                                             <Group gap={9} align="baseline" wrap="nowrap">
                                                 <Text fz={34} fw={800} c={numColor(s.label)} lh={1}>{s.count}</Text>
                                                 <Text fz={14} fw={600} c="dimmed">{pct(s.count)}%</Text>
                                             </Group>
                                         </Box>
-                                    ))}
+                                        );
+                                    })}
                                 </Box>
                             </Group>
                         </Box>
@@ -413,19 +414,20 @@ export default function MissedDoses({ items = [], date, prevDate, nextDate, toda
                 {/* Log + rail */}
                 <Box style={{ display: 'flex', flexWrap: 'wrap', gap: 20, alignItems: 'flex-start' }}>
                     {/* Log */}
-                    <Box style={{ ...card, flex: '1 1 480px', minWidth: 0, padding: isSm ? '16px 14px' : '22px 24px' }}>
+                    <Box style={{ ...card, background: BANNER_GRADIENT_REV, flex: '1 1 480px', minWidth: 0, padding: isSm ? '16px 14px' : '22px 24px' }}>
                         <Group justify="space-between" align="center" pb={14} wrap="wrap" gap="sm">
                             <Group gap={22} wrap="nowrap" style={{ flex: '1 1 240px', minWidth: 0 }}>
-                                <Text fz={18} fw={800} c={TXT}>Log</Text>
+                                <Text fz={24} fw={800} c={TXT}>Log</Text>
                                 <TextInput
-                                    size="xs" radius="md" flex="1 1 auto" maw={280}
+                                    size="sm" radius="xl" flex="1 1 auto" maw={340}
                                     placeholder="Search resident, room or medication…"
-                                    leftSection={<IconSearch size={14} />}
+                                    leftSection={<IconSearch size={16} />}
                                     value={query} onChange={(e) => setQuery(e.currentTarget.value)}
-                                    rightSection={query ? <ActionIcon size="sm" variant="subtle" color="gray" radius="xl" aria-label="Clear search" onClick={() => setQuery('')}><IconX size={12} /></ActionIcon> : null}
+                                    rightSection={query ? <ActionIcon size="sm" variant="subtle" color="gray" radius="xl" aria-label="Clear search" onClick={() => setQuery('')}><IconX size={13} /></ActionIcon> : null}
+                                    styles={{ input: { borderRadius: 999, boxShadow: '0 6px 16px -5px rgba(19,35,63,0.4), inset 0 1px 2px rgba(19,35,63,0.06)', paddingLeft: 38 } }}
                                 />
                             </Group>
-                            <Group gap={3} wrap="nowrap" style={{ background: 'light-dark(#E3E9F2, var(--mantine-color-dark-8))', borderRadius: 11, padding: 4 }}>
+                            <Group gap={3} wrap="nowrap" style={{ background: 'light-dark(#E3E9F2, var(--mantine-color-dark-8))', borderRadius: 11, padding: 4, boxShadow: 'inset 0 1px 3px light-dark(rgba(19,35,63,0.10), rgba(0,0,0,0.30))' }}>
                                 {TABS.map((t) => {
                                     const on = tab === t.k;
                                     return (
@@ -466,16 +468,22 @@ export default function MissedDoses({ items = [], date, prevDate, nextDate, toda
                                 const o = OUTCOME[r.key];
                                 return (
                                     <Group key={r.id} gap={14} wrap="nowrap" align="center" px={4} py={17}
+                                        role="button" tabIndex={0} aria-label={`${r.resolved ? 'View' : 'Resolve'} ${r.resident_name} — ${r.medication_name}, ${r.slot}`}
                                         onClick={() => (r.resolved ? openView(r) : openResolve(r))}
+                                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); r.resolved ? openView(r) : openResolve(r); } }}
                                         style={{ cursor: 'pointer', borderTop: idx ? '1px solid light-dark(#F3F5F8, var(--mantine-color-dark-5))' : 'none', borderRadius: 10, transition: 'background .15s' }}
-                                        onMouseEnter={(e) => { e.currentTarget.style.background = 'light-dark(#E4EAF3, var(--mantine-color-dark-5))'; }}
+                                        onFocus={(e) => { e.currentTarget.style.background = 'light-dark(rgba(28,50,90,0.20), var(--mantine-color-dark-5))'; e.currentTarget.style.outline = '2px solid #1F9E93'; e.currentTarget.style.outlineOffset = '-2px'; }}
+                                        onBlur={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.outline = 'none'; }}
+                                        onMouseEnter={(e) => { e.currentTarget.style.background = 'light-dark(rgba(28,50,90,0.20), var(--mantine-color-dark-5))'; }}
                                         onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}>
                                         {/* Resident */}
                                         <Group gap="sm" wrap="nowrap" style={{ flex: '2 1 180px', minWidth: 0 }}>
-                                            <Avatar color={avatarColor(r.resident_name ?? '')} radius="xl" size={38}>{initials(r.resident_name ?? '')}</Avatar>
+                                            <Avatar color={avatarColor(r.resident_name ?? '')} radius="xl" size={38} style={{ boxShadow: '0 4px 10px -4px rgba(20,50,80,0.4)', flexShrink: 0 }}>{initials(r.resident_name ?? '')}</Avatar>
                                             <Box style={{ minWidth: 0 }}>
                                                 <Text fz={13.5} fw={700} c={TXT} truncate>{r.resident_name}</Text>
                                                 <Text fz={11.5} c="dimmed" truncate>{r.room ? `Room ${r.room}` : '—'}</Text>
+                                                {/* On phone the Medication/reason column is hidden — surface the reason here so it isn't lost. */}
+                                                <Text hiddenFrom="sm" fz={11} c={r.resolved ? '#1F8A5B' : o.c} truncate mt={2}>{r.resolved ? 'Resolved' : r.reason}</Text>
                                             </Box>
                                         </Group>
                                         {/* Medication + reason */}
@@ -493,8 +501,8 @@ export default function MissedDoses({ items = [], date, prevDate, nextDate, toda
                                         {/* Outcome */}
                                         <Box style={{ width: 96, flexShrink: 0 }}>
                                             {r.resolved
-                                                ? <Box style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '4px 10px', borderRadius: 999, fontSize: 10.5, fontWeight: 800, letterSpacing: 0.4, background: 'light-dark(#E7F3E8, rgba(31,138,91,0.2))', color: '#1F8A5B' }}><IconCheck size={11} stroke={3} />RESOLVED</Box>
-                                                : <Box style={{ display: 'inline-flex', alignItems: 'center', padding: '4px 11px', borderRadius: 999, fontSize: 10.5, fontWeight: 800, letterSpacing: 0.5, background: o.bg, color: o.c }}>{r.outLabel.toUpperCase()}</Box>}
+                                                ? <Box style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '4px 10px', borderRadius: 999, fontSize: 10.5, fontWeight: 800, letterSpacing: 0.4, background: 'light-dark(#E7F3E8, rgba(31,138,91,0.2))', color: '#1F8A5B', boxShadow: '0 3px 8px -4px rgba(31,138,91,0.5)' }}><IconCheck size={11} stroke={3} />RESOLVED</Box>
+                                                : <Box style={{ display: 'inline-flex', alignItems: 'center', padding: '4px 11px', borderRadius: 999, fontSize: 10.5, fontWeight: 800, letterSpacing: 0.5, background: o.bg, color: o.c, boxShadow: '0 3px 8px -4px rgba(20,50,80,0.35)' }}>{r.outLabel.toUpperCase()}</Box>}
                                         </Box>
                                         <ActionIcon variant="subtle" color="gray" radius="xl" style={{ flexShrink: 0 }}><IconChevronRight size={16} /></ActionIcon>
                                     </Group>

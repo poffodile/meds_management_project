@@ -4,10 +4,13 @@ namespace App\Http\Controllers\frontEnd\Medication;
 
 use App\Http\Controllers\Controller;
 use App\Models\MARSheet;
+use App\Models\MedicationStockBatch;
+use App\Models\MedicationStockOrder;
 use App\Models\MedicationStockTransaction;
 use App\ServiceUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 use Inertia\Inertia;
 
 class MedicationStockController extends Controller
@@ -101,6 +104,9 @@ class MedicationStockController extends Controller
             'disposal_method' => 'nullable|string|max:255',
             'witness_name' => 'nullable|string|max:255',
             'notes' => 'nullable|string',
+            'batch_number' => 'nullable|string|max:100',
+            'supplier' => 'nullable|string|max:255',
+            'barcode' => 'nullable|string|max:100',
         ]);
 
         $homeId = $this->getHomeId();
@@ -110,9 +116,12 @@ class MedicationStockController extends Controller
             return 'Medication not found.';
         }
 
-        // Update tracked details (expiry + controlled-drug flag) on the medication.
+        // Update tracked details (expiry + controlled-drug flag + barcode) on the medication.
         if ($request->filled('expiry_date')) {
             $sheet->expiry_date = $request->input('expiry_date');
+        }
+        if ($request->has('barcode') && Schema::hasColumn('mar_sheets', 'barcode')) {
+            $sheet->barcode = $request->input('barcode') ?: null;
         }
         $sheet->is_controlled = $request->boolean('is_controlled');
         $sheet->cd_schedule = $request->boolean('is_controlled') ? $request->input('cd_schedule') : null;
@@ -134,6 +143,22 @@ class MedicationStockController extends Controller
                     'notes' => $request->input('notes'),
                 ]
             );
+
+            // Batch tracking (#30) — booking stock IN creates a batch (its own expiry/lot).
+            if ($request->input('transaction_type') === 'received' && Schema::hasTable('medication_stock_batches')) {
+                MedicationStockBatch::create([
+                    'home_id' => $homeId,
+                    'mar_sheet_id' => $sheet->id,
+                    'client_id' => $sheet->client_id,
+                    'batch_number' => $request->input('batch_number'),
+                    'quantity' => (float) $request->input('quantity'),
+                    'received_quantity' => (float) $request->input('quantity'),
+                    'expiry_date' => $request->filled('expiry_date') ? $request->input('expiry_date') : null,
+                    'supplier' => $request->input('supplier'),
+                    'performed_by_user_id' => (int) Auth::id(),
+                    'received_at' => now(),
+                ]);
+            }
         }
 
         return null;
@@ -197,6 +222,82 @@ class MedicationStockController extends Controller
             ->with($error ? 'error' : 'success', $error ?? 'Stock updated.');
     }
 
+    /** "Stock 2" — redesigned copy (Missed-doses design language). Same data + adjust logic. */
+    public function indexFrontend2Stock2(Request $request)
+    {
+        return Inertia::render('Frontend2/Stock2', $this->stockReactData());
+    }
+
+    public function adjustFrontend2Stock2(Request $request)
+    {
+        $error = $this->runAdjustment($request);
+
+        return redirect()->route('frontend2.stock-2')
+            ->with($error ? 'error' : 'success', $error ?? 'Stock updated.');
+    }
+
+    /**
+     * Stock count / reconciliation (#31) — apply physical-count corrections in bulk.
+     * Each changed item posts a `correction` transaction (absolute recount).
+     * Controlled drugs require a witness.
+     */
+    public function reconcileFrontend2Stock2(Request $request)
+    {
+        $request->validate([
+            'counts' => 'required|array|min:1',
+            'counts.*.mar_sheet_id' => 'required|integer',
+            'counts.*.counted' => 'required|numeric|min:0',
+            'counts.*.reason' => 'nullable|string|max:255',
+            'counts.*.witness_name' => 'nullable|string|max:255',
+        ]);
+
+        $homeId = $this->getHomeId();
+        $applied = 0;
+        $skipped = 0;
+
+        foreach ($request->input('counts') as $row) {
+            $sheet = MARSheet::forHome($homeId)->active()->find($row['mar_sheet_id']);
+            if (! $sheet) {
+                continue;
+            }
+
+            $counted = (float) $row['counted'];
+            $current = (float) ($sheet->stock_level ?? 0);
+            if ($counted === $current) {
+                continue; // no discrepancy, nothing to post
+            }
+
+            // Controlled drugs must be witnessed.
+            if ($sheet->is_controlled && empty($row['witness_name'])) {
+                $skipped++;
+                continue;
+            }
+
+            $resident = ServiceUser::where('id', $sheet->client_id)->first();
+            MedicationStockTransaction::apply(
+                $sheet,
+                'correction',
+                $counted,
+                (int) Auth::id(),
+                [
+                    'client_name' => $resident->name ?? null,
+                    'reason' => $row['reason'] ?: 'Stock count',
+                    'witness_name' => $row['witness_name'] ?? null,
+                    'notes' => 'Reconciled via stock count (was '.$current.', counted '.$counted.').',
+                ]
+            );
+            $applied++;
+        }
+
+        $msg = $applied ? "{$applied} item".($applied === 1 ? '' : 's').' reconciled.' : 'No changes applied.';
+        if ($skipped) {
+            $msg .= " {$skipped} controlled-drug item".($skipped === 1 ? '' : 's').' skipped (missing witness).';
+        }
+
+        return redirect()->route('frontend2.stock-2')
+            ->with($skipped && ! $applied ? 'error' : 'success', $msg);
+    }
+
     /**
      * Build the React stock payload (meds, transactions, stats) shared by the
      * live page and the lab copy.
@@ -216,14 +317,30 @@ class MedicationStockController extends Controller
 
         $today = now()->startOfDay();
 
-        $meds = $sheets->map(function ($s) use ($residentNames, $today) {
+        // Batch / lot tracking (#30) — live batches per sheet, FEFO-ordered.
+        // Guarded so the page still works before the migration is run.
+        $batchesBySheet = collect();
+        if (Schema::hasTable('medication_stock_batches')) {
+            $batchesBySheet = MedicationStockBatch::forHome($homeId)
+                ->where('is_depleted', false)
+                ->where('quantity', '>', 0)
+                ->orderByRaw('expiry_date IS NULL, expiry_date ASC')
+                ->orderBy('id')
+                ->get()
+                ->groupBy('mar_sheet_id');
+        }
+
+        $meds = $sheets->map(function ($s) use ($residentNames, $today, $batchesBySheet) {
             $low = ! is_null($s->stock_level) && ! is_null($s->reorder_level) && $s->stock_level <= $s->reorder_level;
             $expired = $s->expiry_date && $s->expiry_date->lt($today);
             $expiringSoon = $s->expiry_date && ! $expired && $s->expiry_date->lte($today->copy()->addDays(30));
 
+            $sheetBatches = $batchesBySheet[$s->id] ?? collect();
+
             return [
                 'id' => $s->id,
                 'medication_name' => $s->medication_name,
+                'client_id' => $s->client_id,
                 'resident' => $residentNames[$s->client_id] ?? null,
                 'stock_level' => $s->stock_level,
                 'reorder_level' => $s->reorder_level,
@@ -231,9 +348,17 @@ class MedicationStockController extends Controller
                 'expiry_date' => $s->expiry_date ? $s->expiry_date->format('d M Y') : null,
                 'is_controlled' => (bool) $s->is_controlled,
                 'cd_schedule' => $s->cd_schedule,
+                'barcode' => $s->barcode,
                 'low' => $low,
                 'expired' => $expired,
                 'expiring_soon' => $expiringSoon,
+                'batches' => $sheetBatches->map(fn ($b) => [
+                    'id' => $b->id,
+                    'batch_number' => $b->batch_number,
+                    'quantity' => $b->quantity,
+                    'expiry_date' => $b->expiry_date ? $b->expiry_date->format('d M Y') : null,
+                    'supplier' => $b->supplier,
+                ])->values(),
             ];
         })->values();
 
@@ -266,10 +391,136 @@ class MedicationStockController extends Controller
             'controlled' => $meds->where('is_controlled', true)->count(),
         ];
 
+        // Reorder → ordering (#32) — open orders for the home (guarded pre-migration).
+        $orders = [];
+        if (Schema::hasTable('medication_stock_orders')) {
+            $orders = MedicationStockOrder::forHome($homeId)->open()
+                ->orderByDesc('ordered_at')->orderByDesc('id')->get()
+                ->map(fn ($o) => [
+                    'id' => $o->id,
+                    'mar_sheet_id' => $o->mar_sheet_id,
+                    'medication_name' => $o->medication_name,
+                    'quantity' => $o->quantity,
+                    'supplier' => $o->supplier,
+                    'ordered_at' => $o->ordered_at ? $o->ordered_at->format('d M Y') : null,
+                    'resident' => $residentNames[$o->client_id] ?? null,
+                ])->values();
+        }
+
+        // Residents that have medications on this home's stock — for client-first pickers (#37).
+        $residents = $residentNames
+            ->map(fn ($name, $id) => ['id' => (int) $id, 'name' => $name])
+            ->sortBy('name')
+            ->values();
+
         return [
             'meds' => $meds,
             'transactions' => $transactions,
             'stats' => $stats,
+            'orders' => $orders,
+            'residents' => $residents,
         ];
+    }
+
+    /** Raise a reorder line for a low medicine (#32). */
+    public function createOrderFrontend2Stock2(Request $request)
+    {
+        $request->validate([
+            'mar_sheet_id' => 'required|integer',
+            'quantity' => 'required|numeric|min:1',
+            'supplier' => 'nullable|string|max:255',
+            'notes' => 'nullable|string|max:1000',
+        ]);
+
+        $homeId = $this->getHomeId();
+        $sheet = MARSheet::forHome($homeId)->active()->find($request->input('mar_sheet_id'));
+
+        if (! $sheet) {
+            return redirect()->route('frontend2.stock-2')->with('error', 'Medication not found.');
+        }
+
+        MedicationStockOrder::create([
+            'home_id' => $homeId,
+            'mar_sheet_id' => $sheet->id,
+            'client_id' => $sheet->client_id,
+            'medication_name' => $sheet->medication_name,
+            'quantity' => (float) $request->input('quantity'),
+            'supplier' => $request->input('supplier'),
+            'status' => 'ordered',
+            'notes' => $request->input('notes'),
+            'created_by_user_id' => (int) Auth::id(),
+            'ordered_at' => now(),
+        ]);
+
+        return redirect()->route('frontend2.stock-2')->with('success', 'Order placed.');
+    }
+
+    /** Receive an open order — books the stock in (creates a batch) and closes the order. */
+    public function receiveOrderFrontend2Stock2(Request $request)
+    {
+        $request->validate([
+            'order_id' => 'required|integer',
+            'quantity' => 'required|numeric|min:0',
+            'expiry_date' => 'nullable|date',
+            'batch_number' => 'nullable|string|max:100',
+        ]);
+
+        $homeId = $this->getHomeId();
+        $order = MedicationStockOrder::forHome($homeId)->open()->find($request->input('order_id'));
+
+        if (! $order) {
+            return redirect()->route('frontend2.stock-2')->with('error', 'Order not found or already closed.');
+        }
+
+        $sheet = MARSheet::forHome($homeId)->active()->find($order->mar_sheet_id);
+        if (! $sheet) {
+            return redirect()->route('frontend2.stock-2')->with('error', 'Medication not found.');
+        }
+
+        $qty = (float) $request->input('quantity');
+        if ($qty > 0) {
+            $resident = ServiceUser::where('id', $sheet->client_id)->first();
+            MedicationStockTransaction::apply($sheet, 'received', $qty, (int) Auth::id(), [
+                'client_name' => $resident->name ?? null,
+                'reason' => 'Order received',
+                'notes' => 'Booked in against order #'.$order->id,
+            ]);
+
+            if (Schema::hasTable('medication_stock_batches')) {
+                MedicationStockBatch::create([
+                    'home_id' => $homeId,
+                    'mar_sheet_id' => $sheet->id,
+                    'client_id' => $sheet->client_id,
+                    'batch_number' => $request->input('batch_number'),
+                    'quantity' => $qty,
+                    'received_quantity' => $qty,
+                    'expiry_date' => $request->filled('expiry_date') ? $request->input('expiry_date') : null,
+                    'supplier' => $order->supplier,
+                    'performed_by_user_id' => (int) Auth::id(),
+                    'received_at' => now(),
+                ]);
+            }
+        }
+
+        $order->status = 'received';
+        $order->received_quantity = $qty;
+        $order->received_at = now();
+        $order->save();
+
+        return redirect()->route('frontend2.stock-2')->with('success', 'Order received and booked in.');
+    }
+
+    /** Cancel an open order. */
+    public function cancelOrderFrontend2Stock2(Request $request)
+    {
+        $request->validate(['order_id' => 'required|integer']);
+        $homeId = $this->getHomeId();
+        $order = MedicationStockOrder::forHome($homeId)->open()->find($request->input('order_id'));
+        if ($order) {
+            $order->status = 'cancelled';
+            $order->save();
+        }
+
+        return redirect()->route('frontend2.stock-2')->with('success', 'Order cancelled.');
     }
 }

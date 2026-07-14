@@ -1515,7 +1515,7 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 
     // BMP
     Route::match(['get', 'post'], '/service/bmp/view/{service_user_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\BmpController@index');
-    Route::post('/service/bmp/add', 'fApp\Http\Controllers\frontEnd\ServiceUserManagement\BmpController@add_bmp');
+    Route::post('/service/bmp/add', 'App\Http\Controllers\frontEnd\ServiceUserManagement\BmpController@add_bmp');
     Route::match(['get', 'post'], '/service/bmp/edit', 'App\Http\Controllers\frontEnd\ServiceUserManagement\BmpController@edit');
     Route::get('/service/bmp/delete/{su_bmp_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\BmpController@delete');
     Route::get('/service/bmp/view_bmp/{su_bmp_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\BmpController@view_bmp');
@@ -1651,6 +1651,13 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
     Route::post('/frontend2/controlled-drugs', [ControlledDrugRegisterController::class, 'storeFrontend2'])->name('frontend2.controlled-drugs.store');
     Route::get('/frontend2/stock', [MedicationStockController::class, 'indexFrontend2'])->name('frontend2.stock');
     Route::post('/frontend2/stock/adjust', [MedicationStockController::class, 'adjustFrontend2'])->name('frontend2.stock.adjust');
+    // Stock 2 — redesigned copy (parked in the Duplicates menu).
+    Route::get('/frontend2/stock-2', [MedicationStockController::class, 'indexFrontend2Stock2'])->name('frontend2.stock-2');
+    Route::post('/frontend2/stock-2/adjust', [MedicationStockController::class, 'adjustFrontend2Stock2'])->name('frontend2.stock-2.adjust');
+    Route::post('/frontend2/stock-2/count', [MedicationStockController::class, 'reconcileFrontend2Stock2'])->name('frontend2.stock-2.count');
+    Route::post('/frontend2/stock-2/order', [MedicationStockController::class, 'createOrderFrontend2Stock2'])->name('frontend2.stock-2.order');
+    Route::post('/frontend2/stock-2/order/receive', [MedicationStockController::class, 'receiveOrderFrontend2Stock2'])->name('frontend2.stock-2.order.receive');
+    Route::post('/frontend2/stock-2/order/cancel', [MedicationStockController::class, 'cancelOrderFrontend2Stock2'])->name('frontend2.stock-2.order.cancel');
     // "Medication 2" — placeholder pages (second meds area).
     Route::get('/frontend2/medication-2/{page}', [Frontend2Controller::class, 'medication2'])->name('frontend2.medication2');
 

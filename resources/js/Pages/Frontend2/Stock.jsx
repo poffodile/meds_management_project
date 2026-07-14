@@ -2,11 +2,12 @@ import { useState, useMemo } from 'react';
 import { Head, useForm } from '@inertiajs/react';
 import { useDisclosure } from '@mantine/hooks';
 import {
-    Box, Group, Text, TextInput, Badge, Button, ThemeIcon, SimpleGrid, Progress,
+    Box, Group, Text, TextInput, Badge, Button, ThemeIcon, Progress,
     SegmentedControl, Modal, Select, NumberInput, Textarea, Checkbox, Stack,
 } from '@mantine/core';
 import {
-    IconSearch, IconPlus, IconBox, IconAlertTriangle, IconCircleX, IconClock, IconCalendar, IconPill, IconShieldLock,
+    IconSearch, IconPlus, IconPill, IconShieldLock,
+    IconPackages, IconTrendingDown, IconPackageOff, IconHourglassHigh, IconCalendarX,
 } from '@tabler/icons-react';
 import AppShell from '@frontend2/Layouts/AppShell';
 import { useRole } from '@frontend/lib/role';
@@ -51,11 +52,43 @@ function stockBar(m) {
 
 function Metric({ icon: Icon, label, value, color }) {
     return (
-        <Box style={{ ...card, padding: 14 }}>
-            <Group gap={10} wrap="nowrap">
-                <ThemeIcon variant="light" color={color} size={38} radius="md"><Icon size={20} stroke={1.7} /></ThemeIcon>
-                <Box><Text fz={24} fw={800} lh={1}>{value}</Text><Text fz="xs" c="dimmed">{label}</Text></Box>
+        <Box style={{
+            ...card, width: 116, padding: '6px 10px', borderRadius: 13,
+            border: '1px solid light-dark(#EAEEF3, rgba(150,172,205,0.18))',
+            boxShadow: '0 8px 20px -12px rgba(20,50,80,0.35)',
+            transition: 'transform .15s ease, box-shadow .15s ease',
+        }}
+            onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 12px 26px -12px rgba(20,50,80,0.45)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 8px 20px -12px rgba(20,50,80,0.35)'; }}>
+            <Group gap={8} wrap="nowrap">
+                <ThemeIcon variant="light" color={color} size={27} radius="md" style={{ boxShadow: '0 4px 10px -5px rgba(20,50,80,0.4)', flexShrink: 0 }}><Icon size={15} stroke={1.9} /></ThemeIcon>
+                <Box style={{ minWidth: 0 }}><Text fz={18} fw={800} lh={1}>{value}</Text><Text fz={10.5} c="dimmed" truncate>{label}</Text></Box>
             </Group>
+        </Box>
+    );
+}
+
+// Pill filter chip — teal filled when active, white outline otherwise, with an icon + count badge.
+function StatPill({ icon: Icon, label, value, active, tint, onClick }) {
+    return (
+        <Box component="button" type="button" onClick={onClick}
+            onMouseEnter={(e) => { if (!active) { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 8px 16px -9px rgba(20,50,80,0.5)'; } }}
+            onMouseLeave={(e) => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = active ? '0 8px 18px -8px rgba(28,156,144,0.6)' : '0 4px 12px -9px rgba(20,50,80,0.4)'; }}
+            style={{
+                display: 'inline-flex', alignItems: 'center', gap: 8, cursor: 'pointer', whiteSpace: 'nowrap',
+                border: active ? '1px solid transparent' : '1px solid light-dark(#E6EAF0, rgba(150,172,205,0.22))',
+                background: active ? 'linear-gradient(180deg, #23B2A4 0%, #1C9C90 100%)' : 'light-dark(#ffffff, var(--mantine-color-dark-6))',
+                borderRadius: 999, padding: active ? '6px 8px 6px 13px' : '6px 13px',
+                boxShadow: active ? '0 8px 18px -8px rgba(28,156,144,0.6)' : '0 4px 12px -9px rgba(20,50,80,0.4)',
+                transition: 'transform .14s ease, box-shadow .14s ease',
+            }}>
+            <Icon size={16} stroke={1.9} color={active ? '#ffffff' : tint} />
+            <Text fz={13} fw={active ? 700 : 600} c={active ? '#ffffff' : 'light-dark(#3E4C63, #C7D1E0)'}>{label}</Text>
+            <Box style={{
+                minWidth: 22, textAlign: 'center', borderRadius: 999, padding: '1px 7px', fontSize: 12, fontWeight: 800,
+                background: active ? '#ffffff' : 'light-dark(#EEF1F6, rgba(255,255,255,0.06))',
+                color: active ? '#1C9C90' : 'light-dark(#6A7A92, #94A2B8)',
+            }}>{value}</Box>
         </Box>
     );
 }
@@ -135,13 +168,22 @@ export default function Stock({ meds = [], stats = {} }) {
                         : <Badge variant="light" color="gray" size="lg" radius="sm">View only</Badge>}
                 </Group>
 
-                <SimpleGrid cols={{ base: 2, sm: 5 }} spacing="md" mb="lg">
-                    <Metric icon={IconBox} label="All items" value={stats.total ?? meds.length} color="indigo" />
-                    <Metric icon={IconAlertTriangle} label="Low" value={stats.low ?? counts.low} color="yellow" />
-                    <Metric icon={IconCircleX} label="Out" value={stats.out_of_stock ?? counts.out} color="orange" />
-                    <Metric icon={IconClock} label="Expiring" value={stats.expiring_soon ?? counts.expiring} color="violet" />
-                    <Metric icon={IconCalendar} label="Expired" value={stats.expired ?? counts.expired} color="red" />
-                </SimpleGrid>
+                <Group gap="sm" mb="lg" wrap="wrap">
+                    <Metric icon={IconPackages} label="All items" value={stats.total ?? meds.length} color="indigo" />
+                    <Metric icon={IconTrendingDown} label="Low" value={stats.low ?? counts.low} color="yellow" />
+                    <Metric icon={IconPackageOff} label="Out" value={stats.out_of_stock ?? counts.out} color="orange" />
+                    <Metric icon={IconHourglassHigh} label="Expiring" value={stats.expiring_soon ?? counts.expiring} color="violet" />
+                    <Metric icon={IconCalendarX} label="Expired" value={stats.expired ?? counts.expired} color="red" />
+                </Group>
+
+                {/* Pill filter row — clickable chips bound to the same filter as the list. */}
+                <Group gap={8} mb="lg" wrap="wrap">
+                    <StatPill icon={IconPackages} label="All items" value={stats.total ?? meds.length} tint="#1C9C90" active={filter === 'all'} onClick={() => setFilter('all')} />
+                    <StatPill icon={IconTrendingDown} label="Low stock" value={stats.low ?? counts.low} tint="#E8842B" active={filter === 'low'} onClick={() => setFilter('low')} />
+                    <StatPill icon={IconPackageOff} label="Out of stock" value={stats.out_of_stock ?? counts.out} tint="#E4574C" active={filter === 'out'} onClick={() => setFilter('out')} />
+                    <StatPill icon={IconHourglassHigh} label="Expiring soon" value={stats.expiring_soon ?? counts.expiring} tint="#8A63C9" active={filter === 'expiring'} onClick={() => setFilter('expiring')} />
+                    <StatPill icon={IconCalendarX} label="Expired" value={stats.expired ?? counts.expired} tint="#C43D6B" active={filter === 'expired'} onClick={() => setFilter('expired')} />
+                </Group>
 
                 <Box style={card}>
                     <Group justify="space-between" align="center" px="md" pt="md" pb="sm" wrap="wrap" gap="sm">

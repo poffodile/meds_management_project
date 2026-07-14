@@ -2,7 +2,9 @@ import React from 'react';
 import { createInertiaApp } from '@inertiajs/react';
 import { createRoot } from 'react-dom/client';
 import { MantineProvider } from '@mantine/core';
+import { Notifications } from '@mantine/notifications';
 import '@mantine/core/styles.css';
+import '@mantine/notifications/styles.css';
 import '../css/app.css';
 import { theme } from '@frontend/theme';
 
@@ -14,6 +16,7 @@ createInertiaApp({
     setup({ el, App, props }) {
         createRoot(el).render(
             <MantineProvider theme={theme}>
+                <Notifications position="bottom-center" limit={3} autoClose={3500} transitionDuration={420} />
                 <App {...props} />
             </MantineProvider>
         );

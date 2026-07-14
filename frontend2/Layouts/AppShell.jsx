@@ -1,16 +1,16 @@
 import { useState, createContext, useContext } from 'react';
 import {
     AppShell as MantineAppShell, Group, Text, Burger, ScrollArea, Box,
-    ActionIcon, UnstyledButton, Menu, Switch, Collapse, Stack, Anchor, useMantineColorScheme, useComputedColorScheme,
+    ActionIcon, UnstyledButton, Menu, Switch, Collapse, Stack, Anchor, SegmentedControl, Tooltip, ThemeIcon, useMantineColorScheme, useComputedColorScheme,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { usePage, Link } from '@inertiajs/react';
 import {
     IconLayoutDashboard, IconUsers, IconPill, IconCalendarEvent, IconChartBar,
     IconFileText, IconSettings, IconBell, IconChevronDown, IconMoon, IconArrowLeft,
-    IconClipboardHeart, IconShieldLock, IconAlertTriangle, IconBox, IconSparkles, IconCopy,
+    IconClipboardHeart, IconShieldLock, IconAlertTriangle, IconBox, IconSparkles, IconCopy, IconEye,
 } from '@tabler/icons-react';
-import { RoleContext } from '@frontend/lib/role';
+import { RoleContext, useRealRole, useViewAs, setViewAs } from '@frontend/lib/role';
 import BrandLogo from '@frontend/components/BrandLogo';
 import classes from './AppShell.module.css';
 
@@ -61,6 +61,7 @@ const NAV = [
             { label: 'Missed doses', icon: IconAlertTriangle, href: '/frontend2/missed-doses' },
             { label: 'Controlled drugs', icon: IconShieldLock, href: '/frontend2/controlled-drugs' },
             { label: 'Stock', icon: IconBox, href: '/frontend2/stock' },
+            { label: 'Stock 2', icon: IconBox, href: '/frontend2/stock-2' },
         ],
     },
     {
@@ -158,7 +159,15 @@ function NavGroup({ item, path }) {
 export default function AppShell({ children, title, section }) {
     const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
     const { props, url } = usePage();
-    const role = props?.auth?.user?.role ?? 'carer';
+    // Real role from the server; managers can PREVIEW the carer view (view-only, persisted,
+    // shared app-wide via the role store so every page re-renders on toggle).
+    const realRole = useRealRole();
+    const isManager = realRole === 'manager';
+    const viewAs = useViewAs();
+    const applyViewAs = (v) => setViewAs(v);
+    // Effective role handed to the whole app. Non-managers can never elevate.
+    const role = isManager ? viewAs : realRole;
+    const previewingCarer = isManager && viewAs === 'carer';
     const userName = props?.auth?.user?.name ?? 'User';
     const home = props?.home; // shown as a chip in the header when the page provides it
     const { colorScheme, toggleColorScheme } = useMantineColorScheme();
@@ -242,6 +251,31 @@ export default function AppShell({ children, title, section }) {
                                     <IconChevronDown size={14} stroke={2.4} color="#9aa4ae" />
                                 </Group>
                             )}
+                            {isManager && (
+                                <Tooltip label="Preview the app as a carer sees it — view only, your real access is unchanged" withArrow openDelay={300} multiline w={240}>
+                                    <Box visibleFrom="sm" style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 4px 3px 3px', borderRadius: 999, background: 'light-dark(#E4E9F1, var(--mantine-color-dark-7))', border: '1px solid light-dark(#CBD5E4, rgba(255,255,255,0.14))', boxShadow: 'inset 0 1px 2px light-dark(rgba(19,35,63,0.10), rgba(0,0,0,0.35))' }}>
+                                        {/* Leading "viewing as" eye — makes it obvious this is a view switch. */}
+                                        <Box style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 26, height: 26, borderRadius: '50%', flexShrink: 0, color: previewingCarer ? '#8A6D3B' : 'light-dark(#7A8697, #8A97AC)' }}>
+                                            <IconEye size={16} stroke={1.9} />
+                                        </Box>
+                                        {[{ k: 'manager', l: 'Manager', c: '#1C325A' }, { k: 'carer', l: 'Carer', c: '#8A6D3B' }].map((o) => {
+                                            const on = viewAs === o.k;
+                                            return (
+                                                <Box key={o.k} component="button" type="button" onClick={() => applyViewAs(o.k)}
+                                                    onMouseEnter={(e) => { if (!on) e.currentTarget.style.background = 'light-dark(#FFFFFF, rgba(255,255,255,0.12))'; }}
+                                                    onMouseLeave={(e) => { if (!on) e.currentTarget.style.background = 'light-dark(#F7F9FC, rgba(255,255,255,0.07))'; }}
+                                                    style={{
+                                                        border: 'none', cursor: 'pointer', borderRadius: 999, padding: '5px 16px', fontSize: 12.5, fontWeight: 700, whiteSpace: 'nowrap',
+                                                        background: on ? o.c : 'light-dark(#F7F9FC, rgba(255,255,255,0.07))',
+                                                        color: on ? '#FFFFFF' : 'light-dark(#44536B, #C3CDDD)',
+                                                        boxShadow: on ? '0 3px 8px -3px rgba(19,35,63,0.55)' : 'inset 0 0 0 1px light-dark(rgba(19,35,63,0.06), rgba(255,255,255,0.06))',
+                                                        transition: 'background .16s ease, color .16s ease',
+                                                    }}>{o.l}</Box>
+                                            );
+                                        })}
+                                    </Box>
+                                </Tooltip>
+                            )}
                             <Text fz={13.5} fw={700} c="#7a8590" visibleFrom="sm">EN</Text>
                             {/* Bell — boxed (white, rounded, shadow) with an orange unread dot, per the mockup. */}
                             <ActionIcon variant="default" size={38} radius={11} pos="relative"
@@ -279,6 +313,14 @@ export default function AppShell({ children, title, section }) {
                 </MantineAppShell.Header>
 
                 <MantineAppShell.Main style={{ background: CANVAS, minHeight: '100dvh' }}>
+                    {previewingCarer && (
+                        <Group justify="center" gap={10} wrap="nowrap" mb="md" px="md" py={8}
+                            style={{ background: 'light-dark(#FBEEDD, rgba(185,102,15,0.16))', border: '1px solid light-dark(#F0D3A8, rgba(185,102,15,0.35))', borderRadius: 12 }}>
+                            <IconEye size={15} color="#B9660F" />
+                            <Text fz={12.5} fw={700} c="light-dark(#8A4E0B, #E0A96A)">Previewing as a carer — manager-only controls are hidden.</Text>
+                            <UnstyledButton onClick={() => applyViewAs('manager')} style={{ fontSize: 12.5, fontWeight: 800, color: '#1F9E93' }}>Back to manager view</UnstyledButton>
+                        </Group>
+                    )}
                     {children}
                 </MantineAppShell.Main>
 

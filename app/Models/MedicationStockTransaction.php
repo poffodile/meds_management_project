@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class MedicationStockTransaction extends Model
 {
@@ -71,6 +72,8 @@ class MedicationStockTransaction extends Model
                     break;
                 default: // administered, disposed, returned
                     $after = max(0, $beforeNum - $quantity);
+                    // Batch tracking (#30 v2) — draw down the earliest-expiry batches first (FEFO).
+                    self::consumeBatchesFefo($sheet, $quantity);
             }
 
             $sheet->stock_level = (int) round($after);
@@ -90,5 +93,35 @@ class MedicationStockTransaction extends Model
                 'transaction_date'     => now(),
             ], $extra));
         });
+    }
+
+    /**
+     * Draw down live batches First-Expiry-First-Out for a consuming movement
+     * (administered / disposed / returned). Additive + safe: a no-op when the
+     * batches table is absent or the sheet has no batches. Any quantity beyond
+     * tracked batches is simply left untracked (stock_level stays authoritative).
+     */
+    protected static function consumeBatchesFefo(MARSheet $sheet, float $quantity): void
+    {
+        if ($quantity <= 0 || ! Schema::hasTable('medication_stock_batches')) {
+            return;
+        }
+
+        $remaining = $quantity;
+        $batches = \App\Models\MedicationStockBatch::forSheetFefo($sheet->id)->lockForUpdate()->get();
+
+        foreach ($batches as $batch) {
+            if ($remaining <= 0) {
+                break;
+            }
+            $take = min((float) $batch->quantity, $remaining);
+            $batch->quantity = (float) $batch->quantity - $take;
+            if ($batch->quantity <= 0) {
+                $batch->quantity = 0;
+                $batch->is_depleted = true;
+            }
+            $batch->save();
+            $remaining -= $take;
+        }
     }
 }
