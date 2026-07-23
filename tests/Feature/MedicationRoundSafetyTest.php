@@ -43,12 +43,13 @@ use Tests\TestCase;
  *
  * ================== SAFETY ==================
  *
- * DatabaseTransactions (NOT RefreshDatabase). This project has no .env.testing and
- * phpunit.xml does not override DB_DATABASE, so tests run against the REAL `laravel`
- * database. RefreshDatabase here would drop it — and because the schema came from a
- * dump with no create-migrations for `home`/`service_user`, it would not come back.
- * Three existing tests in this suite do use RefreshDatabase; running the full suite is
- * currently destructive. Do not follow their lead.
+ * DatabaseTransactions (NOT RefreshDatabase). As of 2026-07-23 phpunit.xml points the
+ * suite at a SEPARATE `laravel_test` database (a clone of `laravel`), so nothing here can
+ * touch the live data — re-clone with `mysqldump laravel | mysql laravel_test`. These
+ * tests still use DatabaseTransactions (roll back per test) because the clone is seeded
+ * demo data we don't want to churn. RefreshDatabase would run migrate:fresh; on this
+ * dump-based schema (no create-migrations for `home`/`service_user`) it would not rebuild
+ * cleanly, so avoid it — but it can now only ever hit the throwaway clone, never live.
  */
 class MedicationRoundSafetyTest extends TestCase
 {
