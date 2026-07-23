@@ -5,7 +5,9 @@ import { IconPrinter, IconArrowLeft } from '@tabler/icons-react';
 // MAR outcome codes → label + colour (matches the round's record codes).
 const CODE = {
     A: { label: 'Given', color: 'green' },
-    S: { label: 'Sleeping', color: 'teal' },
+    // Not green/teal: asleep means the dose was NOT given, and on a printed MAR chart
+    // a green-family marker reads as "taken" at a glance.
+    S: { label: 'Asleep — not given', color: 'indigo' },
     R: { label: 'Refused', color: 'red' },
     W: { label: 'Withheld', color: 'orange' },
     N: { label: 'Not available', color: 'gray' },

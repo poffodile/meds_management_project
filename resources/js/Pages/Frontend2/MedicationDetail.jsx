@@ -31,7 +31,9 @@ function InfoRow({ icon: Icon, label, value, last }) {
 
 // A given/refused/omitted marker for an administration row.
 function codeTone(code) {
-    if (code === 'A' || code === 'S') return { c: 'teal', Icon: IconCircleCheck };
+    // 'S' (asleep) is not given — it must not show the same green tick as a dose
+    // the resident actually took.
+    if (isGivenCode(code)) return { c: 'teal', Icon: IconCircleCheck };
     if (code === 'R') return { c: 'red', Icon: IconCircleX };
     return { c: 'orange', Icon: IconBan };
 }

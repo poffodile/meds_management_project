@@ -4,7 +4,8 @@ import {
     ActionIcon, UnstyledButton, Menu, Switch, Collapse, Stack, Anchor, SegmentedControl, Tooltip, ThemeIcon, useMantineColorScheme, useComputedColorScheme,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { usePage, Link } from '@inertiajs/react';
+import { usePage, Link, router } from '@inertiajs/react';
+import { IconCheck as IconCheckMark, IconBuilding } from '@tabler/icons-react';
 import {
     IconLayoutDashboard, IconUsers, IconPill, IconCalendarEvent, IconChartBar,
     IconFileText, IconSettings, IconBell, IconChevronDown, IconMoon, IconArrowLeft,
@@ -12,6 +13,7 @@ import {
 } from '@tabler/icons-react';
 import { RoleContext, useRealRole, useViewAs, setViewAs } from '@frontend/lib/role';
 import BrandLogo from '@frontend/components/BrandLogo';
+import ErrorBoundary from '@frontend/components/ErrorBoundary';
 import classes from './AppShell.module.css';
 
 // ── Frontend2 — "CLINIK"-style shell ─────────────────────────────────────────
@@ -65,13 +67,31 @@ const NAV = [
         ],
     },
     {
-        // Trial / superseded variants — parked here (not deleted) so the main menu stays clean.
+        // Every trial / superseded round variant lives here, in ONE collapsible menu —
+        // parked, not deleted (owner instruction 2026-07-23). These older pages still
+        // render "Sleeping"/"Withheld" as given; the write path underneath them is the
+        // corrected shared one, so the DATA they record is right, only their display is
+        // stale. Kept reachable for reference; not for daily use.
         group: 'Duplicates', icon: IconCopy, children: [
+            // Frontend 2 variants
             { label: 'Med round (new)', icon: IconClipboardHeart, href: '/frontend2/medication-round-v2' },
             { label: 'Med round (split)', icon: IconClipboardHeart, href: '/frontend2/medication-round-split' },
             { label: 'Med round (split B)', icon: IconClipboardHeart, href: '/frontend2/medication-round-split-b' },
             { label: 'Med round (split C)', icon: IconClipboardHeart, href: '/frontend2/medication-round-split-c' },
             { label: 'Missed doses (new)', icon: IconAlertTriangle, href: '/frontend2/missed-doses-b' },
+            // Frontend 1 experimental variants (open in the old shell)
+            { label: 'F1 round (react)', icon: IconClipboardHeart, href: '/medication/medication-round-react' },
+            { label: 'F1 round (lab)', icon: IconClipboardHeart, href: '/medication/medication-round-lab' },
+            { label: 'F1 round (lab 2)', icon: IconClipboardHeart, href: '/medication/medication-round-lab2' },
+            { label: 'F1 round (lab 1.1)', icon: IconClipboardHeart, href: '/medication/medication-round-lab1-1' },
+            { label: 'F1 round (lab 1.2)', icon: IconClipboardHeart, href: '/medication/medication-round-lab1-2' },
+            { label: 'F1 round (lab 1.3)', icon: IconClipboardHeart, href: '/medication/medication-round-lab1-3' },
+            { label: 'F1 round (lab 1.4)', icon: IconClipboardHeart, href: '/medication/medication-round-lab1-4' },
+            { label: 'F1 round (lab 1.4.1)', icon: IconClipboardHeart, href: '/medication/medication-round-lab1-4-1' },
+            { label: 'F1 round (lab 1.4.2)', icon: IconClipboardHeart, href: '/medication/medication-round-lab1-4-2' },
+            { label: 'F1 round (lab 1.4.3)', icon: IconClipboardHeart, href: '/medication/medication-round-lab1-4-3' },
+            { label: 'F1 round (v4)', icon: IconClipboardHeart, href: '/medication/medication-round-4' },
+            { label: 'F1 round (v4.2)', icon: IconClipboardHeart, href: '/medication/medication-round-4-2' },
         ],
     },
     {
@@ -107,6 +127,12 @@ function NavItem({ item, active }) {
         </Group>
     );
     if (disabled) return <Box title="Coming soon">{inner}</Box>;
+    // Frontend 1 pages (the parked /medication/* duplicates) are old-shell Blade pages,
+    // not Inertia pages. An Inertia <Link> would XHR them and get non-Inertia HTML back;
+    // a plain anchor does the correct full-page navigation into the old shell.
+    if (!item.href.startsWith('/frontend2')) {
+        return <Box component="a" href={item.href} style={{ textDecoration: 'none', display: 'block' }}>{inner}</Box>;
+    }
     return <Box component={Link} href={item.href} style={{ textDecoration: 'none', display: 'block' }}>{inner}</Box>;
 }
 
@@ -127,7 +153,63 @@ function SubNavItem({ item, active }) {
         </Group>
     );
     if (disabled) return <Box title="Coming soon">{inner}</Box>;
+    // Frontend 1 pages (the parked /medication/* duplicates) are old-shell Blade pages,
+    // not Inertia pages. An Inertia <Link> would XHR them and get non-Inertia HTML back;
+    // a plain anchor does the correct full-page navigation into the old shell.
+    if (!item.href.startsWith('/frontend2')) {
+        return <Box component="a" href={item.href} style={{ textDecoration: 'none', display: 'block' }}>{inner}</Box>;
+    }
     return <Box component={Link} href={item.href} style={{ textDecoration: 'none', display: 'block' }}>{inner}</Box>;
+}
+
+/**
+ * Header home-switcher (CR-06). Shows the active home. When the manager has more than
+ * one home, it becomes a menu to switch between them; the chosen home drives every
+ * medication/resident query server-side. With a single home it is a plain label.
+ * `homes` is null for single-home users (the server withholds it), so the menu only
+ * appears where it's meaningful.
+ */
+function HomeSwitcher({ home, homes }) {
+    const list = homes?.list ?? [];
+    const activeId = homes?.active;
+    const activeName = list.find((h) => h.id === activeId)?.name ?? home;
+
+    if (!homes || list.length < 2) {
+        // Single home (or none) — the static label the header always had.
+        return activeName ? (
+            <Group gap={8} wrap="nowrap" visibleFrom="sm">
+                <Text fz={13.5} fw={700} c="light-dark(#13233F, var(--mantine-color-gray-1))">{activeName}</Text>
+            </Group>
+        ) : null;
+    }
+
+    const switchTo = (id) => {
+        if (id === activeId) return;
+        router.post('/frontend2/switch-home', { home_id: id }, { preserveScroll: true });
+    };
+
+    return (
+        <Menu position="bottom-start" withArrow width={240} shadow="md">
+            <Menu.Target>
+                <UnstyledButton visibleFrom="sm" style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '5px 10px', borderRadius: 999, border: '1px solid light-dark(#CBD5E4, rgba(255,255,255,0.14))', background: 'light-dark(#E4E9F1, var(--mantine-color-dark-7))' }}>
+                    <IconBuilding size={15} stroke={1.9} color="#7A8697" />
+                    <Text fz={13.5} fw={700} c="light-dark(#13233F, var(--mantine-color-gray-1))">{activeName ?? 'Select home'}</Text>
+                    <IconChevronDown size={14} stroke={2.4} color="#9aa4ae" />
+                </UnstyledButton>
+            </Menu.Target>
+            <Menu.Dropdown>
+                <Menu.Label>Switch home ({list.length})</Menu.Label>
+                {list.map((h) => (
+                    <Menu.Item key={h.id} onClick={() => switchTo(h.id)}
+                        leftSection={<IconBuilding size={15} stroke={1.8} />}
+                        rightSection={h.id === activeId ? <IconCheckMark size={15} stroke={2.4} color="#1F9E93" /> : null}
+                        fw={h.id === activeId ? 700 : 500}>
+                        {h.name}
+                    </Menu.Item>
+                ))}
+            </Menu.Dropdown>
+        </Menu>
+    );
 }
 
 // Collapsible group (e.g. Medication) — opens automatically when a child is active.
@@ -170,6 +252,7 @@ export default function AppShell({ children, title, section }) {
     const previewingCarer = isManager && viewAs === 'carer';
     const userName = props?.auth?.user?.name ?? 'User';
     const home = props?.home; // shown as a chip in the header when the page provides it
+    const homes = props?.homes; // {active, list:[{id,name}]} when the user has >1 home (CR-06)
     const { colorScheme, toggleColorScheme } = useMantineColorScheme();
     const computedScheme = useComputedColorScheme('light');
     const dark = computedScheme === 'dark';
@@ -245,12 +328,7 @@ export default function AppShell({ children, title, section }) {
                             )}
                         </Group>
                         <Group gap={20} wrap="nowrap">
-                            {home && (
-                                <Group gap={8} wrap="nowrap" visibleFrom="sm">
-                                    <Text fz={13.5} fw={700} c="light-dark(#13233F, var(--mantine-color-gray-1))">{home}</Text>
-                                    <IconChevronDown size={14} stroke={2.4} color="#9aa4ae" />
-                                </Group>
-                            )}
+                            <HomeSwitcher home={home} homes={homes} />
                             {isManager && (
                                 <Tooltip label="Preview the app as a carer sees it — view only, your real access is unchanged" withArrow openDelay={300} multiline w={240}>
                                     <Box visibleFrom="sm" style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 4px 3px 3px', borderRadius: 999, background: 'light-dark(#E4E9F1, var(--mantine-color-dark-7))', border: '1px solid light-dark(#CBD5E4, rgba(255,255,255,0.14))', boxShadow: 'inset 0 1px 2px light-dark(rgba(19,35,63,0.10), rgba(0,0,0,0.35))' }}>
@@ -321,7 +399,8 @@ export default function AppShell({ children, title, section }) {
                             <UnstyledButton onClick={() => applyViewAs('manager')} style={{ fontSize: 12.5, fontWeight: 800, color: '#1F9E93' }}>Back to manager view</UnstyledButton>
                         </Group>
                     )}
-                    {children}
+                    {/* Keyed by url so a caught error clears on navigation instead of sticking. */}
+                    <ErrorBoundary key={url}>{children}</ErrorBoundary>
                 </MantineAppShell.Main>
 
                 {/* Slim generic footer — copyright + version, quick links, and a system-status pill. */}

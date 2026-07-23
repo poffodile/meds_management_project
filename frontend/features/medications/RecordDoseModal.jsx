@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Select, TextInput, Textarea, Text, Badge } from '@mantine/core';
 import { useForm } from '@inertiajs/react';
+import { notifications } from '@mantine/notifications';
 import FormModal from '@frontend/components/FormModal';
 import { MED_CODES, REASON_REQUIRED_CODES, REFUSAL_REASONS, OMISSION_REASONS } from '@frontend/lib/medicationCodes';
 
@@ -52,6 +53,17 @@ export default function RecordDoseModal({ opened, onClose, row, date, presetCode
             preserveScroll: true,
             preserveState: true,
             onSuccess: () => { form.setData('notes', ''); form.setData('witnessed_by', ''); form.setData('reason', ''); onClose(); },
+            // Field errors (code/reason/witnessed_by) render inline; a server error with no
+            // matching field (e.g. prescription-not-found) would otherwise be invisible and
+            // the modal would sit there as if nothing happened (audit CR-07). The modal is
+            // deliberately NOT closed on error — the carer has not succeeded.
+            onError: (errors) => {
+                const shown = ['code', 'reason', 'witnessed_by'];
+                const orphan = Object.entries(errors ?? {}).find(([k]) => !shown.includes(k));
+                if (orphan) {
+                    notifications.show({ color: 'red', title: 'Not recorded', message: orphan[1], autoClose: 6000 });
+                }
+            },
         });
     };
 

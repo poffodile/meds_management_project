@@ -11,7 +11,7 @@ import {
     IconMoon, IconScan, IconShieldCheck, IconClock,
 } from '@tabler/icons-react';
 import AppShell from '@frontend2/Layouts/AppShell';
-import { CODE_LABELS } from '@frontend/lib/medicationCodes';
+import { CODE_LABELS, isGivenCode } from '@frontend/lib/medicationCodes';
 import { initials } from '@frontend/lib/avatarColor';
 
 const ENDPOINT = '/frontend2/medication-round-v2';
@@ -47,7 +47,8 @@ export const THEME = { ACCENT, INK, TXT, CARD_BG, CARD_BD, SOFT, LINE, GIVEN, GI
 const NO_ALLERGY = /^(no|none|nil|n\/?a|na|none known|no known allergies|no allergies|unknown)$/i;
 export const cleanAllergies = (list) => (list ?? []).filter((a) => a && !NO_ALLERGY.test(String(a).trim()));
 
-export const isGiven = (c) => c === 'A' || c === 'S';
+// Delegates to the shared list. 'S' (asleep) is NOT given — see medicationCodes.js.
+export const isGiven = (c) => isGivenCode(c);
 
 export function fmtDate(d) {
     if (!d) return '';

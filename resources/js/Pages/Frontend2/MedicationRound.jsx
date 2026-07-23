@@ -1,5 +1,6 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Head, Link, router, usePage } from '@inertiajs/react';
+import { notifications } from '@mantine/notifications';
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import {
     Box, Group, Stack, Text, Badge, Avatar, Button, ActionIcon, ThemeIcon,
@@ -7,12 +8,13 @@ import {
 } from '@mantine/core';
 import {
     IconChevronRight, IconCheck, IconCircleX, IconBan, IconPill, IconAlertTriangle,
-    IconLock, IconLockOpen, IconPlayerPause, IconPlayerPlay, IconSun, IconSoup,
+    IconLock, IconLockOpen, IconSun, IconSoup,
     IconSunset, IconMoon, IconClockHour4, IconArrowRight, IconUser,
 } from '@tabler/icons-react';
 import AppShell from '@frontend2/Layouts/AppShell';
 import RecordDoseModal from '@frontend/features/medications/RecordDoseModal';
-import { CODE_LABELS } from '@frontend/lib/medicationCodes';
+import { CODE_LABELS, isGivenCode } from '@frontend/lib/medicationCodes';
+import { useRole } from '@frontend/lib/role';
 import { avatarColor, initials } from '@frontend/lib/avatarColor';
 
 const ENDPOINT = '/frontend2/medication-round';
@@ -36,8 +38,9 @@ export const ageFromDob = (dob) => { const t = Date.parse(dob); return Number.is
 const NO_ALLERGY = /^(no|none|nil|n\/?a|na|none known|no known allergies|no allergies|unknown)$/i;
 export const cleanAllergies = (list) => (list ?? []).filter((a) => a && !NO_ALLERGY.test(String(a).trim()));
 
-export const isGiven = (c) => c === 'A' || c === 'S';
-const isOutcome = (c) => ['R', 'N', 'O', 'W'].includes(c);
+// Delegates to the shared list. 'S' (asleep) is NOT given — see medicationCodes.js.
+// Re-exported because MedicationRoundSplit{,B,C} import it from here.
+export const isGiven = (c) => isGivenCode(c);
 
 export function fmtDate(d) {
     if (!d) return '';
@@ -84,6 +87,11 @@ export function RoundTab({ round, active, done, total, onClick }) {
 /** A med line inside an expanded resident row. */
 export function MedLine({ row, locked, onGiven, onOutcome, isSm }) {
     const recorded = Boolean(row.code);
+    // PRN block state, computed server-side and — until now — thrown away (audit IM-08).
+    // A carer must see WHY a PRN dose can't be given before tapping, not discover it from
+    // a rejection after. `blocked` means daily max hit or inside the minimum interval.
+    const prn = row.as_required ? row.prn : null;
+    const prnBlocked = Boolean(prn?.blocked);
     const tone = recorded
         ? (isGiven(row.code) ? { c: GREEN, t: CODE_LABELS[row.code] } : (row.code === 'R' ? { c: '#D14343', t: 'Refused' } : { c: ORANGE, t: CODE_LABELS[row.code] }))
         : row.status === 'overdue' ? { c: ORANGE, t: 'Overdue' } : row.as_required ? { c: '#6E5BE6', t: 'PRN' } : { c: '#3E6FB0', t: 'Due' };
@@ -93,7 +101,10 @@ export function MedLine({ row, locked, onGiven, onOutcome, isSm }) {
             ? <Text fz="xs" c="dimmed" style={{ flexShrink: 0 }}>Round ended</Text>
             : (
                 <Group gap={6} wrap="nowrap" justify={isSm ? 'flex-end' : 'flex-start'} style={{ flexShrink: 0, width: isSm ? '100%' : undefined }}>
-                    <Button size="xs" radius="xl" color="teal" leftSection={<IconCheck size={14} />} onClick={() => onGiven(row)}>Given</Button>
+                    <Tooltip label={prnBlocked ? (prn.block_reason || 'Not due yet') : 'Record as given'} disabled={!prnBlocked}>
+                        <Button size="xs" radius="xl" color="teal" leftSection={<IconCheck size={14} />}
+                            disabled={prnBlocked} onClick={() => onGiven(row)}>Given</Button>
+                    </Tooltip>
                     <Tooltip label="Refused"><ActionIcon size="md" radius="xl" variant="light" color="red" onClick={() => onOutcome(row, 'R')}><IconCircleX size={15} /></ActionIcon></Tooltip>
                     <Tooltip label="Omitted"><ActionIcon size="md" radius="xl" variant="light" color="orange" onClick={() => onOutcome(row, 'O')}><IconBan size={15} /></ActionIcon></Tooltip>
                 </Group>
@@ -109,6 +120,15 @@ export function MedLine({ row, locked, onGiven, onOutcome, isSm }) {
                         {row.is_controlled && <Badge size="xs" variant="light" color="grape" radius="sm">CD</Badge>}
                     </Group>
                     <Text fz="xs" c="dimmed" truncate>{[row.strength, row.dose && `Dose ${row.dose}`, row.route].filter(Boolean).join(' · ') || '—'}</Text>
+                    {!recorded && prn && (
+                        <Text fz={11} mt={3} c={prnBlocked ? '#D14343' : 'dimmed'} lh={1.35}>
+                            {[
+                                prn.max_daily != null && `${prn.given_today ?? 0}/${prn.max_daily} today`,
+                                prn.block_reason,
+                                !prnBlocked && prn.next_available && `next due ${prn.next_available}`,
+                            ].filter(Boolean).join(' · ')}
+                        </Text>
+                    )}
                     {recorded && (row.reason || row.notes || row.witnessed_by || row.recorded_by) && (
                         <Text fz={11} c="dimmed" mt={3} lh={1.35}>
                             {[row.reason, row.notes && `“${row.notes}”`, row.witnessed_by && `Witnessed by ${row.witnessed_by}`, row.recorded_by && `by ${row.recorded_by}`].filter(Boolean).join(' · ')}
@@ -205,7 +225,11 @@ function ResidentRow({ resident, isNext, active, onOpen, onClose, locked, onGive
                                 {(allergies.length > 0 || (resident.risk_flags ?? []).length > 0) && (
                                     <Group gap={7} wrap="wrap" mb="xs">
                                         {allergies.map((a, i) => <Badge key={`a${i}`} color="red" variant="light" radius="sm" leftSection={<IconAlertTriangle size={11} />}>{a}</Badge>)}
-                                        {(resident.risk_flags ?? []).map((r, i) => <Badge key={`r${i}`} color="orange" variant="light" radius="sm">{r}</Badge>)}
+                                        {(resident.risk_flags ?? []).map((r, i) => (
+                                            <Badge key={`r${i}`} color={r?.level === 'high' ? 'red' : 'orange'} variant="light" radius="sm">
+                                                {typeof r === 'string' ? r : (r?.label ?? '')}
+                                            </Badge>
+                                        ))}
                                     </Group>
                                 )}
                                 {chips.length > 0 && (
@@ -234,11 +258,12 @@ function ResidentRow({ resident, isNext, active, onOpen, onClose, locked, onGive
 export default function MedicationRound({ rounds = [], grid = {}, date, currentRound = 'morning', closures = {}, home }) {
     const isMobile = useMediaQuery('(max-width: 768px)');
     const isSm = useMediaQuery('(max-width: 576px)');
-    const isManager = usePage().props?.auth?.user?.role === 'manager';
+    // Effective role, so a manager previewing the carer view loses manager-only
+    // controls here too. Reading auth.user.role directly ignores that preview.
+    const isManager = useRole() === 'manager';
 
     const [activeRound, setActiveRound] = useState(currentRound);
     const [openId, setOpenId] = useState(null);
-    const [paused, setPaused] = useState(false);
     const [tab, setTab] = useState('all');
     const [recordRow, setRecordRow] = useState(null);
     const [recordCode, setRecordCode] = useState('A');
@@ -312,14 +337,35 @@ export default function MedicationRound({ rounds = [], grid = {}, date, currentR
         return out.sort((a, b) => String(b.at).localeCompare(String(a.at))).slice(0, 6);
     }, [grid]);
 
-    const statusWord = roundClosed ? 'completed' : paused ? 'paused' : (roundDone === 0 ? 'not started' : roundDone >= roundTotal ? 'review' : 'in progress');
+    const statusWord = roundClosed ? 'completed' : (roundDone === 0 ? 'not started' : roundDone >= roundTotal ? 'review' : 'in progress');
 
-    const reload = (params) => router.get(ENDPOINT, { date, ...params }, { preserveScroll: true, preserveState: true });
+    // Surface server flash (end/reopen round, and any redirect-carried error). These
+    // were shared to Inertia but never rendered on this page (audit CR-07), so an
+    // "error" flash arrived and vanished silently.
+    const flash = usePage().props?.flash;
+    useEffect(() => {
+        if (flash?.error) notifications.show({ color: 'red', title: 'Something went wrong', message: flash.error, autoClose: 6000 });
+        else if (flash?.success) notifications.show({ color: 'teal', message: flash.success });
+    }, [flash?.error, flash?.success]);
+
     const openRecord = (row, code) => { setRecordRow(row); setRecordCode(code); record.open(); };
     const giveDose = (row) => {
         if (roundClosed) return;
         if (!row.is_controlled && !row.as_required && row.slot) {
-            router.post(`${ENDPOINT}/record`, { mar_sheet_id: row.mar_sheet_id, date, time_slot: row.slot, code: 'A', dose_given: row.dose ?? '', notes: '' }, { preserveScroll: true, preserveState: true });
+            router.post(`${ENDPOINT}/record`, { mar_sheet_id: row.mar_sheet_id, date, time_slot: row.slot, code: 'A', dose_given: row.dose ?? '', notes: '' }, {
+                preserveScroll: true,
+                preserveState: true,
+                // A rejected write must never look like success (audit CR-07). Inertia resolves
+                // a 302 as onSuccess, so a server-side block used to clear silently on this
+                // one-tap path. Surface the actual reason instead.
+                onError: (errors) => notifications.show({
+                    color: 'red',
+                    title: 'Not recorded',
+                    message: Object.values(errors ?? {})[0] || 'This dose could not be recorded.',
+                    autoClose: 6000,
+                }),
+                onSuccess: () => notifications.show({ color: 'teal', message: `${row.medication_name} recorded as given.` }),
+            });
         } else { openRecord(row, 'A'); }
     };
     const outcomeDose = (row, code) => { if (!roundClosed) openRecord(row, code); };
@@ -350,12 +396,8 @@ export default function MedicationRound({ rounds = [], grid = {}, date, currentR
                         {roundClosed
                             ? (isManager && <Button radius={999} variant="default" leftSection={<IconLockOpen size={15} />} onClick={reopenRound}>Re-open</Button>)
                             : (
-                                <>
-                                    <Button radius={999} variant="default" leftSection={paused ? <IconPlayerPlay size={14} /> : <IconPlayerPause size={14} />} onClick={() => setPaused((p) => !p)}
-                                        style={{ border: '1.5px solid #cddbe6', color: '#3A7CA5', paddingInline: 18 }}>{paused ? 'Resume' : 'Pause'}</Button>
-                                    <Button radius={999} leftSection={<IconLock size={15} />} onClick={endRound}
-                                        style={{ background: '#3A7CA5', paddingInline: 22, boxShadow: '0 8px 18px rgba(58,124,165,0.28)' }}>End round</Button>
-                                </>
+                                <Button radius={999} leftSection={<IconLock size={15} />} onClick={endRound}
+                                    style={{ background: '#3A7CA5', paddingInline: 22, boxShadow: '0 8px 18px rgba(58,124,165,0.28)' }}>End round</Button>
                             )}
                     </Group>
                 </Group>

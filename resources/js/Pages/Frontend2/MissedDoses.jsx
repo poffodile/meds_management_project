@@ -361,7 +361,7 @@ export default function MissedDoses({ items = [], date, prevDate, nextDate, toda
                     }));
                     const numColor = (label) => (label === 'Overdue' ? '#E8842B' : label === 'Follow-ups pending' ? '#3A7CA5' : TXT);
                     return (
-                        <Box style={{ ...card, background: BANNER_GRADIENT, zoom: 0.8, transformOrigin: 'top left', marginBottom: 20, padding: isSm ? '12px 14px' : '13px 24px', boxShadow: '0 10px 26px rgba(19,35,63,0.22)' }}>
+                        <Box style={{ ...card, background: BANNER_GRADIENT, maxWidth: '96%', marginLeft: 'auto', marginRight: 'auto', marginBottom: 20, padding: isSm ? '12px 14px' : '13px 24px', boxShadow: '0 10px 26px rgba(19,35,63,0.22)' }}>
                             <Group align="center" gap={isSm ? 16 : 30} wrap="wrap">
                                 {/* Hover each coloured slice to see its reason + count (like a pie chart). Clicking anywhere on the ring shows all. */}
                                 <Box role="button" tabIndex={0} aria-label="Outstanding doses by reason — click to show all"
@@ -412,9 +412,9 @@ export default function MissedDoses({ items = [], date, prevDate, nextDate, toda
                 })()}
 
                 {/* Log + rail */}
-                <Box style={{ display: 'flex', flexWrap: 'wrap', gap: 20, alignItems: 'flex-start' }}>
+                <Box style={{ display: 'flex', flexWrap: 'wrap', gap: 20, alignItems: 'flex-start', justifyContent: 'center' }}>
                     {/* Log */}
-                    <Box style={{ ...card, background: BANNER_GRADIENT_REV, flex: '1 1 480px', minWidth: 0, padding: isSm ? '16px 14px' : '22px 24px' }}>
+                    <Box style={{ ...card, background: BANNER_GRADIENT_REV, flex: '1 1 480px', minWidth: 0, maxWidth: '96%', padding: isSm ? '16px 14px' : '22px 24px' }}>
                         <Group justify="space-between" align="center" pb={14} wrap="wrap" gap="sm">
                             <Group gap={22} wrap="nowrap" style={{ flex: '1 1 240px', minWidth: 0 }}>
                                 <Text fz={24} fw={800} c={TXT}>Log</Text>

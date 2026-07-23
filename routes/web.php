@@ -44,6 +44,7 @@ use App\Http\Controllers\frontEnd\Domiciliary\StaffController as DomStaffControl
 use App\Http\Controllers\frontEnd\Domiciliary\VisitScheduleController as DomVisitScheduleController;
 use App\Http\Controllers\frontEnd\Frontend2Controller;
 use App\Http\Controllers\frontEnd\Medication\ControlledDrugRegisterController;
+use App\Http\Controllers\frontEnd\Medication\Medication2RoundController;
 use App\Http\Controllers\frontEnd\Medication\MedicationRoundController;
 use App\Http\Controllers\frontEnd\Medication\MedicationStockController;
 use App\Http\Controllers\frontEnd\Medication\MissedDosesController;
@@ -1611,6 +1612,7 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 
     // Frontend 2 — a separate app shell with its own sidebar (new section, own React pages).
     Route::get('/frontend2', [Frontend2Controller::class, 'index'])->name('frontend2.home');
+    Route::post('/frontend2/switch-home', [Frontend2Controller::class, 'switchHome'])->name('frontend2.switch-home');
     Route::get('/frontend2/residents', [Frontend2Controller::class, 'residents'])->name('frontend2.residents');
     Route::get('/frontend2/residents/{id}', [Frontend2Controller::class, 'resident'])->where('id', '[0-9]+')->name('frontend2.resident');
     Route::get('/frontend2/medications', [Frontend2Controller::class, 'medications'])->name('frontend2.medications');
@@ -1658,7 +1660,26 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
     Route::post('/frontend2/stock-2/order', [MedicationStockController::class, 'createOrderFrontend2Stock2'])->name('frontend2.stock-2.order');
     Route::post('/frontend2/stock-2/order/receive', [MedicationStockController::class, 'receiveOrderFrontend2Stock2'])->name('frontend2.stock-2.order.receive');
     Route::post('/frontend2/stock-2/order/cancel', [MedicationStockController::class, 'cancelOrderFrontend2Stock2'])->name('frontend2.stock-2.order.cancel');
-    // "Medication 2" — placeholder pages (second meds area).
+    // "Medication 2" — the real Round page. MUST be registered BEFORE the {page}
+    // catch-all below: Laravel matches first-registered, and it does not prefer a
+    // literal segment over a wildcard across separate declarations, so a later
+    // explicit route would be shadowed and render the empty placeholder (audit CR route note).
+    Route::get('/frontend2/medication-2/round', [Medication2RoundController::class, 'index'])->name('frontend2.medication2.round');
+    Route::post('/frontend2/medication-2/round/record', [Medication2RoundController::class, 'record'])->name('frontend2.medication2.round.record');
+    Route::post('/frontend2/medication-2/round/end', [Medication2RoundController::class, 'endRound'])->name('frontend2.medication2.round.end');
+    Route::post('/frontend2/medication-2/round/reopen', [Medication2RoundController::class, 'reopenRound'])->name('frontend2.medication2.round.reopen');
+    // The other Medication 2 pages — real routes, also before the catch-all, reusing the
+    // existing controllers' data helpers and rendering fresh Medication 2 views.
+    Route::get('/frontend2/medication-2/medications', [Frontend2Controller::class, 'medications2'])->name('frontend2.medication2.medications');
+    Route::get('/frontend2/medication-2/missed-doses', [MissedDosesController::class, 'indexMedication2'])->name('frontend2.medication2.missed-doses');
+    Route::post('/frontend2/medication-2/missed-doses/resolve', [MissedDosesController::class, 'resolveMedication2'])->name('frontend2.medication2.missed-doses.resolve');
+    Route::post('/frontend2/medication-2/missed-doses/unresolve', [MissedDosesController::class, 'unresolveMedication2'])->name('frontend2.medication2.missed-doses.unresolve');
+    Route::get('/frontend2/medication-2/controlled-drugs', [ControlledDrugRegisterController::class, 'indexMedication2'])->name('frontend2.medication2.controlled-drugs');
+    Route::post('/frontend2/medication-2/controlled-drugs', [ControlledDrugRegisterController::class, 'storeMedication2'])->name('frontend2.medication2.controlled-drugs.store');
+    Route::get('/frontend2/medication-2/stock', [MedicationStockController::class, 'indexMedication2'])->name('frontend2.medication2.stock');
+
+    // "Medication 2" — placeholder pages (second meds area). 'round' is served by the
+    // explicit route above; the rest are still stubs.
     Route::get('/frontend2/medication-2/{page}', [Frontend2Controller::class, 'medication2'])->name('frontend2.medication2');
 
     // Medication Management — Controlled Drugs Register (append-only ledger)
