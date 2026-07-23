@@ -20,3 +20,6 @@ yarn-error.log
 /.vscode
 /p_sessions
 /dev-router.php
+
+# Agent-created git worktrees (isolated repo copies) — never commit
+.claude/worktrees/
