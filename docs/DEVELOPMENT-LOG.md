@@ -508,6 +508,35 @@ All four open with the manager's currently-selected home (the home switcher work
 
 ---
 
+## 23 July 2026 (end of day, part 4) — the witnessed controlled-drug register
+
+The compliance review's single biggest gap is now closed. Controlled drugs are meant to have a register: a running tally where every movement — a dose given, stock received, something disposed of — is written down with the balance after it and a second person's name as witness. The table for it existed but nothing ever wrote to it, so it sat empty while controlled drugs were being given.
+
+Now:
+- **Giving a controlled drug on the round writes a register entry by itself**, using the witness the carer already entered, and works out the new balance itself — the running total can never be a number someone just typed in.
+- **The balance starts from the real recorded stock** on the first movement and chains from there, so it always adds up.
+- **Receiving, disposing, returning or recounting** stock are recorded from the controlled-drugs page, each with a witness.
+- **Nothing can be edited or deleted** — a mistake is fixed with a recount entry, not by changing history. That's the whole point of a register.
+- Where a witness genuinely isn't required (a person's own home in supported living), the entry says "Not witnessed" rather than leaving the legally-required witness field blank.
+
+The controlled-drugs page now shows each medicine's current balance and its full history, newest movements expandable.
+
+Honest boundary, written into the docs: the register is a legal duty for registered care homes; the witness-at-administration is strongly-expected good practice, not a statute. This is software support for keeping that record — it doesn't make anyone compliant, and we don't claim it does.
+
+Checked properly: the balance opens from stock, chains correctly across mixed movements, a recount sets it absolutely, giving a controlled drug on the round writes a witnessed entry, and an unwitnessed movement is recorded as such rather than blank. 33 automated checks pass in total; build clean.
+
+---
+
+## 23 July 2026 (housekeeping) — two safety landmines defused
+
+**The "instant login" shortcut can no longer work in production.** `/dev-login` logs someone in as a manager with no password — fine for demoing, a wide-open door in production. It now refuses to work anywhere except a local/testing environment (returns a plain "not found"). Still works exactly as before on this machine.
+
+**Running the tests can no longer wipe the real database.** A couple of the older tests rebuild the database from scratch as they run — and there was nothing stopping them from doing that to the *live* data. Tests now run against a separate throwaway copy (`laravel_test`), proven by checking which database a test actually connects to (it's the copy, not the real one) and by confirming the live data was byte-for-byte unchanged after a full test run. If the copy ever gets stale, it's one command to refresh: `mysqldump laravel | mysql laravel_test`.
+
+Both were flagged earlier as things to fix before this goes anywhere near real use; both are now closed. All 33 of our checks still pass, against the copy.
+
+---
+
 **Still waiting on a real pharmacist:** the new code list, whether zero stock should block or just warn, and how old a child's weight can be before it's untrustworthy. We're not deciding those ourselves.
 
 ---

@@ -130,6 +130,10 @@ Route::get('clear', function () {
 });
 
 Route::get('dev-login', function () {
+    // SAFETY GATE: this shortcut logs a user in with NO credentials. It must never be
+    // reachable in production — outside local/testing it 404s as if it does not exist.
+    abort_unless(app()->environment(['local', 'testing']), 404);
+
     // Prefer a user whose PRIMARY (first) home is the demo home 101 — that's where the
     // medication demo data lives — so the 4.1 screens have live residents/meds. Managers
     // first for the fullest demo. Falls back to any user if none match.
