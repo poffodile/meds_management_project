@@ -532,6 +532,9 @@ class WorkflowEngineService
                 ->join('mar_sheets', 'mar_administrations.mar_sheet_id', '=', 'mar_sheets.id')
                 ->where('mar_sheets.home_id', $homeId)
                 ->where('mar_administrations.code', $status)
+                // Current versions only — raw query builder does not get the model's
+                // append-only global scope (mar_administrations is now append-only).
+                ->where('mar_administrations.is_current', 1)
                 ->where('mar_administrations.created_at', '>=', Carbon::today())
                 ->count(),
             'feedback' => DB::table('client_portal_feedback')
@@ -601,7 +604,9 @@ class WorkflowEngineService
     {
         $query = DB::table('mar_administrations')
             ->join('mar_sheets', 'mar_administrations.mar_sheet_id', '=', 'mar_sheets.id')
-            ->where('mar_sheets.home_id', $homeId);
+            ->where('mar_sheets.home_id', $homeId)
+            // Current versions only — raw builder bypasses the model's append-only scope.
+            ->where('mar_administrations.is_current', 1);
 
         if ($condition === 'count_exceeds') {
             return $query->where('mar_administrations.created_at', '>=', $since)->count();

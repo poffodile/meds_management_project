@@ -121,6 +121,96 @@ class ControlledDrugRegisterController extends Controller
         return Inertia::render('Frontend2/ControlledDrugs', $data);
     }
 
+    /**
+     * Medication 2 → Controlled drugs register. Builds a per-medicine append-only ledger
+     * with the server-computed running balance — the witnessed CD register.
+     */
+    public function indexMedication2(Request $request)
+    {
+        $homeId = $this->getHomeId();
+
+        // Every controlled drug currently prescribed in this home.
+        $sheets = MARSheet::forHome($homeId)->active()->currentlyActive()
+            ->where('is_controlled', 1)
+            ->orderBy('medication_name')
+            ->get();
+
+        $names = ServiceUser::whereIn('id', $sheets->pluck('client_id')->unique())->pluck('name', 'id');
+
+        // All register entries for these medicines, oldest first (the ledger reads down).
+        $entries = ControlledDrugRegister::forHome($homeId)
+            ->whereIn('mar_sheet_id', $sheets->pluck('id'))
+            ->with('createdByUser:id,name')
+            ->orderBy('entry_date')->orderBy('entry_time')->orderBy('id')
+            ->get()
+            ->groupBy('mar_sheet_id');
+
+        $registers = $sheets->map(function ($s) use ($names, $entries) {
+            $rows = ($entries->get($s->id) ?? collect())->map(fn ($e) => [
+                'id' => $e->id,
+                'date' => $e->entry_date ? \Carbon\Carbon::parse($e->entry_date)->format('d M Y') : null,
+                'time' => $e->entry_time ? substr($e->entry_time, 0, 5) : null,
+                'action' => $e->action_type,
+                'quantity' => $e->dose_quantity,
+                'balance_before' => $e->balance_before,
+                'balance_after' => $e->balance_after,
+                'witness' => $e->witness_name,
+                'by' => $e->createdByUser->name ?? null,
+                'notes' => $e->notes,
+            ])->values();
+
+            return [
+                'mar_sheet_id' => $s->id,
+                'client_id' => $s->client_id,
+                'resident' => $names[$s->client_id] ?? ('Resident #'.$s->client_id),
+                'medication_name' => $s->medication_name,
+                'cd_schedule' => $s->cd_schedule,
+                'unit' => $s->unit,
+                // Current balance = last register entry, else the opening stock (the register
+                // bootstraps from real stock on its first movement).
+                'balance' => $rows->isNotEmpty() ? (float) $rows->last()['balance_after'] : (float) ($s->stock_level ?? 0),
+                'has_entries' => $rows->isNotEmpty(),
+                'entries' => $rows,
+            ];
+        })->values();
+
+        return Inertia::render('Frontend2/Medication2/ControlledDrugs', [
+            'registers' => $registers,
+            'home' => \DB::table('home')->where('id', $homeId)->value('title'),
+        ]);
+    }
+
+    /** Record a witnessed CD movement (received / disposed / returned / adjustment). */
+    public function storeMedication2(Request $request)
+    {
+        $request->validate([
+            'mar_sheet_id' => 'required|integer',
+            'action_type' => 'required|in:received,disposed,returned,adjustment',
+            'quantity' => 'required|numeric|min:0',
+            'witness_name' => 'required|string|max:255',   // manual movements are always witnessed
+            'notes' => 'nullable|string|max:2000',
+        ]);
+
+        $homeId = $this->getHomeId();
+        $sheet = MARSheet::forHome($homeId)->active()->where('is_controlled', 1)->find($request->input('mar_sheet_id'));
+        if (! $sheet) {
+            return back()->with('error', 'That controlled drug could not be found for your home.');
+        }
+
+        $resident = ServiceUser::where('id', $sheet->client_id)->first();
+        ControlledDrugRegister::record(
+            $sheet,
+            $request->input('action_type'),
+            (float) $request->input('quantity'),
+            (int) Auth::id(),
+            $request->input('witness_name'),
+            ['client_name' => $resident->name ?? null, 'notes' => $request->input('notes')]
+        );
+
+        return redirect()->route('frontend2.medication2.controlled-drugs')
+            ->with('success', 'Register entry recorded.');
+    }
+
     /** Add a register entry + return to the frontend2 register page. */
     public function storeFrontend2(Request $request)
     {

@@ -76,7 +76,12 @@ class MedicationStockTransaction extends Model
                     self::consumeBatchesFefo($sheet, $quantity);
             }
 
-            $sheet->stock_level = (int) round($after);
+            // Keep the fraction. stock_level is decimal(10,3) — rounding to int here
+            // was losing 0.5 ml on every 7.5 ml dose, so the ledger (which records the
+            // true quantity) and the balance drifted apart a little more each time.
+            // Rounded to 3dp only to match the column and avoid float representation
+            // noise accumulating over many doses.
+            $sheet->stock_level = round($after, 3);
             $sheet->save();
 
             return self::create(array_merge([

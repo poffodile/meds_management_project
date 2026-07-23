@@ -20,6 +20,42 @@ To run it on this computer: `start-local.bat` (starts the database, the web serv
 
 ---
 
+## 2026-07-16
+
+- **Built a permanent Care One OS multi-agent review/build system inside the project.** This turns the ad-hoc "review panel" into a durable, versioned setup so every page can be designed, built and reviewed the same rigorous way. Nothing about the running app changed — this is tooling + documentation only.
+- **15 specialist agents** in `.claude/agents/`: `care-one-orchestrator` (runs the whole per-page process and enforces the completion gate), `healthcare-researcher`, `uk-compliance-reviewer`, `clinical-safety-reviewer` (DCB0129/0160 thinking), `medication-workflow-specialist`, `dm-d-terminology-specialist`, `gp-connect-integration-specialist`, `barcode-and-medication-identification-specialist`, `information-governance-reviewer`, `security-and-permissions-reviewer`, `healthcare-ui-designer`, `responsive-accessibility-reviewer`, `frontend-implementer`, `backend-implementer`, `healthcare-qa-reviewer`. Each has a **limited responsibility, only the tools it needs, the stack, the official standards it must cite, a fixed output format, and hard rules** against unsupported compliance claims + instructions to preserve existing functionality and flag decisions needing a qualified human.
+- **7 reusable slash commands** in `.claude/commands/`: `/care-one-research`, `/care-one-design-page`, `/care-one-build-page`, `/care-one-review-page`, `/care-one-safety-review`, `/care-one-mobile-review`, `/care-one-test-page`.
+- **Shared registry** in `docs/care-one-os/`: product context, UK standards register (classified legal / NHS-standard / assurance / good-practice), official source register (with version + access date), design-system rules, medication-workflow requirements, a DCB0129-style clinical hazard log, a requirements traceability matrix, a per-page Definition of Done (completion gate), and the agent review workflow.
+- **Guardrail baked into every agent + doc:** an AI review does **not** make Care One OS compliant, certified, clinically safe or NHS-approved — agents must name the exact requirement + official source and flag what a CSO / DPO / pharmacist / medication lead / security specialist / NHS assurance body must sign off. The orchestrator **refuses to mark a page "done" while any Critical finding is open**, and does not let two implementers edit the same file at once.
+- Superseded the 5 earlier one-off reviewer agents (folded into the 15). Confirmed Claude Code v2.1.209 supports project subagents + slash commands; validated all 22 config files (frontmatter, required fields, agent name==filename) — all pass.
+
+### Medication Round — review panel findings (no page code written yet)
+- Ran 7 specialists over the **existing** round page. Headline: **the backend is much better than our own notes claimed** — `buildRoundProps()` already returns PRN limits/blocked state, allergies, risk flags, NHS number, CD schedule, stock and full audit fields. The frontend simply **never renders** most of it. So the rebuild is mostly a frontend job on working logic. (`docs/medication-round-requirements.md` is out of date — it describes a different variant.)
+- **Critical defects found in the live page:** a **render crash** (`MedicationRound.jsx:208` renders a `{label,level}` object as a React child — blanks the page for any resident with an active care-plan risk, and there is no error boundary); **silent write failure** (`recordFrontend2()` redirects on failure so Inertia fires `onSuccess` → a failed dose can look recorded); **MAR code "S" (Sleeping) counted as Given** (and consuming PRN allowance) while "Resident asleep" *also* exists as a refusal reason — the same event recordable two opposite ways; **round can be locked with doses outstanding**, no confirmation; **no unique constraint** on `(mar_sheet_id,date,time_slot)` + no submit disable → double-administration race.
+- **Security/IG:** `marReport()` had a **cross-home IDOR** (unscoped `ServiceUser::find()` → another home's name/DOB). The role gate lists *every* user_type, so it gates nothing — any carer can record any dose and lock a whole home's round (only *reopen* is manager-gated). CD "witness" is unverified free text. Round-closure rows are **hard-deleted** on reopen; corrections **overwrite in place**.
+- **Accessibility:** a keyboard/screen-reader user **cannot complete a round at all** (the resident row is a `div` with `onClick`). On phone, status collapses to a **bare colour dot** (tooltip logic inverted). "Overdue"/"Given" text fails contrast (2.7:1 / 3.35:1) because the page defines **local hex** instead of importing the vetted `statusPalette`.
+- Agents corrected me repeatedly, which is the point: CD **witness at administration is CQC/NICE good practice, not** a Misuse of Drugs Regs 2001 clause; there is **no nationally-mandated MAR code set** (provider policy); WCAG 2.2 is Oct 2023.
+
+### Two regulatory regimes — the register was aimed at the wrong one
+- The owner's company runs **children's & young people's** homes. Children's homes are regulated by **Ofsted** under the Care Standards Act 2000 + **Children's Homes (England) Regulations 2015** — **not CQC**. Our register was CQC/adult-only, and **NICE NG67 is confirmed adults-18+**, so we'd been citing inapplicable guidance for the owner's own service. Register now covers **both** regimes (adult/CQC STD-01–13; children's/Ofsted STD-60–65); agents must cite the one matching the **house's** setting.
+- Key children's findings: **reg 23** = medicines (storage, right-child, records, supported self-administration); **reg 10** = GP + dentist registration; **reg 40** = Ofsted notifications. **MCA 2005 applies from 16**, so under-16s need **Gillick competence / parental responsibility** — MCA covers *none* of Neptune's younger residents. 16–17 overlap is **UNVERIFIED** (legal review). **No NICE children's-home medicines equivalent of SC1/NG67 exists.**
+
+### Dataset — reset to an industry-standard demo ("Neptune House" build)
+- The dummy data was **wrong for the market and clinically dangerous**: residents were **children aged 7–14 in an adult-social-care pitch**; **Warfarin 25mg×2 flagged as a Schedule 2 CD** (warfarin is not a CD; 50mg is a dangerous dose); **Cetirizine flagged as a CD**; **Metformin marked PRN**; "Test"/"test" medicines; Aries residents were triplicate names with **2025/2026 DOBs (babies)**; `care_plan_risks` held **one placeholder row** ("Risk Description"/"test") — which is exactly why the render crash stayed invisible.
+- **Backup first:** `storage/backups/laravel-backup-2026-07-16-pre-reseed.sql` (34MB) — everything reversible.
+- **Schema (additive, guarded):** `mar_sheets.form` + `mar_sheets.unit` (the brief requires *form*; `unit` was **read by the round payload but never existed** — always null); `home.care_setting` + `home.is_dual_registered` (nothing recorded which regime a house is under — and `number_of_child` is a *capacity count*, not a type flag); `service_user.date_of_birth` **TEXT → DATE** with `date_of_birth_raw` preserving the original.
+- **DOB conversion was not trivial:** 169 ISO + 34 `DD-MM-YYYY` + 7 `DD/MM/YYYY` + 1 `DD.MM.YYYY` + a literal `.` + **36 rows of `1970-01-01`** (Unix epoch placeholder). 31 rows were genuinely ambiguous (`05-01-2007` = 5 Jan or 1 May?). Resolved as DD-MM on evidence (day>12 cases prove the ordering) but **kept the raw text** rather than trust the inference. Epoch placeholders **left in place, flagged** — deleting valid-but-implausible dates is data-cleaning, not type-conversion, and this migration will one day run on real customer data.
+- **Seeded** `NeptuneHouseDemoSeeder`: **Neptune House (101) = children's home**, 8 residents aged **7–17**, 18 sheets; **Aries House (8) = adult supported living**, 6 residents aged 35–88, 12 sheets. Deliberate test cases: NKDA strings, **12 real care-plan risks** (arms the crash), PRN **at daily max** and **inside interval** (both must return `blocked`), low **and zero** stock, a 70-char medicine name, a discontinued sheet, and only genuine CDs (Methylphenidate/Morphine Sch 2). Removed orphaned sheets on deleted Station Road, and **Paracetamol + Warfarin rows in the CD register** (same misclassification, second table).
+- **Honestly flagged, not faked:** paediatric PRN limits are a flat 4/24h — real paediatric dosing is **weight/age-banded (BNFc)** and needs a pharmacist; **Aries' CD requirements are unresolved** (CQC's position is a person's *own home*, incl. supported-living tenancy, needs **no** CD register/witness — that attaches to registered *care homes*), so the Morphine entry assumes the strict model and may be wrong. Resident **photos were not faked** — pointing at non-existent files renders broken images, which is worse than an honest avatar.
+
+### Product architecture decided with the owner
+- **SaaS two-tier data:** *reference* data ships with the product (dm+d catalogue, MAR codes, CD schedules) **shared across tenants**; *tenant* data is imported per company. This resolves the dm+d agent's open question — the medicine catalogue is **shared, not per-company**. A customer shouldn't have to type in the BNF to start.
+- **Medication must stand alone** (a pharmacy has no MAR sheets) — today a medicine has **no independent existence**, it only exists as a `mar_sheets` row. Needs a **medicine catalogue** as the identity anchor (REQ-MED-100/101/102).
+- **One resident model, common core + conditional fields** (REQ-MED-109/110/111): companies running both children's and adult services must never enter data twice. **Do not fork the model** — a 16–17-year-old in a children's home sits in *both* consent frames, and a resident turning 18 must transition without losing history. **Structure stays static and queryable; only *which fields are asked* is dynamic** — explicitly **no EAV/JSON blobs**, which would destroy the extractability the owner asked for.
+- `is_controlled` should be **derived from coded reference data**, never typed per prescription — that's what let Warfarin become a Schedule 2 drug (REQ-MED-107).
+
+---
+
 ## 2026-07-14
 
 - **New standing bar: the whole site must look premium / "Apple-quality" / like real money was spent.** The owner found the existing colours, spacing and layouts "childish" and "not unique/professional." Captured this as a permanent design directive (see `memory/premium-design-bar.md`): one ink colour, neutral greys, hairline dividers, **muted** semantic hues (never fully saturated), lighter type weights, tabular numerals, soft single-layer shadows, and colour used only as **small signals** (a dot, a thin bar) — no rainbow Mantine `variant="light"` badges/tiles, no cream/tan surfaces, no heavy glows.
@@ -307,6 +343,172 @@ Worked entirely on the **Stock 2** page today. In plain English:
 **Tables now match across all the tabs** — added column headers to Transactions, Stock count, Reorder and Disposal, and gave every table the same airy, right-grouped column spacing (one shared setting). On the Stock count tab specifically, moved the Expected/Counted/Difference columns across so Difference sits under the "Post corrections" button (tuned for a wide screen).
 
 **Left to finish on Stock 2 (small):** a couple of purely visual click-throughs in the browser (disposal success message; the reorder inline forms), and the Stock count column position is tuned to a wide monitor so it'll shift on narrow windows if we ever care.
+
+---
+
+## 16 July 2026 — we audited the Medication Round before rebuilding it, and found a lot
+
+The owner asked for something sensible before any building started: have the agents check **every function and every object**, prove nothing clashes, and leave nothing out. Five audits ran in parallel — backend, frontend, workflow logic, the database, and the joins between them. Everything is written up in `docs/care-one-os/ROUND-AUDIT-2026-07-16.md`, with the proposed responses in `ROUND-FIX-PLAN.md`.
+
+**The big realisation:** the Medication Round isn't one page, it's **18 pages sharing one save routine**. So every fault in that save routine exists on all 18 at once — and a shiny new page built on top would inherit all of them. **The fixes have to go underneath the page, not into it.** That changed the plan.
+
+**Nine serious faults.** The worst four:
+- **The "as needed" (PRN) limits can't actually work.** Every PRN dose is saved against the same fixed time slot, so the second dose of the day **overwrites the first**, and the check that counts earlier doses skips that very slot — so it always finds nothing. The 4-hour rule and the audit trail are broken by the same root cause.
+- **One tap can wipe a medicine's stock.** The amount to deduct is worked out by stripping the letters out of the dose text, so `"10 ml (500mg)"` becomes **10500**. Tested for real: stock went 56 → 0, silently.
+- **Any resident with a risk flag crashed the whole page** — and there was **no safety net anywhere in the app**, so it took the screen down completely.
+- **"Sleeping" counted as GIVEN.** A child who was asleep and got nothing used up their PRN allowance and started the 4-hour clock. For a controlled drug it skipped the witness, the reason and the stock deduction entirely.
+
+**Two of these were ours.** The paracetamol doses we added yesterday (`10 ml (500mg)`) are exactly the format that breaks the stock maths — the old data said "1 Tablet", which hid it. And the PRN demo we seeded was proving the wrong thing: it inserted doses at realistic clock times, which is *not* what happens when a carer taps the button. Honest lesson: **making the dummy data realistic is what exposed the real bugs**, which is a point in favour of doing it.
+
+**Fixed today (the small, safe ones — no database redesign needed):**
+- The risk-flag crash, and a proper **safety net** so one bad row can never blank the screen again mid-round.
+- **Weight, form and unit now actually save.** We'd added the columns and the page read them, but nothing wrote them — values were silently thrown away. Verified with a real (rolled-back) test.
+- A **privacy leak** on the printable MAR chart: it would show another company's resident's name and date of birth. Now locked to your own home.
+- **Deleted the "Pause" button.** It did nothing at all — it changed a word on screen while a carer could carry straight on recording, and so could a colleague. A control that lies is worse than none.
+- "Preview as carer" now actually hides the manager-only button on this page.
+- Speed: three tables had no indexes at all, including the one that separates companies.
+
+**Decisions the owner made:** weight will be **kg only, pounds refused** (two residents are recorded in pounds right now — read as kg that's a 2.2× overdose). Medicine amounts will come from the **dose form** (tablets in tablets, liquids in ml) instead of being typed, so counting in matches counting out. And **"Withheld" and "Omitted" are being scrapped** — they're confusing because they mix up *what happened*, *why*, and *who decided*. "Omitted" especially is a dustbin that lets a real error be papered over with one tap.
+
+**Also done today — the two structural decisions:**
+
+**Controlled drugs now follow the house type.** Aries is supported living, which is someone's own home, so a second signature isn't automatically required there — but the code demanded one everywhere. It now checks the house. The important bit is what happens when a house has *no* type set (12 of them don't): it **requires the witness anyway**. Being too strict is an inconvenience; being too lax in a care home is a real risk. It means the unset houses aren't blocked while the owner works through them one by one.
+
+**The shared logic moved out into a reusable piece ("a trait").** The plan had been for the new Medication 2 page to *inherit* from the old controller. That turned out to be a trap: it would also inherit all 62 methods and all 18 pages' worth of surface, so one edit for the new page could quietly change every old page at once. It now shares only the round-building and dose-recording logic, and each page keeps its own front door. To prove nothing shifted, we took a fingerprint of exactly what the round produces before the move and again after — **identical, to the byte**. Then re-tested the round's four safety rules: all still working.
+
+**Then we fixed the two worst faults properly.**
+
+**The stock bug is dead.** How much to take off stock is now a proper number stored against the prescription, not something worked out by pulling the letters out of the dose text. `"10 ml (500mg)"` now takes off **10**, not 10,500. And if a carer types nonsense into the "dose given" box, it makes no difference at all any more — the typed text can't touch the quantity.
+
+We were deliberately cowardly with the old data: the automatic fill-in only touched doses it could read with total certainty, and left 5 alone. A NULL means "don't touch stock" — wrong, but honestly wrong, and it can't destroy a balance. We then set those 5 by hand with the reasoning written down. One of them is a genuine trap: **"1 spray each nostril" uses TWO sprays, not one.** No automatic reader would ever have got that right.
+
+**Liquids now count properly.** Stock could only be whole numbers, so a 7.5 ml dose quietly rounded. Four of Sofia's doses took 60 ml down to 32 when it should be 30 — 2 ml of medicine that doesn't exist, every single day, on one child. Now it's exact.
+
+**The "as needed" limits actually work now.** Every PRN dose used to be filed under the same fixed time, so the second dose of the day *overwrote the first* and the safety check could never see any earlier doses. Each dose is now its own record with its own real time. Tested the way a carer actually works: four doses go through, the fifth is refused ("daily maximum reached"), a dose straight after another is refused ("not due until 19:13") — and editing a note no longer restarts the clock and locks a child out of their pain relief.
+
+**Something the testing caught that we'd have shipped.** Fixing the above exposed a second bug hiding behind the first: the "don't take stock off twice" guard also went by that same fixed time, so PRN doses 2, 3 and 4 looked like edits of dose 1 and took **nothing** off stock. A child could have four doses and the cupboard count move once. Only visible because we tested it the way a carer works rather than the way the code was written.
+
+**Everything re-checked afterwards:** 7 out of 7 safety rules still pass, and the round produces identical output to before. Nothing was taken on trust.
+
+**Then we checked our own work, and most of it didn't survive.**
+
+The owner asked for the same agents to be turned on our own fixes. They found four serious faults in them — and the worst one is that **the "as needed" safety limits can't be set through the app at all.** There's no field for them anywhere. The only reason they exist in our demo is that the seeder writes them straight into the database. So every prescription a real user creates has no daily maximum and no minimum gap — and because we'd changed those doses to record separately, a double-tap now recorded **two doses and took stock off twice**. Before the change it recorded one. **We made the real path worse and told the owner it was fixed**, because we only ever tested the one dataset where it works.
+
+Same story three times in one day: **we kept checking against a database we'd already arranged to be right, instead of against what the app actually does.**
+
+**An accident proved the point.** While setting up a clean test database, the backup file turned out to name its own database inside it, so restoring it overwrote the working one instead. Nothing was lost — it's all migrations and a seeder, both re-runnable — but rebuilding it from scratch immediately exposed a fault the agents had predicted on paper: **the seeder never recorded the time a dose was given**, so on a clean rebuild the "too soon, not due until 7:39" block quietly stopped working. It had only ever appeared to work because a later step happened to fill that gap in afterwards. A second paracetamol an hour after the first went straight through, silently.
+
+**So now there's a proper test file** (`tests/Feature/MedicationRoundSafetyTest.php`) — 14 checks covering the whole write path. Three rules baked into it:
+- **Build the test the way the app does.** If a prescription can only be made safe by a database write no user can perform, the safety rule doesn't exist.
+- **Check the side effects, not just the happy path.** Every dose test counts the rows *and* the stock, because that's where the hidden bug was.
+- **Prove a guard by breaking it**, not by watching it not complain.
+
+12 pass. **2 fail — and they're meant to.** They are the two real bugs, and they'll keep failing until those are fixed rather than quietly forgotten.
+
+The seeder now also **refuses to finish** if its own demo data doesn't demonstrate what it claims — no more fixtures that silently prove nothing.
+
+**One landmine found on the way:** the existing tests run against the *live* database, and three of them use a setting that wipes it. Anyone running the full test suite today would destroy the working data. Needs a separate test database before that happens by accident.
+
+## 23 July 2026 — a failed dose stops looking like a saved one, and the "as needed" block becomes visible
+
+Two things the carer actually sees.
+
+**A failed recording no longer pretends it worked.** Deep down, when a dose couldn't be saved (a prescription that doesn't belong to this house, say), the code quietly returned "not found" — and every page turned that into a page-refresh the screen read as *success*, so the box cleared and closed as if the dose had gone in. It now raises a proper error instead, in one place that covers all the pages at once. On screen: tap "Given" and if it fails you now get a red "Not recorded" message with the reason, and the box stays open. The same is true inside the record pop-up and for the End/Reopen round messages, which were being sent but never shown.
+
+**The "as needed" limit is now visible before you tap, not after.** The daily count, the next-due time, and the reason a dose is blocked were all being worked out on the server and thrown away. They now show on the medicine line — "2/4 today · next due 19:39" — and when a dose isn't due yet the "Given" button is greyed out with the reason on hover. This matters because the limit now actually fires; a silent block would just be a button that does nothing.
+
+**The duplicate round pages are tidied, not deleted** (as asked). Every old experimental version of the round — all the "lab" ones and the v4 ones — is now tucked into the single "Duplicates" drop-down in the new menu, next to the ones that were already there. They still show "Sleeping" as given on screen, but the machinery underneath them is the corrected one, so what they *record* is right.
+
+**Caught another rotting fixture, and killed it properly.** Two of the safety tests were passing only because the demo data had been re-created that same day — leave it a week and they quietly stopped testing anything. Those two tests now build their own same-day data, so they can't go stale. Proved it by deliberately ageing the demo data a week and watching them still pass. The suite is 15 checks now, and the two that are *meant* to fail (the unfixed bugs) still do.
+
+**One honest wobble:** while setting up a separate test database, a backup file named its own database inside it and overwrote the working one. Nothing was lost — it all rebuilds from code — but it's a reminder to read a dump's header before restoring it.
+
+---
+
+## 23 July 2026 (later) — the industry check, and a bug in our own homework
+
+We ran the two agents over the whole design against current official sources: one to gather what the rules actually say, one to judge our decisions against them and hunt for over-claims in our own paperwork. Both were told to trust nothing we'd written.
+
+**They caught our documents contradicting the real sources — including a mistake we'd made an hour earlier.**
+- Our register said the main "medicines in care homes" guidance (NICE SC1) was **adult-only**. Verified against the actual guidance: it explicitly covers children's homes too. We'd even acted on the wrong label — a warning note added earlier that day repeated it. Both are now corrected.
+- The rule that a controlled drug needs a second person to witness it — we'd written it up as if it were **the law**. It isn't; it's strongly-expected good practice, and the regulations themselves name no such witness. Corrected to say exactly that, so nobody mistakes a good-practice choice for a legal duty.
+- A citation pointing at a standard number that **doesn't exist** ("STD-17") — a typo for a real one. Fixed.
+- The actual law covering whether a 16- or 17-year-old can consent to their own medicine (the Family Law Reform Act 1969) was **missing entirely** from our list. Added. The harder question — what happens when such a young person *refuses* — is flagged for a real lawyer.
+
+**One thing they let us fix on the spot, and we did:** a "Withheld" dose no longer records with no explanation. Withholding a prescribed medicine is a deliberate decision, so the record now has to say why — same bar as refused or omitted. On screen the reason box appears; the server rejects a blank one. Test added, 16 checks pass.
+
+**The honest headline from the compliance side:** what we've built is careful safety engineering, but it is **not** something an inspector could look at as evidence of compliance today. The biggest single gap they named is one we already knew about — when a dose record is corrected, the old version is still silently overwritten with no trail of who changed it or why. For a regulator that's the first thing they'd look for. It's on the list, not done.
+
+**Confirmed still open** (nothing hidden): the overwrite-without-a-trail problem; the manager who can only see their first house; the medicine dictionary that would make "Warfarin as a controlled drug" impossible doesn't exist yet; and the consent rules for 16–17-year-olds must not go live until a lawyer has ruled on them.
+
+**Two licensing facts worth knowing for later:** the dosing reference (BNF/BNFc) that a "this dose looks too high" feature would need is **commercially licensed** — it can't just be embedded; that needs a paid agreement. And the medicines dictionary (dm+d) is free to register for but its exact redistribution terms for a SaaS still need someone with an account to read the small print.
+
+---
+
+## 23 July 2026 (later still) — corrections now leave a trail
+
+Fixed the biggest thing the compliance check flagged: **a corrected dose record no longer erases the original.**
+
+Before, if someone recorded a dose as "Given" and later fixed it to "Refused", the "Given" entry was simply overwritten — gone, with no record that it had ever said that, who wrote it, or why it changed. That's the first thing an inspector looks for, and it was the single worst gap we had.
+
+Now a correction keeps both. The original stays in the table, marked as an old version, with the time it was replaced; the correction is a fresh entry that points back to what it replaced and can carry a "why". Nothing is ever deleted. The screens still show only the live version — the history sits underneath for audit. And tapping the same thing twice by accident doesn't clutter the history, because an identical re-entry changes nothing.
+
+To make sure no screen accidentally shows an old version, the rule is enforced in one central place rather than page by page — this codebase has been bitten too many times by a single reader that got missed. Proved it end to end: record Given, correct to Refused, and the round page shows Refused with exactly one live entry, while the original Given is still there in the history.
+
+**Also done:** "Withheld" now needs a reason, same as refused or omitted — withholding a medicine is a deliberate decision and the record has to say why.
+
+18 checks pass, build clean, and the change safely re-runs from scratch. The rollback deliberately refuses if any history exists, rather than quietly flattening it.
+
+**Not touched yet, on purpose:** a database-level guard against two identical entries racing in at once. The obvious version of that would wrongly block a legitimate second "as needed" dose (they share a nominal time), and the app already serialises those writes, so it needs a more careful design — flagged, not forgotten.
+
+---
+
+## 23 July 2026 (end of day) — the new Medication Round page is built
+
+After a week of fixing the foundation, the actual page exists. The owner picked the **focused one-resident flow** from three mockups (shown as an interactive comparison first).
+
+**What it is:** one resident fills the screen — their photo, age, weight and allergies pinned at the top so they can't scroll away while a dose is being recorded (the wrong-resident risk the clinical review flagged). Record their doses, then "Next resident". A progress bar shows how far through the round you are. Round-of-day tabs across the top.
+
+**The payoff of all the groundwork:** the new page got every safety fix for *free*, because it shares the same underlying machinery rather than copying it. Verified end to end: recording a dose deducts stock correctly, a controlled drug still demands a witness, a failed save raises a real error instead of pretending to succeed, and corrections still leave an audit trail. None of that had to be rebuilt for the new page.
+
+**Kept honest:** the page shows what genuinely exists. It does not invent a "weighed N days ago" age (weight isn't dated yet — that's still to build) and it shows the real prescribed dose rather than a computed volume (the medicine dictionary that would compute it isn't built yet). No fake data on screen.
+
+**Wiring:** the new page is served by its own controller that *composes* the shared round logic (not inherits it), so an edit here can't reshape the 18 old round pages. Its route is registered before the catch-all so it isn't shadowed into an empty placeholder. 23 automated checks pass across the round and the home switcher; build clean.
+
+**Still open, honestly:** the full new code list, weight-as-a-dated-series, and the "block or warn on zero stock" policy all still wait on a pharmacist. And the page is built but not yet clicked through in a real browser on a real phone — that's the next check.
+
+---
+
+## 23 July 2026 (end of day, part 2) — the round overview, weights, and the "not yet due" guard
+
+Three things the owner asked for, all built on the Round page.
+
+**Weight now means something.** It was a plain undated number, with two children secretly recorded in pounds. It's now a proper dated history: shown as "38 kg · weighed 35 days ago", kept in kg only (pounds refused and converted on the way in), and flagged in orange when it's too old to trust. How old is "too old" still needs a pharmacist — that number is a clearly-marked placeholder — but the machinery is there.
+
+**A round now opens with an overview.** Instead of dropping straight onto the first resident, the carer first sees everyone in the round — who's done, who's overdue, who has an allergy, who has a controlled drug due — then taps "Start round". If they've already done some, the button says "Resume — [next person]" and jumps to the first person still outstanding, not back to the top. Tapping anyone opens them directly. This also means an interrupted round no longer loses its place. The overview is deliberately look-only — you can't record a dose from it, so the safety of the one-resident-at-a-time screen is never bypassed.
+
+**Ending a round now checks first.** "End round" lives on the overview and, if doses are still outstanding, asks "3 doses still due — end anyway?" and records that they were left. Managers can re-open; carers can't (checked on the server).
+
+**The owner's "gave night meds in the afternoon" catch is fixed.** Recording a dose whose time hasn't arrived yet now asks "not due until 20:00 — record early?" rather than silently going through. It's a confirmation, not a block, because giving early is sometimes legitimate.
+
+Everything was checked the way that actually catches things: the rollup status the overview shows is computed in one place so it can't drift from the focused screen, end/reopen were tested end-to-end (including a carer being correctly refused a re-open), and the page was loaded through the real server. 28 automated checks pass; build clean.
+
+---
+
+## 23 July 2026 (end of day, part 3) — the rest of the Medication 2 pages
+
+The four remaining pages in the Medication 2 area were empty placeholders. They're now real, and they all reuse the existing data rather than duplicating it — each new page points at the same query the old version already used, so there's one source of truth and nothing to drift.
+
+- **Medications** — every active prescription in the current home, searchable, with quick filters (all / as-needed / controlled / low stock). Shows dose, form, route, and stock at a glance.
+- **Missed doses** — the day's missed and not-given doses, with day-to-day navigation and a resolve flow: pick the clinical action taken, add notes, mark it resolved (or undo). Pairs with the round.
+- **Stock** — a clean overview: how much of each medicine is in stock, what's low, out, expiring or expired, with the ones needing attention floated to the top. Deliberately read-only — receiving and adjusting stock stays on the fuller Stock 2 page, and the page says so.
+- **Controlled drugs** — the controlled medicines in the home, by resident, with their schedule and current stock. It's **honest about a real gap**: there is no witnessed running-balance register being kept yet, so the page says the stock figures come from the medication record, not a register, rather than dressing up an empty register as a working one. Building that register is noted as real work still to do.
+
+All four open with the manager's currently-selected home (the home switcher works across them), each was loaded through the real server, the resolve flow was tested end-to-end, and every existing safety check still passes. The routes are all registered ahead of the old catch-all so none of them fall back to a blank placeholder.
+
+---
+
+**Still waiting on a real pharmacist:** the new code list, whether zero stock should block or just warn, and how old a child's weight can be before it's untrustworthy. We're not deciding those ourselves.
 
 ---
 

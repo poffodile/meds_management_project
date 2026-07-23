@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\frontEnd\Medication;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\frontEnd\Medication\Concerns\BuildsMedicationRound;
 use App\Models\MARAdministration;
 use App\Models\MARSheet;
 use App\Models\MedicationRoundClosure;
@@ -18,19 +19,8 @@ use Inertia\Inertia;
 
 class MedicationRoundController extends Controller
 {
+    use BuildsMedicationRound;
     private const ALLOWED_USER_TYPES = ['N', 'M', 'A', 'CM', 'O'];
-
-    /**
-     * Time-of-day rounds. A medication belongs to a round when one of its
-     * scheduled time slots falls within [start, end). Anything before 06:00
-     * or from 18:00 onwards counts as Night.
-     */
-    private const ROUNDS = [
-        'morning' => ['label' => 'Morning',   'start' => 6,  'end' => 12, 'icon' => 'fa-sun-o',     'window' => '06:00–12:00'],
-        'lunchtime' => ['label' => 'Lunchtime', 'start' => 12, 'end' => 14, 'icon' => 'fa-coffee',    'window' => '12:00–14:00'],
-        'evening' => ['label' => 'Evening',   'start' => 14, 'end' => 18, 'icon' => 'fa-cloud',     'window' => '14:00–18:00'],
-        'night' => ['label' => 'Night',     'start' => 18, 'end' => 24, 'icon' => 'fa-moon-o',    'window' => '18:00–06:00'],
-    ];
 
     public function __construct()
     {
@@ -41,31 +31,6 @@ class MedicationRoundController extends Controller
 
             return $next($request);
         });
-    }
-
-    /** Resolve the carer's primary home (matches MARSheetController). */
-    private function getHomeId(): int
-    {
-        return (int) explode(',', Auth::user()->home_id)[0];
-    }
-
-    /** Which round does an "HH:MM" time fall into? */
-    private function roundForTime(?string $time): string
-    {
-        if (! $time) {
-            return 'night';
-        }
-        $hour = (int) substr($time, 0, 2);
-        foreach (self::ROUNDS as $key => $cfg) {
-            if ($key === 'night') {
-                continue;
-            }
-            if ($hour >= $cfg['start'] && $hour < $cfg['end']) {
-                return $key;
-            }
-        }
-
-        return 'night';
     }
 
     public function index(Request $request)
@@ -196,214 +161,23 @@ class MedicationRoundController extends Controller
         return Inertia::render('Medication/MedicationRoundLab143', $this->buildRoundProps($request));
     }
 
-    /** Builds the shared props for the medication round React pages. */
-    private function buildRoundProps(Request $request): array
-    {
-        $request->validate(['date' => 'nullable|date']);
-
-        $homeId = $this->getHomeId();
-        $date = $request->input('date', now()->toDateString());
-
-        $sheets = MARSheet::forHome($homeId)
-            ->active()
-            ->currentlyActive()
-            ->with(['administrations' => function ($q) use ($date) {
-                $q->where('date', $date)->with('administeredByUser:id,name');
-            }])
-            ->orderBy('medication_name')
-            ->get();
-
-        $clientIds = $sheets->pluck('client_id')->unique()->values();
-        $residents = ServiceUser::whereIn('id', $clientIds)->get()->keyBy('id');
-
-        // Per-resident regular / PRN medication counts (across all active sheets).
-        $counts = [];
-        foreach ($sheets as $s) {
-            $cid = $s->client_id;
-            if (! isset($counts[$cid])) {
-                $counts[$cid] = ['regular' => 0, 'prn' => 0];
-            }
-            $s->as_required ? $counts[$cid]['prn']++ : $counts[$cid]['regular']++;
-        }
-
-        // Per-resident active risks (generic — surfaced with their impact level).
-        $risksByClient = \DB::table('care_plan_risks')
-            ->whereIn('client_id', $clientIds)
-            ->where('status', 1)
-            ->whereNull('deleted_at')
-            ->get(['client_id', 'description', 'impact'])
-            ->groupBy('client_id');
-
-        // Time context for the due / overdue / upcoming derivation (relative to "now").
-        $today = now()->toDateString();
-        $isToday = ($date === $today);
-        $isPast = ($date < $today);
-        $nowMin = (int) now()->format('H') * 60 + (int) now()->format('i');
-
-        $grid = [];
-        foreach (array_keys(self::ROUNDS) as $roundKey) {
-            $grid[$roundKey] = [];
-        }
-
-        foreach ($sheets as $sheet) {
-            $slots = ! empty($sheet->time_slots) ? $sheet->time_slots : [null];
-            $adminsBySlot = $sheet->administrations->keyBy('time_slot');
-
-            // PRN ("as needed") state: how many given today, last given, next allowed.
-            $prn = null;
-            if ($sheet->as_required) {
-                $given = $sheet->administrations->filter(fn ($a) => in_array($a->code, ['A', 'S'], true));
-                $count = $given->count();
-                $last = $given->sortByDesc('updated_at')->first()?->updated_at;
-                $intervalH = (float) ($sheet->prn_min_interval_hours ?? 0);
-                $next = ($last && $intervalH > 0) ? $last->copy()->addMinutes((int) round($intervalH * 60)) : null;
-                $maxDaily = $sheet->prn_max_daily;
-                $hitMax = $maxDaily !== null && $count >= (int) $maxDaily;
-                $tooSoon = $isToday && $next && now()->lt($next);
-                $prn = [
-                    'max_daily' => $maxDaily !== null ? (int) $maxDaily : null,
-                    'interval_hours' => $sheet->prn_min_interval_hours !== null ? (float) $sheet->prn_min_interval_hours : null,
-                    'given_today' => $count,
-                    'last_given' => $last?->format('H:i'),
-                    'next_available' => $next?->format('H:i'),
-                    'blocked' => $isToday && ($hitMax || $tooSoon),
-                    'block_reason' => $hitMax ? 'Daily maximum reached' : ($tooSoon ? ('Not due until '.$next?->format('H:i')) : null),
-                ];
-            }
-
-            foreach ($slots as $slot) {
-                $targetRounds = $slot !== null ? [$this->roundForTime($slot)] : array_keys(self::ROUNDS);
-
-                foreach ($targetRounds as $roundKey) {
-                    $clientId = $sheet->client_id;
-                    if (! isset($grid[$roundKey][$clientId])) {
-                        $su = $residents->get($clientId);
-                        $allergies = ($su && $su->allergies)
-                            ? array_values(array_filter(array_map('trim', preg_split('/[,;]+/', $su->allergies))))
-                            : [];
-                        $riskFlags = ($risksByClient[$clientId] ?? collect())->map(function ($r) {
-                            return ['label' => $r->description, 'level' => strtolower($r->impact ?: 'medium')];
-                        })->values()->all();
-                        $gender = ($su && $su->gender) ? (['M' => 'Male', 'F' => 'Female'][$su->gender] ?? $su->gender) : null;
-                        $grid[$roundKey][$clientId] = [
-                            'client_id' => $clientId,
-                            'name' => $su->name ?? ('Resident #'.$clientId),
-                            'photo' => ($su && $su->image) ? url('public/images/serviceUserProfileImages/'.$su->image) : null,
-                            'dob' => $su->date_of_birth ?? null,
-                            'gender' => $gender,
-                            'weight' => ($su && $su->weight) ? $su->weight : null,
-                            'weight_unit' => $su->weight_unit ?? null,
-                            'room' => ($su && $su->room_number) ? $su->room_number : null,
-                            'nhs' => ($su && $su->nhs_number) ? $su->nhs_number : null,
-                            'mobility' => ($su && $su->suMobility) ? $su->suMobility : null,
-                            'diet' => ($su && $su->diet) ? $su->diet : null,
-                            'allergies' => $allergies,
-                            'risk_flags' => $riskFlags,
-                            'regular_count' => $counts[$clientId]['regular'] ?? 0,
-                            'prn_count' => $counts[$clientId]['prn'] ?? 0,
-                            'rows' => [],
-                        ];
-                    }
-                    $admin = $slot !== null ? $adminsBySlot->get($slot) : null;
-                    $grid[$roundKey][$clientId]['rows'][] = [
-                        'mar_sheet_id' => $sheet->id,
-                        'medication_name' => $sheet->medication_name,
-                        'strength' => $sheet->dosage,
-                        'dose' => $sheet->dose,
-                        'route' => $sheet->route,
-                        'instruction' => $sheet->prn_details ?: $sheet->reason_for_medication,
-                        'slot' => $slot,
-                        'stock' => $sheet->stock_level,
-                        'low_stock' => ! is_null($sheet->stock_level) && ! is_null($sheet->reorder_level) && $sheet->stock_level <= $sheet->reorder_level,
-                        'unit' => $sheet->unit,
-                        'is_controlled' => (bool) $sheet->is_controlled,
-                        'cd_schedule' => $sheet->cd_schedule,
-                        'as_required' => (bool) $sheet->as_required,
-                        'prn' => $prn,
-                        'status' => $this->doseBucket($slot, $admin->code ?? null, $isToday, $isPast, $nowMin),
-                        'code' => $admin->code ?? null,
-                        'reason' => $admin?->reason,
-                        'notes' => $admin?->notes,
-                        'witnessed_by' => $admin?->witnessed_by,
-                        'recorded_at' => $admin?->updated_at?->format('H:i'),
-                        'dose_given' => $admin->dose_given ?? null,
-                        'recorded_by' => ($admin && $admin->administeredByUser) ? $admin->administeredByUser->name : null,
-                    ];
-                }
-            }
-        }
-
-        foreach ($grid as $roundKey => $residents) {
-            $grid[$roundKey] = collect($residents)->sortBy('name')->values()->all();
-        }
-
-        $rounds = [];
-        foreach (self::ROUNDS as $key => $cfg) {
-            $rounds[] = ['key' => $key, 'label' => $cfg['label'], 'window' => $cfg['window']];
-        }
-
-        // Which rounds (for this home + date) have been ended, with who/when.
-        $closures = MedicationRoundClosure::where('home_id', $homeId)->where('date', $date)
-            ->with('closedByUser:id,name')->get()
-            ->mapWithKeys(fn ($c) => [$c->round => [
-                'by' => $c->closedByUser->name ?? null,
-                'at' => $c->updated_at?->format('H:i'),
-            ]])->all();
-
-        return [
-            'rounds' => $rounds,
-            'grid' => $grid,
-            'date' => $date,
-            'currentRound' => $this->roundForTime(now()->format('H:i')),
-            'closures' => $closures,
-            'home' => \DB::table('home')->where('id', $homeId)->value('title'),
-        ];
-    }
-
-    /**
-     * Derive a dose's timing bucket relative to "now" (only meaningful for today):
-     * completed | overdue | due_now (<=60m) | upcoming (<=120m) | later | due (PRN/unscheduled).
-     */
-    private function doseBucket($slot, $code, $isToday, $isPast, $nowMin)
-    {
-        if ($code) {
-            return 'completed';
-        }
-        if ($slot === null || strpos((string) $slot, ':') === false) {
-            return 'due'; // PRN / unscheduled
-        }
-        [$h, $m] = explode(':', $slot);
-        $slotMin = (int) $h * 60 + (int) $m;
-        if ($isPast) {
-            return 'overdue';
-        }
-        if (! $isToday) {
-            return 'later';
-        }
-        $diff = $slotMin - $nowMin;
-        if ($diff < 0) {
-            return 'overdue';
-        }
-        if ($diff <= 60) {
-            return 'due_now';
-        }
-        if ($diff <= 120) {
-            return 'upcoming';
-        }
-
-        return 'later';
-    }
-
     /**
      * Record an administration via the existing MAR service, and auto-deduct stock when given.
      * Guards against double-deducting if an already-"Given" record is edited.
      */
     public function record(Request $request, MARSheetService $marSheetService)
     {
-        $ok = $this->applyRecord($request, $marSheetService);
-
-        if (! $ok) {
-            return response()->json(['ok' => false, 'message' => 'Prescription not found'], 404);
+        // applyRecord now throws on a missing sheet (audit CR-07) rather than returning
+        // false. This JSON endpoint preserves its old 404 contract by catching it; the
+        // other validation failures (PRN, CD witness, reason, round lock) surface as the
+        // usual 422 that Laravel produces from a ValidationException.
+        try {
+            $this->applyRecord($request, $marSheetService);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            if (array_key_exists('mar_sheet_id', $e->errors())) {
+                return response()->json(['ok' => false, 'message' => 'Prescription not found'], 404);
+            }
+            throw $e;
         }
 
         return response()->json(['ok' => true]);
@@ -671,7 +445,12 @@ class MedicationRoundController extends Controller
             $days[] = $d->toDateString();
         }
 
-        $client = \App\Models\ServiceUser::find($clientId);
+        // Scope the resident lookup to this home. An unscoped find() leaks another
+        // tenant's name/DOB even though the medication grid below stays correctly empty.
+        $client = \App\Models\ServiceUser::where('id', $clientId)
+            ->where('home_id', $homeId)
+            ->first();
+        abort_if(! $client, 404);
 
         $sheets = MARSheet::forHome($homeId)->active()
             ->where('client_id', $clientId)
@@ -1079,110 +858,4 @@ class MedicationRoundController extends Controller
         return $back->with('success', 'Round re-opened.');
     }
 
-    /** Record an administration + auto-deduct stock on a newly-given dose. Returns false if not found. */
-    private function applyRecord(Request $request, MARSheetService $marSheetService): bool
-    {
-        $request->validate([
-            'mar_sheet_id' => 'required|integer',
-            'date' => 'required|date',
-            'time_slot' => 'required|string|max:10',
-            'code' => 'required|in:A,S,R,W,N,O',
-            'dose_given' => 'nullable|string|max:100',
-            'witnessed_by' => 'nullable|string|max:255',
-            'reason' => 'nullable|string|max:255',
-            'notes' => 'nullable|string|max:2000',
-        ]);
-
-        // A refused / not-given / omitted dose must carry a reason (auditable record).
-        if (in_array($request->input('code'), ['R', 'N', 'O'], true) && trim((string) $request->input('reason')) === '') {
-            throw ValidationException::withMessages([
-                'reason' => 'Please give a reason when a dose is refused or not given.',
-            ]);
-        }
-
-        $homeId = $this->getHomeId();
-        $userId = (int) Auth::id();
-
-        $sheet = MARSheet::forHome($homeId)->active()->find($request->input('mar_sheet_id'));
-        if (! $sheet) {
-            return false;
-        }
-
-        // A round that has been ended is locked — no further recording.
-        $round = $this->roundForTime($request->input('time_slot'));
-        if (MedicationRoundClosure::where('home_id', $homeId)->where('date', $request->input('date'))->where('round', $round)->exists()) {
-            throw ValidationException::withMessages([
-                'code' => 'This round has been ended and is locked.',
-            ]);
-        }
-
-        // Controlled drugs legally require a witness to administer ("Given").
-        if ($sheet->is_controlled && $request->input('code') === 'A' && trim((string) $request->input('witnessed_by')) === '') {
-            throw ValidationException::withMessages([
-                'witnessed_by' => 'A witness is required to administer a controlled drug.',
-            ]);
-        }
-
-        // PRN limits: enforce daily maximum + minimum interval between doses.
-        if ($sheet->as_required && in_array($request->input('code'), ['A', 'S'], true)) {
-            $given = MARAdministration::where('mar_sheet_id', $sheet->id)
-                ->where('date', $request->input('date'))
-                ->whereIn('code', ['A', 'S'])
-                ->where('time_slot', '!=', $request->input('time_slot')) // exclude the dose being (re)recorded
-                ->get();
-            if ($sheet->prn_max_daily !== null && $given->count() >= (int) $sheet->prn_max_daily) {
-                throw ValidationException::withMessages([
-                    'code' => 'PRN daily maximum ('.(int) $sheet->prn_max_daily.') already reached for this medication.',
-                ]);
-            }
-            $intervalH = (float) ($sheet->prn_min_interval_hours ?? 0);
-            if ($intervalH > 0) {
-                $last = $given->sortByDesc('updated_at')->first()?->updated_at;
-                if ($last) {
-                    $next = $last->copy()->addMinutes((int) round($intervalH * 60));
-                    if (now()->lt($next)) {
-                        throw ValidationException::withMessages([
-                            'code' => 'Too soon — the next PRN dose is not due until '.$next->format('H:i').'.',
-                        ]);
-                    }
-                }
-            }
-        }
-
-        // Was this slot already recorded as Given? (so we don't deduct twice on edit)
-        $existing = MARAdministration::where('mar_sheet_id', $request->input('mar_sheet_id'))
-            ->where('date', $request->input('date'))
-            ->where('time_slot', $request->input('time_slot'))
-            ->first();
-        $wasGiven = $existing && $existing->code === 'A';
-
-        $admin = $marSheetService->administer(
-            (int) $request->input('mar_sheet_id'),
-            $request->only(['date', 'time_slot', 'code', 'dose_given', 'witnessed_by', 'reason', 'notes']),
-            $homeId,
-            $userId
-        );
-
-        if (! $admin) {
-            return false;
-        }
-
-        // Auto-deduct stock only on a newly-given dose.
-        $nowGiven = $request->input('code') === 'A';
-        if ($nowGiven && ! $wasGiven) {
-            if (! is_null($sheet->stock_level)) {
-                $qty = (float) preg_replace('/[^0-9.]/', '', (string) ($request->input('dose_given') ?: $sheet->dose));
-                if ($qty <= 0) {
-                    $qty = 1;
-                }
-                $resident = ServiceUser::where('id', $sheet->client_id)->first();
-                MedicationStockTransaction::apply($sheet, 'administered', $qty, $userId, [
-                    'client_name' => $resident->name ?? null,
-                    'notes' => 'Auto-deducted on administration (Medication Round)',
-                ]);
-            }
-        }
-
-        return true;
-    }
 }

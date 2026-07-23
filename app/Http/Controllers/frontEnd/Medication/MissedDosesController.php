@@ -16,7 +16,11 @@ class MissedDosesController extends Controller
     private const ALLOWED_USER_TYPES = ['N', 'M', 'A', 'CM', 'O'];
 
     // MAR codes that count as "not given as planned".
-    private const NOT_GIVEN_CODES = ['R', 'O', 'W', 'N'];
+    // 'S' (asleep) included: the resident received nothing, so it is a not-given
+    // outcome and belongs in review like any other. It was previously excluded
+    // because 'S' was wrongly counted as "given", which meant a sleeping resident's
+    // missed dose never surfaced to anyone.
+    private const NOT_GIVEN_CODES = ['R', 'O', 'W', 'N', 'S'];
 
     public function __construct()
     {
@@ -160,6 +164,34 @@ class MissedDosesController extends Controller
         $data['home'] = \DB::table('home')->where('id', $this->getHomeId())->value('title');
 
         return Inertia::render('Frontend2/MissedDoses', $data);
+    }
+
+    /** Medication 2 → Missed doses. Same data helper as indexFrontend2; fresh view. */
+    public function indexMedication2(Request $request)
+    {
+        $request->merge(['status' => 'all']);
+        $data = $this->missedReactData($request);
+        $data['home'] = \DB::table('home')->where('id', $this->getHomeId())->value('title');
+
+        return Inertia::render('Frontend2/Medication2/MissedDoses', $data);
+    }
+
+    /** Resolve a missed/not-given dose from the Medication 2 page (same logic, returns here). */
+    public function resolveMedication2(Request $request)
+    {
+        $error = $this->runResolve($request);
+
+        return redirect()->route('frontend2.medication2.missed-doses', ['date' => $request->input('review_date')])
+            ->with($error ? 'error' : 'success', $error ?? 'Dose reviewed and resolved.');
+    }
+
+    /** Undo a resolution from the Medication 2 page. */
+    public function unresolveMedication2(Request $request)
+    {
+        $error = $this->runUnresolve($request);
+
+        return redirect()->route('frontend2.medication2.missed-doses', ['date' => $request->input('review_date')])
+            ->with($error ? 'error' : 'success', $error ?? 'Resolution removed.');
     }
 
     /** Resolve a dose + return to the frontend2 review page (keeping the date). */

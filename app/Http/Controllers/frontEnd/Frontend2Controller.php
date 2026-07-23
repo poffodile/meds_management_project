@@ -17,10 +17,32 @@ use Inertia\Inertia;
  */
 class Frontend2Controller extends Controller
 {
-    /** Resolve the carer's primary home (matches the medication screens). */
+    use \App\Http\Controllers\frontEnd\Concerns\ResolvesCurrentHome;
+
+    /** The home currently in view — the manager's selected home, not blindly the first. */
     private function getHomeId(): int
     {
-        return (int) explode(',', Auth::user()->home_id)[0];
+        return $this->currentHomeId();
+    }
+
+    /**
+     * Switch which of the manager's homes is in view. Validates the target against the
+     * user's OWN home list (via the resolver's session write path re-checking against
+     * that list), so a manager can never select a home they don't have access to.
+     */
+    public function switchHome(Request $request)
+    {
+        $request->validate(['home_id' => 'required|integer']);
+        $target = (int) $request->input('home_id');
+
+        if (! in_array($target, $this->allowedHomeIds(), true)) {
+            return back()->with('error', 'You do not have access to that home.');
+        }
+
+        session(['active_home_id' => $target]);
+        $name = \App\Home::where('id', $target)->value('name') ?: ('Home #'.$target);
+
+        return back()->with('success', 'Now viewing '.$name.'.');
     }
 
     private function genderLabel($g): ?string
@@ -183,17 +205,44 @@ class Frontend2Controller extends Controller
     /** "Medication 2" — placeholder pages (a second meds area to iterate on later). */
     public function medication2(Request $request, $page)
     {
-        $map = [
-            'round' => 'MedicationRound',
-            'medications' => 'Medications',
-            'missed-doses' => 'MissedDoses',
-            'controlled-drugs' => 'ControlledDrugs',
-            'stock' => 'Stock',
-        ];
+        // These four are now served by real routes registered BEFORE the {page} catch-all
+        // (frontend2.medication2.*). Only genuinely-unbuilt sub-pages fall through here.
+        $map = [];
 
         abort_unless(isset($map[$page]), 404);
 
         return Inertia::render('Frontend2/Medication2/'.$map[$page]);
+    }
+
+    /** Medication 2 → Medications: every active prescription across the current home. */
+    public function medications2(Request $request)
+    {
+        $homeId = $this->getHomeId();
+
+        $sheets = MARSheet::forHome($homeId)->active()->currentlyActive()->orderBy('medication_name')->get();
+        $names = ServiceUser::whereIn('id', $sheets->pluck('client_id')->unique())->pluck('name', 'id');
+
+        $meds = $sheets->map(fn ($s) => [
+            'id' => $s->id,
+            'name' => $s->medication_name,
+            'resident' => $names[$s->client_id] ?? null,
+            'client_id' => $s->client_id,
+            'strength' => $s->dosage,
+            'dose' => $s->dose,
+            'form' => $s->form,
+            'unit' => $s->unit,
+            'route' => $s->route,
+            'prn' => (bool) $s->as_required,
+            'controlled' => (bool) $s->is_controlled,
+            'cd_schedule' => $s->cd_schedule,
+            'stock' => $s->stock_level,
+            'low_stock' => ! is_null($s->stock_level) && ! is_null($s->reorder_level) && $s->stock_level <= $s->reorder_level,
+        ])->values();
+
+        return Inertia::render('Frontend2/Medication2/Medications', [
+            'meds' => $meds,
+            'home' => \DB::table('home')->where('id', $homeId)->value('title'),
+        ]);
     }
 
     /** Medications section — every active prescription across the home. */

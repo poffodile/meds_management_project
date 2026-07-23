@@ -57,23 +57,30 @@ class MARSheetController extends Controller
             'medication_name'        => 'required|string|max:255',
             'dosage'                 => 'nullable|string|max:100',
             'dose'                   => 'nullable|string|max:100',
+            'dose_quantity'          => 'nullable|numeric|min:0.001|max:9999',
+            'form'                   => 'nullable|string|max:100',
+            'unit'                   => 'nullable|string|max:50',
             'route'                  => 'nullable|string|max:100',
             'frequency'              => 'nullable|string|max:255',
             'time_slots'             => 'nullable|array',
             'time_slots.*'           => 'string|max:10',
             'as_required'            => 'nullable|boolean',
             'prn_details'            => 'nullable|string|max:2000',
+            // PRN safety limits. Bounded rather than free: a 0 daily maximum would mean
+            // "never give this", which is a discontinuation, not a limit.
+            'prn_max_daily'          => 'nullable|integer|min:1|max:24',
+            'prn_min_interval_hours' => 'nullable|numeric|min:0|max:24',
             'reason_for_medication'  => 'nullable|string|max:2000',
             'prescribed_by'          => 'nullable|string|max:255',
             'prescriber'             => 'nullable|string|max:255',
             'pharmacy'               => 'nullable|string|max:255',
             'start_date'             => 'nullable|date',
             'end_date'               => 'nullable|date|after_or_equal:start_date',
-            'stock_level'            => 'nullable|integer|min:0',
-            'reorder_level'          => 'nullable|integer|min:0',
-            'quantity_received'      => 'nullable|integer|min:0',
-            'quantity_carried_forward' => 'nullable|integer|min:0',
-            'quantity_returned'      => 'nullable|integer|min:0',
+            'stock_level'            => 'nullable|numeric|min:0',
+            'reorder_level'          => 'nullable|numeric|min:0',
+            'quantity_received'      => 'nullable|numeric|min:0',
+            'quantity_carried_forward' => 'nullable|numeric|min:0',
+            'quantity_returned'      => 'nullable|numeric|min:0',
             'storage_requirements'   => 'nullable|string|max:1000',
             'allergies_warnings'     => 'nullable|string|max:1000',
         ]);
@@ -82,8 +89,9 @@ class MARSheetController extends Controller
             $homeId = $this->getHomeId();
             $userId = (int) Auth::user()->id;
             $data = $request->only([
-                'client_id', 'medication_name', 'dosage', 'dose', 'route', 'frequency',
-                'time_slots', 'as_required', 'prn_details', 'reason_for_medication',
+                'client_id', 'medication_name', 'dosage', 'dose', 'dose_quantity', 'form', 'unit', 'route', 'frequency',
+                'time_slots', 'as_required', 'prn_details', 'prn_max_daily', 'prn_min_interval_hours',
+                'reason_for_medication',
                 'prescribed_by', 'prescriber', 'pharmacy', 'start_date', 'end_date',
                 'stock_level', 'reorder_level', 'quantity_received', 'quantity_carried_forward',
                 'quantity_returned', 'storage_requirements', 'allergies_warnings',
@@ -108,23 +116,30 @@ class MARSheetController extends Controller
             'medication_name'        => 'nullable|string|max:255',
             'dosage'                 => 'nullable|string|max:100',
             'dose'                   => 'nullable|string|max:100',
+            'dose_quantity'          => 'nullable|numeric|min:0.001|max:9999',
+            'form'                   => 'nullable|string|max:100',
+            'unit'                   => 'nullable|string|max:50',
             'route'                  => 'nullable|string|max:100',
             'frequency'              => 'nullable|string|max:255',
             'time_slots'             => 'nullable|array',
             'time_slots.*'           => 'string|max:10',
             'as_required'            => 'nullable|boolean',
             'prn_details'            => 'nullable|string|max:2000',
+            // PRN safety limits. Bounded rather than free: a 0 daily maximum would mean
+            // "never give this", which is a discontinuation, not a limit.
+            'prn_max_daily'          => 'nullable|integer|min:1|max:24',
+            'prn_min_interval_hours' => 'nullable|numeric|min:0|max:24',
             'reason_for_medication'  => 'nullable|string|max:2000',
             'prescribed_by'          => 'nullable|string|max:255',
             'prescriber'             => 'nullable|string|max:255',
             'pharmacy'               => 'nullable|string|max:255',
             'start_date'             => 'nullable|date',
             'end_date'               => 'nullable|date|after_or_equal:start_date',
-            'stock_level'            => 'nullable|integer|min:0',
-            'reorder_level'          => 'nullable|integer|min:0',
-            'quantity_received'      => 'nullable|integer|min:0',
-            'quantity_carried_forward' => 'nullable|integer|min:0',
-            'quantity_returned'      => 'nullable|integer|min:0',
+            'stock_level'            => 'nullable|numeric|min:0',
+            'reorder_level'          => 'nullable|numeric|min:0',
+            'quantity_received'      => 'nullable|numeric|min:0',
+            'quantity_carried_forward' => 'nullable|numeric|min:0',
+            'quantity_returned'      => 'nullable|numeric|min:0',
             'storage_requirements'   => 'nullable|string|max:1000',
             'allergies_warnings'     => 'nullable|string|max:1000',
         ]);
@@ -132,8 +147,9 @@ class MARSheetController extends Controller
         try {
             $homeId = $this->getHomeId();
             $data = $request->only([
-                'medication_name', 'dosage', 'dose', 'route', 'frequency',
-                'time_slots', 'as_required', 'prn_details', 'reason_for_medication',
+                'medication_name', 'dosage', 'dose', 'dose_quantity', 'form', 'unit', 'route', 'frequency',
+                'time_slots', 'as_required', 'prn_details', 'prn_max_daily', 'prn_min_interval_hours',
+                'reason_for_medication',
                 'prescribed_by', 'prescriber', 'pharmacy', 'start_date', 'end_date',
                 'stock_level', 'reorder_level', 'quantity_received', 'quantity_carried_forward',
                 'quantity_returned', 'storage_requirements', 'allergies_warnings',
@@ -301,9 +317,9 @@ class MARSheetController extends Controller
     {
         $request->validate([
             'id'                       => 'required|integer',
-            'quantity_received'        => 'nullable|integer|min:0',
-            'quantity_carried_forward' => 'nullable|integer|min:0',
-            'quantity_returned'        => 'nullable|integer|min:0',
+            'quantity_received'        => 'nullable|numeric|min:0',
+            'quantity_carried_forward' => 'nullable|numeric|min:0',
+            'quantity_returned'        => 'nullable|numeric|min:0',
         ]);
 
         try {

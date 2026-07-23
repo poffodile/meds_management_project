@@ -213,6 +213,12 @@ class MedicationStockController extends Controller
         return Inertia::render('Frontend2/Stock', $this->stockReactData());
     }
 
+    /** Medication 2 → Stock. Same data helper as indexFrontend2; fresh view. */
+    public function indexMedication2(Request $request)
+    {
+        return Inertia::render('Frontend2/Medication2/Stock', $this->stockReactData());
+    }
+
     /** Stock adjustment that returns to the frontend2 stock page. */
     public function adjustFrontend2(Request $request)
     {
