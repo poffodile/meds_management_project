@@ -547,7 +547,34 @@ Picked the Medication Round to-do list back up. Going through it item by item, m
 
 What was genuinely still weak was **special instructions**. A directive like "take with food" or "crush tablet" was being jammed into the same muted grey line as the strength and route, where it was easy to skim straight past on a busy round. It now sits on its **own line, in its own soft strip with an orange accent edge and an info icon**, directly under the dose — prominent without being a flashing alarm, in keeping with the restrained look of the rest of the page. Build clean.
 
-**Still genuinely open on the Round** (not yet built): a way to **flag a problem straight to Shift Handover** from the round — the Handover page only exists in the older screen set, and the agreed plan puts Handover *after* these four pages; and a short **summary when a round is ended** (it locks correctly, it just doesn't show a wrap-up). Neither is blocking.
+**Still genuinely open on the Round** (not yet built): a way to **flag a problem straight to Shift Handover** from the round — the Handover page only exists in the older screen set, and the agreed plan puts Handover *after* these four pages.
+
+---
+
+## 28 July 2026 (part 2) — built the end-of-round summary, then ran the page through the review agents, which caught two honesty problems in the very things we'd just added
+
+Added an **end-of-round summary**: when a round is locked, the overview now shows four tiles — given / refused / not-given / outstanding — plus an amber note when doses were left unrecorded, and keeps the "ended by / at" line and the manager re-open.
+
+Then, as planned, ran the whole Round page through the orchestrated **review** (`/care-one-review-page` → the compliance, clinical-safety, workflow, IG, security, accessibility and QA agents). It came back **NOT READY**, and — to its credit — the two Criticals it raised were both about the two changes we'd *just* made:
+
+1. **The "special instructions" strip was lying.** The field we elevated was really "PRN details, or else the reason the medicine is prescribed". For a normal scheduled medicine that meant we were showing the **indication** ("for blood pressure") dressed up with a warning colour and an info icon as if it were an **administration directive** ("do not crush"). Worse, the review confirmed there is **no field anywhere** that actually holds "do not crush / take with food" — so the prominence implied a safety instruction that can't even be recorded yet.
+2. **Ending a round writes nothing about the individual doses.** It saves only a "round closed" marker — no per-dose "not given" and no reason. Our new summary footer said the right thing ("left unrecorded"), but the **confirmation pop-up still claimed those doses "will be recorded as not given"**, which simply isn't true.
+   Plus a smaller one: the summary's "included N controlled drugs / N as-needed doses" line read **zero** for as-needed doses (they're recorded differently), so it could **undercount a controlled drug** — a bad number to get wrong.
+
+**Fixed the honesty problems straight away** (the parts we'd introduced):
+- Split the jammed backend field into **two separate things** — a real `instruction` (only genuine PRN administration notes) and the `indication` — so they can never be confused again.
+- The round now shows the **indication quietly** in the grey detail line ("· For blood pressure"), and the **accent strip only appears for a genuine instruction**, clearly labelled "INSTRUCTION" and in a neutral colour, not warning-orange. It no longer pretends a directive exists when it doesn't.
+- **Removed the controlled-drug / as-needed count** from the summary rather than show a number we can't compute honestly. The four main tiles (given/refused/not-given/outstanding) are accurate.
+- **Rewrote the end-round confirmation** to tell the truth: outstanding doses stay *unrecorded* for this round (not marked given, no reason captured), and a manager can re-open to record them.
+
+Frontend build clean; PHP lint clean.
+
+**What the review says still blocks "Ready" — and these are not ours to just code:**
+- **A real administration-directions field** ("do not crush", "with food", "half-hour before food") needs designing and, more importantly, a **pharmacist + Clinical Safety Officer** to say what belongs in it. Until then the round honestly shows only what exists.
+- **Ending a round should write a proper per-dose outcome + reason** (or an escalation) for anything left outstanding, not just lock the door — a **registered-manager / CSO** decision about what that record should say (REQ-MED-06/08/30).
+- Older residuals it re-confirmed: no resident name/photo *inside* the record pop-up at the moment you commit; witness is still a typed name, not a second sign-in; a controlled drug given with a free-text (unstructured) dose skips the CD register; no dm+d medicine code yet. Each is logged with an owner.
+
+Traceability matrix and clinical hazard log updated (HAZ-22/23/24 added, HAZ-10 updated). **Claim boundary unchanged:** an AI review doesn't make any of this compliant, certified or clinically safe — the named humans still have to sign it off.
 
 ---
 

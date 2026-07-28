@@ -3,7 +3,7 @@ import { Head, router, usePage } from '@inertiajs/react';
 import { notifications } from '@mantine/notifications';
 import {
     Box, Group, Text, Badge, Avatar, Button, ActionIcon, ThemeIcon,
-    SegmentedControl, Tooltip, Progress, Modal,
+    SegmentedControl, Tooltip, Progress, Modal, SimpleGrid,
 } from '@mantine/core';
 import {
     IconChevronLeft, IconChevronRight, IconCheck, IconCircleX, IconBan, IconPill,
@@ -81,16 +81,22 @@ function MedLine({ row, locked, onGiven, onOutcome }) {
                     </Group>
                     {row.dose && <Text fz={13} fw={700} c={TEAL} mt={1}>Give {row.dose}</Text>}
                     <Text fz={12} c={MUTED} mt={1}>
-                        {[row.strength, row.route].filter(Boolean).join(' · ') || '—'}
+                        {[row.strength, row.route, row.indication && `For ${row.indication}`].filter(Boolean).join(' · ') || '—'}
                     </Text>
 
-                    {/* Special instructions — pulled out of the muted line so a directive
-                        like "take with food" / "crush tablet" can't be missed on a busy round. */}
+                    {/* Administration instruction — ONLY a genuine directive (PRN details today),
+                        clearly labelled so it isn't confused with the indication above. A dedicated
+                        "do not crush / with food" field does not exist yet (review C1/HAZ-22, pending
+                        pharmacist + CSO) — so we do NOT dress the indication up as a directive, and
+                        the accent is neutral (teal), not warning-orange. */}
                     {row.instruction && (
                         <Group gap={6} wrap="nowrap" align="flex-start" mt={5}
-                            style={{ background: SOFT, border: `1px solid ${HAIR}`, borderLeft: `2.5px solid ${ORANGE}`, borderRadius: 8, padding: '5px 9px' }}>
-                            <IconInfoCircle size={13} color="var(--mantine-color-orange-6)" style={{ flexShrink: 0, marginTop: 1 }} />
-                            <Text fz={12} fw={600} c={TXT} style={{ lineHeight: 1.35 }}>{row.instruction}</Text>
+                            style={{ background: SOFT, border: `1px solid ${HAIR}`, borderLeft: `2.5px solid ${TEAL}`, borderRadius: 8, padding: '5px 9px' }}>
+                            <IconInfoCircle size={13} color="var(--mantine-color-teal-6)" style={{ flexShrink: 0, marginTop: 1 }} />
+                            <Text fz={12} c={TXT} style={{ lineHeight: 1.35 }}>
+                                <Text component="span" fz={10.5} fw={800} c={MUTED} tt="uppercase" style={{ letterSpacing: '0.04em' }}>Instruction </Text>
+                                {row.instruction}
+                            </Text>
                         </Group>
                     )}
 
@@ -150,6 +156,31 @@ function MedLine({ row, locked, onGiven, onOutcome }) {
             {locked && !recorded && <Text fz="xs" c={MUTED} mt={8} pl={56}>Round ended — recording locked</Text>}
         </Box>
     );
+}
+
+/**
+ * Round-wide outcome tally for the end-of-round summary. Computed from the same rows
+ * the roster and focused view read, so the summary can never disagree with them.
+ * `outstanding` = scheduled doses with no outcome — on lock these are left unrecorded
+ * for this round (the server writes only a closure marker, not per-dose outcomes —
+ * review C2/HAZ-10). Only scheduled doses are tallied: a given PRN dose does not carry
+ * a `code` on its grid row (BuildsMedicationRound: null slot ⇒ null admin), so CD/PRN
+ * "given" cannot be counted here honestly and is deliberately not shown.
+ */
+function roundOutcomeSummary(residents) {
+    let given = 0, refused = 0, notGiven = 0, outstanding = 0;
+    for (const r of residents) {
+        for (const row of (r.rows ?? [])) {
+            if (row.code) {
+                if (isGivenCode(row.code)) given += 1;
+                else if (row.code === 'R') refused += 1;
+                else notGiven += 1;
+            } else if (!row.as_required) {
+                outstanding += 1;
+            }
+        }
+    }
+    return { given, refused, notGiven, outstanding };
 }
 
 /** A scheduled dose whose time hasn't arrived yet (owner: confirm before recording early). */
@@ -249,6 +280,7 @@ export default function Medication2Round({ rounds = [], grid = {}, date, current
     const overdueResidents = residents.filter((r) => residentStatus(r).overdue).length;
     const allergyResidents = residents.filter((r) => residentStatus(r).hasAllergy).length;
     const cdResidents = residents.filter((r) => residentStatus(r).hasCd).length;
+    const summary = roundOutcomeSummary(residents);   // end-of-round tally (used when closed)
 
     // Surface server flash + one-tap errors (audit CR-07).
     const flash = usePage().props?.flash;
@@ -376,12 +408,43 @@ export default function Medication2Round({ rounds = [], grid = {}, date, current
                             </Box>
                         )}
                         {roundClosed && (
-                            <Box mb="md" p="sm" style={{ background: SOFT, border: `1px solid ${HAIR}`, borderRadius: 12 }}>
-                                <Group justify="space-between" wrap="wrap" gap="xs">
-                                    <Group gap={7}><IconLock size={15} color="var(--mantine-color-dimmed)" />
-                                        <Text fz={13} c={MUTED}>Round ended{closure?.by ? ` by ${closure.by}` : ''}{closure?.at ? ` at ${closure.at}` : ''} — recording locked</Text></Group>
+                            <Box mb="md" style={{ background: SURFACE, border: `1px solid ${HAIR}`, borderRadius: 16, overflow: 'hidden' }}>
+                                <Group justify="space-between" wrap="wrap" gap="xs" p="sm" style={{ background: SOFT, borderBottom: `1px solid ${HAIR}` }}>
+                                    <Group gap={7} wrap="nowrap">
+                                        <IconLock size={15} color="var(--mantine-color-dimmed)" />
+                                        <Box>
+                                            <Text fz={13.5} fw={700} c={TXT}>Round ended — recording locked</Text>
+                                            {(closure?.by || closure?.at) && (
+                                                <Text fz={12} c={MUTED}>
+                                                    {[closure?.by && `by ${closure.by}`, closure?.at && closure.at].filter(Boolean).join(' · ')}
+                                                </Text>
+                                            )}
+                                        </Box>
+                                    </Group>
                                     {isManager && <Button size="xs" radius="xl" variant="default" leftSection={<IconLockOpen size={14} />} onClick={reopenRound}>Re-open</Button>}
                                 </Group>
+
+                                <SimpleGrid cols={{ base: 2, xs: 4 }} spacing="xs" p="sm">
+                                    {[
+                                        { label: 'Given', value: summary.given, tone: TEAL },
+                                        { label: 'Refused', value: summary.refused, tone: RED },
+                                        { label: 'Not given', value: summary.notGiven, tone: ORANGE },
+                                        { label: 'Outstanding', value: summary.outstanding, tone: summary.outstanding > 0 ? ORANGE : MUTED },
+                                    ].map((t) => (
+                                        <Box key={t.label} ta="center" py={10} style={{ background: SOFT, border: `1px solid ${HAIR}`, borderRadius: 12 }}>
+                                            <Text fz={24} fw={800} c={t.tone} style={{ fontVariantNumeric: 'tabular-nums', lineHeight: 1.1 }}>{t.value}</Text>
+                                            <Text fz={11} fw={600} c={MUTED} mt={2}>{t.label}</Text>
+                                        </Box>
+                                    ))}
+                                </SimpleGrid>
+
+                                {summary.outstanding > 0 && (
+                                    <Box px="sm" pb="sm">
+                                        <Text fz={12} c={ORANGE} fw={600}>
+                                            {summary.outstanding} scheduled dose{summary.outstanding === 1 ? '' : 's'} left unrecorded when the round was ended.
+                                        </Text>
+                                    </Box>
+                                )}
                             </Box>
                         )}
 
@@ -485,7 +548,7 @@ export default function Medication2Round({ rounds = [], grid = {}, date, current
             <Modal opened={endOpen} onClose={() => setEndOpen(false)} title="End this round?" centered radius="md" size="sm">
                 {outstandingDoses > 0 ? (
                     <Text fz="sm" c={MUTED} mb="md">
-                        <b style={{ color: 'var(--mantine-color-orange-7)' }}>{outstandingDoses} scheduled dose{outstandingDoses === 1 ? '' : 's'} still outstanding.</b> Ending the round locks it — those doses will be recorded as not given for this round. A manager can re-open it if needed.
+                        <b style={{ color: 'var(--mantine-color-orange-7)' }}>{outstandingDoses} scheduled dose{outstandingDoses === 1 ? '' : 's'} still outstanding.</b> Ending the round locks recording — these doses stay <b style={{ color: 'var(--mantine-color-text)' }}>unrecorded</b> for this round (they are not marked given, and no reason is captured). A manager can re-open the round to record them.
                     </Text>
                 ) : (
                     <Text fz="sm" c={MUTED} mb="md">All scheduled doses are recorded. Ending the round locks it; a manager can re-open it if needed.</Text>

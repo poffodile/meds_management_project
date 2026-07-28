@@ -215,7 +215,14 @@ trait BuildsMedicationRound
                         'strength' => $sheet->dosage,
                         'dose' => $sheet->dose,
                         'route' => $sheet->route,
-                        'instruction' => $sheet->prn_details ?: $sheet->reason_for_medication,
+                        // Two DIFFERENT things, kept separate (they were jammed into one field,
+                        // which let the round show an indication styled as an administration
+                        // directive — review C1/HAZ-22, 2026-07-28). `instruction` is a genuine
+                        // administration note (only PRN carries one today); `indication` is why
+                        // the medicine is prescribed. A dedicated "do not crush / with food"
+                        // directions field does not exist yet — pending pharmacist + CSO.
+                        'instruction' => $sheet->prn_details ?: null,
+                        'indication' => $sheet->reason_for_medication ?: null,
                         'slot' => $slot,
                         'stock' => $sheet->stock_level,
                         'low_stock' => ! is_null($sheet->stock_level) && ! is_null($sheet->reorder_level) && $sheet->stock_level <= $sheet->reorder_level,
