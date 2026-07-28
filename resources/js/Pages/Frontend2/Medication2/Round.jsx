@@ -8,7 +8,7 @@ import {
 import {
     IconChevronLeft, IconChevronRight, IconCheck, IconCircleX, IconBan, IconPill,
     IconAlertTriangle, IconLock, IconLockOpen, IconUser, IconArrowRight,
-    IconShieldLock, IconPlayerPlay,
+    IconShieldLock, IconPlayerPlay, IconInfoCircle,
 } from '@tabler/icons-react';
 import AppShell from '@frontend2/Layouts/AppShell';
 import RecordDoseModal from '@frontend/features/medications/RecordDoseModal';
@@ -81,8 +81,18 @@ function MedLine({ row, locked, onGiven, onOutcome }) {
                     </Group>
                     {row.dose && <Text fz={13} fw={700} c={TEAL} mt={1}>Give {row.dose}</Text>}
                     <Text fz={12} c={MUTED} mt={1}>
-                        {[row.strength, row.route, row.instruction].filter(Boolean).join(' · ') || '—'}
+                        {[row.strength, row.route].filter(Boolean).join(' · ') || '—'}
                     </Text>
+
+                    {/* Special instructions — pulled out of the muted line so a directive
+                        like "take with food" / "crush tablet" can't be missed on a busy round. */}
+                    {row.instruction && (
+                        <Group gap={6} wrap="nowrap" align="flex-start" mt={5}
+                            style={{ background: SOFT, border: `1px solid ${HAIR}`, borderLeft: `2.5px solid ${ORANGE}`, borderRadius: 8, padding: '5px 9px' }}>
+                            <IconInfoCircle size={13} color="var(--mantine-color-orange-6)" style={{ flexShrink: 0, marginTop: 1 }} />
+                            <Text fz={12} fw={600} c={TXT} style={{ lineHeight: 1.35 }}>{row.instruction}</Text>
+                        </Group>
+                    )}
 
                     {/* Stock, when low — surfaced so a carer knows before recording. */}
                     {row.low_stock && row.stock != null && (

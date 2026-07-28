@@ -541,6 +541,16 @@ Both were flagged earlier as things to fix before this goes anywhere near real u
 
 ---
 
+## 28 July 2026 — Medication Round wish-list: took stock, and lifted special instructions out of the noise
+
+Picked the Medication Round to-do list back up. Going through it item by item, most of it turned out to be **already built** in the 23 July work: the drop-down reason on a refused/not-given dose, the "as needed" (PRN) block showing how many were given today, when the next is due and why it's blocked, the round pushing refused/not-given doses onto the Missed Doses screen, the "given at HH:MM by [name]" trail, and the End-round lock with a manager-only re-open.
+
+What was genuinely still weak was **special instructions**. A directive like "take with food" or "crush tablet" was being jammed into the same muted grey line as the strength and route, where it was easy to skim straight past on a busy round. It now sits on its **own line, in its own soft strip with an orange accent edge and an info icon**, directly under the dose — prominent without being a flashing alarm, in keeping with the restrained look of the rest of the page. Build clean.
+
+**Still genuinely open on the Round** (not yet built): a way to **flag a problem straight to Shift Handover** from the round — the Handover page only exists in the older screen set, and the agreed plan puts Handover *after* these four pages; and a short **summary when a round is ended** (it locks correctly, it just doesn't show a wrap-up). Neither is blocking.
+
+---
+
 ## Still to do (carried forward)
 
 **Medication Round screen** (from the wish-list):
