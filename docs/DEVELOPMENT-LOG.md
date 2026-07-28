@@ -578,6 +578,69 @@ Traceability matrix and clinical hazard log updated (HAZ-22/23/24 added, HAZ-10 
 
 ---
 
+## 28 July 2026 (part 3) — you can now see *who* you're recording against, inside the pop-up
+
+Took the one review residual that was safe to fix without a clinician's sign-off: the record pop-up (used for controlled drugs, refusals and every "other outcome") showed only the **medicine** — the resident's name and photo were behind the pop-up, out of sight at the exact moment you commit the record. That's a classic wrong-resident risk (HAZ-02).
+
+The pop-up now leads with a **small identity header** — photo, name, age, date of birth, room — and shows the resident's **allergies** as red chips right there. It's fed from whichever resident is open on the round, so it can't drift from the page. The older screens that share this pop-up don't pass a resident, so they're unaffected. Build clean.
+
+Remaining review items are the ones that genuinely need a pharmacist / Clinical Safety Officer / registered manager: the real administration-directions field, writing a proper per-dose record when a round is ended, the typed-vs-signed-in witness, and the controlled drug given with a free-text dose. Logged, owners named, not ours to invent.
+
+---
+
+## 28 July 2026 (part 4) — put the other three medication pages through the same review gate; all four now have a proper stamp
+
+To answer "are we officially done", we ran **Missed doses, Controlled drugs and Stock** through the same full review the Round had. **None of the four passes the gate yet — every one has at least one Critical** — but most of the Criticals are ours to fix; only some need a clinician or the owner. Verdicts:
+
+- **Medication round** — NOT READY. 2 Criticals, both needing a human: a real "do not crush / with food" field (pharmacist + CSO), and writing a proper per-dose record when a round is ended (manager + CSO).
+- **Controlled drugs** — NOT READY. The page's own code is sound (balance is server-computed, append-only, locked). 2 Criticals in the code *around* it: an **old legacy endpoint still lets the balance be typed in by the client** and poisons the same ledger (ours to fix), and a CD given with a free-text dose **skips the register** (pharmacist + manager).
+- **Missed doses** — NOT READY. 1 Critical: a **multi-home manager only sees their first home**, so missed doses elsewhere are invisible (ours to fix).
+- **Stock** — NOT READY. 2 Criticals: **stock writes aren't role-restricted on the server** (the manager-only look is only skin-deep — ours to fix), and **controlled-drug stock movements don't reconcile with the CD register** (pharmacist + CSO + manager).
+
+**The pattern worth knowing:** three separate pages (Missed, CD, Stock) still pick "the first home" instead of the one the manager selected — the Round already fixed exactly this with its home-switcher. So **one shared fix** clears a Critical on Missed plus an Important on both CD and Stock. And the "controlled drug recorded but never hitting the register / running balance" problem shows up on the Round, CD and Stock together — one clinical decision, one fix, three pages.
+
+**Split of what's left:**
+- *Ours to code now (no sign-off needed):* the multi-home switcher on the other three pages; server-side role gate on stock writes; close the legacy client-supplied-balance hole; stop silent write failures on Stock (mirror the Round's fix); server-validate the missed-dose action list; show the audit history that's already computed; fix a couple of low-contrast labels.
+- *Needs a named human:* the real directions field, the round-end record, CD-register reconciliation + the free-text-dose CD, the typed-vs-signed-in witness, who exactly may do stock writes / see a CD register, and dm+d medicine codes.
+
+Traceability matrix and clinical hazard log updated across all four pages (HAZ-24…HAZ-30). No application code changed in the reviews. **Claim boundary unchanged.**
+
+---
+
+## 28 July 2026 (part 5) — started clearing the fixable review findings: the multi-home switcher now works on the other three pages
+
+First of the "ours to fix" items, and the highest-leverage one. A manager who covers more than one home could switch home on the **Round**, but **Missed doses, Controlled drugs and Stock still quietly showed only their first home** — so a missed insulin, a CD movement or a stock count in another home was invisible, and the page gave no hint the other homes existed. On the Missed-doses page the review rated this a **Critical** (a triage queue that says "0 outstanding" while doses sit unreviewed elsewhere).
+
+The Round had already solved this properly: a shared `ResolvesCurrentHome` helper that reads the manager's *chosen* home from the session and **re-checks they're actually allowed it** (so a tampered session can't jump to another company's home), falling back to their first home otherwise. All three other medication controllers now use that same helper instead of the old "just take the first home" line.
+
+It's wired the whole way through: the home-switch menu already sits in the shared shell for anyone with more than one home, the switch button was already saving the choice, and now these pages actually read that choice for every list *and every write* — so a stock adjustment or a CD entry is recorded against the home you're actually looking at, not always home #1. The switcher's "active" tick and the page's data now come from the exact same check, so they can't disagree.
+
+Closed in one change: **Missed doses C1 (Critical)**, **Controlled drugs I-5**, **Stock I-4**. PHP lint clean; no front-end change. The one thing still worth an eyeball is the live click-through — log in as a multi-home manager, switch home on each page, and confirm the list changes.
+
+---
+
+## 28 July 2026 (part 6) — the Stock page's "manager only" is now real, not just hidden buttons
+
+The Stock review's Critical: changing stock — adjusting, counting, ordering, receiving, cancelling an order — *looked* manager-only (a carer doesn't see the buttons), but the server accepted the request from **any** logged-in medication user. Anyone who posted the request directly could move stock. Skin-deep permission.
+
+Now every one of those five actions checks the role **on the server** before doing anything, using the exact same manager/carer rule the rest of the app already uses (manager = M/CM/A/O; a plain carer = N). A carer posting a stock change gets a flat refusal. **Viewing** stock is untouched — carers can still see it, they just can't change it. Closes **Stock C-1 (Critical)**. PHP lint clean; no front-end change.
+
+Note kept for later: the older stock-adjust endpoints on the *other* stock pages (`adjust`, `adjustReact`, `adjustMedsStock41`, `adjustFrontend2`) have the same skin-deep gap but belong to different/owner-owned pages, so they were left alone in this focused change — worth the same guard when those pages are next touched.
+
+---
+
+## 28 July 2026 (part 7) — the controlled-drug register can no longer be told what its balance is
+
+The most serious CD finding. A controlled-drug register's whole point is a **running balance the computer works out** — last balance minus what was given — so no one can quietly write in a figure that hides a missing dose. The **older** "add a register entry" endpoint didn't do that: it asked the browser to send the new balance and saved whatever number it got. Because the new Med 2 CD page reads its balances downward from the latest entry, a single made-up number there would throw off every balance after it. (The Med 2 page's own "add movement" was always safe — this was the legacy path underneath the original CD screens.)
+
+Now that old endpoint goes through the **same safe method the Med 2 page uses**: it looks up the actual prescription, takes the previous entry's balance, and **computes** the new one itself under a lock so two people recording at once can't collide. The browser's typed balance is ignored. The one number an operator can still set is the total for a **stock recount** ("adjustment") — which is exactly what a recount is, an operator-declared absolute, and the register records it as such. Entries are still only ever added, never edited.
+
+One deliberate tightening: a register entry now has to be tied to a **prescription** (it always should be — that's where the medicine's identity and opening stock come from). If an old form ever tried to add one without picking a medicine, it now gets a clear "couldn't find that controlled drug" message instead of silently writing a free-text entry. Closes **CD C-1 (Critical)**. PHP lint clean; no schema or front-end change. Live check worth doing: add a movement from an old CD screen and confirm the balance is computed (and that leaving the balance box blank no longer matters).
+
+**All three of the review Criticals that were safe for us to fix are now done** — Missed doses (home switcher), Stock (server-side manager gate), Controlled drugs (server-computed balance). What remains blocking "Ready" on each page is the human-decision work: the real directions field, the round-end record, CD-register reconciliation + the free-text-dose CD, the typed-vs-signed-in witness — pharmacist / CSO / registered manager / owner.
+
+---
+
 ## Still to do (carried forward)
 
 **Medication Round screen** (from the wish-list):

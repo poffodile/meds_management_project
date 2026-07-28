@@ -15,7 +15,19 @@ use Inertia\Inertia;
 
 class MedicationStockController extends Controller
 {
+    use \App\Http\Controllers\frontEnd\Concerns\ResolvesCurrentHome;
+
     private const ALLOWED_USER_TYPES = ['N', 'M', 'A', 'CM', 'O'];
+
+    /**
+     * Manager-level roles that may CHANGE stock. Mirrors the canonical mapping in
+     * HandleInertiaRequests (everyone else — i.e. 'N' — is a carer). The Stock page
+     * already hides the write controls for carers (`canAdjust = role === 'manager'`);
+     * this enforces the same rule on the SERVER so it can't be bypassed by posting the
+     * request directly (review Stock C-1 / HAZ-27). Read access stays open to all
+     * medication roles (ALLOWED_USER_TYPES) so carers can still view stock.
+     */
+    private const MANAGER_USER_TYPES = ['M', 'CM', 'A', 'O'];
 
     public function __construct()
     {
@@ -28,9 +40,26 @@ class MedicationStockController extends Controller
         });
     }
 
+    /**
+     * The home currently in view — the manager's *selected* home, re-validated against
+     * the homes they may access, not blindly the first one (review Stock I-4). Shared
+     * with the Round via ResolvesCurrentHome so every read and stock write hits the home
+     * the manager is actually looking at.
+     */
     private function getHomeId(): int
     {
-        return (int) explode(',', Auth::user()->home_id)[0];
+        return $this->currentHomeId();
+    }
+
+    /**
+     * Guard a stock-write action: only a manager-level role may change stock. Aborts 403
+     * otherwise. Enforces server-side what the Stock UI already assumes (review Stock C-1).
+     */
+    private function requireManager(): void
+    {
+        if (! in_array(Auth::user()->user_type, self::MANAGER_USER_TYPES, true)) {
+            abort(403, 'Only a manager can change stock.');
+        }
     }
 
     public function index(Request $request)
@@ -236,6 +265,7 @@ class MedicationStockController extends Controller
 
     public function adjustFrontend2Stock2(Request $request)
     {
+        $this->requireManager();
         $error = $this->runAdjustment($request);
 
         return redirect()->route('frontend2.stock-2')
@@ -249,6 +279,7 @@ class MedicationStockController extends Controller
      */
     public function reconcileFrontend2Stock2(Request $request)
     {
+        $this->requireManager();
         $request->validate([
             'counts' => 'required|array|min:1',
             'counts.*.mar_sheet_id' => 'required|integer',
@@ -432,6 +463,7 @@ class MedicationStockController extends Controller
     /** Raise a reorder line for a low medicine (#32). */
     public function createOrderFrontend2Stock2(Request $request)
     {
+        $this->requireManager();
         $request->validate([
             'mar_sheet_id' => 'required|integer',
             'quantity' => 'required|numeric|min:1',
@@ -465,6 +497,7 @@ class MedicationStockController extends Controller
     /** Receive an open order — books the stock in (creates a batch) and closes the order. */
     public function receiveOrderFrontend2Stock2(Request $request)
     {
+        $this->requireManager();
         $request->validate([
             'order_id' => 'required|integer',
             'quantity' => 'required|numeric|min:0',
@@ -520,6 +553,7 @@ class MedicationStockController extends Controller
     /** Cancel an open order. */
     public function cancelOrderFrontend2Stock2(Request $request)
     {
+        $this->requireManager();
         $request->validate(['order_id' => 'required|integer']);
         $homeId = $this->getHomeId();
         $order = MedicationStockOrder::forHome($homeId)->open()->find($request->input('order_id'));

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\frontEnd\Medication;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 use App\Http\Controllers\Controller;
 use App\Models\ControlledDrugRegister;
 use App\Models\MARSheet;
@@ -12,6 +13,8 @@ use Inertia\Inertia;
 
 class ControlledDrugRegisterController extends Controller
 {
+    use \App\Http\Controllers\frontEnd\Concerns\ResolvesCurrentHome;
+
     private const ALLOWED_USER_TYPES = ['N', 'M', 'A', 'CM', 'O'];
 
     public function __construct()
@@ -24,10 +27,15 @@ class ControlledDrugRegisterController extends Controller
         });
     }
 
-    /** Resolve the carer's primary home (matches the other medication screens). */
+    /**
+     * The home currently in view — the manager's *selected* home, re-validated against
+     * the homes they may access, not blindly the first one (review CD I-5). Shared with
+     * the Round via ResolvesCurrentHome so all medication pages agree, and so a CD
+     * movement is written against the home the manager is actually looking at.
+     */
     private function getHomeId(): int
     {
-        return (int) explode(',', Auth::user()->home_id)[0];
+        return $this->currentHomeId();
     }
 
     public function index(Request $request)
@@ -300,47 +308,64 @@ class ControlledDrugRegisterController extends Controller
             ->with('success', 'Controlled drug register entry added.');
     }
 
-    /** Validate + create a register entry. Shared by the legacy + React pages. */
+    /**
+     * Validate + create a register entry. Shared by the legacy + React pages.
+     *
+     * Balance integrity (review CD C-1 / HAZ-25): the running balance is NEVER taken from
+     * the client. This routes through ControlledDrugRegister::record(), which reads the
+     * previous entry's balance under a row lock and computes the new one itself — the same
+     * safe path the Medication 2 page uses. The entry now hangs off a real prescription
+     * (`mar_sheet_id` required), so medicine identity and opening stock come from the
+     * record, not free text. The ONLY figure an operator legitimately supplies is the
+     * absolute total for an `adjustment` (a physical recount), which record() stores as-is.
+     */
     private function createEntry(Request $request): void
     {
         $request->validate([
-            'client_id'       => 'required|integer',
-            'mar_sheet_id'    => 'nullable|integer',
-            'medication_name' => 'required|string|max:255',
-            'cd_schedule'     => 'nullable|string|max:50',
+            'mar_sheet_id'    => 'required|integer',
             'action_type'     => 'required|in:administered,received,disposed,returned,adjustment',
-            'entry_date'      => 'required|date',
-            'entry_time'      => 'required',
+            'entry_date'      => 'nullable|date',
+            'entry_time'      => 'nullable',
             'dose_quantity'   => 'nullable|numeric|min:0',
             'unit'            => 'nullable|string|max:50',
-            'balance_before'  => 'nullable|numeric',
-            'balance_after'   => 'required|numeric',
+            // Accepted ONLY as the absolute recount total for an `adjustment`; ignored for
+            // every movement (those balances are computed, never client-supplied).
+            'balance_after'   => 'nullable|numeric|min:0',
             'witness_name'    => 'required|string|max:255',
             'notes'           => 'nullable|string',
         ]);
 
-        $homeId   = $this->getHomeId();
-        $resident = ServiceUser::where('id', $request->input('client_id'))
-            ->where('home_id', $homeId)
-            ->first();
+        $homeId = $this->getHomeId();
+        $sheet  = MARSheet::forHome($homeId)->where('is_controlled', 1)->find($request->input('mar_sheet_id'));
+        if (! $sheet) {
+            throw ValidationException::withMessages([
+                'mar_sheet_id' => 'That controlled drug could not be found for your home.',
+            ]);
+        }
 
-        ControlledDrugRegister::create([
-            'home_id'            => $homeId,
-            'client_id'          => $request->input('client_id'),
-            'client_name'        => $resident->name ?? null,
-            'mar_sheet_id'       => $request->input('mar_sheet_id') ?: null,
-            'medication_name'    => $request->input('medication_name'),
-            'cd_schedule'        => $request->input('cd_schedule'),
-            'action_type'        => $request->input('action_type'),
-            'entry_date'         => $request->input('entry_date'),
-            'entry_time'         => $request->input('entry_time'),
-            'dose_quantity'      => $request->input('dose_quantity'),
-            'unit'               => $request->input('unit'),
-            'balance_before'     => $request->input('balance_before'),
-            'balance_after'      => $request->input('balance_after'),
-            'witness_name'       => $request->input('witness_name'),
-            'notes'              => $request->input('notes'),
-            'created_by_user_id' => Auth::id(),
-        ]);
+        $action = $request->input('action_type');
+        // For a movement, the quantity moved drives the computed balance. For an adjustment,
+        // the operator's absolute recount total is the figure record() stores (before was
+        // the last balance); prefer the count field, fall back to dose_quantity.
+        $qty = $action === 'adjustment'
+            ? (float) ($request->input('balance_after') ?? $request->input('dose_quantity') ?? 0)
+            : (float) ($request->input('dose_quantity') ?? 0);
+
+        $resident = ServiceUser::where('id', $sheet->client_id)->first();
+
+        ControlledDrugRegister::record(
+            $sheet,
+            $action,
+            $qty,
+            (int) Auth::id(),
+            $request->input('witness_name'),
+            [
+                'client_name' => $resident->name ?? null,
+                'entry_date'  => $request->input('entry_date'),
+                'entry_time'  => $request->input('entry_time'),
+                'unit'        => $request->input('unit'),
+                'notes'       => $request->input('notes'),
+            ]
+        );
     }
 }

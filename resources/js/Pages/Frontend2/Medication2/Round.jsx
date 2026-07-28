@@ -528,6 +528,8 @@ export default function Medication2Round({ rounds = [], grid = {}, date, current
                 opened={modalOpen}
                 onClose={() => setModalOpen(false)}
                 row={recordRow}
+                resident={resident}
+                allergies={allergies}
                 date={date}
                 presetCode={recordCode}
                 endpoint={`${ENDPOINT}/record`}

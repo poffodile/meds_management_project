@@ -13,6 +13,8 @@ use Inertia\Inertia;
 
 class MissedDosesController extends Controller
 {
+    use \App\Http\Controllers\frontEnd\Concerns\ResolvesCurrentHome;
+
     private const ALLOWED_USER_TYPES = ['N', 'M', 'A', 'CM', 'O'];
 
     // MAR codes that count as "not given as planned".
@@ -32,9 +34,14 @@ class MissedDosesController extends Controller
         });
     }
 
+    /**
+     * The home currently in view — the manager's *selected* home, re-validated against
+     * the homes they may access, not blindly the first one (review Missed C1 / HAZ-25).
+     * Shared with the Round via ResolvesCurrentHome so all medication pages agree.
+     */
     private function getHomeId(): int
     {
-        return (int) explode(',', Auth::user()->home_id)[0];
+        return $this->currentHomeId();
     }
 
     public function index(Request $request)

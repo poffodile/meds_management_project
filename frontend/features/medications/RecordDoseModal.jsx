@@ -1,15 +1,37 @@
 import { useEffect } from 'react';
-import { Select, TextInput, Textarea, Text, Badge } from '@mantine/core';
+import { Select, TextInput, Textarea, Text, Badge, Avatar, Group, Box } from '@mantine/core';
+import { IconAlertTriangle } from '@tabler/icons-react';
 import { useForm } from '@inertiajs/react';
 import { notifications } from '@mantine/notifications';
 import FormModal from '@frontend/components/FormModal';
 import { MED_CODES, REASON_REQUIRED_CODES, REFUSAL_REASONS, OMISSION_REASONS } from '@frontend/lib/medicationCodes';
+import { avatarColor, initials } from '@frontend/lib/avatarColor';
+
+/** Age in whole years from an ISO date-of-birth. */
+function ageFromDob(dob) {
+    if (!dob) return null;
+    const d = new Date(dob);
+    if (Number.isNaN(d.getTime())) return null;
+    const now = new Date();
+    let a = now.getFullYear() - d.getFullYear();
+    const m = now.getMonth() - d.getMonth();
+    if (m < 0 || (m === 0 && now.getDate() < d.getDate())) a -= 1;
+    return a >= 0 && a < 130 ? a : null;
+}
+
+/** "12 Mar 1948" from an ISO date-of-birth, or null. */
+function dobLabel(dob) {
+    if (!dob) return null;
+    const d = new Date(dob);
+    if (Number.isNaN(d.getTime())) return null;
+    return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+}
 
 /**
  * RecordDoseModal — record the outcome of a single dose in the Medication Round.
  * The dose details come from the selected row; "Given" auto-deducts stock server-side.
  */
-export default function RecordDoseModal({ opened, onClose, row, date, presetCode, endpoint = '/medication/medication-round-react/record' }) {
+export default function RecordDoseModal({ opened, onClose, row, resident = null, allergies = [], date, presetCode, endpoint = '/medication/medication-round-react/record' }) {
     const form = useForm({
         mar_sheet_id: '',
         date: date ?? '',
@@ -78,6 +100,32 @@ export default function RecordDoseModal({ opened, onClose, row, date, presetCode
             submitting={form.processing}
             submitLabel="Record"
         >
+            {/* Resident identity at the point of commit — you should see WHO you are
+                recording against here, not only behind the modal (review I1 / HAZ-02). */}
+            {resident && (
+                <Box mb="xs" p="xs"
+                    style={{ background: 'light-dark(#F7F9FC, #14202F)', border: '1px solid light-dark(#E1E7F0, #22303F)', borderRadius: 10 }}>
+                    <Group gap="sm" wrap="nowrap" align="center">
+                        <Avatar src={resident.photo || undefined} size={40} radius="md" color={avatarColor(resident.name)}>
+                            {initials(resident.name)}
+                        </Avatar>
+                        <Box style={{ minWidth: 0 }}>
+                            <Text fw={700} size="sm" truncate>{resident.name}</Text>
+                            <Text size="xs" c="dimmed">
+                                {[ageFromDob(resident.dob) != null && `${ageFromDob(resident.dob)}y`, dobLabel(resident.dob), resident.room && `Room ${resident.room}`]
+                                    .filter(Boolean).join(' · ') || '—'}
+                            </Text>
+                        </Box>
+                    </Group>
+                    {allergies.length > 0 && (
+                        <Group gap={5} mt={7} wrap="wrap">
+                            {allergies.map((a, i) => (
+                                <Badge key={i} size="xs" color="red" variant="light" radius="sm" leftSection={<IconAlertTriangle size={10} />}>{a}</Badge>
+                            ))}
+                        </Group>
+                    )}
+                </Box>
+            )}
             <Text size="sm" c="dimmed">
                 {row.medication_name}{row.dose ? ` · ${row.dose}` : ''} · {row.slot}
             </Text>
