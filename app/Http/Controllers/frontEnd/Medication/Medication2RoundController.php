@@ -7,6 +7,7 @@ use App\Http\Controllers\frontEnd\Medication\Concerns\BuildsMedicationRound;
 use App\Services\Staff\MARSheetService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
 /**
@@ -60,31 +61,46 @@ class Medication2RoundController extends Controller
     }
 
     /**
-     * End (lock) a round. The overview confirms outstanding doses before calling this
-     * (the carer chose to proceed), so this records WHO ended it and, if there were
-     * unrecorded doses, HOW MANY — an auditable fact, not a silent lock (closes the
-     * spirit of HAZ-10: an unguarded end with no record of what was left).
+     * End (lock) a round — ONLY once every scheduled dose has an outcome (owner decision
+     * B3, 2026-07-28; pending CSO). Nothing is auto-filled: the carer must record each dose
+     * (given, or a reason such as refused / not available) first. The outstanding count is
+     * recomputed here from the same data the page shows — the client's number is never
+     * trusted — and the end is refused if anything is still unrecorded. Records WHO ended it.
      */
     public function endRound(Request $request)
     {
         $request->validate([
             'date' => 'required|date',
             'round' => 'required|string|max:20',
-            'outstanding' => 'nullable|integer|min:0',
         ]);
 
+        $round = $request->input('round');
+
+        // Recompute outstanding scheduled (non-PRN) doses with no recorded outcome.
+        $props = $this->buildRoundProps($request);
+        $outstanding = 0;
+        foreach (($props['grid'][$round] ?? []) as $resident) {
+            foreach (($resident['rows'] ?? []) as $row) {
+                if (empty($row['as_required']) && empty($row['code'])) {
+                    $outstanding++;
+                }
+            }
+        }
+
+        if ($outstanding > 0) {
+            throw ValidationException::withMessages([
+                'round' => "This round still has {$outstanding} dose".($outstanding === 1 ? '' : 's')
+                    .' to record. Record each one — given, or a reason — before ending the round.',
+            ]);
+        }
+
         \App\Models\MedicationRoundClosure::updateOrCreate(
-            ['home_id' => $this->getHomeId(), 'date' => $request->input('date'), 'round' => $request->input('round')],
+            ['home_id' => $this->getHomeId(), 'date' => $request->input('date'), 'round' => $round],
             ['closed_by' => (int) Auth::id()]
         );
 
-        $outstanding = (int) $request->input('outstanding', 0);
-        $msg = $outstanding > 0
-            ? "Round ended with {$outstanding} dose(s) still outstanding."
-            : 'Round ended.';
-
         return redirect()->route('frontend2.medication2.round', ['date' => $request->input('date')])
-            ->with('success', $msg);
+            ->with('success', 'Round ended.');
     }
 
     /** Re-open a locked round. Manager-only (mirrors the original round). */

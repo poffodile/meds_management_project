@@ -641,6 +641,56 @@ One deliberate tightening: a register entry now has to be tied to a **prescripti
 
 ---
 
+## 28 July 2026 (part 8) — the Stock page stops telling you things worked when they didn't
+
+Started the "Important" list with the Stock page's honesty problems (review I-3). Ordering, receiving, cancelling an order and posting a stock count could all **say they succeeded when they hadn't** — the same trap as the Round had: when the server bounced a request (order already closed, medicine not found, and now the new "only a manager can change stock" refusal), it did so in a way the page read as *success*, so it cheerfully toasted "Order received" while nothing happened. The stock count was worse: it always said "N items reconciled" even when the server had skipped some — for example a controlled-drug count with no witness — so you'd think a count went in that didn't.
+
+Now:
+- The server **refuses properly** on those failure cases (a real error the page can catch) instead of a redirect that looks like success.
+- Every one of those actions shows a **red failure message** if it didn't work, instead of silence or a false green tick.
+- The stock count shows the **server's own count** of what actually applied and what was skipped ("3 reconciled. 1 controlled-drug item skipped (missing witness)") rather than a made-up number.
+
+So a carer who somehow posts a stock change now sees a clear "only a manager can change stock", and a manager who counts a CD without a witness is told it was skipped, not that it saved. Closes **Stock I-3**. Front-end build + PHP lint both clean.
+
+---
+
+## 28 July 2026 (part 9) — three tidy-ups on the Missed-doses page
+
+Cleared the rest of the fixable Missed-doses findings:
+- **The list of clinical actions is now enforced on the server** (review I5). The page already limited you to a fixed list ("contacted GP", "dose given late", etc.), but the server would have accepted any text sent directly. It now only accepts one of the real actions, so the record can't be filled with an arbitrary value.
+- **The full change history now shows** (review I3). Every time a missed dose is resolved, edited or unresolved, that's recorded with who and when — the page was building that trail but never showing it. A resolved dose now lists its history underneath.
+- **Faint labels darkened for readability** (review I8). The small grey uppercase labels ("Action taken", "History") were too light to pass the accessibility contrast bar; nudged darker in light mode and lighter in dark mode so they're comfortably readable in both.
+
+Build + PHP lint clean.
+
+**Reached the human line.** The next item on the list, **CD I-2** (the register currently shows a tidy `0` when someone records removing more of a controlled drug than the balance says exists, instead of surfacing that impossible result), is **not ours to just code** — what *should* happen when a count doesn't add up (show the negative, block it, or raise it as an incident) is a registered-manager / pharmacist decision. Flagged to the owner; not changed. Everything from here that blocks a page reaching "Ready" needs a named human.
+
+---
+
+## 28 July 2026 (part 10) — owner made four decisions; built three of them
+
+Wrote up a **decision sheet** (`docs/care-one-os/MEDICATION-DECISION-SHEET.md`) of everything blocking the pages that needs a human, and the owner answered four of them directly. Three were clean to build straight away:
+
+- **Controlled-drug register is now manager-only** (decision A1). A carer still gives a CD on the round (which records a witnessed register entry automatically), but the register *page* — the running ledger — is managers only, view and write.
+- **A medicine that isn't in stock can no longer be marked "given"** (decision B2). On the round, if the stock figure shows nothing left, the "Given" button is disabled with an explanation, a one-tap **"Not available"** is offered instead, and the row shows "Out of stock" in red. The server enforces it too — it refuses a "given" against zero tracked stock and points the carer to "not available" (a manager can correct the count if it's wrong; carers can't change stock, per A1). Untracked medicines are left alone.
+- **A round can't be ended until every dose is recorded** (decision B3). Previously you could end a round with doses outstanding and it just locked them away. Now ending is blocked while anything is unrecorded — the carer is sent to record each one (given, or a reason like refused / not available), nothing is auto-filled, and a fully-recorded round gets an "are you sure?" confirm. Enforced on the server too: it recomputes what's outstanding from the real data (never trusts the browser's count) and refuses to end if anything remains.
+
+The fourth decision (**A2 — the controlled-drug witness co-signature workflow**) is a bigger, multi-part feature — the named witness gets a notification on their own account to confirm the signature, a manager can override, and the record says which. Captured as a full spec in the decision sheet; to be built as its own piece and confirmed by a CSO.
+
+---
+
+## 28 July 2026 (part 11) — started building A2 (the witness co-signature), foundation in
+
+Logged the full "Adam & Eve" spec onto the existing issue **#14** (it was already noted as a to-do), and started the build in stages. **Stage 1 (the data layer) is done:** a new, separate table `cd_witness_confirmations` holds each pending/confirmed/manager-overridden confirmation, referencing the controlled-drug register entry it belongs to — deliberately kept *off* the register itself, because the register is append-only and must never change, whereas a confirmation has a lifecycle (pending → confirmed, or → manager-overridden). New `CdWitnessConfirmation` model with the status lifecycle and a "pending for this witness" scope. **A migration was run on the local database** to create the table (additive only — one new table, nothing else touched); it's guarded and re-runnable, and its rollback refuses to drop the table once any confirmation exists.
+
+Still to build (stages 2–5): create a pending confirmation when a CD is given/moved and resolve the witness to a staff account so they can be notified; a "signatures awaiting you" surface + header count for the witness; the confirm + manager-override actions; and showing the status on the register and round. The witness field will become a **staff picker** (so the person can actually be notified), with a typed fallback for anyone without an account — done backward-compatibly so the older shared screens are unaffected.
+
+**Stage 2 done (capture + witness picker).** The "Witnessed by" field on the round's record pop-up and on the controlled-drugs movement form is now a **staff picker** — you choose the colleague who witnessed, rather than typing a name — so that person is a real account we can later notify. (Where no staff list is supplied — the older shared screens — it falls back to the plain typed field, unchanged.) When a controlled drug is administered on the round or a movement is recorded, a **pending witness confirmation is now created automatically** against that register entry, naming the witness. A movement with no witness (e.g. supported living, "Not witnessed") correctly creates nothing. Verified end-to-end against the real database in a rolled-back test: the staff list loads (38 in the test home), the register entry computes its balance, the confirmation is created as *pending* with the witness resolved to their account, and the "awaiting this witness" query returns it. Front-end build + PHP lint clean.
+
+Front-end build + PHP lint clean throughout. Decisions recorded in the decision sheet with date + who.
+
+---
+
 ## Still to do (carried forward)
 
 **Medication Round screen** (from the wish-list):

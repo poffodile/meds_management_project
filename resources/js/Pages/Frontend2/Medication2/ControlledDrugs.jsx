@@ -30,12 +30,14 @@ const ACTION_LABEL = {
 const OUTGOING = ['administered', 'disposed', 'returned'];
 
 /** Record a witnessed movement for one CD medicine. */
-function MovementModal({ reg, onClose }) {
+function MovementModal({ reg, onClose, staff = [] }) {
     const form = useForm({
         mar_sheet_id: reg.mar_sheet_id, action_type: 'received',
-        quantity: '', witness_name: '', notes: '',
+        quantity: '', witness_name: '', witness_user_id: '', notes: '',
     });
     const isAdjust = form.data.action_type === 'adjustment';
+    // Pick the witness from staff (so they can be notified to confirm — issue #14 / A2).
+    const pickWitness = staff.length > 0;
     const submit = () => form.post(`${ENDPOINT}`, {
         preserveScroll: true,
         onSuccess: () => { notifications.show({ color: 'teal', message: 'Register entry recorded.' }); onClose(); },
@@ -58,8 +60,17 @@ function MovementModal({ reg, onClose }) {
             <NumberInput label={isAdjust ? 'Counted balance' : 'Quantity'} radius="md" mb="sm" min={0} hideControls
                 description={isAdjust ? 'The actual amount counted — this becomes the new balance.' : undefined}
                 value={form.data.quantity} onChange={(v) => form.setData('quantity', v)} error={form.errors.quantity} />
-            <TextInput label="Witness" radius="md" mb="sm" placeholder="Second signatory’s name" required
-                value={form.data.witness_name} onChange={(e) => form.setData('witness_name', e.currentTarget.value)} error={form.errors.witness_name} />
+            {pickWitness ? (
+                <Select label="Witness" radius="md" mb="sm" placeholder="Choose the witnessing staff member" required searchable
+                    data={staff} nothingFoundMessage="No staff match"
+                    description="They’ll be asked to confirm the signature on their own account."
+                    value={form.data.witness_user_id || null}
+                    onChange={(v) => { form.setData('witness_user_id', v ?? ''); const o = staff.find((s) => s.value === v); form.setData('witness_name', o ? o.label : ''); }}
+                    error={form.errors.witness_name} />
+            ) : (
+                <TextInput label="Witness" radius="md" mb="sm" placeholder="Second signatory’s name" required
+                    value={form.data.witness_name} onChange={(e) => form.setData('witness_name', e.currentTarget.value)} error={form.errors.witness_name} />
+            )}
             <Textarea label="Notes (optional)" radius="md" autosize minRows={2}
                 value={form.data.notes} onChange={(e) => form.setData('notes', e.currentTarget.value)} />
             <Group justify="flex-end" mt="lg" gap="sm">
@@ -130,7 +141,7 @@ function RegisterCard({ reg, onMove }) {
     );
 }
 
-export default function ControlledDrugs({ registers = [], home }) {
+export default function ControlledDrugs({ registers = [], home, staff = [] }) {
     const [move, setMove] = useState(null);
     const flash = usePage().props?.flash;
     useEffect(() => {
@@ -174,7 +185,7 @@ export default function ControlledDrugs({ registers = [], home }) {
                 </Text>
             </Box>
 
-            {move && <MovementModal reg={move} onClose={() => setMove(null)} />}
+            {move && <MovementModal reg={move} onClose={() => setMove(null)} staff={staff} />}
         </AppShell>
     );
 }

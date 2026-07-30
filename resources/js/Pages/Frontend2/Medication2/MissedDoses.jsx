@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { Head, router, useForm, usePage } from '@inertiajs/react';
 import {
     Box, Group, Text, Badge, Button, ActionIcon, ThemeIcon, SegmentedControl,
-    Modal, Select, Textarea, ScrollArea,
+    Modal, Select, Textarea, ScrollArea, Stack,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import {
@@ -13,7 +13,9 @@ import AppShell from '@frontend2/Layouts/AppShell';
 
 const TXT = 'light-dark(#13233F, #E9EDF4)';
 const MUTED = 'light-dark(#4A5A72, #A6B3C6)';
-const FAINT = 'light-dark(#8493A8, #6C7C93)';
+// Darkened (light) / lightened (dark) from the old #8493A8/#6C7C93 so the small uppercase
+// labels + captions clear WCAG 2.2 AA 4.5:1 on the page surfaces (review Missed I8).
+const FAINT = 'light-dark(#586780, #9BA9BD)';
 const TEAL = 'light-dark(#1B9C90, #3BC3B4)';
 const ORANGE = 'light-dark(#DE7B1E, #EBA65A)';
 const RED = 'light-dark(#CE3F3F, #E56B6B)';
@@ -65,6 +67,26 @@ function ResolvePanel({ item, date, onClose }) {
                     <Text fz="sm" c={TXT} mb="xs">{item.clinical_action || '—'}</Text>
                     {item.notes && <><Text fz={12} fw={700} c={FAINT} tt="uppercase" style={{ letterSpacing: 0.4 }}>Notes</Text><Text fz="sm" c={MUTED} mb="xs">{item.notes}</Text></>}
                     {item.reviewed_by && <Text fz={11.5} c={FAINT}>Reviewed by {item.reviewed_by}{item.reviewed_at ? ` · ${item.reviewed_at}` : ''}</Text>}
+
+                    {/* Full change trail (resolved / edited / removed), already computed
+                        server-side but previously never shown (review Missed I3 / REQ-MED-105). */}
+                    {item.history?.length > 0 && (
+                        <>
+                            <Text fz={12} fw={700} c={FAINT} tt="uppercase" style={{ letterSpacing: 0.4 }} mt="md">History</Text>
+                            <Stack gap={8} mt={6}>
+                                {item.history.map((h, i) => (
+                                    <Box key={i} style={{ borderLeft: `2px solid ${HAIR}`, paddingLeft: 10 }}>
+                                        <Text fz={12.5} fw={650} c={TXT} tt="capitalize">
+                                            {h.action}{h.clinical_action ? <Text component="span" fw={400} c={MUTED}> — {h.clinical_action}</Text> : null}
+                                        </Text>
+                                        {h.notes && <Text fz={11.5} c={MUTED}>“{h.notes}”</Text>}
+                                        {(h.by || h.at) && <Text fz={11} c={FAINT}>{[h.by, h.at].filter(Boolean).join(' · ')}</Text>}
+                                    </Box>
+                                ))}
+                            </Stack>
+                        </>
+                    )}
+
                     <Group justify="space-between" mt="lg">
                         <Button variant="subtle" color="red" radius="xl" onClick={undo}>Undo resolution</Button>
                         <Button variant="light" radius="xl" onClick={() => setEditing(true)}>Edit</Button>

@@ -268,6 +268,8 @@ trait BuildsMedicationRound
             'currentRound' => $this->roundForTime(now()->format('H:i')),
             'closures' => $closures,
             'home' => \DB::table('home')->where('id', $homeId)->value('title'),
+            // Staff who can be named as a CD witness (issue #14 / A2) — excludes the current user.
+            'staff' => $this->homeStaffOptions(),
         ];
     }
 
@@ -344,6 +346,7 @@ trait BuildsMedicationRound
             'code' => 'required|in:A,S,R,W,N,O',
             'dose_given' => 'nullable|string|max:100',
             'witnessed_by' => 'nullable|string|max:255',
+            'witness_user_id' => 'nullable|integer',
             'reason' => 'nullable|string|max:255',
             'notes' => 'nullable|string|max:2000',
         ]);
@@ -422,6 +425,19 @@ trait BuildsMedicationRound
             && trim((string) $request->input('witnessed_by')) === '') {
             throw ValidationException::withMessages([
                 'witnessed_by' => 'A witness is required to administer a controlled drug.',
+            ]);
+        }
+
+        // Owner B2 (2026-07-28): a medicine that isn't in stock must not be recorded as
+        // given. When the stock figure is tracked and shows nothing left, refuse the
+        // "given" and steer the carer to record it as Not available — a manager can
+        // correct the count if it's wrong (carers can't change stock, see decision A1).
+        // Untracked stock (null) is left alone: we can't assert it's absent.
+        if ($request->input('code') === 'A'
+            && ! is_null($sheet->stock_level)
+            && (float) $sheet->stock_level <= 0) {
+            throw ValidationException::withMessages([
+                'code' => 'There is no stock recorded for this medicine, so it cannot be marked as given. Record it as “Not available”, or ask a manager to correct the stock count.',
             ]);
         }
 
@@ -547,13 +563,21 @@ trait BuildsMedicationRound
                 // server-side. Without this the register stays empty even as CDs are given
                 // (the exact gap the compliance review flagged).
                 if ($sheet->is_controlled) {
-                    \App\Models\ControlledDrugRegister::record(
+                    $cdEntry = \App\Models\ControlledDrugRegister::record(
                         $sheet, 'administered', $qty, $userId,
                         $request->input('witnessed_by'),
                         [
                             'client_name' => $resident->name ?? null,
                             'notes' => 'Administered on the medication round.',
                         ]
+                    );
+
+                    // Open a PENDING witness co-signature for the witness to confirm on their
+                    // own account (issue #14 / A2). No-op if there was no witness.
+                    \App\Models\CdWitnessConfirmation::open(
+                        $cdEntry, $userId,
+                        $request->input('witness_user_id') ? (int) $request->input('witness_user_id') : null,
+                        $request->input('witnessed_by')
                     );
                 }
 

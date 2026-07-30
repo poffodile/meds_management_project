@@ -4,6 +4,7 @@ namespace App\Http\Controllers\frontEnd\Medication;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use App\Http\Controllers\Controller;
 use App\Models\MARSheet;
 use App\Models\MedicationDoseReview;
@@ -23,6 +24,22 @@ class MissedDosesController extends Controller
     // because 'S' was wrongly counted as "given", which meant a sleeping resident's
     // missed dose never surfaced to anyone.
     private const NOT_GIVEN_CODES = ['R', 'O', 'W', 'N', 'S'];
+
+    /**
+     * The clinical actions a reviewer may record. MUST stay in step with the frontend list
+     * (CLINICAL_ACTIONS in resources/js/Pages/Frontend2/Medication2/MissedDoses.jsx). The UI
+     * already limits the picker to these; this enforces the same server-side so a replayed or
+     * hand-crafted request can't store an arbitrary "action" (review Missed I5 / REQ-MED-06).
+     */
+    private const CLINICAL_ACTIONS = [
+        'Contacted GP / prescriber',
+        'Contacted pharmacy',
+        'Dose given late',
+        'Monitored resident — no action needed',
+        'Escalated to manager / senior',
+        'Documented, no further action',
+        'Other (see notes)',
+    ];
 
     public function __construct()
     {
@@ -375,7 +392,7 @@ class MissedDosesController extends Controller
             'time_slot'       => 'required|string|max:10',
             'dose_kind'       => 'required|in:missed,not_given',
             'code'            => 'nullable|string|max:5',
-            'clinical_action' => 'required|string|max:100',
+            'clinical_action' => ['required', Rule::in(self::CLINICAL_ACTIONS)],
             'notes'           => 'nullable|string',
         ]);
 

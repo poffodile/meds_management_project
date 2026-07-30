@@ -434,7 +434,16 @@ function CountView({ meds = [], canAdjust }) {
         setProcessing(true);
         router.post(COUNT, { counts: payload }, {
             preserveScroll: true,
-            onSuccess: () => { toast(`${payload.length} item${payload.length === 1 ? '' : 's'} reconciled.`); setCounts({}); },
+            // Show the server's OWN message — it knows how many actually applied vs were
+            // skipped (e.g. a CD with no witness). The old hardcoded "N reconciled" claimed
+            // success for items the server may have skipped (review Stock I-3).
+            onSuccess: (page) => {
+                const f = page?.props?.flash || {};
+                if (f.error) toast(f.error, false);
+                else toast(f.success || 'Stock count posted.');
+                setCounts({});
+            },
+            onError: (e) => toast((e && Object.values(e)[0]) || 'Could not post the stock count — please try again.', false),
             onFinish: () => setProcessing(false),
         });
     };
@@ -560,14 +569,16 @@ function ReorderView({ meds = [], orders = [], canAdjust }) {
     const orderForm = useForm({ mar_sheet_id: '', quantity: '', supplier: '', notes: '' });
     const recvForm = useForm({ order_id: '', quantity: '', expiry_date: '', batch_number: '' });
 
-    const toast = (message) => notifications.show({
-        message, autoClose: 3500, withBorder: true, icon: <IconCheck size={20} stroke={3} />,
+    const toast = (message, ok = true) => notifications.show({
+        message, autoClose: ok ? 3500 : 5000, withBorder: true, icon: ok ? <IconCheck size={20} stroke={3} /> : <IconAlertTriangle size={20} stroke={2.4} />,
         styles: {
-            root: { padding: '16px 22px', minWidth: 340, borderRadius: 24, backgroundColor: 'light-dark(#13233F, #18243D)', borderColor: '#1F9E93', boxShadow: '0 22px 48px -12px rgba(19,35,63,0.62)' },
-            icon: { backgroundColor: '#1F9E93', width: 38, height: 38, borderRadius: '50%' },
+            root: { padding: '16px 22px', minWidth: 340, borderRadius: 24, backgroundColor: 'light-dark(#13233F, #18243D)', borderColor: ok ? '#1F9E93' : '#C0413A', boxShadow: '0 22px 48px -12px rgba(19,35,63,0.62)' },
+            icon: { backgroundColor: ok ? '#1F9E93' : '#C0413A', width: 38, height: 38, borderRadius: '50%' },
             body: { marginInlineStart: 8 }, description: { color: '#FFFFFF', fontSize: 15, fontWeight: 700 }, closeButton: { color: 'rgba(255,255,255,0.65)' },
         },
     });
+    // First server/validation error message, whatever field it came back under.
+    const firstErr = (e) => (e && typeof e === 'object' ? Object.values(e)[0] : null) || 'Something went wrong — please try again.';
 
     const needs = meds.filter((m) => m.low || isOut(m)).sort((a, b) => Number(a.stock_level ?? 0) - Number(b.stock_level ?? 0));
     const onOrderIds = new Set(orders.map((o) => o.mar_sheet_id));
@@ -577,10 +588,10 @@ function ReorderView({ meds = [], orders = [], canAdjust }) {
     };
 
     const openOrder = (m) => { orderForm.clearErrors(); orderForm.setData({ mar_sheet_id: String(m.id), quantity: suggested(m), supplier: '', notes: '' }); setReceiveFor(null); setOrderFor(m.id); };
-    const placeOrder = () => orderForm.post(ORDER, { preserveScroll: true, onSuccess: () => { toast('Order placed.'); setOrderFor(null); orderForm.reset(); } });
+    const placeOrder = () => orderForm.post(ORDER, { preserveScroll: true, onSuccess: () => { toast('Order placed.'); setOrderFor(null); orderForm.reset(); }, onError: (e) => toast(firstErr(e), false) });
     const openReceive = (o) => { recvForm.clearErrors(); recvForm.setData({ order_id: String(o.id), quantity: o.quantity, expiry_date: '', batch_number: '' }); setOrderFor(null); setReceiveFor(o.id); };
-    const receive = () => recvForm.post(ORDER_RECEIVE, { preserveScroll: true, onSuccess: () => { toast('Order received and booked in.'); setReceiveFor(null); recvForm.reset(); } });
-    const cancelOrder = (o) => router.post(ORDER_CANCEL, { order_id: o.id }, { preserveScroll: true, onSuccess: () => toast('Order cancelled.') });
+    const receive = () => recvForm.post(ORDER_RECEIVE, { preserveScroll: true, onSuccess: () => { toast('Order received and booked in.'); setReceiveFor(null); recvForm.reset(); }, onError: (e) => toast(firstErr(e), false) });
+    const cancelOrder = (o) => router.post(ORDER_CANCEL, { order_id: o.id }, { preserveScroll: true, onSuccess: () => toast('Order cancelled.'), onError: (e) => toast(firstErr(e), false) });
 
     return (
         <Stack gap={16}>

@@ -60,4 +60,20 @@ trait ResolvesCurrentHome
 
         return $allowed[0] ?? 0;
     }
+
+    /**
+     * Staff accounts in the current home, as {value,label} options for a picker (e.g. the
+     * controlled-drug witness — issue #14 / A2). The current user is EXCLUDED: a witness
+     * must be a second person, not the one recording. FIND_IN_SET so a staff member whose
+     * home_id column holds a comma-list still matches.
+     */
+    protected function homeStaffOptions(): array
+    {
+        return \App\User::whereRaw('FIND_IN_SET(?, home_id)', [$this->currentHomeId()])
+            ->where('id', '!=', (int) Auth::id())
+            ->orderBy('name')
+            ->get(['id', 'name'])
+            ->map(fn ($u) => ['value' => (string) $u->id, 'label' => $u->name])
+            ->all();
+    }
 }

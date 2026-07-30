@@ -60,6 +60,9 @@ function MedLine({ row, locked, onGiven, onOutcome }) {
     const recorded = Boolean(row.code);
     const prn = row.as_required ? row.prn : null;
     const prnBlocked = Boolean(prn?.blocked);
+    // Owner B2: a medicine with no stock recorded can't be marked given — steer to "Not
+    // available". Only when stock is actually tracked (not null) and shows nothing left.
+    const outOfStock = row.stock != null && Number(row.stock) <= 0;
 
     const tone = recorded
         ? (isGivenCode(row.code) ? TEAL : (row.code === 'R' ? RED : ORANGE))
@@ -100,10 +103,12 @@ function MedLine({ row, locked, onGiven, onOutcome }) {
                         </Group>
                     )}
 
-                    {/* Stock, when low — surfaced so a carer knows before recording. */}
-                    {row.low_stock && row.stock != null && (
+                    {/* Stock — out-of-stock (can't be given) shown in red; low stock in amber. */}
+                    {outOfStock ? (
+                        <Text fz={11.5} c={RED} fw={700} mt={2}>Out of stock — can’t be marked given</Text>
+                    ) : row.low_stock && row.stock != null ? (
                         <Text fz={11.5} c={ORANGE} fw={650} mt={2}>Low stock: {row.stock}{row.unit ? ` ${row.unit}` : ''} left</Text>
-                    )}
+                    ) : null}
 
                     {/* PRN state — visible before the tap (audit IM-08). */}
                     {!recorded && prn && (
@@ -140,11 +145,16 @@ function MedLine({ row, locked, onGiven, onOutcome }) {
 
             {/* Actions — only when not recorded and the round is open. */}
             {!recorded && !locked && (
-                <Group gap={8} mt={10} pl={56} wrap="nowrap">
-                    <Tooltip label={prnBlocked ? (prn.block_reason || 'Not due yet') : 'Record as given'} disabled={!prnBlocked} withArrow>
+                <Group gap={8} mt={10} pl={56} wrap="wrap">
+                    <Tooltip
+                        label={outOfStock ? 'No stock recorded — record as “Not available”, or ask a manager to correct the count' : (prnBlocked ? (prn.block_reason || 'Not due yet') : 'Record as given')}
+                        disabled={!outOfStock && !prnBlocked} withArrow multiline w={outOfStock ? 250 : undefined}>
                         <Button size="xs" radius="xl" color="teal" leftSection={<IconCheck size={14} />}
-                            disabled={prnBlocked} onClick={() => onGiven(row)}>Given</Button>
+                            disabled={prnBlocked || outOfStock} onClick={() => onGiven(row)}>Given</Button>
                     </Tooltip>
+                    {outOfStock && (
+                        <Button size="xs" radius="xl" variant="light" color="orange" leftSection={<IconBan size={14} />} onClick={() => onOutcome(row, 'N')}>Not available</Button>
+                    )}
                     <Tooltip label="Refused" withArrow>
                         <ActionIcon size="lg" radius="xl" variant="light" color="red" onClick={() => onOutcome(row, 'R')}><IconCircleX size={16} /></ActionIcon>
                     </Tooltip>
@@ -251,7 +261,7 @@ function RosterRow({ resident, isNext, onOpen }) {
     );
 }
 
-export default function Medication2Round({ rounds = [], grid = {}, date, currentRound = 'morning', closures = {}, home }) {
+export default function Medication2Round({ rounds = [], grid = {}, date, currentRound = 'morning', closures = {}, home, staff = [] }) {
     const [activeRound, setActiveRound] = useState(currentRound);
     const [view, setView] = useState('overview');         // 'overview' | 'focused'
     const [focus, setFocus] = useState(0);
@@ -320,9 +330,15 @@ export default function Medication2Round({ rounds = [], grid = {}, date, current
     const outcomeDose = (row, code) => { if (!roundClosed) openRecord(row, code); };
 
     // --- end / reopen ---
+    // Owner B3: a round can only end once every scheduled dose is recorded. If any are
+    // outstanding, we don't end — we send the carer to record them (given, or a reason).
+    const recordRemaining = () => { setEndOpen(false); startRound(); };
     const confirmEnd = () => {
-        router.post(`${ENDPOINT}/end`, { date, round: activeRound, outstanding: outstandingDoses }, {
-            preserveScroll: true, onSuccess: () => setEndOpen(false),
+        router.post(`${ENDPOINT}/end`, { date, round: activeRound }, {
+            preserveScroll: true,
+            onSuccess: () => setEndOpen(false),
+            // Server recomputes outstanding and refuses if any remain (defence in depth).
+            onError: (e) => notifications.show({ color: 'red', title: 'Round not ended', message: Object.values(e ?? {})[0] || 'This round could not be ended.', autoClose: 6000 }),
         });
     };
     const reopenRound = () => router.post(`${ENDPOINT}/reopen`, { date, round: activeRound }, { preserveScroll: true });
@@ -530,6 +546,7 @@ export default function Medication2Round({ rounds = [], grid = {}, date, current
                 row={recordRow}
                 resident={resident}
                 allergies={allergies}
+                witnessOptions={staff}
                 date={date}
                 presetCode={recordCode}
                 endpoint={`${ENDPOINT}/record`}
@@ -546,19 +563,28 @@ export default function Medication2Round({ rounds = [], grid = {}, date, current
                 </Group>
             </Modal>
 
-            {/* End-round confirm (owner: confirm-and-allow when doses outstanding). */}
-            <Modal opened={endOpen} onClose={() => setEndOpen(false)} title="End this round?" centered radius="md" size="sm">
+            {/* End-round (owner B3): cannot end while doses are outstanding — the carer is
+                sent to record them; only a fully-recorded round gets an "are you sure?" end. */}
+            <Modal opened={endOpen} onClose={() => setEndOpen(false)} title={outstandingDoses > 0 ? 'Finish recording first' : 'End this round?'} centered radius="md" size="sm">
                 {outstandingDoses > 0 ? (
-                    <Text fz="sm" c={MUTED} mb="md">
-                        <b style={{ color: 'var(--mantine-color-orange-7)' }}>{outstandingDoses} scheduled dose{outstandingDoses === 1 ? '' : 's'} still outstanding.</b> Ending the round locks recording — these doses stay <b style={{ color: 'var(--mantine-color-text)' }}>unrecorded</b> for this round (they are not marked given, and no reason is captured). A manager can re-open the round to record them.
-                    </Text>
+                    <>
+                        <Text fz="sm" c={MUTED} mb="md">
+                            <b style={{ color: 'var(--mantine-color-orange-7)' }}>{outstandingDoses} dose{outstandingDoses === 1 ? '' : 's'} still to record.</b> Every dose needs an outcome — given, or a reason (refused, not available, and so on) — before this round can be ended. Nothing is filled in for you.
+                        </Text>
+                        <Group justify="flex-end" gap="sm">
+                            <Button variant="default" radius="xl" onClick={() => setEndOpen(false)}>Cancel</Button>
+                            <Button color="teal" radius="xl" onClick={recordRemaining}>Record remaining</Button>
+                        </Group>
+                    </>
                 ) : (
-                    <Text fz="sm" c={MUTED} mb="md">All scheduled doses are recorded. Ending the round locks it; a manager can re-open it if needed.</Text>
+                    <>
+                        <Text fz="sm" c={MUTED} mb="md">All scheduled doses are recorded. Are you sure you want to end this round? It locks recording; a manager can re-open it if needed.</Text>
+                        <Group justify="flex-end" gap="sm">
+                            <Button variant="default" radius="xl" onClick={() => setEndOpen(false)}>Cancel</Button>
+                            <Button color="teal" radius="xl" onClick={confirmEnd}>Yes, end round</Button>
+                        </Group>
+                    </>
                 )}
-                <Group justify="flex-end" gap="sm">
-                    <Button variant="default" radius="xl" onClick={() => setEndOpen(false)}>Cancel</Button>
-                    <Button color={outstandingDoses > 0 ? 'orange' : 'teal'} radius="xl" onClick={confirmEnd}>End round</Button>
-                </Group>
             </Modal>
         </AppShell>
     );

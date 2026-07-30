@@ -31,7 +31,7 @@ function dobLabel(dob) {
  * RecordDoseModal — record the outcome of a single dose in the Medication Round.
  * The dose details come from the selected row; "Given" auto-deducts stock server-side.
  */
-export default function RecordDoseModal({ opened, onClose, row, resident = null, allergies = [], date, presetCode, endpoint = '/medication/medication-round-react/record' }) {
+export default function RecordDoseModal({ opened, onClose, row, resident = null, allergies = [], witnessOptions = [], date, presetCode, endpoint = '/medication/medication-round-react/record' }) {
     const form = useForm({
         mar_sheet_id: '',
         date: date ?? '',
@@ -39,9 +39,13 @@ export default function RecordDoseModal({ opened, onClose, row, resident = null,
         code: 'A',
         dose_given: '',
         witnessed_by: '',
+        witness_user_id: '',
         reason: '',
         notes: '',
     });
+    // When staff options are supplied, the witness is PICKED (so they can be notified to
+    // confirm — issue #14 / A2); otherwise the old free-text field is used (legacy screens).
+    const pickWitness = witnessOptions.length > 0;
 
     const needsReason = REASON_REQUIRED_CODES.includes(form.data.code);
     const reasonOptions = form.data.code === 'R' ? REFUSAL_REASONS : OMISSION_REASONS;
@@ -54,6 +58,7 @@ export default function RecordDoseModal({ opened, onClose, row, resident = null,
             form.setData('code', presetCode ?? row.code ?? 'A');
             form.setData('dose_given', row.dose_given ?? row.dose ?? '');
             form.setData('witnessed_by', row.witnessed_by ?? '');
+            form.setData('witness_user_id', '');
             form.setData('reason', row.reason ?? '');
             form.setData('notes', row.notes ?? '');
         }
@@ -74,7 +79,7 @@ export default function RecordDoseModal({ opened, onClose, row, resident = null,
         form.post(endpoint, {
             preserveScroll: true,
             preserveState: true,
-            onSuccess: () => { form.setData('notes', ''); form.setData('witnessed_by', ''); form.setData('reason', ''); onClose(); },
+            onSuccess: () => { form.setData('notes', ''); form.setData('witnessed_by', ''); form.setData('witness_user_id', ''); form.setData('reason', ''); onClose(); },
             // Field errors (code/reason/witnessed_by) render inline; a server error with no
             // matching field (e.g. prescription-not-found) would otherwise be invisible and
             // the modal would sit there as if nothing happened (audit CR-07). The modal is
@@ -163,14 +168,33 @@ export default function RecordDoseModal({ opened, onClose, row, resident = null,
                 onChange={(e) => form.setData('dose_given', e.currentTarget.value)}
                 error={form.errors.dose_given}
             />
-            <TextInput
-                label="Witnessed by"
-                placeholder={row.is_controlled ? 'Second staff member (required)' : 'Optional'}
-                required={row.is_controlled}
-                value={form.data.witnessed_by}
-                onChange={(e) => form.setData('witnessed_by', e.currentTarget.value)}
-                error={form.errors.witnessed_by}
-            />
+            {pickWitness ? (
+                <Select
+                    label="Witnessed by"
+                    placeholder={row.is_controlled ? 'Choose the witnessing staff member' : 'Optional'}
+                    data={witnessOptions}
+                    searchable
+                    nothingFoundMessage="No staff match"
+                    required={row.is_controlled}
+                    value={form.data.witness_user_id || null}
+                    onChange={(v) => {
+                        form.setData('witness_user_id', v ?? '');
+                        const opt = witnessOptions.find((o) => o.value === v);
+                        form.setData('witnessed_by', opt ? opt.label : '');
+                    }}
+                    error={form.errors.witnessed_by}
+                    description={row.is_controlled ? 'They’ll be asked to confirm the signature on their own account.' : undefined}
+                />
+            ) : (
+                <TextInput
+                    label="Witnessed by"
+                    placeholder={row.is_controlled ? 'Second staff member (required)' : 'Optional'}
+                    required={row.is_controlled}
+                    value={form.data.witnessed_by}
+                    onChange={(e) => form.setData('witnessed_by', e.currentTarget.value)}
+                    error={form.errors.witnessed_by}
+                />
+            )}
             <Textarea
                 label="Notes"
                 autosize

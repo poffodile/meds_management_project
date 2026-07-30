@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use App\Http\Controllers\Controller;
+use App\Models\CdWitnessConfirmation;
 use App\Models\ControlledDrugRegister;
 use App\Models\MARSheet;
 use App\ServiceUser;
@@ -15,13 +16,19 @@ class ControlledDrugRegisterController extends Controller
 {
     use \App\Http\Controllers\frontEnd\Concerns\ResolvesCurrentHome;
 
-    private const ALLOWED_USER_TYPES = ['N', 'M', 'A', 'CM', 'O'];
+    /**
+     * The controlled-drug register is MANAGER-ONLY — view and write (owner decision A1,
+     * 2026-07-28; review CD I-1). A plain carer ('N') administers a CD on the round (which
+     * writes a witnessed register entry automatically via the round path), but cannot open
+     * the register itself. Manager-level = M / CM / A / O.
+     */
+    private const ALLOWED_USER_TYPES = ['M', 'CM', 'A', 'O'];
 
     public function __construct()
     {
         $this->middleware(function ($request, $next) {
             if (!Auth::check() || !in_array(Auth::user()->user_type, self::ALLOWED_USER_TYPES, true)) {
-                abort(403, 'You do not have access to medication management.');
+                abort(403, 'The controlled-drug register is available to managers only.');
             }
             return $next($request);
         });
@@ -185,6 +192,8 @@ class ControlledDrugRegisterController extends Controller
         return Inertia::render('Frontend2/Medication2/ControlledDrugs', [
             'registers' => $registers,
             'home' => \DB::table('home')->where('id', $homeId)->value('title'),
+            // Staff who can be named as a witness (issue #14 / A2) — excludes the current user.
+            'staff' => $this->homeStaffOptions(),
         ]);
     }
 
@@ -196,6 +205,7 @@ class ControlledDrugRegisterController extends Controller
             'action_type' => 'required|in:received,disposed,returned,adjustment',
             'quantity' => 'required|numeric|min:0',
             'witness_name' => 'required|string|max:255',   // manual movements are always witnessed
+            'witness_user_id' => 'nullable|integer',       // the witness's staff account, for confirmation (A2)
             'notes' => 'nullable|string|max:2000',
         ]);
 
@@ -206,13 +216,20 @@ class ControlledDrugRegisterController extends Controller
         }
 
         $resident = ServiceUser::where('id', $sheet->client_id)->first();
-        ControlledDrugRegister::record(
+        $entry = ControlledDrugRegister::record(
             $sheet,
             $request->input('action_type'),
             (float) $request->input('quantity'),
             (int) Auth::id(),
             $request->input('witness_name'),
             ['client_name' => $resident->name ?? null, 'notes' => $request->input('notes')]
+        );
+
+        // Open a pending witness co-signature for the named witness to confirm (issue #14 / A2).
+        CdWitnessConfirmation::open(
+            $entry, (int) Auth::id(),
+            $request->input('witness_user_id') ? (int) $request->input('witness_user_id') : null,
+            $request->input('witness_name')
         );
 
         return redirect()->route('frontend2.medication2.controlled-drugs')

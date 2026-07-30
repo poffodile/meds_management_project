@@ -11,6 +11,7 @@ use App\ServiceUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
 class MedicationStockController extends Controller
@@ -475,7 +476,9 @@ class MedicationStockController extends Controller
         $sheet = MARSheet::forHome($homeId)->active()->find($request->input('mar_sheet_id'));
 
         if (! $sheet) {
-            return redirect()->route('frontend2.stock-2')->with('error', 'Medication not found.');
+            // Throw, don't redirect-with-error: a 302+flash reads as success in Inertia and
+            // the page would falsely toast "Order placed" (review Stock I-3 / same as Round CR-07).
+            throw ValidationException::withMessages(['mar_sheet_id' => 'That medication could not be found for your home.']);
         }
 
         MedicationStockOrder::create([
@@ -509,12 +512,13 @@ class MedicationStockController extends Controller
         $order = MedicationStockOrder::forHome($homeId)->open()->find($request->input('order_id'));
 
         if (! $order) {
-            return redirect()->route('frontend2.stock-2')->with('error', 'Order not found or already closed.');
+            // Throw so the page shows the failure instead of silently toasting success (Stock I-3).
+            throw ValidationException::withMessages(['order_id' => 'That order was not found or has already been closed.']);
         }
 
         $sheet = MARSheet::forHome($homeId)->active()->find($order->mar_sheet_id);
         if (! $sheet) {
-            return redirect()->route('frontend2.stock-2')->with('error', 'Medication not found.');
+            throw ValidationException::withMessages(['order_id' => 'The medication for that order could not be found.']);
         }
 
         $qty = (float) $request->input('quantity');
@@ -557,10 +561,12 @@ class MedicationStockController extends Controller
         $request->validate(['order_id' => 'required|integer']);
         $homeId = $this->getHomeId();
         $order = MedicationStockOrder::forHome($homeId)->open()->find($request->input('order_id'));
-        if ($order) {
-            $order->status = 'cancelled';
-            $order->save();
+        if (! $order) {
+            // Was: silently report "cancelled" even when nothing was found (Stock I-3).
+            throw ValidationException::withMessages(['order_id' => 'That order was not found or has already been closed.']);
         }
+        $order->status = 'cancelled';
+        $order->save();
 
         return redirect()->route('frontend2.stock-2')->with('success', 'Order cancelled.');
     }
