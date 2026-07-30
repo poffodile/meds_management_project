@@ -49,6 +49,7 @@ use App\Http\Controllers\frontEnd\Medication\MedicationRoundController;
 use App\Http\Controllers\frontEnd\Medication\MedicationStockController;
 use App\Http\Controllers\frontEnd\Medication\MissedDosesController;
 use App\Http\Controllers\frontEnd\Medication\WitnessConfirmationController;
+use App\Http\Controllers\frontEnd\Medication\MarChartController;
 use App\Http\Controllers\frontEnd\Medication\ShiftHandoverController;
 use App\Http\Controllers\frontEnd\PettyCashController;
 use App\Http\Controllers\frontEnd\Roster\AICarePlanController;
@@ -1682,6 +1683,14 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
     Route::get('/frontend2/medication-2/controlled-drugs', [ControlledDrugRegisterController::class, 'indexMedication2'])->name('frontend2.medication2.controlled-drugs');
     Route::post('/frontend2/medication-2/controlled-drugs', [ControlledDrugRegisterController::class, 'storeMedication2'])->name('frontend2.medication2.controlled-drugs.store');
     Route::get('/frontend2/medication-2/stock', [MedicationStockController::class, 'indexMedication2'])->name('frontend2.medication2.stock');
+
+    // Medication 2 → MAR chart (the canonical administration record; read-only).
+    Route::get('/frontend2/medication-2/mar-chart', [MarChartController::class, 'index'])->name('frontend2.medication2.mar-chart');
+
+    // Medication 2 → Shift Handover (fresh CLINIK-shell page; reuses the shared handover logic).
+    Route::get('/frontend2/medication-2/shift-handover', [ShiftHandoverController::class, 'indexMedication2'])->name('frontend2.medication2.shift-handover');
+    Route::post('/frontend2/medication-2/shift-handover', [ShiftHandoverController::class, 'storeMedication2'])->name('frontend2.medication2.shift-handover.store');
+    Route::post('/frontend2/medication-2/shift-handover/{id}/acknowledge', [ShiftHandoverController::class, 'acknowledgeMedication2'])->where('id', '[0-9]+')->name('frontend2.medication2.shift-handover.acknowledge');
 
     // CD witness co-signatures (issue #14 / A2): a witness confirms signatures named against
     // them; managers can override. Registered ABOVE the {page} catch-all below.

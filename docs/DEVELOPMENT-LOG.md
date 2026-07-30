@@ -703,6 +703,91 @@ Deliberately **not** added to the medication round itself: the round's rows come
 
 **Note:** MySQL/Vite/Laravel were stopped during a `/login` restart mid-session; MySQL was restarted to run the DB checks. If you want to view the app, the web + Vite servers need starting again (say the word).
 
+---
+
+## 28 July 2026 (part 12) — owner answered the clinical-direction questions; built the first one (the directions field)
+
+The owner gave product direction on four of the parked clinical decisions (a pharmacist/CSO still confirms each): the **directions field** — build it now, typed in; a **CD count that doesn't add up** — show the true figure, flag it, raise an incident; **"given late"** — write a late entry on the chart; **stale weight** — warn, don't block (that one already ships). All recorded in the decision sheet and, for the directions field, issue **#29**.
+
+**Built the directions field (C1 / #29) — the blocking Critical.** There is now a proper **"Administration instructions"** field on a prescription — the place for a real "how to give it" directive like *do not crush*, *take with food*, *half an hour before food*. A manager types it on the prescription form (added to the client-details prescribe form + its save/populate wiring), and the medication round shows it in its own clearly-labelled strip. It's a new, nullable field, so existing prescriptions are unaffected; once the meds dictionary (dm+d, #17) lands it can auto-fill from there instead of being typed per resident. Verified: the field saves and reads back, and the round now sources its instruction line from it. Migration run on the local DB (additive — one nullable column). Build + PHP lint clean.
+
+This closes the honesty gap from earlier in the day: the round briefly showed the *indication* dressed up as a directive; now the indication sits quietly in the detail line and the **real directive** has its own field and prominent display.
+
+---
+
+## 28 July 2026 (part 13) — built the other three owner-directed decisions (given-late, CD discrepancy)
+
+Cleared the rest of the answered decisions:
+
+**"Given late" now writes to the chart (B4).** Resolving a missed dose as "dose given late" used to record only a review — the medication chart still showed a gap, so the chart and the review disagreed about whether the resident actually got the dose. Now it *also* writes a real administration on the chart, **marked as late** (a new flag, so it's never confused with an on-time dose), through the same append-only path everything else uses. Stock isn't moved by this (a late dose's exact quantity is uncertain and the round owns stock) — the point is that the chart honestly shows the dose was given. Verified: a late resolve produces an administration that reads *given + late*.
+
+**A controlled-drug count that doesn't add up is no longer hidden (B1).** The register used to floor an outgoing movement at zero — so recording that you'd removed *more* of a controlled drug than the register said existed produced a tidy zero balance, quietly swallowing the exact discrepancy a CD register exists to catch. Now it records the **true (negative) figure**, **flags the entry as a "Discrepancy"** (red badge + a "took more than the recorded balance — needs review" line on the register), and a **later receipt recovers the balance** normally. Verified end-to-end: give 2 from 3 → 1 (clean); give 5 from 1 → **−4, flagged**; receive 10 → 6, unflagged. **Noted for when the Incidents module (#20) is built:** a discrepancy should also raise a medication incident automatically — the hook is marked in the code.
+
+**Stale weight (C4)** needed no new code — the "warn, show the weight's age, don't block" behaviour already shipped with the weight work (CR-09); the owner's decision confirms that's the right behaviour, with the exact staleness threshold left as a clinician-set value.
+
+Two migrations run on the local DB (both additive single columns: `mar_administrations.is_late`, `controlled_drug_register.is_discrepancy`). All four owner-directed decisions (C1, B4, B1, C4) are now built and DB-verified; each still wants a pharmacist/CSO to confirm the clinical intent. Build + PHP lint clean throughout.
+
+---
+
+## 28 July 2026 (part 14) — three more decisions taken; built the controlled-drug "proper dose" block (C2, the last Critical)
+
+Owner directed the remaining questions: **C2** (CD dose) — require a proper quantity before a CD can be given; **C3** (outcome codes) — adopt the clearer set once a pharmacist signs off the exact list; **C5** (NHS dm+d codes) — schedule after the current pages. All recorded in the decision sheet.
+
+**Important owner refinement on C2, worth keeping:** the person recording a dose should enter **only the number** — the **unit belongs to the medicine** (a tablet is counted in tablets, a liquid in ml) and is never typed or picked at the point of giving it (and later comes automatically from the dm+d dictionary). A unit *choice* is how a unit *error* happens.
+
+**Built the C2 mechanism (the last Critical).** A controlled drug can no longer be marked "given" until its dose is recorded as a proper **number** — because without one there's nothing to move in the controlled-drug register, and a CD given with no register movement was the exact gap the review flagged. On the round, such a CD now shows *"Dose not set as a quantity — a manager must set it first"*, the **Given button is disabled** with that explanation, and the **server refuses it too** (so it can't be bypassed). Verified: a controlled drug with no numeric dose is correctly detected and blocked. Build + PHP lint clean.
+
+**Honest boundary on C2 — two parts remain, and neither is "just code":**
+1. **A pharmacist must assign the correct number** for each existing messy CD dose (e.g. "10ml (500mg)"). The system must not guess this — it only enforces that a number exists.
+2. **CD stock movements from the Stock page** (disposal, count corrections) still don't post to the register — that's a separate engineering piece (part (b) of C2), noted for a follow-up.
+
+**Where the decisions stand:** every medication decision the owner could direct is now taken and, where buildable, built (A1, A2, B1–B4, C1, C2-mechanism, C4; C3 and C5 are scheduled/awaiting a pharmacist). What's left before any page is formally "Ready" is **external sign-off** — a Clinical Safety Officer to confirm A2/B1/B3/B4/C1/C2, and a pharmacist for C3 and the CD dose mapping.
+
+---
+
+## 28 July 2026 (part 15) — the fifth page: Shift Handover (Medication 2)
+
+Started the page that comes after the four — **Shift Handover** — the place a shift writes down what the next shift needs to know. A full version already existed in the older screens (statuses draft → submitted → acknowledged, per-resident updates, medication concerns, priority alerts, an edit trail, an acknowledge step), so this reused that proven backend and gave it a fresh page in the new (CLINIK) shell, consistent with the other four pages.
+
+What's there:
+- **A day log** of the shift's handovers — page back and forward by day — each shown as a card with its time, who handed over to whom, the general notes, any **priority alerts**, **medication concerns** (with an "action needed" marker), and **resident updates** (each with a low/medium/high/urgent priority). A **status badge** (Draft / Submitted / Acknowledged) on each.
+- **A "New handover" builder** — general notes plus add-as-many-as-you-need priority alerts, medication concerns (pick the resident, write the concern, tick "action required"), and resident updates (pick the resident, set a priority). Save as a **draft** or **submit** it.
+- **Acknowledge** — a manager marks a submitted handover as received; it records who and when.
+- **Manager home-switcher** applies (reads via the shared resolver), and the "to" carer + resident pickers are **real staff/residents**, not typed.
+
+**And the round now connects to it (the "flag to handover" the round always wanted):** a dose recorded as refused / not given now shows a **"Flag to handover"** link, which opens the handover builder with a medication concern **pre-filled** — the resident, the medicine, the outcome and the reason — for the carer to review and submit. So a problem on the round can be passed to the next shift in two taps instead of being re-typed.
+
+Added to the Medication 2 sidebar. Verified against the real database (rolled back): a handover creates with its concerns and alerts intact, the day-scoped read returns it, and acknowledge flips the status. Build + PHP lint clean.
+
+**Still to do on Handover** (carried, not blocking): editing an existing handover from this page (the backend `update` + edit-log exists; the Med2 page currently creates + acknowledges), and a proper review pass through the agent system like the other four pages had.
+
+---
+
+## 30 July 2026 — ran Shift Handover through the review gate; it caught a page-breaker my own test missed
+
+Put the new Shift Handover page through the same orchestrated review the other four had. It did its job — it found a **Critical I'd missed: the page would 500 on every load.** I'd added the shared home-resolver but called `$this->getHomeId()`, which that helper doesn't define (it's `currentHomeId()`), and — unlike the other four controllers — this one never had the little `getHomeId()` wrapper. My earlier database check exercised the *model* directly and never actually opened the *page*, so it sailed straight past the break. Lesson logged: verify the real page load, not just the data layer.
+
+Fixed both Criticals:
+- **The page loads again** — added the missing `getHomeId()` wrapper. This time I verified by actually invoking the controller as a logged-in manager: it returns a proper page, not a 500.
+- **Acknowledging is now manager-only on the server**, not just hidden in the UI. Before, any logged-in medication user could have marked a handover "acknowledged" (forging who-received-it) by posting the request directly; now the server refuses it unless you're a manager. (Owner to confirm that acknowledging should indeed be manager-only.)
+
+Also fixed the notable privacy finding while here:
+- **Resident health data no longer travels in the web address.** The round's "Flag to handover" used to put the resident's name and the clinical concern straight in the URL (which lands in server logs and browser history). Now it passes only harmless identifiers (which medicine, which day, which time slot); the handover page **rebuilds the concern itself, server-side, from the record** — and, as a bonus, a tampered or wrong-home identifier simply produces no prefill. Verified: the flag now yields a proper concern ("Metformin (08:00): Not given") with nothing sensitive in the URL, and a bogus id yields nothing.
+
+Build + PHP lint clean; both Criticals verified by actually running the controller. Traceability matrix + hazard log updated by the review (HAZ-31…HAZ-37).
+
+**Remaining review items (Important, not blocking, deliberately deferred):** editing a handover from this page (I-7 — reuse the existing audited `update()`/edit-log), persisting the structured staff id for the "to" carer (I-4), and tightening the time-format/back-date validation (I-6). These touch the shared legacy write path, so they're a focused follow-up rather than a tail-end change. **Gate:** with both Criticals fixed, Shift Handover clears its own review blockers; the deferred Importants and the usual external sign-offs remain.
+
+---
+
+## 30 July 2026 (part 2) — product direction: meds management is a STANDALONE product; added a MAR chart page
+
+Owner set an important direction: the medication-management side of Care One is being built as a **standalone product** that drops into **any** healthcare setting — a care home, other settings, or an **individual** managing their own meds. Practical consequence: it must **not hard-depend on a pharmacist** (many customers won't have one). A pharmacist review is *optional tightening for customers who have one*, never a gate that breaks the flow for everyone; the product ships with safe working defaults. Recorded in memory + [[meds-standalone-vision]] (restates ROUND-FIX-PLAN Part 2A). This reframes the parked "needs a pharmacist/CSO" items as optional-per-customer, not universal blockers.
+
+**Built a MAR chart page** (owner request — "there should be a MAR sheet in the sidebar"). The MAR (Medication Administration Record) is the canonical, read-only view of what was recorded: pick a resident, page by week, and see each active medicine as a row with the **outcome of every scheduled dose across the seven days** — a coloured letter per box (A given, R refused, W withheld, N not available, O omitted, S asleep), a small marker for a **late** dose, and for **PRN** meds a per-day count of how many were given. Controlled drugs are marked, today's column is highlighted, and there's a legend plus an honest note that a blank box means nothing recorded yet and that doses are recorded on the round. Read-only by design — the record is *viewed* here and *made* on the Medication round.
+
+Built to be **setting-agnostic**: it works for a single individual just as well as a full home (resident picker + one-person case both handled). New `MarChartController` (home-switcher-scoped, reads existing `mar_sheets` + `mar_administrations`), a route above the catch-all, the page, and a **"MAR chart" item in the Medication 2 sidebar** (right under Medication round). **Applied the handover lesson** — verified by actually invoking the controller as a logged-in user (the page renders, and the grid populates correctly for a resident with both scheduled and PRN meds), not just a model-level check. Found and fixed one issue that way: `time_slots` is stored as JSON on some rows, so it's read as either an array or a comma string. Build + PHP lint clean.
+
 Front-end build + PHP lint clean throughout. Decisions recorded in the decision sheet with date + who.
 
 ---

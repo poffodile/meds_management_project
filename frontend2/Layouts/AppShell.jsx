@@ -9,7 +9,7 @@ import { IconCheck as IconCheckMark, IconBuilding } from '@tabler/icons-react';
 import {
     IconLayoutDashboard, IconUsers, IconPill, IconCalendarEvent, IconChartBar,
     IconFileText, IconSettings, IconBell, IconChevronDown, IconMoon, IconArrowLeft,
-    IconClipboardHeart, IconShieldLock, IconAlertTriangle, IconBox, IconSparkles, IconCopy, IconEye,
+    IconClipboardHeart, IconClipboardText, IconTable, IconShieldLock, IconAlertTriangle, IconBox, IconSparkles, IconCopy, IconEye,
 } from '@tabler/icons-react';
 import { RoleContext, useRealRole, useViewAs, setViewAs } from '@frontend/lib/role';
 import BrandLogo from '@frontend/components/BrandLogo';
@@ -98,10 +98,12 @@ const NAV = [
         // Second meds area — placeholder pages, to iterate on separately.
         group: 'Medication 2', icon: IconPill, children: [
             { label: 'Medication round', icon: IconClipboardHeart, href: '/frontend2/medication-2/round' },
+            { label: 'MAR chart', icon: IconTable, href: '/frontend2/medication-2/mar-chart' },
             { label: 'Medications', icon: IconPill, href: '/frontend2/medication-2/medications' },
             { label: 'Missed doses', icon: IconAlertTriangle, href: '/frontend2/medication-2/missed-doses' },
             { label: 'Controlled drugs', icon: IconShieldLock, href: '/frontend2/medication-2/controlled-drugs' },
             { label: 'Stock', icon: IconBox, href: '/frontend2/medication-2/stock' },
+            { label: 'Shift handover', icon: IconClipboardText, href: '/frontend2/medication-2/shift-handover' },
         ],
     },
     { label: 'Scheduled visits', icon: IconCalendarEvent, href: '#' },

@@ -190,6 +190,7 @@
         if (item.as_required) $('#mar-prn-fields').show();
         $('#mar_prn_details').val(item.prn_details || '');
         $('#mar_reason_for_medication').val(item.reason_for_medication || '');
+        $('#mar_administration_instructions').val(item.administration_instructions || '');
         $('#mar_prescribed_by').val(item.prescribed_by || '');
         $('#mar_prescriber').val(item.prescriber || '');
         $('#mar_pharmacy').val(item.pharmacy || '');
@@ -232,6 +233,7 @@
             as_required: $('#mar_as_required').is(':checked') ? 1 : 0,
             prn_details: $('#mar_prn_details').val(),
             reason_for_medication: $('#mar_reason_for_medication').val(),
+            administration_instructions: $('#mar_administration_instructions').val(),
             prescribed_by: $('#mar_prescribed_by').val(),
             prescriber: $('#mar_prescriber').val(),
             pharmacy: $('#mar_pharmacy').val(),
@@ -329,6 +331,7 @@
         var detailRows = '';
         if (item.dose) detailRows += detailRow('Dose', item.dose);
         if (item.reason_for_medication) detailRows += detailRow('Reason', item.reason_for_medication);
+        if (item.administration_instructions) detailRows += detailRow('Instructions', item.administration_instructions);
         if (item.prescriber) detailRows += detailRow('Prescriber', item.prescriber);
         if (item.start_date) detailRows += detailRow('Start Date', formatDate(item.start_date));
         if (item.end_date) detailRows += detailRow('End Date', formatDate(item.end_date));

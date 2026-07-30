@@ -8,7 +8,7 @@ import {
 import {
     IconChevronLeft, IconChevronRight, IconCheck, IconCircleX, IconBan, IconPill,
     IconAlertTriangle, IconLock, IconLockOpen, IconUser, IconArrowRight,
-    IconShieldLock, IconPlayerPlay, IconInfoCircle,
+    IconShieldLock, IconPlayerPlay, IconInfoCircle, IconClipboardText,
 } from '@tabler/icons-react';
 import AppShell from '@frontend2/Layouts/AppShell';
 import RecordDoseModal from '@frontend/features/medications/RecordDoseModal';
@@ -56,13 +56,15 @@ function weightAgeLabel(w) {
 }
 
 /** One medicine line inside the focused resident. */
-function MedLine({ row, locked, onGiven, onOutcome }) {
+function MedLine({ row, locked, onGiven, onOutcome, onFlag }) {
     const recorded = Boolean(row.code);
     const prn = row.as_required ? row.prn : null;
     const prnBlocked = Boolean(prn?.blocked);
     // Owner B2: a medicine with no stock recorded can't be marked given — steer to "Not
     // available". Only when stock is actually tracked (not null) and shows nothing left.
     const outOfStock = row.stock != null && Number(row.stock) <= 0;
+    // Owner C2: a controlled drug with no numeric dose can't be given (nothing to register).
+    const cdNeedsQty = Boolean(row.cd_needs_quantity);
 
     const tone = recorded
         ? (isGivenCode(row.code) ? TEAL : (row.code === 'R' ? RED : ORANGE))
@@ -110,6 +112,11 @@ function MedLine({ row, locked, onGiven, onOutcome }) {
                         <Text fz={11.5} c={ORANGE} fw={650} mt={2}>Low stock: {row.stock}{row.unit ? ` ${row.unit}` : ''} left</Text>
                     ) : null}
 
+                    {/* C2: CD with no numeric dose — can't be given until the dose is set. */}
+                    {cdNeedsQty && (
+                        <Text fz={11.5} c={RED} fw={650} mt={2}>Dose not set as a quantity — a manager must set it before this can be given</Text>
+                    )}
+
                     {/* PRN state — visible before the tap (audit IM-08). */}
                     {!recorded && prn && (
                         <Text fz={11.5} mt={3} fw={prnBlocked ? 650 : 400} c={prnBlocked ? RED : MUTED} style={{ fontVariantNumeric: 'tabular-nums' }}>
@@ -138,6 +145,13 @@ function MedLine({ row, locked, onGiven, onOutcome }) {
                                     ].filter(Boolean).join(' · ')}
                                 </Text>
                             )}
+                            {/* Not-given doses can be passed to the next shift (round → handover). */}
+                            {!isGivenCode(row.code) && (
+                                <Button size="compact-xs" variant="subtle" color="indigo" radius="xl"
+                                    leftSection={<IconClipboardText size={13} />} onClick={() => onFlag(row)}>
+                                    Flag to handover
+                                </Button>
+                            )}
                         </Group>
                     )}
                 </Box>
@@ -147,10 +161,10 @@ function MedLine({ row, locked, onGiven, onOutcome }) {
             {!recorded && !locked && (
                 <Group gap={8} mt={10} pl={56} wrap="wrap">
                     <Tooltip
-                        label={outOfStock ? 'No stock recorded — record as “Not available”, or ask a manager to correct the count' : (prnBlocked ? (prn.block_reason || 'Not due yet') : 'Record as given')}
-                        disabled={!outOfStock && !prnBlocked} withArrow multiline w={outOfStock ? 250 : undefined}>
+                        label={cdNeedsQty ? 'This controlled drug’s dose must be set as a quantity before it can be given' : outOfStock ? 'No stock recorded — record as “Not available”, or ask a manager to correct the count' : (prnBlocked ? (prn.block_reason || 'Not due yet') : 'Record as given')}
+                        disabled={!outOfStock && !prnBlocked && !cdNeedsQty} withArrow multiline w={(outOfStock || cdNeedsQty) ? 250 : undefined}>
                         <Button size="xs" radius="xl" color="teal" leftSection={<IconCheck size={14} />}
-                            disabled={prnBlocked || outOfStock} onClick={() => onGiven(row)}>Given</Button>
+                            disabled={prnBlocked || outOfStock || cdNeedsQty} onClick={() => onGiven(row)}>Given</Button>
                     </Tooltip>
                     {outOfStock && (
                         <Button size="xs" radius="xl" variant="light" color="orange" leftSection={<IconBan size={14} />} onClick={() => onOutcome(row, 'N')}>Not available</Button>
@@ -328,6 +342,18 @@ export default function Medication2Round({ rounds = [], grid = {}, date, current
         doGive(row);
     };
     const outcomeDose = (row, code) => { if (!roundClosed) openRecord(row, code); };
+
+    // Pass a not-given dose to the next shift: open Shift Handover with a medication concern
+    // pre-filled. Only IDENTIFIERS travel in the URL (mar_sheet_id + date + slot) — never the
+    // resident's name or the clinical concern text (IG: keep health data out of URLs/logs,
+    // review I-3). The handover controller rebuilds the concern server-side from the dose.
+    const flagToHandover = (row) => {
+        router.get('/frontend2/medication-2/shift-handover', {
+            flag_sheet: row.mar_sheet_id ?? '',
+            flag_date: date,
+            flag_slot: row.slot ?? '',
+        });
+    };
 
     // --- end / reopen ---
     // Owner B3: a round can only end once every scheduled dose is recorded. If any are
@@ -524,7 +550,7 @@ export default function Medication2Round({ rounds = [], grid = {}, date, current
                                 <Text fz="sm" c={MUTED} py="lg" ta="center">No medications in this round.</Text>
                             )}
                             {(resident.rows ?? []).map((row, i) => (
-                                <MedLine key={`${row.mar_sheet_id}-${row.slot ?? 'prn'}-${i}`} row={row} locked={roundClosed} onGiven={giveDose} onOutcome={outcomeDose} />
+                                <MedLine key={`${row.mar_sheet_id}-${row.slot ?? 'prn'}-${i}`} row={row} locked={roundClosed} onGiven={giveDose} onOutcome={outcomeDose} onFlag={flagToHandover} />
                             ))}
                         </Box>
 

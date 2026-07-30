@@ -171,8 +171,10 @@ function RegisterCard({ reg, onMove, isManager, onOverride }) {
                                                 <Group gap={6} wrap="nowrap">
                                                     <Text fz={12.5} fw={700} c={TXT}>{ACTION_LABEL[e.action] ?? e.action}</Text>
                                                     {e.quantity != null && <Text fz={12} c={out ? RED : TEAL} fw={650}>{out ? '−' : '+'}{e.quantity}</Text>}
+                                                    {e.is_discrepancy && <Badge size="xs" color="red" variant="filled" radius="sm">Discrepancy</Badge>}
                                                 </Group>
                                                 <Text fz={11} c={FAINT}>{e.date} {e.time} · witness {e.witness}{e.by ? ` · by ${e.by}` : ''}</Text>
+                                                {e.is_discrepancy && <Text fz={11} c={RED} fw={650} mt={1}>Took more than the recorded balance — the running total is now negative. Needs review.</Text>}
                                                 <WitnessStatus conf={e.confirmation} isManager={isManager} onOverride={onOverride} />
                                                 {e.notes && <Text fz={11} c={MUTED} mt={1}>{e.notes}</Text>}
                                             </Box>

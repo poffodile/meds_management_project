@@ -55,7 +55,7 @@
 | Block the movement entirely until the balance is corrected | Prevents the bad entry, but could stop a genuine, urgent administration |
 | Store `0` but raise a medication-incident flag | Keeps the balance clean but records that something was wrong |
 
-**Decision:** ________________  **By:** ____________  **Date:** __________
+**Decision:** ✅ **Show the true figure + flag + raise an incident (owner, 2026-07-28, pharmacist to confirm):** record what actually happened (allow it to go negative), mark that entry as a **discrepancy**, and open a **medication incident (#20)** so it's reviewed. Nothing hidden — the point of a CD register.  **By:** owner  **Date:** 2026-07-28
 
 ### B2 — Zero stock on the round: block the dose, or warn and allow? (IM-06)
 **Why it matters:** if the system thinks stock is zero, should it *stop* a carer recording the dose, or *warn* and let them proceed? Stock figures can be stale; a hard block on stale data could omit a genuinely-needed dose.
@@ -89,7 +89,7 @@
 | ⭐ **"Dose given late" writes a late MAR administration (flagged late), so the chart and the review agree** | One consistent record of what the resident actually received |
 | Keep review-only; the MAR gap stays | Simpler; but the chart and review contradict each other |
 
-**Decision:** ________________  **By:** ____________  **Date:** __________
+**Decision:** ✅ **Yes — write a late MAR administration, flagged late (owner, 2026-07-28, pharmacist/CSO to confirm):** so the chart and the review agree the resident got the dose. Recorded distinctly as *given late* (not a normal on-time dose).  **By:** owner  **Date:** 2026-07-28
 
 ---
 
@@ -98,32 +98,32 @@
 ### C1 — A real administration-directions field ("do not crush", "with food", "half-hour before food") (Round C1)
 **Why it matters:** there is currently **no field** that holds a genuine administration directive. The round can only show the *indication* (why it's prescribed). A safety directive like "do not crush" can't be carried at all.
 **Question for the pharmacist/CSO:** what should this field contain, where does it come from (prescriber entry? catalogue?), and which directives are safety-critical enough to show prominently?
-**Trace:** Round C1, HAZ-22, REQ-MED-04.
-**Decision / spec:** ________________  **By:** ____________  **Date:** __________
+**Trace:** Round C1, HAZ-22, REQ-MED-04. Tracked as issue **#29**.
+**Decision / spec:** ✅ **Build it now, typed in (owner, 2026-07-28, pharmacist to confirm content):** add a dedicated `administration_instructions` field on the prescription, shown prominently on the round; a **manager/prescriber types it** now, and it **auto-fills from the dm+d dictionary (#17)** once that lands. Pharmacist still to define which directives are safety-critical.  **By:** owner  **Date:** 2026-07-28
 
 ### C2 — Controlled-drug reconciliation + the free-text-dose CD (CD C-2 / Stock C-2 / Round I3)
 **Why it matters:** (a) a CD given with a **free-text dose** (e.g. "10ml (500mg)") records on the chart but **skips the register**, so no balance moves; (b) CD **stock** movements (disposal, count corrections) don't post to the register either. Both need the dose captured as a proper quantity, which needs the medicine mapped.
 **Question:** confirm the approach — require a structured quantity before a CD can be given/moved, and post every CD movement to the register.
 **Trace:** CD C-2, Stock C-2, Round I3, HAZ-24, REQ-MED-20/21/22.
-**Decision / spec:** ________________  **By:** ____________  **Date:** __________
+**Decision / spec:** ✅ **Require a proper quantity before a CD can be given/moved (owner, 2026-07-28, pharmacist to map existing doses):** a controlled drug can't be given until its dose is a **plain number** on the prescription. **Key owner refinement:** the person enters **only the number** — the **unit comes from the medicine** (tablet→tablets, liquid→ml), never typed or picked at administration (and later comes from dm+d, #17). Engineering builds the *mechanism* (block until numeric quantity exists; then post every CD movement to the register); **a pharmacist assigns the correct number for each existing free-text CD dose** — the system must not guess ("10 ml (500mg)" can't be safely auto-split).  **By:** owner  **Date:** 2026-07-28
 
 ### C3 — The MAR outcome code set (proposal) (CR-04 / Part 2)
 **Why it matters:** the current codes mix "what happened", "why", and "who decided". A cleaner set was proposed (e.g. asleep `Z` = not given; `H` held-on-clinical-advice requires an authoriser; splitting the catch-all "omitted" into absent / no-stock / unexplained-incident). **This must not ship without pharmacist sign-off**, and it's unverified whether any national code set is mandated.
 **Question:** approve, amend, or replace the proposed code set in `ROUND-FIX-PLAN.md` Part 2.3.
 **Trace:** CR-04, ROUND-FIX-PLAN Part 2.
-**Decision / spec:** ________________  **By:** ____________  **Date:** __________
+**Decision / spec:** ✅ **Adopt the clearer set — pharmacist confirms the exact list first (owner, 2026-07-28):** move to the fuller code set (separating what happened / why / who decided) so every non-given dose explains itself and the vague "omitted" can't paper over an error. Engineering builds it once a **pharmacist / medication lead** signs off the exact codes in ROUND-FIX-PLAN Part 2.3. (Partly done already — e.g. "asleep" already counts as not-given.)  **By:** owner  **Date:** 2026-07-28
 
 ### C4 — Stale-weight threshold and behaviour (CR-09)
 **Why it matters:** weight is used for weight-based dosing. "Stale after 90 days" is a **placeholder**. The real threshold is probably age-dependent, and it's unclear whether a stale weight should *block* or *warn* on a weight-based dose.
 **Question:** the threshold(s), whether age-banded, and block vs warn.
 **Trace:** CR-09, REQ-MED-112.
-**Decision / spec:** ________________  **By:** ____________  **Date:** __________
+**Decision / spec:** ✅ **Warn, don't block (owner, 2026-07-28, clinician to set the threshold):** show a clear "this weight is old" warning but let the dose proceed — a hard block on possibly-just-old data could withhold a needed dose. The staleness threshold (likely age-banded) is a **setting a clinician configures**. *(The warn behaviour + weight age display already ships — CR-09.)*  **By:** owner  **Date:** 2026-07-28
 
 ### C5 — dm+d medicine codes (ISSUE #17)
 **Why it matters:** medicines are identified by **free-typed name** today, not a stable NHS dm+d/SNOMED code. This underlies several findings (a rename can fork a CD balance; no interoperability). Needs a pharmacist-reviewed mapping of the catalogue.
 **Question:** commission the dm+d mapping; confirm the concept level (VTM/VMP/AMP).
 **Trace:** O3 across pages, CD I-3, REQ-MED-50/107.
-**Decision / spec:** ________________  **By:** ____________  **Date:** __________
+**Decision / spec:** ✅ **Schedule after the current medication pages (owner, 2026-07-28):** finish the four pages + Shift Handover to a solid state first, then take on the dm+d dictionary (#17) as its own major build. It's foundational (GP Connect, allergy checks, directions auto-fill, CD integrity all build on it) but large; the pages work with typed names until then.  **By:** owner  **Date:** 2026-07-28
 
 ---
 
