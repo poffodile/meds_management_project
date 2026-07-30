@@ -59,7 +59,22 @@ class HandleInertiaRequests extends Middleware
                 'success' => fn () => $request->session()->get('success'),
                 'error'   => fn () => $request->session()->get('error'),
             ],
+            // How many controlled-drug witness signatures are awaiting THIS user's
+            // confirmation (issue #14 / A2). Drives the header bell badge + the
+            // "signatures awaiting you" surface. Lazy + guarded so it costs nothing on
+            // pages that don't read it and can't break if the table isn't there yet.
+            'witnessPending' => fn () => $this->witnessPendingCount($user),
         ];
+    }
+
+    /** Count of CD witness confirmations pending the given user's sign-off. */
+    private function witnessPendingCount($user): int
+    {
+        if (! $user || ! \Illuminate\Support\Facades\Schema::hasTable('cd_witness_confirmations')) {
+            return 0;
+        }
+
+        return \App\Models\CdWitnessConfirmation::pendingForUser((int) $user->id)->count();
     }
 
     /**

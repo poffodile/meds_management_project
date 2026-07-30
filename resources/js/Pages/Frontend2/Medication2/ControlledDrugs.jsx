@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Head, useForm, usePage } from '@inertiajs/react';
+import { Head, useForm, usePage, router } from '@inertiajs/react';
 import {
     Box, Group, Text, Badge, ThemeIcon, Avatar, Button, Collapse, Modal,
     Select, NumberInput, TextInput, Textarea, ScrollArea, Alert,
@@ -7,7 +7,7 @@ import {
 import { notifications } from '@mantine/notifications';
 import {
     IconShieldLock, IconPill, IconChevronDown, IconPlus, IconArrowDownRight,
-    IconArrowUpRight, IconInfoCircle,
+    IconArrowUpRight, IconInfoCircle, IconClock, IconCircleCheck, IconGavel,
 } from '@tabler/icons-react';
 import AppShell from '@frontend2/Layouts/AppShell';
 import { avatarColor, initials } from '@frontend/lib/avatarColor';
@@ -16,6 +16,7 @@ const TXT = 'light-dark(#13233F, #E9EDF4)';
 const MUTED = 'light-dark(#4A5A72, #A6B3C6)';
 const FAINT = 'light-dark(#8493A8, #6C7C93)';
 const TEAL = 'light-dark(#1B9C90, #3BC3B4)';
+const ORANGE = 'light-dark(#DE7B1E, #EBA65A)';
 const RED = 'light-dark(#CE3F3F, #E56B6B)';
 const PURPLE = 'light-dark(#6455D0, #8E7FEC)';
 const HAIR = 'light-dark(#E1E7F0, #22303F)';
@@ -81,8 +82,54 @@ function MovementModal({ reg, onClose, staff = [] }) {
     );
 }
 
+/** Manager override modal — confirm a witness signature on the witness's behalf, with a reason. */
+function OverrideModal({ conf, onClose }) {
+    const form = useForm({ override_reason: '' });
+    const submit = () => form.post(`${ENDPOINT.replace('/controlled-drugs', '/witness-confirmations')}/${conf.id}/override`, {
+        preserveScroll: true,
+        onSuccess: () => { notifications.show({ color: 'teal', message: 'Marked as manager-overridden.' }); onClose(); },
+        onError: (e) => notifications.show({ color: 'red', title: 'Not saved', message: Object.values(e ?? {})[0] || 'Could not override.' }),
+    });
+    return (
+        <Modal opened onClose={onClose} centered radius="md" size="sm" title={<Text fw={750} c={TXT}>Override witness confirmation</Text>}>
+            <Text fz="sm" c={MUTED} mb="sm">
+                Confirm this signature on the witness’s behalf. This is recorded as a <b style={{ color: 'var(--mantine-color-text)' }}>manager override</b>, not a witness confirmation. Say why the witness can’t confirm it themselves.
+            </Text>
+            <TextInput label="Reason" radius="md" placeholder="e.g. witness has left the shift" required
+                value={form.data.override_reason} onChange={(e) => form.setData('override_reason', e.currentTarget.value)} error={form.errors.override_reason} />
+            <Group justify="flex-end" mt="lg" gap="sm">
+                <Button variant="default" radius="xl" onClick={onClose}>Cancel</Button>
+                <Button color="orange" radius="xl" loading={form.processing} onClick={submit}>Override</Button>
+            </Group>
+        </Modal>
+    );
+}
+
+/** Witness confirmation status line for one ledger entry (issue #14 / A2). */
+function WitnessStatus({ conf, isManager, onOverride }) {
+    if (!conf) return null;
+    const map = {
+        pending: { c: ORANGE, icon: <IconClock size={11} />, text: 'Awaiting witness confirmation' },
+        confirmed: { c: TEAL, icon: <IconCircleCheck size={11} />, text: `Witness confirmed${conf.confirmed_at ? ` · ${conf.confirmed_at}` : ''}` },
+        manager_overridden: { c: PURPLE, icon: <IconGavel size={11} />, text: `Manager-overridden${conf.confirmed_by ? ` by ${conf.confirmed_by}` : ''}${conf.override_reason ? ` · ${conf.override_reason}` : ''}` },
+    };
+    const s = map[conf.status] ?? map.pending;
+    return (
+        <Group gap={6} mt={3} wrap="wrap" align="center">
+            <Badge size="xs" radius="sm" variant="light"
+                leftSection={s.icon}
+                style={{ background: `color-mix(in srgb, ${s.c} 14%, transparent)`, color: s.c }}>
+                {s.text}
+            </Badge>
+            {conf.status === 'pending' && isManager && (
+                <Button size="compact-xs" variant="subtle" color="orange" radius="xl" onClick={() => onOverride(conf)}>Override</Button>
+            )}
+        </Group>
+    );
+}
+
 /** One CD medicine: current balance + its append-only ledger. */
-function RegisterCard({ reg, onMove }) {
+function RegisterCard({ reg, onMove, isManager, onOverride }) {
     const [open, setOpen] = useState(false);
     return (
         <Box style={{ background: SURFACE, border: `1px solid ${HAIR}`, borderRadius: 16, overflow: 'hidden' }}>
@@ -126,6 +173,7 @@ function RegisterCard({ reg, onMove }) {
                                                     {e.quantity != null && <Text fz={12} c={out ? RED : TEAL} fw={650}>{out ? '−' : '+'}{e.quantity}</Text>}
                                                 </Group>
                                                 <Text fz={11} c={FAINT}>{e.date} {e.time} · witness {e.witness}{e.by ? ` · by ${e.by}` : ''}</Text>
+                                                <WitnessStatus conf={e.confirmation} isManager={isManager} onOverride={onOverride} />
                                                 {e.notes && <Text fz={11} c={MUTED} mt={1}>{e.notes}</Text>}
                                             </Box>
                                             <Text fz={12.5} fw={700} c={TXT} style={{ flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>{e.balance_after}</Text>
@@ -141,8 +189,9 @@ function RegisterCard({ reg, onMove }) {
     );
 }
 
-export default function ControlledDrugs({ registers = [], home, staff = [] }) {
+export default function ControlledDrugs({ registers = [], home, staff = [], isManager = false }) {
     const [move, setMove] = useState(null);
+    const [override, setOverride] = useState(null);
     const flash = usePage().props?.flash;
     useEffect(() => {
         if (flash?.error) notifications.show({ color: 'red', title: 'Something went wrong', message: flash.error });
@@ -176,7 +225,7 @@ export default function ControlledDrugs({ registers = [], home, staff = [] }) {
                     </Box>
                 ) : (
                     <Box style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                        {registers.map((r) => <RegisterCard key={r.mar_sheet_id} reg={r} onMove={setMove} />)}
+                        {registers.map((r) => <RegisterCard key={r.mar_sheet_id} reg={r} onMove={setMove} isManager={isManager} onOverride={setOverride} />)}
                     </Box>
                 )}
 
@@ -186,6 +235,7 @@ export default function ControlledDrugs({ registers = [], home, staff = [] }) {
             </Box>
 
             {move && <MovementModal reg={move} onClose={() => setMove(null)} staff={staff} />}
+            {override && <OverrideModal conf={override} onClose={() => setOverride(null)} />}
         </AppShell>
     );
 }

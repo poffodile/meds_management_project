@@ -1,4 +1,4 @@
-<?php
+ n<?php
 Route::get('clear', function() {
 	Artisan::call('cache:clear');
 	return "Cleared!";

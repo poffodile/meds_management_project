@@ -253,6 +253,7 @@ export default function AppShell({ children, title, section }) {
     const userName = props?.auth?.user?.name ?? 'User';
     const home = props?.home; // shown as a chip in the header when the page provides it
     const homes = props?.homes; // {active, list:[{id,name}]} when the user has >1 home (CR-06)
+    const witnessPending = Number(props?.witnessPending ?? 0); // CD signatures awaiting this user (A2)
     const { colorScheme, toggleColorScheme } = useMantineColorScheme();
     const computedScheme = useComputedColorScheme('light');
     const dark = computedScheme === 'dark';
@@ -355,12 +356,21 @@ export default function AppShell({ children, title, section }) {
                                 </Tooltip>
                             )}
                             <Text fz={13.5} fw={700} c="#7a8590" visibleFrom="sm">EN</Text>
-                            {/* Bell — boxed (white, rounded, shadow) with an orange unread dot, per the mockup. */}
-                            <ActionIcon variant="default" size={38} radius={11} pos="relative"
-                                style={{ background: 'light-dark(#fff, var(--mantine-color-dark-6))', boxShadow: '0 2px 6px rgba(20,50,80,0.06)' }}>
-                                <IconBell size={18} stroke={1.8} color="#5F6B76" />
-                                <Box pos="absolute" top={8} right={9} w={8} h={8} style={{ background: '#F58321', borderRadius: '50%', border: '1.5px solid #fff' }} />
-                            </ActionIcon>
+                            {/* Bell — links to "signatures awaiting you" (A2); shows a live count
+                                of controlled-drug witness confirmations pending this user. */}
+                            <Tooltip label={witnessPending > 0 ? `${witnessPending} controlled-drug signature${witnessPending === 1 ? '' : 's'} awaiting you` : 'No signatures awaiting you'} withArrow openDelay={300}>
+                                <ActionIcon component={Link} href="/frontend2/medication-2/witness-confirmations"
+                                    variant="default" size={38} radius={11} pos="relative" aria-label="Signatures awaiting you"
+                                    style={{ background: 'light-dark(#fff, var(--mantine-color-dark-6))', boxShadow: '0 2px 6px rgba(20,50,80,0.06)' }}>
+                                    <IconBell size={18} stroke={1.8} color="#5F6B76" />
+                                    {witnessPending > 0 && (
+                                        <Box pos="absolute" top={-4} right={-4} miw={17} h={17} px={4}
+                                            style={{ background: '#F58321', borderRadius: 999, border: '1.5px solid #fff', color: '#fff', fontSize: 10.5, fontWeight: 800, lineHeight: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontVariantNumeric: 'tabular-nums' }}>
+                                            {witnessPending > 9 ? '9+' : witnessPending}
+                                        </Box>
+                                    )}
+                                </ActionIcon>
+                            </Tooltip>
                             <Menu position="bottom-end" withArrow width={210}>
                                 <Menu.Target>
                                     {/* Bare "P" badge (mockup), but still opens the dropdown. */}

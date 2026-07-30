@@ -160,19 +160,41 @@ class ControlledDrugRegisterController extends Controller
             ->get()
             ->groupBy('mar_sheet_id');
 
-        $registers = $sheets->map(function ($s) use ($names, $entries) {
-            $rows = ($entries->get($s->id) ?? collect())->map(fn ($e) => [
-                'id' => $e->id,
-                'date' => $e->entry_date ? \Carbon\Carbon::parse($e->entry_date)->format('d M Y') : null,
-                'time' => $e->entry_time ? substr($e->entry_time, 0, 5) : null,
-                'action' => $e->action_type,
-                'quantity' => $e->dose_quantity,
-                'balance_before' => $e->balance_before,
-                'balance_after' => $e->balance_after,
-                'witness' => $e->witness_name,
-                'by' => $e->createdByUser->name ?? null,
-                'notes' => $e->notes,
-            ])->values();
+        // Witness co-signature status per register entry (issue #14 / A2), keyed by register_id.
+        $confirmations = CdWitnessConfirmation::forHome($homeId)
+            ->with('confirmedBy:id,name')
+            ->whereIn('register_id', $entries->flatten()->pluck('id'))
+            ->get()
+            ->keyBy('register_id');
+
+        $isManager = in_array(Auth::user()->user_type, ['M', 'CM', 'A', 'O'], true);
+
+        $registers = $sheets->map(function ($s) use ($names, $entries, $confirmations) {
+            $rows = ($entries->get($s->id) ?? collect())->map(function ($e) use ($confirmations) {
+                $conf = $confirmations->get($e->id);
+
+                return [
+                    'id' => $e->id,
+                    'date' => $e->entry_date ? \Carbon\Carbon::parse($e->entry_date)->format('d M Y') : null,
+                    'time' => $e->entry_time ? substr($e->entry_time, 0, 5) : null,
+                    'action' => $e->action_type,
+                    'quantity' => $e->dose_quantity,
+                    'balance_before' => $e->balance_before,
+                    'balance_after' => $e->balance_after,
+                    'witness' => $e->witness_name,
+                    'by' => $e->createdByUser->name ?? null,
+                    'notes' => $e->notes,
+                    // Witness confirmation (null when the movement had no witness, e.g. supported living).
+                    'confirmation' => $conf ? [
+                        'id' => $conf->id,
+                        'status' => $conf->status,
+                        'label' => $conf->statusLabel(),
+                        'confirmed_by' => $conf->confirmedBy->name ?? null,
+                        'confirmed_at' => $conf->confirmed_at ? $conf->confirmed_at->format('d M Y · H:i') : null,
+                        'override_reason' => $conf->override_reason,
+                    ] : null,
+                ];
+            })->values();
 
             return [
                 'mar_sheet_id' => $s->id,
@@ -194,6 +216,8 @@ class ControlledDrugRegisterController extends Controller
             'home' => \DB::table('home')->where('id', $homeId)->value('title'),
             // Staff who can be named as a witness (issue #14 / A2) — excludes the current user.
             'staff' => $this->homeStaffOptions(),
+            // Managers may override a pending witness confirmation from the register.
+            'isManager' => $isManager,
         ]);
     }
 

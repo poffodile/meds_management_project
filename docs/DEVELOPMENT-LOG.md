@@ -687,6 +687,22 @@ Still to build (stages 2–5): create a pending confirmation when a CD is given/
 
 **Stage 2 done (capture + witness picker).** The "Witnessed by" field on the round's record pop-up and on the controlled-drugs movement form is now a **staff picker** — you choose the colleague who witnessed, rather than typing a name — so that person is a real account we can later notify. (Where no staff list is supplied — the older shared screens — it falls back to the plain typed field, unchanged.) When a controlled drug is administered on the round or a movement is recorded, a **pending witness confirmation is now created automatically** against that register entry, naming the witness. A movement with no witness (e.g. supported living, "Not witnessed") correctly creates nothing. Verified end-to-end against the real database in a rolled-back test: the staff list loads (38 in the test home), the register entry computes its balance, the confirmation is created as *pending* with the witness resolved to their account, and the "awaiting this witness" query returns it. Front-end build + PHP lint clean.
 
+**Stages 3 + 4 done (the witness's inbox, confirm, and manager override).** Eve now has a place to act:
+- A **"Signatures awaiting you"** page listing the controlled-drug movements where she was named as witness, each with a **Confirm** button.
+- A **live count on the header bell** on every page — the number of signatures waiting for her — so she notices without hunting. It links straight to the page. (Shared as a global prop, guarded so it costs nothing and can't break where the table's absent.)
+- **Confirm**: she confirms and it's recorded as *witness-confirmed* with the time; the bell count drops.
+- **Manager override**: a manager can confirm on the witness's behalf, which requires a reason and is recorded distinctly as *manager-overridden* — never dressed up as a real witness confirmation. (Endpoint + rules built and tested; the override *button* sits on the register in stage 5, where a manager sees the pending items.)
+- A witness can only confirm **their own** signature (enforced server-side); a manager override is manager-only.
+Verified end-to-end against the real DB (rolled back): a confirmation goes pending → confirmed and the count drops; the override path records *manager-overridden* with its reason. Build + lint clean.
+
+**Stage 5 done (status on the register + manager override button) — A2 build complete.** The controlled-drugs register now shows, under each movement, whether its witness signature is **awaiting confirmation** (amber), **witness-confirmed** (teal, with when), or **manager-overridden** (purple, with who and why). On a still-pending signature, a **manager** sees an **Override** button right there, which asks for a reason and records the override. So the register is honest at a glance about which signatures are real witness confirmations and which a manager stepped in on.
+
+Deliberately **not** added to the medication round itself: the round's rows come from the administration record, not the register, so status there would be indirect; the three places it matters — the register (the CD audit view), the witness's own inbox, and the header bell — all show it. Front-end build + PHP lint clean.
+
+**A2 (the witness co-signature workflow) is now fully built** across five stages: the data layer, capturing a pending confirmation with a real staff witness, the witness's "signatures awaiting you" inbox + a live header-bell count, confirm + manager-override, and the status shown on the register. Every backend piece was verified against the real database in rolled-back tests. **Still needs a Clinical Safety Officer to confirm** the design meets the good-practice witness intent (recorded on issue #14 and in the decision sheet), and a proper click-through once the servers are back up.
+
+**Note:** MySQL/Vite/Laravel were stopped during a `/login` restart mid-session; MySQL was restarted to run the DB checks. If you want to view the app, the web + Vite servers need starting again (say the word).
+
 Front-end build + PHP lint clean throughout. Decisions recorded in the decision sheet with date + who.
 
 ---

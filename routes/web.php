@@ -48,6 +48,7 @@ use App\Http\Controllers\frontEnd\Medication\Medication2RoundController;
 use App\Http\Controllers\frontEnd\Medication\MedicationRoundController;
 use App\Http\Controllers\frontEnd\Medication\MedicationStockController;
 use App\Http\Controllers\frontEnd\Medication\MissedDosesController;
+use App\Http\Controllers\frontEnd\Medication\WitnessConfirmationController;
 use App\Http\Controllers\frontEnd\Medication\ShiftHandoverController;
 use App\Http\Controllers\frontEnd\PettyCashController;
 use App\Http\Controllers\frontEnd\Roster\AICarePlanController;
@@ -1681,6 +1682,12 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
     Route::get('/frontend2/medication-2/controlled-drugs', [ControlledDrugRegisterController::class, 'indexMedication2'])->name('frontend2.medication2.controlled-drugs');
     Route::post('/frontend2/medication-2/controlled-drugs', [ControlledDrugRegisterController::class, 'storeMedication2'])->name('frontend2.medication2.controlled-drugs.store');
     Route::get('/frontend2/medication-2/stock', [MedicationStockController::class, 'indexMedication2'])->name('frontend2.medication2.stock');
+
+    // CD witness co-signatures (issue #14 / A2): a witness confirms signatures named against
+    // them; managers can override. Registered ABOVE the {page} catch-all below.
+    Route::get('/frontend2/medication-2/witness-confirmations', [WitnessConfirmationController::class, 'index'])->name('frontend2.medication2.witness-confirmations');
+    Route::post('/frontend2/medication-2/witness-confirmations/{id}/confirm', [WitnessConfirmationController::class, 'confirm'])->where('id', '[0-9]+')->name('frontend2.medication2.witness-confirmations.confirm');
+    Route::post('/frontend2/medication-2/witness-confirmations/{id}/override', [WitnessConfirmationController::class, 'override'])->where('id', '[0-9]+')->name('frontend2.medication2.witness-confirmations.override');
 
     // "Medication 2" — placeholder pages (second meds area). 'round' is served by the
     // explicit route above; the rest are still stubs.
