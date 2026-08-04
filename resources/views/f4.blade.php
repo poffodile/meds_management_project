@@ -15,9 +15,15 @@
     <meta name="color-scheme" content="light">
     <title inertia>{{ config('app.name', 'Care One OS') }} — Frontend 4</title>
 
+    {{--
+        Manrope for headings, Inter for interface and clinical text — the pairing
+        in the Care One OS visual specification. Manrope is calm and slightly
+        distinctive; Inter is the most legible at the small sizes that medicine
+        names, doses and MAR tables actually get read at.
+    --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     {{-- Paint the app background before React mounts so there is no white flash. --}}
     <style>html,body{margin:0;background:#F7F8FA;}</style>

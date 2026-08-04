@@ -9,42 +9,84 @@
 
    Loaded ONLY by resources/views/f4.blade.php via resources/js/f4.jsx.
    frontend4 pulls in no global CSS at all: not resources/css/app.css, not
-   frontend3/f4.css, not a component-library reset. This file is the whole of it.
+   frontend3/f3.css, not a component-library reset. This file is the whole of it.
+
+   RELATIONSHIP TO THE VISUAL SPECIFICATION
+   The Care One OS visual specification says warm ivory + clinical teal. That is
+   frontend3. Frontend4 keeps cool grey + indigo — decided 2026-08-04. The HUE
+   diverges; every craft rule in that specification is implemented here.
+   docs/care-one-os/FRONTEND4/CARE-ONE-OS-VISUAL-AND-PAGE-SPEC.md
    ========================================================================= */
 
 .f4-root {
-  /* Palette — mirrors frontend4/tokens.js. Change both together. */
-  --f4-canvas:    #F7F8FA;
-  --f4-surface:   #FFFFFF;
-  --f4-sunken:    #EEF1F5;
-  --f4-ink:       #111827;
-  --f4-body:      #334155;
-  --f4-muted:     #64748B;
-  --f4-line:      #E2E8F0;
-  --f4-accent:    #3F4FD6;
-  --f4-accent-in: #2F3CB0;
+  /* ── Core palette — mirrors frontend4/tokens.js. Change both together. ──── */
+  --f4-canvas:     #F7F8FA;
+  --f4-surface:    #FFFFFF;
+  --f4-sunken:     #EEF1F5;
+  --f4-ink:        #111827;
+  --f4-body:       #334155;
+  --f4-muted:      #64748B;
+  --f4-line:       #E2E8F0;
+  --f4-line-hard:  #CBD5E1;
+  --f4-accent:     #3F4FD6;
+  --f4-accent-in:  #2F3CB0;
+  --f4-accent-edge:#7C88E8;
 
-  /* Status tints — always paired with a word, never colour alone. */
-  --f4-neutral-fg: #334155; --f4-neutral-bg: #EEF1F5;
-  --f4-good-fg:    #166534; --f4-good-bg:    #E7F4EC;
-  --f4-caution-fg: #854D0E; --f4-caution-bg: #FBF1DC;
-  --f4-risk-fg:    #9F1239; --f4-risk-bg:    #FCE9EE;
-  --f4-info-fg:    #3F4FD6; --f4-info-bg:    #EAECFB;
+  /* ── The ten statuses, each at three intensities plus an edge ──────────────
+     strong = text, icons, the dot, thin borders
+     soft   = badge background, selected filter
+     faint  = hover, table-row emphasis, context panel
+     edge   = outlined-badge border
+     A tint NEVER carries meaning alone — every status renders its word too.  */
+  --f4-given-s:  #146B4A; --f4-given-b:  #E6F2EC; --f4-given-f:  #F2F9F6; --f4-given-e:  #A8CFBE;
+  --f4-due-s:    #2A5FA0; --f4-due-b:    #E7EEF8; --f4-due-f:    #F4F7FC; --f4-due-e:    #AEC4E2;
+  --f4-upc-s:    #5A6675; --f4-upc-b:    #EDEFF3; --f4-upc-f:    #F6F7F9; --f4-upc-e:    #C3C9D2;
+  --f4-late-s:   #8C5410; --f4-late-b:   #F7EEE2; --f4-late-f:   #FBF6F0; --f4-late-e:   #DCC3A0;
+  --f4-over-s:   #A32638; --f4-over-b:   #F9E9EC; --f4-over-f:   #FDF4F6; --f4-over-e:   #E0B2BB;
+  --f4-ref-s:    #6E4A6B; --f4-ref-b:    #F2ECF1; --f4-ref-f:    #F9F5F8; --f4-ref-e:    #CDBACA;
+  --f4-omit-s:   #64605A; --f4-omit-b:   #F0EFED; --f4-omit-f:   #F8F7F6; --f4-omit-e:   #CBC7C1;
+  --f4-wit-s:    #474F7A; --f4-wit-b:    #ECEEF6; --f4-wit-f:    #F5F7FB; --f4-wit-e:    #B9BFD6;
+  --f4-info-s:   #4A6479; --f4-info-b:   #EBF0F4; --f4-info-f:   #F5F8FA; --f4-info-e:   #BCCBD6;
+  --f4-off-s:    #4E545B; --f4-off-b:    #EEEFF1; --f4-off-f:    #F7F8F9; --f4-off-e:    #C4C7CB;
 
-  /* Geometry — eight-point spacing. */
+  /* ── Geometry — eight-point spacing, with the spec's stated purposes ────── */
   --f4-r-sm: 6px; --f4-r-md: 10px; --f4-r-lg: 14px; --f4-r-pill: 999px;
-  --f4-s1: 4px; --f4-s2: 8px; --f4-s3: 12px; --f4-s4: 16px;
-  --f4-s5: 24px; --f4-s6: 32px; --f4-s7: 48px;
+  --f4-s1: 4px;   /* very small internal gaps   */
+  --f4-s2: 8px;   /* icon to text               */
+  --f4-s3: 12px;  /* compact controls           */
+  --f4-s4: 16px;  /* standard card padding      */
+  --f4-s5: 24px;  /* between related sections   */
+  --f4-s6: 32px;  /* between major sections     */
+  --f4-s7: 48px;  /* page-level breathing space */
 
   --f4-hair: 1px solid var(--f4-line);
-  --f4-lift: 0 1px 2px rgba(17,24,39,.04), 0 8px 20px -12px rgba(17,24,39,.18);
+  /* Shadows are almost invisible. Cards rely on surface and border contrast. */
+  --f4-card-shadow: 0 1px 2px rgba(17,24,39,.03);
+  --f4-float:       0 8px 24px -12px rgba(17,24,39,.22);
 
-  --f4-font: "Figtree", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  /* ── Type — Manrope headings, Inter interface text ─────────────────────── */
+  --f4-font-head: "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --f4-font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --f4-font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
-  font-family: var(--f4-font);
+  --f4-t-page:    1.9375rem;  /* 31px — main page title    */
+  --f4-t-section: 1.3125rem;  /* 21px — section title      */
+  --f4-t-card:    1.0625rem;  /* 17px — card heading       */
+  --f4-t-body:    1rem;       /* 16px — standard body      */
+  --f4-t-support: 0.875rem;   /* 14px — supporting text    */
+  --f4-t-label:   0.75rem;    /* 12px — small label        */
+  --f4-t-med:     1.1875rem;  /* 19px — critical medicine  */
+
+  /* Shell measurements, in one place so the sticky offsets stay in step. */
+  --f4-nav-w:     248px;
+  --f4-context-h: 56px;
+  --f4-bottom-h:  62px;
+  --f4-field-h:   44px;
+
+  font-family: var(--f4-font-body);
   color: var(--f4-body);
   background: var(--f4-canvas);
-  font-size: 16px;
+  font-size: var(--f4-t-body);
   line-height: 1.55;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
@@ -56,14 +98,15 @@
 
 .f4-root h1, .f4-root h2, .f4-root h3 {
   margin: 0;
+  font-family: var(--f4-font-head);
   color: var(--f4-ink);
   font-weight: 700;
   letter-spacing: -.015em;
   line-height: 1.25;
 }
-.f4-root h1 { font-size: 1.75rem; }
-.f4-root h2 { font-size: 1.25rem; }
-.f4-root h3 { font-size: 1rem; }
+.f4-root h1 { font-size: var(--f4-t-page); }
+.f4-root h2 { font-size: var(--f4-t-section); }
+.f4-root h3 { font-size: var(--f4-t-card); }
 .f4-root p  { margin: 0; }
 
 .f4-root code {
@@ -71,15 +114,22 @@
   border-radius: var(--f4-r-sm);
   background: var(--f4-sunken);
   color: var(--f4-ink);
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-family: var(--f4-font-mono);
   font-size: .875em;
 }
 
-.f4-root a {
+/*
+ * `a:not([class])` — NOT `a`. This is deliberate and frontend3 learned it the
+ * hard way. `.f4-root a` is specificity (0,1,1) and silently beats `.f4-btn` at
+ * (0,1,0), so a link styled as a button rendered as indigo text on an indigo
+ * background — an invisible button. Restricting the base rule to unclassed
+ * links means a component's own colour always wins.
+ */
+.f4-root a:not([class]) {
   color: var(--f4-accent);
   text-decoration: none;
 }
-.f4-root a:hover { text-decoration: underline; }
+.f4-root a:not([class]):hover { text-decoration: underline; }
 
 /* Visible focus everywhere — keyboard users must never lose their place. */
 .f4-root :focus-visible {
@@ -88,13 +138,44 @@
   border-radius: var(--f4-r-sm);
 }
 
-/* ── Shell ────────────────────────────────────────────────────────────────── */
+/* For text only a screen reader needs. Never used to hide real content. */
+.f4-sr {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
 
-.f4-topbar {
+/* Every icon in frontend4 is one line-icon family at a consistent stroke. */
+.f4-root svg { flex: 0 0 auto; }
+
+/* ══ SHELL ═══════════════════════════════════════════════════════════════════
+   Context bar across the top, navigation down the left, content in the middle.
+   On a phone the left navigation is replaced by a bottom bar — not hidden
+   behind a hamburger, because a carer mid-round should not have to open a menu
+   to get back to the round.
+   ========================================================================= */
+
+.f4-app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ── Context bar: where am I, as whom, and is the connection up ───────────── */
+
+.f4-context {
+  position: sticky;
+  top: 0;
+  z-index: 30;
   display: flex;
   align-items: center;
-  gap: var(--f4-s3);
-  padding: var(--f4-s4) var(--f4-s5);
+  gap: var(--f4-s4);
+  height: var(--f4-context-h);
+  padding: 0 var(--f4-s5);
   background: var(--f4-surface);
   border-bottom: var(--f4-hair);
 }
@@ -105,39 +186,217 @@
   justify-content: center;
   width: 30px;
   height: 30px;
+  flex: 0 0 auto;
   border-radius: var(--f4-r-sm);
   background: var(--f4-accent);
   color: #fff;
-  font-weight: 700;
+  font-family: var(--f4-font-head);
+  font-weight: 800;
   font-size: .8125rem;
   letter-spacing: .02em;
 }
 
-.f4-topbar-title {
-  font-weight: 600;
+/* The place selector. What it says changes the meaning of every other screen,
+   so it sits first and is never abbreviated away. */
+.f4-place { display: flex; align-items: baseline; gap: var(--f4-s2); min-width: 0; }
+.f4-place-name {
+  font-family: var(--f4-font-head);
+  font-weight: 700;
   color: var(--f4-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
+.f4-place-sub { font-size: var(--f4-t-support); color: var(--f4-muted); white-space: nowrap; }
 
-.f4-topbar-meta {
-  margin-left: auto;
-  font-size: .8125rem;
+.f4-context-end { display: flex; align-items: center; gap: var(--f4-s4); margin-left: auto; }
+
+/* Connectivity. Dot AND word — a dot alone tells a colour-blind user nothing,
+   and this is the indicator that decides whether they trust the screen. */
+.f4-conn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--f4-t-support);
   color: var(--f4-muted);
+  white-space: nowrap;
+}
+.f4-conn::before {
+  content: "";
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--f4-given-s);
+}
+.f4-conn[data-state="offline"] { color: var(--f4-off-s); font-weight: 600; }
+.f4-conn[data-state="offline"]::before { background: var(--f4-off-s); }
+
+.f4-who {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--f4-s2);
+  font-size: var(--f4-t-support);
+  color: var(--f4-body);
+  white-space: nowrap;
+}
+.f4-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--f4-sunken);
+  color: var(--f4-ink);
+  font-size: var(--f4-t-label);
+  font-weight: 700;
 }
 
-.f4-main {
-  max-width: 880px;
-  margin: 0 auto;
-  padding: var(--f4-s6) var(--f4-s5) var(--f4-s7);
+/* ── Body: nav + content ──────────────────────────────────────────────────── */
+
+.f4-body {
+  display: grid;
+  grid-template-columns: var(--f4-nav-w) minmax(0, 1fr);
+  flex: 1 1 auto;
+  align-items: start;
 }
+
+/*
+ * The sidebar sits on frontend4's deep ink rather than the specification's
+ * navy — same role, this palette's ground. Dark navigation with a light canvas
+ * is the part of the spec that carries across regardless of hue.
+ */
+.f4-nav {
+  position: sticky;
+  top: var(--f4-context-h);
+  align-self: start;
+  height: calc(100vh - var(--f4-context-h));
+  padding: var(--f4-s4) var(--f4-s3);
+  background: var(--f4-ink);
+  overflow-y: auto;
+}
+
+.f4-nav-group { display: grid; gap: 2px; }
+.f4-nav-group + .f4-nav-group { margin-top: var(--f4-s4); }
+
+/* Understated section labels — HOME, MEDICATION ADMINISTRATION, PEOPLE… */
+.f4-nav-label {
+  padding: var(--f4-s3) var(--f4-s3) var(--f4-s1);
+  color: #7C8798;
+  font-size: .6875rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+/*
+ * The current area is marked THREE ways: a thin accent left edge, a slightly
+ * lifted surface, and brighter text. Never a filled accent block — that is the
+ * specification's rule, and colour is never the only signal.
+ */
+.f4-nav-item {
+  display: flex;
+  align-items: center;
+  gap: var(--f4-s3);
+  min-height: 42px;
+  padding: 0 var(--f4-s3);
+  border-left: 2px solid transparent;
+  border-radius: 0 var(--f4-r-md) var(--f4-r-md) 0;
+  color: #E8ECF1;
+  font-size: .9375rem;
+  text-decoration: none;
+}
+.f4-nav-item:hover { background: rgba(255,255,255,.06); text-decoration: none; color: #fff; }
+.f4-nav-item[aria-current="page"] {
+  border-left-color: var(--f4-accent-edge);
+  background: rgba(255,255,255,.08);
+  color: #FFFFFF;
+  font-weight: 600;
+}
+.f4-nav-item[aria-disabled="true"] { color: #AEB9C6; opacity: .55; }
+.f4-nav-icon { display: inline-flex; opacity: .8; }
+.f4-nav-item[aria-current="page"] .f4-nav-icon { opacity: 1; }
+
+.f4-nav-count {
+  margin-left: auto;
+  padding: 1px 7px;
+  border-radius: var(--f4-r-pill);
+  background: rgba(255,255,255,.12);
+  color: #E8ECF1;
+  font-size: var(--f4-t-label);
+  font-weight: 600;
+}
+.f4-nav-count[data-tone="overdue"] { background: var(--f4-over-s); color: #fff; }
+
+.f4-content { min-width: 0; }
+
+/* ── Page header: title, plain-language state, ONE primary action ─────────── */
+
+.f4-page-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--f4-s4);
+  padding: var(--f4-s5) var(--f4-s6) var(--f4-s4);
+  background: var(--f4-surface);
+  border-bottom: var(--f4-hair);
+}
+.f4-page-header-text { flex: 1 1 320px; min-width: 0; }
+.f4-page-summary { margin-top: var(--f4-s1); color: var(--f4-muted); font-size: .9375rem; }
+.f4-page-header-action { flex: 0 0 auto; margin-left: auto; }
+.f4-sync {
+  display: block;
+  margin-top: var(--f4-s1);
+  font-size: var(--f4-t-label);
+  color: var(--f4-muted);
+  text-align: right;
+}
+
+.f4-main { padding: var(--f4-s5) var(--f4-s6) var(--f4-s7); max-width: 1180px; }
+.f4-main[data-width="narrow"] { max-width: 880px; margin: 0 auto; }
 
 .f4-page-head { margin-bottom: var(--f4-s5); }
-.f4-page-head p {
-  margin-top: var(--f4-s2);
+.f4-page-head p { margin-top: var(--f4-s2); color: var(--f4-muted); max-width: 60ch; }
+
+/* ── Bottom navigation (phone only) — a LIGHT surface, not a dark block ───── */
+
+.f4-bottomnav {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  z-index: 30;
+  height: var(--f4-bottom-h);
+  background: var(--f4-surface);
+  border-top: var(--f4-hair);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.f4-bottomnav-item {
+  position: relative;
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-height: 44px;
   color: var(--f4-muted);
-  max-width: 60ch;
+  font-size: .6875rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+.f4-bottomnav-item:hover { text-decoration: none; }
+.f4-bottomnav-item[aria-current="page"] { color: var(--f4-accent); }
+/* Position again, not colour alone: a small indicator line above the current. */
+.f4-bottomnav-item[aria-current="page"]::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 34px; height: 2px;
+  border-radius: 0 0 2px 2px;
+  background: var(--f4-accent);
 }
 
-/* ── Cards ────────────────────────────────────────────────────────────────── */
+/* ══ COMPONENTS ══════════════════════════════════════════════════════════════ */
+
+/* ── Cards and sections ───────────────────────────────────────────────────── */
 
 .f4-stack { display: grid; gap: var(--f4-s4); }
 
@@ -146,36 +405,269 @@
   border: var(--f4-hair);
   border-radius: var(--f4-r-lg);
   padding: var(--f4-s5);
-  box-shadow: var(--f4-lift);
+  box-shadow: var(--f4-card-shadow);
 }
-.f4-card h2 { margin-bottom: var(--f4-s2); }
+.f4-card h2 { font-size: var(--f4-t-card); margin-bottom: var(--f4-s2); }
 .f4-card p  { color: var(--f4-body); }
 
 /* Never nest a card inside a card — one job per surface. */
 .f4-card .f4-card { box-shadow: none; }
 
-.f4-list {
-  margin: var(--f4-s3) 0 0;
-  padding-left: 1.15rem;
-  color: var(--f4-body);
+/* A card whose body is rows, so the rows can meet the card edges. */
+.f4-card[data-pad="none"] { padding: 0; overflow: hidden; }
+
+.f4-card-head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--f4-s3);
+  padding: var(--f4-s4) var(--f4-s5);
+  border-bottom: var(--f4-hair);
 }
+.f4-card-head h2 { margin: 0; }
+.f4-card-head-note { margin-left: auto; font-size: var(--f4-t-support); color: var(--f4-muted); }
+
+.f4-list { margin: var(--f4-s3) 0 0; padding-left: 1.15rem; color: var(--f4-body); }
 .f4-list li { margin-bottom: var(--f4-s1); }
 
-/* ── Badge ────────────────────────────────────────────────────────────────── */
-
-.f4-badge {
-  display: inline-block;
-  padding: 2px var(--f4-s2);
-  border-radius: var(--f4-r-pill);
-  font-size: .75rem;
-  font-weight: 600;
-  background: var(--f4-neutral-bg);
-  color: var(--f4-neutral-fg);
+.f4-cols {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  gap: var(--f4-s4);
+  align-items: start;
 }
-.f4-badge[data-tone="good"]    { background: var(--f4-good-bg);    color: var(--f4-good-fg); }
-.f4-badge[data-tone="caution"] { background: var(--f4-caution-bg); color: var(--f4-caution-fg); }
-.f4-badge[data-tone="risk"]    { background: var(--f4-risk-bg);    color: var(--f4-risk-fg); }
-.f4-badge[data-tone="info"]    { background: var(--f4-info-bg);    color: var(--f4-info-fg); }
+
+/* ══ STATUS ══════════════════════════════════════════════════════════════════
+   The specification's rule, implemented literally: a small dot or icon, a
+   WORD, and restrained colour. Never a filled block, never colour alone.
+
+       ● Overdue · 22 minutes
+   ========================================================================= */
+
+.f4-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--f4-t-support);
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--f4-upc-s);
+}
+.f4-status-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.f4-status-note { font-weight: 400; color: var(--f4-muted); }
+
+/* The outlined badge variant, for when a status needs a little more presence.
+   Still a word, still a thin edge — not a filled colour block. */
+.f4-status[data-variant="badge"] {
+  padding: 2px var(--f4-s2);
+  border: 1px solid currentColor;
+  border-radius: var(--f4-r-pill);
+  font-size: var(--f4-t-label);
+}
+
+.f4-status[data-status="given"]    { color: var(--f4-given-s); }
+.f4-status[data-status="due"]      { color: var(--f4-due-s); }
+.f4-status[data-status="upcoming"] { color: var(--f4-upc-s); }
+.f4-status[data-status="late"]     { color: var(--f4-late-s); }
+.f4-status[data-status="overdue"]  { color: var(--f4-over-s); }
+.f4-status[data-status="refused"]  { color: var(--f4-ref-s); }
+.f4-status[data-status="omitted"]  { color: var(--f4-omit-s); }
+.f4-status[data-status="witness"]  { color: var(--f4-wit-s); }
+.f4-status[data-status="info"]     { color: var(--f4-info-s); }
+.f4-status[data-status="offline"]  { color: var(--f4-off-s); }
+
+/* The SOFT intensity: badge background, selected filter. Used sparingly. */
+.f4-status[data-fill="soft"] { border-color: transparent; }
+.f4-status[data-fill="soft"][data-status="given"]    { background: var(--f4-given-b); }
+.f4-status[data-fill="soft"][data-status="due"]      { background: var(--f4-due-b); }
+.f4-status[data-fill="soft"][data-status="upcoming"] { background: var(--f4-upc-b); }
+.f4-status[data-fill="soft"][data-status="late"]     { background: var(--f4-late-b); }
+.f4-status[data-fill="soft"][data-status="overdue"]  { background: var(--f4-over-b); }
+.f4-status[data-fill="soft"][data-status="refused"]  { background: var(--f4-ref-b); }
+.f4-status[data-fill="soft"][data-status="omitted"]  { background: var(--f4-omit-b); }
+.f4-status[data-fill="soft"][data-status="witness"]  { background: var(--f4-wit-b); }
+.f4-status[data-fill="soft"][data-status="info"]     { background: var(--f4-info-b); }
+.f4-status[data-fill="soft"][data-status="offline"]  { background: var(--f4-off-b); }
+
+/* ── Stat: one number, one label. No decoration ───────────────────────────── */
+
+.f4-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--f4-s3);
+}
+
+.f4-stat {
+  padding: var(--f4-s4);
+  background: var(--f4-surface);
+  border: var(--f4-hair);
+  border-radius: var(--f4-r-lg);
+  box-shadow: var(--f4-card-shadow);
+}
+.f4-stat-value {
+  display: block;
+  font-family: var(--f4-font-head);
+  color: var(--f4-ink);
+  font-size: 1.875rem;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -.02em;
+  font-variant-numeric: tabular-nums;
+}
+.f4-stat-label { display: block; margin-top: var(--f4-s1); color: var(--f4-muted); font-size: var(--f4-t-support); }
+.f4-stat-note  { display: block; margin-top: var(--f4-s2); font-size: var(--f4-t-label); color: var(--f4-muted); }
+
+/*
+ * A stat that represents risk gets the FAINT tint and a strong left edge —
+ * not a filled red card. The specification is explicit: keep the status
+ * visible without turning the page red.
+ */
+.f4-stat[data-status] { border-left-width: 3px; }
+.f4-stat[data-status="overdue"] { border-left-color: var(--f4-over-s); background: var(--f4-over-f); }
+.f4-stat[data-status="overdue"] .f4-stat-value { color: var(--f4-over-s); }
+.f4-stat[data-status="due"]     { border-left-color: var(--f4-due-s);  background: var(--f4-due-f); }
+.f4-stat[data-status="due"] .f4-stat-value { color: var(--f4-due-s); }
+.f4-stat[data-status="late"]    { border-left-color: var(--f4-late-s); background: var(--f4-late-f); }
+.f4-stat[data-status="late"] .f4-stat-value { color: var(--f4-late-s); }
+
+/* ── Progress ─────────────────────────────────────────────────────────────── */
+
+.f4-progress { height: 6px; border-radius: var(--f4-r-pill); background: var(--f4-sunken); overflow: hidden; }
+.f4-progress-fill { height: 100%; border-radius: inherit; background: var(--f4-accent); }
+
+/* ── Person identity ──────────────────────────────────────────────────────── */
+
+.f4-person { display: flex; align-items: center; gap: var(--f4-s3); min-width: 0; }
+.f4-person-photo {
+  flex: 0 0 auto;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--f4-sunken);
+}
+.f4-person-initials {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: var(--f4-sunken);
+  color: var(--f4-ink);
+  font-size: var(--f4-t-support);
+  font-weight: 700;
+}
+.f4-person-text { min-width: 0; }
+.f4-person-name {
+  display: block;
+  font-family: var(--f4-font-head);
+  color: var(--f4-ink);
+  font-weight: 700;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.f4-person-meta { display: block; color: var(--f4-muted); font-size: var(--f4-t-support); }
+
+/* Bigger identity block for administration screens, where it is the anchor. */
+.f4-person[data-size="lg"] .f4-person-photo,
+.f4-person[data-size="lg"] .f4-person-initials { width: 52px; height: 52px; font-size: 1rem; }
+.f4-person[data-size="lg"] .f4-person-name { font-size: var(--f4-t-med); }
+
+/* ── Safety strip: allergies and alerts, always visible, always worded ────── */
+
+.f4-safety {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--f4-s2);
+  padding: var(--f4-s1) var(--f4-s3);
+  border-radius: var(--f4-r-md);
+  border-left: 3px solid var(--f4-over-s);
+  background: var(--f4-over-f);
+  color: var(--f4-over-s);
+  font-size: var(--f4-t-support);
+  font-weight: 600;
+}
+.f4-safety-label { text-transform: uppercase; letter-spacing: .04em; font-size: .6875rem; }
+.f4-safety[data-tone="caution"] {
+  border-left-color: var(--f4-late-s);
+  background: var(--f4-late-f);
+  color: var(--f4-late-s);
+}
+
+/* ── Rows: the repeated unit of the product ───────────────────────────────── */
+
+.f4-rows { display: flex; flex-direction: column; }
+
+.f4-row {
+  display: flex;
+  align-items: center;
+  gap: var(--f4-s4);
+  width: 100%;
+  padding: var(--f4-s3) var(--f4-s5);
+  border: 0;
+  border-top: var(--f4-hair);
+  border-left: 3px solid transparent;
+  background: var(--f4-surface);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+}
+.f4-rows > .f4-row:first-child { border-top: 0; }
+a.f4-row, button.f4-row { cursor: pointer; }
+a.f4-row:hover, button.f4-row:hover { background: var(--f4-upc-f); text-decoration: none; }
+
+.f4-row-main { flex: 1 1 auto; min-width: 0; }
+.f4-row-title {
+  display: block;
+  color: var(--f4-ink);
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.f4-row-sub  { display: block; color: var(--f4-muted); font-size: var(--f4-t-support); }
+.f4-row-end  { flex: 0 0 auto; display: flex; align-items: center; gap: var(--f4-s3); }
+.f4-row-time { font-variant-numeric: tabular-nums; color: var(--f4-muted); font-size: var(--f4-t-support); }
+
+/* A row needing attention carries a thin left edge AND the faint tint AND a
+   worded status. Three signals, none of them a filled colour block. */
+.f4-row[data-status="overdue"] { border-left-color: var(--f4-over-s); background: var(--f4-over-f); }
+.f4-row[data-status="due"]     { border-left-color: var(--f4-due-s); }
+.f4-row[data-status="late"]    { border-left-color: var(--f4-late-s); background: var(--f4-late-f); }
+.f4-row[data-status="refused"] { border-left-color: var(--f4-ref-s); }
+.f4-row[data-status="witness"] { border-left-color: var(--f4-wit-s); background: var(--f4-wit-f); }
+.f4-row[data-status="given"]   { border-left-color: var(--f4-given-s); }
+
+/* Completed work stays visible but recedes — seeing the round finish matters. */
+.f4-row[data-done="true"] .f4-row-title { color: var(--f4-muted); font-weight: 500; }
+
+/* The medicine name is the strongest thing in a medicine row; strength, dose,
+   route and time stay clearly visible but do not compete equally. */
+.f4-med-name {
+  display: block;
+  font-family: var(--f4-font-head);
+  font-size: var(--f4-t-med);
+  font-weight: 700;
+  color: var(--f4-ink);
+  line-height: 1.25;
+}
+.f4-med-strength { display: block; font-size: var(--f4-t-support); color: var(--f4-muted); }
+.f4-med-detail   { margin-top: var(--f4-s1); font-size: var(--f4-t-body); color: var(--f4-body); }
+.f4-med-detail b { font-weight: 600; color: var(--f4-ink); }
+.f4-med-instruction {
+  margin-top: var(--f4-s2);
+  padding-left: var(--f4-s3);
+  border-left: 2px solid var(--f4-line-hard);
+  font-size: var(--f4-t-support);
+  color: var(--f4-body);
+}
 
 /* ── Buttons ──────────────────────────────────────────────────────────────── */
 
@@ -183,7 +675,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 44px;           /* touch target */
+  gap: var(--f4-s2);
+  min-height: 44px;
   padding: 0 var(--f4-s5);
   border: 1px solid transparent;
   border-radius: var(--f4-r-md);
@@ -192,29 +685,210 @@
   font: inherit;
   font-weight: 600;
   cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
 }
-.f4-btn:hover  { background: var(--f4-accent-in); text-decoration: none; }
+.f4-btn:hover  { background: var(--f4-accent-in); color: #fff; text-decoration: none; }
 .f4-btn:active { transform: translateY(1px); }
+.f4-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
 
-.f4-btn[data-variant="quiet"] {
+/* Secondary — outlined, ink text. View Details, Add Note, Open MAR. */
+.f4-btn[data-variant="quiet"],
+.f4-btn[data-variant="secondary"] {
   background: var(--f4-surface);
-  border-color: var(--f4-line);
-  color: var(--f4-body);
+  border-color: var(--f4-line-hard);
+  color: var(--f4-ink);
 }
-.f4-btn[data-variant="quiet"]:hover { background: var(--f4-sunken); }
+.f4-btn[data-variant="quiet"]:hover,
+.f4-btn[data-variant="secondary"]:hover { background: var(--f4-sunken); color: var(--f4-ink); }
 
-.f4-actions {
+/* Tertiary — text only, underline on hover. View History, Learn More. */
+.f4-btn[data-variant="text"] {
+  background: transparent;
+  border-color: transparent;
+  color: var(--f4-accent);
+  padding: 0 var(--f4-s2);
+}
+.f4-btn[data-variant="text"]:hover { background: transparent; color: var(--f4-accent-in); text-decoration: underline; }
+
+/*
+ * Destructive. Only rendered when the destructive action is genuinely
+ * relevant — never sitting on a normal page.
+ */
+.f4-btn[data-variant="destructive"] {
+  background: var(--f4-surface);
+  border-color: var(--f4-over-e);
+  color: var(--f4-over-s);
+}
+.f4-btn[data-variant="destructive"]:hover { background: var(--f4-over-f); color: var(--f4-over-s); }
+
+.f4-btn[data-size="sm"] { min-height: 34px; padding: 0 var(--f4-s3); font-size: var(--f4-t-support); }
+
+.f4-actions { display: flex; flex-wrap: wrap; gap: var(--f4-s3); margin-top: var(--f4-s5); }
+
+/* ── Forms ────────────────────────────────────────────────────────────────── */
+
+.f4-field { display: block; margin-bottom: var(--f4-s4); }
+
+/* Label ABOVE the field, always. Placeholder text is never the only label. */
+.f4-field-label {
+  display: block;
+  margin-bottom: var(--f4-s1);
+  color: var(--f4-ink);
+  font-size: var(--f4-t-support);
+  font-weight: 600;
+}
+.f4-field-hint { display: block; margin-bottom: var(--f4-s2); color: var(--f4-muted); font-size: var(--f4-t-support); }
+
+.f4-input, .f4-select, .f4-textarea {
+  display: block;
+  width: 100%;
+  min-height: var(--f4-field-h);
+  padding: var(--f4-s2) var(--f4-s3);
+  border: 1px solid var(--f4-line-hard);
+  border-radius: var(--f4-r-md);
+  background: var(--f4-surface);
+  color: var(--f4-ink);
+  font: inherit;
+}
+.f4-textarea { min-height: 96px; resize: vertical; padding-top: var(--f4-s3); }
+.f4-input:hover, .f4-select:hover, .f4-textarea:hover { border-color: var(--f4-muted); }
+
+/* Errors sit immediately below the field, and are announced, not just red. */
+.f4-field[data-invalid="true"] .f4-input,
+.f4-field[data-invalid="true"] .f4-select,
+.f4-field[data-invalid="true"] .f4-textarea { border-color: var(--f4-over-s); background: var(--f4-over-f); }
+.f4-field-error {
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--f4-s3);
-  margin-top: var(--f4-s5);
+  align-items: center;
+  gap: 6px;
+  margin-top: var(--f4-s1);
+  color: var(--f4-over-s);
+  font-size: var(--f4-t-support);
+  font-weight: 600;
 }
 
-/* ── Small screens ────────────────────────────────────────────────────────── */
+/* ── Tables — for the MAR, stock ledger, CD register, audit trail ─────────── */
+
+.f4-table-wrap { overflow-x: auto; }
+
+.f4-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--f4-t-support);
+}
+.f4-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: var(--f4-s2) var(--f4-s3);
+  background: var(--f4-sunken);
+  border-bottom: 1px solid var(--f4-line-hard);
+  color: var(--f4-ink);
+  font-size: var(--f4-t-label);
+  font-weight: 700;
+  letter-spacing: .03em;
+  text-transform: uppercase;
+  text-align: left;
+  white-space: nowrap;
+}
+.f4-table td {
+  padding: var(--f4-s3);
+  border-bottom: var(--f4-hair);
+  color: var(--f4-body);
+  vertical-align: top;
+}
+.f4-table tbody tr:hover td { background: var(--f4-upc-f); }
+
+/* Quantities are right-aligned and use tabular numerals so columns line up. */
+.f4-table [data-numeric] {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* ══ THE SIX STATES ══════════════════════════════════════════════════════════ */
+
+.f4-skeleton {
+  border-radius: var(--f4-r-sm);
+  background: linear-gradient(90deg, var(--f4-sunken) 25%, #E4E9F0 37%, var(--f4-sunken) 63%);
+  background-size: 400% 100%;
+  animation: f4-shimmer 1.4s ease infinite;
+}
+@keyframes f4-shimmer {
+  from { background-position: 100% 50%; }
+  to   { background-position: 0 50%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .f4-skeleton { animation: none; }
+}
+
+.f4-state { padding: var(--f4-s6) var(--f4-s5); text-align: center; color: var(--f4-muted); }
+.f4-state-title {
+  display: block;
+  font-family: var(--f4-font-head);
+  color: var(--f4-ink);
+  font-weight: 700;
+  margin-bottom: var(--f4-s1);
+}
+.f4-state-body { max-width: 46ch; margin: 0 auto; font-size: .9375rem; }
+.f4-state .f4-actions { justify-content: center; }
+.f4-state[data-tone="risk"] .f4-state-title { color: var(--f4-over-s); }
+.f4-state-ref { display: block; margin-top: var(--f4-s3); font-size: var(--f4-t-label); color: var(--f4-muted); }
+
+/*
+ * Offline — a persistent banner, never a toast. A toast that has been dismissed
+ * is a lie: the writes are still queued and the user no longer knows.
+ */
+.f4-offline {
+  display: flex;
+  align-items: center;
+  gap: var(--f4-s3);
+  padding: var(--f4-s3) var(--f4-s5);
+  background: var(--f4-off-b);
+  border-bottom: 1px solid var(--f4-off-e);
+  color: var(--f4-off-s);
+  font-size: .875rem;
+  font-weight: 600;
+}
+.f4-offline-count { margin-left: auto; font-variant-numeric: tabular-nums; }
+
+/* ══ RESPONSIVE ══════════════════════════════════════════════════════════════
+   Designed at 390 first, then 768, then 1280. Every rule below is still scoped
+   under .f4-root — an @media block is the only top-level construct allowed.
+   ========================================================================= */
+
+@media (max-width: 900px) {
+  .f4-body { grid-template-columns: minmax(0, 1fr); }
+  .f4-nav  { display: none; }
+
+  .f4-bottomnav { display: flex; }
+  .f4-app { padding-bottom: var(--f4-bottom-h); }
+
+  .f4-page-header { padding: var(--f4-s4) var(--f4-s5) var(--f4-s3); }
+  .f4-main { padding: var(--f4-s4) var(--f4-s5) var(--f4-s6); }
+  .f4-cols { grid-template-columns: minmax(0, 1fr); }
+}
 
 @media (max-width: 600px) {
-  .f4-main   { padding: var(--f4-s5) var(--f4-s4) var(--f4-s6); }
-  .f4-card   { padding: var(--f4-s4); }
+  .f4-root { --f4-field-h: 50px; }   /* larger targets on a phone */
+
+  .f4-context { gap: var(--f4-s3); padding: 0 var(--f4-s4); }
+  /* The shift and the profile name go; the place and connectivity stay,
+     because those two decide whether the screen can be trusted. */
+  .f4-place-sub, .f4-who-name { display: none; }
+
+  .f4-page-header { padding: var(--f4-s4); }
+  .f4-page-header-action { width: 100%; margin-left: 0; }
+  .f4-page-header-action .f4-btn { width: 100%; }
+  .f4-sync { text-align: left; }
+
+  .f4-main    { padding: var(--f4-s4) var(--f4-s4) var(--f4-s6); }
+  .f4-card    { padding: var(--f4-s4); }
+  .f4-card-head { padding: var(--f4-s3) var(--f4-s4); }
+  .f4-row     { padding: var(--f4-s3) var(--f4-s4); gap: var(--f4-s3); flex-wrap: wrap; }
   .f4-root h1 { font-size: 1.5rem; }
+
+  .f4-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .f4-actions .f4-btn { flex: 1 1 100%; }
 }

@@ -3,16 +3,22 @@
 namespace App\Http\Controllers\Frontend4;
 
 use App\Http\Controllers\Controller;
+use App\Services\Frontend4\Permissions;
+use App\Services\Frontend4\RoleResolver;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 /**
  * Base for every frontend4 controller.
  *
- * Exists for one reason: to make sure every frontend4 response renders through
- * frontend4's own root view, and to keep the explanation of WHY in one place.
+ * Two jobs: put every response through frontend4's own root view, and give
+ * every action the same role and permission checks.
  */
 abstract class F4Controller extends Controller
 {
+    /** Resolved once per request — the resolver reads the database. */
+    private ?string $resolvedRole = null;
+
     /**
      * Point Inertia at frontend4's own root view (resources/views/f4.blade.php).
      *
@@ -31,5 +37,70 @@ abstract class F4Controller extends Controller
     protected function useF4Layout(): void
     {
         Inertia::setRootView('f4');
+    }
+
+    /** The signed-in user's frontend4 role: carer, lead, manager, admin or none. */
+    protected function role(): string
+    {
+        if ($this->resolvedRole === null) {
+            $this->resolvedRole = app(RoleResolver::class)->resolve(Auth::user());
+        }
+
+        return $this->resolvedRole;
+    }
+
+    /** May the signed-in user perform this action? */
+    protected function can(string $permission): bool
+    {
+        return app(Permissions::class)->allows($this->role(), $permission);
+    }
+
+    /**
+     * Refuse the request unless the user holds this permission.
+     *
+     * THIS is the access control. The React side hides controls a user has no
+     * permission for, but that is a courtesy — a hidden button is not a check.
+     * Every frontend4 action that writes anything calls this first.
+     */
+    protected function requirePermission(string $permission): void
+    {
+        if (! $this->can($permission)) {
+            abort(403, 'You do not have permission to do that.');
+        }
+    }
+
+    /**
+     * Refuse anyone with no medication access at all.
+     *
+     * Called at the top of every frontend4 action, including read-only ones. It
+     * replaces the previous check, which admitted every user type there is —
+     * meaning anyone who could log in could reach medication management.
+     *
+     * Finance accounts ("Account Manager") land here even when their account
+     * type says admin, because an access level mapped to NONE beats the account
+     * type. See RoleResolver::resolve().
+     */
+    protected function requireMedicationAccess(): void
+    {
+        if ($this->role() === RoleResolver::NONE) {
+            abort(403, 'You do not have access to medication management.');
+        }
+    }
+
+    /**
+     * Role and permissions for the React side.
+     *
+     * Merged into every frontend4 Inertia response so a page can hide what it
+     * should hide without asking the server a second time. Display only.
+     */
+    protected function roleProps(): array
+    {
+        $role = $this->role();
+
+        return [
+            'role' => $role,
+            'roleLabel' => app(RoleResolver::class)->label($role),
+            'can' => app(Permissions::class)->forRole($role),
+        ];
     }
 }
