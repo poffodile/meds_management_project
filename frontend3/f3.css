@@ -8,12 +8,12 @@
    If you ever need a rule that cannot be written under .f3-root, stop — that
    is the signal you are about to leak. See FRONTEND3-PLAN.md.
 
-   This file is loaded ONLY by resources/views/f3.blade.php via
-   resources/js/f3.jsx. It is not in the frontend2 bundle.
+   Loaded ONLY by resources/views/f3.blade.php via resources/js/f3.jsx.
 
-   The full component vocabulary explored in the concept screens lives in
-   docs/care-one-os/FRONTEND3/wireframes/careone-f3.css. Rules graduate from
-   there into here as real pages get built.
+   THE UNCLUTTERED RULE
+   One job per screen. One primary action. Detail lives behind a tap, not
+   stacked on the page. Generous whitespace is doing work — it is not waste.
+   Never nest a card inside a card.
    ========================================================================= */
 
 .f3-root {
@@ -42,6 +42,10 @@
 
   --f3-hair: 1px solid var(--f3-stone);
   --f3-lift: 0 1px 2px rgba(23,36,59,.04), 0 8px 24px -12px rgba(23,36,59,.16);
+  --f3-lift-lg: 0 2px 4px rgba(23,36,59,.05), 0 24px 48px -20px rgba(23,36,59,.28);
+
+  --f3-nav-w: 236px;
+  --f3-rail-w: 72px;
 
   --f3-font-head: "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --f3-font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -53,11 +57,12 @@
   line-height: 1.5;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 .f3-root *, .f3-root *::before, .f3-root *::after { box-sizing: border-box; }
 
-.f3-root h1, .f3-root h2, .f3-root h3 {
+.f3-root h1, .f3-root h2, .f3-root h3, .f3-root h4 {
   font-family: var(--f3-font-head);
   color: var(--f3-navy);
   margin: 0;
@@ -65,7 +70,16 @@
   letter-spacing: -.015em;
   line-height: 1.25;
 }
+.f3-root h1 { font-size: 1.5rem; }
+.f3-root h2 { font-size: 1.0625rem; }
+.f3-root h3 { font-size: .9375rem; }
+.f3-root h4 {
+  font-size: .7rem; letter-spacing: .07em; text-transform: uppercase;
+  color: var(--f3-slate); font-weight: 700;
+}
 .f3-root p { margin: 0; }
+.f3-root ul, .f3-root ol { margin: 0; padding: 0; list-style: none; }
+
 /* Only PLAIN links get link styling. An anchor carrying a component class
    (.f3-btn, .f3-tile…) must keep that component's own colour. Without
    :not([class]) this rule is specificity (0,1,1) and silently beats
@@ -89,72 +103,159 @@
   }
 }
 
-/* ------------------------------------------------------------------ layout */
+/* ============================== SHELL ==================================== */
 
-.f3-page {
-  max-width: 1140px;
-  margin: 0 auto;
-  padding: var(--f3-s7) var(--f3-s5);
+.f3-shell { display: flex; min-height: 100vh; }
+
+.f3-nav {
+  width: var(--f3-nav-w); flex: none;
+  background: var(--f3-porcelain); border-right: var(--f3-hair);
+  padding: var(--f3-s5) var(--f3-s3);
+  display: flex; flex-direction: column; gap: var(--f3-s5);
+  position: sticky; top: 0; height: 100vh; overflow-y: auto;
 }
 
-.f3-header { display: flex; align-items: center; gap: var(--f3-s4); flex-wrap: wrap; }
-
+.f3-brand { display: flex; align-items: center; gap: var(--f3-s3); padding: 0 var(--f3-s2); }
 .f3-mark {
-  width: 44px; height: 44px; flex: none; border-radius: 13px;
+  width: 34px; height: 34px; flex: none; border-radius: 10px;
   background: var(--f3-navy); color: var(--f3-ivory);
   display: grid; place-items: center;
-  font-family: var(--f3-font-head); font-weight: 800; font-size: .95rem;
-  letter-spacing: -.02em;
+  font-family: var(--f3-font-head); font-weight: 800; font-size: .78rem; letter-spacing: -.02em;
+}
+.f3-mark--lg { width: 44px; height: 44px; border-radius: 13px; font-size: .95rem; }
+.f3-brand-name { font-family: var(--f3-font-head); font-weight: 700; color: var(--f3-navy); font-size: .92rem; line-height: 1.2; }
+.f3-brand-sub { font-size: .66rem; color: var(--f3-slate); letter-spacing: .07em; text-transform: uppercase; margin-top: 2px; }
+
+.f3-navgroup { display: flex; flex-direction: column; gap: 2px; }
+.f3-navgroup > h4 { padding: 0 var(--f3-s2) var(--f3-s2); }
+.f3-navlink {
+  display: flex; align-items: center; gap: var(--f3-s3);
+  padding: 10px var(--f3-s2); border-radius: var(--f3-r-md);
+  color: var(--f3-ink); font-size: .875rem; font-weight: 500;
+  min-height: 42px; position: relative;
+}
+.f3-navlink:hover { background: var(--f3-mist); }
+.f3-navlink[aria-current="page"] { background: var(--f3-navy); color: var(--f3-porcelain); font-weight: 600; }
+.f3-navlink[aria-current="page"] .f3-navicon { border-color: rgba(255,252,247,.45); }
+.f3-navicon {
+  width: 22px; height: 22px; flex: none; border-radius: 6px;
+  border: 1.5px solid var(--f3-eucalyptus);
+  display: grid; place-items: center; font-size: .58rem; font-weight: 800;
+}
+.f3-navcount {
+  margin-left: auto; font-size: .68rem; font-weight: 800;
+  background: var(--f3-risk-bg); color: var(--f3-risk-fg);
+  padding: 1px 7px; border-radius: var(--f3-r-pill);
+}
+.f3-navlink[aria-current="page"] .f3-navcount { background: rgba(255,252,247,.18); color: var(--f3-porcelain); }
+
+.f3-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+
+.f3-topbar {
+  display: flex; align-items: center; gap: var(--f3-s3);
+  padding: var(--f3-s3) var(--f3-s5); border-bottom: var(--f3-hair);
+  background: rgba(255,252,247,.86); backdrop-filter: blur(10px);
+  position: sticky; top: 0; z-index: 20;
+}
+.f3-context { display: flex; align-items: center; gap: var(--f3-s2); min-width: 0; flex-wrap: wrap; }
+.f3-topbar-actions { display: flex; align-items: center; gap: var(--f3-s2); margin-left: auto; }
+
+.f3-avatar {
+  width: 38px; height: 38px; border-radius: var(--f3-r-pill); flex: none;
+  background: var(--f3-eucalyptus); color: #fff;
+  display: grid; place-items: center;
+  font-family: var(--f3-font-head); font-weight: 700; font-size: .76rem;
 }
 
-.f3-title { font-size: 1.75rem; }
-.f3-sub { color: var(--f3-slate); font-size: .875rem; margin-top: 4px; }
-
-.f3-card {
-  background: var(--f3-porcelain);
-  border: var(--f3-hair);
-  border-radius: var(--f3-r-lg);
-  padding: var(--f3-s5);
-  box-shadow: var(--f3-lift);
+.f3-pagehead {
+  padding: var(--f3-s6) var(--f3-s5) var(--f3-s4);
+  display: flex; align-items: flex-start; gap: var(--f3-s4); flex-wrap: wrap;
 }
+.f3-pagehead-text { flex: 1; min-width: 240px; }
+.f3-pagehead h1 { font-size: 1.6rem; }
+.f3-pagehead-sum { color: var(--f3-slate); font-size: .875rem; margin-top: 6px; max-width: 62ch; }
+.f3-sync { font-size: .74rem; color: var(--f3-slate); display: flex; align-items: center; gap: 6px; margin-top: var(--f3-s2); }
+.f3-sync::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--f3-teal); flex: none; }
+
+.f3-page {
+  padding: 0 var(--f3-s5) var(--f3-s7);
+  display: flex; flex-direction: column; gap: var(--f3-s5);
+  max-width: 1360px; width: 100%;
+}
+
+.f3-bottomnav { display: none; }
+
+/* ============================== LAYOUT ================================== */
 
 .f3-grid { display: grid; gap: var(--f3-s4); }
-.f3-grid--cards { grid-template-columns: repeat(auto-fill, minmax(268px, 1fr)); }
+.f3-grid--2 { grid-template-columns: repeat(2, minmax(0,1fr)); }
+.f3-grid--3 { grid-template-columns: repeat(3, minmax(0,1fr)); }
+.f3-grid--cards { grid-template-columns: repeat(auto-fill, minmax(268px,1fr)); }
+.f3-grid--main { grid-template-columns: minmax(0,1.75fr) minmax(0,1fr); align-items: start; }
 .f3-stack { display: flex; flex-direction: column; gap: var(--f3-s4); }
+.f3-stack--sm { gap: var(--f3-s2); }
 .f3-row { display: flex; align-items: center; gap: var(--f3-s3); flex-wrap: wrap; }
+.f3-spacer { margin-left: auto; }
+
+/* ============================== SURFACES ================================ */
+
+.f3-card {
+  background: var(--f3-porcelain); border: var(--f3-hair);
+  border-radius: var(--f3-r-lg); padding: var(--f3-s5);
+  box-shadow: var(--f3-lift);
+}
+.f3-card--flat { box-shadow: none; }
+.f3-card--tint { background: var(--f3-mist); box-shadow: none; border-color: transparent; }
+.f3-cardhead { display: flex; align-items: center; gap: var(--f3-s3); margin-bottom: var(--f3-s4); flex-wrap: wrap; }
+.f3-cardhead > :first-child { margin-right: auto; }
+.f3-cardsub { font-size: .8rem; color: var(--f3-slate); margin-top: 2px; }
 
 .f3-tile {
   display: flex; flex-direction: column; gap: var(--f3-s2);
-  padding: var(--f3-s4);
-  border: var(--f3-hair); border-radius: var(--f3-r-lg);
+  padding: var(--f3-s4); border: var(--f3-hair); border-radius: var(--f3-r-lg);
   background: var(--f3-porcelain); box-shadow: var(--f3-lift);
   color: var(--f3-ink); min-height: 148px;
 }
-.f3-tile:hover { border-color: var(--f3-teal); text-decoration: none; transform: translateY(-2px); }
+.f3-tile:hover { border-color: var(--f3-teal); transform: translateY(-2px); }
 @media (prefers-reduced-motion: no-preference) {
   .f3-tile { transition: transform .18s ease, border-color .18s ease; }
 }
-.f3-tile-num {
-  font-family: var(--f3-font-head); font-weight: 800; font-size: .72rem;
-  color: var(--f3-eucalyptus); letter-spacing: .1em;
-}
+.f3-tile-num { font-family: var(--f3-font-head); font-weight: 800; font-size: .72rem; color: var(--f3-eucalyptus); letter-spacing: .1em; }
 .f3-tile-text { color: var(--f3-slate); font-size: .85rem; }
 
-/* ------------------------------------------------------------------ atoms */
+/* Stat — a number that OPENS something. Never decorative (spec §5). */
+.f3-stat {
+  display: flex; flex-direction: column; gap: 2px; text-align: left; width: 100%;
+  background: var(--f3-porcelain); border: var(--f3-hair);
+  border-radius: var(--f3-r-lg); padding: var(--f3-s4) var(--f3-s5);
+  cursor: pointer; font-family: var(--f3-font-body);
+}
+.f3-stat:hover { border-color: var(--f3-eucalyptus); }
+.f3-stat-label { font-size: .74rem; color: var(--f3-slate); font-weight: 700; letter-spacing: .03em; text-transform: uppercase; }
+.f3-stat-value { font-family: var(--f3-font-head); font-size: 2.25rem; font-weight: 800; color: var(--f3-navy); letter-spacing: -.035em; line-height: 1.05; }
+.f3-stat-meta { font-size: .74rem; color: var(--f3-slate); }
+.f3-stat-meta b { color: var(--f3-ink); font-weight: 600; }
+.f3-stat--alert { border-color: rgba(126,51,39,.28); }
+.f3-stat--alert .f3-stat-value { color: var(--f3-risk-fg); }
+.f3-stat--quiet .f3-stat-value { color: var(--f3-eucalyptus); }
+
+/* ============================== ATOMS =================================== */
 
 .f3-chip {
   display: inline-flex; align-items: center; gap: 6px;
   padding: 5px 11px; border-radius: var(--f3-r-pill);
   border: var(--f3-hair); background: var(--f3-porcelain);
-  font-size: .78rem; font-weight: 500; white-space: nowrap;
+  font-size: .78rem; font-weight: 500; white-space: nowrap; color: var(--f3-ink);
 }
+.f3-chip b { font-weight: 700; color: var(--f3-navy); }
+.f3-chip--quiet { background: transparent; border-color: transparent; color: var(--f3-slate); }
 
-/* Word + shape + tint. The ::before shape is what keeps it readable in
-   greyscale and to a colour-blind user — never remove it. */
+/* Word + shape + tint. The ::before shape keeps it readable in greyscale and
+   to a colour-blind user — never remove it. */
 .f3-badge {
   display: inline-flex; align-items: center; gap: 6px;
   padding: 3px 10px 3px 8px; border-radius: var(--f3-r-pill);
-  font-size: .74rem; font-weight: 700; white-space: nowrap;
+  font-size: .73rem; font-weight: 700; white-space: nowrap;
   background: var(--f3-neutral-bg); color: var(--f3-neutral-fg);
 }
 .f3-badge::before { content: "●"; font-size: .7em; line-height: 1; }
@@ -176,9 +277,74 @@
   border: var(--f3-hair); background: var(--f3-porcelain); color: var(--f3-navy);
   cursor: pointer; white-space: nowrap;
 }
-.f3-btn:hover { background: var(--f3-mist); text-decoration: none; }
+.f3-btn:hover { background: var(--f3-mist); }
 .f3-btn--primary { background: var(--f3-teal); border-color: var(--f3-teal); color: #fff; }
 .f3-btn--primary:hover { background: #12564F; border-color: #12564F; }
+.f3-btn--ghost { background: transparent; border-color: transparent; color: var(--f3-teal); }
+.f3-btn--ghost:hover { background: var(--f3-mist); }
+.f3-btn--sm { min-height: 36px; padding: 0 var(--f3-s3); font-size: .8rem; }
+.f3-btn--block { width: 100%; }
+.f3-btn[disabled] { opacity: .45; cursor: not-allowed; }
+
+.f3-iconbtn {
+  width: 38px; height: 38px; border-radius: var(--f3-r-md); border: var(--f3-hair);
+  background: var(--f3-porcelain); display: grid; place-items: center;
+  font-size: .85rem; color: var(--f3-navy); cursor: pointer; position: relative;
+}
+.f3-iconbtn:hover { background: var(--f3-mist); }
+
+/* ============================== PEOPLE ================================== */
+
+.f3-person { display: flex; align-items: center; gap: var(--f3-s3); min-width: 0; }
+.f3-photo {
+  width: 44px; height: 44px; flex: none; border-radius: 14px;
+  background: var(--f3-mist); border: var(--f3-hair); color: var(--f3-navy);
+  display: grid; place-items: center; overflow: hidden;
+  font-family: var(--f3-font-head); font-weight: 800; font-size: .78rem;
+}
+.f3-photo img { width: 100%; height: 100%; object-fit: cover; }
+.f3-photo--lg { width: 60px; height: 60px; border-radius: 18px; font-size: 1rem; }
+.f3-person-name { font-family: var(--f3-font-head); font-weight: 700; color: var(--f3-navy); font-size: .95rem; }
+.f3-person-meta { font-size: .78rem; color: var(--f3-slate); margin-top: 1px; }
+
+/* Safety strip — allergies and risks. Never colour alone: it is labelled. */
+.f3-safety {
+  display: flex; align-items: center; gap: var(--f3-s2); flex-wrap: wrap;
+  padding: 7px var(--f3-s3); border-radius: var(--f3-r-md);
+  background: var(--f3-risk-bg); color: var(--f3-risk-fg);
+  font-size: .76rem; font-weight: 600;
+}
+.f3-safety-label { text-transform: uppercase; letter-spacing: .07em; font-size: .64rem; opacity: .85; }
+
+/* ============================== ROWS ==================================== */
+
+.f3-list { display: flex; flex-direction: column; }
+.f3-listitem {
+  display: flex; align-items: center; gap: var(--f3-s4);
+  padding: var(--f3-s4) 0; border-bottom: var(--f3-hair); min-width: 0;
+}
+.f3-listitem:last-child { border-bottom: 0; }
+.f3-listbody { flex: 1; min-width: 0; }
+.f3-listmeta { font-size: .78rem; color: var(--f3-slate); margin-top: 2px; }
+.f3-listmeta b { color: var(--f3-ink); font-weight: 600; }
+
+/* A person row that opens their round. The whole row is the target. */
+.f3-personrow {
+  display: flex; align-items: center; gap: var(--f3-s4);
+  width: 100%; text-align: left; font-family: var(--f3-font-body);
+  padding: var(--f3-s4); border: var(--f3-hair); border-radius: var(--f3-r-md);
+  background: var(--f3-porcelain); cursor: pointer; color: var(--f3-ink);
+  border-left: 3px solid transparent;
+}
+.f3-personrow:hover { border-color: var(--f3-eucalyptus); border-left-color: var(--f3-eucalyptus); }
+.f3-personrow--alert { border-left-color: var(--f3-risk-fg); }
+.f3-personrow--due { border-left-color: var(--f3-teal); }
+.f3-personrow--done { background: transparent; box-shadow: none; }
+.f3-personrow--done .f3-person-name { color: var(--f3-slate); }
+/* The person whose workspace is open, so the two columns stay connected. */
+.f3-personrow--open { background: var(--f3-mist); border-color: var(--f3-eucalyptus); }
+
+/* ============================== MISC ==================================== */
 
 .f3-note {
   border-left: 3px solid var(--f3-eucalyptus);
@@ -188,16 +354,189 @@
   font-size: .82rem; color: var(--f3-info-fg);
 }
 
+.f3-empty {
+  text-align: center; padding: var(--f3-s6) var(--f3-s5);
+  border: 1px dashed var(--f3-stone); border-radius: var(--f3-r-lg);
+  background: var(--f3-porcelain);
+}
+.f3-empty-mark {
+  width: 44px; height: 44px; margin: 0 auto var(--f3-s3); border-radius: 14px;
+  background: var(--f3-mist); display: grid; place-items: center;
+  color: var(--f3-eucalyptus); font-size: 1.05rem;
+}
+.f3-empty p { color: var(--f3-slate); font-size: .85rem; max-width: 44ch; margin: 6px auto 0; }
+
+/* Progress — a quiet bar, never a novelty. */
+.f3-progress { height: 6px; border-radius: var(--f3-r-pill); background: var(--f3-mist); overflow: hidden; }
+.f3-progress > span { display: block; height: 100%; background: var(--f3-teal); border-radius: inherit; }
+
+/* Visible to screen readers only — for the words a sighted user gets from
+   layout but a screen-reader user would otherwise lose. */
+.f3-sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
 .f3-mut { color: var(--f3-slate); }
 .f3-sm  { font-size: .85rem; }
 .f3-xs  { font-size: .74rem; }
 .f3-hr  { height: 1px; background: var(--f3-stone); border: 0; margin: 0; }
+.f3-tabnum { font-variant-numeric: tabular-nums; }
 
-/* ------------------------------------------------------------ responsive */
+/* ============================== TABS ==================================== */
 
+.f3-segment { display: inline-flex; padding: 3px; background: var(--f3-mist); border-radius: var(--f3-r-md); gap: 2px; flex-wrap: wrap; }
+.f3-segment button {
+  padding: 7px var(--f3-s3); border: 0; background: transparent; border-radius: var(--f3-r-sm);
+  font-family: var(--f3-font-body); font-size: .8rem; font-weight: 600;
+  color: var(--f3-slate); cursor: pointer; min-height: 36px;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.f3-segment button[aria-pressed="true"] { background: var(--f3-porcelain); color: var(--f3-navy); box-shadow: var(--f3-lift); }
+.f3-segment .f3-segcount { font-size: .68rem; font-weight: 800; color: var(--f3-risk-fg); }
+
+/* ============================== WORKSPACE =============================== */
+
+.f3-workspace { position: sticky; top: 84px; align-self: start; }
+
+/* A medicine in the person's list. The whole row opens it. */
+.f3-medrow {
+  display: flex; align-items: center; gap: var(--f3-s3); width: 100%; text-align: left;
+  font-family: var(--f3-font-body); color: var(--f3-ink);
+  padding: var(--f3-s3) var(--f3-s4); border: var(--f3-hair); border-radius: var(--f3-r-md);
+  background: var(--f3-porcelain); cursor: pointer; border-left: 3px solid transparent;
+}
+.f3-medrow:hover { border-color: var(--f3-eucalyptus); border-left-color: var(--f3-eucalyptus); }
+.f3-medrow--overdue { border-left-color: var(--f3-risk-fg); }
+.f3-medrow--due { border-left-color: var(--f3-teal); }
+.f3-medrow--done { background: transparent; }
+.f3-medrow--done .f3-medname { color: var(--f3-slate); }
+.f3-medrow[disabled] { cursor: not-allowed; opacity: .6; }
+.f3-medname { font-family: var(--f3-font-head); font-weight: 700; font-size: .9rem; color: var(--f3-navy); }
+.f3-meddose { font-size: .78rem; color: var(--f3-slate); margin-top: 1px; }
+
+/* Definition list used for the medicine card and the confirmation summary. */
+.f3-dl { display: grid; grid-template-columns: minmax(92px, 33%) 1fr; gap: var(--f3-s2) var(--f3-s4); font-size: .84rem; margin: 0; }
+.f3-dl dt { color: var(--f3-slate); font-weight: 500; }
+.f3-dl dd { margin: 0; color: var(--f3-ink); font-weight: 600; }
+
+.f3-confirm { background: var(--f3-mist); border-radius: var(--f3-r-md); padding: var(--f3-s4); }
+
+/* ============================== OUTCOMES ================================ */
+/* The safe path is the shortest path — but every deviation is one tap away,
+   never hidden behind a menu (spec §6). */
+
+.f3-outcomes { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); gap: var(--f3-s2); }
+.f3-outcome {
+  display: flex; flex-direction: column; gap: 2px; text-align: left;
+  padding: var(--f3-s3); min-height: 62px;
+  border: var(--f3-hair); border-radius: var(--f3-r-md);
+  background: var(--f3-porcelain); cursor: pointer; font-family: var(--f3-font-body);
+  color: var(--f3-ink);
+}
+.f3-outcome:hover { border-color: var(--f3-eucalyptus); background: var(--f3-ivory); }
+.f3-outcome[aria-pressed="true"] { border-color: var(--f3-teal); border-width: 2px; background: var(--f3-good-bg); }
+.f3-outcome[disabled] { opacity: .45; cursor: not-allowed; }
+.f3-outcome-name { font-family: var(--f3-font-head); font-weight: 700; font-size: .85rem; color: var(--f3-navy); }
+.f3-outcome-hint { font-size: .7rem; color: var(--f3-slate); }
+
+/* ============================== FORMS =================================== */
+
+.f3-field { display: flex; flex-direction: column; gap: 6px; }
+.f3-label { font-size: .8rem; font-weight: 600; color: var(--f3-ink); }
+.f3-req { color: var(--f3-risk-fg); }
+.f3-hint { font-size: .75rem; color: var(--f3-slate); }
+.f3-input, .f3-select, .f3-textarea {
+  width: 100%; min-height: 44px; padding: 10px var(--f3-s3);
+  border: var(--f3-hair); border-radius: var(--f3-r-md); background: var(--f3-porcelain);
+  font-family: var(--f3-font-body); font-size: .875rem; color: var(--f3-ink);
+}
+.f3-textarea { min-height: 80px; resize: vertical; }
+.f3-input:focus, .f3-select:focus, .f3-textarea:focus {
+  outline: 2px solid var(--f3-teal); outline-offset: 1px; border-color: var(--f3-teal);
+}
+.f3-error { font-size: .78rem; color: var(--f3-risk-fg); font-weight: 600; display: flex; gap: 6px; }
+.f3-error::before { content: "■"; font-size: .6em; line-height: 2; }
+
+/* ============================== ALERTS ================================== */
+
+.f3-alert {
+  display: flex; gap: var(--f3-s3); padding: var(--f3-s3) var(--f3-s4);
+  border-radius: var(--f3-r-md); border: 1px solid transparent;
+  background: var(--f3-caution-bg); border-color: rgba(122,90,34,.22); color: var(--f3-caution-fg);
+}
+.f3-alert--risk { background: var(--f3-risk-bg); border-color: rgba(126,51,39,.22); color: var(--f3-risk-fg); }
+.f3-alert--info { background: var(--f3-info-bg); border-color: rgba(74,101,96,.22); color: var(--f3-info-fg); }
+.f3-alert-mark { font-weight: 800; flex: none; font-size: .85rem; line-height: 1.7; }
+.f3-alert-title { font-family: var(--f3-font-head); font-weight: 700; font-size: .875rem; }
+.f3-alert-text { font-size: .8rem; margin-top: 2px; opacity: .95; }
+
+/* ============================================================================
+   RESPONSIVE — mobile-first breakpoints from spec §18
+   ========================================================================= */
+
+/* 900–1199: sidebar collapses to an icon rail, list-detail layout. */
+@media (max-width: 1199px) {
+  .f3-root { --f3-nav-w: var(--f3-rail-w); }
+  .f3-nav { padding: var(--f3-s4) var(--f3-s2); align-items: center; }
+  .f3-brand-text, .f3-navgroup > h4, .f3-navlabel { display: none; }
+  .f3-navlink { justify-content: center; padding: 10px 0; }
+  .f3-navcount { position: absolute; margin: 0; transform: translate(15px,-14px); padding: 0 5px; font-size: .6rem; }
+  .f3-pagehead { padding-top: var(--f3-s5); }
+}
+
+/* 600–899: single column. */
+@media (max-width: 899px) {
+  .f3-grid--main, .f3-grid--3 { grid-template-columns: minmax(0,1fr); }
+}
+
+/* <600: bottom navigation, sticky primary action, full-width surfaces. */
 @media (max-width: 599px) {
-  .f3-page { padding: var(--f3-s5) var(--f3-s4); }
-  .f3-title { font-size: 1.4rem; }
+  .f3-shell { display: block; }
+  .f3-nav { display: none; }
+
+  .f3-topbar { padding: var(--f3-s3) var(--f3-s4); }
+  .f3-pagehead { padding: var(--f3-s4) var(--f3-s4) var(--f3-s3); }
+  .f3-pagehead h1 { font-size: 1.35rem; }
+  .f3-page { padding: 0 var(--f3-s4) 150px; gap: var(--f3-s4); }
   .f3-card { padding: var(--f3-s4); border-radius: var(--f3-r-md); }
-  .f3-grid--cards { grid-template-columns: minmax(0, 1fr); }
+
+  .f3-grid--2, .f3-grid--3, .f3-grid--cards, .f3-grid--main { grid-template-columns: minmax(0,1fr); }
+  .f3-stat { padding: var(--f3-s3) var(--f3-s4); }
+  .f3-stat-value { font-size: 1.9rem; }
+
+  .f3-bottomnav {
+    display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
+    background: rgba(255,252,247,.94); backdrop-filter: blur(12px);
+    border-top: var(--f3-hair);
+    padding: 6px var(--f3-s2) calc(6px + env(safe-area-inset-bottom));
+  }
+  .f3-bottomnav a {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+    padding: 6px 2px; min-height: 52px; color: var(--f3-slate);
+    font-size: .64rem; font-weight: 600; position: relative;
+  }
+  .f3-bottomnav a[aria-current="page"] { color: var(--f3-teal); }
+  .f3-bottomnav .f3-navicon { border-color: currentColor; width: 24px; height: 24px; }
+  .f3-bottomnav .f3-navcount { position: absolute; margin: 0; top: 2px; right: 22%; transform: none; padding: 0 5px; font-size: .58rem; }
+
+  /* Sticky primary action, within thumb reach, above the bottom nav. */
+  .f3-stickybar {
+    position: fixed; left: 0; right: 0; bottom: 64px; z-index: 39;
+    padding: var(--f3-s3) var(--f3-s4) calc(var(--f3-s3) + env(safe-area-inset-bottom));
+    background: rgba(255,252,247,.96); backdrop-filter: blur(12px);
+    border-top: var(--f3-hair); display: flex; gap: var(--f3-s3);
+  }
+  .f3-stickybar .f3-btn { flex: 1; }
+
+  .f3-hide-sm { display: none !important; }
+
+  .f3-workspace { position: static; }
+  .f3-outcomes { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .f3-dl { grid-template-columns: minmax(84px, 38%) 1fr; }
+}
+
+@media (min-width: 600px) {
+  .f3-only-sm { display: none !important; }
+  .f3-stickybar { display: none; }
 }

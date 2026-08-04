@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Frontend3;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -21,20 +20,21 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
  *
  * See docs/care-one-os/FRONTEND3/FRONTEND3-PLAN.md.
  */
-class Frontend3Controller extends Controller
+class Frontend3Controller extends F3Controller
 {
     /** Where the concept screens live, relative to the project root. */
     private const WIREFRAME_DIR = 'docs/care-one-os/FRONTEND3/wireframes';
 
-    public function __construct()
-    {
-        // Everything this controller renders uses frontend3's own layout.
-        Inertia::setRootView('f3');
-    }
-
-    /** The frontend3 landing page. */
+    /**
+     * "About this build" — orientation, not a working screen.
+     *
+     * Today is the landing page (spec §3 puts Today first). This sits behind
+     * /frontend3/start so the dashboard stays uncluttered.
+     */
     public function index(Request $request)
     {
+        $this->useF3Layout();
+
         return Inertia::render('Home', [
             'wireframesUrl' => url('/frontend3/wireframes'),
         ]);

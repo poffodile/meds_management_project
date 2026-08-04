@@ -42,8 +42,9 @@ Plain English throughout. No jargon. If a decision was made, write down *why*, s
 | Stack for frontend3 | **Decided: React + Inertia + Mantine**, fully isolated from frontend2 | 2026-08-04 |
 | Shared files touched | 3, all additive: `vite.config.js`, `routes/web.php`, `header.blade.php` | 2026-08-04 |
 | Anything shared broken by frontend3 | No — `app-*.js` bundle unchanged; build passes | 2026-08-04 |
-| Clicked through in a browser | **Not yet** — routes, view and build verified, rendering not | 2026-08-04 |
-| Committed | **No** — everything is uncommitted on the `frontend3` branch | 2026-08-04 |
+| Clicked through in a browser | **Yes** — Today + Round both verified on live data, desktop and mobile | 2026-08-04 |
+| Pages built | **Today** (`/frontend3`) · **Medication round** (`/frontend3/round`) · **Signatures** (`/frontend3/signatures`) | 2026-08-04 |
+| Palette | Verified identical to spec §17, all nine colours | 2026-08-04 |
 
 ---
 
@@ -297,6 +298,198 @@ Plain English throughout. No jargon. If a decision was made, write down *why*, s
 
 ---
 
+### 2026-08-04 12:50 — Two real bugs found in the browser and fixed
+
+Everything above had been committed. Then it was actually opened in a browser, and two things were wrong. Both are worth remembering because both are the kind of bug that a build passing cleanly will never catch.
+
+**Bug 1 — the primary button was invisible.**
+`.f3-root a { color: var(--teal) }` is specificity **(0,1,1)**. `.f3-btn--primary { color: #fff }` is **(0,1,0)**. The broad rule won, so every anchor-based button took teal text — and the primary button, which has a teal background, rendered as a **solid teal block with no readable label**.
+
+*Fix:* scope the link rule to `a:not([class])` in **both** stylesheets, so only plain links get link colouring and any anchor carrying a component class keeps its own. Applied to `wireframes/careone-f3.css` and `frontend3/f3.css`.
+
+*Lesson:* a broad element rule under a scoping class quietly outranks single-class component rules. When a design system is scoped under a root class, keep the base element resets narrow — `a:not([class])` rather than `a`.
+
+**Bug 2 — `/frontend3` rendered blank.**
+Console said `TypeError: Cannot read properties of undefined (reading 'default')`, and the page had loaded **`app-2a699682.js`** — the frontend2 bundle — with the tab titled `Laravel` instead of `Laravel — Frontend 3`. So `Inertia::setRootView('f3')` had not taken effect: `app.blade.php` rendered, `app.jsx` booted, looked for the page in `./Pages/`, found nothing, and blew up on `.default`.
+
+*Cause:* the call was in the **controller constructor**. Laravel instantiates a controller while **gathering route middleware**, which happens *before* the middleware pipeline runs. So the constructor set `f3`, and then `HandleInertiaRequests::handle()` — which calls `Inertia::setRootView($this->rootView)` before `$next($request)` — overwrote it back to `app`.
+
+*Fix:* moved it into a `useF3Layout()` helper called at the top of the action. Actions run inside the pipeline, so they run *after* that middleware. Every future frontend3 action must call it.
+
+*Lesson:* **a controller constructor is not "inside" the middleware pipeline.** Anything that must override middleware state has to happen in the action.
+
+**Not a bug:** the Frontend 3 button briefly looked white/grey with grey text. That is the old Bootstrap `.btn:hover` / `:focus` styling, which does exactly the same to Frontend 1 and Frontend 2 once clicked. Verified teal `#176B65` with white text and a leaf icon in its resting state.
+
+**Verified end to end in the browser, signed in:**
+- `/frontend3` renders — tab title **"Frontend 3"**, warm ivory background, navy `C1` mark, the six area tiles, "Signed in as Phil Holt" pulled from shared Inertia props
+- The concept screens render correctly, primary button now white-on-teal
+- Assets rebuilt: `f3-4b16101d.js` + `f3-410c6b20.css`, `app-*.js` unchanged at 1,142.92 kB
+
+**Files touched:**
+- `app/Http/Controllers/Frontend3/Frontend3Controller.php` (root view moved out of the constructor, with the reason documented in place)
+- `frontend3/f3.css` and `docs/care-one-os/FRONTEND3/wireframes/careone-f3.css` (link specificity)
+
+---
+
+### 2026-08-04 13:10 — First real pages: the app shell + Today
+
+**What we did:**
+Built the first production frontend3 screens — the responsive shell and the Today dashboard — on live data from the real database.
+
+**Decisions made:**
+
+- **Shell + Today first, as one piece.** The shell is inherited by every later page, so building the dashboard without it would mean building it twice. Today is also read-only, which means the visual language gets settled before we touch anything that writes a permanent medication record.
+- **THE UNCLUTTERED RULE, written into the CSS header so it survives:** one job per screen, one primary action, detail behind a tap, generous whitespace doing real work, never a card inside a card. Today has **three** stats, not eight. Handover and quick-actions panels from spec §5 were deliberately **left out of v1** — no data source yet, and they would have been the fourth column that turns a calm page into a busy one.
+- **frontend3 shares the BACKEND, and only isolates the FRONT END.** `TodayController` uses the existing `BuildsMedicationRound` trait rather than reimplementing dose derivation. A second implementation of "is this dose overdue" would drift from the first, and two screens would then disagree about a safety-critical fact. The isolation rule is about layout, theme and CSS — not about duplicating clinical logic.
+- **Today is now the landing page** at `/frontend3` (spec §3 puts Today first). The orientation page moved to `/frontend3/start`, linked quietly from the sidebar, so the dashboard stays clean.
+- **The round button honestly points at the existing working round page** until frontend3's own round page exists, with one quiet note saying so. A dead button would be worse.
+
+**Built:**
+
+| File | What it is |
+|---|---|
+| `frontend3/f3.css` | Full design system — shell, atoms, rows, states, the whole responsive model. Still every rule under `.f3-root`. |
+| `frontend3/components/F3Shell.jsx` | The shell. Sidebar → icon rail → bottom bar, context strip, page header, one primary action shown once (top-right on desktop, sticky bar on mobile). |
+| `frontend3/components/F3Atoms.jsx` | Badge, Chip, Card, CardHead, Stat, Person, SafetyStrip, Empty, Progress, Note. |
+| `resources/js/F3Pages/Today.jsx` | The dashboard. |
+| `app/Http/Controllers/Frontend3/F3Controller.php` | Base class holding `useF3Layout()` and the reason it cannot live in a constructor. |
+| `app/Http/Controllers/Frontend3/TodayController.php` | Read-only. Derives the dashboard from the shared round trait. |
+
+**Two real data problems found and handled:**
+
+1. **PRN double-counting.** The round trait deliberately repeats when-required medicines into *every* round, so counting raw rows inflates every number on the page. `summary()` and `attention()` deduplicate by `mar_sheet_id|slot` before counting.
+2. **Duplicated strength in medicine labels.** Spotted in the browser: *"Risperidone 500microgram tablets 500mcg"*. Many prescriptions already carry the strength inside the name. Added `medLabel()`, which normalises to digits+letters and also catches the unit-spelling mismatch (`500microgram` vs `500mcg`). Verified against four real cases — two suppressed, two correctly appended. Same class of bug that was already fixed in frontend2's `Round.jsx`.
+
+**Verified in the browser, signed in, on live data:**
+Neptune House · "Good afternoon, Phil" · 7 medicines across 6 people, 7 overdue · real residents (Amelia Hughes, Darren Smith, Jacob Bennett, Leo Walsh) with real room numbers, allergy badges and medicines. Build clean; `f3-6246cff6.js` 17.89 kB + `f3-a947ac80.css` 14.97 kB, `app-*.js` unchanged at 1,142.92 kB.
+
+**NOT verified: the mobile layout.** The browser tool cannot resize below Chrome's minimum window width, so the `<600px` breakpoint — bottom navigation, sticky action bar, single column — has not been seen rendered. The CSS is written and the same approach renders correctly in the concept screens, but that is not the same as having looked at it. **Check with `Ctrl+Shift+M` in DevTools before trusting it.**
+
+**Open questions / what's next:**
+- Medication Round is the next page, and the one that matters most.
+- "Needs attention" is showing 19 on real data. Worth asking whether that is genuinely 19 things a person must respond to, or whether the threshold is too loose.
+
+**Files touched:** the six above, plus `routes/web.php` (Today route + `/frontend3/start`) and `Frontend3Controller.php` (now extends `F3Controller`).
+
+---
+
+### 2026-08-04 13:35 — Medication Round built; three real bugs found by looking at it
+
+**What we did:**
+Built the frontend3 Medication Round — the page that matters most, and the first frontend3 screen that **writes a clinical record**.
+
+**Decisions made:**
+
+- **This controller does not implement recording.** Every dose goes through `applyRecord()` on the shared `BuildsMedicationRound` trait, which already carries the prescription row lock (so two carers tapping "Given" at the same moment cannot both pass the PRN maximum check), the interval and daily-maximum checks, the duplicate-submission window, the mandatory reason on refused/withheld/not-available/other, the controlled-drug quantity rule, round-closure locking and automatic stock deduction. Re-implementing any of that to get a nicer screen would be the most dangerous change anyone could make to this codebase. It is written into the controller docblock in those words.
+- **Uncluttered via three levels, not one crowded screen:** people in this round → that person's medicines → one medicine with full attention (identity, safety, evidence, outcome, confirm). Desktop keeps levels 2–3 in a workspace beside the list; mobile replaces each level with a Back control.
+- **Blocking is explained, never silent.** When "Given" is unavailable the page says why — round ended, controlled drug needs a quantity, PRN not due yet — and the other outcomes stay enabled. *Recording that a dose was NOT given must never be prevented.*
+- **Disabling a button is a courtesy, not a control.** The server refuses regardless. Written into the page header comment.
+
+**Three real bugs, all found by opening the page rather than by the build:**
+
+1. **`rounds` is a LIST of `{key,label,window}`, not a map keyed by round.** Indexing it by key yielded `undefined` and *silently degraded three things at once*: no tab appeared selected, no counts showed, and the heading lost the round name. Nothing threw. The same mistake was already live in `TodayController`, where it had been quietly hiding the round window since Today was built — fixed there too, via a `roundMeta()` lookup.
+2. **Person and medicine rows had no accessible name.** The accessibility tree showed bare `button` with no label — a screen-reader user would hear "button" and nothing else. Now every row carries an explicit `aria-label` ("Amelia Hughes, room C1, 1 to record, 1 overdue, has allergies"). Added a real `.f3-sr-only` utility and removed an inline-style bodge in the shell.
+3. **The tab said 2, the card said 7.** Two different numbers for the same round, because one counted when-required medicines as outstanding and the other did not. Settled on **one** definition — *a when-required medicine is available, not outstanding; nobody is behind because a PRN dose has not been given* — expressed once as `isOutstanding()` in the page and mirrored in `TodayController` with the reasoning in a comment beside it. PRN medicines now sit in their own quiet "When required · not owed" group: still listed, still givable, never counted as work.
+
+**Verified in the browser on live Neptune House data:**
+- Round list, round tabs with counts (Morning 8 · Lunchtime 2 · Evening 1 · Night 4), the selected tab, the window `12:00–14:00`
+- Drill-down works end to end: person → medicines → administer panel with all six outcome buttons present
+- Real clinical context rendering: safety strip *"NKDA · ADHD — medication timing critical for the school day"*, and the **Controlled drug** badge on Methylphenidate
+- The medicine-label dedupe holding across both pages
+- **The mobile layout, at last** — at a 504px viewport the sidebar is gone, the bottom navigation renders, and the mobile-only "← People" back control appears. This closes the gap left open in the previous entry.
+
+**Deliberately NOT done:** no dose was recorded. Clicking "Given" would have written a real, permanent, append-only clinical record to the live database. Verification stopped at the confirmation step.
+
+**Note on the environment:** Chrome's page zoom for `127.0.0.1:8000` drifted during this session and may still be zoomed in. `Ctrl+0` resets it.
+
+**Open questions / what's next:**
+- **"Needs attention" showing 19 on Today** is still unreviewed — is that 19 things a person must genuinely respond to, or is the threshold too loose? Worth tightening before it trains people to ignore it.
+- The round page does not yet offer **end round / re-open round**, or the **controlled-drug witness confirmation** flow that frontend2 has. The witness *field* is there and required for a CD given-dose; the separate two-person confirmation record is not.
+
+**Files touched:** `RoundController.php`, `Concerns/LabelsMedicines.php` (new, shared with Today), `TodayController.php`, `resources/js/F3Pages/Round.jsx` (new), `frontend3/f3.css`, `frontend3/components/F3Shell.jsx`, `routes/web.php`.
+
+---
+
+### 2026-08-04 13:55 — End round and controlled-drug witness confirmation
+
+**What we did:**
+Closed the two gaps flagged in the previous entry.
+
+**End / re-open round**
+- `RoundController::end()` and `reopen()`, mirroring the existing pages: `MedicationRoundClosure` upsert to lock, delete to unlock, **managers only** for re-open.
+- On the page, an inline confirmation rather than a browser dialog — a native `confirm()` blocks the whole tab and is a worse experience besides.
+
+**Decision — ending a round does NOT require everything to be recorded.** A round can honestly end with gaps: someone was out, a medicine was unavailable. Forcing a false "given" to close a round would be far worse than an honest gap. So the control states plainly what is being left — *"2 medicines will be left without an outcome. That is allowed — but the gap stays on the record, and the round locks."* — and asks once. When locked, the card shows who ended it and when, and offers re-open to managers only.
+
+**Controlled-drug witness confirmation**
+The round was already opening the pending co-signature — `applyRecord()` calls `CdWitnessConfirmation::open()` whenever a controlled drug is given with a named witness, and writes the register movement. What was missing was the screen where the witness *signs*. Now at `/frontend3/signatures`.
+
+- **Only the named witness can confirm.** Anyone else gets a 403 — server-side, not a hidden button.
+- **A manager acting on someone's behalf is an OVERRIDE**, recorded as `STATUS_OVERRIDDEN` with a mandatory reason, never as a witness confirmation. In the UI it sits behind a disclosure ("Manager override instead…") with a warning that says in as many words *"This is not a witness signature"*. The rare path must never look as easy as the correct one.
+- **Idempotent** — re-confirming a resolved signature is a no-op success, so a double tap cannot produce a second record or an error.
+- **Self-witnessing remains impossible** — the witness list at administration already excludes the current user, so a confirmation can never be pending for the person who recorded the dose.
+- Surfaced in the shell's top bar as *"N signatures awaiting you"*, from the `witnessPending` prop the server already shares on every page — and **only when the count is above zero**. A permanent zero would be clutter.
+
+**Verified:**
+- All eight frontend3 routes resolve; `CdWitnessConfirmation::STATUS_CONFIRMED` / `STATUS_OVERRIDDEN`, `isPending()`, the `pendingForUser` scope and `MedicationRoundClosure` all confirmed present by booting the app.
+- End-round confirmation renders and reads correctly on live data: *"End the lunchtime round?"* / *"2 medicines will be left without an outcome."*
+- Signatures page renders with its empty state — correct, since the signed-in user is not a named witness on anything pending.
+- Build clean: `f3-153a3cb5.js` 40.91 kB, `app-*.js` untouched.
+
+**Deliberately NOT done:**
+- Did not click "Yes, end the round" — that would have locked the live lunchtime round.
+- Did not record a controlled drug to produce a pending signature, so **the populated state of the signatures page is unverified**. Only the empty state has been seen.
+
+**Note:** Chrome's page zoom for `127.0.0.1:8000` is stuck high from this session's testing and cannot be reset through the browser tool. `Ctrl+0` fixes it.
+
+**Open questions / what's next:**
+- Still open: **"Needs attention" showing 19** on Today — too loose a threshold trains people to ignore it.
+- The signatures page has not been seen with real pending items.
+
+**Files touched:** `RoundController.php`, `WitnessController.php` (new), `resources/js/F3Pages/Witness.jsx` (new), `resources/js/F3Pages/Round.jsx`, `frontend3/components/F3Shell.jsx`, `routes/web.php`.
+
+---
+
+### 2026-08-04 14:05 — "Needs attention" fixed: 19 → 6, and a hidden out-of-stock medicine surfaced
+
+**What we did:**
+Investigated the 19 before changing anything, and found the threshold was **not** the main problem.
+
+**What was actually wrong — four separate causes:**
+
+1. **One entry per dose, not per problem.** A medicine given four times a day and low on stock produced *four identical* "Low stock" rows, because the dedupe key included the time slot.
+2. **No grace period.** A dose became "Overdue" the second its window closed — so mid-round, a normal round in progress read as a wall of exceptions.
+3. **'Asleep' counted as needing attention.** The server does not even require a reason for it, because the code already states the reason. It is a recorded outcome, not an open question.
+4. **The worst one: ranking.** Overdue and supply problems share the same "risk" tone, and overdue vastly outnumbered everything else — so overdue flooded the top and the genuinely different problems never appeared at all.
+
+**What it turned out to be hiding:** on real data the top item is now **"Out of stock — Maya Patel, Ibuprofen 100mg/5ml oral suspension · 0 ml left"**. That was in the data the whole time and *was not visible on the dashboard*, because 17 identical "Overdue" rows sat above it and the list was capped at 6. A resident's medicine had run out and the screen meant to say so was busy repeating itself.
+
+**The fixes:**
+- **One entry per problem**, grouped by person + medicine + kind, carrying a dose count ("Low stock · 3 doses").
+- **Supply is a property of the medicine**, counted once however many times a day it is given.
+- **A 60-minute grace period** before a late dose counts. A dose is not a problem the moment its window closes — the round is in progress. `OVERDUE_GRACE_MINUTES`.
+- **A whole unrecorded round is ONE problem.** Three or more overdue medicines in the same round now collapse to *"Morning round not recorded — 8 doses across 5 people"* rather than eight rows. `OVERDUE_CLUSTER`.
+- **Ranking rewritten: supply → recorded outcomes → overdue.** Supply and outcome problems need a *distinct decision* — chase a pharmacy, respond to a refusal. Overdue needs one thing: go and do the round. If overdue sorts first it hides everything genuinely different, which is exactly how an attention list stops being read.
+- **Overflow is stated, not hidden**: *"Showing the 8 most urgent of N. Nothing is hidden — the rest are lower risk, not dismissed."*
+- 'Asleep' removed from the attention set, with the reasoning written in beside the constant.
+
+**Result on live data — 19 → 6, and the list now reads:**
+
+| | |
+|---|---|
+| ■ Out of stock | Maya Patel · Ibuprofen 100mg/5ml · **0 ml left** |
+| ▲ Low stock · 3 doses | Sofia Martins · Amoxicillin 250mg/5ml · 3 ml left |
+| ▲ Low stock | … |
+| ▲ Refused | … |
+| ■ Morning round not recorded | 8 doses across 5 people |
+| ■ Lunchtime round not recorded | 7 doses |
+
+**The lesson worth keeping:** the complaint was "the number is too high", but the number was honest — 17 medicines really were overdue. The defect was that the list could not distinguish *one problem repeated* from *many different problems*, so the loudest cause drowned the most urgent one. **Tuning the threshold would have hidden the symptom and kept the out-of-stock medicine invisible.**
+
+**Files touched:** `TodayController.php` (attention rewritten, three new constants with their reasoning), `resources/js/F3Pages/Today.jsx` (dose counts, honest overflow line, updated captions).
+
+---
+
 ## Part 2 — Conversation record
 
 ### 2026-08-04 ~11:40 — "Look into FRONTEND3-PLAN.md and tell me what you understand"
@@ -406,3 +599,99 @@ Two judgement calls worth recording:
 Verified by booting Laravel directly (the repo's `route:list` is broken by an unrelated missing `ManagerController`): both routes resolve, the controller class loads, the `f3` view is found, `php -l` is clean, and `npx vite build` produces **two independent bundles** — frontend3 at 6.36 kB JS + 5.25 kB CSS, with the 1,142 kB `app-*.js` untouched. Said plainly that the page has **not** been clicked through in a browser yet.
 
 Also flagged something noticed but not touched: `resources/js/Pages/Frontend2/Medication2/Round.jsx` is staged but uncommitted, predating this work — mentioned so it doesn't get swept into a frontend3 commit by accident.
+
+### 2026-08-04 ~12:44 — "Give me a link to the page itself, let me see if it would show"
+
+**Asked:** A link to the page, to look at it directly.
+
+**Answered:** Gave two — the twelve concept screens on a throwaway static server at `http://127.0.0.1:8765/index.html` (no login needed, dies with the session), and the real app page at `/frontend3` (needs a login, which only the owner can do). Noted at the same time that a screenshot taken while checking had caught the invisible-primary-button bug, and that it was fixed in both stylesheets but uncommitted.
+
+### 2026-08-04 ~12:47 — "When I click Frontend 3 the page is blank" (with screenshot)
+
+**Asked:** Clicking Frontend 3 gives a blank page. Other files have been committed.
+
+**Answered:** Debugged it rather than guessing, using the same Chrome profile so the signed-in session was reachable.
+
+> Checked the obvious environmental causes first: no stale `public/hot` file, and the build manifest correctly contained `resources/js/f3.jsx → assets/f3-*.js`. So it was not an asset-resolution problem.
+>
+> The console had one exception: `TypeError: Cannot read properties of undefined (reading 'default')` — the signature of Inertia failing to resolve a page component. The tab title was `Laravel`, not `Laravel — Frontend 3`, which pointed at the wrong root view. Confirmed by listing the page's script tags: it had loaded **`app-2a699682.js`**, the frontend2 bundle. So `app.blade.php` rendered, `app.jsx` booted, looked for the page in `./Pages/`, found nothing, and died on `.default`.
+>
+> **Root cause:** `Inertia::setRootView('f3')` was in the controller **constructor**. Laravel instantiates a controller while *gathering* route middleware — before the pipeline runs — so the constructor set `f3`, then `HandleInertiaRequests::handle()` overwrote it back to `app`. A controller constructor is not "inside" the middleware pipeline.
+>
+> **Fix:** moved it into a `useF3Layout()` helper called at the top of the action, with the reason written into the code so it doesn't get "tidied" back into the constructor later. Rebuilt, reloaded, verified: tab title **"Frontend 3"**, page renders, "Signed in as Phil Holt" coming through the shared Inertia props.
+
+On the button looking white/grey in the screenshot: checked it and reported it was **not a bug** — that's the old Bootstrap `.btn:hover`/`:focus` styling, which does the same to Frontend 1 and Frontend 2 once clicked. At rest it is teal `#176B65`, white text, leaf icon.
+
+### 2026-08-04 ~13:00 — "Now build mobile and desktop responsive pages from the document and the CSS colours — distinctive, uncluttered, elegant, modern. What page would you start with?"
+
+**Asked:** Start building real responsive pages from the specification and the palette. It must be **distinctively unique**, the work **must not be cluttered together**, and it must be easy to use, elegant, stylish, neat and modern. Which page first?
+
+**Answered:** Took "must not be cluttered together" as the governing design rule and named it explicitly — *one job per screen, one primary action, progressive disclosure; detail lives behind a tap, not stacked on the page.* Wrote it into the stylesheet header so it survives the sessions where nobody remembers this conversation.
+
+Recommended **the global shell plus Today, as one piece**, for four reasons:
+
+> The shell is built once and every later page inherits it — building the dashboard without it means building it twice. It exercises every layout primitive we will ever need, so the design language gets settled on a real page with real data before anything harder. It is **read-only**, so no clinical record is written while the visual language is still moving — which matters, because the round page writes permanent append-only medication events. And it is the page anyone would demo first.
+>
+> Then the medication round second: highest value, hardest, and by then the shell is proven.
+>
+> Also noted the one argument against — spec §20 says do domain model, identity, tenancy, permissions and audit *before* screens — and why it does not apply here: those already exist in the Laravel app, so frontend3 is a new face on existing data.
+
+Owner chose that, with **real data from the existing app** rather than placeholders.
+
+Before writing anything, read the existing data layer and found `BuildsMedicationRound` — a shared trait that already derives `overdue` / `due_now` / `upcoming` / `completed`. Reused it rather than reimplementing, and recorded why:
+
+> **frontend3 shares the backend and isolates only the front end.** A second implementation of "is this dose overdue" would drift from the first, and two screens would then disagree about a safety-critical fact.
+
+Then built the shell, the atoms, the Today page and its controller; found and fixed two real data problems (PRN rows are repeated into every round and were inflating the counts; medicine names already contain the strength and were rendering as *"Risperidone 500microgram tablets 500mcg"*); and verified the result in the browser on live Neptune House data.
+
+Reported plainly that the **mobile layout was not visually verified** — the browser tool cannot resize below Chrome's minimum window width — and told the owner to check it with `Ctrl+Shift+M` rather than claiming it was done. *(Superseded the same session: while testing the round page the viewport did drop to 504px and the mobile layout was confirmed working.)*
+
+### 2026-08-04 ~13:20 — "Now build the medication round page. Also, is this done with the document's colour palette?"
+
+**Asked:** Build the medication round page. And confirm the work is using the specification's colour palette.
+
+**Answered:** Checked the palette against the source rather than asserting it — extracted every hex from spec §17 and from `frontend3/tokens.js` and compared:
+
+> `#F6F2E9 #FFFCF7 #EEEAE2 #17243B #176B65 #7E9B90 #202A35 #626D78 #D9D4CA` — identical, in the same order. The only extra hex in the tokens file is `#13233F` inside the comment that warns *not* to use frontend2's navy.
+
+Then built the round. Read the existing recording path first and found `applyRecord()` — prescription row locking, PRN maximum and interval checks, a duplicate-submission window, mandatory reasons, controlled-drug rules, round-closure locking, stock deduction. Reused it exactly, and wrote into the controller docblock that re-implementing any of it to get a nicer screen would be the most dangerous change anyone could make to this codebase.
+
+Structured the page as **three levels** rather than one crowded screen — people → that person's medicines → one medicine with full attention — so the uncluttered rule holds even on the busiest page in the product.
+
+Then found three real bugs by actually opening it, and said so plainly: the `rounds` prop is a list not a map (which had been silently degrading Today as well); the person and medicine rows had **no accessible name** at all; and the tab count and the card count disagreed because they defined "outstanding" differently. Fixed all three, unified the definition in one place, and gave when-required medicines their own "not owed" group.
+
+Stopped short of recording a dose — clicking "Given" would have written a permanent clinical record to the live database.
+
+### 2026-08-04 ~13:45 — "Add end round and the CD witness confirmation" (and: what's the link to the meds round page?)
+
+**Asked:** Add the end-round control and the controlled-drug witness confirmation. Also, what is the link to the medication round page?
+
+**Answered:** The link is **`http://127.0.0.1:8000/frontend3/round`** (or the primary button on Today at `/frontend3`).
+
+Read the existing witness flow before building, and found that half the work was already done: `applyRecord()` already writes the controlled-drug register movement **and** opens a pending co-signature via `CdWitnessConfirmation::open()` whenever a CD is given with a named witness. So frontend3's round was already creating signatures correctly — what was missing was the screen where the witness actually signs. Built that at `/frontend3/signatures`, plus end/re-open round.
+
+Two design decisions worth keeping:
+
+> **Ending a round does not require everything to be recorded.** A round can honestly end with gaps — someone was out, a medicine was unavailable — and forcing a false "given" to close it would be far worse than an honest gap. So the control says exactly what is being left (*"2 medicines will be left without an outcome"*) and asks once.
+>
+> **A manager override must never look as easy as the correct path.** Only the named witness can confirm; a manager acting on their behalf is recorded as an override with a mandatory reason, sits behind a disclosure, and carries a warning that says in as many words *"This is not a witness signature"*.
+
+Verified the routes, the model members and the end-round confirmation on live data, and said plainly what was **not** verified: the "Yes, end the round" click was not made (it would have locked the live lunchtime round) and no controlled drug was recorded, so the signatures page has only been seen in its empty state.
+
+### 2026-08-04 ~14:00 — "Fix the needs attention threshold"
+
+**Asked:** Fix the "Needs attention" threshold that was producing 19 items.
+
+**Answered:** Looked at what was producing 19 before changing anything — and reported back that **the threshold was not the main problem.**
+
+> Four separate causes. One entry per *dose* rather than per *problem*, so a medicine given four times a day and low on stock produced four identical rows. No grace period, so a dose became "Overdue" the second its window closed and a normal round in progress read as a wall of exceptions. 'Asleep' counted as needing attention, when the server does not even require a reason for it. And worst: **ranking** — overdue shares the "risk" tone with supply and vastly outnumbered everything else, so it flooded the top.
+>
+> The number itself was honest. Seventeen medicines really were overdue, because the morning round was never recorded in this database. Tuning the threshold down would have hidden the symptom.
+
+Then found what the noise was concealing:
+
+> The top item is now **"Out of stock — Maya Patel, Ibuprofen 100mg/5ml oral suspension · 0 ml left"**. That was in the data the whole time and *was not visible on the dashboard* — 17 identical "Overdue" rows sat above it and the list was capped at 6. A resident's medicine had run out and the screen meant to say so was busy repeating itself.
+
+Fixed by grouping one entry per problem with a dose count, treating supply as a property of the medicine, adding a 60-minute grace period, collapsing a whole unrecorded round into a single line (*"Morning round not recorded — 8 doses across 5 people"*), and re-ranking so supply and recorded outcomes come before overdue — because those need a distinct decision, whereas overdue needs one thing: go and do the round.
+
+**19 → 6**, with the out-of-stock medicine first.

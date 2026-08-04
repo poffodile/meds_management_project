@@ -44,6 +44,9 @@ use App\Http\Controllers\frontEnd\Domiciliary\StaffController as DomStaffControl
 use App\Http\Controllers\frontEnd\Domiciliary\VisitScheduleController as DomVisitScheduleController;
 use App\Http\Controllers\frontEnd\Frontend2Controller;
 use App\Http\Controllers\Frontend3\Frontend3Controller;
+use App\Http\Controllers\Frontend3\RoundController as Frontend3RoundController;
+use App\Http\Controllers\Frontend3\TodayController as Frontend3TodayController;
+use App\Http\Controllers\Frontend3\WitnessController as Frontend3WitnessController;
 use App\Http\Controllers\frontEnd\Medication\ControlledDrugRegisterController;
 use App\Http\Controllers\frontEnd\Medication\Medication2RoundController;
 use App\Http\Controllers\frontEnd\Medication\MedicationRoundController;
@@ -1621,7 +1624,16 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
     // Own Blade root view (f3.blade.php), own Vite entry (resources/js/f3.jsx), own theme and
     // own CSS scoped under .f3-root. Shares nothing with frontend1/frontend2 except the stack.
     // Docs: docs/care-one-os/FRONTEND3/
-    Route::get('/frontend3', [Frontend3Controller::class, 'index'])->name('frontend3.home');
+    Route::get('/frontend3', [Frontend3TodayController::class, 'index'])->name('frontend3.today');
+    Route::get('/frontend3/round', [Frontend3RoundController::class, 'index'])->name('frontend3.round');
+    Route::post('/frontend3/round/record', [Frontend3RoundController::class, 'record'])->name('frontend3.round.record');
+    Route::post('/frontend3/round/end', [Frontend3RoundController::class, 'end'])->name('frontend3.round.end');
+    Route::post('/frontend3/round/reopen', [Frontend3RoundController::class, 'reopen'])->name('frontend3.round.reopen');
+    // Controlled-drug witness co-signatures — the named witness signs on their own account.
+    Route::get('/frontend3/signatures', [Frontend3WitnessController::class, 'index'])->name('frontend3.witness');
+    Route::post('/frontend3/signatures/{id}/confirm', [Frontend3WitnessController::class, 'confirm'])->whereNumber('id')->name('frontend3.witness.confirm');
+    Route::post('/frontend3/signatures/{id}/override', [Frontend3WitnessController::class, 'override'])->whereNumber('id')->name('frontend3.witness.override');
+    Route::get('/frontend3/start', [Frontend3Controller::class, 'index'])->name('frontend3.start');
     Route::get('/frontend3/wireframes/{file?}', [Frontend3Controller::class, 'wireframe'])->name('frontend3.wireframes');
 
     // Frontend 2 — a separate app shell with its own sidebar (new section, own React pages).
