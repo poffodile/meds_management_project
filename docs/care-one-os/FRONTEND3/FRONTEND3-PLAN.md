@@ -45,11 +45,16 @@ Do **not** edit (these are shared by frontend1 / frontend2):
 | `frontend/theme.js` + `frontend/tokens.js` | `frontend3/theme.js` + `frontend3/tokens.js` — the Quiet Clinical Luxury palette |
 | `resources/css/app.css` | `frontend3/f3.css` — everything nested under `.f3-root` |
 | `@frontend` / `@frontend2` aliases | `@frontend3` alias |
-| `HandleInertiaRequests` (`$rootView = 'app'`) | `HandleF3InertiaRequests` (`$rootView = 'f3'`) |
+| `HandleInertiaRequests` (`$rootView = 'app'`) | `Inertia::setRootView('f3')` in `Frontend3Controller::__construct()` |
 
-Two shared files unavoidably need a **purely additive** touch, and nothing more:
-- `vite.config.js` — add `resources/js/f3.jsx` to the `input` array and add the `@frontend3` alias. Adding an input does not alter the frontend2 bundle.
-- `routes/web.php` — append a new `/f3/...` route group. Existing routes untouched.
+**All of the above was built on 2026-08-04 and verified** (routes resolve, view found, `npx vite build` produces a separate `f3-*.js` / `f3-*.css` pair).
+
+On that last row: a `HandleF3InertiaRequests` middleware was the obvious approach, but registering an alias means editing `app/Http/Kernel.php` — a file shared with frontend1 and frontend2. Setting the root view in the frontend3 controller's constructor achieves the same thing and touches nothing shared. Prefer it.
+
+Three shared files need a **purely additive** touch, and nothing more:
+- `vite.config.js` — add `resources/js/f3.jsx` to the `input` array and add the `@frontend3` alias. Adding an input does not alter the frontend2 bundle (verified: `app-*.js` is unchanged in size and content).
+- `routes/web.php` — append the `/frontend3` routes and one `use` statement. Existing routes untouched.
+- `resources/views/frontEnd/common/header.blade.php` — one `<li>` for the **Frontend 3** button, matching the existing Frontend 1 and Frontend 2 buttons. This is the single entry point the plan calls for.
 
 Everything else frontend3 needs is a **new file**. If a change can only be made by editing an existing frontend1/frontend2 file, that is the signal to stop and copy it into `frontend3/` instead.
 

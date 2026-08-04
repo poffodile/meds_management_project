@@ -95,15 +95,24 @@ $allowed_ids = array_filter(explode(',', str_replace(' ', '', $raw_home_id)));
                         </a>
                     </li>
                     @endif
-                    <!-- New UI shortcuts: Frontend 1 (React round) + Frontend 2 (new shell) -->
+                    <!-- New UI shortcuts: Frontend 1 (React round) + Frontend 2 (new shell) + Frontend 3 (UX spec build) -->
                     <li style="list-style: none;">
                         <a href="{{ url('/medication/medication-round-react') }}" class="btn" style="font-size: 12px !important; padding: 5px 12px !important; margin-right: 8px; border-radius: 4px !important; font-weight: bold; text-decoration: none; display: inline-block; margin-top: 3px; background:#1C325A; color:#fff;">
                             <i class="fa fa-flask"></i> Frontend 1
                         </a>
                     </li>
                     <li style="list-style: none;">
-                        <a href="{{ url('/frontend2') }}" class="btn" style="font-size: 12px !important; padding: 5px 12px !important; margin-right: 15px; border-radius: 4px !important; font-weight: bold; text-decoration: none; display: inline-block; margin-top: 3px; background:#FF9800; color:#fff;">
+                        <a href="{{ url('/frontend2') }}" class="btn" style="font-size: 12px !important; padding: 5px 12px !important; margin-right: 8px; border-radius: 4px !important; font-weight: bold; text-decoration: none; display: inline-block; margin-top: 3px; background:#FF9800; color:#fff;">
                             <i class="fa fa-rocket"></i> Frontend 2
+                        </a>
+                    </li>
+                    {{-- Frontend 3 — the only entry point into frontend3. Teal #176B65 is its own
+                         "clinical teal" from the Care One OS UX Specification, so the button reads
+                         as belonging to that front end rather than to this one.
+                         Docs: docs/care-one-os/FRONTEND3/ --}}
+                    <li style="list-style: none;">
+                        <a href="{{ url('/frontend3') }}" class="btn" style="font-size: 12px !important; padding: 5px 12px !important; margin-right: 15px; border-radius: 4px !important; font-weight: bold; text-decoration: none; display: inline-block; margin-top: 3px; background:#176B65; color:#fff;">
+                            <i class="fa fa-leaf"></i> Frontend 3
                         </a>
                     </li>
                     <!-- user login dropdown start-->

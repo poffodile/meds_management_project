@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>02 Medication round — Care One OS frontend3 wireframe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="careone-f3.css">
+</head>
+<body class="f3-root">
+
+<div class="f3-shell">
+
+  <aside class="f3-nav">
+    <div class="f3-brand">
+      <div class="f3-brand-mark">C1</div>
+      <div class="f3-brand-text">
+        <div class="f3-brand-name">Care One OS</div>
+        <div class="f3-brand-sub">Willowbank</div>
+      </div>
+    </div>
+    <nav class="f3-navgroup" aria-label="Primary">
+      <h4>Areas</h4>
+      <a class="f3-navlink" href="careone-dashboard-wireframe.html" aria-current="page"><span class="f3-navicon">T</span><span>Today</span></a>
+      <a class="f3-navlink" href="careone-person-profile-wireframe.html"><span class="f3-navicon">P</span><span>People</span></a>
+      <a class="f3-navlink" href="careone-mar-wireframe.html"><span class="f3-navicon">M</span><span>Medicines</span></a>
+      <a class="f3-navlink" href="careone-missed-doses-wireframe.html"><span class="f3-navicon">O</span><span>Operations</span><span class="f3-navcount">7</span></a>
+      <a class="f3-navlink" href="careone-manager-compliance-wireframe.html"><span class="f3-navicon">A</span><span>Assurance</span></a>
+      <a class="f3-navlink" href="careone-admin-integrations-wireframe.html"><span class="f3-navicon">S</span><span>Settings</span></a>
+    </nav>
+    <nav class="f3-navgroup">
+      <h4>Prototype</h4>
+      <a class="f3-navlink" href="index.html"><span class="f3-navicon">◇</span><span>All screens</span></a>
+    </nav>
+  </aside>
+
+  <div class="f3-main">
+
+    <div class="f3-offlinebar">
+      <span class="f3-badge">Offline</span>
+      <span><b>2 records queued</b> on this device — held, not committed. They will sync when the connection returns.</span>
+      <span class="f3-spacer f3-hide-sm">Controlled-drug witnessing is disabled while offline.</span>
+    </div>
+
+    <header class="f3-topbar">
+      <div class="f3-context">
+        <span class="f3-chip"><b>Willowbank House</b></span>
+        <span class="f3-chip f3-chip--quiet">14:00 round · 4 of 14 done</span>
+      </div>
+      <div class="f3-topbar-actions">
+        <button class="f3-iconbtn" aria-label="Notifications">◔<span class="f3-dot"></span></button>
+        <div class="f3-avatar" aria-hidden="true">JA</div>
+      </div>
+    </header>
+
+    <div class="f3-pagehead">
+      <div class="f3-pagehead-text">
+        <h1>14:00 medication round</h1>
+        <p class="f3-pagehead-sum"><b>9 medicines</b> across 4 people · window closes 15:00 · 1 person in progress on another device</p>
+        <p class="f3-sync">Last synced 14:22</p>
+      </div>
+      <button class="f3-btn f3-hide-sm">End round</button>
+    </div>
+
+    <main class="f3-page">
+
+      <div class="f3-grid f3-grid--main">
+
+        <!-- ==================== ROUND LIST ==================== -->
+        <div class="f3-stack">
+          <section class="f3-card" aria-labelledby="rl-h">
+            <div class="f3-cardhead">
+              <div>
+                <h2 id="rl-h">People in this round</h2>
+                <p class="f3-cardsub">Grouped by time window, not alphabetically — the order is the order of work.</p>
+              </div>
+              <button class="f3-btn f3-btn--sm">Filters</button>
+            </div>
+
+            <h4 style="margin-bottom:var(--s3)">Late — 14:00 window</h4>
+            <article class="f3-listitem f3-listitem--card f3-listitem--lead">
+              <div class="f3-person">
+                <div class="f3-photo" aria-hidden="true">NO</div>
+                <div>
+                  <div class="f3-person-name">Nadia Okonkwo</div>
+                  <div class="f3-person-meta">Room 4 · born 12 Mar 1948 · 3 medicines</div>
+                </div>
+              </div>
+              <div class="f3-spacer f3-row">
+                <span class="f3-badge f3-badge--caution">Late 18m</span>
+                <span class="f3-badge f3-badge--risk">Allergy</span>
+                <button class="f3-btn f3-btn--primary f3-btn--sm">Continue</button>
+              </div>
+            </article>
+
+            <article class="f3-listitem f3-listitem--card">
+              <div class="f3-person">
+                <div class="f3-photo" aria-hidden="true">BF</div>
+                <div>
+                  <div class="f3-person-name">Bruno Farrell-Reyes</div>
+                  <div class="f3-person-meta">Room 11 · born 2 Nov 1955 · 2 medicines</div>
+                </div>
+              </div>
+              <div class="f3-spacer f3-row">
+                <span class="f3-badge f3-badge--info">In progress · Marcus D.</span>
+                <button class="f3-btn f3-btn--sm" disabled>Locked</button>
+              </div>
+            </article>
+
+            <h4 style="margin:var(--s4) 0 var(--s3)">Due</h4>
+            <article class="f3-listitem f3-listitem--card">
+              <div class="f3-person">
+                <div class="f3-photo" aria-hidden="true">TL</div>
+                <div>
+                  <div class="f3-person-name">Theo Lindqvist</div>
+                  <div class="f3-person-meta">Room 2 · born 30 Jun 1961 · 3 medicines</div>
+                </div>
+              </div>
+              <div class="f3-spacer f3-row">
+                <span class="f3-badge f3-badge--neutral">Due</span>
+                <button class="f3-btn f3-btn--sm">Open</button>
+              </div>
+            </article>
+
+            <h4 style="margin:var(--s4) 0 var(--s3)">Early window</h4>
+            <article class="f3-listitem f3-listitem--card">
+              <div class="f3-person">
+                <div class="f3-photo" aria-hidden="true">AS</div>
+                <div>
+                  <div class="f3-person-name">Amara Sithole</div>
+                  <div class="f3-person-meta">Room 7 · born 19 Sep 1972 · 1 medicine</div>
+                </div>
+              </div>
+              <div class="f3-spacer f3-row">
+                <span class="f3-badge f3-badge--ghost">Opens 15:30</span>
+                <button class="f3-btn f3-btn--sm">Open</button>
+              </div>
+            </article>
+
+            <h4 style="margin:var(--s4) 0 var(--s3)">Completed</h4>
+            <article class="f3-listitem f3-listitem--card">
+              <div class="f3-person">
+                <div class="f3-photo" aria-hidden="true">RP</div>
+                <div>
+                  <div class="f3-person-name">Rowan Petrescu</div>
+                  <div class="f3-person-meta">Room 9 · 1 given, 1 unavailable</div>
+                </div>
+              </div>
+              <div class="f3-spacer f3-row">
+                <span class="f3-badge f3-badge--good">Completed 14:06</span>
+                <span class="f3-badge f3-badge--risk">Needs review</span>
+              </div>
+            </article>
+          </section>
+
+          <p class="f3-note">
+            <b>Status is never colour alone.</b> Every badge carries a word and a shape as well as a tint —
+            Due ●, Completed ✓, Late ▲, Unavailable ■, In progress ◐.
+          </p>
+        </div>
+
+        <!-- ==================== ADMINISTRATION WORKSPACE ==================== -->
+        <aside class="f3-drawer" aria-labelledby="aw-h">
+
+          <!-- Identity — persistent, never scrolls away on mobile -->
+          <div class="f3-drawer-head">
+            <div class="f3-photo f3-photo--lg" aria-hidden="true">NO</div>
+            <div>
+              <h2 id="aw-h">Nadia Okonkwo</h2>
+              <p class="f3-person-meta">Born 12 Mar 1948 · Room 4 · ID WB-0142</p>
+            </div>
+          </div>
+
+          <!-- Safety strip -->
+          <div class="f3-safety" style="margin-bottom:var(--s4)">
+            <span class="f3-safety-label">Allergies</span>
+            <span>Penicillin — anaphylaxis</span>
+            <span aria-hidden="true">·</span>
+            <span>Swallowing: needs thickened fluids</span>
+          </div>
+
+          <div class="f3-stack">
+
+            <!-- Medicine card -->
+            <section class="f3-card f3-card--flat" style="padding:var(--s4)">
+              <div class="f3-row" style="gap:var(--s2); margin-bottom:6px">
+                <span class="f3-badge f3-badge--neutral">Medicine 1 of 3</span>
+                <span class="f3-badge f3-badge--caution">Late 18m</span>
+              </div>
+              <h3>Amlodipine 5mg tablet</h3>
+              <p class="f3-sm f3-mut" style="margin-top:2px">One tablet · by mouth · 14:00 (window 13:30–15:00)</p>
+
+              <dl class="f3-dl" style="margin-top:var(--s4)">
+                <dt>Indication</dt><dd>High blood pressure</dd>
+                <dt>Instructions</dt><dd>Give with or after food. Sit upright for 30 minutes.</dd>
+                <dt>Source</dt><dd>GP prescription v3 · effective 14 Jul 2026</dd>
+              </dl>
+            </section>
+
+            <!-- Evidence at the point of action -->
+            <section class="f3-card f3-card--tint" style="padding:var(--s4)">
+              <h4 style="margin-bottom:var(--s3)">Evidence</h4>
+              <dl class="f3-dl">
+                <dt>Last given</dt><dd>Yesterday 14:10 · by Priya R.</dd>
+                <dt>Recent outcomes</dt><dd>6 given, 1 declined (Sun)</dd>
+                <dt>Stock here</dt><dd>18 tablets · 6 days cover</dd>
+                <dt>Observations</dt><dd>None required for this medicine</dd>
+              </dl>
+            </section>
+
+            <!-- Action -->
+            <section>
+              <h4 style="margin-bottom:var(--s3)">Record the outcome</h4>
+              <div class="f3-outcomes">
+                <button class="f3-outcome" aria-pressed="true">
+                  <span class="f3-outcome-name">Administered</span>
+                  <span class="f3-outcome-hint">Taken as prescribed</span>
+                </button>
+                <button class="f3-outcome" aria-pressed="false">
+                  <span class="f3-outcome-name">Part administered</span>
+                  <span class="f3-outcome-hint">Quantity + reason required</span>
+                </button>
+                <button class="f3-outcome" aria-pressed="false">
+                  <span class="f3-outcome-name">Declined</span>
+                  <span class="f3-outcome-hint">Reason + attempt required</span>
+                </button>
+                <button class="f3-outcome" aria-pressed="false">
+                  <span class="f3-outcome-name">Not available</span>
+                  <span class="f3-outcome-hint">Raises a supply exception</span>
+                </button>
+                <button class="f3-outcome" aria-pressed="false">
+                  <span class="f3-outcome-name">Delayed</span>
+                  <span class="f3-outcome-hint">Re-offer later this window</span>
+                </button>
+                <button class="f3-outcome" aria-pressed="false">
+                  <span class="f3-outcome-name">Self-administered</span>
+                  <span class="f3-outcome-hint">Per assessed level</span>
+                </button>
+                <button class="f3-outcome" aria-pressed="false">
+                  <span class="f3-outcome-name">Omitted — clinical</span>
+                  <span class="f3-outcome-hint">Decision maker required</span>
+                </button>
+                <button class="f3-outcome" aria-pressed="false">
+                  <span class="f3-outcome-name">Not required</span>
+                  <span class="f3-outcome-hint">Condition not met</span>
+                </button>
+              </div>
+
+              <div class="f3-stack" style="margin-top:var(--s4)">
+                <div class="f3-field">
+                  <label class="f3-label" for="qty">Quantity given <span class="f3-req" aria-hidden="true">*</span></label>
+                  <input class="f3-input" id="qty" value="1 tablet" readonly>
+                  <span class="f3-hint">Stock will reduce from 18 to 17.</span>
+                </div>
+                <div class="f3-field">
+                  <label class="f3-label" for="note">Note <span class="f3-mut">(optional)</span></label>
+                  <textarea class="f3-textarea" id="note" placeholder="Anything the next person needs to know…"></textarea>
+                </div>
+                <div class="f3-field">
+                  <label class="f3-label" for="late">Reason it is late <span class="f3-req" aria-hidden="true">*</span></label>
+                  <select class="f3-select" id="late">
+                    <option>Choose a reason…</option>
+                    <option selected>Person was in the garden — re-offered on return</option>
+                    <option>Staff attending an urgent situation</option>
+                    <option>Medicine had to be located</option>
+                    <option>Other (describe in the note)</option>
+                  </select>
+                </div>
+              </div>
+            </section>
+
+            <!-- Confirmation -->
+            <section class="f3-confirm">
+              <h4 style="margin-bottom:var(--s3)">You are about to record</h4>
+              <dl class="f3-dl">
+                <dt>Person</dt><dd>Nadia Okonkwo · WB-0142</dd>
+                <dt>Medicine</dt><dd>Amlodipine 5mg tablet</dd>
+                <dt>Dose &amp; route</dt><dd>1 tablet · by mouth</dd>
+                <dt>Outcome</dt><dd>Administered</dd>
+                <dt>Time</dt><dd>14:18 (scheduled 14:00)</dd>
+                <dt>Stock impact</dt><dd>18 → 17 tablets</dd>
+                <dt>Recorded by</dt><dd>Joy Adeyemi · this device</dd>
+              </dl>
+              <p class="f3-xs f3-mut" style="margin-top:var(--s3)">
+                This creates a permanent record. It cannot be deleted — a mistake is corrected by a linked addendum that keeps both versions visible.
+              </p>
+            </section>
+
+            <button class="f3-btn f3-btn--primary f3-btn--block">Confirm and record</button>
+            <button class="f3-btn f3-btn--block">Back to medicine list</button>
+
+            <p class="f3-note">
+              <b>Hard stop.</b> If identity cannot be confirmed, the prescription is expired or inactive, an allergy conflict is
+              unresolved, or the server rejects validation, this button is disabled and an escalation path opens instead.
+              AI cannot override it.
+            </p>
+
+          </div>
+        </aside>
+
+      </div>
+    </main>
+  </div>
+</div>
+
+<div class="f3-stickybar f3-only-sm">
+  <button class="f3-btn">Back</button>
+  <button class="f3-btn f3-btn--primary">Confirm and record</button>
+</div>
+
+<nav class="f3-bottomnav" aria-label="Primary">
+  <a href="careone-dashboard-wireframe.html"><span class="f3-navicon" aria-hidden="true">T</span>Today</a>
+  <a href="careone-person-profile-wireframe.html"><span class="f3-navicon" aria-hidden="true">P</span>People</a>
+  <a href="careone-medication-round-wireframe.html" aria-current="page"><span class="f3-navicon" aria-hidden="true">R</span>Round<span class="f3-navcount">9</span></a>
+  <a href="careone-handover-wireframe.html"><span class="f3-navicon" aria-hidden="true">M</span>Messages</a>
+  <a href="index.html"><span class="f3-navicon" aria-hidden="true">···</span>More</a>
+</nav>
+
+</body>
+</html>

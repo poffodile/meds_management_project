@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>05 PRN workflow — Care One OS frontend3 wireframe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="careone-f3.css">
+</head>
+<body class="f3-root">
+
+<div class="f3-shell">
+
+  <aside class="f3-nav">
+    <div class="f3-brand">
+      <div class="f3-brand-mark">C1</div>
+      <div class="f3-brand-text">
+        <div class="f3-brand-name">Care One OS</div>
+        <div class="f3-brand-sub">Willowbank</div>
+      </div>
+    </div>
+    <nav class="f3-navgroup" aria-label="Primary">
+      <h4>Areas</h4>
+      <a class="f3-navlink" href="careone-dashboard-wireframe.html"><span class="f3-navicon">T</span><span>Today</span></a>
+      <a class="f3-navlink" href="careone-person-profile-wireframe.html"><span class="f3-navicon">P</span><span>People</span></a>
+      <a class="f3-navlink" href="careone-mar-wireframe.html" aria-current="page"><span class="f3-navicon">M</span><span>Medicines</span></a>
+      <a class="f3-navlink" href="careone-missed-doses-wireframe.html"><span class="f3-navicon">O</span><span>Operations</span><span class="f3-navcount">7</span></a>
+      <a class="f3-navlink" href="careone-manager-compliance-wireframe.html"><span class="f3-navicon">A</span><span>Assurance</span></a>
+      <a class="f3-navlink" href="careone-admin-integrations-wireframe.html"><span class="f3-navicon">S</span><span>Settings</span></a>
+    </nav>
+    <nav class="f3-navgroup">
+      <h4>Prototype</h4>
+      <a class="f3-navlink" href="index.html"><span class="f3-navicon">◇</span><span>All screens</span></a>
+    </nav>
+  </aside>
+
+  <div class="f3-main">
+
+    <header class="f3-topbar">
+      <div class="f3-context">
+        <span class="f3-chip"><b>Willowbank House</b></span>
+        <span class="f3-chip f3-chip--quiet">PRN — when required</span>
+      </div>
+      <div class="f3-topbar-actions">
+        <button class="f3-iconbtn" aria-label="Notifications">◔<span class="f3-dot"></span></button>
+        <div class="f3-avatar" aria-hidden="true">JA</div>
+      </div>
+    </header>
+
+    <div class="f3-pagehead">
+      <div class="f3-pagehead-text">
+        <h1>PRN &amp; outcome reviews</h1>
+        <p class="f3-pagehead-sum"><b>3 outcome reviews due</b> · 1 overdue by 1h 52m · 2 people near a 24-hour maximum</p>
+        <p class="f3-sync">Last synced 14:22</p>
+      </div>
+    </div>
+
+    <main class="f3-page">
+
+      <!-- ============ PRN DASHBOARD — reviews first ============ -->
+      <div class="f3-grid f3-grid--4">
+        <button class="f3-stat f3-stat--alert">
+          <span class="f3-stat-label">Outcome reviews due</span>
+          <span class="f3-stat-value">3</span>
+          <span class="f3-stat-meta">1 overdue · <b>opens the list</b></span>
+        </button>
+        <button class="f3-stat">
+          <span class="f3-stat-label">Near maximum</span>
+          <span class="f3-stat-value">2</span>
+          <span class="f3-stat-meta">in the last 24 hours</span>
+        </button>
+        <button class="f3-stat">
+          <span class="f3-stat-label">Repeated use</span>
+          <span class="f3-stat-value">1</span>
+          <span class="f3-stat-meta">rising 7-day pattern</span>
+        </button>
+        <button class="f3-stat">
+          <span class="f3-stat-label">Protocols overdue review</span>
+          <span class="f3-stat-value">1</span>
+          <span class="f3-stat-meta">last reviewed 11 Feb</span>
+        </button>
+      </div>
+
+      <div class="f3-grid f3-grid--main">
+
+        <div class="f3-stack">
+
+          <!-- ============ PROTOCOL CARD ============ -->
+          <section class="f3-card" aria-labelledby="pc-h">
+            <div class="f3-cardhead">
+              <div class="f3-person">
+                <div class="f3-photo" aria-hidden="true">IM</div>
+                <div>
+                  <h2 id="pc-h">Paracetamol 500mg tablet</h2>
+                  <p class="f3-person-meta">Ines Marchetti · Room 6 · born 8 Jan 1959</p>
+                </div>
+              </div>
+              <span class="f3-spacer f3-badge f3-badge--good">Protocol complete</span>
+            </div>
+
+            <div class="f3-grid f3-grid--2">
+              <div class="f3-stack f3-stack--sm">
+                <div>
+                  <h4>Indication</h4>
+                  <p class="f3-sm">For mild to moderate pain, most often knee and hip discomfort.</p>
+                  <p class="f3-sm f3-mut">Signs to look for: rubbing the knee, reluctance to stand, wincing on transfer, saying she is "aching".</p>
+                </div>
+                <div>
+                  <h4>Dose and route</h4>
+                  <p class="f3-sm"><b>1 or 2 tablets</b> by mouth. Start with 1 unless pain is described as severe.</p>
+                </div>
+                <div>
+                  <h4>Try first, if appropriate</h4>
+                  <p class="f3-sm">Reposition, warm pack, short walk, or scheduled physiotherapy exercises.</p>
+                </div>
+              </div>
+
+              <div class="f3-stack f3-stack--sm">
+                <div class="f3-card f3-card--tint" style="padding:var(--s4)">
+                  <h4 style="margin-bottom:var(--s3)">Right now</h4>
+                  <dl class="f3-dl">
+                    <dt>Last dose</dt><dd>2 tablets at 10:30 today</dd>
+                    <dt>Minimum interval</dt><dd>4 hours</dd>
+                    <dt>Eligible from</dt><dd><b>14:30</b> — 8 minutes away</dd>
+                    <dt>24h total so far</dt><dd>4 of maximum 8 tablets</dd>
+                    <dt>Doses today</dt><dd>2 of maximum 4</dd>
+                  </dl>
+                </div>
+                <div>
+                  <h4>Outcome plan</h4>
+                  <p class="f3-sm">Expect pain to ease within <b>60 minutes</b>. Review at that point.
+                  If two consecutive doses are ineffective, contact the GP.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="f3-alert" style="margin-top:var(--s4)">
+              <span class="f3-alert-mark" aria-hidden="true">▲</span>
+              <div class="f3-alert-body">
+                <div class="f3-alert-title">Too soon — 8 minutes until the next dose is permitted</div>
+                <div class="f3-alert-text">
+                  The minimum interval is 4 hours and the last dose was at 10:30. The administer button stays disabled until 14:30.
+                  If this needs to happen sooner, that is a clinical decision — record it as an early dose with a reason, or contact the prescriber.
+                </div>
+                <div class="f3-alert-actions">
+                  <button class="f3-btn f3-btn--sm">Message the GP</button>
+                  <button class="f3-btn f3-btn--sm">Record a non-drug measure</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ============ ADMINISTRATION JOURNEY ============ -->
+          <section class="f3-card" aria-labelledby="aj-h">
+            <div class="f3-cardhead">
+              <h2 id="aj-h">Give a PRN dose</h2>
+              <span class="f3-badge f3-badge--neutral">Step 2 of 5</span>
+            </div>
+
+            <div class="f3-stack">
+              <div class="f3-field">
+                <label class="f3-label" for="ind">Which prescribed indication? <span class="f3-req" aria-hidden="true">*</span></label>
+                <select class="f3-select" id="ind">
+                  <option selected>Mild to moderate pain — knee and hip</option>
+                </select>
+                <span class="f3-hint">Only indications on the protocol appear here. You cannot invent one.</span>
+              </div>
+
+              <div class="f3-field">
+                <label class="f3-label" for="sym">What did you observe? <span class="f3-req" aria-hidden="true">*</span></label>
+                <textarea class="f3-textarea" id="sym" placeholder="What you saw or were told, in plain words…">Rubbing right knee, said "it's aching again", reluctant to walk to the lounge.</textarea>
+              </div>
+
+              <div>
+                <span class="f3-label">Non-drug measures tried</span>
+                <div class="f3-check">
+                  <span class="f3-check-box f3-check-box--on" aria-hidden="true">✓</span>
+                  <span class="f3-check-label">Repositioned in chair with cushion</span>
+                </div>
+                <div class="f3-check">
+                  <span class="f3-check-box f3-check-box--on" aria-hidden="true">✓</span>
+                  <span class="f3-check-label">Warm pack, 15 minutes</span>
+                </div>
+                <div class="f3-check">
+                  <span class="f3-check-box" aria-hidden="true"></span>
+                  <span class="f3-check-label">Short walk</span>
+                </div>
+                <div class="f3-check">
+                  <span class="f3-check-box" aria-hidden="true"></span>
+                  <span class="f3-check-label">None appropriate — explain in the note</span>
+                </div>
+              </div>
+
+              <div class="f3-field">
+                <label class="f3-label" for="dose">Dose <span class="f3-req" aria-hidden="true">*</span></label>
+                <select class="f3-select" id="dose">
+                  <option>1 tablet (500mg)</option>
+                  <option selected>2 tablets (1g)</option>
+                </select>
+                <span class="f3-hint">Taking 2 brings the 24-hour total to 6 of 8. A further dose would then be blocked until 06:30 tomorrow.</span>
+              </div>
+
+              <div class="f3-confirm">
+                <h4 style="margin-bottom:var(--s3)">A review task will be created</h4>
+                <dl class="f3-dl">
+                  <dt>Review due</dt><dd><b>15:38</b> — 60 minutes after administration</dd>
+                  <dt>Assigned to</dt><dd>Whoever is on shift at that time</dd>
+                  <dt>Question asked</dt><dd>Did it work? Any adverse effects? Does anything need escalating?</dd>
+                </dl>
+              </div>
+
+              <button class="f3-btn f3-btn--primary f3-btn--block" disabled>Administer — available at 14:30</button>
+            </div>
+          </section>
+
+          <!-- ============ OUTCOME REVIEW ============ -->
+          <section class="f3-card" aria-labelledby="or-h">
+            <div class="f3-cardhead">
+              <div>
+                <h2 id="or-h">Outcome review</h2>
+                <p class="f3-cardsub">Paracetamol 1g given at 10:30 · review was due 11:30</p>
+              </div>
+              <span class="f3-badge f3-badge--risk">Overdue 1h 52m</span>
+            </div>
+
+            <div class="f3-stack">
+              <div>
+                <span class="f3-label">Was it effective?</span>
+                <div class="f3-outcomes" style="margin-top:var(--s2)">
+                  <button class="f3-outcome" aria-pressed="false">
+                    <span class="f3-outcome-name">Effective</span>
+                    <span class="f3-outcome-hint">Pain eased as expected</span>
+                  </button>
+                  <button class="f3-outcome" aria-pressed="true">
+                    <span class="f3-outcome-name">Partly effective</span>
+                    <span class="f3-outcome-hint">Some improvement</span>
+                  </button>
+                  <button class="f3-outcome" aria-pressed="false">
+                    <span class="f3-outcome-name">Not effective</span>
+                    <span class="f3-outcome-hint">Triggers a review flag</span>
+                  </button>
+                  <button class="f3-outcome" aria-pressed="false">
+                    <span class="f3-outcome-name">Cannot tell</span>
+                    <span class="f3-outcome-hint">Say why in the note</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="f3-field">
+                <label class="f3-label" for="adv">Any adverse effects? <span class="f3-req" aria-hidden="true">*</span></label>
+                <select class="f3-select" id="adv">
+                  <option selected>None observed</option>
+                  <option>Yes — describe below (creates an incident)</option>
+                </select>
+              </div>
+
+              <div class="f3-field">
+                <label class="f3-label" for="rnote">Review note</label>
+                <textarea class="f3-textarea" id="rnote">Walked to the lounge unaided at 11:45. Still rubbing the knee occasionally.</textarea>
+              </div>
+
+              <div class="f3-alert f3-alert--info">
+                <span class="f3-alert-mark" aria-hidden="true">◐</span>
+                <div class="f3-alert-body">
+                  <div class="f3-alert-title">This is the third "partly effective" in seven days</div>
+                  <div class="f3-alert-text">The protocol's escalation threshold is two consecutive ineffective doses. This is a pattern worth a GP conversation, not an automatic escalation — you decide.</div>
+                  <div class="f3-alert-actions">
+                    <button class="f3-btn f3-btn--sm">Draft a GP message</button>
+                    <button class="f3-btn f3-btn--sm">Add to handover</button>
+                  </div>
+                </div>
+              </div>
+
+              <button class="f3-btn f3-btn--primary f3-btn--block">Save outcome review</button>
+            </div>
+          </section>
+
+        </div>
+
+        <!-- RIGHT -->
+        <div class="f3-stack">
+
+          <!-- BLOCKED / INCOMPLETE PROTOCOL -->
+          <section class="f3-card" aria-labelledby="bl-h">
+            <div class="f3-cardhead">
+              <h2 id="bl-h">Blocked</h2>
+              <span class="f3-badge f3-badge--risk">1</span>
+            </div>
+            <article class="f3-listitem f3-listitem--card f3-listitem--alert" style="margin-bottom:0">
+              <div class="f3-listbody">
+                <div class="f3-listtitle">Theo Lindqvist — Lorazepam 0.5mg</div>
+                <div class="f3-listmeta" style="margin-top:4px">
+                  The protocol has <b>no maximum in 24 hours</b> and <b>no stated indication</b>.
+                  Administration is blocked by policy until a clinician completes it.
+                </div>
+              </div>
+            </article>
+            <p class="f3-note" style="margin-top:var(--s3)">
+              <b>Hard rule.</b> A missing or ambiguous PRN protocol is never repaired by generated advice.
+              The system blocks administration where policy requires and routes a query to the responsible clinician or pharmacy.
+            </p>
+            <button class="f3-btn f3-btn--block" style="margin-top:var(--s3)">Send protocol query</button>
+          </section>
+
+          <section class="f3-card" aria-labelledby="pat-h">
+            <div class="f3-cardhead">
+              <h2 id="pat-h">Use pattern</h2>
+              <span class="f3-badge f3-badge--ghost">Last 14 days</span>
+            </div>
+            <p class="f3-sm f3-mut" style="margin-bottom:var(--s4)">Ines Marchetti · paracetamol, doses per day</p>
+            <div class="f3-row" style="align-items:flex-end; gap:6px; height:96px">
+              <div style="flex:1;height:25%;background:var(--eucalyptus);border-radius:4px 4px 0 0" title="1"></div>
+              <div style="flex:1;height:0%;background:var(--mist);border-radius:4px 4px 0 0" title="0"></div>
+              <div style="flex:1;height:25%;background:var(--eucalyptus);border-radius:4px 4px 0 0" title="1"></div>
+              <div style="flex:1;height:50%;background:var(--eucalyptus);border-radius:4px 4px 0 0" title="2"></div>
+              <div style="flex:1;height:25%;background:var(--eucalyptus);border-radius:4px 4px 0 0" title="1"></div>
+              <div style="flex:1;height:50%;background:var(--eucalyptus);border-radius:4px 4px 0 0" title="2"></div>
+              <div style="flex:1;height:50%;background:var(--eucalyptus);border-radius:4px 4px 0 0" title="2"></div>
+              <div style="flex:1;height:75%;background:var(--teal);border-radius:4px 4px 0 0" title="3"></div>
+              <div style="flex:1;height:75%;background:var(--teal);border-radius:4px 4px 0 0" title="3"></div>
+              <div style="flex:1;height:50%;background:var(--eucalyptus);border-radius:4px 4px 0 0" title="2"></div>
+              <div style="flex:1;height:75%;background:var(--teal);border-radius:4px 4px 0 0" title="3"></div>
+              <div style="flex:1;height:100%;background:var(--teal);border-radius:4px 4px 0 0" title="4"></div>
+              <div style="flex:1;height:75%;background:var(--teal);border-radius:4px 4px 0 0" title="3"></div>
+              <div style="flex:1;height:50%;background:var(--teal);border-radius:4px 4px 0 0" title="2 so far"></div>
+            </div>
+            <p class="f3-xs f3-mut" style="margin-top:var(--s3)">
+              21 Jul → 3 Aug. Range shown because a chart without one means nothing.
+              Rising, but this describes the data — it does not claim a cause.
+            </p>
+          </section>
+
+          <section class="f3-card f3-card--flat" aria-labelledby="ct-h">
+            <h2 id="ct-h" style="margin-bottom:var(--s4)">Required on every PRN protocol</h2>
+            <ul class="f3-stack f3-stack--sm f3-sm">
+              <li>✓ Indication in plain language, with observable signs</li>
+              <li>✓ Exact permitted dose or range, unambiguous units</li>
+              <li>✓ Minimum interval, shown as the next eligible time</li>
+              <li>✓ Rolling and/or calendar maximum, with the current total</li>
+              <li>✓ Non-drug measures to consider first, if specified</li>
+              <li>✓ Expected effect, review interval and escalation threshold</li>
+            </ul>
+          </section>
+
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<nav class="f3-bottomnav" aria-label="Primary">
+  <a href="careone-dashboard-wireframe.html"><span class="f3-navicon" aria-hidden="true">T</span>Today</a>
+  <a href="careone-person-profile-wireframe.html"><span class="f3-navicon" aria-hidden="true">P</span>People</a>
+  <a href="careone-medication-round-wireframe.html"><span class="f3-navicon" aria-hidden="true">R</span>Round</a>
+  <a href="careone-handover-wireframe.html"><span class="f3-navicon" aria-hidden="true">M</span>Messages</a>
+  <a href="index.html" aria-current="page"><span class="f3-navicon" aria-hidden="true">···</span>More</a>
+</nav>
+
+</body>
+</html>

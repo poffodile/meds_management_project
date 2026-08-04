@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>04 Person profile — Care One OS frontend3 wireframe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="careone-f3.css">
+</head>
+<body class="f3-root">
+
+<div class="f3-shell">
+
+  <aside class="f3-nav">
+    <div class="f3-brand">
+      <div class="f3-brand-mark">C1</div>
+      <div class="f3-brand-text">
+        <div class="f3-brand-name">Care One OS</div>
+        <div class="f3-brand-sub">Willowbank</div>
+      </div>
+    </div>
+    <nav class="f3-navgroup" aria-label="Primary">
+      <h4>Areas</h4>
+      <a class="f3-navlink" href="careone-dashboard-wireframe.html"><span class="f3-navicon">T</span><span>Today</span></a>
+      <a class="f3-navlink" href="careone-person-profile-wireframe.html" aria-current="page"><span class="f3-navicon">P</span><span>People</span></a>
+      <a class="f3-navlink" href="careone-mar-wireframe.html"><span class="f3-navicon">M</span><span>Medicines</span></a>
+      <a class="f3-navlink" href="careone-missed-doses-wireframe.html"><span class="f3-navicon">O</span><span>Operations</span><span class="f3-navcount">7</span></a>
+      <a class="f3-navlink" href="careone-manager-compliance-wireframe.html"><span class="f3-navicon">A</span><span>Assurance</span></a>
+      <a class="f3-navlink" href="careone-admin-integrations-wireframe.html"><span class="f3-navicon">S</span><span>Settings</span></a>
+    </nav>
+    <nav class="f3-navgroup">
+      <h4>Prototype</h4>
+      <a class="f3-navlink" href="index.html"><span class="f3-navicon">◇</span><span>All screens</span></a>
+    </nav>
+  </aside>
+
+  <div class="f3-main">
+
+    <header class="f3-topbar">
+      <div class="f3-context">
+        <span class="f3-chip"><b>Willowbank House</b></span>
+        <span class="f3-chip f3-chip--quiet">People · 14 in your care</span>
+      </div>
+      <div class="f3-search" role="search"><span aria-hidden="true">⌕</span><span>Search people…</span></div>
+      <div class="f3-topbar-actions">
+        <button class="f3-iconbtn" aria-label="Notifications">◔</button>
+        <div class="f3-avatar" aria-hidden="true">JA</div>
+      </div>
+    </header>
+
+    <div class="f3-pagehead">
+      <div class="f3-person" style="flex:1; min-width:260px">
+        <div class="f3-photo f3-photo--lg" aria-hidden="true">NO</div>
+        <div>
+          <h1>Nadia Okonkwo</h1>
+          <p class="f3-person-meta">Born 12 Mar 1948 (78) · Room 4 · WB-0142 · admitted 4 Feb 2024</p>
+          <div class="f3-row" style="margin-top:var(--s2); gap:var(--s2)">
+            <span class="f3-badge f3-badge--risk">Penicillin allergy</span>
+            <span class="f3-badge f3-badge--caution">Thickened fluids</span>
+            <span class="f3-badge f3-badge--info">GP review 7 Aug</span>
+          </div>
+        </div>
+      </div>
+      <div class="f3-row">
+        <a class="f3-btn f3-btn--sm" href="careone-mar-wireframe.html">Open MAR</a>
+        <a class="f3-btn f3-btn--primary f3-btn--sm" href="careone-medication-round-wireframe.html">Next dose 14:00</a>
+      </div>
+    </div>
+
+    <div style="padding:0 var(--s5)">
+      <div class="f3-tabs" role="tablist">
+        <button class="f3-tab" role="tab" aria-selected="false">Overview</button>
+        <button class="f3-tab" role="tab" aria-selected="true">Medicines</button>
+        <button class="f3-tab" role="tab" aria-selected="false">MAR</button>
+        <button class="f3-tab" role="tab" aria-selected="false">Health &amp; safety</button>
+        <button class="f3-tab" role="tab" aria-selected="false">Documents</button>
+        <button class="f3-tab" role="tab" aria-selected="false">Contacts</button>
+        <button class="f3-tab" role="tab" aria-selected="false">Activity</button>
+      </div>
+    </div>
+
+    <main class="f3-page" style="padding-top:var(--s5)">
+
+      <!-- Terminology note -->
+      <p class="f3-note">
+        <b>Terminology.</b> This organisation is in <b>Residential care</b> mode, so the interface says "Resident".
+        In a children's home the same screen says "Young person"; in supported living, "Person".
+        The underlying audit and API records keep one stable canonical concept regardless of the label.
+      </p>
+
+      <div class="f3-grid f3-grid--main">
+
+        <div class="f3-stack">
+
+          <!-- ACTIVE MEDICINES -->
+          <section class="f3-card" aria-labelledby="act-h">
+            <div class="f3-cardhead">
+              <div>
+                <h2 id="act-h">Active medicines</h2>
+                <p class="f3-cardsub">4 active · 1 awaiting verification · 1 paused</p>
+              </div>
+              <button class="f3-btn f3-btn--sm">Add medicine</button>
+            </div>
+
+            <article class="f3-listitem f3-listitem--card">
+              <div class="f3-listbody">
+                <div class="f3-row" style="gap:var(--s2)">
+                  <span class="f3-badge f3-badge--good">Active</span>
+                  <span class="f3-xs f3-mut">v3 · effective 14 Jul 2026 · verified by S. Whitfield (pharmacist)</span>
+                </div>
+                <div class="f3-listtitle" style="margin-top:6px">Amlodipine 5mg tablet</div>
+                <div class="f3-listmeta">1 tablet · by mouth · daily 14:00 · for high blood pressure · with or after food</div>
+              </div>
+              <button class="f3-btn f3-btn--sm">Details</button>
+            </article>
+
+            <article class="f3-listitem f3-listitem--card">
+              <div class="f3-listbody">
+                <div class="f3-row" style="gap:var(--s2)">
+                  <span class="f3-badge f3-badge--good">Active</span>
+                  <span class="f3-xs f3-mut">v1 · effective 4 Feb 2024</span>
+                </div>
+                <div class="f3-listtitle" style="margin-top:6px">Levothyroxine 50mcg tablet</div>
+                <div class="f3-listmeta">1 tablet · by mouth · daily 07:00 · <b>before food, 30 min before breakfast</b></div>
+              </div>
+              <button class="f3-btn f3-btn--sm">Details</button>
+            </article>
+
+            <article class="f3-listitem f3-listitem--card">
+              <div class="f3-listbody">
+                <div class="f3-row" style="gap:var(--s2)">
+                  <span class="f3-badge f3-badge--good">Active</span>
+                  <span class="f3-badge f3-badge--info">PRN</span>
+                  <span class="f3-xs f3-mut">protocol complete · reviewed 12 Jul</span>
+                </div>
+                <div class="f3-listtitle" style="margin-top:6px">Paracetamol 500mg tablet</div>
+                <div class="f3-listmeta">1–2 tablets · by mouth · when required for pain · <b>min 4h apart · max 8 in 24h</b></div>
+              </div>
+              <a class="f3-btn f3-btn--sm" href="careone-prn-wireframe.html">Protocol</a>
+            </article>
+
+            <article class="f3-listitem f3-listitem--card f3-listitem--alert">
+              <div class="f3-listbody">
+                <div class="f3-row" style="gap:var(--s2)">
+                  <span class="f3-badge f3-badge--caution">Awaiting verification</span>
+                  <span class="f3-xs f3-mut">added 2 Aug by Joy A. from discharge letter</span>
+                </div>
+                <div class="f3-listtitle" style="margin-top:6px">Furosemide 20mg tablet</div>
+                <div class="f3-listmeta">Cannot be administered until a permitted user verifies it against the source prescription.</div>
+              </div>
+              <button class="f3-btn f3-btn--primary f3-btn--sm">Verify</button>
+            </article>
+
+            <article class="f3-listitem f3-listitem--card">
+              <div class="f3-listbody">
+                <div class="f3-row" style="gap:var(--s2)">
+                  <span class="f3-badge f3-badge--ghost">Paused</span>
+                  <span class="f3-xs f3-mut">paused 28 Jul by Dr Ellery — review 7 Aug</span>
+                </div>
+                <div class="f3-listtitle f3-mut" style="margin-top:6px">Sertraline 50mg tablet</div>
+                <div class="f3-listmeta">Paused pending GP review. Does not appear in rounds while paused.</div>
+              </div>
+              <button class="f3-btn f3-btn--sm">History</button>
+            </article>
+          </section>
+
+          <!-- LIFECYCLE -->
+          <section class="f3-card f3-card--tint" aria-labelledby="lc-h">
+            <h2 id="lc-h" style="margin-bottom:var(--s3)">Medicine lifecycle</h2>
+            <div class="f3-row" style="gap:var(--s2)">
+              <span class="f3-badge f3-badge--ghost">Draft</span>
+              <span class="f3-mut" aria-hidden="true">→</span>
+              <span class="f3-badge f3-badge--caution">Awaiting verification</span>
+              <span class="f3-mut" aria-hidden="true">→</span>
+              <span class="f3-badge f3-badge--good">Active</span>
+              <span class="f3-mut" aria-hidden="true">→</span>
+              <span class="f3-badge f3-badge--neutral">Paused</span>
+              <span class="f3-mut" aria-hidden="true">→</span>
+              <span class="f3-badge f3-badge--neutral">Ended</span>
+              <span class="f3-mut" aria-hidden="true">→</span>
+              <span class="f3-badge f3-badge--ghost">Superseded</span>
+            </div>
+            <p class="f3-sm f3-mut" style="margin-top:var(--s3)">
+              Every activation records source, author, verifier where required, effective dates and version.
+              Nothing moves between these states silently.
+            </p>
+          </section>
+
+          <!-- DECISION SUPPORT -->
+          <div class="f3-alert">
+            <span class="f3-alert-mark" aria-hidden="true">▲</span>
+            <div class="f3-alert-body">
+              <div class="f3-alert-title">Possible duplicate — needs a person to decide</div>
+              <div class="f3-alert-text">
+                Furosemide 20mg (awaiting verification) may duplicate an entry ended on 12 June.
+                This is <b>decision support, not a clinical conclusion</b> — a competent person confirms or dismisses it.
+              </div>
+              <div class="f3-alert-actions">
+                <button class="f3-btn f3-btn--sm">Compare the two</button>
+                <button class="f3-btn f3-btn--sm">Not a duplicate</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <div class="f3-stack">
+
+          <section class="f3-card" aria-labelledby="sa-h">
+            <div class="f3-cardhead">
+              <h2 id="sa-h">Self-administration</h2>
+              <span class="f3-badge f3-badge--info">Level 2</span>
+            </div>
+            <dl class="f3-dl">
+              <dt>Assessed level</dt><dd>2 — holds own inhaler only</dd>
+              <dt>Storage</dt><dd>Locked bedside cabinet, key held by resident</dd>
+              <dt>Prompt required</dt><dd>Yes — morning and evening</dd>
+              <dt>Assessed by</dt><dd>Ines Marchetti, 3 Jun 2026</dd>
+              <dt>Review due</dt><dd>3 Sep 2026</dd>
+            </dl>
+          </section>
+
+          <section class="f3-card" aria-labelledby="lv-h">
+            <div class="f3-cardhead">
+              <h2 id="lv-h">Leave &amp; away status</h2>
+              <span class="f3-badge f3-badge--ghost">Present</span>
+            </div>
+            <p class="f3-sm f3-mut">
+              When someone is away, this states who holds responsibility for medicines, what supply went with them,
+              and what must be reconciled on return.
+            </p>
+            <button class="f3-btn f3-btn--block" style="margin-top:var(--s4)">Record planned leave</button>
+          </section>
+
+          <section class="f3-card" aria-labelledby="cn-h">
+            <h2 id="cn-h" style="margin-bottom:var(--s4)">Contacts</h2>
+            <ul class="f3-list">
+              <li class="f3-listitem" style="padding:var(--s3) 0">
+                <div class="f3-listbody">
+                  <div class="f3-listtitle">Dr Amina Ellery</div>
+                  <div class="f3-listmeta">GP · Fernhill Surgery</div>
+                </div>
+              </li>
+              <li class="f3-listitem" style="padding:var(--s3) 0">
+                <div class="f3-listbody">
+                  <div class="f3-listtitle">Whitfield Pharmacy</div>
+                  <div class="f3-listmeta">Supplying pharmacy · 28-day cycle</div>
+                </div>
+              </li>
+              <li class="f3-listitem" style="padding:var(--s3) 0">
+                <div class="f3-listbody">
+                  <div class="f3-listtitle">Chidi Okonkwo</div>
+                  <div class="f3-listmeta">Son · next of kin · <b>approved for medicines updates</b></div>
+                </div>
+              </li>
+            </ul>
+          </section>
+
+          <section class="f3-card f3-card--flat" aria-labelledby="doc-h">
+            <h2 id="doc-h" style="margin-bottom:var(--s4)">Documents</h2>
+            <ul class="f3-list">
+              <li class="f3-listitem" style="padding:var(--s3) 0">
+                <div class="f3-listbody">
+                  <div class="f3-listtitle">Discharge letter — 2 Aug 2026</div>
+                  <div class="f3-listmeta">Uploaded by Joy A. · source: Northgate Hospital</div>
+                </div>
+              </li>
+              <li class="f3-listitem" style="padding:var(--s3) 0">
+                <div class="f3-listbody">
+                  <div class="f3-listtitle">Covert administration care plan</div>
+                  <div class="f3-listmeta"><span class="f3-badge f3-badge--ghost">Not applicable</span></div>
+                </div>
+              </li>
+              <li class="f3-listitem" style="padding:var(--s3) 0">
+                <div class="f3-listbody">
+                  <div class="f3-listtitle">Consent &amp; capacity record</div>
+                  <div class="f3-listmeta">Reviewed 12 Jul 2026 · has capacity for medicines decisions</div>
+                </div>
+              </li>
+            </ul>
+          </section>
+
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<nav class="f3-bottomnav" aria-label="Primary">
+  <a href="careone-dashboard-wireframe.html"><span class="f3-navicon" aria-hidden="true">T</span>Today</a>
+  <a href="careone-person-profile-wireframe.html" aria-current="page"><span class="f3-navicon" aria-hidden="true">P</span>People</a>
+  <a href="careone-medication-round-wireframe.html"><span class="f3-navicon" aria-hidden="true">R</span>Round</a>
+  <a href="careone-handover-wireframe.html"><span class="f3-navicon" aria-hidden="true">M</span>Messages</a>
+  <a href="index.html"><span class="f3-navicon" aria-hidden="true">···</span>More</a>
+</nav>
+
+</body>
+</html>

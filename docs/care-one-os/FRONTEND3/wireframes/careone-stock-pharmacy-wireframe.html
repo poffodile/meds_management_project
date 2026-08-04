@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>07 Stock &amp; pharmacy — Care One OS frontend3 wireframe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="careone-f3.css">
+</head>
+<body class="f3-root">
+
+<div class="f3-shell">
+
+  <aside class="f3-nav">
+    <div class="f3-brand">
+      <div class="f3-brand-mark">C1</div>
+      <div class="f3-brand-text">
+        <div class="f3-brand-name">Care One OS</div>
+        <div class="f3-brand-sub">Willowbank</div>
+      </div>
+    </div>
+    <nav class="f3-navgroup" aria-label="Primary">
+      <h4>Areas</h4>
+      <a class="f3-navlink" href="careone-dashboard-wireframe.html"><span class="f3-navicon">T</span><span>Today</span></a>
+      <a class="f3-navlink" href="careone-person-profile-wireframe.html"><span class="f3-navicon">P</span><span>People</span></a>
+      <a class="f3-navlink" href="careone-mar-wireframe.html" aria-current="page"><span class="f3-navicon">M</span><span>Medicines</span></a>
+      <a class="f3-navlink" href="careone-missed-doses-wireframe.html"><span class="f3-navicon">O</span><span>Operations</span><span class="f3-navcount">7</span></a>
+      <a class="f3-navlink" href="careone-manager-compliance-wireframe.html"><span class="f3-navicon">A</span><span>Assurance</span></a>
+      <a class="f3-navlink" href="careone-admin-integrations-wireframe.html"><span class="f3-navicon">S</span><span>Settings</span></a>
+    </nav>
+    <nav class="f3-navgroup">
+      <h4>Prototype</h4>
+      <a class="f3-navlink" href="index.html"><span class="f3-navicon">◇</span><span>All screens</span></a>
+    </nav>
+  </aside>
+
+  <div class="f3-main">
+
+    <header class="f3-topbar">
+      <div class="f3-context">
+        <span class="f3-chip"><b>Willowbank House</b></span>
+        <span class="f3-chip f3-chip--quiet">Stock &amp; pharmacy · cycle 4</span>
+      </div>
+      <div class="f3-topbar-actions">
+        <button class="f3-iconbtn" aria-label="Notifications">◔<span class="f3-dot"></span></button>
+        <div class="f3-avatar" aria-hidden="true">JA</div>
+      </div>
+    </header>
+
+    <div class="f3-pagehead">
+      <div class="f3-pagehead-text">
+        <h1>Stock &amp; pharmacy</h1>
+        <p class="f3-pagehead-sum"><b>3 low</b> · 1 out of stock · 2 expiring within 30 days · 1 quarantined · next cycle order due 6 Aug</p>
+        <p class="f3-sync">Last synced 14:22 · pharmacy connection healthy</p>
+      </div>
+      <button class="f3-btn f3-btn--primary f3-hide-sm">Start cycle order</button>
+    </div>
+
+    <main class="f3-page">
+
+      <div class="f3-tabs" role="tablist">
+        <button class="f3-tab" role="tab" aria-selected="true">Overview</button>
+        <button class="f3-tab" role="tab" aria-selected="false">Medicine ledger</button>
+        <button class="f3-tab" role="tab" aria-selected="false">Ordering</button>
+        <button class="f3-tab" role="tab" aria-selected="false">Deliveries</button>
+        <button class="f3-tab" role="tab" aria-selected="false">Returns &amp; disposal</button>
+        <button class="f3-tab" role="tab" aria-selected="false">Reconciliation</button>
+        <button class="f3-tab" role="tab" aria-selected="false">Pharmacy</button>
+      </div>
+
+      <div class="f3-grid f3-grid--4">
+        <button class="f3-stat f3-stat--alert">
+          <span class="f3-stat-label">Out of stock</span>
+          <span class="f3-stat-value">1</span>
+          <span class="f3-stat-meta">Levetiracetam · <b>doses affected</b></span>
+        </button>
+        <button class="f3-stat">
+          <span class="f3-stat-label">Low</span>
+          <span class="f3-stat-value">3</span>
+          <span class="f3-stat-meta">under 5 days cover</span>
+        </button>
+        <button class="f3-stat">
+          <span class="f3-stat-label">Expiring ≤30 days</span>
+          <span class="f3-stat-value">2</span>
+          <span class="f3-stat-meta">earliest 19 Aug</span>
+        </button>
+        <button class="f3-stat">
+          <span class="f3-stat-label">Unreconciled</span>
+          <span class="f3-stat-value">4</span>
+          <span class="f3-stat-meta">last count 28 Jul</span>
+        </button>
+      </div>
+
+      <!-- ============ OVERVIEW TABLE ============ -->
+      <section class="f3-card" aria-labelledby="ov-h">
+        <div class="f3-cardhead">
+          <h2 id="ov-h">Stock overview</h2>
+          <button class="f3-btn f3-btn--sm">Filters</button>
+        </div>
+        <div class="f3-tablewrap">
+          <table class="f3-table">
+            <thead>
+              <tr>
+                <th scope="col">Medicine</th><th scope="col">Person</th><th scope="col">Balance</th>
+                <th scope="col">Cover</th><th scope="col">Expiry</th><th scope="col">Status</th><th scope="col"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><b>Levetiracetam 500mg</b><div class="f3-xs f3-mut">tablet</div></td>
+                <td>Rowan Petrescu</td>
+                <td class="f3-num">0</td>
+                <td class="f3-num">—</td>
+                <td>—</td>
+                <td><span class="f3-badge f3-badge--risk">Out of stock</span></td>
+                <td><a class="f3-btn f3-btn--sm" href="careone-missed-doses-wireframe.html">Exception</a></td>
+              </tr>
+              <tr>
+                <td><b>Fortisip compact</b><div class="f3-xs f3-mut">200ml bottle</div></td>
+                <td>Nadia Okonkwo</td>
+                <td class="f3-num">6</td>
+                <td class="f3-num">3 days</td>
+                <td>12 Nov 2026</td>
+                <td><span class="f3-badge f3-badge--caution">Low</span></td>
+                <td><button class="f3-btn f3-btn--sm">Order</button></td>
+              </tr>
+              <tr>
+                <td><b>Metformin 500mg</b><div class="f3-xs f3-mut">tablet</div></td>
+                <td>Bruno Farrell-Reyes</td>
+                <td class="f3-num">14</td>
+                <td class="f3-num">4 days</td>
+                <td>3 Mar 2027</td>
+                <td><span class="f3-badge f3-badge--caution">Low</span></td>
+                <td><button class="f3-btn f3-btn--sm">Order</button></td>
+              </tr>
+              <tr>
+                <td><b>Insulin glargine</b><div class="f3-xs f3-mut">pen · cold chain</div></td>
+                <td>Amara Sithole</td>
+                <td class="f3-num">2</td>
+                <td class="f3-num">—</td>
+                <td>19 Aug 2026</td>
+                <td><span class="f3-badge f3-badge--risk">Quarantined</span></td>
+                <td><button class="f3-btn f3-btn--sm">Fridge log</button></td>
+              </tr>
+              <tr>
+                <td><b>Amlodipine 5mg</b><div class="f3-xs f3-mut">tablet</div></td>
+                <td>Nadia Okonkwo</td>
+                <td class="f3-num">18</td>
+                <td class="f3-num">18 days</td>
+                <td>8 Jan 2027</td>
+                <td><span class="f3-badge f3-badge--good">In stock</span></td>
+                <td><button class="f3-btn f3-btn--sm">Ledger</button></td>
+              </tr>
+              <tr>
+                <td><b>Paracetamol 500mg</b><div class="f3-xs f3-mut">tablet · PRN</div></td>
+                <td>Ines Marchetti</td>
+                <td class="f3-num">42</td>
+                <td class="f3-num">~14 days</td>
+                <td>22 Sep 2026</td>
+                <td><span class="f3-badge f3-badge--good">In stock</span></td>
+                <td><button class="f3-btn f3-btn--sm">Ledger</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="f3-xs f3-mut" style="margin-top:var(--s3)">
+          PRN cover is an estimate based on recent use and is marked with ~. Scheduled cover is exact.
+        </p>
+      </section>
+
+      <div class="f3-grid f3-grid--main">
+
+        <div class="f3-stack">
+
+          <!-- ============ LEDGER ============ -->
+          <section class="f3-card" aria-labelledby="lg-h">
+            <div class="f3-cardhead">
+              <div>
+                <h2 id="lg-h">Medicine ledger — Amlodipine 5mg</h2>
+                <p class="f3-cardsub">Nadia Okonkwo · every movement, immutable, from opening balance</p>
+              </div>
+            </div>
+            <div class="f3-tablewrap">
+              <table class="f3-table">
+                <thead>
+                  <tr><th scope="col">When</th><th scope="col">Movement</th><th scope="col">Qty</th><th scope="col">Balance</th><th scope="col">By</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>3 Aug 14:18</td><td>Administration</td><td class="f3-num">−1</td><td class="f3-num">18</td><td>Joy A.</td></tr>
+                  <tr><td>2 Aug 14:10</td><td>Administration</td><td class="f3-num">−1</td><td class="f3-num">19</td><td>Priya R.</td></tr>
+                  <tr><td>1 Aug 14:20</td><td>Declined — no movement</td><td class="f3-num">0</td><td class="f3-num">20</td><td>Priya R.</td></tr>
+                  <tr><td>29 Jul 09:02</td><td>Adjustment — count correction</td><td class="f3-num">−2</td><td class="f3-num">20</td><td>Ines M.</td></tr>
+                  <tr><td>28 Jul 10:15</td><td><b>Receipt</b> — order #4390</td><td class="f3-num">+28</td><td class="f3-num">22</td><td>Joy A.</td></tr>
+                  <tr><td>28 Jul 10:15</td><td>Opening balance, cycle 4</td><td class="f3-num">—</td><td class="f3-num">−6</td><td>system</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="f3-alert f3-alert--info" style="margin-top:var(--s4)">
+              <span class="f3-alert-mark" aria-hidden="true">◐</span>
+              <div class="f3-alert-body">
+                <div class="f3-alert-title">The 29 July adjustment has a reason attached</div>
+                <div class="f3-alert-text">"Physical count 20, system 22. Two tablets unaccounted. Investigated — likely dropped and disposed of without recording on 26 Jul. Signed off by I. Marchetti."</div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ============ ORDERING ============ -->
+          <section class="f3-card" aria-labelledby="or-h">
+            <div class="f3-cardhead">
+              <div>
+                <h2 id="or-h">Suggested order — cycle 5</h2>
+                <p class="f3-cardsub">A person approves every order. Nothing is sent automatically.</p>
+              </div>
+              <span class="f3-badge f3-badge--ghost">Draft</span>
+            </div>
+
+            <article class="f3-listitem f3-listitem--card">
+              <div class="f3-listbody">
+                <div class="f3-listtitle">Amlodipine 5mg tablet — suggest 28</div>
+                <div class="f3-listmeta">Nadia Okonkwo · Whitfield Pharmacy</div>
+                <div class="f3-card f3-card--tint" style="padding:var(--s3); margin-top:var(--s3)">
+                  <h4 style="margin-bottom:var(--s2)">How 28 was calculated</h4>
+                  <dl class="f3-dl f3-sm">
+                    <dt>Current balance</dt><dd>18 tablets</dd>
+                    <dt>Scheduled demand</dt><dd>28 doses over the 28-day cycle</dd>
+                    <dt>PRN assumption</dt><dd>None — this is a scheduled medicine</dd>
+                    <dt>Expected delivery</dt><dd>6 Aug (3 days of cover used first)</dd>
+                    <dt>Configured buffer</dt><dd>7 days</dd>
+                    <dt>Result</dt><dd><b>28 − 18 + 7 + 3 buffer/transit = 20, rounded to a 28-pack</b></dd>
+                  </dl>
+                </div>
+              </div>
+              <div class="f3-stack f3-stack--sm">
+                <input class="f3-input" value="28" style="width:88px; text-align:center" aria-label="Quantity to order">
+                <button class="f3-btn f3-btn--sm">Remove</button>
+              </div>
+            </article>
+
+            <article class="f3-listitem f3-listitem--card">
+              <div class="f3-listbody">
+                <div class="f3-listtitle">Fortisip compact — suggest 30 bottles</div>
+                <div class="f3-listmeta">Nadia Okonkwo · <b>currently low, 3 days cover</b></div>
+              </div>
+              <div class="f3-stack f3-stack--sm">
+                <input class="f3-input" value="30" style="width:88px; text-align:center" aria-label="Quantity to order">
+                <button class="f3-btn f3-btn--sm">Remove</button>
+              </div>
+            </article>
+
+            <div class="f3-row" style="margin-top:var(--s4)">
+              <span class="f3-sm f3-mut">2 items · to Whitfield Pharmacy</span>
+              <div class="f3-spacer f3-row">
+                <button class="f3-btn">Save draft</button>
+                <button class="f3-btn f3-btn--primary">Approve &amp; send</button>
+              </div>
+            </div>
+
+            <p class="f3-note" style="margin-top:var(--s4)">
+              <b>Safety calculation.</b> Suggested quantities always expose their inputs — balance, scheduled demand,
+              PRN assumption, expected delivery and buffer. A number you cannot interrogate is a number you cannot trust.
+            </p>
+          </section>
+
+          <!-- ============ DELIVERY / RECONCILIATION ============ -->
+          <section class="f3-card" aria-labelledby="dl-h">
+            <div class="f3-cardhead">
+              <h2 id="dl-h">Delivery check-in — order #4471</h2>
+              <span class="f3-badge f3-badge--caution">Discrepancy</span>
+            </div>
+            <div class="f3-tablewrap">
+              <table class="f3-table">
+                <thead>
+                  <tr><th scope="col">Item</th><th scope="col">Expected</th><th scope="col">Received</th><th scope="col">Batch</th><th scope="col">Expiry</th><th scope="col">Status</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>Amlodipine 5mg</td><td class="f3-num">28</td><td class="f3-num">28</td><td>AZ4471K</td><td>8 Jan 2027</td><td><span class="f3-badge f3-badge--good">Matches</span></td></tr>
+                  <tr><td>Levetiracetam 500mg</td><td class="f3-num">56</td><td class="f3-num">0</td><td>—</td><td>—</td><td><span class="f3-badge f3-badge--risk">Not supplied</span></td></tr>
+                  <tr><td>Fortisip compact</td><td class="f3-num">30</td><td class="f3-num">24</td><td>FC22019</td><td>12 Nov 2026</td><td><span class="f3-badge f3-badge--caution">Part supplied</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="f3-stack" style="margin-top:var(--s4)">
+              <div class="f3-field">
+                <label class="f3-label" for="disc">Discrepancy note <span class="f3-req" aria-hidden="true">*</span></label>
+                <textarea class="f3-textarea" id="disc">Levetiracetam not supplied — wholesaler out of stock, pharmacy sourcing. Fortisip short by 6, to follow.</textarea>
+              </div>
+              <div class="f3-row">
+                <span class="f3-sm f3-mut">Received by Joy Adeyemi · 3 Aug 13:05</span>
+                <button class="f3-btn f3-btn--primary f3-spacer">Accept delivery with discrepancy</button>
+              </div>
+            </div>
+          </section>
+
+        </div>
+
+        <!-- ============ PHARMACY WORKSPACE ============ -->
+        <div class="f3-stack">
+
+          <section class="f3-card" aria-labelledby="ph-h">
+            <div class="f3-cardhead">
+              <h2 id="ph-h">Pharmacy</h2>
+              <span class="f3-badge f3-badge--good">Connected</span>
+            </div>
+            <p class="f3-sm f3-mut" style="margin-bottom:var(--s4)">
+              Whitfield Pharmacy · 28-day cycle · role-scoped access: they see only this organisation and only what the contract allows.
+            </p>
+
+            <h4 style="margin-bottom:var(--s3)">Order lifecycle</h4>
+            <div class="f3-row" style="gap:6px; margin-bottom:var(--s4)">
+              <span class="f3-badge f3-badge--ghost">Draft</span>
+              <span class="f3-badge f3-badge--ghost">Approved</span>
+              <span class="f3-badge f3-badge--neutral">Sent</span>
+              <span class="f3-badge f3-badge--info">Acknowledged</span>
+              <span class="f3-badge f3-badge--caution">Part supplied</span>
+              <span class="f3-badge f3-badge--good">Supplied</span>
+              <span class="f3-badge f3-badge--ghost">Cancelled</span>
+            </div>
+
+            <h4 style="margin-bottom:var(--s3)">Open queries</h4>
+            <article class="f3-listitem f3-listitem--card">
+              <div class="f3-listbody">
+                <div class="f3-row" style="gap:var(--s2)">
+                  <span class="f3-badge f3-badge--caution">Awaiting pharmacy</span>
+                  <span class="f3-xs f3-mut">2 days</span>
+                </div>
+                <div class="f3-listtitle" style="margin-top:6px">Metformin — spat out, redose?</div>
+                <div class="f3-listmeta">Bruno Farrell-Reyes · linked to exception #E-2210</div>
+              </div>
+            </article>
+            <article class="f3-listitem f3-listitem--card">
+              <div class="f3-listbody">
+                <div class="f3-row" style="gap:var(--s2)">
+                  <span class="f3-badge f3-badge--info">Awaiting us</span>
+                </div>
+                <div class="f3-listtitle" style="margin-top:6px">Furosemide — confirm strength</div>
+                <div class="f3-listmeta">Nadia Okonkwo · pharmacy asks whether the discharge letter says 20mg or 40mg</div>
+              </div>
+            </article>
+            <article class="f3-listitem f3-listitem--card" style="margin-bottom:0">
+              <div class="f3-listbody">
+                <div class="f3-row" style="gap:var(--s2)">
+                  <span class="f3-badge f3-badge--good">Resolved</span>
+                </div>
+                <div class="f3-listtitle" style="margin-top:6px">Sertraline — paused, stop supply?</div>
+                <div class="f3-listmeta">Theo Lindqvist · closed 1 Aug</div>
+              </div>
+            </article>
+
+            <button class="f3-btn f3-btn--block" style="margin-top:var(--s4)">New query</button>
+          </section>
+
+          <section class="f3-card" aria-labelledby="rec-h">
+            <div class="f3-cardhead">
+              <h2 id="rec-h">Reconciliation</h2>
+              <span class="f3-badge f3-badge--caution">4 unreconciled</span>
+            </div>
+            <dl class="f3-dl">
+              <dt>Last count</dt><dd>28 Jul, by Ines M. &amp; Joy A.</dd>
+              <dt>Next due</dt><dd>4 Aug (weekly)</dd>
+              <dt>Open variances</dt><dd>1 — Amlodipine, investigated and signed off</dd>
+            </dl>
+            <button class="f3-btn f3-btn--block" style="margin-top:var(--s4)">Start a count</button>
+          </section>
+
+          <section class="f3-card f3-card--flat" aria-labelledby="rd-h">
+            <h2 id="rd-h" style="margin-bottom:var(--s4)">Returns &amp; disposal</h2>
+            <p class="f3-sm f3-mut" style="margin-bottom:var(--s4)">
+              Every return records reason, quantity, destination or method, witness where required, and evidence.
+              Controlled drugs use the CD destruction workflow instead.
+            </p>
+            <a class="f3-btn f3-btn--block" href="careone-controlled-drugs-wireframe.html">CD destruction</a>
+            <button class="f3-btn f3-btn--block" style="margin-top:var(--s2)">Record a return</button>
+          </section>
+
+          <!-- EMPTY STATE example -->
+          <section class="f3-empty">
+            <div class="f3-empty-mark" aria-hidden="true">◇</div>
+            <h3>No expiring items in this view</h3>
+            <p>Nothing in the current filter expires within 30 days. Two items expire within 90 — widen the range to see them.</p>
+            <button class="f3-btn f3-btn--sm">Show 90 days</button>
+          </section>
+
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<nav class="f3-bottomnav" aria-label="Primary">
+  <a href="careone-dashboard-wireframe.html"><span class="f3-navicon" aria-hidden="true">T</span>Today</a>
+  <a href="careone-person-profile-wireframe.html"><span class="f3-navicon" aria-hidden="true">P</span>People</a>
+  <a href="careone-medication-round-wireframe.html"><span class="f3-navicon" aria-hidden="true">R</span>Round</a>
+  <a href="careone-handover-wireframe.html"><span class="f3-navicon" aria-hidden="true">M</span>Messages</a>
+  <a href="index.html" aria-current="page"><span class="f3-navicon" aria-hidden="true">···</span>More</a>
+</nav>
+
+</body>
+</html>

@@ -72,6 +72,15 @@ function MedLine({ row, locked, onGiven, onOutcome, onFlag }) {
 
     const slotLabel = row.as_required ? 'PRN' : (row.slot || '—');
 
+    // Some rows carry the SAME text in both `indication` (shown in the meta line as
+    // "For …") and `instruction` — rendering both reads as jumbled duplication. Show the
+    // instruction only when it genuinely adds something the indication doesn't already say.
+    const norm = (s) => String(s || '').toLowerCase().replace(/[\s.]+/g, ' ').trim();
+    const nInd = norm(row.indication);
+    const nIns = norm(row.instruction);
+    const showInstruction = Boolean(row.instruction) && nIns.length > 0
+        && !(nInd && (nInd === nIns || nInd.includes(nIns) || nIns.includes(nInd)));
+
     return (
         <Box py={12} style={{ borderTop: `1px solid ${HAIR}` }}>
             <Group gap="sm" wrap="nowrap" align="flex-start">
@@ -94,7 +103,7 @@ function MedLine({ row, locked, onGiven, onOutcome, onFlag }) {
                         "do not crush / with food" field does not exist yet (review C1/HAZ-22, pending
                         pharmacist + CSO) — so we do NOT dress the indication up as a directive, and
                         the accent is neutral (teal), not warning-orange. */}
-                    {row.instruction && (
+                    {showInstruction && (
                         <Group gap={6} wrap="nowrap" align="flex-start" mt={5}
                             style={{ background: SOFT, border: `1px solid ${HAIR}`, borderLeft: `2.5px solid ${TEAL}`, borderRadius: 8, padding: '5px 9px' }}>
                             <IconInfoCircle size={13} color="var(--mantine-color-teal-6)" style={{ flexShrink: 0, marginTop: 1 }} />
@@ -532,16 +541,33 @@ export default function Medication2Round({ rounds = [], grid = {}, date, current
                                 </Box>
                             </Group>
                             {(allergies.length > 0 || risks.length > 0) && (
-                                <Group gap={7} mt={10} wrap="wrap">
-                                    {allergies.map((a, i) => (
-                                        <Badge key={`a${i}`} color="red" variant="light" radius="sm" leftSection={<IconAlertTriangle size={11} />}>{a}</Badge>
-                                    ))}
-                                    {risks.map((r, i) => (
-                                        <Badge key={`r${i}`} color={r?.level === 'high' ? 'red' : 'orange'} variant="light" radius="sm">
-                                            {typeof r === 'string' ? r : (r?.label ?? '')}
-                                        </Badge>
-                                    ))}
-                                </Group>
+                                <Box mt={10}>
+                                    {/* Allergies — short red chips (sentence case, not shouty uppercase). */}
+                                    {allergies.length > 0 && (
+                                        <Group gap={7} wrap="wrap" mb={risks.length > 0 ? 7 : 0}>
+                                            {allergies.map((a, i) => (
+                                                <Badge key={`a${i}`} color="red" variant="light" radius="sm"
+                                                    leftSection={<IconAlertTriangle size={11} />}
+                                                    styles={{ label: { textTransform: 'none' } }}>{a}</Badge>
+                                            ))}
+                                        </Group>
+                                    )}
+                                    {/* Risk flags — full sentences, so shown as calm, readable alert rows
+                                        (icon + normal-case text + left accent) instead of ALL-CAPS badges. */}
+                                    {risks.map((r, i) => {
+                                        const high = typeof r === 'object' && r?.level === 'high';
+                                        const label = typeof r === 'string' ? r : (r?.label ?? '');
+                                        if (!label) return null;
+                                        const col = high ? RED : ORANGE;
+                                        return (
+                                            <Group key={`r${i}`} gap={8} wrap="nowrap" align="flex-start" mt={i === 0 ? 0 : 6}
+                                                style={{ background: `color-mix(in srgb, ${col} 8%, transparent)`, border: `1px solid color-mix(in srgb, ${col} 20%, transparent)`, borderLeft: `2.5px solid ${col}`, borderRadius: 8, padding: '7px 11px' }}>
+                                                <IconAlertTriangle size={14} color={col} style={{ flexShrink: 0, marginTop: 1.5 }} />
+                                                <Text fz={12.5} c={TXT} style={{ lineHeight: 1.4 }}>{label}</Text>
+                                            </Group>
+                                        );
+                                    })}
+                                </Box>
                             )}
                         </Box>
 

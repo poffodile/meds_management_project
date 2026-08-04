@@ -36,11 +36,14 @@ Plain English throughout. No jargon. If a decision was made, write down *why*, s
 | The driving documentation | **Supplied** — `CARE-ONE-OS-UX-SPECIFICATION.md` (+ original .docx) in this folder | 2026-08-04 |
 | The 12 wireframe prototypes it references | **Missing** — parked as [issue 1](FRONTEND3-ISSUES.md); own set built instead | 2026-08-04 |
 | Own wireframe set | **Built** — 12 screens + contact sheet + scoped CSS in `wireframes/` | 2026-08-04 |
+| Link from the Blade header into frontend3 | **Built** — "Frontend 3" button beside Frontend 1 and 2, → `/frontend3` | 2026-08-04 |
+| frontend3's own layout + scoped CSS (`.f3-root`) | **Built & verified** — own root view, Vite entry, theme, tokens, stylesheet; separate bundle | 2026-08-04 |
 | First build slice chosen | Not yet — spec suggests shell + dashboard + round | 2026-08-04 |
 | Stack for frontend3 | **Decided: React + Inertia + Mantine**, fully isolated from frontend2 | 2026-08-04 |
-| Link from Blade landing page into frontend3 | Not built | 2026-08-04 |
-| frontend3's own layout + scoped CSS (`.f3-root`) | Not built | 2026-08-04 |
-| Anything shared broken by frontend3 | No — nothing built yet | 2026-08-04 |
+| Shared files touched | 3, all additive: `vite.config.js`, `routes/web.php`, `header.blade.php` | 2026-08-04 |
+| Anything shared broken by frontend3 | No — `app-*.js` bundle unchanged; build passes | 2026-08-04 |
+| Clicked through in a browser | **Not yet** — routes, view and build verified, rendering not | 2026-08-04 |
+| Committed | **No** — everything is uncommitted on the `frontend3` branch | 2026-08-04 |
 
 ---
 
@@ -248,6 +251,52 @@ Plain English throughout. No jargon. If a decision was made, write down *why*, s
 
 ---
 
+### 2026-08-04 12:40 — Frontend 3 link added to the Blade header, and the skeleton behind it built
+
+**What we did:**
+- Found how Frontend 1 and Frontend 2 are actually linked: two `<li>` buttons in **`resources/views/frontEnd/common/header.blade.php`** (lines ~98–108), under the comment *"New UI shortcuts"*. Frontend 1 → `/medication/medication-round-react` in navy `#1C325A`; Frontend 2 → `/frontend2` in orange `#FF9800`.
+- Added a **third button in exactly that pattern** — Frontend 3 → `/frontend3`, in the spec's clinical teal `#176B65` with a leaf icon, so it reads as belonging to frontend3 rather than to the old app.
+- A link needs a destination, so built the **minimal isolated frontend3 skeleton** behind it. All of it verified.
+
+**What was built (all new files):**
+
+| File | What it is |
+|---|---|
+| `frontend3/tokens.js` | Quiet Clinical Luxury palette, muted status tints with word+shape, geometry, breakpoints |
+| `frontend3/theme.js` | Own Mantine theme built from those tokens — teal and navy shade ramps, 44px button minimum |
+| `frontend3/f3.css` | Scoped stylesheet, **every rule under `.f3-root`** |
+| `resources/js/f3.jsx` | Own Inertia entry — own MantineProvider, resolves pages from `./F3Pages/`, wraps everything in `.f3-root` |
+| `resources/js/F3Pages/Home.jsx` | The landing page — six areas, build status, links to the concept screens |
+| `resources/views/f3.blade.php` | Own root view — Manrope + Inter only, own Vite entry, no font-switcher, no Fontshare |
+| `app/Http/Controllers/Frontend3/Frontend3Controller.php` | Sets the root view; serves the concept screens read-only from a filename whitelist |
+
+**Additive edits to three shared files — nothing more:**
+- `vite.config.js` — `resources/js/f3.jsx` added to `input`, `@frontend3` alias added
+- `routes/web.php` — `/frontend3` and `/frontend3/wireframes/{file?}` plus one `use` statement, placed beside the frontend2 routes so they inherit the same auth group
+- `resources/views/frontEnd/common/header.blade.php` — the one `<li>`
+
+**Decisions made:**
+- **No `HandleF3InertiaRequests` middleware after all.** It was the obvious approach, but registering a middleware alias means editing `app/Http/Kernel.php`, which is shared with frontend1 and frontend2. `Inertia::setRootView('f3')` in the controller constructor does the same job and touches nothing shared. The plan document has been corrected to say so.
+- **The concept screens are served from `docs/`, not copied into `public/`.** A second copy would drift. A controller action serves them read-only behind an explicit filename whitelist — the whitelist, not a path sanitiser, is what makes traversal impossible.
+- **No font switcher in frontend3.** The specification fixes Manrope and Inter, so offering a picker would let someone configure their way out of the design.
+
+**Verified:**
+- Laravel booted directly (`route:list` is broken repo-wide by an unrelated missing `ManagerController`): `frontend3.home` → `/frontend3` ✓, `frontend3.wireframes` → `/frontend3/wireframes` ✓, controller class found ✓, `f3` view found ✓
+- `php -l` on the controller: clean
+- `npx vite build`: succeeds, and produces **two independent bundles** — `f3-6cdf3d9a.js` (6.36 kB) + `f3-70b32fe6.css` (5.25 kB) alongside the untouched `app-*.js` (1,142 kB). frontend3 is not riding in the frontend2 bundle.
+- `public/build` is gitignored, so no build artefacts enter the repo.
+
+**Not yet verified:** the page has not been clicked through in a browser. Routes, view resolution and the build are confirmed; the rendered result is not.
+
+**Noticed, not touched:** `resources/js/Pages/Frontend2/Medication2/Round.jsx` is sitting **staged but uncommitted**. It is not part of this work and was already staged before it. Flagged so it does not get swept into a frontend3 commit by accident.
+
+**Open questions / what's next:**
+- Unchanged: first build slice (issue 2), overlap with frontend2 (issue 3), palette relationship (issue 4).
+
+**Files touched:** listed in the two tables above, plus `FRONTEND3-PLAN.md` (root-view row corrected, third shared file documented) and this log.
+
+---
+
 ## Part 2 — Conversation record
 
 ### 2026-08-04 ~11:40 — "Look into FRONTEND3-PLAN.md and tell me what you understand"
@@ -337,3 +386,23 @@ Recorded the resulting rule in `FRONTEND3-PLAN.md`: **stack from the existing ap
 > All data is fictional, with deliberately long names to test the layout. Tag balance checked across all thirteen files.
 
 Noted that the underlying judgement here was: **don't wait on a missing input when the brief is enough to proceed.** The specification was detailed enough to design from directly, so building and marking it replaceable beat blocking.
+
+### 2026-08-04 ~12:30 — "Create a link to the frontend3 page on the Laravel/Blade page, just how frontend 1 and 2 is"
+
+**Asked:** Add a link to frontend3 on the Blade page, following the same pattern as the existing Frontend 1 and Frontend 2 links.
+
+**Answered:** Found the pattern first rather than inventing one.
+
+> Frontend 1 and Frontend 2 are two `<li>` buttons in `resources/views/frontEnd/common/header.blade.php`, under a comment reading *"New UI shortcuts"*. Frontend 1 points at `/medication/medication-round-react` in navy `#1C325A` with a flask icon; Frontend 2 points at `/frontend2` in orange `#FF9800` with a rocket icon. Added a third in exactly that shape — **Frontend 3 → `/frontend3`**, in the specification's clinical teal `#176B65` with a leaf icon, so the button reads as belonging to frontend3's palette rather than the old app's.
+
+Then made the link go somewhere real, since a link to a 404 is worse than no link. Built the minimal isolated skeleton: `frontend3/tokens.js`, `frontend3/theme.js`, `frontend3/f3.css` (every rule under `.f3-root`), `resources/js/f3.jsx` (own Inertia entry, own MantineProvider, resolves from `./F3Pages/`), `resources/js/F3Pages/Home.jsx`, `resources/views/f3.blade.php` (own root view, Manrope + Inter only) and `app/Http/Controllers/Frontend3/Frontend3Controller.php`. Only three shared files were touched, all additively: `vite.config.js`, `routes/web.php` and the header Blade file.
+
+Two judgement calls worth recording:
+
+> **Dropped the planned middleware.** `HandleF3InertiaRequests` would have needed an alias registered in `app/Http/Kernel.php` — a file shared with frontend1 and frontend2. `Inertia::setRootView('f3')` in the controller constructor achieves the same isolation and touches nothing shared. The plan document was corrected rather than left saying something we deliberately didn't do.
+>
+> **The concept screens are served from `docs/`, not copied into `public/`.** A second copy would drift out of sync. A controller action serves them read-only behind an explicit filename whitelist — the whitelist, not a path sanitiser, is what makes traversal impossible.
+
+Verified by booting Laravel directly (the repo's `route:list` is broken by an unrelated missing `ManagerController`): both routes resolve, the controller class loads, the `f3` view is found, `php -l` is clean, and `npx vite build` produces **two independent bundles** — frontend3 at 6.36 kB JS + 5.25 kB CSS, with the 1,142 kB `app-*.js` untouched. Said plainly that the page has **not** been clicked through in a browser yet.
+
+Also flagged something noticed but not touched: `resources/js/Pages/Frontend2/Medication2/Round.jsx` is staged but uncommitted, predating this work — mentioned so it doesn't get swept into a frontend3 commit by accident.

@@ -43,6 +43,7 @@ use App\Http\Controllers\frontEnd\Domiciliary\StaffAvailabilityController as Dom
 use App\Http\Controllers\frontEnd\Domiciliary\StaffController as DomStaffController;
 use App\Http\Controllers\frontEnd\Domiciliary\VisitScheduleController as DomVisitScheduleController;
 use App\Http\Controllers\frontEnd\Frontend2Controller;
+use App\Http\Controllers\Frontend3\Frontend3Controller;
 use App\Http\Controllers\frontEnd\Medication\ControlledDrugRegisterController;
 use App\Http\Controllers\frontEnd\Medication\Medication2RoundController;
 use App\Http\Controllers\frontEnd\Medication\MedicationRoundController;
@@ -1615,6 +1616,13 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
     Route::post('/medication/medication-round-4-2/record', [MedicationRoundController::class, 'recordMedsRound42'])->name('medication.medication-round.v42.record');
     Route::post('/medication/medication-round-4-2/end-round', [MedicationRoundController::class, 'endMedsRound42'])->name('medication.medication-round.v42.end');
     Route::post('/medication/medication-round-4-2/reopen-round', [MedicationRoundController::class, 'reopenMedsRound42'])->name('medication.medication-round.v42.reopen');
+
+    // Frontend 3 — a third parallel front end, built to the Care One OS UX Specification.
+    // Own Blade root view (f3.blade.php), own Vite entry (resources/js/f3.jsx), own theme and
+    // own CSS scoped under .f3-root. Shares nothing with frontend1/frontend2 except the stack.
+    // Docs: docs/care-one-os/FRONTEND3/
+    Route::get('/frontend3', [Frontend3Controller::class, 'index'])->name('frontend3.home');
+    Route::get('/frontend3/wireframes/{file?}', [Frontend3Controller::class, 'wireframe'])->name('frontend3.wireframes');
 
     // Frontend 2 — a separate app shell with its own sidebar (new section, own React pages).
     Route::get('/frontend2', [Frontend2Controller::class, 'index'])->name('frontend2.home');
