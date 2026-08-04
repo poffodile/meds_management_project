@@ -66,8 +66,14 @@
   line-height: 1.25;
 }
 .f3-root p { margin: 0; }
-.f3-root a { color: var(--f3-teal); text-decoration: none; }
-.f3-root a:hover { text-decoration: underline; }
+/* Only PLAIN links get link styling. An anchor carrying a component class
+   (.f3-btn, .f3-tile…) must keep that component's own colour. Without
+   :not([class]) this rule is specificity (0,1,1) and silently beats
+   .f3-btn--primary at (0,1,0) — teal text on a teal button, i.e. an
+   invisible primary action. Caught in the browser on 2026-08-04. */
+.f3-root a:not([class]) { color: var(--f3-teal); text-decoration: none; }
+.f3-root a:not([class]):hover { text-decoration: underline; }
+.f3-root a { text-decoration: none; }
 
 /* Visible focus on everything interactive (WCAG 2.2 AA). */
 .f3-root :focus-visible {

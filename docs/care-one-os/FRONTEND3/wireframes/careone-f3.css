@@ -60,8 +60,14 @@
 .f3-root h3 { font-size: 1rem; }
 .f3-root h4 { font-size: .875rem; letter-spacing: .04em; text-transform: uppercase; color: var(--slate); font-weight: 600; }
 .f3-root p  { margin: 0; }
-.f3-root a  { color: var(--teal); text-decoration: none; }
-.f3-root a:hover { text-decoration: underline; }
+/* Only PLAIN links get link styling. An anchor carrying a component class
+   (.f3-btn, .f3-tile, .f3-navlink, .f3-stat…) must keep that component's own
+   colour. Without :not([class]) this rule is specificity (0,1,1) and silently
+   beats .f3-btn--primary at (0,1,0) — which renders teal text on a teal
+   button, i.e. an invisible primary action. */
+.f3-root a:not([class])  { color: var(--teal); text-decoration: none; }
+.f3-root a:not([class]):hover { text-decoration: underline; }
+.f3-root a { text-decoration: none; }
 .f3-root ul { margin: 0; padding: 0; list-style: none; }
 
 /* Visible focus on every interactive thing (WCAG 2.2 AA, spec §18) */
