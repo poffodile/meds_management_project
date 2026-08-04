@@ -32,21 +32,28 @@ Plain English throughout. If a decision was made, write down *why*.
 
 | Thing | State | As of |
 |---|---|---|
-| Git branch | `frontend3` (frontend4 is being built on the same branch) | 2026-08-04 |
+> **▶ Picking this up again? Jump to [RESUME HERE](#-resume-here--2026-08-04) at the bottom of this file.**
+
+| Git branch | **`frontend4`** — own branch, fast-forwarded from `frontend3`. **Everything uncommitted.** | 2026-08-04 |
 | Route into frontend4 | **Built** — "Frontend 4" button in the Blade header → `/frontend4` | 2026-08-04 |
 | Own root view + Vite entry + page dir | **Built** — `f4.blade.php`, `resources/js/f4.jsx`, `resources/js/F4Pages/` | 2026-08-04 |
 | Own scoped CSS (`.f4-root`) | **Built & checked** — every rule scoped; no global stylesheet loaded | 2026-08-04 |
 | Own tokens + shell component | **Built** — `frontend4/tokens.js`, `frontend4/components/F4Shell.jsx` | 2026-08-04 |
 | Same database / same login | **Yes by design** — one `.env`, existing tables and models, existing auth | 2026-08-04 |
-| Real screens reading real data | **None yet** — `Home.jsx` is a scaffold page only | 2026-08-04 |
+| Real screens reading real data | **Two built** — Today (`/frontend4`) and the medication round (`/frontend4/round`), both on live data | 2026-08-04 |
+| Roles & permissions | **Built** — 40 access-level names → four roles; enforced server-side. Closed a hole where any logged-in user could reach medication management | 2026-08-04 |
+| Outcomes | **Nine of ten** recording. *Part administered* deferred — needs a quantity; decision open | 2026-08-04 |
+| Issue log | **17 issues** — [FRONTEND4-ISSUES.md](FRONTEND4-ISSUES.md); I1 and I16 closed | 2026-08-04 |
+| Test log | **Written** — [FRONTEND4-TEST-LOG.md](FRONTEND4-TEST-LOG.md), a case per feature and per issue | 2026-08-04 |
+| Test suite baseline | **14 errors / 3 failures** (pre-existing, [I12](FRONTEND4-ISSUES.md#i12)). Any other result = something changed | 2026-08-04 |
 | Design direction + shell + page plan | **Written** — [FRONTEND4-DESIGN.md](FRONTEND4-DESIGN.md) | 2026-08-04 |
 | The owner's full specification | **In the repo** — [CARE-ONE-OS-VISUAL-AND-PAGE-SPEC.md](CARE-ONE-OS-VISUAL-AND-PAGE-SPEC.md) | 2026-08-04 |
 | Milestone plan | **Written** — [FRONTEND4-MILESTONES.md](FRONTEND4-MILESTONES.md); M0 and M1 ticked off | 2026-08-04 |
 | Palette | **Settled** — frontend4 keeps cool grey + indigo; hue off-spec by design, every craft rule adopted | 2026-08-04 |
 | First role | **Support worker** — settled. Other roles are added as expansions of the same structure, later | 2026-08-04 |
-| Sidebar | **Being reworked** — six areas shown to everyone is wrong for a carer; short role-gated nav instead | 2026-08-04 |
-| Next milestone | **M2 — Medication Round — PAUSED** pending the navigation + roles plan | 2026-08-04 |
-| Which page to build first | **Planned, not started** — Today/dashboard, then round list, then administration workspace | 2026-08-04 |
+| Sidebar | **Built** — five items for a carer, more added by role. Nothing deleted, everything gated | 2026-08-04 |
+| Terminology | **`client`** is canonical (already is — `client_id` in 37 tables). Display label stays configurable | 2026-08-04 |
+| Next milestone | **M3 — waiting on you to look at the round.** PRN, CD witnessing, stock deduction and sign-off come after | 2026-08-04 |
 
 ---
 
@@ -278,3 +285,89 @@ Seven places in `BuildsMedicationRound` decide "did the medicine go in?" by comp
 On versatility: it helps more than it might look, because it rules things out rather than just describing an ambition. No hard-coded "Resident", no assumption a person has a room or a unit, terminology taken from configuration with "Person" as the neutral default, modules that toggle per service mode while the safety patterns stay identical, no visual design aimed at an age group, and layouts that still look composed when a whole module is switched off. It also constrains the build order — Phase 1 can't start with a screen only a care home would use, which the current five don't.
 
 It was also flagged that the original question had been asked badly. "Who is it for" was meant as *which devices and working posture* — a carer on a phone mid-round versus someone at a desk — not which people the software serves. That part is still open; the scope question is now closed.
+
+---
+
+### 2026-08-04 (continued) — the rest of the session
+
+**Asked:** which devices, own branch, wireframes?
+**Answered/decided:** desktop **and** mobile both properly · **own `frontend4` branch** (fast-forwarded from `frontend3`, no commits lost) · **straight to built screens**, no wireframes.
+
+**Asked:** "I don't like seeing all those options on the side. I'd rather have the main 4 or 5. But different roles… the current pages are useful too, maybe for admin."
+**Answered:** that is a role question wearing a navigation costume. **A page is not a menu item.** Eleven pages exist; a carer *navigates* to five. The rest are reached in context — you tap a client to open their profile, and open the MAR from inside it. Reaching the MAR from a menu loses the client you meant. So nothing is deleted; it is gated. The long list belongs to the administrator, and to us.
+
+**Asked:** "Make it a plan I can see on the screen, not you typing out what each thing does."
+**Answered:** built two pages instead of prose —
+· **Plan** https://claude.ai/code/artifact/8d49b4f3-b17a-439c-9a92-a5645f0d5a39 (sidebar drawn per role, where the 11 pages live, the roles found in the database, the 8 conflicts)
+· **Milestones** https://claude.ai/code/artifact/654f4328-e604-4cc1-9755-c3092feeb3ef (every milestone in plain English, after "I don't know what M2 is")
+
+**Asked:** send the documentation.
+**Answered:** the `.docx` was **byte-identical** to the copy already in the repo. No third document — the UX Specification plus the pasted visual/page spec is the whole set. Merged into `CARE-ONE-OS-MERGED-PLAN.md` with eight conflicts (C1–C8) surfaced rather than silently resolved.
+
+**Asked:** is anything wrong with the database?
+**Answered:** no. It is strongest exactly where being wrong would be dangerous — an append-only correction chain on `mar_administrations`, `balance_before`/`balance_after` on stock movements, a real second account for CD witnessing, PRN maxima enforced inside a row lock. The gaps are where the specification goes *beyond* what was built, not breakage.
+
+**Asked:** what roles already exist?
+**Answered:** two tiers — `user_type` (N 281 · A 75 · M 45 · CM 11 · O 2) and `access_level`, **82 levels across 46 homes under 40 different names**. Four of the five role groups already exist in some form. The finding that mattered: the new `/medication/*` pages had **no permission rows at all** — anyone who could log in could reach medication management.
+
+**Asked:** "My company calls the people clients — people can also be staff."
+**Answered:** you were right and my C3 recommendation was wrong. The database already says `client_id` in **37 tables** plus dozens of `client_*` tables, and "people" genuinely is ambiguous when staff are people too. `client` is canonical; the display label stays configurable.
+
+**Asked:** managers should edit clinical records, but with a permanent log; and manage staff.
+**Answered:** that *is* the correction model, already in the schema — `supersedes_id`, `is_current`, `amendment_reason`. My matrix row saying "never" meant *overwrite or delete*, which stays impossible for everyone. Managers manage staff **in their own homes**; defining what a role may do stays with the administrator, or a manager could grant themselves anything.
+
+**Asked:** "Managers should record doses — they're practically staff with more access."
+**Answered:** exactly how it was built. Roles inherit the one below.
+
+**Asked:** why can't we fix M1.8 now?
+**Answered:** we could, and the deferral did not survive the question. The refactor is **provably a no-op** — the "given" list holds only `'A'`, so every call returns what the old comparison returned. Cheap and verifiable while it changes nothing; expensive and risky later. **Correction on doing it: it was ten sites, not seven.** The first search only covered one file, and the three missed were the worst — two write the persisted `given` column.
+
+**Asked:** where did "part administered" come from?
+**Answered:** your own UX Specification, section 10. It is not a way of giving medicines — it records what happened when only some of the dose went in. Neither "given" nor "refused" would be true. It is also the **only** thing M1.8 was blocking.
+
+**Asked:** fix I16, then let me look at the round.
+**Answered:** fixed. The dose is still recorded — refusing to record a dose someone physically gave is the worse error — but the ledger now tells the truth: `administered 3.00 → −2.00`, then a labelled `correction −2.00 → 0.00` naming the shortfall. The `?` I had flagged in the reason text turned out to be the Windows MySQL client mis-displaying an em-dash; nothing was wrong, so nothing was "fixed".
+
+**Asked:** make an issue log; then add the issues to the test log.
+**Answered:** `FRONTEND4-ISSUES.md` (17 issues, severity-rated, nothing closed until done) and `FRONTEND4-TEST-LOG.md` (a test per issue — ✅ proves a fix, ⚠️ demonstrates a gap, so I3 reads "give a client a medicine they're allergic to; nothing warns you" rather than a paragraph).
+
+---
+
+# ▶ RESUME HERE — 2026-08-04
+
+**Branch:** `frontend4` · **Everything is uncommitted** (nothing has been committed this session).
+
+**Say:** *"continue frontend4"*
+
+### Where we stopped
+The medication round is **built and working**, and you were about to open it and tell me what is wrong with it. That look is the gate — **M3 (PRN, controlled-drug witnessing, stock deduction, sign-off) waits until you have seen it.** That is your own instruction from the specification and it is the right one.
+
+**To run it:**
+```
+"C:/laragon/bin/mysql/mysql-8.4.3-winx64/bin/mysqld.exe" --datadir=C:/laragon/data/mysql-8.4
+"C:/laragon/bin/php/php-8.3.30-Win32-vs16-x64/php.exe" -S 127.0.0.1:8000 serve-local.php
+```
+then `http://127.0.0.1:8000/dev-login` → `http://127.0.0.1:8000/frontend4/round`
+
+### Done
+M0 isolation · M1 design system · M1.5 roles & permissions · M1.6 role-gated sidebar · M1.7 nine outcomes · M1.8 one definition of "given" · M2 the medication round · I16 stock ledger reconciles
+
+### Open decisions waiting on you
+1. **Part administered** — do you want it as an outcome? M1.8 is done so it is now a one-line change, but it needs a quantity captured. If you do not want it, nothing is waiting.
+2. **I2** — the medication pages in frontends 1, 2 and 3 are still reachable by anyone who can log in. Add permission rows, or apply the same role check? It touches three live front ends, so it is not mine to just do.
+
+### Owed
+- A regression test for the I16 fix (verified against live data, which is weaker).
+- **I12** — the suite is red at **14 errors / 3 failures**. That is the baseline; any different result means something changed. Until it is triaged, every "identical before and after" check in this session is weaker evidence than it should be.
+
+### The files that hold everything
+| File | What it is |
+|---|---|
+| `FRONTEND4.md` | this log — work log + conversation record + this resume point |
+| `FRONTEND4-MILESTONES.md` | the build plan, M0 → M12 plus the database track |
+| `CARE-ONE-OS-MERGED-PLAN.md` | both specifications merged; the C1–C8 conflicts and how they were settled |
+| `CARE-ONE-OS-VISUAL-AND-PAGE-SPEC.md` | your pasted specification, saved verbatim |
+| `FRONTEND4-ISSUES.md` | 17 issues, severity-rated |
+| `FRONTEND4-TEST-LOG.md` | a test case per feature and per issue |
+| `FRONTEND4-PLAN.md` | the isolation rules |
+| `FRONTEND4-DESIGN.md` | the design direction |
