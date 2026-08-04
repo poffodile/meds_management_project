@@ -6,11 +6,11 @@ import { fileURLToPath, URL } from 'node:url';
 export default defineConfig({
     plugins: [
         laravel({
-            // Two independent entries. app.jsx is frontend1/frontend2; f3.jsx is
-            // frontend3 and shares nothing with it — its own theme, its own
-            // stylesheet, its own page directory. Adding an entry here does not
-            // change the app.jsx bundle.
-            input: ['resources/js/app.jsx', 'resources/js/f3.jsx'],
+            // Three independent entries. app.jsx is frontend1/frontend2; f3.jsx is
+            // frontend3 and f4.jsx is frontend4, and neither shares anything with
+            // it — each has its own theme, its own stylesheet, its own page
+            // directory. Adding an entry here does not change the other bundles.
+            input: ['resources/js/app.jsx', 'resources/js/f3.jsx', 'resources/js/f4.jsx'],
             refresh: true,
         }),
         react(),
@@ -24,6 +24,10 @@ export default defineConfig({
             // Third front end (own theme + own scoped CSS) lives in /frontend3 — import via '@frontend3/...'
             // Nothing under /frontend or /frontend2 may import from here, and vice versa.
             '@frontend3': fileURLToPath(new URL('./frontend3', import.meta.url)),
+            // Fourth front end (own scoped CSS, no component library) lives in
+            // /frontend4 — import via '@frontend4/...'. Same rule as above:
+            // nothing outside may import from here, and vice versa.
+            '@frontend4': fileURLToPath(new URL('./frontend4', import.meta.url)),
         },
     },
     server: {

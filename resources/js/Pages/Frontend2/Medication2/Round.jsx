@@ -28,6 +28,14 @@ const HAIR = 'light-dark(#E1E7F0, #22303F)';
 const SURFACE = 'light-dark(#FFFFFF, #14202F)';
 const SOFT = 'light-dark(#F7F9FC, #101A27)';
 
+// Small neutral pill for a single structured fact (strength, route) — used instead of
+// chaining facts together with middots, which reads as a jumble once the line is long.
+const TAG = {
+    display: 'inline-flex', alignItems: 'center', padding: '2px 8px', borderRadius: 6,
+    background: 'light-dark(#EEF2F8, #1B2A3E)', border: '1px solid light-dark(#E1E7F0, #22303F)',
+    fontSize: 11.5, fontWeight: 600, color: 'light-dark(#3A4A62, #B7C4D6)', lineHeight: 1.5, whiteSpace: 'nowrap',
+};
+
 /** Age in whole years from an ISO date-of-birth. */
 function ageFromDob(dob) {
     if (!dob) return null;
@@ -81,6 +89,12 @@ function MedLine({ row, locked, onGiven, onOutcome, onFlag }) {
     const showInstruction = Boolean(row.instruction) && nIns.length > 0
         && !(nInd && (nInd === nIns || nInd.includes(nIns) || nIns.includes(nInd)));
 
+    // Indication laid out as a short lead ("For pain or fever") + any remaining detail on a
+    // quieter second line, instead of one long dot-joined run.
+    const indParts = String(row.indication || '').split(/\.\s+/).map((s) => s.trim()).filter(Boolean);
+    const indLead = indParts[0] || '';
+    const indRest = indParts.slice(1).join('. ');
+
     return (
         <Box py={12} style={{ borderTop: `1px solid ${HAIR}` }}>
             <Group gap="sm" wrap="nowrap" align="flex-start">
@@ -94,9 +108,20 @@ function MedLine({ row, locked, onGiven, onOutcome, onFlag }) {
                         {row.is_controlled && <Badge size="xs" variant="light" color="grape" radius="sm">CD</Badge>}
                     </Group>
                     {row.dose && <Text fz={13} fw={700} c={TEAL} mt={1}>Give {row.dose}</Text>}
-                    <Text fz={12} c={MUTED} mt={1}>
-                        {[row.strength, row.route, row.indication && `For ${row.indication}`].filter(Boolean).join(' · ') || '—'}
-                    </Text>
+                    {/* Strength + route as small tags; the indication sentence on its own line,
+                        so short facts and prose no longer run together behind middots. */}
+                    {(row.strength || row.route) && (
+                        <Group gap={6} mt={5} wrap="wrap">
+                            {row.strength && <Box component="span" style={TAG}>{row.strength}</Box>}
+                            {row.route && <Box component="span" style={TAG}>{row.route}</Box>}
+                        </Group>
+                    )}
+                    {indLead ? (
+                        <Box mt={5}>
+                            <Text fz={12} c={MUTED} style={{ lineHeight: 1.4 }}>For {indLead}</Text>
+                            {indRest && <Text fz={11.5} c={MUTED} mt={1} style={{ lineHeight: 1.35 }}>{indRest}</Text>}
+                        </Box>
+                    ) : (!row.strength && !row.route && <Text fz={12} c={MUTED} mt={5}>—</Text>)}
 
                     {/* Administration instruction — ONLY a genuine directive (PRN details today),
                         clearly labelled so it isn't confused with the indication above. A dedicated

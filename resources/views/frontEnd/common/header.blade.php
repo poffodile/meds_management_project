@@ -111,8 +111,16 @@ $allowed_ids = array_filter(explode(',', str_replace(' ', '', $raw_home_id)));
                          as belonging to that front end rather than to this one.
                          Docs: docs/care-one-os/FRONTEND3/ --}}
                     <li style="list-style: none;">
-                        <a href="{{ url('/frontend3') }}" class="btn" style="font-size: 12px !important; padding: 5px 12px !important; margin-right: 15px; border-radius: 4px !important; font-weight: bold; text-decoration: none; display: inline-block; margin-top: 3px; background:#176B65; color:#fff;">
+                        <a href="{{ url('/frontend3') }}" class="btn" style="font-size: 12px !important; padding: 5px 12px !important; margin-right: 8px; border-radius: 4px !important; font-weight: bold; text-decoration: none; display: inline-block; margin-top: 3px; background:#176B65; color:#fff;">
                             <i class="fa fa-leaf"></i> Frontend 3
+                        </a>
+                    </li>
+                    {{-- Frontend 4 — the only entry point into frontend4. Indigo #3F4FD6 is its
+                         own accent colour, so the button reads as belonging to that front end
+                         rather than to this one. --}}
+                    <li style="list-style: none;">
+                        <a href="{{ url('/frontend4') }}" class="btn" style="font-size: 12px !important; padding: 5px 12px !important; margin-right: 15px; border-radius: 4px !important; font-weight: bold; text-decoration: none; display: inline-block; margin-top: 3px; background:#3F4FD6; color:#fff;">
+                            <i class="fa fa-square-o"></i> Frontend 4
                         </a>
                     </li>
                     <!-- user login dropdown start-->

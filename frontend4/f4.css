@@ -1,0 +1,220 @@
+/* ============================================================================
+   frontend4 — scoped stylesheet
+
+   THE ISOLATION RULE
+   Every rule below is scoped under .f4-root. Nothing here can reach a
+   frontend1, frontend2 or frontend3 page, even though they run in the same
+   application. If you ever need a rule that cannot be written under .f4-root,
+   stop — that is the signal you are about to leak into the global stylesheet.
+
+   Loaded ONLY by resources/views/f4.blade.php via resources/js/f4.jsx.
+   frontend4 pulls in no global CSS at all: not resources/css/app.css, not
+   frontend3/f4.css, not a component-library reset. This file is the whole of it.
+   ========================================================================= */
+
+.f4-root {
+  /* Palette — mirrors frontend4/tokens.js. Change both together. */
+  --f4-canvas:    #F7F8FA;
+  --f4-surface:   #FFFFFF;
+  --f4-sunken:    #EEF1F5;
+  --f4-ink:       #111827;
+  --f4-body:      #334155;
+  --f4-muted:     #64748B;
+  --f4-line:      #E2E8F0;
+  --f4-accent:    #3F4FD6;
+  --f4-accent-in: #2F3CB0;
+
+  /* Status tints — always paired with a word, never colour alone. */
+  --f4-neutral-fg: #334155; --f4-neutral-bg: #EEF1F5;
+  --f4-good-fg:    #166534; --f4-good-bg:    #E7F4EC;
+  --f4-caution-fg: #854D0E; --f4-caution-bg: #FBF1DC;
+  --f4-risk-fg:    #9F1239; --f4-risk-bg:    #FCE9EE;
+  --f4-info-fg:    #3F4FD6; --f4-info-bg:    #EAECFB;
+
+  /* Geometry — eight-point spacing. */
+  --f4-r-sm: 6px; --f4-r-md: 10px; --f4-r-lg: 14px; --f4-r-pill: 999px;
+  --f4-s1: 4px; --f4-s2: 8px; --f4-s3: 12px; --f4-s4: 16px;
+  --f4-s5: 24px; --f4-s6: 32px; --f4-s7: 48px;
+
+  --f4-hair: 1px solid var(--f4-line);
+  --f4-lift: 0 1px 2px rgba(17,24,39,.04), 0 8px 20px -12px rgba(17,24,39,.18);
+
+  --f4-font: "Figtree", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  font-family: var(--f4-font);
+  color: var(--f4-body);
+  background: var(--f4-canvas);
+  font-size: 16px;
+  line-height: 1.55;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* No global reset is loaded, so frontend4 does its own — still scoped. */
+.f4-root *, .f4-root *::before, .f4-root *::after { box-sizing: border-box; }
+
+.f4-root h1, .f4-root h2, .f4-root h3 {
+  margin: 0;
+  color: var(--f4-ink);
+  font-weight: 700;
+  letter-spacing: -.015em;
+  line-height: 1.25;
+}
+.f4-root h1 { font-size: 1.75rem; }
+.f4-root h2 { font-size: 1.25rem; }
+.f4-root h3 { font-size: 1rem; }
+.f4-root p  { margin: 0; }
+
+.f4-root code {
+  padding: 1px 5px;
+  border-radius: var(--f4-r-sm);
+  background: var(--f4-sunken);
+  color: var(--f4-ink);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: .875em;
+}
+
+.f4-root a {
+  color: var(--f4-accent);
+  text-decoration: none;
+}
+.f4-root a:hover { text-decoration: underline; }
+
+/* Visible focus everywhere — keyboard users must never lose their place. */
+.f4-root :focus-visible {
+  outline: 2px solid var(--f4-accent);
+  outline-offset: 2px;
+  border-radius: var(--f4-r-sm);
+}
+
+/* ── Shell ────────────────────────────────────────────────────────────────── */
+
+.f4-topbar {
+  display: flex;
+  align-items: center;
+  gap: var(--f4-s3);
+  padding: var(--f4-s4) var(--f4-s5);
+  background: var(--f4-surface);
+  border-bottom: var(--f4-hair);
+}
+
+.f4-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--f4-r-sm);
+  background: var(--f4-accent);
+  color: #fff;
+  font-weight: 700;
+  font-size: .8125rem;
+  letter-spacing: .02em;
+}
+
+.f4-topbar-title {
+  font-weight: 600;
+  color: var(--f4-ink);
+}
+
+.f4-topbar-meta {
+  margin-left: auto;
+  font-size: .8125rem;
+  color: var(--f4-muted);
+}
+
+.f4-main {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: var(--f4-s6) var(--f4-s5) var(--f4-s7);
+}
+
+.f4-page-head { margin-bottom: var(--f4-s5); }
+.f4-page-head p {
+  margin-top: var(--f4-s2);
+  color: var(--f4-muted);
+  max-width: 60ch;
+}
+
+/* ── Cards ────────────────────────────────────────────────────────────────── */
+
+.f4-stack { display: grid; gap: var(--f4-s4); }
+
+.f4-card {
+  background: var(--f4-surface);
+  border: var(--f4-hair);
+  border-radius: var(--f4-r-lg);
+  padding: var(--f4-s5);
+  box-shadow: var(--f4-lift);
+}
+.f4-card h2 { margin-bottom: var(--f4-s2); }
+.f4-card p  { color: var(--f4-body); }
+
+/* Never nest a card inside a card — one job per surface. */
+.f4-card .f4-card { box-shadow: none; }
+
+.f4-list {
+  margin: var(--f4-s3) 0 0;
+  padding-left: 1.15rem;
+  color: var(--f4-body);
+}
+.f4-list li { margin-bottom: var(--f4-s1); }
+
+/* ── Badge ────────────────────────────────────────────────────────────────── */
+
+.f4-badge {
+  display: inline-block;
+  padding: 2px var(--f4-s2);
+  border-radius: var(--f4-r-pill);
+  font-size: .75rem;
+  font-weight: 600;
+  background: var(--f4-neutral-bg);
+  color: var(--f4-neutral-fg);
+}
+.f4-badge[data-tone="good"]    { background: var(--f4-good-bg);    color: var(--f4-good-fg); }
+.f4-badge[data-tone="caution"] { background: var(--f4-caution-bg); color: var(--f4-caution-fg); }
+.f4-badge[data-tone="risk"]    { background: var(--f4-risk-bg);    color: var(--f4-risk-fg); }
+.f4-badge[data-tone="info"]    { background: var(--f4-info-bg);    color: var(--f4-info-fg); }
+
+/* ── Buttons ──────────────────────────────────────────────────────────────── */
+
+.f4-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;           /* touch target */
+  padding: 0 var(--f4-s5);
+  border: 1px solid transparent;
+  border-radius: var(--f4-r-md);
+  background: var(--f4-accent);
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.f4-btn:hover  { background: var(--f4-accent-in); text-decoration: none; }
+.f4-btn:active { transform: translateY(1px); }
+
+.f4-btn[data-variant="quiet"] {
+  background: var(--f4-surface);
+  border-color: var(--f4-line);
+  color: var(--f4-body);
+}
+.f4-btn[data-variant="quiet"]:hover { background: var(--f4-sunken); }
+
+.f4-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--f4-s3);
+  margin-top: var(--f4-s5);
+}
+
+/* ── Small screens ────────────────────────────────────────────────────────── */
+
+@media (max-width: 600px) {
+  .f4-main   { padding: var(--f4-s5) var(--f4-s4) var(--f4-s6); }
+  .f4-card   { padding: var(--f4-s4); }
+  .f4-root h1 { font-size: 1.5rem; }
+  .f4-actions .f4-btn { flex: 1 1 100%; }
+}

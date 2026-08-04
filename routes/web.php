@@ -47,6 +47,7 @@ use App\Http\Controllers\Frontend3\Frontend3Controller;
 use App\Http\Controllers\Frontend3\RoundController as Frontend3RoundController;
 use App\Http\Controllers\Frontend3\TodayController as Frontend3TodayController;
 use App\Http\Controllers\Frontend3\WitnessController as Frontend3WitnessController;
+use App\Http\Controllers\Frontend4\Frontend4Controller;
 use App\Http\Controllers\frontEnd\Medication\ControlledDrugRegisterController;
 use App\Http\Controllers\frontEnd\Medication\Medication2RoundController;
 use App\Http\Controllers\frontEnd\Medication\MedicationRoundController;
@@ -1635,6 +1636,12 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
     Route::post('/frontend3/signatures/{id}/override', [Frontend3WitnessController::class, 'override'])->whereNumber('id')->name('frontend3.witness.override');
     Route::get('/frontend3/start', [Frontend3Controller::class, 'index'])->name('frontend3.start');
     Route::get('/frontend3/wireframes/{file?}', [Frontend3Controller::class, 'wireframe'])->name('frontend3.wireframes');
+
+    // Frontend 4 — a fourth parallel front end, starter build.
+    // Own Blade root view (f4.blade.php), own Vite entry (resources/js/f4.jsx) and
+    // own CSS scoped under .f4-root. Loads no global stylesheet at all. Shares
+    // nothing with frontend1/2/3 except the stack.
+    Route::get('/frontend4', [Frontend4Controller::class, 'index'])->name('frontend4.home');
 
     // Frontend 2 — a separate app shell with its own sidebar (new section, own React pages).
     Route::get('/frontend2', [Frontend2Controller::class, 'index'])->name('frontend2.home');
