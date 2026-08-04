@@ -1,9 +1,15 @@
 # Frontend3 — plan & isolation rules
 
-**Raised:** 2026-08-04 · **Status:** planned, to be built on its own branch in a separate terminal session.
+**Raised:** 2026-08-04 · **Status:** branch created 2026-08-04; driving documentation received; awaiting first build slice.
 
 ## What frontend3 is
-A **third, parallel front end** — alongside `frontend1` (the old Blade app) and `frontend2` (the Medication 2 / Inertia+React+Mantine pages). It carries **new Blade/Laravel work** driven by new documentation (to be supplied). It is an experiment area; it must not disturb what already works.
+A **third, parallel front end** — alongside `frontend1` (the old Blade app) and `frontend2` (the Medication 2 / Inertia+React+Mantine pages). It is an experiment area; it must not disturb what already works.
+
+**Driven by:** [CARE-ONE-OS-UX-SPECIFICATION.md](CARE-ONE-OS-UX-SPECIFICATION.md) — the Care One OS Product & UX Blueprint v1.0 (original `.docx` kept beside it as the master).
+
+**Stack — decided 2026-08-04:** **React + Inertia + Mantine**, following the specification's stated stack (Laravel • React • Inertia • Mantine • SQL). This **supersedes** the earlier wording in this document that said frontend3 would carry "new Blade/Laravel work" — that was written before the specification arrived, and the specification's component language (contextual drawers, command palette, skeleton loaders matching final geometry) assumes React.
+
+The stack being the *same* as frontend2 makes the isolation rule below **more** important, not less: same technology, zero shared files.
 
 ## How you reach it
 - Login is **unchanged** — you log in through the **old Blade login** exactly as today and **land on the normal old Blade page**. Do **not** hijack the post-login redirect.
@@ -25,10 +31,23 @@ Do **not** edit (these are shared by frontend1 / frontend2):
 - `frontend/lib/font.js`, `resources/js/app.jsx`, shared Mantine theme/providers (frontend2)
 - anything under `resources/js/Pages/...` or `frontend/` that frontend1/2 pages import
 
-**Instead, for frontend3, do this:**
-- Give frontend3 its **own layout** (its own Blade layout file, or its own Inertia/Vite entry) that loads **only its own CSS file(s)**.
-- Scope frontend3's CSS under a **root wrapper class** (e.g. everything under `.f3-root { … }`) so even a rule frontend3 *thinks* of as "global" can only match inside frontend3 pages.
-- If frontend3 uses its own build entry, keep it separate from `resources/js/app.jsx` so it can't collide with the frontend2 bundle.
+**Instead, for frontend3, do this** (concrete file plan, given the React/Inertia decision):
+
+| frontend2 uses | frontend3 gets its own |
+|---|---|
+| `resources/views/app.blade.php` (root view) | `resources/views/f3.blade.php` — own fonts (Manrope + Inter), own vite entry |
+| `resources/js/app.jsx` (Vite entry) | `resources/js/f3.jsx` — own `createInertiaApp`, own MantineProvider |
+| `resources/js/Pages/**` | `resources/js/F3Pages/**` — own page resolver glob |
+| `frontend/theme.js` + `frontend/tokens.js` | `frontend3/theme.js` + `frontend3/tokens.js` — the Quiet Clinical Luxury palette |
+| `resources/css/app.css` | `frontend3/f3.css` — everything nested under `.f3-root` |
+| `@frontend` / `@frontend2` aliases | `@frontend3` alias |
+| `HandleInertiaRequests` (`$rootView = 'app'`) | `HandleF3InertiaRequests` (`$rootView = 'f3'`) |
+
+Two shared files unavoidably need a **purely additive** touch, and nothing more:
+- `vite.config.js` — add `resources/js/f3.jsx` to the `input` array and add the `@frontend3` alias. Adding an input does not alter the frontend2 bundle.
+- `routes/web.php` — append a new `/f3/...` route group. Existing routes untouched.
+
+Everything else frontend3 needs is a **new file**. If a change can only be made by editing an existing frontend1/frontend2 file, that is the signal to stop and copy it into `frontend3/` instead.
 
 Do that and "change the global CSS in frontend3" really means "change *frontend3's own* CSS" — 1 and 2 never see it, on the branch or after merge.
 
