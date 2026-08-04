@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>09 Shift handover — Care One OS frontend3 wireframe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="careone-f3.css">
+</head>
+<body class="f3-root">
+
+<div class="f3-shell">
+
+  <aside class="f3-nav">
+    <div class="f3-brand">
+      <div class="f3-brand-mark">C1</div>
+      <div class="f3-brand-text">
+        <div class="f3-brand-name">Care One OS</div>
+        <div class="f3-brand-sub">Willowbank</div>
+      </div>
+    </div>
+    <nav class="f3-navgroup" aria-label="Primary">
+      <h4>Areas</h4>
+      <a class="f3-navlink" href="careone-dashboard-wireframe.html"><span class="f3-navicon">T</span><span>Today</span></a>
+      <a class="f3-navlink" href="careone-person-profile-wireframe.html"><span class="f3-navicon">P</span><span>People</span></a>
+      <a class="f3-navlink" href="careone-mar-wireframe.html"><span class="f3-navicon">M</span><span>Medicines</span></a>
+      <a class="f3-navlink" href="careone-handover-wireframe.html" aria-current="page"><span class="f3-navicon">O</span><span>Operations</span><span class="f3-navcount">7</span></a>
+      <a class="f3-navlink" href="careone-manager-compliance-wireframe.html"><span class="f3-navicon">A</span><span>Assurance</span></a>
+      <a class="f3-navlink" href="careone-admin-integrations-wireframe.html"><span class="f3-navicon">S</span><span>Settings</span></a>
+    </nav>
+    <nav class="f3-navgroup">
+      <h4>Prototype</h4>
+      <a class="f3-navlink" href="index.html"><span class="f3-navicon">◇</span><span>All screens</span></a>
+    </nav>
+  </aside>
+
+  <div class="f3-main">
+
+    <header class="f3-topbar">
+      <div class="f3-context">
+        <span class="f3-chip"><b>Willowbank House</b></span>
+        <span class="f3-chip f3-chip--quiet">Late → Night · 21:45</span>
+      </div>
+      <div class="f3-topbar-actions">
+        <button class="f3-iconbtn" aria-label="Notifications">◔<span class="f3-dot"></span></button>
+        <div class="f3-avatar" aria-hidden="true">JA</div>
+      </div>
+    </header>
+
+    <div class="f3-pagehead">
+      <div class="f3-pagehead-text">
+        <h1>Shift handover</h1>
+        <p class="f3-pagehead-sum">
+          Late shift <b>Joy Adeyemi</b> → Night shift <b>Samira Volkov</b> ·
+          <b>9 items</b> assembled · 6 need an owner before you can hand over
+        </p>
+        <p class="f3-sync">Last synced 21:44</p>
+      </div>
+      <button class="f3-btn f3-btn--primary f3-hide-sm">Review &amp; hand over</button>
+    </div>
+
+    <main class="f3-page">
+
+      <p class="f3-note">
+        <b>What this replaces.</b> Memory and scattered messages. This is a structured transfer of unresolved
+        medication responsibility — items assembled automatically from the record, given context and an owner by a person.
+      </p>
+
+      <div class="f3-grid f3-grid--main">
+
+        <div class="f3-stack">
+
+          <!-- OUTSTANDING ACTIONS -->
+          <section class="f3-card" aria-labelledby="oa-h">
+            <div class="f3-cardhead">
+              <h2 id="oa-h">Outstanding actions</h2>
+              <span class="f3-badge f3-badge--caution">3</span>
+            </div>
+
+            <article class="f3-listitem f3-listitem--card f3-listitem--alert">
+              <div class="f3-listbody">
+                <div class="f3-row" style="gap:var(--s2)">
+                  <span class="f3-badge f3-badge--risk">Urgent</span>
+                  <span class="f3-xs f3-mut">auto-assembled from exception #E-2208</span>
+                </div>
+                <div class="f3-listtitle" style="margin-top:6px">Rowan Petrescu — Levetiracetam still not supplied</div>
+                <div class="f3-listmeta">
+                  Two doses affected. Pharmacy expected delivery today, did not arrive.
+                  <b>If nothing by 22:00, call GP out of hours.</b>
+                </div>
+                <div class="f3-row" style="margin-top:var(--s3); gap:var(--s2)">
+                  <span class="f3-chip">Owner: Samira V.</span>
+                  <span class="f3-chip">By 22:00</span>
+                </div>
+              </div>
+              <button class="f3-btn f3-btn--sm">Edit</button>
+            </article>
+
+            <article class="f3-listitem f3-listitem--card">
+              <div class="f3-listbody">
+                <div class="f3-row" style="gap:var(--s2)">
+                  <span class="f3-badge f3-badge--caution">Needs owner</span>
+                </div>
+                <div class="f3-listtitle" style="margin-top:6px">Ines Marchetti — PRN outcome review</div>
+                <div class="f3-listmeta">Paracetamol given 20:15. Review due 21:15, not yet recorded.</div>
+                <div class="f3-row" style="margin-top:var(--s3); gap:var(--s2)">
+                  <select class="f3-select" style="max-width:200px" aria-label="Assign owner">
+                    <option selected>Choose an owner…</option>
+                    <option>Samira Volkov</option>
+                    <option>Night care worker</option>
+                  </select>
+                </div>
+              </div>
+            </article>
+
+            <article class="f3-listitem f3-listitem--card">
+              <div class="f3-listbody">
+                <div class="f3-listtitle">Fridge temperature — recheck at 02:00</div>
+                <div class="f3-listmeta">Ran high at 08:15. Insulin quarantined. Engineer booked for tomorrow morning.</div>
+                <div class="f3-row" style="margin-top:var(--s3); gap:var(--s2)">
+                  <span class="f3-chip">Owner: Samira V.</span>
+                  <span class="f3-chip">By 02:00</span>
+                </div>
+              </div>
+              <button class="f3-btn f3-btn--sm">Edit</button>
+            </article>
+          </section>
+
+          <!-- EXCEPTIONS -->
+          <section class="f3-card" aria-labelledby="ex-h">
+            <div class="f3-cardhead">
+              <h2 id="ex-h">Exceptions</h2>
+              <span class="f3-badge f3-badge--caution">2</span>
+            </div>
+            <article class="f3-listitem f3-listitem--card">
+              <div class="f3-listbody">
+                <div class="f3-listtitle">Theo Lindqvist — declined Sertraline again (3rd this week)</div>
+                <div class="f3-listmeta">Policy threshold reached. GP contact required tomorrow. Do not press him tonight — he becomes distressed.</div>
+              </div>
+            </article>
+            <article class="f3-listitem f3-listitem--card" style="margin-bottom:0">
+              <div class="f3-listbody">
+                <div class="f3-listtitle">Bruno Farrell-Reyes — Metformin spat out, awaiting pharmacy advice</div>
+                <div class="f3-listmeta"><b>Do not redose.</b> Advice expected in the morning.</div>
+              </div>
+            </article>
+          </section>
+
+          <!-- CHANGES -->
+          <section class="f3-card" aria-labelledby="ch-h">
+            <div class="f3-cardhead">
+              <h2 id="ch-h">Changes since last handover</h2>
+              <span class="f3-badge f3-badge--info">2</span>
+            </div>
+            <ul class="f3-list">
+              <li class="f3-listitem">
+                <div class="f3-listbody">
+                  <div class="f3-listtitle">Nadia Okonkwo — Furosemide 20mg added</div>
+                  <div class="f3-listmeta">From discharge letter · <b>awaiting verification, do not administer</b></div>
+                </div>
+                <span class="f3-badge f3-badge--caution">New</span>
+              </li>
+              <li class="f3-listitem">
+                <div class="f3-listbody">
+                  <div class="f3-listtitle">Theo Lindqvist — Sertraline paused</div>
+                  <div class="f3-listmeta">By Dr Ellery, 28 Jul · review 7 Aug · no longer appears in rounds</div>
+                </div>
+                <span class="f3-badge f3-badge--neutral">Paused</span>
+              </li>
+            </ul>
+          </section>
+
+          <div class="f3-grid f3-grid--2">
+            <!-- SUPPLY -->
+            <section class="f3-card" aria-labelledby="su-h">
+              <div class="f3-cardhead"><h2 id="su-h">Supply</h2></div>
+              <ul class="f3-stack f3-stack--sm f3-sm">
+                <li><span class="f3-badge f3-badge--risk">Out</span> Levetiracetam — order #4471 outstanding</li>
+                <li><span class="f3-badge f3-badge--caution">Part</span> Fortisip short by 6 bottles</li>
+                <li><span class="f3-badge f3-badge--risk">Cold chain</span> Insulin quarantined pending advice</li>
+              </ul>
+            </section>
+
+            <!-- CONTROLLED DRUGS -->
+            <section class="f3-card" aria-labelledby="cd-h">
+              <div class="f3-cardhead"><h2 id="cd-h">Controlled drugs</h2></div>
+              <ul class="f3-stack f3-stack--sm f3-sm">
+                <li><span class="f3-badge f3-badge--risk">Discrepancy</span> Morphine −3ml, investigation open</li>
+                <li><span class="f3-badge f3-badge--good">Counted</span> Ground &amp; First, 17:04, two staff</li>
+                <li><span class="f3-badge f3-badge--caution">Follow-up</span> Ines M. to complete stage 4 tomorrow</li>
+              </ul>
+            </section>
+          </div>
+
+          <!-- PEOPLE AWAY -->
+          <section class="f3-card" aria-labelledby="aw-h">
+            <div class="f3-cardhead">
+              <h2 id="aw-h">People away or returning</h2>
+            </div>
+            <ul class="f3-list">
+              <li class="f3-listitem">
+                <div class="f3-person">
+                  <div class="f3-photo" aria-hidden="true">AS</div>
+                  <div>
+                    <div class="f3-person-name">Amara Sithole</div>
+                    <div class="f3-person-meta">Returned 16:10 from Northgate Hospital</div>
+                  </div>
+                </div>
+                <div class="f3-spacer">
+                  <span class="f3-badge f3-badge--caution">Reconciliation due</span>
+                </div>
+              </li>
+              <li class="f3-listitem">
+                <div class="f3-person">
+                  <div class="f3-photo" aria-hidden="true">EK</div>
+                  <div>
+                    <div class="f3-person-name">Esther Kowalczyk</div>
+                    <div class="f3-person-meta">With family until Tue · 3 days of medicines supplied, family holds responsibility</div>
+                  </div>
+                </div>
+                <div class="f3-spacer">
+                  <span class="f3-badge f3-badge--info">Away</span>
+                </div>
+              </li>
+            </ul>
+          </section>
+
+        </div>
+
+        <!-- RIGHT -->
+        <div class="f3-stack">
+
+          <section class="f3-card" aria-labelledby="hw-h">
+            <div class="f3-cardhead">
+              <h2 id="hw-h">Handover steps</h2>
+              <span class="f3-badge f3-badge--neutral">Step 2</span>
+            </div>
+            <div class="f3-timeline">
+              <div class="f3-tl-item">
+                <div class="f3-tl-time">Done 21:40</div>
+                <div class="f3-tl-title">Items assembled</div>
+                <div class="f3-tl-text">9 candidates pulled from exceptions, PRN reviews, supply, CD and changes.</div>
+              </div>
+              <div class="f3-tl-item f3-tl-item--now">
+                <div class="f3-tl-time">Now</div>
+                <div class="f3-tl-title">Outgoing lead adds context</div>
+                <div class="f3-tl-text">Assign owners and set urgency and deadlines. 6 items still need an owner.</div>
+              </div>
+              <div class="f3-tl-item">
+                <div class="f3-tl-time">Next</div>
+                <div class="f3-tl-title">Incoming lead reviews by section</div>
+                <div class="f3-tl-text">And asks clarifying questions before accepting.</div>
+              </div>
+              <div class="f3-tl-item">
+                <div class="f3-tl-time">Then</div>
+                <div class="f3-tl-title">Acknowledge specific items</div>
+                <div class="f3-tl-text"><b>Not a blanket screen.</b> Each item is acknowledged individually.</div>
+              </div>
+              <div class="f3-tl-item">
+                <div class="f3-tl-time">After</div>
+                <div class="f3-tl-title">Unresolved items stay active</div>
+                <div class="f3-tl-text">They appear on Today for the incoming shift until closed.</div>
+              </div>
+            </div>
+          </section>
+
+          <section class="f3-card" aria-labelledby="ack-h">
+            <div class="f3-cardhead">
+              <h2 id="ack-h">Incoming acknowledgement</h2>
+              <span class="f3-badge f3-badge--caution">0 of 9</span>
+            </div>
+            <p class="f3-sm f3-mut" style="margin-bottom:var(--s4)">
+              Samira Volkov will acknowledge each item separately. A read receipt is not an acknowledgement,
+              and acknowledging is not the same as completing.
+            </p>
+            <div class="f3-check">
+              <span class="f3-check-box" aria-hidden="true"></span>
+              <span class="f3-check-label">Levetiracetam supply — urgent, by 22:00</span>
+            </div>
+            <div class="f3-check">
+              <span class="f3-check-box" aria-hidden="true"></span>
+              <span class="f3-check-label">PRN outcome review — Ines M.</span>
+            </div>
+            <div class="f3-check">
+              <span class="f3-check-box" aria-hidden="true"></span>
+              <span class="f3-check-label">Fridge recheck at 02:00</span>
+            </div>
+            <button class="f3-btn f3-btn--block" style="margin-top:var(--s4)" disabled>Accept handover — 6 items need an owner</button>
+          </section>
+
+          <section class="f3-card f3-card--flat" aria-labelledby="mr-h">
+            <h2 id="mr-h" style="margin-bottom:var(--s4)">Messaging rules</h2>
+            <ul class="f3-stack f3-stack--sm f3-sm">
+              <li>Clinical threads link to a person, medicine, order or event — never float free.</li>
+              <li><b>Urgent is not emergency.</b> The approved emergency route is shown separately.</li>
+              <li>Read receipts do not replace acknowledgement of an assigned action.</li>
+              <li>A message can never silently change prescription or MAR data.</li>
+              <li>Retention and access follow the underlying record's policy.</li>
+            </ul>
+          </section>
+
+          <div class="f3-alert f3-alert--risk">
+            <span class="f3-alert-mark" aria-hidden="true">■</span>
+            <div class="f3-alert-body">
+              <div class="f3-alert-title">In an emergency</div>
+              <div class="f3-alert-text">Do not use handover or messaging. Follow the site emergency procedure — 999, then inform the on-call manager.</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<div class="f3-stickybar f3-only-sm">
+  <button class="f3-btn f3-btn--primary" disabled>6 items need an owner</button>
+</div>
+
+<nav class="f3-bottomnav" aria-label="Primary">
+  <a href="careone-dashboard-wireframe.html"><span class="f3-navicon" aria-hidden="true">T</span>Today</a>
+  <a href="careone-person-profile-wireframe.html"><span class="f3-navicon" aria-hidden="true">P</span>People</a>
+  <a href="careone-medication-round-wireframe.html"><span class="f3-navicon" aria-hidden="true">R</span>Round</a>
+  <a href="careone-handover-wireframe.html" aria-current="page"><span class="f3-navicon" aria-hidden="true">M</span>Messages<span class="f3-navcount">9</span></a>
+  <a href="index.html"><span class="f3-navicon" aria-hidden="true">···</span>More</a>
+</nav>
+
+</body>
+</html>

@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>10 Manager &amp; compliance — Care One OS frontend3 wireframe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="careone-f3.css">
+</head>
+<body class="f3-root">
+
+<div class="f3-shell">
+
+  <aside class="f3-nav">
+    <div class="f3-brand">
+      <div class="f3-brand-mark">C1</div>
+      <div class="f3-brand-text">
+        <div class="f3-brand-name">Care One OS</div>
+        <div class="f3-brand-sub">Meadowfield</div>
+      </div>
+    </div>
+    <nav class="f3-navgroup" aria-label="Primary">
+      <h4>Areas</h4>
+      <a class="f3-navlink" href="careone-dashboard-wireframe.html"><span class="f3-navicon">T</span><span>Today</span></a>
+      <a class="f3-navlink" href="careone-person-profile-wireframe.html"><span class="f3-navicon">P</span><span>People</span></a>
+      <a class="f3-navlink" href="careone-mar-wireframe.html"><span class="f3-navicon">M</span><span>Medicines</span></a>
+      <a class="f3-navlink" href="careone-missed-doses-wireframe.html"><span class="f3-navicon">O</span><span>Operations</span><span class="f3-navcount">7</span></a>
+      <a class="f3-navlink" href="careone-manager-compliance-wireframe.html" aria-current="page"><span class="f3-navicon">A</span><span>Assurance</span></a>
+      <a class="f3-navlink" href="careone-admin-integrations-wireframe.html"><span class="f3-navicon">S</span><span>Settings</span></a>
+    </nav>
+    <nav class="f3-navgroup">
+      <h4>Prototype</h4>
+      <a class="f3-navlink" href="index.html"><span class="f3-navicon">◇</span><span>All screens</span></a>
+    </nav>
+  </aside>
+
+  <div class="f3-main">
+
+    <header class="f3-topbar">
+      <div class="f3-context">
+        <span class="f3-chip"><b>Meadowfield Care</b></span>
+        <span class="f3-chip">3 sites</span>
+        <span class="f3-chip f3-chip--quiet">28 Jul – 3 Aug 2026</span>
+      </div>
+      <div class="f3-topbar-actions">
+        <button class="f3-iconbtn" aria-label="Notifications">◔<span class="f3-dot"></span></button>
+        <div class="f3-avatar" aria-hidden="true">DM</div>
+      </div>
+    </header>
+
+    <div class="f3-pagehead">
+      <div class="f3-pagehead-text">
+        <h1>Assurance</h1>
+        <p class="f3-pagehead-sum">Willowbank · Ashgrove · Elmside · <b>2 open high-risk events</b> · reporting period 7 days</p>
+        <p class="f3-sync">Data complete to 3 Aug 14:00 · 2 queued writes unresolved at Elmside</p>
+      </div>
+      <button class="f3-btn f3-hide-sm">Build audit pack</button>
+    </div>
+
+    <main class="f3-page">
+
+      <!-- Assurance rule, stated up front -->
+      <div class="f3-alert f3-alert--risk">
+        <span class="f3-alert-mark" aria-hidden="true">■</span>
+        <div class="f3-alert-body">
+          <div class="f3-alert-title">2 open high-risk events — these stay visible regardless of any green figure below</div>
+          <div class="f3-alert-text">
+            Morphine discrepancy at Willowbank (investigation stage 3) · Levetiracetam supply failure affecting 2 doses.
+            A good percentage never closes or hides an unresolved serious issue.
+          </div>
+          <div class="f3-alert-actions">
+            <button class="f3-btn f3-btn--sm">Open both</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ METRIC FAMILIES ============ -->
+      <section class="f3-card" aria-labelledby="mf-h">
+        <div class="f3-cardhead">
+          <div>
+            <h2 id="mf-h">Metric families</h2>
+            <p class="f3-cardsub">Every figure states its date range, opens the records behind it, and says whether it is informational or actionable.</p>
+          </div>
+          <div class="f3-segment" role="group" aria-label="Period">
+            <button aria-pressed="false">24h</button>
+            <button aria-pressed="true">7 days</button>
+            <button aria-pressed="false">28 days</button>
+          </div>
+        </div>
+
+        <div class="f3-grid f3-grid--4">
+          <button class="f3-stat">
+            <span class="f3-stat-label">Administration completeness</span>
+            <span class="f3-stat-value">97.4%</span>
+            <span class="f3-stat-meta"><b>1,482 of 1,521</b> · 7 days · informational</span>
+          </button>
+          <button class="f3-stat f3-stat--alert">
+            <span class="f3-stat-label">Late or omitted</span>
+            <span class="f3-stat-value">39</span>
+            <span class="f3-stat-meta">21 late, 11 declined, 5 supply, 2 clinical · <b>actionable</b></span>
+          </button>
+          <button class="f3-stat f3-stat--alert">
+            <span class="f3-stat-label">PRN reviews not completed</span>
+            <span class="f3-stat-value">12</span>
+            <span class="f3-stat-meta">of 47 doses · <b>actionable</b></span>
+          </button>
+          <button class="f3-stat">
+            <span class="f3-stat-label">CD discrepancies open</span>
+            <span class="f3-stat-value">1</span>
+            <span class="f3-stat-meta">Willowbank · stage 3 of 6</span>
+          </button>
+        </div>
+
+        <div class="f3-tablewrap" style="margin-top:var(--s5)">
+          <table class="f3-table">
+            <thead>
+              <tr><th scope="col">Family</th><th scope="col">The question it answers</th><th scope="col">Now</th><th scope="col"></th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><b>Administration</b></td>
+                <td>Which doses are late or omitted, why, where, and who owns the follow-up?</td>
+                <td><span class="f3-badge f3-badge--caution">39 open</span></td>
+                <td><button class="f3-btn f3-btn--sm">Drill down</button></td>
+              </tr>
+              <tr>
+                <td><b>PRN</b></td>
+                <td>Are protocols complete? Are outcomes reviewed? Is use increasing?</td>
+                <td><span class="f3-badge f3-badge--caution">1 protocol incomplete</span></td>
+                <td><button class="f3-btn f3-btn--sm">Drill down</button></td>
+              </tr>
+              <tr>
+                <td><b>Stock</b></td>
+                <td>Which items are low, out, expiring or unreconciled?</td>
+                <td><span class="f3-badge f3-badge--risk">1 out, 3 low</span></td>
+                <td><button class="f3-btn f3-btn--sm">Drill down</button></td>
+              </tr>
+              <tr>
+                <td><b>Controlled drugs</b></td>
+                <td>Are counts complete? Which discrepancies remain open?</td>
+                <td><span class="f3-badge f3-badge--risk">1 open</span></td>
+                <td><button class="f3-btn f3-btn--sm">Drill down</button></td>
+              </tr>
+              <tr>
+                <td><b>Prescriptions</b></td>
+                <td>Which reviews, verifications or renewals are overdue?</td>
+                <td><span class="f3-badge f3-badge--caution">4 overdue</span></td>
+                <td><button class="f3-btn f3-btn--sm">Drill down</button></td>
+              </tr>
+              <tr>
+                <td><b>Workforce</b></td>
+                <td>Which competency, access or training controls need action?</td>
+                <td><span class="f3-badge f3-badge--caution">2 competencies expiring</span></td>
+                <td><button class="f3-btn f3-btn--sm">Drill down</button></td>
+              </tr>
+              <tr>
+                <td><b>System</b></td>
+                <td>Are integrations failing, data stale, or queued writes unresolved?</td>
+                <td><span class="f3-badge f3-badge--caution">2 queued at Elmside</span></td>
+                <td><button class="f3-btn f3-btn--sm">Drill down</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <div class="f3-grid f3-grid--main">
+
+        <div class="f3-stack">
+
+          <!-- ============ DRILL-DOWN ============ -->
+          <section class="f3-card" aria-labelledby="dd-h">
+            <div class="f3-cardhead">
+              <div>
+                <h2 id="dd-h">Late &amp; omitted — by site and shift</h2>
+                <p class="f3-cardsub">28 Jul – 3 Aug · 39 events · excludes 2 people on planned leave</p>
+              </div>
+            </div>
+
+            <div class="f3-tablewrap">
+              <table class="f3-table">
+                <thead>
+                  <tr><th scope="col">Site</th><th scope="col">Early</th><th scope="col">Late</th><th scope="col">Night</th><th scope="col">Total</th><th scope="col">Rate</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>Willowbank House</td><td class="f3-num">6</td><td class="f3-num">9</td><td class="f3-num">3</td><td class="f3-num">18</td><td>18 / 612 = <b>2.9%</b></td></tr>
+                  <tr><td>Ashgrove Lodge</td><td class="f3-num">4</td><td class="f3-num">5</td><td class="f3-num">2</td><td class="f3-num">11</td><td>11 / 498 = <b>2.2%</b></td></tr>
+                  <tr><td>Elmside</td><td class="f3-num">3</td><td class="f3-num">6</td><td class="f3-num">1</td><td class="f3-num">10</td><td>10 / 411 = <b>2.4%</b></td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="f3-alert f3-alert--info" style="margin-top:var(--s4)">
+              <span class="f3-alert-mark" aria-hidden="true">◐</span>
+              <div class="f3-alert-body">
+                <div class="f3-alert-title">Data-quality caveat</div>
+                <div class="f3-alert-text">
+                  Elmside has <b>2 queued writes unresolved</b> from 2 Aug. Its figures may rise when those sync.
+                  Numerator, denominator and exclusions are shown above so the rate can be checked rather than trusted.
+                </div>
+              </div>
+            </div>
+
+            <p class="f3-note" style="margin-top:var(--s4)">
+              <b>No staff league table.</b> Individual staff are not ranked here. Late doses correlate with staffing levels,
+              acuity and round size — ranking people without a validated methodology produces blame, not safety.
+            </p>
+          </section>
+
+          <!-- ============ AUDIT PACK ============ -->
+          <section class="f3-card" aria-labelledby="ap-h">
+            <div class="f3-cardhead">
+              <h2 id="ap-h">Audit pack</h2>
+              <span class="f3-badge f3-badge--ghost">Draft</span>
+            </div>
+
+            <div class="f3-grid f3-grid--2">
+              <div class="f3-stack f3-stack--sm">
+                <div class="f3-field">
+                  <label class="f3-label" for="ap-site">Sites</label>
+                  <select class="f3-select" id="ap-site"><option>Willowbank House</option></select>
+                </div>
+                <div class="f3-field">
+                  <label class="f3-label" for="ap-per">Period</label>
+                  <input class="f3-input" id="ap-per" value="1 Jul – 3 Aug 2026">
+                </div>
+                <div class="f3-field">
+                  <label class="f3-label" for="ap-sc">Scope</label>
+                  <select class="f3-select" id="ap-sc">
+                    <option selected>Medication events + exceptions + CD register</option>
+                    <option>Single person, full record</option>
+                    <option>Controlled drugs only</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="f3-card f3-card--tint" style="padding:var(--s4)">
+                <h4 style="margin-bottom:var(--s3)">The export will contain</h4>
+                <dl class="f3-dl">
+                  <dt>Filters applied</dt><dd>Recorded in the file itself</dd>
+                  <dt>Generated</dt><dd>3 Aug 2026 14:24 BST</dd>
+                  <dt>Requested by</dt><dd>Dara Mwangi (registered manager)</dd>
+                  <dt>Integrity</dt><dd>SHA-256 checksum + row count</dd>
+                  <dt>Source records</dt><dd>Linked, not summarised away</dd>
+                </dl>
+                <p class="f3-xs f3-mut" style="margin-top:var(--s3)">
+                  This export is itself logged. Who exported what, when, and about whom is auditable.
+                </p>
+              </div>
+            </div>
+
+            <div class="f3-row" style="margin-top:var(--s4)">
+              <span class="f3-sm f3-mut">Contains special-category health data — handle per your organisation's policy.</span>
+              <button class="f3-btn f3-btn--primary f3-spacer">Generate audit pack</button>
+            </div>
+          </section>
+
+        </div>
+
+        <!-- RIGHT -->
+        <div class="f3-stack">
+
+          <section class="f3-card" aria-labelledby="rp-h">
+            <h2 id="rp-h" style="margin-bottom:var(--s4)">Reporting principles</h2>
+            <ul class="f3-stack f3-stack--sm f3-sm">
+              <li>Activity volume and safety performance are separate measures, never blended into one score.</li>
+              <li>Every rate shows numerator, denominator, exclusions and data-quality caveats.</li>
+              <li>Small cohorts are suppressed or aggregated where privacy requires it.</li>
+              <li>Staff are not ranked without context and a validated methodology.</li>
+              <li>Trend and control context comes before any claim of improvement or deterioration.</li>
+            </ul>
+          </section>
+
+          <section class="f3-card" aria-labelledby="ca-h">
+            <div class="f3-cardhead">
+              <h2 id="ca-h">Corrective actions</h2>
+              <span class="f3-badge f3-badge--caution">3 open</span>
+            </div>
+            <article class="f3-listitem f3-listitem--card">
+              <div class="f3-listbody">
+                <div class="f3-listtitle">Second CD count added to night shift</div>
+                <div class="f3-listmeta">Owner Dara M. · due 10 Aug · evidence: rota + policy v4</div>
+              </div>
+            </article>
+            <article class="f3-listitem f3-listitem--card">
+              <div class="f3-listbody">
+                <div class="f3-listtitle">PRN review prompts moved to Today</div>
+                <div class="f3-listmeta">Owner Ines M. · due 14 Aug · <b>closure needs approval</b></div>
+              </div>
+            </article>
+            <article class="f3-listitem f3-listitem--card" style="margin-bottom:0">
+              <div class="f3-listbody">
+                <div class="f3-listtitle">Critical-medicines supply escalation drill</div>
+                <div class="f3-listmeta">Owner Dara M. · due 21 Aug</div>
+              </div>
+            </article>
+          </section>
+
+          <section class="f3-card" aria-labelledby="aa-h">
+            <div class="f3-cardhead">
+              <h2 id="aa-h">Access audit</h2>
+              <span class="f3-badge f3-badge--caution">1 anomaly</span>
+            </div>
+            <ul class="f3-list">
+              <li class="f3-listitem" style="padding:var(--s3) 0">
+                <div class="f3-listbody">
+                  <div class="f3-listtitle">Break-glass access used</div>
+                  <div class="f3-listmeta">2 Aug 03:12 · night lead viewed Elmside records · justification recorded · time-limited to 2h · reviewed</div>
+                </div>
+              </li>
+              <li class="f3-listitem" style="padding:var(--s3) 0">
+                <div class="f3-listbody">
+                  <div class="f3-listtitle">Export of 1 person's full record</div>
+                  <div class="f3-listmeta">31 Jul · Dara M. · for a GP review · logged</div>
+                </div>
+              </li>
+            </ul>
+          </section>
+
+          <section class="f3-card f3-card--flat" aria-labelledby="cs-h">
+            <h2 id="cs-h" style="margin-bottom:var(--s4)">Clinical safety log</h2>
+            <dl class="f3-dl">
+              <dt>Hazards logged</dt><dd>34</dd>
+              <dt>Open, unmitigated</dt><dd><b>2</b></dd>
+              <dt>Last review</dt><dd>18 Jul 2026</dd>
+              <dt>Safety officer</dt><dd class="f3-mut">Named human — not this system</dd>
+            </dl>
+            <button class="f3-btn f3-btn--block" style="margin-top:var(--s4)">Open hazard log</button>
+          </section>
+
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<nav class="f3-bottomnav" aria-label="Primary">
+  <a href="careone-dashboard-wireframe.html"><span class="f3-navicon" aria-hidden="true">T</span>Today</a>
+  <a href="careone-person-profile-wireframe.html"><span class="f3-navicon" aria-hidden="true">P</span>People</a>
+  <a href="careone-medication-round-wireframe.html"><span class="f3-navicon" aria-hidden="true">R</span>Round</a>
+  <a href="careone-handover-wireframe.html"><span class="f3-navicon" aria-hidden="true">M</span>Messages</a>
+  <a href="index.html" aria-current="page"><span class="f3-navicon" aria-hidden="true">···</span>More</a>
+</nav>
+
+</body>
+</html>

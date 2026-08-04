@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>03 MAR chart — Care One OS frontend3 wireframe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="careone-f3.css">
+</head>
+<body class="f3-root">
+
+<div class="f3-shell">
+
+  <aside class="f3-nav">
+    <div class="f3-brand">
+      <div class="f3-brand-mark">C1</div>
+      <div class="f3-brand-text">
+        <div class="f3-brand-name">Care One OS</div>
+        <div class="f3-brand-sub">Willowbank</div>
+      </div>
+    </div>
+    <nav class="f3-navgroup" aria-label="Primary">
+      <h4>Areas</h4>
+      <a class="f3-navlink" href="careone-dashboard-wireframe.html"><span class="f3-navicon">T</span><span>Today</span></a>
+      <a class="f3-navlink" href="careone-person-profile-wireframe.html"><span class="f3-navicon">P</span><span>People</span></a>
+      <a class="f3-navlink" href="careone-mar-wireframe.html" aria-current="page"><span class="f3-navicon">M</span><span>Medicines</span></a>
+      <a class="f3-navlink" href="careone-missed-doses-wireframe.html"><span class="f3-navicon">O</span><span>Operations</span><span class="f3-navcount">7</span></a>
+      <a class="f3-navlink" href="careone-manager-compliance-wireframe.html"><span class="f3-navicon">A</span><span>Assurance</span></a>
+      <a class="f3-navlink" href="careone-admin-integrations-wireframe.html"><span class="f3-navicon">S</span><span>Settings</span></a>
+    </nav>
+    <nav class="f3-navgroup">
+      <h4>Prototype</h4>
+      <a class="f3-navlink" href="index.html"><span class="f3-navicon">◇</span><span>All screens</span></a>
+    </nav>
+  </aside>
+
+  <div class="f3-main">
+
+    <header class="f3-topbar">
+      <div class="f3-context">
+        <span class="f3-chip"><b>Willowbank House</b></span>
+        <span class="f3-chip f3-chip--quiet">MAR · current cycle</span>
+      </div>
+      <div class="f3-topbar-actions">
+        <button class="f3-iconbtn" aria-label="Notifications">◔</button>
+        <div class="f3-avatar" aria-hidden="true">JA</div>
+      </div>
+    </header>
+
+    <!-- Sticky person header WITH allergies and safety alerts -->
+    <div class="f3-pagehead">
+      <div class="f3-person" style="flex:1; min-width:260px">
+        <div class="f3-photo f3-photo--lg" aria-hidden="true">NO</div>
+        <div>
+          <h1>Nadia Okonkwo</h1>
+          <p class="f3-person-meta">Born 12 Mar 1948 · Room 4 · WB-0142</p>
+          <div class="f3-safety" style="margin-top:var(--s2)">
+            <span class="f3-safety-label">Allergies</span>
+            <span>Penicillin — anaphylaxis</span>
+            <span aria-hidden="true">·</span>
+            <span>Thickened fluids</span>
+          </div>
+        </div>
+      </div>
+      <div class="f3-row">
+        <a class="f3-btn f3-btn--sm" href="careone-person-profile-wireframe.html">Person record</a>
+        <button class="f3-btn f3-btn--sm">Print / export</button>
+      </div>
+    </div>
+
+    <main class="f3-page">
+
+      <div class="f3-row">
+        <div class="f3-segment" role="group" aria-label="View">
+          <button aria-pressed="true">Week</button>
+          <button aria-pressed="false">Day</button>
+          <button aria-pressed="false">Cycle</button>
+        </div>
+        <span class="f3-chip">28 Jul – 3 Aug 2026</span>
+        <span class="f3-spacer f3-sm f3-mut">Cycle 4 of 4 · next cycle starts 4 Aug</span>
+      </div>
+
+      <!-- ==================== DESKTOP GRID ==================== -->
+      <section class="f3-card f3-hide-sm" aria-labelledby="mar-h">
+        <div class="f3-cardhead">
+          <div>
+            <h2 id="mar-h">Medication administration record</h2>
+            <p class="f3-cardsub">Selecting a cell opens the full event record. Cells are never edited in place.</p>
+          </div>
+        </div>
+
+        <div class="f3-tablewrap">
+          <table class="f3-mar">
+            <caption class="f3-hide-sm">Rows are medicines and their instructions. Columns are scheduled opportunities.</caption>
+            <thead>
+              <tr>
+                <th scope="col">Medicine</th>
+                <th scope="col">Tue 28</th><th scope="col">Wed 29</th><th scope="col">Thu 30</th>
+                <th scope="col">Fri 31</th><th scope="col">Sat 1</th><th scope="col">Sun 2</th><th scope="col">Mon 3</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row" style="text-align:left">
+                  <div class="f3-mar-med">Amlodipine 5mg</div>
+                  <div class="f3-mar-dose">1 tablet · oral · 14:00</div>
+                </th>
+                <td><div class="f3-cell f3-cell--good"><span class="f3-cell-code">A</span><span class="f3-cell-time">14:05</span></div></td>
+                <td><div class="f3-cell f3-cell--good"><span class="f3-cell-code">A</span><span class="f3-cell-time">14:02</span></div></td>
+                <td><div class="f3-cell f3-cell--good"><span class="f3-cell-code">A</span><span class="f3-cell-time">13:58</span></div></td>
+                <td><div class="f3-cell f3-cell--good"><span class="f3-cell-code">A</span><span class="f3-cell-time">14:11</span></div></td>
+                <td><div class="f3-cell f3-cell--risk"><span class="f3-cell-code">D</span><span class="f3-cell-time">14:20</span></div></td>
+                <td><div class="f3-cell f3-cell--good"><span class="f3-cell-code">A</span><span class="f3-cell-time">14:10</span></div></td>
+                <td><div class="f3-cell f3-cell--due"><span class="f3-cell-code">·</span><span class="f3-cell-time">14:00</span></div></td>
+              </tr>
+              <tr>
+                <th scope="row" style="text-align:left">
+                  <div class="f3-mar-med">Levothyroxine 50mcg</div>
+                  <div class="f3-mar-dose">1 tablet · oral · 07:00 · before food</div>
+                </th>
+                <td><div class="f3-cell f3-cell--good"><span class="f3-cell-code">A</span><span class="f3-cell-time">07:04</span></div></td>
+                <td><div class="f3-cell f3-cell--good"><span class="f3-cell-code">A</span><span class="f3-cell-time">07:02</span></div></td>
+                <td><div class="f3-cell f3-cell--caution"><span class="f3-cell-code">L</span><span class="f3-cell-time">08:40</span></div></td>
+                <td><div class="f3-cell f3-cell--good"><span class="f3-cell-code">A</span><span class="f3-cell-time">07:00</span></div></td>
+                <td><div class="f3-cell f3-cell--good"><span class="f3-cell-code">A</span><span class="f3-cell-time">07:06</span></div></td>
+                <td><div class="f3-cell f3-cell--good"><span class="f3-cell-code">A</span><span class="f3-cell-time">07:01</span></div></td>
+                <td><div class="f3-cell f3-cell--good"><span class="f3-cell-code">A</span><span class="f3-cell-time">07:03</span></div></td>
+              </tr>
+              <tr>
+                <th scope="row" style="text-align:left">
+                  <div class="f3-mar-med">Paracetamol 500mg</div>
+                  <div class="f3-mar-dose">1–2 tablets · oral · PRN · max 8 in 24h</div>
+                </th>
+                <td><div class="f3-cell f3-cell--empty" aria-label="No PRN dose"></div></td>
+                <td><div class="f3-cell f3-cell--good"><span class="f3-cell-code">A</span><span class="f3-cell-time">21:15</span></div></td>
+                <td><div class="f3-cell f3-cell--empty" aria-label="No PRN dose"></div></td>
+                <td><div class="f3-cell f3-cell--empty" aria-label="No PRN dose"></div></td>
+                <td><div class="f3-cell f3-cell--good"><span class="f3-cell-code">A</span><span class="f3-cell-time">10:30</span></div></td>
+                <td><div class="f3-cell f3-cell--caution"><span class="f3-cell-code">R</span><span class="f3-cell-time">due</span></div></td>
+                <td><div class="f3-cell f3-cell--empty" aria-label="No PRN dose"></div></td>
+              </tr>
+              <tr>
+                <th scope="row" style="text-align:left">
+                  <div class="f3-mar-med">Fortisip compact</div>
+                  <div class="f3-mar-dose">1 bottle · oral · 11:00 · thickened</div>
+                </th>
+                <td><div class="f3-cell f3-cell--good"><span class="f3-cell-code">A</span><span class="f3-cell-time">11:10</span></div></td>
+                <td><div class="f3-cell f3-cell--caution"><span class="f3-cell-code">P</span><span class="f3-cell-time">11:05</span></div></td>
+                <td><div class="f3-cell f3-cell--good"><span class="f3-cell-code">A</span><span class="f3-cell-time">11:00</span></div></td>
+                <td><div class="f3-cell f3-cell--risk"><span class="f3-cell-code">U</span><span class="f3-cell-time">11:00</span></div></td>
+                <td><div class="f3-cell f3-cell--good"><span class="f3-cell-code">A</span><span class="f3-cell-time">11:12</span></div></td>
+                <td><div class="f3-cell f3-cell--good"><span class="f3-cell-code">A</span><span class="f3-cell-time">11:04</span></div></td>
+                <td><div class="f3-cell f3-cell--due"><span class="f3-cell-code">·</span><span class="f3-cell-time">11:00</span></div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="f3-legend" style="margin-top:var(--s4)">
+          <span class="f3-legend-item"><span class="f3-legend-key f3-cell--good">A</span> Administered</span>
+          <span class="f3-legend-item"><span class="f3-legend-key f3-cell--caution">L</span> Late</span>
+          <span class="f3-legend-item"><span class="f3-legend-key f3-cell--caution">P</span> Part administered</span>
+          <span class="f3-legend-item"><span class="f3-legend-key f3-cell--risk">D</span> Declined</span>
+          <span class="f3-legend-item"><span class="f3-legend-key f3-cell--risk">U</span> Unavailable</span>
+          <span class="f3-legend-item"><span class="f3-legend-key f3-cell--caution">R</span> Review due</span>
+          <span class="f3-legend-item"><span class="f3-legend-key f3-cell--due">·</span> Not yet due</span>
+          <span class="f3-legend-item"><span class="f3-legend-key f3-cell--empty"></span> No scheduled dose</span>
+        </div>
+      </section>
+
+      <!-- ==================== MOBILE TIMELINE ==================== -->
+      <section class="f3-card f3-only-sm" aria-labelledby="marm-h">
+        <div class="f3-cardhead">
+          <h2 id="marm-h">Amlodipine 5mg</h2>
+        </div>
+        <p class="f3-cardsub" style="margin-bottom:var(--s4)">1 tablet · oral · 14:00 · with or after food</p>
+
+        <div class="f3-row" style="margin-bottom:var(--s4)">
+          <span class="f3-badge f3-badge--ghost">Tue 28</span>
+          <span class="f3-badge f3-badge--ghost">Wed 29</span>
+          <span class="f3-badge f3-badge--neutral">Mon 3</span>
+        </div>
+
+        <div class="f3-timeline">
+          <div class="f3-tl-item f3-tl-item--now">
+            <div class="f3-tl-time">Mon 3 · 14:00</div>
+            <div class="f3-tl-title">Due now</div>
+            <div class="f3-tl-text">Window 13:30–15:00</div>
+          </div>
+          <div class="f3-tl-item">
+            <div class="f3-tl-time">Sun 2 · 14:10</div>
+            <div class="f3-tl-title">Administered <span class="f3-badge f3-badge--good">A</span></div>
+            <div class="f3-tl-text">1 tablet by Priya R.</div>
+          </div>
+          <div class="f3-tl-item">
+            <div class="f3-tl-time">Sat 1 · 14:20</div>
+            <div class="f3-tl-title">Declined <span class="f3-badge f3-badge--risk">D</span></div>
+            <div class="f3-tl-text">"Felt sick" · re-offered 15:00, declined again · GP informed</div>
+          </div>
+          <div class="f3-tl-item">
+            <div class="f3-tl-time">Fri 31 · 14:11</div>
+            <div class="f3-tl-title">Administered <span class="f3-badge f3-badge--good">A</span></div>
+            <div class="f3-tl-text">1 tablet by Joy A.</div>
+          </div>
+        </div>
+
+        <p class="f3-note" style="margin-top:var(--s4)">
+          <b>Mobile behaviour.</b> The MAR becomes a medicine-by-medicine timeline with date chips.
+          The primary reading path never depends on a wide grid — horizontal scrolling only ever supports comparison.
+        </p>
+      </section>
+
+      <!-- ==================== EVENT DETAIL ==================== -->
+      <section class="f3-card" aria-labelledby="ev-h">
+        <div class="f3-cardhead">
+          <div>
+            <h2 id="ev-h">Event record</h2>
+            <p class="f3-cardsub">Amlodipine 5mg · Saturday 1 August, 14:20</p>
+          </div>
+          <span class="f3-badge f3-badge--risk">Declined</span>
+        </div>
+
+        <div class="f3-grid f3-grid--2">
+          <div class="f3-stack">
+            <div>
+              <h4 style="margin-bottom:var(--s2)">Prescription</h4>
+              <dl class="f3-dl">
+                <dt>Medicine</dt><dd>Amlodipine 5mg tablet</dd>
+                <dt>Dose &amp; route</dt><dd>1 tablet · by mouth</dd>
+                <dt>Schedule</dt><dd>Daily 14:00 · window 13:30–15:00</dd>
+                <dt>Indication</dt><dd>High blood pressure</dd>
+                <dt>Version</dt><dd>v3 · effective 14 Jul 2026</dd>
+              </dl>
+            </div>
+            <div>
+              <h4 style="margin-bottom:var(--s2)">Event</h4>
+              <dl class="f3-dl">
+                <dt>Scheduled</dt><dd>14:00</dd>
+                <dt>Recorded</dt><dd>14:20</dd>
+                <dt>Outcome</dt><dd>Declined</dd>
+                <dt>Quantity</dt><dd>0 tablets</dd>
+                <dt>Stock movement</dt><dd>None</dd>
+              </dl>
+            </div>
+          </div>
+
+          <div class="f3-stack">
+            <div>
+              <h4 style="margin-bottom:var(--s2)">Accountability</h4>
+              <dl class="f3-dl">
+                <dt>Recorded by</dt><dd>Priya Ramanathan</dd>
+                <dt>Witnessed by</dt><dd class="f3-mut">Not required</dd>
+                <dt>Device</dt><dd>Ward tablet WB-T2</dd>
+                <dt>Site</dt><dd>Willowbank House</dd>
+              </dl>
+            </div>
+            <div>
+              <h4 style="margin-bottom:var(--s2)">Reasoning</h4>
+              <dl class="f3-dl">
+                <dt>Reason code</dt><dd>Declined — felt unwell</dd>
+                <dt>Note</dt><dd>"Said she felt sick. Re-offered at 15:00, declined again."</dd>
+                <dt>Capacity context</dt><dd>Has capacity for this decision</dd>
+                <dt>Escalation</dt><dd>GP surgery informed 15:30</dd>
+                <dt>Linked incident</dt><dd class="f3-mut">None</dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+
+        <hr class="f3-hr" style="margin:var(--s5) 0">
+
+        <h4 style="margin-bottom:var(--s3)">History</h4>
+        <div class="f3-timeline">
+          <div class="f3-tl-item">
+            <div class="f3-tl-time">1 Aug · 16:02</div>
+            <div class="f3-tl-title">Addendum added by Joy Adeyemi</div>
+            <div class="f3-tl-text">Reason: "GP contact was not recorded at the time." Added escalation detail. <b>Original values remain visible above.</b></div>
+          </div>
+          <div class="f3-tl-item">
+            <div class="f3-tl-time">1 Aug · 14:20</div>
+            <div class="f3-tl-title">Event created by Priya Ramanathan</div>
+            <div class="f3-tl-text">Outcome: Declined</div>
+          </div>
+        </div>
+
+        <div class="f3-alert f3-alert--info" style="margin-top:var(--s5)">
+          <span class="f3-alert-mark" aria-hidden="true">◐</span>
+          <div class="f3-alert-body">
+            <div class="f3-alert-title">Corrections never overwrite</div>
+            <div class="f3-alert-text">
+              A permitted user adds an addendum or correction linked to this event, with a reason.
+              Both records stay visible in the audit history — there is no destructive edit and no delete.
+            </div>
+            <div class="f3-alert-actions">
+              <button class="f3-btn f3-btn--sm">Add addendum</button>
+              <button class="f3-btn f3-btn--sm">Request correction</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<nav class="f3-bottomnav" aria-label="Primary">
+  <a href="careone-dashboard-wireframe.html"><span class="f3-navicon" aria-hidden="true">T</span>Today</a>
+  <a href="careone-person-profile-wireframe.html"><span class="f3-navicon" aria-hidden="true">P</span>People</a>
+  <a href="careone-medication-round-wireframe.html"><span class="f3-navicon" aria-hidden="true">R</span>Round</a>
+  <a href="careone-handover-wireframe.html"><span class="f3-navicon" aria-hidden="true">M</span>Messages</a>
+  <a href="index.html" aria-current="page"><span class="f3-navicon" aria-hidden="true">···</span>More</a>
+</nav>
+
+</body>
+</html>

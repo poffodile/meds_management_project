@@ -7,9 +7,13 @@ A **third, parallel front end** — alongside `frontend1` (the old Blade app) an
 
 **Driven by:** [CARE-ONE-OS-UX-SPECIFICATION.md](CARE-ONE-OS-UX-SPECIFICATION.md) — the Care One OS Product & UX Blueprint v1.0 (original `.docx` kept beside it as the master).
 
-**Stack — decided 2026-08-04:** **React + Inertia + Mantine**, following the specification's stated stack (Laravel • React • Inertia • Mantine • SQL). This **supersedes** the earlier wording in this document that said frontend3 would carry "new Blade/Laravel work" — that was written before the specification arrived, and the specification's component language (contextual drawers, command palette, skeleton loaders matching final geometry) assumes React.
+**Stack — decided 2026-08-04:** **same stack as the existing app** — Laravel 10 / PHP 8.3 · React + Inertia.js + Mantine v7 · Vite · MySQL 8.4. This is frontend2's stack (recorded in `../PRODUCT-CONTEXT.md`) and it is also exactly what the specification names, so there is no conflict to resolve.
 
-The stack being the *same* as frontend2 makes the isolation rule below **more** important, not less: same technology, zero shared files.
+This **supersedes** the earlier wording in this document that said frontend3 would carry "new Blade/Laravel work" — that was written before the specification arrived. (frontend1 is the legacy Blade + Bootstrap 3 + jQuery app; it has no written spec and is not the model for anything new.)
+
+**The rule going forward:** *stack from the existing app, everything else from the frontend3 specification.* Same technology; new design language, palette, typography, information architecture, page inventory and workflow — all taken from [CARE-ONE-OS-UX-SPECIFICATION.md](CARE-ONE-OS-UX-SPECIFICATION.md).
+
+Sharing a stack with frontend2 makes the isolation rule below **more** important, not less: same technology, zero shared files.
 
 ## How you reach it
 - Login is **unchanged** — you log in through the **old Blade login** exactly as today and **land on the normal old Blade page**. Do **not** hijack the post-login redirect.

@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Care One OS — frontend3 wireframes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="careone-f3.css">
+</head>
+<body class="f3-root">
+
+<div class="f3-sheet">
+
+  <div class="f3-row" style="margin-bottom:var(--s5)">
+    <div class="f3-brand-mark" style="width:44px;height:44px;border-radius:13px;font-size:.95rem">C1</div>
+    <div>
+      <h1 style="font-size:1.75rem">Care One OS — frontend3 wireframes</h1>
+      <p class="f3-mut f3-sm" style="margin-top:4px">
+        Twelve original concept screens built from the UX Specification · <b>Quiet Clinical Luxury</b> · 3 August 2026
+      </p>
+    </div>
+  </div>
+
+  <div class="f3-alert f3-alert--info" style="margin-bottom:var(--s5)">
+    <span class="f3-alert-mark" aria-hidden="true">◐</span>
+    <div class="f3-alert-body">
+      <div class="f3-alert-title">These are original work, not the twelve named in Appendix A</div>
+      <div class="f3-alert-text">
+        The prototype files listed in the specification could not be found. Rather than block, these were designed
+        from the specification itself using the same file names, so the bridge Appendix A describes still exists.
+        If the originals surface, compare the two sets before treating either as settled — see
+        <b>FRONTEND3-ISSUES.md, issue 1</b>.
+      </div>
+    </div>
+  </div>
+
+  <div class="f3-sheetgrid" style="margin-bottom:var(--s7)">
+
+    <a class="f3-sheetcard" href="careone-dashboard-wireframe.html">
+      <span class="f3-sheetnum">01</span>
+      <h3>Frontline dashboard</h3>
+      <p class="f3-sm f3-mut">Shift context, due now, needs attention, upcoming, handover, quick actions. Every number opens what is behind it.</p>
+      <span class="f3-row" style="gap:6px;margin-top:auto;padding-top:var(--s3)">
+        <span class="f3-badge f3-badge--ghost">Today</span>
+        <span class="f3-badge f3-badge--ghost">MVP</span>
+      </span>
+    </a>
+
+    <a class="f3-sheetcard" href="careone-medication-round-wireframe.html">
+      <span class="f3-sheetnum">02</span>
+      <h3>Medication round</h3>
+      <p class="f3-sm f3-mut">Round list plus the administration workspace — identity, safety strip, medicine, evidence, outcome, confirmation. Hard stops shown.</p>
+      <span class="f3-row" style="gap:6px;margin-top:auto;padding-top:var(--s3)">
+        <span class="f3-badge f3-badge--ghost">Today</span>
+        <span class="f3-badge f3-badge--ghost">MVP</span>
+        <span class="f3-badge f3-badge--info">Offline state</span>
+      </span>
+    </a>
+
+    <a class="f3-sheetcard" href="careone-mar-wireframe.html">
+      <span class="f3-sheetnum">03</span>
+      <h3>MAR chart</h3>
+      <p class="f3-sm f3-mut">Grid on desktop, per-medicine timeline on mobile. Full event record with accountability, reasoning and an append-only history.</p>
+      <span class="f3-row" style="gap:6px;margin-top:auto;padding-top:var(--s3)">
+        <span class="f3-badge f3-badge--ghost">Medicines</span>
+        <span class="f3-badge f3-badge--ghost">MVP</span>
+      </span>
+    </a>
+
+    <a class="f3-sheetcard" href="careone-person-profile-wireframe.html">
+      <span class="f3-sheetnum">04</span>
+      <h3>Person profile</h3>
+      <p class="f3-sm f3-mut">Seven tabs, medicine lifecycle states, self-administration, leave, and duplicate warnings framed as decision support only.</p>
+      <span class="f3-row" style="gap:6px;margin-top:auto;padding-top:var(--s3)">
+        <span class="f3-badge f3-badge--ghost">People</span>
+        <span class="f3-badge f3-badge--ghost">MVP</span>
+      </span>
+    </a>
+
+    <a class="f3-sheetcard" href="careone-prn-wireframe.html">
+      <span class="f3-sheetnum">05</span>
+      <h3>PRN workflow</h3>
+      <p class="f3-sm f3-mut">Protocol card, interval and maximum enforcement, the administration journey, and the timed outcome review that follows it.</p>
+      <span class="f3-row" style="gap:6px;margin-top:auto;padding-top:var(--s3)">
+        <span class="f3-badge f3-badge--ghost">Medicines</span>
+        <span class="f3-badge f3-badge--caution">Blocked state</span>
+      </span>
+    </a>
+
+    <a class="f3-sheetcard" href="careone-missed-doses-wireframe.html">
+      <span class="f3-sheetnum">06</span>
+      <h3>Missed doses &amp; exceptions</h3>
+      <p class="f3-sm f3-mut">The full outcome taxonomy — eight distinct outcomes, not one word called "missed". Owner, deadline, chronology, resolution.</p>
+      <span class="f3-row" style="gap:6px;margin-top:auto;padding-top:var(--s3)">
+        <span class="f3-badge f3-badge--ghost">Operations</span>
+        <span class="f3-badge f3-badge--ghost">MVP</span>
+      </span>
+    </a>
+
+    <a class="f3-sheetcard" href="careone-stock-pharmacy-wireframe.html">
+      <span class="f3-sheetnum">07</span>
+      <h3>Stock &amp; pharmacy</h3>
+      <p class="f3-sm f3-mut">Immutable ledger, order suggestions that show their working, delivery discrepancies, reconciliation and the pharmacy query queue.</p>
+      <span class="f3-row" style="gap:6px;margin-top:auto;padding-top:var(--s3)">
+        <span class="f3-badge f3-badge--ghost">Medicines</span>
+        <span class="f3-badge f3-badge--info">Empty state</span>
+      </span>
+    </a>
+
+    <a class="f3-sheetcard" href="careone-controlled-drugs-wireframe.html">
+      <span class="f3-sheetnum">08</span>
+      <h3>Controlled drugs</h3>
+      <p class="f3-sm f3-mut">Register with running balance, two-person witnessing where self-witnessing is impossible, and the six-stage discrepancy workflow.</p>
+      <span class="f3-row" style="gap:6px;margin-top:auto;padding-top:var(--s3)">
+        <span class="f3-badge f3-badge--ghost">Operations</span>
+        <span class="f3-badge f3-badge--risk">Offline disabled</span>
+      </span>
+    </a>
+
+    <a class="f3-sheetcard" href="careone-handover-wireframe.html">
+      <span class="f3-sheetnum">09</span>
+      <h3>Shift handover</h3>
+      <p class="f3-sm f3-mut">Six sections auto-assembled, given owners and deadlines by a person, acknowledged item by item rather than as a blanket screen.</p>
+      <span class="f3-row" style="gap:6px;margin-top:auto;padding-top:var(--s3)">
+        <span class="f3-badge f3-badge--ghost">Operations</span>
+        <span class="f3-badge f3-badge--ghost">MVP</span>
+      </span>
+    </a>
+
+    <a class="f3-sheetcard" href="careone-manager-compliance-wireframe.html">
+      <span class="f3-sheetnum">10</span>
+      <h3>Manager &amp; compliance</h3>
+      <p class="f3-sm f3-mut">Seven metric families with drill-down, numerator and denominator on every rate, audit pack with integrity metadata. No staff league table.</p>
+      <span class="f3-row" style="gap:6px;margin-top:auto;padding-top:var(--s3)">
+        <span class="f3-badge f3-badge--ghost">Assurance</span>
+        <span class="f3-badge f3-badge--ghost">MVP</span>
+      </span>
+    </a>
+
+    <a class="f3-sheetcard" href="careone-admin-integrations-wireframe.html">
+      <span class="f3-sheetnum">11</span>
+      <h3>Administration &amp; integrations</h3>
+      <p class="f3-sm f3-mut">Permission matrix that mirrors what the server enforces, terminology mapped to canonical concepts, integration status including a mocked GP Connect.</p>
+      <span class="f3-row" style="gap:6px;margin-top:auto;padding-top:var(--s3)">
+        <span class="f3-badge f3-badge--ghost">Settings</span>
+        <span class="f3-badge f3-badge--caution">Degraded state</span>
+      </span>
+    </a>
+
+    <a class="f3-sheetcard" href="careone-ai-workspace-wireframe.html">
+      <span class="f3-sheetnum">12</span>
+      <h3>AI workspace</h3>
+      <p class="f3-sm f3-mut">Sourced facts separated from inference and suggestions, omissions stated plainly, prohibited autonomy listed, nothing sends itself.</p>
+      <span class="f3-row" style="gap:6px;margin-top:auto;padding-top:var(--s3)">
+        <span class="f3-badge f3-badge--ghost">Settings</span>
+        <span class="f3-badge f3-badge--info">Governance</span>
+      </span>
+    </a>
+
+  </div>
+
+  <div class="f3-grid f3-grid--2" style="margin-bottom:var(--s7)">
+
+    <section class="f3-card">
+      <h2 style="margin-bottom:var(--s4)">The design language</h2>
+      <div class="f3-row" style="gap:var(--s2); margin-bottom:var(--s4)">
+        <span title="Warm clinical ivory #F6F2E9" style="width:38px;height:38px;border-radius:10px;background:#F6F2E9;border:1px solid #D9D4CA"></span>
+        <span title="Soft porcelain #FFFCF7" style="width:38px;height:38px;border-radius:10px;background:#FFFCF7;border:1px solid #D9D4CA"></span>
+        <span title="Warm mist #EEEAE2" style="width:38px;height:38px;border-radius:10px;background:#EEEAE2;border:1px solid #D9D4CA"></span>
+        <span title="Deep navy #17243B" style="width:38px;height:38px;border-radius:10px;background:#17243B"></span>
+        <span title="Clinical teal #176B65" style="width:38px;height:38px;border-radius:10px;background:#176B65"></span>
+        <span title="Muted eucalyptus #7E9B90" style="width:38px;height:38px;border-radius:10px;background:#7E9B90"></span>
+        <span title="Deep ink #202A35" style="width:38px;height:38px;border-radius:10px;background:#202A35"></span>
+        <span title="Slate #626D78" style="width:38px;height:38px;border-radius:10px;background:#626D78"></span>
+        <span title="Warm stone #D9D4CA" style="width:38px;height:38px;border-radius:10px;background:#D9D4CA;border:1px solid #C9C3B7"></span>
+      </div>
+      <ul class="f3-stack f3-stack--sm f3-sm">
+        <li>Manrope for headings, Inter for body and UI.</li>
+        <li>Radius 12–16px, eight-point spacing, elevation reserved for overlays.</li>
+        <li>Status carries a <b>word, a shape and a tint</b> — ● Due, ✓ Done, ▲ Late, ■ Risk, ◐ In progress. Never colour alone.</li>
+        <li>Hairline borders, no heavy shadows, no rainbow badges.</li>
+        <li>All of it scoped under <code>.f3-root</code> in one stylesheet.</li>
+      </ul>
+    </section>
+
+    <section class="f3-card">
+      <h2 style="margin-bottom:var(--s4)">Review checklist</h2>
+      <p class="f3-sm f3-mut" style="margin-bottom:var(--s4)">From the specification's own Appendix A. Use it when you look through these.</p>
+      <div class="f3-check"><span class="f3-check-box f3-check-box--on" aria-hidden="true">✓</span><span class="f3-check-label">Fictional data only</span></div>
+      <div class="f3-check"><span class="f3-check-box" aria-hidden="true"></span><span class="f3-check-label">Reviewed at 390, 768, 1024 and 1440px</span></div>
+      <div class="f3-check"><span class="f3-check-box f3-check-box--on" aria-hidden="true">✓</span><span class="f3-check-label">Long names, instructions and notes tested (Bruno Farrell-Reyes, Esther Kowalczyk)</span></div>
+      <div class="f3-check"><span class="f3-check-box f3-check-box--on" aria-hidden="true">✓</span><span class="f3-check-label">Every status, validation error and empty state exercised</span></div>
+      <div class="f3-check"><span class="f3-check-box f3-check-box--on" aria-hidden="true">✓</span><span class="f3-check-label">One-handed primary actions; destructive actions kept apart</span></div>
+      <div class="f3-check"><span class="f3-check-box" aria-hidden="true"></span><span class="f3-check-label">Frontline scenario testing before visual refinement</span></div>
+    </section>
+
+  </div>
+
+  <section class="f3-card f3-card--tint">
+    <h2 style="margin-bottom:var(--s4)">How to review these</h2>
+    <ol class="f3-stack f3-stack--sm f3-sm" style="padding-left:var(--s5); list-style:decimal">
+      <li>Open each screen and resize the window from wide down to about 390px. The layout should go three-zone → list-detail → single column, and the navigation should go labelled sidebar → icon rail → bottom bar. Nothing should ever scroll sideways except the tables and the MAR grid, which scroll inside their own frames.</li>
+      <li>Tab through with the keyboard. Every control should show a clear teal focus ring.</li>
+      <li>Look for the annotated notes in green — each one explains a rule from the specification that the screen is enforcing, so you can check whether you agree with the interpretation.</li>
+      <li>Say what is wrong. These are a starting position, not a proposal to be accepted or rejected whole.</li>
+    </ol>
+  </section>
+
+  <p class="f3-xs f3-mut" style="margin-top:var(--s5); text-align:center">
+    All people, medicines, doses, sites and events are fictional. Nothing here is clinical advice or a compliance claim.
+  </p>
+
+</div>
+
+</body>
+</html>

@@ -5,7 +5,7 @@
 
 Every session, every decision, every question, every bit of work goes in here with the date and time — so you can pick this up from any terminal, any day, without remembering what happened last time.
 
-- The rules and the plan live in [FRONTEND3-PLAN.md](FRONTEND3-PLAN.md).
+- The rules and the plan live in [FRONTEND3-PLAN.md](FRONTEND3-PLAN.md). Parked items live in [FRONTEND3-ISSUES.md](FRONTEND3-ISSUES.md). The brief is [CARE-ONE-OS-UX-SPECIFICATION.md](CARE-ONE-OS-UX-SPECIFICATION.md). The concept screens are in [wireframes/index.html](wireframes/index.html).
 - This file has **two parts**: the **Work log** (what was done and decided) and the **Conversation record** (what was actually said, both sides). Newest at the bottom in both.
 
 ---
@@ -34,7 +34,8 @@ Plain English throughout. No jargon. If a decision was made, write down *why*, s
 |---|---|---|
 | `frontend3` git branch | **Created — currently checked out** | 2026-08-04 |
 | The driving documentation | **Supplied** — `CARE-ONE-OS-UX-SPECIFICATION.md` (+ original .docx) in this folder | 2026-08-04 |
-| The 12 wireframe prototypes it references | **Missing** — not in repo, not in Downloads | 2026-08-04 |
+| The 12 wireframe prototypes it references | **Missing** — parked as [issue 1](FRONTEND3-ISSUES.md); own set built instead | 2026-08-04 |
+| Own wireframe set | **Built** — 12 screens + contact sheet + scoped CSS in `wireframes/` | 2026-08-04 |
 | First build slice chosen | Not yet — spec suggests shell + dashboard + round | 2026-08-04 |
 | Stack for frontend3 | **Decided: React + Inertia + Mantine**, fully isolated from frontend2 | 2026-08-04 |
 | Link from Blade landing page into frontend3 | Not built | 2026-08-04 |
@@ -162,6 +163,91 @@ Plain English throughout. No jargon. If a decision was made, write down *why*, s
 
 ---
 
+### 2026-08-04 12:05 — What frontend1/2 were built from, and what frontend3 inherits vs replaces
+
+**What we did:**
+- Answered "what spec did frontend 1 and 2 use" from the repo rather than from memory (full answer in the Conversation record).
+- Confirmed the stack instruction and the specification **do not conflict** — both say Laravel + React + Inertia + Mantine.
+- Worked out which existing documents frontend3 **inherits** and which the new specification **replaces**.
+
+**Decisions made:**
+
+**The rule: stack from the existing app, everything else from the frontend3 specification.**
+
+- **Stack (inherited, unchanged):** Laravel 10 / PHP 8.3 · React + Inertia.js + Mantine v7 · Vite · MySQL 8.4. Including the database caveat from `PRODUCT-CONTEXT.md` — schema comes from a dump, not a clean migration history, there is no standard Laravel `users` table, and migrations must be guarded with `Schema::hasTable`/`hasColumn`.
+
+| Existing doc | frontend3's position |
+|---|---|
+| `PRODUCT-CONTEXT.md` — stack, DB caveat, two-tier roles, server-side authz | **Inherit.** Environmental fact, not design opinion. |
+| `STANDARDS-REGISTER.md`, `SOURCE-REGISTER.md` | **Inherit.** UK law and NHS standards don't change per front end. Appendix B of the new spec maps onto the same sources. |
+| `CLINICAL-HAZARD-LOG.md`, `TRACEABILITY-MATRIX.md`, `DEFINITION-OF-DONE.md`, `REVIEW-WORKFLOW.md` | **Inherit.** The assurance machinery and the 15-agent review system apply to frontend3 pages too. |
+| `MEDICATION-WORKFLOW.md` | **Inherit as the floor; the new spec extends it.** The spec's outcome taxonomy, PRN protocol and CD workflow are richer — where they differ, the spec wins for frontend3. |
+| `DESIGN-SYSTEM.md`, `docs/design-system.md`, `docs/brand-guidelines.md`, `frontend/tokens.js` | **REPLACED for frontend3.** These describe frontend2's visual language. frontend3 uses the specification's Quiet Clinical Luxury palette and Manrope/Inter typography, in its own `frontend3/tokens.js`. Do not merge the two. |
+| `docs/ui-modernization-plan.md` | **Historical.** It's where the stack was originally chosen; that decision stands, the rest is frontend2's roadmap. |
+
+- **frontend1 has no specification** and is not a model for anything — legacy Blade + Bootstrap 3 + jQuery.
+
+**Open questions / what's next:**
+- Unchanged: the **12 missing wireframes**, the **first build slice**, and the **overlap with frontend2's existing med pages**.
+
+**Files touched:**
+- `docs/care-one-os/FRONTEND3/FRONTEND3-PLAN.md` (stack section rewritten around the inherit-stack / spec-everything-else rule)
+- `docs/care-one-os/FRONTEND3/FRONTEND3.md` (this entry + conversation record)
+
+---
+
+### 2026-08-04 12:21 — Issue tracker started; twelve original wireframes designed and built
+
+**What we did:**
+- Created **`FRONTEND3-ISSUES.md`** as the parked-items list, with the 12 missing wireframes as **issue 1** and the other three open questions as issues 2–4. Issue 1 records the full Appendix A table, where we searched, what was built instead, and the two things to resolve if the originals ever turn up.
+- Designed and built a **complete original set of twelve wireframes** in `wireframes/`, using the spec's own file names so Appendix A's "direct bridge" still holds, plus an `index.html` contact sheet.
+- Wrote **`careone-f3.css`** — the shared design language, every rule scoped under `.f3-root`. This is the prototype of what becomes `frontend3/f3.css` + `frontend3/tokens.js`.
+- Checked tag balance across all thirteen HTML files: clean.
+
+**The design language built:**
+- Full Quiet Clinical Luxury palette as CSS custom properties, plus five **muted** status tints derived from it (neutral / good / caution / risk / info). No rainbow badges.
+- Manrope headings, Inter body. Radius 12–16px, eight-point spacing, hairline borders, elevation only on overlays.
+- **Status carries a word, a shape and a tint** — ● Due, ✓ Completed, ▲ Late, ■ Risk, ◐ In progress — so it survives colour blindness, greyscale printing and a bright corridor.
+- Responsive shell on the spec's own breakpoints: ≥1200 three-zone workspace · 900–1199 icon rail + list-detail · 600–899 adaptive single column · <600 bottom navigation, full-width drawers, sticky primary action in thumb reach, safe-area padding.
+- Wide content (tables, MAR grid) scrolls inside its own frame — the page body never scrolls sideways.
+- Skeletons match final geometry; `prefers-reduced-motion` respected; visible teal focus ring on everything.
+
+**What each screen deliberately demonstrates** (beyond looking right):
+
+| # | Screen | The rule it makes visible |
+|---|---|---|
+| 01 | Frontline dashboard | Every number opens its records, states its range, says whether it's actionable. No "give all" button — batching would compress away the seven things that must never be compressed. |
+| 02 | Medication round | Identity → safety strip → medicine → evidence → outcome → confirmation, in that order. Hard stops named. Offline banner with queued-write count. Another device's in-progress lock. |
+| 03 | MAR chart | Grid on desktop, per-medicine timeline on mobile. Cells open the event, never edit in place. Addendum visible alongside the original. |
+| 04 | Person profile | Six lifecycle states. Awaiting-verification blocks administration. Duplicate warning framed as decision support, not a conclusion. Terminology note. |
+| 05 | PRN workflow | Interval maths shown, not hidden. Administer button disabled with the reason. Incomplete protocol blocks and routes a query — never repaired by generated advice. |
+| 06 | Missed doses | The whole eight-outcome taxonomy as a reference table. Reviewer must differ from owner. |
+| 07 | Stock & pharmacy | Order suggestion shows its full working. Immutable ledger with a reasoned adjustment. Part-supplied delivery. Empty state that offers the next move. |
+| 08 | Controlled drugs | Self-witnessing impossible — the administering user is absent from the witness list. One atomic transaction. Offline disabled. Six-stage discrepancy workflow. |
+| 09 | Shift handover | Auto-assembled, human-owned, acknowledged item by item. Cannot hand over while items lack an owner. Emergency route separated from "urgent". |
+| 10 | Manager & compliance | Numerator/denominator/exclusions on every rate. Data-quality caveat for unsynced sites. Open high-risk events stay visible above any green figure. No staff ranking. |
+| 11 | Admin & integrations | Permission matrix mirroring server enforcement. Locked configuration boundary. GP Connect shown honestly as a mock with a feature flag. |
+| 12 | AI workspace | Sourced facts / inference / suggestions kept apart. Omissions stated. Prohibited-autonomy list. Nothing sends itself. Outage doesn't stop administration. |
+
+**Decisions made:**
+- **Do not wait on missing inputs when the brief is sufficient to proceed.** The specification was detailed enough to design from directly. Building and marking it as replaceable beats blocking.
+- Wireframes use the **spec's exact file names**, so if the originals appear they can be diffed directly.
+- Fictional data throughout, with deliberately long names (Bruno Farrell-Reyes, Esther Kowalczyk) to test layout.
+- The CSS is the **draft of frontend3's real design system**, not throwaway prototype styling — it carries the tokens, the responsive shell and the status conventions forward.
+
+**Open questions / what's next:**
+- Owner to review the twelve — the contact sheet has a "how to review these" section. They are a starting position, not a proposal to accept or reject whole.
+- Then: first build slice (issue 2), overlap with frontend2 (issue 3), palette relationship (issue 4).
+- Nothing is committed on the `frontend3` branch yet.
+
+**Files touched:**
+- `docs/care-one-os/FRONTEND3/FRONTEND3-ISSUES.md` (new)
+- `docs/care-one-os/FRONTEND3/wireframes/careone-f3.css` (new)
+- `docs/care-one-os/FRONTEND3/wireframes/index.html` (new)
+- `docs/care-one-os/FRONTEND3/wireframes/careone-{dashboard,medication-round,mar,person-profile,prn,missed-doses,stock-pharmacy,controlled-drugs,handover,manager-compliance,admin-integrations,ai-workspace}-wireframe.html` (12 new)
+
+---
+
 ## Part 2 — Conversation record
 
 ### 2026-08-04 ~11:40 — "Look into FRONTEND3-PLAN.md and tell me what you understand"
@@ -213,3 +299,41 @@ Also raised four things needing a decision: the Blade-vs-React contradiction bet
 **Asked:** Confirm the conversation itself is going into the log, not just the outcomes.
 
 **Answered:** It wasn't — the log was capturing decisions and work only. Fixed it: this file now has two parts, a Work log and this Conversation record, and the whole session up to this point has been written back in retrospectively. Going forward both parts get updated together.
+
+### 2026-08-04 ~12:05 — "What spec did frontend 1 and 2 use? Use that same stack — but the rest from the frontend3 spec I sent"
+
+**Asked:** What specification did frontend1 and frontend2 use? Use that same **stack** — but everything else should come from the current frontend3 specification I sent.
+
+**Answered:** Checked the repo rather than answering from memory.
+
+> **frontend1 has no specification.** It's the legacy app — Blade templates under `resources/views/frontEnd/` with a `master.blade.php` layout, styled by `public/frontEnd/css/*` and driven by Bootstrap 3 + jQuery plus a large pile of plugins in `public/frontEnd/js/` (datepickers, Chart.js, even an AngularJS folder). It predates all the documentation and isn't the model for anything new.
+>
+> **frontend2's specification is the `docs/care-one-os/` folder**, which its own README calls "the single source of truth for how Care One OS pages are designed, built and reviewed" — `PRODUCT-CONTEXT.md` (stack + non-negotiables), `STANDARDS-REGISTER.md`, `SOURCE-REGISTER.md`, `DESIGN-SYSTEM.md`, `MEDICATION-WORKFLOW.md`, `CLINICAL-HAZARD-LOG.md`, `TRACEABILITY-MATRIX.md`, `DEFINITION-OF-DONE.md`, `REVIEW-WORKFLOW.md`. Behind that sits `docs/ui-modernization-plan.md`, which is where the stack was originally chosen, plus `docs/design-system.md` and `docs/brand-guidelines.md` for the visual layer.
+>
+> **The stack is stated in `PRODUCT-CONTEXT.md`:** Laravel 10 / PHP 8.3 · React + Inertia.js + Mantine v7 · Vite · MySQL 8.4 (schema loaded from a dump, not migrations — so guard migrations with `Schema::hasTable`/`hasColumn`; there's no standard Laravel `users` table).
+>
+> **The good news:** that is *the same stack the new specification names* ("Laravel • React • Inertia • Mantine • SQL"). So "use the same stack as 1 and 2" and "follow the spec" are the same instruction — there's nothing to reconcile, and the React/Inertia/Mantine decision made a few minutes earlier already satisfies both.
+
+Recorded the resulting rule in `FRONTEND3-PLAN.md`: **stack from the existing app, everything else from the frontend3 specification** — design language, palette, typography, information architecture, page inventory and workflow all come from the new blueprint. Also noted which existing docs frontend3 inherits versus which it replaces (see the Work log entry for that split).
+
+### 2026-08-04 ~12:07 — "Give me your own version. Park the 12 missing wireframes as a frontend3 issue"
+
+**Asked:** Log the 12 missing wireframes as an issue inside the frontend3 folder, so we know it's something to come back to afterwards. But don't stop there — build your own version of those twelve, in your own design: **unique, polished, and easy to use on both mobile and desktop**.
+
+**Answered:** Did both.
+
+> **The issue.** Created `FRONTEND3-ISSUES.md` with the missing wireframes as issue 1 — the full Appendix A table with a present/absent column, where we searched (this repo and Downloads), what was built instead, and the two things to settle if the originals ever surface: do they exist, and if they turn up, which set wins. Issues 2–4 carry the other open questions so nothing lives only in conversation.
+>
+> **The twelve.** Designed and built a complete original set in `wireframes/`, using the spec's own file names so Appendix A's "direct bridge to the approved concept screens" still holds. Plus an `index.html` contact sheet with the palette, the spec's own review checklist, and a "how to review these" section.
+>
+> **The design language.** One stylesheet, `careone-f3.css`, every rule scoped under `.f3-root` — the isolation rule honoured from the first line of CSS rather than retrofitted. Full Quiet Clinical Luxury palette as custom properties, five muted status tints derived from it, Manrope and Inter, radius 12–16px, eight-point spacing, hairline borders, elevation only on overlays.
+>
+> **On "easy to access on both mobile and desktop"** — the responsive model follows the spec's own breakpoints. At 1200px and above it's a three-zone workspace with a labelled sidebar; 900–1199 the sidebar collapses to an icon rail and the layout becomes list-detail; below 600 the sidebar disappears entirely, a bottom navigation bar takes over, drawers become full-width, and the primary action sticks within thumb reach with safe-area padding for the home indicator. Tables and the MAR grid scroll inside their own frames so the page body never scrolls sideways. Touch targets are 44px minimum on primary controls.
+>
+> **On status never being colour alone** — every badge carries a word, a distinct shape and a tint: ● Due, ✓ Completed, ▲ Late, ■ Risk, ◐ In progress. It survives colour blindness, greyscale printing and a bright corridor.
+>
+> Each screen also demonstrates a specific rule from the specification rather than just looking right — the round has no "give all" button because batching would compress away the seven things the spec says must never be compressed; the CD screen omits the administering user from the witness dropdown so self-witnessing is structurally impossible; the manager screen shows numerator, denominator and exclusions on every rate and keeps open high-risk events visible above any green figure; the AI workspace separates sourced facts from inference from suggestions and states what is missing from its own summary.
+>
+> All data is fictional, with deliberately long names to test the layout. Tag balance checked across all thirteen files.
+
+Noted that the underlying judgement here was: **don't wait on a missing input when the brief is enough to proceed.** The specification was detailed enough to design from directly, so building and marking it replaceable beat blocking.

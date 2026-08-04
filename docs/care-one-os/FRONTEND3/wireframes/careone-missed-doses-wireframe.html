@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>06 Missed doses &amp; exceptions — Care One OS frontend3 wireframe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="careone-f3.css">
+</head>
+<body class="f3-root">
+
+<div class="f3-shell">
+
+  <aside class="f3-nav">
+    <div class="f3-brand">
+      <div class="f3-brand-mark">C1</div>
+      <div class="f3-brand-text">
+        <div class="f3-brand-name">Care One OS</div>
+        <div class="f3-brand-sub">Willowbank</div>
+      </div>
+    </div>
+    <nav class="f3-navgroup" aria-label="Primary">
+      <h4>Areas</h4>
+      <a class="f3-navlink" href="careone-dashboard-wireframe.html"><span class="f3-navicon">T</span><span>Today</span></a>
+      <a class="f3-navlink" href="careone-person-profile-wireframe.html"><span class="f3-navicon">P</span><span>People</span></a>
+      <a class="f3-navlink" href="careone-mar-wireframe.html"><span class="f3-navicon">M</span><span>Medicines</span></a>
+      <a class="f3-navlink" href="careone-missed-doses-wireframe.html" aria-current="page"><span class="f3-navicon">O</span><span>Operations</span><span class="f3-navcount">7</span></a>
+      <a class="f3-navlink" href="careone-manager-compliance-wireframe.html"><span class="f3-navicon">A</span><span>Assurance</span></a>
+      <a class="f3-navlink" href="careone-admin-integrations-wireframe.html"><span class="f3-navicon">S</span><span>Settings</span></a>
+    </nav>
+    <nav class="f3-navgroup">
+      <h4>Prototype</h4>
+      <a class="f3-navlink" href="index.html"><span class="f3-navicon">◇</span><span>All screens</span></a>
+    </nav>
+  </aside>
+
+  <div class="f3-main">
+
+    <header class="f3-topbar">
+      <div class="f3-context">
+        <span class="f3-chip"><b>Willowbank House</b></span>
+        <span class="f3-chip f3-chip--quiet">Exceptions</span>
+      </div>
+      <div class="f3-topbar-actions">
+        <button class="f3-iconbtn" aria-label="Notifications">◔<span class="f3-dot"></span></button>
+        <div class="f3-avatar" aria-hidden="true">JA</div>
+      </div>
+    </header>
+
+    <div class="f3-pagehead">
+      <div class="f3-pagehead-text">
+        <h1>Exceptions</h1>
+        <p class="f3-pagehead-sum"><b>7 open</b> · 2 past their response deadline · oldest raised 3 days ago</p>
+        <p class="f3-sync">Last synced 14:22</p>
+      </div>
+      <button class="f3-btn f3-hide-sm">Filters</button>
+    </div>
+
+    <main class="f3-page">
+
+      <p class="f3-note">
+        <b>Language rule.</b> Not every non-administration is a "missed dose". Declined, unavailable, omitted-clinical,
+        omitted-operational, late, part-administered and spat-out are distinct outcomes with distinct follow-up.
+        Collapsing them into one word erases the context that reporting depends on.
+      </p>
+
+      <div class="f3-grid f3-grid--4">
+        <button class="f3-stat f3-stat--alert">
+          <span class="f3-stat-label">Past deadline</span>
+          <span class="f3-stat-value">2</span>
+          <span class="f3-stat-meta">supply &amp; consent · <b>actionable</b></span>
+        </button>
+        <button class="f3-stat">
+          <span class="f3-stat-label">Open, in time</span>
+          <span class="f3-stat-value">5</span>
+          <span class="f3-stat-meta">all have a named owner</span>
+        </button>
+        <button class="f3-stat">
+          <span class="f3-stat-label">Resolved this week</span>
+          <span class="f3-stat-value">14</span>
+          <span class="f3-stat-meta">28 Jul – 3 Aug · informational</span>
+        </button>
+        <button class="f3-stat">
+          <span class="f3-stat-label">Linked to incidents</span>
+          <span class="f3-stat-value">1</span>
+          <span class="f3-stat-meta">safeguarding: none</span>
+        </button>
+      </div>
+
+      <div class="f3-grid f3-grid--main">
+
+        <!-- ============ QUEUE ============ -->
+        <section class="f3-card" aria-labelledby="q-h">
+          <div class="f3-cardhead">
+            <h2 id="q-h">Open exceptions</h2>
+            <div class="f3-segment" role="group" aria-label="Sort">
+              <button aria-pressed="true">By risk</button>
+              <button aria-pressed="false">By age</button>
+              <button aria-pressed="false">By owner</button>
+            </div>
+          </div>
+
+          <article class="f3-listitem f3-listitem--card f3-listitem--alert">
+            <div class="f3-listbody">
+              <div class="f3-row" style="gap:var(--s2)">
+                <span class="f3-badge f3-badge--risk">Unavailable</span>
+                <span class="f3-badge f3-badge--caution">Past deadline</span>
+                <span class="f3-xs f3-mut">2 doses affected</span>
+              </div>
+              <div class="f3-listtitle" style="margin-top:6px">Rowan Petrescu — Levetiracetam 500mg</div>
+              <div class="f3-listmeta">Owner <b>Joy Adeyemi</b> · due 16:00 yesterday · anti-epileptic, supply critical</div>
+            </div>
+            <button class="f3-btn f3-btn--primary f3-btn--sm">Open</button>
+          </article>
+
+          <article class="f3-listitem f3-listitem--card f3-listitem--alert">
+            <div class="f3-listbody">
+              <div class="f3-row" style="gap:var(--s2)">
+                <span class="f3-badge f3-badge--risk">Declined ×3</span>
+                <span class="f3-badge f3-badge--caution">Threshold reached</span>
+              </div>
+              <div class="f3-listtitle" style="margin-top:6px">Theo Lindqvist — Sertraline 50mg</div>
+              <div class="f3-listmeta">Owner <b>Ines Marchetti</b> · policy threshold 3-in-7-days reached today · GP contact required</div>
+            </div>
+            <button class="f3-btn f3-btn--sm">Open</button>
+          </article>
+
+          <article class="f3-listitem f3-listitem--card">
+            <div class="f3-listbody">
+              <div class="f3-row" style="gap:var(--s2)">
+                <span class="f3-badge f3-badge--caution">Late</span>
+              </div>
+              <div class="f3-listtitle" style="margin-top:6px">Nadia Okonkwo — Levothyroxine 50mcg given 08:40</div>
+              <div class="f3-listmeta">Owner <b>Marcus Delacroix</b> · due 07:00 · <b>later windows recalculated</b> · risk assessed as low</div>
+            </div>
+            <button class="f3-btn f3-btn--sm">Open</button>
+          </article>
+
+          <article class="f3-listitem f3-listitem--card">
+            <div class="f3-listbody">
+              <div class="f3-row" style="gap:var(--s2)">
+                <span class="f3-badge f3-badge--caution">Spat out</span>
+              </div>
+              <div class="f3-listtitle" style="margin-top:6px">Bruno Farrell-Reyes — Metformin 500mg</div>
+              <div class="f3-listmeta">Owner <b>Priya Ramanathan</b> · amount taken unknown · <b>awaiting pharmacy advice — do not redose</b></div>
+            </div>
+            <button class="f3-btn f3-btn--sm">Open</button>
+          </article>
+
+          <article class="f3-listitem f3-listitem--card">
+            <div class="f3-listbody">
+              <div class="f3-row" style="gap:var(--s2)">
+                <span class="f3-badge f3-badge--neutral">Omitted — clinical</span>
+              </div>
+              <div class="f3-listtitle" style="margin-top:6px">Amara Sithole — Bisoprolol 2.5mg</div>
+              <div class="f3-listmeta">Owner <b>Ines Marchetti</b> · heart rate 48 bpm, below the withhold threshold of 50 · decision by nurse on duty</div>
+            </div>
+            <button class="f3-btn f3-btn--sm">Open</button>
+          </article>
+
+          <article class="f3-listitem f3-listitem--card">
+            <div class="f3-listbody">
+              <div class="f3-row" style="gap:var(--s2)">
+                <span class="f3-badge f3-badge--neutral">Part administered</span>
+              </div>
+              <div class="f3-listtitle" style="margin-top:6px">Nadia Okonkwo — Fortisip compact, half taken</div>
+              <div class="f3-listmeta">Owner <b>Joy Adeyemi</b> · 100ml of 200ml · stock reconciliation pending</div>
+            </div>
+            <button class="f3-btn f3-btn--sm">Open</button>
+          </article>
+
+          <article class="f3-listitem f3-listitem--card">
+            <div class="f3-listbody">
+              <div class="f3-row" style="gap:var(--s2)">
+                <span class="f3-badge f3-badge--neutral">Omitted — operational</span>
+              </div>
+              <div class="f3-listtitle" style="margin-top:6px">Willowbank — 18:00 window, 2 doses not recorded</div>
+              <div class="f3-listmeta">Owner <b>Joy Adeyemi</b> · staff sickness, single cover · incident threshold not met</div>
+            </div>
+            <button class="f3-btn f3-btn--sm">Open</button>
+          </article>
+        </section>
+
+        <!-- ============ DETAIL ============ -->
+        <aside class="f3-drawer" aria-labelledby="d-h">
+          <div class="f3-drawer-head">
+            <div>
+              <span class="f3-badge f3-badge--risk">Unavailable</span>
+              <h2 id="d-h" style="margin-top:var(--s2)">Levetiracetam 500mg not available</h2>
+              <p class="f3-person-meta">Rowan Petrescu · Room 9 · raised 2 Aug 11:40</p>
+            </div>
+          </div>
+
+          <div class="f3-stack">
+
+            <section class="f3-card f3-card--tint" style="padding:var(--s4)">
+              <h4 style="margin-bottom:var(--s3)">Risk summary</h4>
+              <p class="f3-sm">Anti-epileptic medicine. Missed doses carry a seizure risk.
+              <b>Two scheduled doses now affected</b> (2 Aug 20:00, 3 Aug 08:00).</p>
+              <p class="f3-xs f3-mut" style="margin-top:var(--s2)">
+                Source rules: local medicines policy §4.2 (critical medicines list) · NICE SC1 supply continuity.
+              </p>
+            </section>
+
+            <section>
+              <h4 style="margin-bottom:var(--s3)">Ownership</h4>
+              <dl class="f3-dl">
+                <dt>Owner</dt><dd>Joy Adeyemi (shift lead)</dd>
+                <dt>Response due</dt><dd><b>2 Aug 16:00</b> — passed</dd>
+                <dt>Escalation path</dt><dd>Supplying pharmacy → GP out of hours → 111</dd>
+                <dt>Linked incident</dt><dd class="f3-mut">None yet</dd>
+              </dl>
+            </section>
+
+            <section>
+              <h4 style="margin-bottom:var(--s3)">What has happened</h4>
+              <div class="f3-timeline">
+                <div class="f3-tl-item f3-tl-item--now">
+                  <div class="f3-tl-time">3 Aug · 08:00</div>
+                  <div class="f3-tl-title">Second dose affected</div>
+                  <div class="f3-tl-text">Recorded as unavailable by Marcus D.</div>
+                </div>
+                <div class="f3-tl-item">
+                  <div class="f3-tl-time">2 Aug · 17:20</div>
+                  <div class="f3-tl-title">Pharmacy acknowledged order #4471</div>
+                  <div class="f3-tl-text">"Out of stock at wholesaler, sourcing alternative pack. Expect 3 Aug pm."</div>
+                </div>
+                <div class="f3-tl-item">
+                  <div class="f3-tl-time">2 Aug · 12:05</div>
+                  <div class="f3-tl-title">Urgent order raised</div>
+                  <div class="f3-tl-text">Order #4471 sent to Whitfield Pharmacy by Joy A.</div>
+                </div>
+                <div class="f3-tl-item">
+                  <div class="f3-tl-time">2 Aug · 11:40</div>
+                  <div class="f3-tl-title">Exception raised</div>
+                  <div class="f3-tl-text">Recorded during the 12:00 round. Last available dose given 08:00 on 2 Aug.</div>
+                </div>
+              </div>
+            </section>
+
+            <div class="f3-alert f3-alert--risk">
+              <span class="f3-alert-mark" aria-hidden="true">■</span>
+              <div class="f3-alert-body">
+                <div class="f3-alert-title">Response deadline passed</div>
+                <div class="f3-alert-text">This exception is 22 hours past its 16:00 deadline and a second dose has now been affected. Escalate or record why not.</div>
+                <div class="f3-alert-actions">
+                  <button class="f3-btn f3-btn--sm">Escalate to GP</button>
+                  <button class="f3-btn f3-btn--sm">Extend with a reason</button>
+                </div>
+              </div>
+            </div>
+
+            <section>
+              <h4 style="margin-bottom:var(--s3)">Resolve</h4>
+              <div class="f3-stack f3-stack--sm">
+                <div class="f3-field">
+                  <label class="f3-label" for="res">Outcome <span class="f3-req" aria-hidden="true">*</span></label>
+                  <select class="f3-select" id="res">
+                    <option selected>Choose…</option>
+                    <option>Supply received — doses resumed</option>
+                    <option>Alternative authorised by prescriber</option>
+                    <option>Person admitted to hospital</option>
+                    <option>Other — describe</option>
+                  </select>
+                </div>
+                <div class="f3-field">
+                  <label class="f3-label" for="learn">Learning note</label>
+                  <textarea class="f3-textarea" id="learn" placeholder="What would stop this happening again?"></textarea>
+                </div>
+                <div class="f3-field">
+                  <label class="f3-label" for="rev">Reviewed by <span class="f3-req" aria-hidden="true">*</span></label>
+                  <input class="f3-input" id="rev" placeholder="A different person from the owner">
+                  <span class="f3-error">A reviewer is required and cannot be the owner</span>
+                </div>
+              </div>
+              <button class="f3-btn f3-btn--primary f3-btn--block" style="margin-top:var(--s4)" disabled>Close exception</button>
+            </section>
+
+          </div>
+        </aside>
+      </div>
+
+      <!-- ============ OUTCOME TAXONOMY ============ -->
+      <section class="f3-card" aria-labelledby="tx-h">
+        <div class="f3-cardhead">
+          <div>
+            <h2 id="tx-h">Outcome taxonomy</h2>
+            <p class="f3-cardsub">Every outcome has a minimum capture and a typical follow-up. Reference, always available.</p>
+          </div>
+        </div>
+        <div class="f3-tablewrap">
+          <table class="f3-table">
+            <thead>
+              <tr><th scope="col">Outcome</th><th scope="col">Minimum capture</th><th scope="col">Typical follow-up</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><span class="f3-badge f3-badge--risk">Declined</span></td><td>Reason offered, capacity/consent context, attempt made, advice given</td><td>Monitor or escalate per medicine and policy</td></tr>
+              <tr><td><span class="f3-badge f3-badge--risk">Unavailable</span></td><td>Stock or source issue, last available dose, order status</td><td>Urgent supply / pharmacy contact</td></tr>
+              <tr><td><span class="f3-badge f3-badge--neutral">Omitted — clinical</span></td><td>Clinical reason, decision maker, instructions followed</td><td>Review or observation</td></tr>
+              <tr><td><span class="f3-badge f3-badge--neutral">Omitted — operational</span></td><td>Reason and responsible owner</td><td>Incident / escalation where the threshold is met</td></tr>
+              <tr><td><span class="f3-badge f3-badge--caution">Late / delayed</span></td><td>Actual time, reason, risk assessment reference</td><td>Recalculate later windows where authorised</td></tr>
+              <tr><td><span class="f3-badge f3-badge--caution">Part administered</span></td><td>Quantity given and not given, reason</td><td>Clinical advice and stock reconciliation</td></tr>
+              <tr><td><span class="f3-badge f3-badge--caution">Spat out / vomited</span></td><td>Timing, observed amount if known, symptoms</td><td>Seek authorised advice — <b>never suggest redosing</b></td></tr>
+              <tr><td><span class="f3-badge f3-badge--ghost">Not required</span></td><td>Scheduled rule or condition not met</td><td>No exception raised if the prescription supports it</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<nav class="f3-bottomnav" aria-label="Primary">
+  <a href="careone-dashboard-wireframe.html"><span class="f3-navicon" aria-hidden="true">T</span>Today</a>
+  <a href="careone-person-profile-wireframe.html"><span class="f3-navicon" aria-hidden="true">P</span>People</a>
+  <a href="careone-medication-round-wireframe.html"><span class="f3-navicon" aria-hidden="true">R</span>Round</a>
+  <a href="careone-handover-wireframe.html"><span class="f3-navicon" aria-hidden="true">M</span>Messages</a>
+  <a href="index.html" aria-current="page"><span class="f3-navicon" aria-hidden="true">···</span>More</a>
+</nav>
+
+</body>
+</html>

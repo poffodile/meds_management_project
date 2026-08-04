@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>08 Controlled drugs — Care One OS frontend3 wireframe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="careone-f3.css">
+</head>
+<body class="f3-root">
+
+<div class="f3-shell">
+
+  <aside class="f3-nav">
+    <div class="f3-brand">
+      <div class="f3-brand-mark">C1</div>
+      <div class="f3-brand-text">
+        <div class="f3-brand-name">Care One OS</div>
+        <div class="f3-brand-sub">Willowbank</div>
+      </div>
+    </div>
+    <nav class="f3-navgroup" aria-label="Primary">
+      <h4>Areas</h4>
+      <a class="f3-navlink" href="careone-dashboard-wireframe.html"><span class="f3-navicon">T</span><span>Today</span></a>
+      <a class="f3-navlink" href="careone-person-profile-wireframe.html"><span class="f3-navicon">P</span><span>People</span></a>
+      <a class="f3-navlink" href="careone-mar-wireframe.html"><span class="f3-navicon">M</span><span>Medicines</span></a>
+      <a class="f3-navlink" href="careone-controlled-drugs-wireframe.html" aria-current="page"><span class="f3-navicon">O</span><span>Operations</span><span class="f3-navcount">7</span></a>
+      <a class="f3-navlink" href="careone-manager-compliance-wireframe.html"><span class="f3-navicon">A</span><span>Assurance</span></a>
+      <a class="f3-navlink" href="careone-admin-integrations-wireframe.html"><span class="f3-navicon">S</span><span>Settings</span></a>
+    </nav>
+    <nav class="f3-navgroup">
+      <h4>Prototype</h4>
+      <a class="f3-navlink" href="index.html"><span class="f3-navicon">◇</span><span>All screens</span></a>
+    </nav>
+  </aside>
+
+  <div class="f3-main">
+
+    <header class="f3-topbar">
+      <div class="f3-context">
+        <span class="f3-chip"><b>Willowbank House</b></span>
+        <span class="f3-chip f3-chip--quiet">CD cabinet · Ground floor clinic</span>
+      </div>
+      <div class="f3-topbar-actions">
+        <button class="f3-iconbtn" aria-label="Notifications">◔<span class="f3-dot"></span></button>
+        <div class="f3-avatar" aria-hidden="true">JA</div>
+      </div>
+    </header>
+
+    <div class="f3-pagehead">
+      <div class="f3-pagehead-text">
+        <h1>Controlled drugs</h1>
+        <p class="f3-pagehead-sum"><b>1 open discrepancy</b> · weekly count due 17:00 today · 4 registers on this site</p>
+        <p class="f3-sync">Last synced 14:22 · online, witnessing available</p>
+      </div>
+      <button class="f3-btn f3-btn--primary f3-hide-sm">New transaction</button>
+    </div>
+
+    <main class="f3-page">
+
+      <div class="f3-alert f3-alert--risk">
+        <span class="f3-alert-mark" aria-hidden="true">■</span>
+        <div class="f3-alert-body">
+          <div class="f3-alert-title">Balance discrepancy — Morphine sulfate 10mg/5ml, Ground floor clinic</div>
+          <div class="f3-alert-text">
+            Expected <b>42ml</b>, physical count <b>39ml</b>. Variance <b>−3ml</b>, found at the 06:00 count on 3 Aug.
+            Casual adjustment is frozen for this register until the investigation is signed off.
+          </div>
+          <div class="f3-alert-actions">
+            <button class="f3-btn f3-btn--sm">Open investigation</button>
+            <button class="f3-btn f3-btn--sm">Who has accessed this register</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="f3-grid f3-grid--main">
+
+        <div class="f3-stack">
+
+          <!-- ============ REGISTER ============ -->
+          <section class="f3-card" aria-labelledby="reg-h">
+            <div class="f3-cardhead">
+              <div>
+                <h2 id="reg-h">Register — Morphine sulfate 10mg/5ml oral solution</h2>
+                <p class="f3-cardsub">Rowan Petrescu · Ground floor clinic cabinet · chronological, immutable, running balance</p>
+              </div>
+              <span class="f3-badge f3-badge--risk">Frozen</span>
+            </div>
+
+            <div class="f3-tablewrap">
+              <table class="f3-table">
+                <thead>
+                  <tr>
+                    <th scope="col">When</th><th scope="col">Transaction</th><th scope="col">In</th>
+                    <th scope="col">Out</th><th scope="col">Balance</th><th scope="col">By</th><th scope="col">Witness</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>3 Aug 06:02</td><td><b>Count</b> — variance −3ml</td>
+                    <td class="f3-num">—</td><td class="f3-num">—</td><td class="f3-num">39 / 42</td>
+                    <td>Ines M.</td><td>Marcus D.</td>
+                  </tr>
+                  <tr>
+                    <td>2 Aug 22:10</td><td>Administration</td>
+                    <td class="f3-num">—</td><td class="f3-num">5ml</td><td class="f3-num">42</td>
+                    <td>Priya R.</td><td>Joy A.</td>
+                  </tr>
+                  <tr>
+                    <td>2 Aug 14:05</td><td>Administration</td>
+                    <td class="f3-num">—</td><td class="f3-num">5ml</td><td class="f3-num">47</td>
+                    <td>Joy A.</td><td>Marcus D.</td>
+                  </tr>
+                  <tr>
+                    <td>2 Aug 09:40</td><td><b>Late entry</b> — administration 1 Aug 22:00</td>
+                    <td class="f3-num">—</td><td class="f3-num">5ml</td><td class="f3-num">52</td>
+                    <td>Priya R.</td><td>Ines M.</td>
+                  </tr>
+                  <tr>
+                    <td>1 Aug 08:15</td><td><b>Receipt</b> — from Whitfield Pharmacy</td>
+                    <td class="f3-num">100ml</td><td class="f3-num">—</td><td class="f3-num">57</td>
+                    <td>Ines M.</td><td>Joy A.</td>
+                  </tr>
+                  <tr>
+                    <td>31 Jul 19:30</td><td>Administration</td>
+                    <td class="f3-num">—</td><td class="f3-num">5ml</td><td class="f3-num">−43</td>
+                    <td>Marcus D.</td><td>Priya R.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <p class="f3-note" style="margin-top:var(--s4)">
+              <b>Late entries and corrections are explicit linked records, never silent edits.</b>
+              The 2 Aug 09:40 row states plainly that it records something that happened on 1 Aug at 22:00.
+              The register keeps both the entry time and the event time.
+            </p>
+          </section>
+
+          <!-- ============ TRANSACTION — TWO PERSON ============ -->
+          <section class="f3-card" aria-labelledby="tx-h">
+            <div class="f3-cardhead">
+              <div>
+                <h2 id="tx-h">Administration — two-person confirmation</h2>
+                <p class="f3-cardsub">Step 4 of 6 · the second user authenticates independently</p>
+              </div>
+              <span class="f3-badge f3-badge--caution">Awaiting witness</span>
+            </div>
+
+            <div class="f3-grid f3-grid--2">
+
+              <div class="f3-stack">
+                <div class="f3-person">
+                  <div class="f3-photo" aria-hidden="true">RP</div>
+                  <div>
+                    <div class="f3-person-name">Rowan Petrescu</div>
+                    <div class="f3-person-meta">Room 9 · born 4 Apr 1951 · WB-0157</div>
+                  </div>
+                </div>
+
+                <div class="f3-card f3-card--tint" style="padding:var(--s4)">
+                  <h4 style="margin-bottom:var(--s3)">Balance and instruction</h4>
+                  <dl class="f3-dl">
+                    <dt>Current balance</dt><dd><b>39ml</b> (physical count)</dd>
+                    <dt>Instruction</dt><dd>2.5–5ml every 4 hours when required, for breakthrough pain</dd>
+                    <dt>Last given</dt><dd>2 Aug 22:10 · 5ml</dd>
+                    <dt>Eligible now</dt><dd>Yes — 16 hours since last dose</dd>
+                  </dl>
+                </div>
+
+                <div class="f3-field">
+                  <label class="f3-label" for="cdq">Quantity <span class="f3-req" aria-hidden="true">*</span></label>
+                  <select class="f3-select" id="cdq">
+                    <option>2.5ml</option>
+                    <option selected>5ml</option>
+                  </select>
+                  <span class="f3-hint">Balance will become 34ml.</span>
+                </div>
+
+                <div class="f3-field">
+                  <label class="f3-label" for="cdn">Supporting detail <span class="f3-req" aria-hidden="true">*</span></label>
+                  <textarea class="f3-textarea" id="cdn">Reported pain 7/10 in lower back, not eased by repositioning.</textarea>
+                </div>
+              </div>
+
+              <div class="f3-stack">
+                <div class="f3-card" style="padding:var(--s4); border-color:var(--teal)">
+                  <h4 style="margin-bottom:var(--s3)">Person 1 — administering</h4>
+                  <div class="f3-row">
+                    <div class="f3-avatar" aria-hidden="true">JA</div>
+                    <div>
+                      <div class="f3-person-name">Joy Adeyemi</div>
+                      <div class="f3-person-meta">Authenticated 14:19 · this device</div>
+                    </div>
+                    <span class="f3-spacer f3-badge f3-badge--good">Confirmed</span>
+                  </div>
+                </div>
+
+                <div class="f3-card" style="padding:var(--s4)">
+                  <h4 style="margin-bottom:var(--s3)">Person 2 — witnessing</h4>
+                  <div class="f3-stack f3-stack--sm">
+                    <div class="f3-field">
+                      <label class="f3-label" for="w-user">Witness <span class="f3-req" aria-hidden="true">*</span></label>
+                      <select class="f3-select" id="w-user">
+                        <option selected>Marcus Delacroix</option>
+                        <option>Priya Ramanathan</option>
+                        <option>Ines Marchetti</option>
+                      </select>
+                      <span class="f3-hint">Joy Adeyemi does not appear in this list. Self-witnessing is impossible.</span>
+                    </div>
+                    <div class="f3-field">
+                      <label class="f3-label" for="w-pass">Witness sign-in <span class="f3-req" aria-hidden="true">*</span></label>
+                      <input class="f3-input" id="w-pass" type="password" value="········">
+                      <span class="f3-hint">The witness authenticates as themselves — they do not simply tap "I agree".</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="f3-confirm">
+                  <h4 style="margin-bottom:var(--s3)">Both of you are confirming</h4>
+                  <dl class="f3-dl">
+                    <dt>Person</dt><dd>Rowan Petrescu · WB-0157</dd>
+                    <dt>Medicine</dt><dd>Morphine sulfate 10mg/5ml oral solution</dd>
+                    <dt>Quantity</dt><dd>5ml by mouth</dd>
+                    <dt>Balance</dt><dd>39ml → <b>34ml</b></dd>
+                    <dt>Time</dt><dd>3 Aug 14:21</dd>
+                    <dt>Administered by</dt><dd>Joy Adeyemi</dd>
+                    <dt>Witnessed by</dt><dd>Marcus Delacroix</dd>
+                  </dl>
+                </div>
+
+                <button class="f3-btn f3-btn--primary f3-btn--block">Witness confirms — commit</button>
+              </div>
+            </div>
+
+            <p class="f3-note" style="margin-top:var(--s4)">
+              <b>Non-negotiable.</b> The entry, both witnesses and the new balance commit as <b>one atomic server transaction</b>.
+              If any part fails, nothing is written. Offline completion is disabled — this screen is unavailable without a connection.
+            </p>
+          </section>
+
+        </div>
+
+        <!-- ============ DISCREPANCY WORKFLOW ============ -->
+        <div class="f3-stack">
+
+          <section class="f3-card" aria-labelledby="dw-h">
+            <div class="f3-cardhead">
+              <h2 id="dw-h">Discrepancy workflow</h2>
+              <span class="f3-badge f3-badge--caution">Stage 3</span>
+            </div>
+
+            <div class="f3-timeline">
+              <div class="f3-tl-item">
+                <div class="f3-tl-time">Stage 1 · done 06:02</div>
+                <div class="f3-tl-title">Detect</div>
+                <div class="f3-tl-text">Expected 42ml vs physical 39ml displayed. Casual adjustment frozen.</div>
+              </div>
+              <div class="f3-tl-item">
+                <div class="f3-tl-time">Stage 2 · done 06:20</div>
+                <div class="f3-tl-title">Contain</div>
+                <div class="f3-tl-text">Local policy followed. Responsible lead: Ines Marchetti (registered nurse).</div>
+              </div>
+              <div class="f3-tl-item f3-tl-item--now">
+                <div class="f3-tl-time">Stage 3 · in progress</div>
+                <div class="f3-tl-title">Investigate</div>
+                <div class="f3-tl-text">Reviewing ledger, administration events, receipts, transfers, returns and access records.</div>
+              </div>
+              <div class="f3-tl-item">
+                <div class="f3-tl-time">Stage 4</div>
+                <div class="f3-tl-title">Escalate</div>
+                <div class="f3-tl-text">Record notifications, external reference and deadlines.</div>
+              </div>
+              <div class="f3-tl-item">
+                <div class="f3-tl-time">Stage 5</div>
+                <div class="f3-tl-title">Resolve</div>
+                <div class="f3-tl-text">Document the conclusion, any authorised correction or addendum, and sign-off.</div>
+              </div>
+              <div class="f3-tl-item">
+                <div class="f3-tl-time">Stage 6</div>
+                <div class="f3-tl-title">Learn</div>
+                <div class="f3-tl-text">Link incident, corrective action and audit evidence.</div>
+              </div>
+            </div>
+          </section>
+
+          <section class="f3-card" aria-labelledby="rgs-h">
+            <div class="f3-cardhead">
+              <h2 id="rgs-h">Registers on this site</h2>
+            </div>
+            <ul class="f3-list">
+              <li class="f3-listitem" style="padding:var(--s3) 0">
+                <div class="f3-listbody">
+                  <div class="f3-listtitle">Ground floor clinic</div>
+                  <div class="f3-listmeta">3 medicines · <b>1 discrepancy</b></div>
+                </div>
+                <span class="f3-badge f3-badge--risk">Frozen</span>
+              </li>
+              <li class="f3-listitem" style="padding:var(--s3) 0">
+                <div class="f3-listbody">
+                  <div class="f3-listtitle">First floor clinic</div>
+                  <div class="f3-listmeta">2 medicines · balanced 28 Jul</div>
+                </div>
+                <span class="f3-badge f3-badge--good">Balanced</span>
+              </li>
+              <li class="f3-listitem" style="padding:var(--s3) 0">
+                <div class="f3-listbody">
+                  <div class="f3-listtitle">Fridge — CD section</div>
+                  <div class="f3-listmeta">1 medicine · cold chain monitored</div>
+                </div>
+                <span class="f3-badge f3-badge--good">Balanced</span>
+              </li>
+              <li class="f3-listitem" style="padding:var(--s3) 0">
+                <div class="f3-listbody">
+                  <div class="f3-listtitle">Awaiting destruction</div>
+                  <div class="f3-listmeta">2 items · authorised witness required</div>
+                </div>
+                <span class="f3-badge f3-badge--caution">Pending</span>
+              </li>
+            </ul>
+          </section>
+
+          <section class="f3-card f3-card--flat" aria-labelledby="wf-h">
+            <h2 id="wf-h" style="margin-bottom:var(--s4)">Dedicated workflows</h2>
+            <div class="f3-stack f3-stack--sm">
+              <button class="f3-btn f3-btn--block">Receipt from pharmacy</button>
+              <button class="f3-btn f3-btn--block">Administration</button>
+              <button class="f3-btn f3-btn--block">Transfer between locations</button>
+              <button class="f3-btn f3-btn--block">Return to pharmacy</button>
+              <button class="f3-btn f3-btn--block">Destruction</button>
+              <button class="f3-btn f3-btn--block">Balance check / count</button>
+            </div>
+            <p class="f3-xs f3-mut" style="margin-top:var(--s3)">
+              Each is a separate workflow with its own required fields. None of them is a generic "adjust balance" form —
+              that form does not exist.
+            </p>
+          </section>
+
+          <!-- OFFLINE / NO-PERMISSION STATES -->
+          <section class="f3-card" aria-labelledby="st-h">
+            <h2 id="st-h" style="margin-bottom:var(--s4)">If things are not normal</h2>
+            <div class="f3-stack f3-stack--sm">
+              <div class="f3-alert f3-alert--risk">
+                <span class="f3-alert-mark" aria-hidden="true">■</span>
+                <div class="f3-alert-body">
+                  <div class="f3-alert-title">Offline — CD witnessing unavailable</div>
+                  <div class="f3-alert-text">A witnessed entry cannot be safely completed without the server. Use the paper register and record it here when the connection returns.</div>
+                </div>
+              </div>
+              <div class="f3-alert f3-alert--info">
+                <span class="f3-alert-mark" aria-hidden="true">◐</span>
+                <div class="f3-alert-body">
+                  <div class="f3-alert-title">You cannot witness controlled drugs</div>
+                  <div class="f3-alert-text">Your role does not include witnessing. Ask a senior, shift lead or nurse on duty. This does not reveal any register content.</div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<nav class="f3-bottomnav" aria-label="Primary">
+  <a href="careone-dashboard-wireframe.html"><span class="f3-navicon" aria-hidden="true">T</span>Today</a>
+  <a href="careone-person-profile-wireframe.html"><span class="f3-navicon" aria-hidden="true">P</span>People</a>
+  <a href="careone-medication-round-wireframe.html"><span class="f3-navicon" aria-hidden="true">R</span>Round</a>
+  <a href="careone-handover-wireframe.html"><span class="f3-navicon" aria-hidden="true">M</span>Messages</a>
+  <a href="index.html" aria-current="page"><span class="f3-navicon" aria-hidden="true">···</span>More</a>
+</nav>
+
+</body>
+</html>

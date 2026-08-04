@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>11 Administration &amp; integrations — Care One OS frontend3 wireframe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="careone-f3.css">
+</head>
+<body class="f3-root">
+
+<div class="f3-shell">
+
+  <aside class="f3-nav">
+    <div class="f3-brand">
+      <div class="f3-brand-mark">C1</div>
+      <div class="f3-brand-text">
+        <div class="f3-brand-name">Care One OS</div>
+        <div class="f3-brand-sub">Meadowfield</div>
+      </div>
+    </div>
+    <nav class="f3-navgroup" aria-label="Primary">
+      <h4>Areas</h4>
+      <a class="f3-navlink" href="careone-dashboard-wireframe.html"><span class="f3-navicon">T</span><span>Today</span></a>
+      <a class="f3-navlink" href="careone-person-profile-wireframe.html"><span class="f3-navicon">P</span><span>People</span></a>
+      <a class="f3-navlink" href="careone-mar-wireframe.html"><span class="f3-navicon">M</span><span>Medicines</span></a>
+      <a class="f3-navlink" href="careone-missed-doses-wireframe.html"><span class="f3-navicon">O</span><span>Operations</span><span class="f3-navcount">7</span></a>
+      <a class="f3-navlink" href="careone-manager-compliance-wireframe.html"><span class="f3-navicon">A</span><span>Assurance</span></a>
+      <a class="f3-navlink" href="careone-admin-integrations-wireframe.html" aria-current="page"><span class="f3-navicon">S</span><span>Settings</span></a>
+    </nav>
+    <nav class="f3-navgroup">
+      <h4>Prototype</h4>
+      <a class="f3-navlink" href="index.html"><span class="f3-navicon">◇</span><span>All screens</span></a>
+    </nav>
+  </aside>
+
+  <div class="f3-main">
+
+    <header class="f3-topbar">
+      <div class="f3-context">
+        <span class="f3-chip"><b>Meadowfield Care</b></span>
+        <span class="f3-chip f3-chip--quiet">Settings · administrator</span>
+      </div>
+      <div class="f3-topbar-actions">
+        <button class="f3-iconbtn" aria-label="Notifications">◔</button>
+        <div class="f3-avatar" aria-hidden="true">DM</div>
+      </div>
+    </header>
+
+    <div class="f3-pagehead">
+      <div class="f3-pagehead-text">
+        <h1>Administration</h1>
+        <p class="f3-pagehead-sum">3 sites · 41 users · 6 roles · 4 integrations · <b>1 integration degraded</b></p>
+        <p class="f3-sync">Configuration version 12 · changed 28 Jul by Dara Mwangi</p>
+      </div>
+    </div>
+
+    <main class="f3-page">
+
+      <div class="f3-tabs" role="tablist">
+        <button class="f3-tab" role="tab" aria-selected="false">Organisation &amp; sites</button>
+        <button class="f3-tab" role="tab" aria-selected="false">Teams &amp; users</button>
+        <button class="f3-tab" role="tab" aria-selected="true">Roles &amp; permissions</button>
+        <button class="f3-tab" role="tab" aria-selected="false">Terminology</button>
+        <button class="f3-tab" role="tab" aria-selected="false">Medication policy</button>
+        <button class="f3-tab" role="tab" aria-selected="false">Integrations</button>
+        <button class="f3-tab" role="tab" aria-selected="false">AI policy</button>
+        <button class="f3-tab" role="tab" aria-selected="false">Audit &amp; export</button>
+      </div>
+
+      <!-- ============ PERMISSION MATRIX ============ -->
+      <section class="f3-card" aria-labelledby="pm-h">
+        <div class="f3-cardhead">
+          <div>
+            <h2 id="pm-h">Permission matrix</h2>
+            <p class="f3-cardsub">Deny by default. View, create, administer, correct, approve, witness, export and configure are separate permissions.</p>
+          </div>
+          <button class="f3-btn f3-btn--sm">Add role</button>
+        </div>
+
+        <div class="f3-tablewrap">
+          <table class="f3-table">
+            <thead>
+              <tr>
+                <th scope="col">Role</th><th scope="col">View</th><th scope="col">Create</th>
+                <th scope="col">Administer</th><th scope="col">Correct</th><th scope="col">Approve</th>
+                <th scope="col">Witness CD</th><th scope="col">Export</th><th scope="col">Configure</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><b>Care worker</b></td>
+                <td><span class="f3-badge f3-badge--good">Yes</span></td>
+                <td><span class="f3-badge f3-badge--good">Yes</span></td>
+                <td><span class="f3-badge f3-badge--good">Yes</span></td>
+                <td><span class="f3-badge f3-badge--ghost">No</span></td>
+                <td><span class="f3-badge f3-badge--ghost">No</span></td>
+                <td><span class="f3-badge f3-badge--ghost">No</span></td>
+                <td><span class="f3-badge f3-badge--ghost">No</span></td>
+                <td><span class="f3-badge f3-badge--ghost">No</span></td>
+              </tr>
+              <tr>
+                <td><b>Senior / shift lead</b></td>
+                <td><span class="f3-badge f3-badge--good">Yes</span></td>
+                <td><span class="f3-badge f3-badge--good">Yes</span></td>
+                <td><span class="f3-badge f3-badge--good">Yes</span></td>
+                <td><span class="f3-badge f3-badge--caution">Addendum</span></td>
+                <td><span class="f3-badge f3-badge--good">Yes</span></td>
+                <td><span class="f3-badge f3-badge--good">Yes</span></td>
+                <td><span class="f3-badge f3-badge--ghost">No</span></td>
+                <td><span class="f3-badge f3-badge--ghost">No</span></td>
+              </tr>
+              <tr>
+                <td><b>Registered nurse</b></td>
+                <td><span class="f3-badge f3-badge--good">Yes</span></td>
+                <td><span class="f3-badge f3-badge--good">Yes</span></td>
+                <td><span class="f3-badge f3-badge--good">Yes</span></td>
+                <td><span class="f3-badge f3-badge--good">Yes</span></td>
+                <td><span class="f3-badge f3-badge--good">Yes</span></td>
+                <td><span class="f3-badge f3-badge--good">Yes</span></td>
+                <td><span class="f3-badge f3-badge--caution">Step-up</span></td>
+                <td><span class="f3-badge f3-badge--ghost">No</span></td>
+              </tr>
+              <tr>
+                <td><b>Registered manager</b></td>
+                <td><span class="f3-badge f3-badge--good">Yes</span></td>
+                <td><span class="f3-badge f3-badge--good">Yes</span></td>
+                <td><span class="f3-badge f3-badge--caution">If competent</span></td>
+                <td><span class="f3-badge f3-badge--good">Yes</span></td>
+                <td><span class="f3-badge f3-badge--good">Yes</span></td>
+                <td><span class="f3-badge f3-badge--good">Yes</span></td>
+                <td><span class="f3-badge f3-badge--caution">Step-up</span></td>
+                <td><span class="f3-badge f3-badge--good">Yes</span></td>
+              </tr>
+              <tr>
+                <td><b>Pharmacy partner</b></td>
+                <td><span class="f3-badge f3-badge--caution">Scoped</span></td>
+                <td><span class="f3-badge f3-badge--caution">Queries only</span></td>
+                <td><span class="f3-badge f3-badge--ghost">No</span></td>
+                <td><span class="f3-badge f3-badge--ghost">No</span></td>
+                <td><span class="f3-badge f3-badge--caution">Orders</span></td>
+                <td><span class="f3-badge f3-badge--ghost">No</span></td>
+                <td><span class="f3-badge f3-badge--ghost">No</span></td>
+                <td><span class="f3-badge f3-badge--ghost">No</span></td>
+              </tr>
+              <tr>
+                <td><b>Auditor</b></td>
+                <td><span class="f3-badge f3-badge--good">Yes</span></td>
+                <td><span class="f3-badge f3-badge--ghost">No</span></td>
+                <td><span class="f3-badge f3-badge--ghost">No</span></td>
+                <td><span class="f3-badge f3-badge--ghost">No</span></td>
+                <td><span class="f3-badge f3-badge--ghost">No</span></td>
+                <td><span class="f3-badge f3-badge--ghost">No</span></td>
+                <td><span class="f3-badge f3-badge--caution">Step-up</span></td>
+                <td><span class="f3-badge f3-badge--ghost">No</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="f3-note" style="margin-top:var(--s4)">
+          <b>Hiding a button is not security.</b> This matrix describes what the server enforces.
+          The interface reflects it — it does not implement it.
+        </p>
+      </section>
+
+      <div class="f3-grid f3-grid--main">
+
+        <div class="f3-stack">
+
+          <!-- ============ INTEGRATIONS ============ -->
+          <section class="f3-card" aria-labelledby="in-h">
+            <div class="f3-cardhead">
+              <h2 id="in-h">Integrations</h2>
+              <span class="f3-badge f3-badge--caution">1 degraded</span>
+            </div>
+
+            <article class="f3-listitem f3-listitem--card">
+              <div class="f3-listbody">
+                <div class="f3-row" style="gap:var(--s2)">
+                  <span class="f3-badge f3-badge--good">Live</span>
+                  <span class="f3-xs f3-mut">production</span>
+                </div>
+                <div class="f3-listtitle" style="margin-top:6px">NHS dm+d — medicines dictionary</div>
+                <dl class="f3-dl f3-sm" style="margin-top:var(--s3)">
+                  <dt>Data scope</dt><dd>Product concepts (VTM / VMP / AMP / VMPP / AMPP)</dd>
+                  <dt>Last successful sync</dt><dd>3 Aug 04:00</dd>
+                  <dt>Data freshness</dt><dd>10 hours · release 2026-07-27</dd>
+                  <dt>Owner</dt><dd>Dara Mwangi</dd>
+                </dl>
+              </div>
+              <button class="f3-btn f3-btn--sm">Audit trail</button>
+            </article>
+
+            <article class="f3-listitem f3-listitem--card f3-listitem--alert">
+              <div class="f3-listbody">
+                <div class="f3-row" style="gap:var(--s2)">
+                  <span class="f3-badge f3-badge--caution">Degraded</span>
+                  <span class="f3-xs f3-mut">production</span>
+                </div>
+                <div class="f3-listtitle" style="margin-top:6px">Whitfield Pharmacy — order exchange</div>
+                <dl class="f3-dl f3-sm" style="margin-top:var(--s3)">
+                  <dt>Last successful sync</dt><dd>2 Aug 18:40 — <b>19 hours ago</b></dd>
+                  <dt>Current incident</dt><dd>Order acknowledgements not returning</dd>
+                  <dt>Retry state</dt><dd>Backing off · next attempt 14:45</dd>
+                  <dt>What users see</dt><dd><b>"Order status may be out of date"</b> on every order screen</dd>
+                </dl>
+              </div>
+              <button class="f3-btn f3-btn--sm">Retry now</button>
+            </article>
+
+            <article class="f3-listitem f3-listitem--card">
+              <div class="f3-listbody">
+                <div class="f3-row" style="gap:var(--s2)">
+                  <span class="f3-badge f3-badge--info">Mock</span>
+                  <span class="f3-xs f3-mut">synthetic data · feature flag off</span>
+                </div>
+                <div class="f3-listtitle" style="margin-top:6px">NHS GP Connect — structured medications</div>
+                <dl class="f3-dl f3-sm" style="margin-top:var(--s3)">
+                  <dt>Environment</dt><dd>Mock provider only. <b>Not connected to any NHS system.</b></dd>
+                  <dt>Data scope</dt><dd>Synthetic medications and allergies for development</dd>
+                  <dt>On enabling</dt><dd>Incoming data lands as <b>proposed</b> and must be reconciled by a person — it never overwrites the local record</dd>
+                </dl>
+              </div>
+              <button class="f3-btn f3-btn--sm">Details</button>
+            </article>
+
+            <article class="f3-listitem f3-listitem--card" style="margin-bottom:0">
+              <div class="f3-listbody">
+                <div class="f3-row" style="gap:var(--s2)">
+                  <span class="f3-badge f3-badge--ghost">Not configured</span>
+                </div>
+                <div class="f3-listtitle" style="margin-top:6px">NHS CIS2 — staff identity</div>
+                <div class="f3-listmeta">Required before any live NHS integration. Local sign-in with MFA remains in use.</div>
+              </div>
+              <button class="f3-btn f3-btn--sm">Set up</button>
+            </article>
+          </section>
+
+          <!-- ============ TERMINOLOGY ============ -->
+          <section class="f3-card" aria-labelledby="tm-h">
+            <div class="f3-cardhead">
+              <div>
+                <h2 id="tm-h">Terminology</h2>
+                <p class="f3-cardsub">Labels change. The canonical concept underneath never does.</p>
+              </div>
+            </div>
+            <div class="f3-tablewrap">
+              <table class="f3-table">
+                <thead><tr><th scope="col">Canonical concept</th><th scope="col">Your label</th><th scope="col">Preview</th></tr></thead>
+                <tbody>
+                  <tr><td><code>subject_of_care</code></td><td><input class="f3-input" value="Resident" style="max-width:190px" aria-label="Label for subject of care"></td><td class="f3-mut">"Resident record", "14 residents"</td></tr>
+                  <tr><td><code>site</code></td><td><input class="f3-input" value="House" style="max-width:190px" aria-label="Label for site"></td><td class="f3-mut">"Willowbank House"</td></tr>
+                  <tr><td><code>care_team</code></td><td><input class="f3-input" value="Care team" style="max-width:190px" aria-label="Label for care team"></td><td class="f3-mut">"Care team on shift"</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p class="f3-xs f3-mut" style="margin-top:var(--s3)">
+              Audit records, exports and the API always say <code>subject_of_care</code>, whatever the interface shows.
+              That is what makes a children's home and a nursing home comparable in the same data model.
+            </p>
+          </section>
+
+        </div>
+
+        <!-- RIGHT -->
+        <div class="f3-stack">
+
+          <section class="f3-card" aria-labelledby="cb-h">
+            <div class="f3-cardhead">
+              <h2 id="cb-h">Configuration boundary</h2>
+              <span class="f3-badge f3-badge--risk">Locked</span>
+            </div>
+            <p class="f3-sm f3-mut" style="margin-bottom:var(--s4)">
+              You may rename concepts, enable optional modules and define escalation routes. You may <b>not</b> switch these off:
+            </p>
+            <ul class="f3-stack f3-stack--sm f3-sm">
+              <li>■ Identity checks before administration</li>
+              <li>■ Outcome coding on every non-administration</li>
+              <li>■ Audit capture on every clinical event</li>
+              <li>■ Controlled-drug witnessing rules</li>
+            </ul>
+            <p class="f3-xs f3-mut" style="margin-top:var(--s4)">
+              Configuration flexes the product to the setting. It never weakens the core controls.
+            </p>
+          </section>
+
+          <section class="f3-card" aria-labelledby="mp-h">
+            <h2 id="mp-h" style="margin-bottom:var(--s4)">Medication policy</h2>
+            <dl class="f3-dl">
+              <dt>Standard window</dt><dd>−30 / +60 minutes</dd>
+              <dt>Critical medicines window</dt><dd>−15 / +15 minutes</dd>
+              <dt>Late escalation</dt><dd>60 minutes past window</dd>
+              <dt>Declined threshold</dt><dd>3 in 7 days → GP contact</dd>
+              <dt>CD witness</dt><dd>Always two authenticated users</dd>
+              <dt>Stock buffer</dt><dd>7 days</dd>
+              <dt>PRN review interval</dt><dd>Per protocol, default 60 minutes</dd>
+            </dl>
+            <p class="f3-xs f3-mut" style="margin-top:var(--s3)">
+              Every event records the policy version in force when it happened, so a rule change never rewrites history.
+            </p>
+          </section>
+
+          <section class="f3-card" aria-labelledby="pmodel-h">
+            <h2 id="pmodel-h" style="margin-bottom:var(--s4)">Permission model</h2>
+            <ul class="f3-stack f3-stack--sm f3-sm">
+              <li>Deny by default.</li>
+              <li>Scoped by organisation, site, team, person relationship and function.</li>
+              <li>Step-up authentication for high-risk actions.</li>
+              <li>The policy version and permission decision are recorded <b>with the event</b>.</li>
+              <li>Break-glass access is time-limited, justified, alerted and audited.</li>
+            </ul>
+          </section>
+
+          <section class="f3-card f3-card--flat" aria-labelledby="aip-h">
+            <div class="f3-cardhead">
+              <h2 id="aip-h">AI policy</h2>
+              <span class="f3-badge f3-badge--ghost">3 of 6 enabled</span>
+            </div>
+            <p class="f3-sm f3-mut" style="margin-bottom:var(--s4)">
+              Enabled use cases, source scope, review rules, retention and monitoring are set here.
+              Everything is off until deliberately switched on.
+            </p>
+            <a class="f3-btn f3-btn--block" href="careone-ai-workspace-wireframe.html">Open AI workspace</a>
+          </section>
+
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<nav class="f3-bottomnav" aria-label="Primary">
+  <a href="careone-dashboard-wireframe.html"><span class="f3-navicon" aria-hidden="true">T</span>Today</a>
+  <a href="careone-person-profile-wireframe.html"><span class="f3-navicon" aria-hidden="true">P</span>People</a>
+  <a href="careone-medication-round-wireframe.html"><span class="f3-navicon" aria-hidden="true">R</span>Round</a>
+  <a href="careone-handover-wireframe.html"><span class="f3-navicon" aria-hidden="true">M</span>Messages</a>
+  <a href="index.html" aria-current="page"><span class="f3-navicon" aria-hidden="true">···</span>More</a>
+</nav>
+
+</body>
+</html>

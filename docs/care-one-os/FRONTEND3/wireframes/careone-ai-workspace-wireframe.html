@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>12 AI workspace — Care One OS frontend3 wireframe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="careone-f3.css">
+</head>
+<body class="f3-root">
+
+<div class="f3-shell">
+
+  <aside class="f3-nav">
+    <div class="f3-brand">
+      <div class="f3-brand-mark">C1</div>
+      <div class="f3-brand-text">
+        <div class="f3-brand-name">Care One OS</div>
+        <div class="f3-brand-sub">Meadowfield</div>
+      </div>
+    </div>
+    <nav class="f3-navgroup" aria-label="Primary">
+      <h4>Areas</h4>
+      <a class="f3-navlink" href="careone-dashboard-wireframe.html"><span class="f3-navicon">T</span><span>Today</span></a>
+      <a class="f3-navlink" href="careone-person-profile-wireframe.html"><span class="f3-navicon">P</span><span>People</span></a>
+      <a class="f3-navlink" href="careone-mar-wireframe.html"><span class="f3-navicon">M</span><span>Medicines</span></a>
+      <a class="f3-navlink" href="careone-missed-doses-wireframe.html"><span class="f3-navicon">O</span><span>Operations</span><span class="f3-navcount">7</span></a>
+      <a class="f3-navlink" href="careone-manager-compliance-wireframe.html"><span class="f3-navicon">A</span><span>Assurance</span></a>
+      <a class="f3-navlink" href="careone-admin-integrations-wireframe.html" aria-current="page"><span class="f3-navicon">S</span><span>Settings</span></a>
+    </nav>
+    <nav class="f3-navgroup">
+      <h4>Prototype</h4>
+      <a class="f3-navlink" href="index.html"><span class="f3-navicon">◇</span><span>All screens</span></a>
+    </nav>
+  </aside>
+
+  <div class="f3-main">
+
+    <header class="f3-topbar">
+      <div class="f3-context">
+        <span class="f3-chip"><b>Meadowfield Care</b></span>
+        <span class="f3-chip f3-chip--quiet">AI workspace</span>
+      </div>
+      <div class="f3-topbar-actions">
+        <button class="f3-iconbtn" aria-label="Notifications">◔</button>
+        <div class="f3-avatar" aria-hidden="true">DM</div>
+      </div>
+    </header>
+
+    <div class="f3-pagehead">
+      <div class="f3-pagehead-text">
+        <div class="f3-row" style="gap:var(--s2); margin-bottom:var(--s2)">
+          <span class="f3-badge f3-badge--info">AI-generated</span>
+          <span class="f3-badge f3-badge--ghost">Nothing here is a clinical decision</span>
+        </div>
+        <h1>AI workspace</h1>
+        <p class="f3-pagehead-sum">
+          This can <b>find, summarise and draft</b> from records you already have access to.
+          It cannot prescribe, administer, witness, escalate or close anything.
+        </p>
+      </div>
+    </div>
+
+    <main class="f3-page">
+
+      <div class="f3-grid f3-grid--main">
+
+        <div class="f3-stack">
+
+          <!-- ============ CONTEXT ============ -->
+          <section class="f3-card" aria-labelledby="cx-h">
+            <div class="f3-cardhead">
+              <h2 id="cx-h">What it is looking at</h2>
+              <button class="f3-btn f3-btn--sm">Change sources</button>
+            </div>
+            <div class="f3-row" style="gap:var(--s2)">
+              <span class="f3-chip"><b>Person:</b> Ines Marchetti</span>
+              <span class="f3-chip"><b>Site:</b> Willowbank House</span>
+              <span class="f3-chip"><b>Range:</b> 21 Jul – 3 Aug 2026</span>
+              <span class="f3-chip"><b>Sources:</b> MAR, PRN reviews, exceptions</span>
+              <span class="f3-chip f3-chip--quiet">Documents: excluded</span>
+            </div>
+            <p class="f3-xs f3-mut" style="margin-top:var(--s3)">
+              It can only read what <b>you</b> can read. Changing site or person here does not widen your permissions.
+            </p>
+          </section>
+
+          <!-- ============ ANSWER ============ -->
+          <section class="f3-card" aria-labelledby="an-h">
+            <div class="f3-cardhead">
+              <div>
+                <h2 id="an-h">Summarise PRN paracetamol use for the GP review</h2>
+                <p class="f3-cardsub">Record summarisation · generated 3 Aug 14:26 · 14-day range</p>
+              </div>
+              <span class="f3-badge f3-badge--info">AI-generated</span>
+            </div>
+
+            <!-- SOURCED FACTS -->
+            <div style="margin-bottom:var(--s5)">
+              <h4 style="margin-bottom:var(--s3)">Sourced facts <span class="f3-mut">— each opens the record behind it</span></h4>
+              <ul class="f3-stack f3-stack--sm f3-sm">
+                <li>• 24 doses of paracetamol recorded between 21 Jul and 3 Aug. <a href="careone-mar-wireframe.html">See the 24 events</a></li>
+                <li>• Daily doses rose from a mean of 1.2 in the first week to 2.9 in the second. <a href="careone-prn-wireframe.html">See the daily counts</a></li>
+                <li>• 9 outcome reviews recorded "partly effective", 3 "not effective", 8 "effective". 4 reviews were <b>not completed</b>. <a href="careone-prn-wireframe.html">See reviews</a></li>
+                <li>• The stated indication on every dose was "mild to moderate pain — knee and hip". <a href="careone-person-profile-wireframe.html">See the protocol</a></li>
+                <li>• Non-drug measures were recorded as tried on 19 of 24 occasions. <a href="careone-mar-wireframe.html">See detail</a></li>
+                <li>• The 24-hour maximum of 8 tablets was never exceeded. Closest was 6 on 1 Aug. <a href="careone-prn-wireframe.html">See 1 Aug</a></li>
+              </ul>
+            </div>
+
+            <!-- INFERENCE -->
+            <div class="f3-card f3-card--tint" style="padding:var(--s4); margin-bottom:var(--s5)">
+              <h4 style="margin-bottom:var(--s3)">Inference <span class="f3-mut">— reasoning, not fact</span></h4>
+              <p class="f3-sm">
+                The pattern is consistent with pain that is <b>increasing or becoming less responsive</b> to the current dose.
+                That is one reading of the numbers. It is not a diagnosis, and this summary has not considered
+                anything outside the sources listed above — no clinical notes, no observations, no physiotherapy records.
+              </p>
+            </div>
+
+            <!-- OMISSIONS -->
+            <div class="f3-alert">
+              <span class="f3-alert-mark" aria-hidden="true">▲</span>
+              <div class="f3-alert-body">
+                <div class="f3-alert-title">What is missing from this summary</div>
+                <div class="f3-alert-text">
+                  <b>4 outcome reviews were never completed</b>, so the effectiveness picture is incomplete.
+                  Documents were excluded from the sources. There is no pain-score record in this system to draw on.
+                </div>
+              </div>
+            </div>
+
+            <!-- SUGGESTED NEXT STEPS -->
+            <div style="margin-top:var(--s5)">
+              <h4 style="margin-bottom:var(--s3)">Suggested next steps <span class="f3-mut">— for a person to decide on</span></h4>
+              <ul class="f3-stack f3-stack--sm f3-sm">
+                <li>• Complete the 4 outstanding outcome reviews before the GP conversation.</li>
+                <li>• Consider whether a pain assessment tool would give the prescriber better information.</li>
+                <li>• Raise the trend at the GP review booked for 7 August.</li>
+              </ul>
+              <p class="f3-xs f3-mut" style="margin-top:var(--s3)">
+                These are prompts, not instructions. None of them has been actioned. Nothing has been sent.
+              </p>
+            </div>
+
+            <hr class="f3-hr" style="margin:var(--s5) 0">
+
+            <div class="f3-row">
+              <span class="f3-sm f3-mut">Was this useful?</span>
+              <div class="f3-row" style="gap:var(--s2)">
+                <button class="f3-btn f3-btn--sm">Useful</button>
+                <button class="f3-btn f3-btn--sm">Incorrect</button>
+                <button class="f3-btn f3-btn--sm">Missing context</button>
+                <button class="f3-btn f3-btn--sm f3-btn--danger">Safety concern</button>
+              </div>
+            </div>
+          </section>
+
+          <!-- ============ DRAFT COMMUNICATION ============ -->
+          <section class="f3-card" aria-labelledby="dr-h">
+            <div class="f3-cardhead">
+              <div>
+                <h2 id="dr-h">Draft — message to Dr Ellery</h2>
+                <p class="f3-cardsub">Draft communication · editable · attributable to you once sent</p>
+              </div>
+              <span class="f3-badge f3-badge--info">AI-generated</span>
+            </div>
+
+            <textarea class="f3-textarea" style="min-height:150px" aria-label="Draft message">Dear Dr Ellery,
+
+Ines Marchetti's PRN paracetamol use has increased over the past two weeks — from an average of 1.2 doses per day to 2.9. Nine of the recorded outcome reviews describe the effect as only partly effective and three as not effective. The 24-hour maximum has not been exceeded.
+
+Non-drug measures (repositioning, warm pack) have been tried on most occasions. We would value your view at the review booked for 7 August.
+
+Kind regards,
+Joy Adeyemi, Willowbank House</textarea>
+
+            <div class="f3-alert f3-alert--info" style="margin-top:var(--s4)">
+              <span class="f3-alert-mark" aria-hidden="true">◐</span>
+              <div class="f3-alert-body">
+                <div class="f3-alert-title">Nothing sends itself</div>
+                <div class="f3-alert-text">
+                  You review and edit this, then send it under your own name. Provenance is preserved:
+                  the record will show it began as an AI draft from the sources listed above.
+                </div>
+                <div class="f3-alert-actions">
+                  <button class="f3-btn f3-btn--sm f3-btn--primary">Review and send</button>
+                  <button class="f3-btn f3-btn--sm">Save as draft</button>
+                  <button class="f3-btn f3-btn--sm">Discard</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+        </div>
+
+        <!-- RIGHT -->
+        <div class="f3-stack">
+
+          <section class="f3-card" aria-labelledby="uc-h">
+            <div class="f3-cardhead">
+              <h2 id="uc-h">Approved use cases</h2>
+              <span class="f3-badge f3-badge--ghost">3 of 6 on</span>
+            </div>
+            <ul class="f3-list">
+              <li class="f3-listitem" style="padding:var(--s3) 0">
+                <div class="f3-listbody">
+                  <div class="f3-listtitle">Record summarisation</div>
+                  <div class="f3-listmeta">Source links, time range, omissions warning, human approval</div>
+                </div>
+                <span class="f3-badge f3-badge--good">On</span>
+              </li>
+              <li class="f3-listitem" style="padding:var(--s3) 0">
+                <div class="f3-listbody">
+                  <div class="f3-listtitle">Policy &amp; guideline retrieval</div>
+                  <div class="f3-listmeta">Approved corpus only · citation, version, jurisdiction</div>
+                </div>
+                <span class="f3-badge f3-badge--good">On</span>
+              </li>
+              <li class="f3-listitem" style="padding:var(--s3) 0">
+                <div class="f3-listbody">
+                  <div class="f3-listtitle">Draft communication</div>
+                  <div class="f3-listmeta">No autonomous sending · editable · attributable</div>
+                </div>
+                <span class="f3-badge f3-badge--good">On</span>
+              </li>
+              <li class="f3-listitem" style="padding:var(--s3) 0">
+                <div class="f3-listbody">
+                  <div class="f3-listtitle f3-mut">Exception triage support</div>
+                  <div class="f3-listmeta">Rules stay authoritative · reviewer confirms</div>
+                </div>
+                <span class="f3-badge f3-badge--ghost">Off</span>
+              </li>
+              <li class="f3-listitem" style="padding:var(--s3) 0">
+                <div class="f3-listbody">
+                  <div class="f3-listtitle f3-mut">Trend explanation</div>
+                  <div class="f3-listmeta">Range and methodology shown · no causal claim</div>
+                </div>
+                <span class="f3-badge f3-badge--ghost">Off</span>
+              </li>
+              <li class="f3-listitem" style="padding:var(--s3) 0">
+                <div class="f3-listbody">
+                  <div class="f3-listtitle f3-mut">Data-quality support</div>
+                  <div class="f3-listmeta">User verifies before any merge or change</div>
+                </div>
+                <span class="f3-badge f3-badge--ghost">Off</span>
+              </li>
+            </ul>
+          </section>
+
+          <section class="f3-card" aria-labelledby="pa-h">
+            <div class="f3-cardhead">
+              <h2 id="pa-h">It cannot do these</h2>
+              <span class="f3-badge f3-badge--risk">Prohibited</span>
+            </div>
+            <ul class="f3-stack f3-stack--sm f3-sm">
+              <li>■ Diagnose, prescribe, change a dose or tell you to redose</li>
+              <li>■ Create an administration record</li>
+              <li>■ Witness a controlled drug or adjust a balance</li>
+              <li>■ Close an incident, make a safeguarding decision or suppress an escalation</li>
+              <li>■ Present generated text as dm+d, NICE, GP or prescription truth</li>
+              <li>■ Override a hard stop</li>
+            </ul>
+          </section>
+
+          <div class="f3-alert f3-alert--info">
+            <span class="f3-alert-mark" aria-hidden="true">◐</span>
+            <div class="f3-alert-body">
+              <div class="f3-alert-title">If this service goes down</div>
+              <div class="f3-alert-text">
+                Nothing stops. Deterministic safety rules live outside the generative service —
+                medication administration and access to authoritative records are unaffected.
+                You would simply lose summaries and drafts.
+              </div>
+            </div>
+          </div>
+
+          <section class="f3-card f3-card--flat" aria-labelledby="gv-h">
+            <h2 id="gv-h" style="margin-bottom:var(--s4)">Governance</h2>
+            <dl class="f3-dl">
+              <dt>Source scope</dt><dd>Records you can already access, plus the approved policy corpus</dd>
+              <dt>Retention</dt><dd>Prompts and outputs kept 90 days, then deleted</dd>
+              <dt>Monitoring</dt><dd>Every generation logged with user, sources and time</dd>
+              <dt>Feedback review</dt><dd>Safety concerns go to the clinical safety officer within 1 working day</dd>
+              <dt>MHRA position</dt><dd class="f3-mut">Medical-device boundary requires assessment before go-live</dd>
+            </dl>
+          </section>
+
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<nav class="f3-bottomnav" aria-label="Primary">
+  <a href="careone-dashboard-wireframe.html"><span class="f3-navicon" aria-hidden="true">T</span>Today</a>
+  <a href="careone-person-profile-wireframe.html"><span class="f3-navicon" aria-hidden="true">P</span>People</a>
+  <a href="careone-medication-round-wireframe.html"><span class="f3-navicon" aria-hidden="true">R</span>Round</a>
+  <a href="careone-handover-wireframe.html"><span class="f3-navicon" aria-hidden="true">M</span>Messages</a>
+  <a href="index.html" aria-current="page"><span class="f3-navicon" aria-hidden="true">···</span>More</a>
+</nav>
+
+</body>
+</html>

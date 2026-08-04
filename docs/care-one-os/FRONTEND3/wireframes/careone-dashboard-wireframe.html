@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>01 Frontline dashboard — Care One OS frontend3 wireframe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="careone-f3.css">
+</head>
+<body class="f3-root">
+
+<div class="f3-shell">
+
+  <aside class="f3-nav">
+    <div class="f3-brand">
+      <div class="f3-brand-mark">C1</div>
+      <div class="f3-brand-text">
+        <div class="f3-brand-name">Care One OS</div>
+        <div class="f3-brand-sub">Willowbank</div>
+      </div>
+    </div>
+    <nav class="f3-navgroup" aria-label="Primary">
+      <h4>Areas</h4>
+      <a class="f3-navlink" href="careone-dashboard-wireframe.html" aria-current="page"><span class="f3-navicon">T</span><span>Today</span></a>
+      <a class="f3-navlink" href="careone-person-profile-wireframe.html"><span class="f3-navicon">P</span><span>People</span></a>
+      <a class="f3-navlink" href="careone-mar-wireframe.html"><span class="f3-navicon">M</span><span>Medicines</span></a>
+      <a class="f3-navlink" href="careone-missed-doses-wireframe.html"><span class="f3-navicon">O</span><span>Operations</span><span class="f3-navcount">7</span></a>
+      <a class="f3-navlink" href="careone-manager-compliance-wireframe.html"><span class="f3-navicon">A</span><span>Assurance</span></a>
+      <a class="f3-navlink" href="careone-admin-integrations-wireframe.html"><span class="f3-navicon">S</span><span>Settings</span></a>
+    </nav>
+    <nav class="f3-navgroup">
+      <h4>Prototype</h4>
+      <a class="f3-navlink" href="index.html"><span class="f3-navicon">◇</span><span>All screens</span></a>
+    </nav>
+  </aside>
+
+  <div class="f3-main">
+
+    <header class="f3-topbar">
+      <div class="f3-context">
+        <span class="f3-chip"><b>Meadowfield Care</b></span>
+        <span class="f3-chip">Willowbank House</span>
+        <span class="f3-chip f3-chip--quiet">Late shift · 14:00–22:00</span>
+      </div>
+      <div class="f3-search" role="search">
+        <span aria-hidden="true">⌕</span><span>Search people, medicines, orders…</span>
+        <span class="f3-spacer f3-xs f3-mut f3-hide-sm">⌘K</span>
+      </div>
+      <div class="f3-topbar-actions">
+        <button class="f3-iconbtn" aria-label="Notifications, 3 unread">◔<span class="f3-dot"></span></button>
+        <div class="f3-avatar" aria-hidden="true">JA</div>
+      </div>
+    </header>
+
+    <div class="f3-pagehead">
+      <div class="f3-pagehead-text">
+        <h1>Good afternoon, Joy</h1>
+        <p class="f3-pagehead-sum">You have <b>9 medicines due</b> in this window and <b>3 items needing attention</b>. Nothing is overdue by more than 20 minutes.</p>
+        <p class="f3-sync">All changes saved · last synced 14:22</p>
+      </div>
+      <a class="f3-btn f3-btn--primary f3-hide-sm" href="careone-medication-round-wireframe.html">Start 14:00 round</a>
+    </div>
+
+    <main class="f3-page">
+
+      <!-- ============ SHIFT CONTEXT ============ -->
+      <section class="f3-card f3-card--tint" aria-labelledby="ctx-h">
+        <div class="f3-cardhead">
+          <div>
+            <h2 id="ctx-h">Your shift</h2>
+            <p class="f3-cardsub">Switching site or shift changes every figure on this page and asks you to confirm.</p>
+          </div>
+          <button class="f3-btn f3-btn--sm">Change context</button>
+        </div>
+        <div class="f3-grid f3-grid--4">
+          <div><h4>Site</h4><p class="f3-sm">Willowbank House · Ground &amp; First</p></div>
+          <div><h4>Team on shift</h4><p class="f3-sm">Joy A. (lead), Marcus D., Priya R.</p></div>
+          <div><h4>People in your care</h4><p class="f3-sm">14 · 2 away on leave</p></div>
+          <div><h4>Staffing note</h4><p class="f3-sm">Marcus finishes 18:00 — cover from Ines M.</p></div>
+        </div>
+      </section>
+
+      <div class="f3-grid f3-grid--main">
+
+        <div class="f3-stack">
+
+          <!-- ============ DUE NOW ============ -->
+          <section class="f3-card" aria-labelledby="due-h">
+            <div class="f3-cardhead">
+              <div>
+                <h2 id="due-h">Due now</h2>
+                <p class="f3-cardsub">14:00 window · closes 15:00</p>
+              </div>
+              <span class="f3-badge f3-badge--neutral">4 people · 9 medicines</span>
+            </div>
+
+            <ul class="f3-list">
+              <li class="f3-listitem">
+                <div class="f3-person">
+                  <div class="f3-photo" aria-hidden="true">NO</div>
+                  <div>
+                    <div class="f3-person-name">Nadia Okonkwo</div>
+                    <div class="f3-person-meta">Room 4 · 3 medicines</div>
+                  </div>
+                </div>
+                <div class="f3-spacer f3-row">
+                  <span class="f3-badge f3-badge--caution">Late 18m</span>
+                  <a class="f3-btn f3-btn--sm" href="careone-medication-round-wireframe.html">Open</a>
+                </div>
+              </li>
+
+              <li class="f3-listitem">
+                <div class="f3-person">
+                  <div class="f3-photo" aria-hidden="true">BF</div>
+                  <div>
+                    <div class="f3-person-name">Bruno Farrell-Reyes</div>
+                    <div class="f3-person-meta">Room 11 · 2 medicines · <b>Crushing risk — see profile</b></div>
+                  </div>
+                </div>
+                <div class="f3-spacer f3-row">
+                  <span class="f3-badge f3-badge--info">In progress · Marcus D.</span>
+                  <a class="f3-btn f3-btn--sm" href="careone-medication-round-wireframe.html">View</a>
+                </div>
+              </li>
+
+              <li class="f3-listitem">
+                <div class="f3-person">
+                  <div class="f3-photo" aria-hidden="true">TL</div>
+                  <div>
+                    <div class="f3-person-name">Theo Lindqvist</div>
+                    <div class="f3-person-meta">Room 2 · 3 medicines</div>
+                  </div>
+                </div>
+                <div class="f3-spacer f3-row">
+                  <span class="f3-badge f3-badge--neutral">Due</span>
+                  <a class="f3-btn f3-btn--sm" href="careone-medication-round-wireframe.html">Open</a>
+                </div>
+              </li>
+
+              <li class="f3-listitem">
+                <div class="f3-person">
+                  <div class="f3-photo" aria-hidden="true">AS</div>
+                  <div>
+                    <div class="f3-person-name">Amara Sithole</div>
+                    <div class="f3-person-meta">Room 7 · 1 medicine</div>
+                  </div>
+                </div>
+                <div class="f3-spacer f3-row">
+                  <span class="f3-badge f3-badge--ghost">Early window</span>
+                  <a class="f3-btn f3-btn--sm" href="careone-medication-round-wireframe.html">Open</a>
+                </div>
+              </li>
+            </ul>
+
+            <p class="f3-note" style="margin-top:var(--s4)">
+              <b>Why no "give all" button.</b> The spec's hard rule is that identity, medicine, dose, route, time, reason and confirmation are never compressed away. Batch completion would do exactly that.
+            </p>
+          </section>
+
+          <!-- ============ NEEDS ATTENTION ============ -->
+          <section class="f3-card" aria-labelledby="att-h">
+            <div class="f3-cardhead">
+              <h2 id="att-h">Needs attention</h2>
+              <a class="f3-btn f3-btn--ghost f3-btn--sm" href="careone-missed-doses-wireframe.html">Open exceptions</a>
+            </div>
+
+            <div class="f3-stack f3-stack--sm">
+              <article class="f3-listitem f3-listitem--card f3-listitem--alert">
+                <div class="f3-listbody">
+                  <div class="f3-row" style="gap:var(--s2)">
+                    <span class="f3-badge f3-badge--risk">Unavailable</span>
+                    <span class="f3-xs f3-mut">raised 11:40 · owner Joy A. · due 16:00</span>
+                  </div>
+                  <div class="f3-listtitle" style="margin-top:6px">Rowan Petrescu — Levetiracetam 500mg not available</div>
+                  <div class="f3-listmeta">Last dose given <b>08:00 yesterday</b>. Order <b>#4471</b> acknowledged by pharmacy, expected today. Two doses now affected.</div>
+                </div>
+                <div class="f3-row">
+                  <a class="f3-btn f3-btn--sm" href="careone-stock-pharmacy-wireframe.html">Chase supply</a>
+                  <a class="f3-btn f3-btn--primary f3-btn--sm" href="careone-missed-doses-wireframe.html">Open</a>
+                </div>
+              </article>
+
+              <article class="f3-listitem f3-listitem--card f3-listitem--alert">
+                <div class="f3-listbody">
+                  <div class="f3-row" style="gap:var(--s2)">
+                    <span class="f3-badge f3-badge--caution">Outcome review overdue</span>
+                    <span class="f3-xs f3-mut">due 12:30 · 1h 52m ago</span>
+                  </div>
+                  <div class="f3-listtitle" style="margin-top:6px">Ines Marchetti — PRN paracetamol given 10:30</div>
+                  <div class="f3-listmeta">Was it effective? Record the outcome so repeat use is visible to the prescriber.</div>
+                </div>
+                <a class="f3-btn f3-btn--primary f3-btn--sm" href="careone-prn-wireframe.html">Record outcome</a>
+              </article>
+
+              <article class="f3-listitem f3-listitem--card">
+                <div class="f3-listbody">
+                  <div class="f3-row" style="gap:var(--s2)">
+                    <span class="f3-badge f3-badge--caution">Declined ×3</span>
+                    <span class="f3-xs f3-mut">pattern over 4 days</span>
+                  </div>
+                  <div class="f3-listtitle" style="margin-top:6px">Theo Lindqvist — declining evening Sertraline</div>
+                  <div class="f3-listmeta">Three refusals since Sunday. Policy threshold for GP contact is <b>3 in 7 days</b> — reached today.</div>
+                </div>
+                <a class="f3-btn f3-btn--sm" href="careone-missed-doses-wireframe.html">Review</a>
+              </article>
+            </div>
+          </section>
+
+          <!-- ============ UPCOMING ============ -->
+          <section class="f3-card" aria-labelledby="up-h">
+            <div class="f3-cardhead">
+              <h2 id="up-h">Upcoming</h2>
+              <div class="f3-segment" role="group" aria-label="Time range">
+                <button aria-pressed="true">Next 4h</button>
+                <button aria-pressed="false">Rest of shift</button>
+              </div>
+            </div>
+            <div class="f3-timeline">
+              <div class="f3-tl-item f3-tl-item--now">
+                <div class="f3-tl-time">16:00</div>
+                <div class="f3-tl-title">Afternoon medicines · 3 people</div>
+                <div class="f3-tl-text">Preview only. The window opens at 15:30 — early administration needs a recorded reason.</div>
+              </div>
+              <div class="f3-tl-item">
+                <div class="f3-tl-time">17:00</div>
+                <div class="f3-tl-title">Controlled drug count · weekly</div>
+                <div class="f3-tl-text">Two staff required. Last count 28 Jul, balanced.</div>
+              </div>
+              <div class="f3-tl-item">
+                <div class="f3-tl-time">18:00</div>
+                <div class="f3-tl-title">Teatime medicines · 11 people</div>
+                <div class="f3-tl-text">Includes 1 covert administration with an authorised care plan.</div>
+              </div>
+              <div class="f3-tl-item">
+                <div class="f3-tl-time">21:45</div>
+                <div class="f3-tl-title">Shift handover</div>
+                <div class="f3-tl-text">6 candidate items assembled so far.</div>
+              </div>
+            </div>
+          </section>
+
+        </div>
+
+        <!-- ============ RIGHT COLUMN ============ -->
+        <div class="f3-stack">
+
+          <section class="f3-card" aria-labelledby="hand-h">
+            <div class="f3-cardhead">
+              <h2 id="hand-h">From last handover</h2>
+              <span class="f3-badge f3-badge--caution">2 unacknowledged</span>
+            </div>
+            <ul class="f3-list">
+              <li class="f3-listitem">
+                <div class="f3-listbody">
+                  <div class="f3-listtitle">Fridge temperature logged high</div>
+                  <div class="f3-listmeta">08:15 by Ines M. · insulin quarantined pending advice</div>
+                </div>
+                <button class="f3-btn f3-btn--sm">Acknowledge</button>
+              </li>
+              <li class="f3-listitem">
+                <div class="f3-listbody">
+                  <div class="f3-listtitle">Amara returning from hospital 16:00</div>
+                  <div class="f3-listmeta">Medicines to reconcile on arrival · discharge letter attached</div>
+                </div>
+                <button class="f3-btn f3-btn--sm">Acknowledge</button>
+              </li>
+              <li class="f3-listitem">
+                <div class="f3-listbody">
+                  <div class="f3-listtitle f3-mut">Bruno's GP review booked Friday</div>
+                  <div class="f3-listmeta">Acknowledged by you at 14:05</div>
+                </div>
+                <span class="f3-badge f3-badge--good">Done</span>
+              </li>
+            </ul>
+            <a class="f3-btn f3-btn--block" href="careone-handover-wireframe.html" style="margin-top:var(--s4)">Open handover board</a>
+          </section>
+
+          <section class="f3-card" aria-labelledby="qa-h">
+            <h2 id="qa-h" style="margin-bottom:var(--s4)">Quick actions</h2>
+            <div class="f3-stack f3-stack--sm">
+              <a class="f3-btn f3-btn--block" href="careone-person-profile-wireframe.html">Find a person</a>
+              <a class="f3-btn f3-btn--block" href="careone-stock-pharmacy-wireframe.html">Check stock</a>
+              <a class="f3-btn f3-btn--block" href="careone-controlled-drugs-wireframe.html">Controlled drug register</a>
+              <a class="f3-btn f3-btn--block" href="careone-stock-pharmacy-wireframe.html">Message pharmacy</a>
+              <a class="f3-btn f3-btn--block" href="careone-missed-doses-wireframe.html">Report an incident</a>
+            </div>
+          </section>
+
+          <section class="f3-card f3-card--flat" aria-labelledby="mgr-h">
+            <div class="f3-cardhead">
+              <h2 id="mgr-h">Manager view</h2>
+              <span class="f3-badge f3-badge--ghost">Different role</span>
+            </div>
+            <p class="f3-sm f3-mut" style="margin-bottom:var(--s4)">
+              A manager signing in sees the same page with completion by site and shift, exception ageing and ownership,
+              PRN review compliance, stock bottlenecks, CD discrepancy status and access anomalies.
+            </p>
+            <a class="f3-btn f3-btn--block" href="careone-manager-compliance-wireframe.html">See manager dashboard</a>
+          </section>
+
+          <p class="f3-note">
+            <b>Design rule applied.</b> Every number on this page opens the records behind it, states its date range,
+            and says whether it is informational or actionable. No figure exists purely as decoration.
+          </p>
+
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- Mobile: sticky primary action + bottom navigation -->
+<div class="f3-stickybar f3-only-sm">
+  <a class="f3-btn f3-btn--primary" href="careone-medication-round-wireframe.html">Start 14:00 round · 9 due</a>
+</div>
+
+<nav class="f3-bottomnav" aria-label="Primary">
+  <a href="careone-dashboard-wireframe.html" aria-current="page"><span class="f3-navicon" aria-hidden="true">T</span>Today</a>
+  <a href="careone-person-profile-wireframe.html"><span class="f3-navicon" aria-hidden="true">P</span>People</a>
+  <a href="careone-medication-round-wireframe.html"><span class="f3-navicon" aria-hidden="true">R</span>Round<span class="f3-navcount">9</span></a>
+  <a href="careone-handover-wireframe.html"><span class="f3-navicon" aria-hidden="true">M</span>Messages</a>
+  <a href="index.html"><span class="f3-navicon" aria-hidden="true">···</span>More</a>
+</nav>
+
+</body>
+</html>
