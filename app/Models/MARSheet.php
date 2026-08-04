@@ -28,6 +28,7 @@ class MARSheet extends Model
         'prn_max_daily',
         'prn_min_interval_hours',
         'reason_for_medication',
+        'administration_instructions',   // "how to give it" directive (issue #29 / C1)
         'prescribed_by',
         'prescriber',
         'pharmacy',

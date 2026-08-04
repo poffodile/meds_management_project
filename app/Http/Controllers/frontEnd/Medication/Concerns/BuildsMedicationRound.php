@@ -215,19 +215,20 @@ trait BuildsMedicationRound
                         'strength' => $sheet->dosage,
                         'dose' => $sheet->dose,
                         'route' => $sheet->route,
-                        // Two DIFFERENT things, kept separate (they were jammed into one field,
-                        // which let the round show an indication styled as an administration
-                        // directive — review C1/HAZ-22, 2026-07-28). `instruction` is a genuine
-                        // administration note (only PRN carries one today); `indication` is why
-                        // the medicine is prescribed. A dedicated "do not crush / with food"
-                        // directions field does not exist yet — pending pharmacist + CSO.
-                        'instruction' => $sheet->prn_details ?: null,
+                        // Three DIFFERENT things, kept separate (they were once jammed into one
+                        // field, which let the round show an indication styled as a directive —
+                        // review C1/HAZ-22). `instruction` is the genuine "how to give it"
+                        // directive (issue #29 / C1) — the dedicated field, falling back to PRN
+                        // details; `indication` is WHY the medicine is prescribed.
+                        'instruction' => $sheet->administration_instructions ?: ($sheet->prn_details ?: null),
                         'indication' => $sheet->reason_for_medication ?: null,
                         'slot' => $slot,
                         'stock' => $sheet->stock_level,
                         'low_stock' => ! is_null($sheet->stock_level) && ! is_null($sheet->reorder_level) && $sheet->stock_level <= $sheet->reorder_level,
                         'unit' => $sheet->unit,
                         'is_controlled' => (bool) $sheet->is_controlled,
+                        // C2: a CD with no numeric dose can't be given (nothing to register).
+                        'cd_needs_quantity' => (bool) $sheet->is_controlled && $this->deductionQuantity($sheet) === null,
                         'cd_schedule' => $sheet->cd_schedule,
                         'as_required' => (bool) $sheet->as_required,
                         'prn' => $prn,
@@ -425,6 +426,20 @@ trait BuildsMedicationRound
             && trim((string) $request->input('witnessed_by')) === '') {
             throw ValidationException::withMessages([
                 'witnessed_by' => 'A witness is required to administer a controlled drug.',
+            ]);
+        }
+
+        // Owner C2 (2026-07-28): a controlled drug can't be given until its dose is a proper
+        // NUMBER (the unit comes from the medicine, never typed). Without a numeric quantity
+        // there is nothing to move in the register — and a CD given with no register movement
+        // is exactly the gap the review flagged (Round I3 / CD C-2 / HAZ-24). So block it and
+        // point to fixing the prescription's dose, rather than silently recording it off the
+        // register. The pharmacist assigns the correct number per medicine.
+        if ($sheet->is_controlled
+            && $request->input('code') === 'A'
+            && $this->deductionQuantity($sheet) === null) {
+            throw ValidationException::withMessages([
+                'code' => 'This controlled drug’s dose needs to be recorded as a quantity before it can be given, so it can be entered in the controlled-drug register. Ask a manager to set the dose amount on the prescription.',
             ]);
         }
 

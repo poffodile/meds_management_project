@@ -181,6 +181,7 @@ class ControlledDrugRegisterController extends Controller
                     'quantity' => $e->dose_quantity,
                     'balance_before' => $e->balance_before,
                     'balance_after' => $e->balance_after,
+                    'is_discrepancy' => (bool) $e->is_discrepancy,
                     'witness' => $e->witness_name,
                     'by' => $e->createdByUser->name ?? null,
                     'notes' => $e->notes,

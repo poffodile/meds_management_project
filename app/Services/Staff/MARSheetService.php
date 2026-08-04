@@ -182,6 +182,7 @@ class MARSheetService
                 $newValues = [
                     // 'A' only. 'S' (asleep) is NOT given — the resident received nothing.
                     'given' => $data['code'] === 'A',
+                    'is_late' => (bool) ($data['is_late'] ?? false),
                     'dose_given' => $data['dose_given'] ?? null,
                     'administered_by' => $userId,
                     'witnessed_by' => $data['witnessed_by'] ?? null,
@@ -234,6 +235,7 @@ class MARSheetService
                     'time_slot' => $data['time_slot'],
                     // 'A' only. 'S' (asleep) is NOT given — the resident received nothing.
                     'given' => $data['code'] === 'A',
+                    'is_late' => (bool) ($data['is_late'] ?? false),
                     'dose_given' => $data['dose_given'] ?? null,
                     'administered_by' => $userId,
                     'witnessed_by' => $data['witnessed_by'] ?? null,

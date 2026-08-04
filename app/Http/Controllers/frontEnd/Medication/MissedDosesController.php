@@ -437,6 +437,30 @@ class MissedDosesController extends Controller
             'changed_by_user_id' => Auth::id(),
         ]);
 
+        // Owner B4 (2026-07-28): resolving as "Dose given late" also writes a real MAR
+        // administration (code A, flagged late), so the medication chart agrees with the
+        // review instead of showing a permanent gap. The append-only administer() path
+        // supersedes any prior not-given row for this slot, or creates one if it was
+        // missed. Stock is deliberately not moved here (a late dose's quantity is uncertain
+        // and the round owns stock deduction) — the record of WHAT the resident received is
+        // the point. Pharmacist/CSO to confirm.
+        if ($request->input('clinical_action') === 'Dose given late') {
+            app(\App\Services\Staff\MARSheetService::class)->administer(
+                $sheet->id,
+                [
+                    'date'      => $request->input('review_date'),
+                    'time_slot' => $request->input('time_slot'),
+                    'code'      => 'A',
+                    'is_late'   => true,
+                    'dose_given' => $sheet->dose ?? null,
+                    'notes'     => trim('Given late — recorded on missed-doses review. '.(string) $request->input('notes')),
+                    'amendment_reason' => 'Given late (missed-doses review)',
+                ],
+                $homeId,
+                (int) Auth::id()
+            );
+        }
+
         return null;
     }
 

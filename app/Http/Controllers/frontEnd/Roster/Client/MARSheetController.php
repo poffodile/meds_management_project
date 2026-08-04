@@ -71,6 +71,7 @@ class MARSheetController extends Controller
             'prn_max_daily'          => 'nullable|integer|min:1|max:24',
             'prn_min_interval_hours' => 'nullable|numeric|min:0|max:24',
             'reason_for_medication'  => 'nullable|string|max:2000',
+            'administration_instructions' => 'nullable|string|max:500',
             'prescribed_by'          => 'nullable|string|max:255',
             'prescriber'             => 'nullable|string|max:255',
             'pharmacy'               => 'nullable|string|max:255',
@@ -91,7 +92,7 @@ class MARSheetController extends Controller
             $data = $request->only([
                 'client_id', 'medication_name', 'dosage', 'dose', 'dose_quantity', 'form', 'unit', 'route', 'frequency',
                 'time_slots', 'as_required', 'prn_details', 'prn_max_daily', 'prn_min_interval_hours',
-                'reason_for_medication',
+                'reason_for_medication', 'administration_instructions',
                 'prescribed_by', 'prescriber', 'pharmacy', 'start_date', 'end_date',
                 'stock_level', 'reorder_level', 'quantity_received', 'quantity_carried_forward',
                 'quantity_returned', 'storage_requirements', 'allergies_warnings',
@@ -130,6 +131,7 @@ class MARSheetController extends Controller
             'prn_max_daily'          => 'nullable|integer|min:1|max:24',
             'prn_min_interval_hours' => 'nullable|numeric|min:0|max:24',
             'reason_for_medication'  => 'nullable|string|max:2000',
+            'administration_instructions' => 'nullable|string|max:500',
             'prescribed_by'          => 'nullable|string|max:255',
             'prescriber'             => 'nullable|string|max:255',
             'pharmacy'               => 'nullable|string|max:255',
@@ -149,7 +151,7 @@ class MARSheetController extends Controller
             $data = $request->only([
                 'medication_name', 'dosage', 'dose', 'dose_quantity', 'form', 'unit', 'route', 'frequency',
                 'time_slots', 'as_required', 'prn_details', 'prn_max_daily', 'prn_min_interval_hours',
-                'reason_for_medication',
+                'reason_for_medication', 'administration_instructions',
                 'prescribed_by', 'prescriber', 'pharmacy', 'start_date', 'end_date',
                 'stock_level', 'reorder_level', 'quantity_received', 'quantity_carried_forward',
                 'quantity_returned', 'storage_requirements', 'allergies_warnings',

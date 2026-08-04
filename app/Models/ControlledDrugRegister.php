@@ -23,6 +23,7 @@ class ControlledDrugRegister extends Model
         'unit',
         'balance_before',
         'balance_after',
+        'is_discrepancy',       // outgoing took more than the balance held (B1)
         'witness_name',
         'notes',
         'created_by_user_id',
@@ -90,11 +91,17 @@ class ControlledDrugRegister extends Model
 
             $before = $last ? (float) $last->balance_after : (float) ($sheet->stock_level ?? 0);
 
+            // Owner B1 (2026-07-28): do NOT floor an outgoing movement at zero. Removing more
+            // than the balance holds is exactly the discrepancy a CD register exists to catch,
+            // so record the true (possibly negative) figure and flag the entry. Flooring to a
+            // tidy 0 hid it. (Pharmacist to confirm; ties to raising an incident — #20.)
             $after = match ($action) {
                 'received' => $before + $qty,
                 'adjustment' => $qty,                    // absolute recount
-                default => max(0, $before - $qty),       // administered / disposed / returned
+                default => $before - $qty,               // administered / disposed / returned
             };
+            // An outgoing movement that drives the balance below zero is a discrepancy.
+            $isDiscrepancy = ! in_array($action, ['received', 'adjustment'], true) && $after < 0;
 
             return self::create([
                 'home_id' => $sheet->home_id,
@@ -110,6 +117,7 @@ class ControlledDrugRegister extends Model
                 'unit' => $extra['unit'] ?? $sheet->unit,
                 'balance_before' => $before,
                 'balance_after' => $after,
+                'is_discrepancy' => $isDiscrepancy,
                 // witness_name is NOT NULL. Where a witness genuinely isn't required (e.g.
                 // supported living), record that fact rather than a name — the register
                 // still shows the movement and that it was unwitnessed.
@@ -117,6 +125,9 @@ class ControlledDrugRegister extends Model
                 'notes' => $extra['notes'] ?? null,
                 'created_by_user_id' => $userId,
             ]);
+            // NOTE (owner B1): a discrepancy should also raise a medication incident. The
+            // Incidents module (#20) is not built yet, so for now the flag + the register's
+            // own visibility carry it. When #20 lands, open an incident here.
         });
     }
 }

@@ -3666,6 +3666,12 @@
                                                                         <textarea class="form-control" id="mar_reason_for_medication" rows="2" placeholder="Why this medication is prescribed"></textarea>
                                                                     </div>
                                                                 </div>
+                                                                <div class="col-md-12">
+                                                                    <div class="form-group">
+                                                                        <label>Administration Instructions</label>
+                                                                        <textarea class="form-control" id="mar_administration_instructions" rows="2" placeholder="How to give it — e.g. do not crush, take with food, half an hour before food"></textarea>
+                                                                    </div>
+                                                                </div>
                                                                 <div class="col-md-4">
                                                                     <div class="form-group">
                                                                         <label>Prescribed By</label>

@@ -16,6 +16,7 @@ class MARAdministration extends Model
         'time_slot',
         'administered_at',
         'given',
+        'is_late',            // recorded as GIVEN LATE via missed-doses resolve (B4)
         'dose_given',
         'quantity_given',
         'administered_by',

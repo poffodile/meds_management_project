@@ -6,12 +6,15 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Controller;
+use App\Models\MARSheet;
 use App\Models\ShiftHandover;
 use App\ServiceUser;
 use Inertia\Inertia;
 
 class ShiftHandoverController extends Controller
 {
+    use \App\Http\Controllers\frontEnd\Concerns\ResolvesCurrentHome;
+
     private const ALLOWED_USER_TYPES = ['N', 'M', 'A', 'CM', 'O'];
 
     public function __construct()
@@ -22,6 +25,16 @@ class ShiftHandoverController extends Controller
             }
             return $next($request);
         });
+    }
+
+    /**
+     * The home currently in view — the manager's *selected* home, re-validated against the
+     * homes they may access (via ResolvesCurrentHome), matching the other medication pages.
+     * (The trait exposes currentHomeId(); this is the thin wrapper the Med2 methods call.)
+     */
+    private function getHomeId(): int
+    {
+        return $this->currentHomeId();
     }
 
     public function index(Request $request)
@@ -99,6 +112,115 @@ class ShiftHandoverController extends Controller
             'nextDate'     => $carbon->copy()->addDay()->toDateString(),
             'todayDate'    => now()->toDateString(),
         ]);
+    }
+
+    /**
+     * Medication 2 → Shift Handover. Fresh CLINIK-shell page; reuses the same handover
+     * logic as the legacy pages. Home-switcher-scoped (getHomeId via ResolvesCurrentHome),
+     * and offers a staff picker for the "from"/"to" carer + residents for per-client updates.
+     */
+    public function indexMedication2(Request $request)
+    {
+        $request->validate(['date' => 'nullable|date']);
+
+        $homeId = $this->getHomeId();
+        $date   = $request->input('date', now()->toDateString());
+        $carbon = \Carbon\Carbon::parse($date);
+
+        $handovers = ShiftHandover::forHome($homeId)
+            ->whereDate('handover_date', $date)
+            ->with(['acknowledgedByUser:id,name', 'createdByUser:id,name'])
+            ->orderByDesc('handover_time')
+            ->get()
+            ->map(fn ($h) => [
+                'id'                  => $h->id,
+                'location'            => $h->location,
+                'handover_date'       => $h->handover_date ? $h->handover_date->format('d M Y') : null,
+                'handover_time'       => $h->handover_time ? \Carbon\Carbon::parse($h->handover_time)->format('H:i') : null,
+                'from_carer_name'     => $h->from_carer_name,
+                'to_carer_name'       => $h->to_carer_name,
+                'general_notes'       => $h->general_notes,
+                'client_updates'      => $h->client_updates ?? [],
+                'medication_concerns' => $h->medication_concerns ?? [],
+                'priority_alerts'     => $h->priority_alerts ?? [],
+                'status'              => $h->status,
+                'acknowledged_by'     => $h->acknowledgedByUser->name ?? null,
+                'acknowledged_at'     => $h->acknowledged_at ? $h->acknowledged_at->format('d M Y · H:i') : null,
+                'created_by'          => $h->createdByUser->name ?? null,
+                'can_acknowledge'     => $h->status === 'submitted',
+            ]);
+
+        $residents = ServiceUser::where('home_id', $homeId)->where('status', 1)
+            ->orderBy('name')->get(['id', 'name'])
+            ->map(fn ($s) => ['value' => (string) $s->id, 'label' => $s->name])->all();
+
+        // Prefill a medication concern when arriving from the round's "flag to handover".
+        // The round passes only IDENTIFIERS (sheet + date + slot); the concern text and the
+        // resident are rebuilt HERE from the dose record, home-scoped — so no resident name
+        // or clinical text ever travels in the URL (review I-3), and a cross-home or bogus
+        // sheet id simply yields no prefill (review I-5).
+        $prefill = null;
+        if ($request->filled('flag_sheet')) {
+            $sheet = MARSheet::forHome($homeId)->find((int) $request->input('flag_sheet'));
+            if ($sheet) {
+                $admin = \App\Models\MARAdministration::where('mar_sheet_id', $sheet->id)
+                    ->where('date', $request->input('flag_date'))
+                    ->where('time_slot', $request->input('flag_slot'))
+                    ->first();
+                $resident = ServiceUser::where('id', $sheet->client_id)->where('home_id', $homeId)->first();
+                $codeLabels = ['A' => 'Given', 'S' => 'Asleep — not given', 'R' => 'Refused', 'W' => 'Withheld', 'N' => 'Not available', 'O' => 'Omitted'];
+                $outcome = $admin ? ($codeLabels[$admin->code] ?? $admin->code ?? 'Not given') : 'Not given';
+                $slot = $request->input('flag_slot');
+                $concern = $sheet->medication_name.($slot ? " ({$slot})" : '').': '.$outcome
+                    .($admin && $admin->reason ? ' — '.$admin->reason : '');
+                $prefill = [
+                    'client_id'   => $sheet->client_id,
+                    'client_name' => $resident->name ?? '',
+                    'concern'     => $concern,
+                ];
+            }
+        }
+
+        return Inertia::render('Frontend2/Medication2/ShiftHandover', [
+            'handovers'    => $handovers,
+            'residents'    => $residents,
+            'staff'        => $this->homeStaffOptions(),
+            'selfName'     => Auth::user()->name,
+            'prefill'      => $prefill,
+            'selectedDate' => $date,
+            'prevDate'     => $carbon->copy()->subDay()->toDateString(),
+            'nextDate'     => $carbon->copy()->addDay()->toDateString(),
+            'todayDate'    => now()->toDateString(),
+            'isManager'    => in_array(Auth::user()->user_type, ShiftHandover::MANAGER_TYPES, true),
+        ]);
+    }
+
+    /** Create a handover from the Medication 2 page (reuses the shared persist logic). */
+    public function storeMedication2(Request $request)
+    {
+        $result = $this->persistHandover($request);
+        if ($result instanceof \Illuminate\Http\RedirectResponse) {
+            return $result;
+        }
+
+        return redirect()->route('frontend2.medication2.shift-handover', ['date' => $request->input('handover_date')])
+            ->with('success', $result === 'submitted' ? 'Handover submitted.' : 'Handover saved as draft.');
+    }
+
+    /** Acknowledge a submitted handover from the Medication 2 page. Manager-only. */
+    public function acknowledgeMedication2(Request $request, $id)
+    {
+        // Server-side match for the UI, which only offers Acknowledge to managers (review
+        // C-2 / HAZ-32). Acknowledging forges the accountability field, so it must be
+        // enforced here, not just hidden. (Owner to confirm the intended role set.)
+        if (! in_array(Auth::user()->user_type, ShiftHandover::MANAGER_TYPES, true)) {
+            abort(403, 'Only a manager can acknowledge a handover.');
+        }
+
+        $error = $this->runAcknowledge($id);
+
+        return redirect()->route('frontend2.medication2.shift-handover', ['date' => $request->input('date')])
+            ->with($error ? 'error' : 'success', $error ?? 'Handover acknowledged.');
     }
 
     public function store(Request $request)
