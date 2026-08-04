@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\frontEnd\Medication;
 
+use App\Services\Medication\DoseOutcome;
 use App\Http\Controllers\Controller;
 use App\Models\MARAdministration;
 use App\Models\MARSheet;
@@ -120,7 +121,7 @@ class MarChartController extends Controller
             if ($s->as_required) {
                 foreach ($days as $day) {
                     $prnByDay[$day['date']] = $adminsByKey
-                        ->filter(fn ($a, $k) => str_starts_with($k, $s->id.'|') && str_ends_with($k, '|'.$day['date']) && $a->code === 'A')
+                        ->filter(fn ($a, $k) => str_starts_with($k, $s->id.'|') && str_ends_with($k, '|'.$day['date']) && DoseOutcome::isGiven($a->code))
                         ->count();
                 }
             }

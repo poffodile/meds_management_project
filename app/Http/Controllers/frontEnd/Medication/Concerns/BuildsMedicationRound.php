@@ -6,6 +6,7 @@ use App\Models\MARAdministration;
 use App\Models\MARSheet;
 use App\Models\MedicationRoundClosure;
 use App\Models\MedicationStockTransaction;
+use App\Services\Medication\DoseOutcome;
 use App\Services\Staff\MARSheetService;
 use App\ServiceUser;
 use Carbon\Carbon;
@@ -148,7 +149,7 @@ trait BuildsMedicationRound
             if ($sheet->as_required) {
                 // 'A' only — an asleep resident consumed no dose, so it must not count
                 // against the PRN daily maximum or restart the interval clock.
-                $given = $sheet->administrations->filter(fn ($a) => $a->code === 'A');
+                $given = $sheet->administrations->filter(fn ($a) => DoseOutcome::isGiven($a->code));
                 $count = $given->count();
                 // administered_at, not updated_at: the interval must run from when the
                 // dose was GIVEN, not from the last time anyone edited the row. Editing
@@ -344,7 +345,18 @@ trait BuildsMedicationRound
             'mar_sheet_id' => 'required|integer',
             'date' => 'required|date',
             'time_slot' => 'required|string|max:10',
-            'code' => 'required|in:A,S,R,W,N,O',
+            // A,S,R,W,N,O are the original six, offered by frontends 1 and 2.
+            // AW,OP,VO,NR are the wider outcome set frontend4 records, from the
+            // Care One OS UX Specification (away, omitted-operational,
+            // vomited/spat out, not required). Widening an allow-list changes
+            // nothing for the existing codes or the front ends that send them.
+            //
+            // Keep in step with CODE_LABELS in frontend/lib/medicationCodes.js,
+            // which is what lets every screen NAME a code it cannot offer.
+            //
+            // 'PA' (part administered) is deliberately absent — see the note on
+            // the reason check below.
+            'code' => 'required|in:A,S,R,W,N,O,AW,OP,VO,NR',
             'dose_given' => 'nullable|string|max:100',
             'witnessed_by' => 'nullable|string|max:255',
             'witness_user_id' => 'nullable|integer',
@@ -356,7 +368,24 @@ trait BuildsMedicationRound
         // 'W' (Withheld) included: withholding a prescribed dose is a deliberate clinical
         // decision and the record must say why. 'S' (asleep) is excluded — the code already
         // states the reason. Keep this list in step with REASON_REQUIRED_CODES on the client.
-        if (in_array($request->input('code'), ['R', 'W', 'N', 'O'], true) && trim((string) $request->input('reason')) === '') {
+        /*
+         * 'OP' and 'VO' join the list (2026-08-04): an operational omission is a
+         * failure of the service and needs a reason and an owner; a vomited dose
+         * needs timing and observed amount before anyone can advise. 'AW' (away)
+         * and 'NR' (not required) do not — the code already states the reason,
+         * the same rule that keeps 'S' off this list.
+         *
+         * WHY 'PA' (PART ADMINISTERED) IS NOT SUPPORTED YET
+         * Part administered means medicine DID go in, so stock must move and a
+         * controlled drug still needs a witness. But seven places in this file
+         * decide that by comparing `code === 'A'` directly, so a part
+         * administration would silently skip every one of those gates — the
+         * same class of bug as the sleeping-child one described in
+         * frontend/lib/medicationCodes.js. Those seven comparisons must be
+         * replaced with one shared "did the resident get this?" helper before
+         * 'PA' can be accepted.
+         */
+        if (in_array($request->input('code'), ['R', 'W', 'N', 'O', 'OP', 'VO'], true) && trim((string) $request->input('reason')) === '') {
             throw ValidationException::withMessages([
                 'reason' => 'Please give a reason when a dose is refused, withheld or not given.',
             ]);
@@ -421,7 +450,7 @@ trait BuildsMedicationRound
         // Controlled drugs: a second signatory at administration. Whether this is
         // required depends on the care setting (REQ-MED-23) — see cdWitnessRequired().
         if ($sheet->is_controlled
-            && $request->input('code') === 'A'
+            && DoseOutcome::isGiven($request->input('code'))
             && $this->cdWitnessRequired($homeId)
             && trim((string) $request->input('witnessed_by')) === '') {
             throw ValidationException::withMessages([
@@ -436,7 +465,7 @@ trait BuildsMedicationRound
         // point to fixing the prescription's dose, rather than silently recording it off the
         // register. The pharmacist assigns the correct number per medicine.
         if ($sheet->is_controlled
-            && $request->input('code') === 'A'
+            && DoseOutcome::isGiven($request->input('code'))
             && $this->deductionQuantity($sheet) === null) {
             throw ValidationException::withMessages([
                 'code' => 'This controlled drug’s dose needs to be recorded as a quantity before it can be given, so it can be entered in the controlled-drug register. Ask a manager to set the dose amount on the prescription.',
@@ -448,7 +477,7 @@ trait BuildsMedicationRound
         // "given" and steer the carer to record it as Not available — a manager can
         // correct the count if it's wrong (carers can't change stock, see decision A1).
         // Untracked stock (null) is left alone: we can't assert it's absent.
-        if ($request->input('code') === 'A'
+        if (DoseOutcome::isGiven($request->input('code'))
             && ! is_null($sheet->stock_level)
             && (float) $sheet->stock_level <= 0) {
             throw ValidationException::withMessages([
@@ -502,7 +531,7 @@ trait BuildsMedicationRound
         // toward the daily maximum or starts the interval clock. Recording "asleep"
         // (S) must never consume a PRN allowance — a child who received nothing and
         // then wakes in pain must not be locked out.
-        if ($sheet->as_required && $request->input('code') === 'A') {
+        if ($sheet->as_required && DoseOutcome::isGiven($request->input('code'))) {
             $given = MARAdministration::where('mar_sheet_id', $sheet->id)
                 ->where('date', $request->input('date'))
                 ->where('code', 'A')
@@ -547,7 +576,7 @@ trait BuildsMedicationRound
                 ->where('date', $request->input('date'))
                 ->where('time_slot', $request->input('time_slot'))
                 ->first();
-            $wasGiven = $existing && $existing->code === 'A';
+            $wasGiven = $existing && DoseOutcome::isGiven($existing->code);
         }
 
         $admin = $marSheetService->administer(
@@ -562,7 +591,7 @@ trait BuildsMedicationRound
         }
 
         // Auto-deduct stock only on a newly-given dose.
-        $nowGiven = $request->input('code') === 'A';
+        $nowGiven = DoseOutcome::isGiven($request->input('code'));
         if ($nowGiven && ! $wasGiven && ! is_null($sheet->stock_level)) {
             $qty = $this->deductionQuantity($sheet);
 

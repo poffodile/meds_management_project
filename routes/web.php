@@ -48,6 +48,7 @@ use App\Http\Controllers\Frontend3\RoundController as Frontend3RoundController;
 use App\Http\Controllers\Frontend3\TodayController as Frontend3TodayController;
 use App\Http\Controllers\Frontend3\WitnessController as Frontend3WitnessController;
 use App\Http\Controllers\Frontend4\Frontend4Controller;
+use App\Http\Controllers\Frontend4\RoundController as Frontend4RoundController;
 use App\Http\Controllers\Frontend4\TodayController as Frontend4TodayController;
 use App\Http\Controllers\frontEnd\Medication\ControlledDrugRegisterController;
 use App\Http\Controllers\frontEnd\Medication\Medication2RoundController;
@@ -1644,6 +1645,10 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
     // nothing with frontend1/2/3 except the stack — and the database, on purpose.
     // Docs: docs/care-one-os/FRONTEND4/
     Route::get('/frontend4', [Frontend4TodayController::class, 'index'])->name('frontend4.today');
+    // The medication round — the queue and recording a dose. PRN, controlled-drug
+    // witnessing, stock deduction and sign-off arrive separately (M3).
+    Route::get('/frontend4/round', [Frontend4RoundController::class, 'index'])->name('frontend4.round');
+    Route::post('/frontend4/round/record', [Frontend4RoundController::class, 'record'])->name('frontend4.round.record');
     // The original scaffold page, kept as the wiring check it was built to be.
     Route::get('/frontend4/start', [Frontend4Controller::class, 'index'])->name('frontend4.start');
 

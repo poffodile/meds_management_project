@@ -2,6 +2,8 @@
 
 namespace App\Services\Staff;
 
+use App\Services\Medication\DoseOutcome;
+
 use App\Models\MARAdministration;
 use App\Models\MARSheet;
 use Illuminate\Support\Facades\DB;
@@ -181,7 +183,7 @@ class MARSheetService
                 // are preserved for audit — nothing is destroyed.
                 $newValues = [
                     // 'A' only. 'S' (asleep) is NOT given — the resident received nothing.
-                    'given' => $data['code'] === 'A',
+                    'given' => DoseOutcome::isGiven($data['code']),
                     'is_late' => (bool) ($data['is_late'] ?? false),
                     'dose_given' => $data['dose_given'] ?? null,
                     'administered_by' => $userId,
@@ -234,7 +236,7 @@ class MARSheetService
                     'date' => $data['date'],
                     'time_slot' => $data['time_slot'],
                     // 'A' only. 'S' (asleep) is NOT given — the resident received nothing.
-                    'given' => $data['code'] === 'A',
+                    'given' => DoseOutcome::isGiven($data['code']),
                     'is_late' => (bool) ($data['is_late'] ?? false),
                     'dose_given' => $data['dose_given'] ?? null,
                     'administered_by' => $userId,

@@ -253,9 +253,16 @@ model before building the round rather than after.
 
 Enforced on the server. Hiding a button is a courtesy; the check is the feature.
 
+> ⚠️ **Deviation, flagged 2026-08-04.** As built, each role **inherits** everything the
+> role below it can do, so a **manager can record an administration** — the table below
+> says they cannot. The inheritance is deliberate: a home manager covering a shift must be
+> able to give medicines, and blocking that is a safety risk from being *too* strict. But
+> it differs from what was approved, so it is the owner's call to reverse. One line in
+> `Permissions::ADMIN_EXCLUDES`-style exclusion would do it.
+
 | Action | Worker | Lead | Manager | Pharmacist | Admin |
 |---|:--:|:--:|:--:|:--:|:--:|
-| Record an administration | ✓ | ✓ | — | — | — |
+| Record an administration | ✓ | ✓ | ✓ *(as built)* | — | — |
 | Witness a controlled drug | if authorised | ✓ | ✓ | — | — |
 | **Correct a clinical record (addendum)** | — | ✓ | **✓** | — | — |
 | Reopen a closed round | — | ✓ | ✓ | — | — |

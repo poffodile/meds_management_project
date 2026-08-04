@@ -67,6 +67,8 @@ function personState(p) {
 }
 
 export default function Today({
+    can,
+    roleLabel,
     terms,
     place,
     date,
@@ -97,6 +99,8 @@ export default function Today({
             place={place}
             placeSub={round.window ? `${round.label} · ${round.window}` : round.label}
             user={user}
+            roleLabel={roleLabel}
+            can={can}
             lastSync={now}
         >
             <Head title="Today" />

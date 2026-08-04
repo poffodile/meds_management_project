@@ -5,7 +5,7 @@
 
 Every session, every decision, every question, every bit of work goes in here with the date — so you can pick this up from any terminal, any day, without remembering what happened last time.
 
-- The rules and the plan live in [FRONTEND4-PLAN.md](FRONTEND4-PLAN.md).
+- The rules and the plan live in [FRONTEND4-PLAN.md](FRONTEND4-PLAN.md). The merged product plan is [CARE-ONE-OS-MERGED-PLAN.md](CARE-ONE-OS-MERGED-PLAN.md). **Anything found that needs doing goes in [FRONTEND4-ISSUES.md](FRONTEND4-ISSUES.md)** — nothing is closed there until it is done, not until it is worked around. Every issue also has a test case in [FRONTEND4-TEST-LOG.md](FRONTEND4-TEST-LOG.md), so a fix can be proved and an open gap can be demonstrated rather than described.
 - This file has **two parts**: the **Work log** (what was done and decided) and the **Conversation record** (what was actually said, both sides). Newest at the bottom in both.
 
 ---
@@ -191,6 +191,71 @@ Your visual direction (warm ivory `#F6F2E9` + clinical teal `#176B65`) is **exac
 **Open:** C1 answer; confirmation of the five sidebar items; agreement or objection on C2–C8.
 
 **Files touched:** `CARE-ONE-OS-MERGED-PLAN.md` (new), `FRONTEND4.md`
+
+### 2026-08-04 — M1.5 and M1.6 built: roles, permissions, role-gated sidebar
+
+**What we did:**
+- Built `App\Services\Frontend4\RoleResolver` — the only place the 40 access-level names are mapped onto four roles (carer, lead, manager, admin, plus "none").
+- Built `App\Services\Frontend4\Permissions` — what each role may do, with roles inheriting the one below.
+- Extended `F4Controller` with `role()`, `can()`, `requirePermission()`, `requireMedicationAccess()` and `roleProps()`.
+- **Closed a real hole.** `TodayController` previously admitted user types `N, A, M, CM, O` — every type there is — so anyone who could log in could reach medication management. It now resolves a role and refuses anyone without medication access.
+- Built `frontend4/roles.js` and rewired `F4Shell` so the sidebar is generated from permissions: five items for a carer, more added by role.
+- Bottom nav fixed at four items on purpose — a bar that changed length by role would move the target a carer reaches for without looking.
+
+**Verified:** build passes; the demo user resolves to **manager** with 11 permissions (inheriting `record_administration`, gaining `manage_staff`, not granted `define_roles` or `manage_settings`); `/frontend3`, `/frontend2` and `/medication/medication-round` all still 200.
+
+**Decisions confirmed by the owner:**
+- Senior Staff / Senior RSW / Team Leader / Sr Supervisor = **shift leads** — they can witness, correct and reopen. Without it, a senior alone on nights has nobody to witness a controlled drug with, which stops the dose entirely.
+- "Account Manager" = **finance, no medication access at all** — and that beats their account type, so a finance account typed `A` does not become a clinical administrator on a technicality.
+- "Agent" = **agency worker**, so a carer.
+- Pharmacist and registered nurse **dropped for now**; four roles, not six.
+
+**Flagged, needs the owner's call:**
+1. **Managers can record doses as built**, because roles inherit. The approved matrix said they could not. Inheriting looks right — a manager covering a shift must be able to give medicines — but it differs from sign-off.
+2. **M1.7, the outcome codes.** `CODE_LABELS[code]` is a plain lookup used across **20 screens** in frontends 1 and 2; an unknown code renders blank. Doing the ten outcomes properly needs a small fallback added to `frontend/lib/medicationCodes.js` — a shared file that frontend4's isolation rule says not to touch. Split out rather than slipped in.
+
+**Files touched:** `app/Services/Frontend4/{RoleResolver,Permissions}.php` (new), `app/Http/Controllers/Frontend4/{F4Controller,TodayController}.php`, `frontend4/roles.js` (new), `frontend4/components/F4Shell.jsx`, `resources/js/F4Pages/Today.jsx`
+
+### 2026-08-04 — M1.7: nine of the ten outcomes, and one deliberately deferred
+
+**What we did:**
+- Owner confirmed both open questions: **managers can record doses** (they are "practically staff with more access" — which is the inheritance model already built), and **go ahead with the small shared change** rather than let the other pages be affected.
+- Widened `CODE_LABELS` in `frontend/lib/medicationCodes.js` to cover the new codes, while leaving `MED_CODES` at the original six. **Two lists on purpose:** what a user is *offered* versus what a stored code *means*. Lookups widen; dropdowns do not. So no journey in frontend1 or frontend2 changes, and none of their ~20 screens can render a blank where an outcome should be.
+- Added `AW` (away), `OP` (omitted — operational), `VO` (vomited/spat out), `NR` (not required) to the server validation and, where they need one, to the reason-required list.
+- Built `App\Services\Frontend4\Outcomes` — frontend4's vocabulary, with `isGiven()`, `needsReason()`, `status()` and per-outcome reason hints.
+
+**Deferred, deliberately: `PA` (part administered).**
+Seven places in `BuildsMedicationRound` decide "did the medicine go in?" by comparing `code === 'A'` inline — lines 151, 452, 467, 479, 533, 578, 593. They gate the PRN daily count, the controlled-drug witness, the no-numeric-dose block, the zero-stock refusal, the PRN maximum/interval check, the amendment test and the stock deduction. Part administered means medicine *did* go in, so all seven would silently answer "no": no witness, no stock movement, no PRN counting, and no error. That is the same failure the file already documents for `'S'` — a sleeping child burning their PRN allowance and being refused pain relief on waking.
+
+**Nothing was fixed there.** The seven lines are untouched. The problem was *avoided* by checking them before adding codes and leaving out the one outcome that would trip over them.
+
+**New milestone M1.8** — replace those seven comparisons with one shared helper (`Outcomes::isGiven()`, already written), with tests around it, then enable `PA`. It changes logic all four front ends run, so it is its own piece of work.
+
+**Verified honestly:** the medication suites were run **before and after** the shared change by stashing only the two shared files. Before: 14 errors, 3 failures. After: 14 errors, 2 failures. The failures are **pre-existing**, not introduced here — and the 3→2 difference is not claimed as a fix. All five pages (`/frontend4`, `/frontend3`, `/frontend2`, `/medication/medication-round`, `/medication/missed-doses`) return 200.
+
+**Files touched:** `frontend/lib/medicationCodes.js` *(shared — agreed with the owner)*, `app/Http/Controllers/frontEnd/Medication/Concerns/BuildsMedicationRound.php` *(shared — validation + reason list only)*, `app/Services/Frontend4/Outcomes.php` (new)
+
+### 2026-08-04 — M2 (the medication round) and M1.8 both built
+
+**What we did:**
+- **M2 — the medication round.** `RoundController` + `F4Pages/Round.jsx`: the queue grouped by urgency rather than alphabet, search, a round switcher, progress in both doses and people, and the chosen client's medicines beside the list. Recording goes through the shared `applyRecord()`, so no second set of rules exists.
+- **M1.8 — one definition of "given".** The owner asked why it could not be done now, and the answer was that it could. Built `App\Services\Medication\DoseOutcome` (neutral namespace — it is shared logic, not frontend4's) and pointed all call sites at it, including `Frontend4\Outcomes::isGiven()`.
+
+**The correction that mattered:** I had logged this as **seven** comparisons. It was **ten** — the first search only covered one file. The three missed were the most consequential: `MARSheetService:184` and `:237` write the **persisted `given` column** into the database, and `MarChartController:123` counts given doses on the MAR chart. A disagreement in the first two is a wrong clinical record, not a display bug.
+
+**Why it was safe to do with a red test suite:** the refactor is provably a no-op. `GIVEN_CODES` holds only `'A'`, so every call returns exactly what the inline comparison returned. Doing it while it changed nothing was cheap and verifiable; doing it later, when it had to change something, would have been neither.
+
+**Verified:**
+- Medication suites: **14 errors / 3 failures before and after** — identical, so behaviour-neutral.
+- Round page loads on real data (Sofia Martins, Room C3, allergies tree nuts + latex, one overdue dose at 14:00).
+- **Mandatory reason enforced:** posting a decline with no reason returned **422** with the server's own wording and wrote **zero rows**.
+- **Recording works and is append-only:** recording as given wrote a new row with `given = 1`, flipped the previous entry's `is_current` 1 → 0 rather than overwriting it, and wrote a stock transaction.
+
+**New issue found while verifying — [I16](FRONTEND4-ISSUES.md#i16), safety-level.** A 5ml dose recorded against 3ml of stock produced a ledger row reading `balance_before 3.00, quantity 5.00, balance_after 0.00`. Three minus five is not zero — the balance clamps silently instead of refusing. There is a guard for *zero* stock but none for *insufficient* stock. On a controlled drug this is a register that does not balance, which is precisely what the discrepancy workflow exists to detect. **Pre-existing** — the deduction arithmetic was untouched by M1.8.
+
+**Files touched:** `app/Services/Medication/DoseOutcome.php` (new), `app/Http/Controllers/Frontend4/RoundController.php` (new), `resources/js/F4Pages/Round.jsx` (new), `routes/web.php`, and the ten call sites across `BuildsMedicationRound.php`, `MARSheetService.php`, `MarChartController.php`, `Frontend4/Outcomes.php`
+
+**Next:** this is the stop-and-look point. The round works; PRN, witnessing, stock deduction and sign-off wait until it has been seen.
 
 ---
 

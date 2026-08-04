@@ -93,6 +93,14 @@ export default function F4Shell({
     place = null,
     placeSub = null,
     user = null,
+    /**
+     * What this person may do, from F4Controller::roleProps().
+     *
+     * Decides which navigation items appear. Display only — the server refuses
+     * anything they are not permitted to do, whether or not it was on screen.
+     */
+    can = [],
+    roleLabel = null,
     /** Offline is a persistent banner, never a toast. */
     offline = false,
     queued = 0,
@@ -117,7 +125,12 @@ export default function F4Shell({
                     {user ? (
                         <span className="f4-who">
                             <span className="f4-avatar" aria-hidden="true">{initials(user)}</span>
-                            <span className="f4-who-name">{user}</span>
+                            {/* The role is shown, not just the name — someone
+                                covering a shift needs to know which account
+                                they are on before they record anything. */}
+                            <span className="f4-who-name">
+                                {user}{roleLabel ? ` · ${roleLabel}` : ''}
+                            </span>
                         </span>
                     ) : null}
                 </span>
@@ -141,12 +154,14 @@ export default function F4Shell({
 
             <div className="f4-body">
                 <nav className="f4-nav" aria-label="Main">
-                    <div className="f4-nav-group">
-                        <span className="f4-nav-label">Care</span>
-                        {AREAS.map((item) => (
-                            <NavItem key={item.key} item={item} current={area} />
-                        ))}
-                    </div>
+                    {navFor(can).map((group, i) => (
+                        <div className="f4-nav-group" key={group.group || `g${i}`}>
+                            <span className="f4-nav-label">{group.group || 'Care'}</span>
+                            {group.items.map((item) => (
+                                <NavItem key={item.key} item={item} current={area} />
+                            ))}
+                        </div>
+                    ))}
                 </nav>
 
                 <div className="f4-content">

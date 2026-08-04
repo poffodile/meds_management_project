@@ -1,8 +1,29 @@
 /**
  * Medication administration (MAR) outcome codes — the single source of truth.
  * Must stay in sync with the controller's `code` validation rule
- * (MedicationRoundController@record). Previously duplicated as `CODE_LABELS`
+ * (BuildsMedicationRound::applyRecord). Previously duplicated as `CODE_LABELS`
  * in MedicationRound.jsx and `CODE_OPTIONS` in RecordDoseModal.jsx.
+ *
+ * ─────────────────────────────────────────────────────────────────────────────
+ * TWO LISTS, ON PURPOSE (added 2026-08-04)
+ *
+ * `MED_CODES` is what a user is OFFERED. `CODE_LABELS` is what any stored code
+ * MEANS. They used to be the same thing, and that was fine while one front end
+ * wrote the records.
+ *
+ * frontend4 records a wider outcome set (away, omitted-operational, vomited,
+ * not required) taken from the Care One OS UX Specification. Those codes reach
+ * the same `mar_administrations` table that frontends 1 and 2 read from, and
+ * `CODE_LABELS[code]` is a plain lookup used across about twenty of their
+ * screens — so a code they had never heard of rendered BLANK where an outcome
+ * should be.
+ *
+ * Widening `CODE_LABELS` fixes that: every screen can now name every code.
+ * `MED_CODES` is deliberately left at the original six, so no dropdown in
+ * frontend1 or frontend2 changes and no existing journey behaves differently.
+ *
+ * If you add a code here, add it to the server's validation rule too.
+ * ─────────────────────────────────────────────────────────────────────────────
  */
 export const MED_CODES = [
     { value: 'A', label: 'Given' },
@@ -13,8 +34,23 @@ export const MED_CODES = [
     { value: 'O', label: 'Omitted' },
 ];
 
-/** code -> label lookup, e.g. CODE_LABELS.A === 'Given'. */
-export const CODE_LABELS = MED_CODES.reduce((m, c) => ({ ...m, [c.value]: c.label }), {});
+/**
+ * code -> label lookup for EVERY code that can appear in the database,
+ * e.g. CODE_LABELS.A === 'Given'.
+ *
+ * Covers the six offered above plus the codes frontend4 can write. Read-only
+ * consumers should use this; anything building a list of choices should use
+ * `MED_CODES` (frontends 1 and 2) or frontend4's own list.
+ */
+export const CODE_LABELS = {
+    ...MED_CODES.reduce((m, c) => ({ ...m, [c.value]: c.label }), {}),
+
+    // Written by frontend4 only. Present here so every screen can name them.
+    AW: 'Away — not given',
+    OP: 'Omitted — operational',
+    VO: 'Vomited / spat out',
+    NR: 'Not required',
+};
 
 /**
  * Codes where the resident actually received the medicine.
@@ -46,8 +82,18 @@ export const isGivenCode = (code) => GIVEN_CODES.includes(code);
  * 'S' is deliberately absent: the code already states the reason ("asleep"), so
  * demanding a second explanation is busywork during a round. It is still a
  * NOT-given outcome — see GIVEN_CODES.
+ *
+ * Same principle applied to the codes added 2026-08-04:
+ *   · 'OP' (omitted — operational) REQUIRES one. An operational omission is a
+ *     failure of the service, not of the person, and the specification asks for
+ *     the reason and a responsible owner.
+ *   · 'VO' (vomited / spat out) REQUIRES one — timing and observed amount are
+ *     what a clinician needs before they can advise, and the system must never
+ *     suggest redosing.
+ *   · 'AW' (away) and 'NR' (not required) do NOT. The code already states the
+ *     reason in both cases, exactly as it does for 'S'.
  */
-export const REASON_REQUIRED_CODES = ['R', 'W', 'N', 'O'];
+export const REASON_REQUIRED_CODES = ['R', 'W', 'N', 'O', 'OP', 'VO'];
 
 /**
  * Common reasons offered when a dose is refused.
