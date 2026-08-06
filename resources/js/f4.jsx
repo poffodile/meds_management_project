@@ -18,6 +18,11 @@ import { createRoot } from 'react-dom/client';
 import '@frontend4/f4.css';
 
 createInertiaApp({
+    // A thin indigo loading bar at the top of the page during every navigation,
+    // so tapping a client gives instant feedback instead of a silent wait. It
+    // only appears once a request runs longer than `delay`, so quick pages don't
+    // flash it.
+    progress: { color: '#3F4FD6', delay: 120, showSpinner: false },
     resolve: (name) => {
         const pages = import.meta.glob('./F4Pages/**/*.jsx', { eager: true });
         return pages[`./F4Pages/${name}.jsx`];

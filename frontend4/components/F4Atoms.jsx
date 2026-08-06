@@ -17,7 +17,7 @@
  *    See docs/care-one-os/FRONTEND4/FRONTEND4-DESIGN.md section 0.
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 
 /* ── Terminology ──────────────────────────────────────────────────────────── */
 
@@ -174,10 +174,16 @@ function initials(name) {
  * stays on screen while the outcome is recorded.
  */
 export function Person({ name, photo, meta, size = 'md' }) {
+    // A photo may be recorded but its file missing (an orphaned reference). Fall
+    // back to clean initials the moment the image fails to load, rather than
+    // showing a broken-image box.
+    const [imgFailed, setImgFailed] = useState(false);
+    const showPhoto = photo && !imgFailed;
+
     return (
         <span className="f4-person" data-size={size}>
-            {photo ? (
-                <img className="f4-person-photo" src={photo} alt="" />
+            {showPhoto ? (
+                <img className="f4-person-photo" src={photo} alt="" onError={() => setImgFailed(true)} />
             ) : (
                 <span className="f4-person-initials" aria-hidden="true">{initials(name)}</span>
             )}
@@ -390,7 +396,7 @@ export function Empty({ title, body, action }) {
     return (
         <div className="f4-state">
             <span className="f4-state-title">{title}</span>
-            <p className="f4-state-body">{body}</p>
+            {body ? <p className="f4-state-body">{body}</p> : null}
             {action ? <div className="f4-actions">{action}</div> : null}
         </div>
     );

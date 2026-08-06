@@ -50,6 +50,8 @@ use App\Http\Controllers\Frontend3\WitnessController as Frontend3WitnessControll
 use App\Http\Controllers\Frontend4\Frontend4Controller;
 use App\Http\Controllers\Frontend4\RoundController as Frontend4RoundController;
 use App\Http\Controllers\Frontend4\TodayController as Frontend4TodayController;
+use App\Http\Controllers\Frontend4\ClientsController as Frontend4ClientsController;
+use App\Http\Controllers\Frontend4\ClientProfileController as Frontend4ClientProfileController;
 use App\Http\Controllers\frontEnd\Medication\ControlledDrugRegisterController;
 use App\Http\Controllers\frontEnd\Medication\Medication2RoundController;
 use App\Http\Controllers\frontEnd\Medication\MedicationRoundController;
@@ -1649,6 +1651,20 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
     // witnessing, stock deduction and sign-off arrive separately (M3).
     Route::get('/frontend4/round', [Frontend4RoundController::class, 'index'])->name('frontend4.round');
     Route::post('/frontend4/round/record', [Frontend4RoundController::class, 'record'])->name('frontend4.round.record');
+    // Clients (the service users) — the searchable list (Page 1), tapping through
+    // to a client's profile (Page 2). Read-only; scoped to the user's own home.
+    Route::get('/frontend4/clients', [Frontend4ClientsController::class, 'index'])->name('frontend4.clients');
+    Route::get('/frontend4/clients/{client}', [Frontend4ClientProfileController::class, 'index'])->where('client', '[0-9]+')->name('frontend4.clients.show');
+    // Change a prescription (pause/resume/stop) — manager+, written to an
+    // append-only change-log. Server-enforced; see PrescriptionController.
+    Route::post('/frontend4/clients/{client}/medications/{sheet}/status', [\App\Http\Controllers\Frontend4\PrescriptionController::class, 'changeStatus'])
+        ->where(['client' => '[0-9]+', 'sheet' => '[0-9]+'])->name('frontend4.clients.medication.status');
+    // The full MAR sheet — reached from the client's profile, not the sidebar.
+    Route::get('/frontend4/clients/{client}/mar', [\App\Http\Controllers\Frontend4\MarController::class, 'index'])
+        ->where('client', '[0-9]+')->name('frontend4.clients.mar');
+    // Correct a MAR entry (append-only amendment) — shift lead and above.
+    Route::post('/frontend4/clients/{client}/mar/{sheet}/correct', [\App\Http\Controllers\Frontend4\MarController::class, 'correct'])
+        ->where(['client' => '[0-9]+', 'sheet' => '[0-9]+'])->name('frontend4.clients.mar.correct');
     // The original scaffold page, kept as the wiring check it was built to be.
     Route::get('/frontend4/start', [Frontend4Controller::class, 'index'])->name('frontend4.start');
 

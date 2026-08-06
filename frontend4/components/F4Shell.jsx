@@ -106,10 +106,16 @@ export default function F4Shell({
     queued = 0,
     /** Prose-shaped pages read better in a narrower column. */
     width = 'wide',
+    /** Pages that carry their own header (e.g. the client profile's identity
+     *  card) skip the shell page-header band so the title isn't shown twice. */
+    bare = false,
     children,
 }) {
     return (
         <div className="f4-app">
+            {/* First tab stop: lets keyboard and screen-reader users jump past the
+                context bar and navigation straight to the page content. */}
+            <a className="f4-skip" href="#f4-main-content">Skip to content</a>
             <header className="f4-context">
                 <span className="f4-mark" aria-hidden="true">F4</span>
 
@@ -165,22 +171,24 @@ export default function F4Shell({
                 </nav>
 
                 <div className="f4-content">
-                    <header className="f4-page-header">
-                        <div className="f4-page-header-text">
-                            <h1>{title}</h1>
-                            {summary ? <p className="f4-page-summary">{summary}</p> : null}
-                        </div>
-                        {action || lastSync ? (
-                            <div className="f4-page-header-action">
-                                {action}
-                                {lastSync ? (
-                                    <span className="f4-sync">Last updated {lastSync}</span>
-                                ) : null}
+                    {bare ? null : (
+                        <header className="f4-page-header">
+                            <div className="f4-page-header-text">
+                                <h1>{title}</h1>
+                                {summary ? <p className="f4-page-summary">{summary}</p> : null}
                             </div>
-                        ) : null}
-                    </header>
+                            {action || lastSync ? (
+                                <div className="f4-page-header-action">
+                                    {action}
+                                    {lastSync ? (
+                                        <span className="f4-sync">Last updated {lastSync}</span>
+                                    ) : null}
+                                </div>
+                            ) : null}
+                        </header>
+                    )}
 
-                    <main className="f4-main" data-width={width}>{children}</main>
+                    <main id="f4-main-content" tabIndex={-1} className="f4-main" data-width={width}>{children}</main>
                 </div>
             </div>
 

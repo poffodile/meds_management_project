@@ -1,0 +1,97 @@
+/* ============================================================================
+   frontend4 — THE COLOUR FILE
+   -------------------------------------------------------------------------
+   This is the ONE place frontend4's colours live. Change a hex here and it
+   changes everywhere in frontend4 — the profile, the round, the MAR sheet,
+   all of it — because every f4 rule reads these variables, never a raw hex.
+
+   ISOLATION: every token is defined under .f4-root, and this file is only
+   ever pulled into the frontend4 bundle (via an @import at the top of
+   f4.css). It cannot reach a frontend1 / frontend2 / frontend3 page. Editing
+   this file is safe: the blast radius is frontend4 and nothing else.
+
+   THE LOOK (owner spec, 2026-08-06): warm cream background, ivory panels,
+   navy structure, teal interactions, thin borders, very restrained status
+   colours. Red is reserved for genuine risk — allergies, overdue medicine,
+   low stock. Manrope for headings, Inter for everything else.
+
+   HOW IT'S STRUCTURED
+   1. --colour-*  : the palette, exactly as written in the spec. Edit these.
+   2. --f4-*      : the names the rest of frontend4 already uses, each pointed
+                    at a --colour-* above. Don't edit these; they just forward.
+   ========================================================================= */
+
+.f4-root {
+  /* ── 1. THE PALETTE (the spec) — edit here ─────────────────────────────── */
+
+  /* Page backgrounds */
+  --colour-background:   #F6F2E9;  /* Warm cream                 */
+  --colour-surface:      #FFFDF8;  /* Cards and panels (ivory)   */
+  --colour-surface-soft: #F4F1EA;  /* Insets, quiet chips        */
+  --colour-divider-soft: #EEEAE2;  /* Hairline dividers          */
+
+  /* Main brand colours */
+  --colour-navy:         #17243B;  /* Sidebar and headings       */
+  --colour-teal:         #176B65;  /* Primary actions            */
+  --colour-teal-light:   #E2EFEB;  /* Teal wash (avatars, Rx)    */
+  --colour-eucalyptus:   #7E9B90;  /* Soft teal for outlines     */
+
+  /* Text */
+  --colour-text:              #202A35;
+  --colour-text-muted:        #68727B;
+  --colour-text-on-dark:      #FFFFFF;
+  --colour-text-on-dark-muted:#AEB8C5;
+
+  /* Borders */
+  --colour-border:       #D9D4CA;
+
+  /* Status colours — restrained. Red is for genuine risk only. */
+  --colour-success:            #49685F;  --colour-success-background: #E8EFEC;
+  --colour-warning:            #9B6A23;  --colour-warning-background: #F4EADC;
+  --colour-danger:             #9C4141;  --colour-danger-background:  #F4E6E3;
+  --colour-away:               #886229;  --colour-away-background:    #F2EADC;
+
+  /* Shadows */
+  --panel-shadow:        0 10px 30px rgba(23, 36, 59, 0.055);
+
+  /* ── 2. FORWARDING — the f4 tokens the codebase uses, pointed at the above.
+        Leave these alone; they exist so the whole app moves with the palette. */
+
+  /* Neutrals */
+  --f4-canvas:     var(--colour-background);
+  --f4-surface:    var(--colour-surface);
+  --f4-sunken:     var(--colour-surface-soft);
+  --f4-ink:        var(--colour-navy);          /* headings, strong values */
+  --f4-body:       var(--colour-text);
+  --f4-muted:      var(--colour-text-muted);
+  --f4-line:       var(--colour-divider-soft);  /* inner hairline */
+  --f4-line-hard:  var(--colour-border);        /* card borders   */
+
+  /* Accent (teal) */
+  --f4-accent:     var(--colour-teal);
+  --f4-accent-in:  var(--colour-teal);          /* link / eyebrow text */
+  --f4-accent-edge:var(--colour-eucalyptus);
+  --f4-accent-soft:var(--colour-teal-light);
+
+  /* Statuses at strong / soft / faint / edge. A tint NEVER carries meaning
+     alone — every status still renders its word. Mapped into the warm family;
+     success = teal-green, warning = amber, danger/overdue = red. */
+  --f4-given-s: var(--colour-success); --f4-given-b: var(--colour-success-background); --f4-given-f: #F2F7F5; --f4-given-e: #B9CCC5;
+  --f4-due-s:   #3F5E6B;               --f4-due-b:   #E6EEEF;                          --f4-due-f:   #F3F7F7; --f4-due-e:   #B7CBCF;
+  --f4-upc-s:   var(--colour-text-muted); --f4-upc-b: var(--colour-divider-soft);      --f4-upc-f:   #F6F3EC; --f4-upc-e:   var(--colour-border);
+  --f4-late-s:  var(--colour-warning); --f4-late-b:  var(--colour-warning-background); --f4-late-f:  #FAF4EA; --f4-late-e:  #E3CDA6;
+  --f4-over-s:  var(--colour-danger);  --f4-over-b:  var(--colour-danger-background);  --f4-over-f:  #FBF1EF; --f4-over-e:  #E0BFBB;
+  --f4-ref-s:   #7A5560;               --f4-ref-b:   #F0E7E9;                          --f4-ref-f:   #F8F2F3; --f4-ref-e:   #D2BFC4;
+  --f4-omit-s:  #6B6258;               --f4-omit-b:  #F0ECE5;                          --f4-omit-f:  #F8F5EF; --f4-omit-e:  #CFC7BA;
+  --f4-wit-s:   #45566E;               --f4-wit-b:   #E9ECF1;                          --f4-wit-f:   #F4F6F9; --f4-wit-e:   #BDC5D3;
+  --f4-info-s:  #45636E;               --f4-info-b:  #E7EEEF;                          --f4-info-f:  #F4F8F8; --f4-info-e:  #B9CCCF;
+  --f4-off-s:   #68727B;               --f4-off-b:   var(--colour-divider-soft);       --f4-off-f:   #F6F3EC; --f4-off-e:   var(--colour-border);
+
+  /* Allergy — the spec's danger red, with a soft tile behind the alert glyph */
+  --f4-allergy-s: var(--colour-danger); --f4-allergy-b: var(--colour-danger-background); --f4-allergy-i: #EAD3CE;
+
+  /* Shadows */
+  --f4-card-shadow: 0 1px 2px rgba(23, 36, 59, .04);
+  --f4-lift:        var(--panel-shadow);
+  --f4-float:       0 8px 24px -12px rgba(23, 36, 59, .20);
+}

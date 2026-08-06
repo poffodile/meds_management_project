@@ -18,37 +18,11 @@
    docs/care-one-os/FRONTEND4/CARE-ONE-OS-VISUAL-AND-PAGE-SPEC.md
    ========================================================================= */
 
+/* Colours live in their own file — the single place to change f4's palette.
+   Still scoped to .f4-root, still only in the f4 bundle. See f4-theme.css. */
+@import './f4-theme.css';
+
 .f4-root {
-  /* ── Core palette — mirrors frontend4/tokens.js. Change both together. ──── */
-  --f4-canvas:     #F7F8FA;
-  --f4-surface:    #FFFFFF;
-  --f4-sunken:     #EEF1F5;
-  --f4-ink:        #111827;
-  --f4-body:       #334155;
-  --f4-muted:      #64748B;
-  --f4-line:       #E2E8F0;
-  --f4-line-hard:  #CBD5E1;
-  --f4-accent:     #3F4FD6;
-  --f4-accent-in:  #2F3CB0;
-  --f4-accent-edge:#7C88E8;
-
-  /* ── The ten statuses, each at three intensities plus an edge ──────────────
-     strong = text, icons, the dot, thin borders
-     soft   = badge background, selected filter
-     faint  = hover, table-row emphasis, context panel
-     edge   = outlined-badge border
-     A tint NEVER carries meaning alone — every status renders its word too.  */
-  --f4-given-s:  #146B4A; --f4-given-b:  #E6F2EC; --f4-given-f:  #F2F9F6; --f4-given-e:  #A8CFBE;
-  --f4-due-s:    #2A5FA0; --f4-due-b:    #E7EEF8; --f4-due-f:    #F4F7FC; --f4-due-e:    #AEC4E2;
-  --f4-upc-s:    #5A6675; --f4-upc-b:    #EDEFF3; --f4-upc-f:    #F6F7F9; --f4-upc-e:    #C3C9D2;
-  --f4-late-s:   #8C5410; --f4-late-b:   #F7EEE2; --f4-late-f:   #FBF6F0; --f4-late-e:   #DCC3A0;
-  --f4-over-s:   #A32638; --f4-over-b:   #F9E9EC; --f4-over-f:   #FDF4F6; --f4-over-e:   #E0B2BB;
-  --f4-ref-s:    #6E4A6B; --f4-ref-b:    #F2ECF1; --f4-ref-f:    #F9F5F8; --f4-ref-e:    #CDBACA;
-  --f4-omit-s:   #64605A; --f4-omit-b:   #F0EFED; --f4-omit-f:   #F8F7F6; --f4-omit-e:   #CBC7C1;
-  --f4-wit-s:    #474F7A; --f4-wit-b:    #ECEEF6; --f4-wit-f:    #F5F7FB; --f4-wit-e:    #B9BFD6;
-  --f4-info-s:   #4A6479; --f4-info-b:   #EBF0F4; --f4-info-f:   #F5F8FA; --f4-info-e:   #BCCBD6;
-  --f4-off-s:    #4E545B; --f4-off-b:    #EEEFF1; --f4-off-f:    #F7F8F9; --f4-off-e:    #C4C7CB;
-
   /* ── Geometry — eight-point spacing, with the spec's stated purposes ────── */
   --f4-r-sm: 6px; --f4-r-md: 10px; --f4-r-lg: 14px; --f4-r-pill: 999px;
   --f4-s1: 4px;   /* very small internal gaps   */
@@ -82,6 +56,7 @@
   --f4-context-h: 56px;
   --f4-bottom-h:  62px;
   --f4-field-h:   44px;
+  --f4-controls-h: 72px;   /* height of the sticky Clients control bar, for letter offsets */
 
   font-family: var(--f4-font-body);
   color: var(--f4-body);
@@ -326,7 +301,11 @@
 }
 .f4-nav-count[data-tone="overdue"] { background: var(--f4-over-s); color: #fff; }
 
-.f4-content { min-width: 0; }
+/* The content column fills the space beside the nav, but caps at a wide
+   maximum and centres — so on a big screen it stretches nearly full-width
+   (like the reference) instead of hugging the sidebar, and the page header
+   band and the cards below it always line up on the same left and right edge. */
+.f4-content { min-width: 0; width: 100%; max-width: 1460px; margin-inline: auto; }
 
 /* ── Page header: title, plain-language state, ONE primary action ─────────── */
 
@@ -335,7 +314,7 @@
   flex-wrap: wrap;
   align-items: flex-start;
   gap: var(--f4-s4);
-  padding: var(--f4-s5) var(--f4-s6) var(--f4-s4);
+  padding: var(--f4-s5) var(--f4-s7) var(--f4-s4);
   background: var(--f4-surface);
   border-bottom: var(--f4-hair);
 }
@@ -350,7 +329,9 @@
   text-align: right;
 }
 
-.f4-main { padding: var(--f4-s5) var(--f4-s6) var(--f4-s7); max-width: 1180px; }
+/* Fills the (already capped and centred) content column, with a comfortable
+   gutter on both sides so the content never hugs the sidebar. */
+.f4-main { padding: var(--f4-s5) var(--f4-s7) var(--f4-s7); }
 .f4-main[data-width="narrow"] { max-width: 880px; margin: 0 auto; }
 
 .f4-page-head { margin-bottom: var(--f4-s5); }
@@ -587,9 +568,9 @@
   gap: var(--f4-s2);
   padding: var(--f4-s1) var(--f4-s3);
   border-radius: var(--f4-r-md);
-  border-left: 3px solid var(--f4-over-s);
-  background: var(--f4-over-f);
-  color: var(--f4-over-s);
+  border-left: 3px solid var(--f4-allergy-s);
+  background: var(--f4-allergy-b);
+  color: var(--f4-allergy-s);
   font-size: var(--f4-t-support);
   font-weight: 600;
 }
@@ -831,7 +812,10 @@ a.f4-row:hover, button.f4-row:hover { background: var(--f4-upc-f); text-decorati
   font-weight: 700;
   margin-bottom: var(--f4-s1);
 }
-.f4-state-body { max-width: 46ch; margin: 0 auto; font-size: .9375rem; }
+/* `.f4-state .f4-state-body` (0,2,0) so it out-specifies the `.f4-root p`
+   margin reset (0,1,1) — otherwise `margin: auto` is ignored and the body sits
+   left of centre instead of under the title. */
+.f4-state .f4-state-body { max-width: 46ch; margin: 0 auto; font-size: .9375rem; }
 .f4-state .f4-actions { justify-content: center; }
 .f4-state[data-tone="risk"] .f4-state-title { color: var(--f4-over-s); }
 .f4-state-ref { display: block; margin-top: var(--f4-s3); font-size: var(--f4-t-label); color: var(--f4-muted); }
@@ -891,4 +875,424 @@ a.f4-row:hover, button.f4-row:hover { background: var(--f4-upc-f); text-decorati
 
   .f4-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .f4-actions .f4-btn { flex: 1 1 100%; }
+}
+
+/* ── Clients (Page 1): search toolbar, A–Z list, flag chips ─────────────────
+   All class selectors are f4-namespaced, matching the file's convention. */
+.f4-toolbar {
+  display: flex; gap: var(--f4-s3); flex-wrap: wrap; align-items: center;
+  margin-bottom: var(--f4-s4);
+}
+.f4-clients-count {
+  white-space: nowrap;
+  color: var(--f4-muted); font-size: var(--f4-t-support); font-variant-numeric: tabular-nums;
+}
+
+/* Clients: filters live in a rail beside the list, not a bar on top. The rail
+   is sticky, so it stays with you as a long list scrolls — and because it sits
+   in its own column it never covers the list. */
+.f4-clients-layout { display: grid; grid-template-columns: 236px minmax(0, 1fr); gap: var(--f4-s5); align-items: start; }
+.f4-clients-filters {
+  display: flex; flex-direction: column; gap: var(--f4-s3);
+  position: sticky; top: var(--f4-context-h);
+}
+.f4-clients-filters .f4-search { flex: none; width: 100%; }
+.f4-clients-filters .f4-toolbar-select { width: 100%; min-width: 0; }
+.f4-clients-filters .f4-clients-count { margin-top: var(--f4-s1); }
+.f4-clients-main { min-width: 0; }
+
+/* On narrow screens the rail becomes a normal row above the list. */
+@media (max-width: 900px) {
+  .f4-clients-layout { grid-template-columns: minmax(0, 1fr); gap: var(--f4-s4); }
+  .f4-clients-filters { position: static; flex-direction: row; flex-wrap: wrap; align-items: center; }
+  .f4-clients-filters .f4-search { flex: 1 1 220px; width: auto; }
+  .f4-clients-filters .f4-toolbar-select { width: auto; }
+  .f4-clients-filters .f4-clients-count { margin-left: auto; }
+}
+.f4-search { position: relative; flex: 1 1 240px; display: flex; align-items: center; }
+.f4-search-icon { position: absolute; left: 13px; color: var(--f4-muted); pointer-events: none; }
+.f4-search-input { padding-left: 38px; }
+.f4-toolbar-select { flex: 0 0 auto; min-width: 168px; }
+
+/* Filters styled as solid buttons that still open a native dropdown. */
+.f4-filter-select {
+  flex: 0 0 auto; width: auto; min-width: 0;
+  appearance: none; -webkit-appearance: none;
+  height: var(--f4-field-h);
+  padding: 0 calc(var(--f4-s5) + 2px) 0 var(--f4-s4);
+  border: 1px solid var(--f4-line-hard);
+  border-radius: var(--f4-r-md);
+  background-color: var(--f4-surface);
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='m6 9 6 6 6-6'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right var(--f4-s3) center;
+  color: var(--f4-ink);
+  font: inherit; font-weight: 600; font-size: var(--f4-t-support);
+  cursor: pointer;
+  box-shadow: var(--f4-card-shadow);
+}
+.f4-filter-select:hover { border-color: var(--f4-muted); background-color: var(--f4-sunken); }
+.f4-filter-select:focus-visible { outline: 2px solid var(--f4-accent); outline-offset: 2px; }
+
+/* The A–Z letter that heads each cluster of clients — quiet, accent-coloured. */
+/* Clients list: one card per A–Z group, with a sticky letter above each. Putting
+   the letter OUTSIDE the card avoids the card's overflow:hidden breaking sticky. */
+.f4-clients-groups { display: flex; flex-direction: column; gap: var(--f4-s3); }
+.f4-az-group { display: flex; flex-direction: column; }
+.f4-az-head {
+  padding: var(--f4-s2) var(--f4-s1);
+  font-family: var(--f4-font-head);
+  font-size: var(--f4-t-label);
+  font-weight: 700;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--f4-accent);
+}
+
+/* One client row: the person grows, the flag + chevron sit at the end. Kept on
+   one line even on a phone, so the row never breaks into an awkward stack. */
+.f4-client-row { flex-wrap: nowrap; }
+.f4-client-row .f4-row-end { gap: var(--f4-s3); }
+.f4-row-chevron { color: var(--f4-line-hard); flex: 0 0 auto; }
+a.f4-client-row:hover .f4-row-chevron { color: var(--f4-accent); }
+
+/* Keyboard focus on a row: an INSET ring (offset -2px) plus a faint tint, so the
+   card's overflow:hidden can never clip it — the default outset ring was
+   invisible on the first row of each group. Applies to every clickable row. */
+a.f4-row:focus-visible, button.f4-row:focus-visible {
+  outline: 2px solid var(--f4-accent); outline-offset: -2px;
+  background: var(--f4-upc-f);
+}
+
+/* A small labelled chip — always a word, never colour alone. */
+.f4-tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: var(--f4-t-label); font-weight: 600; line-height: 1.5;
+  padding: 2px 10px; border-radius: var(--f4-r-pill); white-space: nowrap;
+}
+.f4-tag::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex: 0 0 auto; }
+/* Allergy chip: a soft, warm muted rose with a small square marker — a calmer,
+   more premium red than the clinical "overdue" red used elsewhere. Scoped to the
+   tag so it doesn't change any status colours. */
+.f4-tag[data-tone="risk"] { color: var(--f4-allergy-s); background: var(--f4-allergy-b); }
+.f4-tag[data-tone="risk"]::before { border-radius: 3px; }
+.f4-tag[data-tone="good"] { color: var(--f4-given-s); background: var(--f4-given-b); }
+.f4-tag[data-tone="info"] { color: var(--f4-info-s); background: var(--f4-info-b); }
+
+@media (max-width: 600px) {
+  /* Search takes the full first row; the two filters share the row below,
+     side by side, instead of stacking awkwardly on a small phone. */
+  .f4-toolbar { flex-wrap: wrap; }
+  .f4-search { flex: 1 1 100%; }
+  .f4-filter-select { flex: 1 1 0; }
+}
+
+/* Skip link — the first tab stop, hidden until focused. */
+.f4-skip {
+  position: absolute; left: var(--f4-s4); top: var(--f4-s3); z-index: 200;
+  transform: translateY(-250%);
+  background: var(--f4-accent); color: #fff;
+  padding: var(--f4-s2) var(--f4-s4); border-radius: var(--f4-r-md);
+  font-weight: 600; text-decoration: none;
+  transition: transform .16s ease;
+}
+.f4-skip:focus { transform: translateY(0); }
+.f4-main:focus { outline: none; }   /* focused only as a scroll/skip target, not a control */
+
+/* ── Client profile (Page 2): persistent header, tab bar, key-value grid ──── */
+/* The header + tabs stay put while a tab's content scrolls — the identity and
+   the allergies are a safety control, not a title, and must not scroll away. */
+/* A quiet back link above the identity header. */
+.f4-profile-back { margin-bottom: var(--f4-s3); }
+.f4-backlink {
+  display: inline-flex; align-items: center; gap: var(--f4-s1);
+  color: var(--f4-muted); font-size: var(--f4-t-support); font-weight: 600;
+  text-decoration: none;
+}
+.f4-backlink:hover { color: var(--f4-accent); text-decoration: none; }
+
+/* ── Client profile: dashboard (reference layout · f4 palette) ─────────────
+   The metrics (small refined type, tight padding, edge-to-edge dividers,
+   soft lift shadow) come from the reference; every colour comes from
+   f4-theme.css, so this stays cool-grey/indigo, not the warm reference. */
+.f4-profile-head { display: flex; flex-direction: column; gap: 13px; }
+
+/* Panels share one soft lifted shadow — the depth that reads considered. */
+.f4-profile-id, .f4-infostrip, .f4-panel {
+  background: var(--f4-surface); border: 1px solid var(--f4-line-hard);
+  border-radius: 15px; box-shadow: var(--f4-lift);
+}
+
+/* Identity card */
+.f4-profile-id { display: flex; align-items: center; gap: 18px; padding: 20px; }
+.f4-profile-av { flex: none; width: 68px; height: 68px; border-radius: 17px;
+  background: var(--f4-accent-soft); color: var(--f4-accent-in);
+  display: grid; place-items: center; font-family: var(--f4-font-head); font-weight: 800; font-size: 19px; }
+.f4-profile-idmain { min-width: 0; flex: 1; }
+.f4-profile-nmrow { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.f4-profile-nm { font-family: var(--f4-font-head); font-weight: 700; font-size: 27px; line-height: 1.1; color: var(--f4-ink); letter-spacing: -.02em; }
+.f4-profile-nmrow .f4-tag { font-size: 10px; padding: 3px 9px; }
+.f4-idmeta { display: flex; flex-wrap: wrap; align-items: center; row-gap: 5px; margin-top: 8px; color: var(--f4-muted); font-size: 11px; font-variant-numeric: tabular-nums; }
+.f4-idmeta span { padding: 0 13px; border-left: 1px solid var(--f4-line-hard); line-height: 1.1; }
+.f4-idmeta span:first-child { padding-left: 0; border-left: none; }
+/* The stat block is a mobile-only alternative to the meta line (see ≤760). */
+.f4-idstats { display: none; }
+.f4-profile-actions { margin-left: auto; display: flex; gap: 8px; align-self: center; }
+
+/* Info / safety strip */
+.f4-infostrip { display: grid; grid-template-columns: 1.05fr 1fr 1fr .85fr; overflow: hidden; }
+.f4-infocell { padding: 13px 16px; border-left: 1px solid var(--f4-line); display: flex; flex-direction: column; }
+.f4-infocell:first-child { border-left: none; }
+.f4-infocell[data-allergy="true"] { background: var(--f4-allergy-b); border-left: none;
+  display: grid; grid-template-columns: 27px 1fr; gap: 10px; align-items: start; }
+.f4-alerticon { width: 27px; height: 27px; border-radius: 8px; background: var(--f4-allergy-i);
+  color: var(--f4-allergy-s); display: grid; place-items: center; font-weight: 800; font-size: 13px; }
+.f4-infobody { display: flex; flex-direction: column; min-width: 0; }
+.f4-infolab { font-size: 9px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--f4-muted); }
+.f4-infocell[data-allergy="true"] .f4-infolab { color: var(--f4-allergy-s); }
+.f4-infobig { font-size: 12px; font-weight: 700; color: var(--f4-ink); margin-top: 4px; }
+.f4-infocell[data-allergy="true"] .f4-infobig { color: var(--f4-allergy-s); }
+.f4-infosm { font-size: 9.5px; color: var(--f4-muted); margin-top: 3px; }
+.f4-muted-v { color: var(--f4-muted); font-weight: 600; }
+
+/* Dashboard grid */
+.f4-dash { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(290px, .72fr); gap: 14px; align-items: start; }
+.f4-dash-main, .f4-dash-side { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.f4-panel { overflow: hidden; }
+.f4-panel > header { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 16px 18px 12px; }
+.f4-eyebrow { margin: 0 0 5px; font-size: 9px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; color: var(--f4-accent-in); }
+.f4-panel h2 { margin: 0; color: var(--f4-ink); font-family: var(--f4-font-head); font-size: 16px; font-weight: 700; letter-spacing: -.01em; }
+.f4-textbtn { border: 0; background: none; cursor: pointer; padding: 0; font: inherit; font-size: 10px; font-weight: 750; color: var(--f4-accent-in); white-space: nowrap; }
+.f4-textbtn:hover { text-decoration: underline; }
+.f4-panel-note { margin: 0; padding: 4px 18px 18px; color: var(--f4-muted); font-size: 11px; line-height: 1.5; }
+
+/* Active medications */
+.f4-medrow { min-height: 64px; display: grid;
+  grid-template-columns: 38px minmax(140px, 1.3fr) minmax(120px, .9fr) minmax(105px, .8fr) 78px;
+  align-items: center; gap: 10px; padding: 9px 18px; border-top: 1px solid var(--f4-line); }
+.f4-rx { width: 32px; height: 32px; border-radius: 9px; background: var(--f4-accent-soft); color: var(--f4-accent-in); display: grid; place-items: center; font-size: 9px; font-weight: 800; }
+.f4-medname { display: flex; flex-direction: column; min-width: 0; }
+.f4-medname strong { font-size: 12px; color: var(--f4-ink); font-weight: 700; }
+.f4-medname small { font-size: 9.5px; color: var(--f4-muted); margin-top: 2px; }
+.f4-medcol { display: flex; flex-direction: column; min-width: 0; }
+.f4-medcol small { font-size: 9px; color: var(--f4-muted); font-weight: 700; letter-spacing: .03em; text-transform: uppercase; }
+.f4-medcol strong { font-size: 11px; color: var(--f4-ink); font-weight: 700; margin-top: 3px; }
+.f4-stock { justify-self: stretch; text-align: center; font-size: 9.5px; font-weight: 750; padding: 5px 7px; border-radius: 12px; background: var(--f4-given-b); color: var(--f4-given-s); }
+.f4-stock[data-low="true"] { background: var(--f4-allergy-b); color: var(--f4-allergy-s); }
+
+/* Care instructions */
+.f4-instructions article { display: grid; grid-template-columns: 30px 1fr; gap: 11px; padding: 13px 18px; border-top: 1px solid var(--f4-line); }
+.f4-instructions article > span { width: 28px; height: 28px; border-radius: 8px; background: var(--f4-sunken); color: var(--f4-accent-in); display: grid; place-items: center; font-size: 9px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.f4-instructions article p { margin: 0; color: var(--f4-muted); font-size: 11px; line-height: 1.55; }
+.f4-instructions article strong { display: block; color: var(--f4-ink); font-size: 11.5px; margin-bottom: 2px; }
+
+/* Next medication */
+.f4-nextmed { padding: 17px; }
+.f4-nextrow { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.f4-nextrow strong { font-family: var(--f4-font-head); font-size: 30px; font-weight: 700; color: var(--f4-ink); letter-spacing: -.02em; line-height: 1; }
+.f4-nextrow span { font-size: 10px; font-weight: 750; color: var(--f4-late-s); }
+.f4-nextmeds { margin: 12px 0 0; padding-top: 11px; border-top: 1px solid var(--f4-line); font-size: 11px; color: var(--f4-body); line-height: 1.6; }
+/* display:flex (not block) so the button's own align/justify still centre the
+   label vertically inside its 44px height, not push it to the top. */
+.f4-block-btn { display: flex; width: 100%; margin-top: 14px; }
+
+/* Key details — a compact two-up spec grid at the top of the overview. */
+.f4-kd { margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.f4-kd > div { display: flex; flex-direction: column; gap: 2px; padding: 11px 18px; border-top: 1px solid var(--f4-line); }
+.f4-kd dt { font-size: 9px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: var(--f4-muted); }
+.f4-kd dd { margin: 0; font-size: 12px; font-weight: 700; color: var(--f4-ink); }
+@media (max-width: 560px) { .f4-kd { grid-template-columns: 1fr; } }
+
+/* Contacts */
+.f4-contacts dl { margin: 0; }
+.f4-contact { display: grid; grid-template-columns: 78px 1fr; padding: 12px 18px; border-top: 1px solid var(--f4-line); }
+.f4-contact dt { font-size: 9px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: var(--f4-muted); }
+.f4-contact dd { margin: 0; display: flex; flex-direction: column; color: var(--f4-ink); font-size: 11px; font-weight: 700; }
+.f4-contact dd small { color: var(--f4-muted); font-size: 9px; font-weight: 400; margin-top: 3px; }
+
+/* Recent activity */
+.f4-recent article { display: flex; gap: 10px; padding: 11px 18px; border-top: 1px solid var(--f4-line); }
+.f4-recent article > span { color: var(--f4-given-s); font-weight: 800; }
+.f4-recent article > span.f4-warning { color: var(--f4-late-s); }
+.f4-recent article p { margin: 0; display: flex; flex-direction: column; min-width: 0; }
+.f4-recent article strong { font-size: 10.5px; color: var(--f4-ink); font-weight: 700; }
+.f4-recent article small { font-size: 9px; color: var(--f4-muted); margin-top: 3px; }
+.f4-viewmar { display: block; width: 100%; text-align: left; padding: 12px 18px; border-top: 1px solid var(--f4-line); }
+
+@media (max-width: 1050px) {
+  .f4-dash { grid-template-columns: 1fr; }
+  .f4-dash-side { display: grid; grid-template-columns: repeat(3, 1fr); align-items: start; }
+}
+@media (max-width: 760px) {
+  /* On a phone the identity card centres: avatar over name over status, then
+     a single labelled stat row underneath. */
+  .f4-profile-id { flex-direction: column; align-items: center; text-align: center; gap: 12px; padding: 20px 16px; }
+  .f4-profile-av { width: 72px; height: 72px; border-radius: 18px; font-size: 22px; }
+  .f4-profile-idmain { flex: none; width: 100%; }
+  .f4-profile-nmrow { flex-direction: column; align-items: center; gap: 8px; }
+  .f4-profile-nm { font-size: 24px; }
+
+  /* The meta line is replaced by a labelled stat block, three across — up to
+     six facts read as two tidy rows. Label on top, value below, hairline
+     dividers between cells. */
+  .f4-idmeta { display: none; }
+  .f4-idstats {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    width: 100%; margin-top: 4px;
+    background: var(--f4-sunken); border: 1px solid var(--f4-line);
+    border-radius: 10px; overflow: hidden;
+  }
+  .f4-idstats span {
+    min-width: 0;
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    padding: 10px 6px; text-align: center;
+    border-left: 1px solid var(--f4-line); border-top: 1px solid var(--f4-line);
+  }
+  .f4-idstats span:nth-child(-n+3) { border-top: none; }   /* top row: no top rule */
+  .f4-idstats span:nth-child(3n+1) { border-left: none; }  /* first column: no left rule */
+  .f4-idstats i { font-style: normal; font-size: 8.5px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; color: var(--f4-muted); }
+  .f4-idstats b { font-size: 12.5px; font-weight: 700; color: var(--f4-ink); font-variant-numeric: tabular-nums; }
+
+  /* Info strip stacks so every cell (allergy included) is visible without a
+     sideways scroll that could hide the allergy off-screen. */
+  .f4-infostrip { display: grid; grid-template-columns: 1fr; }
+  .f4-infocell { border-left: none; border-top: 1px solid var(--f4-line); }
+  .f4-infocell:first-child { border-top: none; }
+
+  /* Side column stacks under the main column. flex-direction and align-items
+     are set explicitly to override the ≤1050 tablet rule (a 3-across grid with
+     align-items:start) — without stretch the cards would not fill the width. */
+  .f4-dash-side { display: flex; flex-direction: column; align-items: stretch; }
+
+  /* Medicine rows stack — the Rx tile stays on the left and the name, dose &
+     route, schedule and stock read down the right. Nothing is hidden. */
+  .f4-medrow { grid-template-columns: 38px minmax(0, 1fr); gap: 5px 10px; padding: 12px 16px; min-height: 0; align-items: center; }
+  .f4-rx { grid-row: 1 / 5; align-self: start; }
+  .f4-medcol { flex-direction: row; align-items: baseline; gap: 8px; }
+  .f4-medcol small { min-width: 96px; }
+  .f4-stock { justify-self: start; }
+}
+
+.f4-tabs { display: flex; gap: 2px; margin-top: var(--f4-s4); border-bottom: 1px solid var(--f4-line); overflow-x: auto; }
+.f4-tab {
+  appearance: none; background: none; border: 0; padding: 11px 13px;
+  font-family: inherit; font-size: var(--f4-t-support); color: var(--f4-muted);
+  white-space: nowrap; border-bottom: 2px solid transparent; cursor: pointer;
+}
+.f4-tab:hover { color: var(--f4-ink); }
+.f4-tab[aria-selected="true"] { color: var(--f4-accent-in); border-bottom-color: var(--f4-accent); font-weight: 650; }
+
+.f4-tabpanel { padding-top: var(--f4-s5); }
+
+/* Overview: section cards side by side (fills the page), each a clean spec list
+   — label quiet on the left, value strong on the right, hairline between. */
+.f4-overview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--f4-s4); align-items: start; }
+.f4-spec { margin-top: var(--f4-s2); }
+.f4-spec-row { display: flex; align-items: baseline; justify-content: space-between; gap: var(--f4-s4); padding: var(--f4-s3) 0; border-bottom: 1px solid var(--f4-line); }
+.f4-spec-row:last-child { border-bottom: none; padding-bottom: 0; }
+.f4-spec-k { color: var(--f4-muted); font-size: var(--f4-t-support); }
+.f4-spec-v { color: var(--f4-ink); font-size: var(--f4-t-support); font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; }
+
+.f4-kv-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--f4-s4) var(--f4-s5); margin-top: var(--f4-s3); }
+.f4-kv-k { display: block; font-size: var(--f4-t-label); text-transform: uppercase; letter-spacing: .04em; color: var(--f4-muted); }
+.f4-kv-v { display: block; color: var(--f4-ink); font-size: var(--f4-t-support); margin-top: 3px; }
+
+@media (max-width: 600px) {
+  .f4-kv-grid { grid-template-columns: 1fr; }
+}
+
+/* Two more chip tones for prescription status. */
+.f4-tag[data-tone="caution"] { color: var(--f4-late-s); background: var(--f4-late-b); }
+.f4-tag[data-tone="muted"]   { color: var(--f4-muted);   background: var(--f4-sunken); }
+
+/* Medications tab card: name grows, status/CD chips sit at the end. */
+.f4-med-top { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--f4-s3); }
+.f4-med-top .f4-med-name { flex: 1 1 auto; min-width: 0; }
+.f4-med-tags { display: flex; gap: 6px; flex-wrap: wrap; flex: 0 0 auto; }
+.f4-med-stock { margin-top: var(--f4-s3); font-size: var(--f4-t-support); color: var(--f4-muted); }
+.f4-med-stock[data-low="true"] { color: var(--f4-late-s); font-weight: 600; }
+
+/* Allergies tab. */
+.f4-tag-list { display: flex; flex-wrap: wrap; gap: var(--f4-s2); margin-top: var(--f4-s3); }
+.f4-note { color: var(--f4-muted); font-size: var(--f4-t-support); margin-top: var(--f4-s4); }
+
+/* Manager-only prescription controls on a medicine card. */
+.f4-med-manage { margin-top: var(--f4-s4); padding-top: var(--f4-s3); border-top: 1px dashed var(--f4-line); }
+.f4-manage-form .f4-field { margin-bottom: var(--f4-s3); }
+
+/* ── MAR sheet (Page 4): the dose grid ──────────────────────────────────── */
+.f4-mar-weeknav { display: flex; align-items: center; gap: var(--f4-s3); margin-bottom: var(--f4-s4); }
+.f4-mar-weeknav .lbl { font-weight: 650; color: var(--f4-ink); min-width: 150px; text-align: center; font-variant-numeric: tabular-nums; }
+
+.f4-mar-summary { display: flex; flex-wrap: wrap; gap: var(--f4-s4); margin-bottom: var(--f4-s4); }
+.f4-mar-summary .f4-stat { min-width: 92px; }
+
+/* The wide grid scrolls in its own frame — the page body never scrolls sideways. */
+.f4-mar-wrap { overflow-x: auto; border: 1px solid var(--f4-line); border-radius: var(--f4-r-lg); background: var(--f4-surface); }
+.f4-mar { border-collapse: collapse; width: 100%; min-width: 640px; }
+.f4-mar th, .f4-mar td { border: 1px solid var(--f4-line); padding: 8px 6px; text-align: center; font-size: var(--f4-t-support); }
+.f4-mar thead th { background: var(--f4-sunken); color: var(--f4-muted); font-weight: 650; font-size: var(--f4-t-label); line-height: 1.25; }
+.f4-mar th[data-today="true"], .f4-mar td[data-today="true"] { background: var(--f4-due-f); }
+.f4-mar-med { text-align: left; white-space: nowrap; font-weight: 600; color: var(--f4-ink); vertical-align: top; }
+.f4-mar-med small { display: block; font-weight: 400; color: var(--f4-muted); font-size: var(--f4-t-label); }
+.f4-mar-time { color: var(--f4-muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.f4-mar-dot { color: var(--f4-line-hard); }
+
+.f4-mar-cell {
+  position: relative; display: inline-flex; align-items: center; justify-content: center;
+  min-width: 24px; height: 24px; padding: 0 5px; border-radius: 6px;
+  font-weight: 800; font-size: var(--f4-t-label); line-height: 1;
+}
+.f4-mar-cell[data-status="given"]    { color: var(--f4-given-s); background: var(--f4-given-b); }
+.f4-mar-cell[data-status="refused"]  { color: var(--f4-ref-s);   background: var(--f4-ref-b); }
+.f4-mar-cell[data-status="omitted"]  { color: var(--f4-omit-s);  background: var(--f4-omit-b); }
+.f4-mar-cell[data-status="upcoming"] { color: var(--f4-upc-s);   background: var(--f4-upc-b); }
+.f4-mar-late { position: absolute; top: -2px; right: -2px; width: 6px; height: 6px; border-radius: 50%; background: var(--f4-late-s); }
+
+.f4-mar-legend { display: flex; flex-wrap: wrap; gap: var(--f4-s4); margin-top: var(--f4-s4); font-size: var(--f4-t-label); color: var(--f4-muted); }
+.f4-mar-legend > span { display: inline-flex; align-items: center; gap: 6px; }
+
+/* A cell you can open for its full detail. */
+.f4-mar-cellbtn { border: 0; cursor: pointer; font: inherit; font-weight: 800; }
+.f4-mar-cellbtn:hover { box-shadow: inset 0 0 0 1.5px var(--f4-accent-edge); }
+
+/* The entry-detail panel. */
+.f4-mar-detail { margin-top: var(--f4-s4); }
+.f4-mar-detail-head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--f4-s3); margin-bottom: var(--f4-s3); }
+.f4-subhead { font-family: var(--f4-font-head); font-weight: 700; font-size: var(--f4-t-support); color: var(--f4-ink); margin-bottom: var(--f4-s2); }
+.f4-correct-form { margin-top: var(--f4-s4); padding-top: var(--f4-s4); border-top: 1px dashed var(--f4-line); }
+.f4-correct-form .f4-field { margin-bottom: var(--f4-s3); }
+.f4-mar-headactions { margin-left: auto; display: inline-flex; gap: var(--f4-s2); flex-wrap: wrap; }
+
+/* ── Print / export the MAR: strip the app chrome, show the record ──────────
+   All selectors stay under .f4-root, so this print rule cannot affect any
+   other front end. */
+@media print {
+  .f4-context, .f4-nav, .f4-bottomnav, .f4-page-header-action,
+  .f4-mar-headactions, .f4-btn, .f4-correct-form, .f4-mar-detail { display: none !important; }
+  .f4-app { padding: 0 !important; }
+  .f4-page-header { padding: 0 0 var(--f4-s2) !important; border: none !important; }
+  .f4-root { background: #fff !important; }
+  /* Let the grid lie flat on the page instead of scrolling in a frame. */
+  .f4-mar-wrap { overflow: visible !important; border: none !important; }
+  .f4-mar { min-width: 0 !important; }
+  .f4-mar th, .f4-mar td { border-color: #999 !important; }
+  .f4-profile-head { position: static !important; }
+}
+
+/* ── Motion: a smooth arrival, and a slide when tabs change ─────────────────
+   Names are f4-prefixed and only referenced by .f4-* classes, so nothing here
+   reaches another front end. Both honour prefers-reduced-motion. */
+@keyframes f4-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes f4-slide-in { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: none; } }
+
+/* The whole page fades in on arrival — e.g. tapping a client into their profile.
+   Opacity-only, so it never disturbs the sticky header. */
+.f4-page-enter { animation: f4-fade-in .28s ease both; }
+
+/* A tab panel slides in from the right each time you move across the tabs. */
+.f4-tab-anim { animation: f4-slide-in .24s cubic-bezier(.22,.61,.36,1) both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .f4-page-enter, .f4-tab-anim { animation: none !important; }
 }

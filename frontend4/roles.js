@@ -42,6 +42,7 @@ export const P = {
     RECEIVE_DELIVERY:         'receive_delivery',
     APPROVE_STOCK_ADJUSTMENT: 'approve_stock_adjustment',
     VIEW_CD_REGISTER:         'view_cd_register',
+    MANAGE_PRESCRIPTION:      'manage_prescription',
     VIEW_REPORTS:             'view_reports',
     EXPORT_REPORT:            'export_report',
     MANAGE_STAFF:             'manage_staff',

@@ -23,10 +23,10 @@
     --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    {{-- Paint the app background before React mounts so there is no white flash. --}}
-    <style>html,body{margin:0;background:#F7F8FA;}</style>
+    {{-- Paint the warm cream background before React mounts so there is no flash. --}}
+    <style>html,body{margin:0;background:#F6F2E9;}</style>
 
     @viteReactRefresh
     @vite(['resources/js/f4.jsx'])
