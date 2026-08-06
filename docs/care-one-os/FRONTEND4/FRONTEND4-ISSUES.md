@@ -19,7 +19,9 @@ Related: [FRONTEND4-MILESTONES.md](FRONTEND4-MILESTONES.md) (the build plan) ·
 | # | Issue | Sev | Status |
 |---|---|:--:|---|
 | [I16](#i16) | A stock transaction can record arithmetic that does not reconcile | 🔴 | ✅ **Closed** 2026-08-04 |
+| [I18](#i18) | Prescription edits are not attributably tracked (no change-log on `mar_sheets`) | 🟠 | ✅ **Closed** 2026-08-05 |
 | [I17](#i17) | A stock shortfall is recorded but nobody is notified | 🟠 | **Open** |
+| [I19](#i19) | A MAR correction does not reconcile stock | 🟠 | ✅ **Closed** 2026-08-06 |
 | [I1](#i1) | Ten inline `code === 'A'` comparisons decide "was it given" | 🔴 | ✅ **Closed** 2026-08-04 |
 | [I2](#i2) | Medication pages in frontends 1–3 have no permission rows | 🔴 | **Open** — closed for frontend4 only |
 | [I3](#i3) | Allergies are free text, so they cannot be checked | 🔴 | Open |
@@ -107,6 +109,87 @@ controlled drug the requirement is stronger still.
 **What has to happen:** surface shortfalls where they will be seen — the Today page's
 attention list is the obvious first home — and route them to the responsible role. Properly
 resolved as part of the Stock milestone (M8) with the discrepancy workflow.
+
+---
+
+## I18 — Prescription edits are not attributably tracked 🟠 ✅ CLOSED {#i18}
+
+**Closed 2026-08-05 (Page 2 Slice E).** Added the append-only **`mar_sheet_changes`** log
+(prescription, field, before, after, reason, changed_by, created_at) and built pause / resume /
+stop through it: the change is written to the log **first**, then the status is updated, both
+inside one transaction with the row locked. Verified live — a pause wrote `active → paused`
+with who/when/why, a stop with no reason was refused (422), a resume restored `active`, and the
+**Audit history tab now shows every change**. Authority settled: **manager-and-above** holds the
+new `manage_prescription` permission; **administrator is excluded** (managing access, not the
+clinical record — owner to reverse if wanted). Future edit types (add a medication, dose change)
+must use the same log.
+
+*Original finding, kept for the record:*
+
+**Found:** 2026-08-05, starting Page 2 Slice E (edits by addendum).
+
+**What:** `mar_sheets` (the prescription record) has only `created_by` and `last_audited`.
+There is **no `modified_by`, no change-log/history table, and no supersede chain** (unlike
+`mar_administrations`, which has `supersedes_id` / `is_current` / `amendment_reason`). Stopping
+a prescription records `discontinued_reason` / `discontinued_date` but not *who*; pausing has
+no reason/who/when field at all.
+
+**Why it matters:** the Definition of Done and both specifications require every clinical edit
+to be **attributable and by addendum — nothing overwritten, who/when/why recorded**. As the
+schema stands, a pause / stop / change to a prescription would mutate the row (e.g.
+`mar_status` active → paused) **without an attributable, reversible record of the change.** That
+is below the standard, and building the edit UI on top of it would ship un-audited clinical
+writes.
+
+**Blocks:** Page 2 **Slice E** (add a medication, record a change, pause/stop). The read side
+(Slices A–D) is unaffected.
+
+**What has to happen (one of):**
+1. Add a **prescription change-log** — a small table recording prescription_id, field, before,
+   after, reason, changed_by, changed_at — then build the edits against it (append-only,
+   attributable). Meets the standard. Ties to the general audit log (**D4 / I7**).
+2. Owner accepts **lighter tracking** for now (use `discontinued_reason`/`date`, add a
+   `modified_by`), knowingly below the full standard — recorded here as owed.
+
+**Also needs a decision (authority):** which role may change a prescription. The permission
+model has no `change_prescription` right; the spec's prescription-changer was the **pharmacist**,
+which is **dropped for now**, and the matrix has managers *request* rather than *make* changes.
+So the authority is currently unassigned.
+
+---
+
+## I19 — A MAR correction does not reconcile stock 🟠 ✅ CLOSED {#i19}
+
+**Closed 2026-08-06.** A correction that changes whether the dose went in now reconciles stock
+through the same audited ledger the round uses: **given → not-given** returns the dose quantity
+(a `correction` recount up), **not-given → given** deducts it (an `administered` movement, which
+inherits the I16 shortfall handling). Only for tracked stock with a structured `dose_quantity`;
+controlled drugs remain blocked. The whole correction now runs in one transaction with the
+prescription row **locked** — which also fixed the transient 500 on rapid successive corrections.
+Verified live: A→R took stock 54→55, R→A took it 55→54, both 302, ledger reconciles, record ends
+truthful. The discrepancy *alert* (notifying a manager) still rides with the Stock milestone
+(I17/M8) — this issue was the reconciliation, and that is done.
+
+**Found:** 2026-08-06, building Page 4 Slice C (MAR corrections).
+
+**What:** a correction is written through `MARSheetService::administer()`, which correctly makes
+an **append-only amendment** to the clinical record — but it **does not touch stock** (it never
+did; stock deduction lives in the round path, separately). So if a correction changes whether the
+dose went in — e.g. **Given → Refused**, or **Refused → Given** — the stock figure is **not**
+adjusted to match.
+
+**Why it matters:** the corrected clinical record is right and fully audited, but stock can drift
+from it. A Given-that-became-Refused leaves stock over-deducted; a Refused-that-became-Given
+leaves it under-deducted. This is a stock discrepancy the correction itself creates — the same
+class of thing I16/I17 and the discrepancy workflow exist to catch.
+
+**Current guardrails (Slice C):** controlled-drug corrections are **blocked** on this path (they
+have register/witness consequences and belong to the CD workflow). So the un-reconciled case is
+limited to ordinary stock.
+
+**What has to happen:** reconcile stock as part of a correction (add back / deduct the difference
+with a labelled stock transaction), or surface the resulting discrepancy to the stock workflow.
+Belongs with the Stock milestone (**M8**) and the discrepancy work (**I16/I17**).
 
 ---
 

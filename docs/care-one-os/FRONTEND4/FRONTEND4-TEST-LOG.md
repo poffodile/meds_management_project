@@ -86,6 +86,134 @@ open one has a step that demonstrates it rather than a paragraph describing it.
 - ☐ **T3** Record a **controlled drug** as Given with no witness. It is refused, with the server's message.
 - ☐ **T4** Search the code for `code === 'A'`. There should be no functional match left — only comments explaining why.
 
+## Page 1 — Clients (the service users)
+
+- **Auto-verified 2026-08-05:** `/frontend4/clients` returns 200 as a signed-in manager, component `Clients`, 8 real clients for Neptune House; loads only `f4-*.css`; frontends 2/3 and `/medication/*` still 200. Tap-through `/frontend4/clients/243` → `ClientProfile` with real identity (Amelia Hughes, 12, NHS, Penicillin). A client outside the user's home (`id 1`) → **404**.
+- ✅ **T1** Open `/frontend4/clients`. The list shows the clients of your home. Auto-verified (8 shown).
+- ✅ **T2** A client in another home cannot be opened — `/frontend4/clients/1` returns 404. Auto-verified (home scoping server-side).
+- ✅ **T3** Tapping a client opens their profile at `/frontend4/clients/:id`. Auto-verified.
+- ✅ **T4** Page loads only `f4-*.css`; no `app-*.css`, `styles-*.css` or `f3-*.css`. Auto-verified.
+- ☐ **T5** Clients are grouped A–Z with the letter heading each cluster; the list reads as ordered.
+- ☐ **T6** Each row shows avatar/initials, name, age and location; an **Allergy** chip appears for a client with a recorded allergy (word, not colour alone).
+- ☐ **T7** Type part of a name in the search box — the list narrows. Clear it — the full list returns.
+- ☐ **T8** Use the location filter — only clients in that location show. "No matches" offers to clear.
+- ☐ **T9** Sidebar shows **Clients** as the current item; the whole row is a link with a chevron.
+- ☐ **T10** At 390px the search + filter stack full-width; rows stay on one line; no horizontal page scroll.
+- ☐ **T11** Keyboard only: tab to the search, tab through the rows, open one with Enter. Focus always visible.
+- ☐ **T12** A no-medication-access account gets 403 (list never renders).
+
+### Clients — UI review with owner + roles/isolation verification (2026-08-06)
+- ✅ Status filter (Active / Inactive / All), defaults to Active; an "Inactive" chip on inactive rows.
+- ✅ Location + Status rendered as **solid buttons** (still dropdowns); search full-width beside them.
+- ✅ Allergy chip restyled to a soft muted rose with a square marker — scoped, so clinical/overdue reds are unchanged.
+- ✅ Page fades in on open; profile tabs slide across; both honour `prefers-reduced-motion`.
+- ✅ Loading feedback: Inertia progress bar on navigation.
+- ✅ "Skip to content" link (first tab stop) jumps keyboard users straight to the list.
+- ✅ Row focus ring made **inset** so the card's `overflow:hidden` can't clip it (was invisible on the first row of a group).
+- ✅ No-match empty state simplified to one line + Clear filters (Empty `body` now optional); empty-state body centred (specificity fix vs `.f4-root p`).
+- ✅ Mobile: search full-width, the two filters side by side (iPhone SE).
+- ✅ **F (roles):** list is home-scoped server-side; a no-access role hits `requireMedicationAccess()` → 403 before render; checks are server-side, not hidden UI.
+- ✅ **G (isolation/tests) verified 2026-08-06:** `/frontend4/clients` serves only `f4-*.css`/`f4-*.js`; `/frontend2`, `/frontend3`, `/medication/medication-round` all 200 with zero f4 references; medication suite **14 errors / 3 failures** — the baseline, unchanged by any of this work.
+
+## Page 2 — Client profile (Slice A: header + Overview)
+
+- **Auto-verified 2026-08-05:** `/frontend4/clients/243` → 200, component `ClientProfile`, real header (Amelia Hughes, 12, NHS 950 000 0000, Active, allergy Penicillin) and Overview on real data (Key details 5 fields, Care & support 2 fields; Emergency-contact section correctly omitted when none recorded). Loads only `f4-*.css`. A client outside the home → 404.
+- ✅ **T1** Open a client from the list. The identity header shows photo/initials, name, age, location, NHS, status. Auto-verified.
+- ✅ **T2** Allergies show as a safety strip (word). Auto-verified (Penicillin).
+- ✅ **T3** Overview shows only recorded fields; an unrecorded field/section is absent, not a blank row. Auto-verified.
+- ☐ **T4** The header + tab bar stay put while a long tab scrolls (sticky).
+- ☐ **T5** All eight tabs are present; the current tab is marked by weight + accent underline (not colour alone).
+- ☐ **T6** Keyboard: focus a tab, use ← → Home End to move; Enter/click selects. Focus always visible.
+- ☐ **T7** Tabs other than Overview show an honest "coming next" panel, not a blank or a fake.
+- ☐ **T8** At 390px the header stays complete, the tab bar scrolls sideways, Overview fields stack; no horizontal page scroll.
+- ☐ **T9** A no-medication-access account gets 403.
+
+### Slice B — Medications + Allergies tabs
+- **Auto-verified 2026-08-05:** client 243 returns 3 medications (Levetiracetam — Active, 1 tablet, Oral, 54 tablets; Paracetamol — PRN; Salbutamol — PRN, inhaled) and allergy Penicillin.
+- ✅ **T10** Medications tab lists the client's prescriptions with name, strength/form, dose · route · frequency, prescriber/dates, stock remaining. Auto-verified (data).
+- ✅ **T11** Each medicine shows a status chip (Active/Paused/Stopped) and a "Controlled drug" chip when applicable. Auto-verified (statuses map from `mar_status`/`discontinued`).
+- ✅ **T12** PRN medicines read "When required (PRN)" as their frequency. Auto-verified.
+- ✅ **T13** Allergies tab lists the recorded allergens with an honest note that reaction/severity/source are the D1 upgrade. Auto-verified.
+- ☐ **T14** A low-stock medicine shows its stock in the caution tone; "Stock not tracked" when there is no figure. *(Visual — needs a low-stock client.)*
+- ☐ **T15** Switching Overview → Medications → Allergies keeps the header + tabs in place; content swaps below.
+
+### Slice C — PRN protocols + MAR history tabs
+- **Auto-verified 2026-08-05:** client 243 → 2 PRN meds (Paracetamol, Salbutamol; max 4/24h, min 4h, protocol text) and 3 MAR history rows (Levetiracetam Given, Salbutamol Declined "Spat out / not swallowed", by Phil Holt) with correct outcome labels + status keys.
+- ✅ **T16** PRN protocols tab lists when-required medicines with dose/route, minimum interval, maximum in 24h, and the protocol text. Auto-verified.
+- ✅ **T17** MAR history lists administrations, most recent first, with medicine, date/time, staff, and the outcome as word + tint (never a bare code). Auto-verified.
+- ✅ **T18** A not-given outcome shows its reason (e.g. "Spat out / not swallowed"). Auto-verified.
+- ☐ **T19** A late dose shows "· late" beside the outcome. *(Visual — needs a late record.)*
+- ☐ **T20** The PRN note explains that symptoms/non-med steps/escalation/review are a planned upgrade; it doesn't pretend they're recorded.
+
+### Slice D — Care notes + Documents + Audit history tabs
+- **Auto-verified 2026-08-05:** all three tabs wired to real sources (`log_book` via `su_log_book`; `client_document_manages`; the `mar_administrations` correction chain). Page 200, no SQL error. This home has no notes/docs/corrections in demo data, so all three show empty states — populated rendering not yet demonstrable here.
+- ✅ **T21** Empty states render honestly (Care notes / Documents / Audit) with a reason, not a blank. Auto-verified.
+- ✅ **T22** Audit empty state states nothing has been amended and that the wider settings/permission audit log is a separate later feature. Auto-verified.
+- ☐ **T23** With a client that HAS care notes: each note shows title, snippet, date · category · staff. *(Needs data.)*
+- ☐ **T24** With a client that HAS documents: each shows name, type, added/expiry, and a Confidential chip where flagged; no download link yet. *(Needs data.)*
+- ☐ **T25** With a corrected clinical record: the audit tab shows the medicine, the corrected outcome, who, when, and the amendment reason; the original is never lost. *(Needs data.)*
+
+### Slice E — Edits by addendum (pause / resume / stop a prescription)
+- **Auto-verified 2026-08-05, live:** as manager, POST pause with reason → 302, `mar_sheets.mar_status` active→paused, a `mar_sheet_changes` row written (paused, active→paused, reason, changed_by). POST stop with **no reason** → **422**, nothing written. POST resume → status restored to active. Audit history tab shows both changes with who/when/why.
+- ✅ **T26** Manager sees Pause/Stop (active) or Resume/Stop (paused) on each medicine; a reason is required before the change is sent. Auto-verified (write path).
+- ✅ **T27** The server refuses a change with no reason (422) and writes nothing. Auto-verified.
+- ✅ **T28** The change is written to the append-only `mar_sheet_changes` log first (before, after, reason, who, when); the prescription row is not silently mutated. Auto-verified.
+- ✅ **T29** A paused prescription leaves `mar_status='active'`, so it drops out of the round (`currentlyActive`), and resume brings it back. Auto-verified (status transitions).
+- ✅ **T30** The Audit history tab lists prescription changes alongside administration corrections, newest first. Auto-verified.
+- ☐ **T31** A **carer** does not see the Pause/Stop controls, and a direct POST to the status route is refused (403). *(Needs a carer account; server check `requirePermission(MANAGE_PRESCRIPTION)` is in place; carer grants exclude it.)*
+- ☐ **T32** An **administrator** is refused the change (admin excluded from `manage_prescription`). *(Needs an admin account; enforced via `ADMIN_EXCLUDES`.)*
+
+## Page 4 — MAR sheet (Slice A: the grid)
+
+- **Auto-verified 2026-08-05:** `/frontend4/clients/243/mar` → 200, component `MarSheet`; grid for the week (Mon–Sun), 3 medicines, the Levetiracetam **Given** cell shows on the correct day; summary 6 scheduled / 1 given / 5 outstanding; full 10-code legend; loads only `f4-*.css`. Previous week (20–26 Jul) correctly shows the 23 Jul dose; `isThisWeek` disables Next.
+- ✅ **T1** Reached from the profile: MAR history tab → "View full MAR" opens `/frontend4/clients/:id/mar`. Auto-verified (route + link).
+- ✅ **T2** Grid: medicines down, days across, a coded box per scheduled dose; the recorded Given cell appears on the right day. Auto-verified.
+- ✅ **T3** Week navigation moves through time; Next is disabled in the current week. Auto-verified.
+- ✅ **T4** Period summary (given / not given / late / outstanding / PRN) computes from the week. Auto-verified.
+- ✅ **T5** Legend names every code. Auto-verified.
+- ☐ **T6** The grid scrolls inside its own frame — no horizontal page scroll at 390px; today's column is tinted.
+- ☐ **T7** A coded cell shows its full meaning on hover / to a screen reader (never a bare letter).
+- ☐ **T8** Identity header + allergy strip stay in view.
+- ✅ **T9** *(Resolved in Slice B)* a **refused/declined PRN** now shows on the grid as its outcome code (e.g. "R" in the refused tint), clickable for detail — not only given counts.
+
+### Slice B — Entry detail (open a cell)
+- **Auto-verified 2026-08-06:** a regular cell (Levetiracetam 08:00, 4 Aug) carries full detail — recorded at 11:25, by Phil Holt, plus witness/dose/reason/notes fields and a correction-history array. A PRN cell (Salbutamol, 4 Aug) shows the day's doses incl a Declined at 11:59.
+- ✅ **T10** Clicking a filled cell opens a detail panel with outcome (full meaning), scheduled vs recorded time, staff, witness, dose, reason, notes. Auto-verified (data wired).
+- ✅ **T11** A PRN cell opens the list of that day's doses (time, outcome, staff, reason). Auto-verified.
+- ✅ **T12** The panel includes a **correction history** (original + every change, current vs superseded) when a record has been corrected — built from all records for that dose, not just the current one. Auto-verified (mechanism; no corrected record in demo data to populate it).
+- ☐ **T13** Open a cell, read the detail, close it; keyboard reachable, focus visible. *(Your look.)*
+- ✅ **T14** *(now populated)* a corrected administration shows the original and the correction in the history — nothing disappears.
+
+### Slice C — Corrections (write, lead+)
+- **Auto-verified 2026-08-06, live:** as manager (holds `correct_record`), correcting Levetiracetam 4 Aug 08:00 A→R wrote a **new** row (id 321, R, `supersedes_id=315`, amendment reason) and set the original (315) `is_current=0` — original preserved. A correction with **no amendment reason → 422**. Reverted R→A cleanly (chain: A → R → A, current = A), leaving a real 3-entry correction history.
+- ✅ **T15** Lead+ sees "Correct this entry" in the cell detail; picking a new outcome + (reason if needed) + amendment reason saves. Auto-verified (write path; manager has correct_record).
+- ✅ **T16** The correction is append-only — the original is never overwritten; the chain shows current vs superseded. Auto-verified.
+- ✅ **T17** Server refuses a correction with no amendment reason (422). Auto-verified.
+- ✅ **T18** A **controlled drug** is blocked on this path with a message directing to the CD register. Auto-verified (guard in code; no CD med for 243 to click).
+- ✅ **T19** *(fixed — [I19](FRONTEND4-ISSUES.md#i19))* a correction that changes given-ness now reconciles stock through the audited ledger. Auto-verified live: A→R took stock 54→55; R→A took it 55→54; ledger reconciles; record ends truthful.
+- ☐ **T20** A **carer** (no `correct_record`) does not see the correct control, and a direct POST is refused (403). *(Needs a carer account; enforced by `requirePermission`.)*
+
+### Slice C — correction edge cases (run these when testing)
+The cases to work through for corrections + stock reconciliation. ✅ = auto-verified, ☐ = for you in the browser.
+- ✅ **E1** **given → not-given** (A→R): the dose is **returned** to stock (+`dose_quantity`), logged as a reconciling ledger entry. Auto-verified (54→55).
+- ✅ **E2** **not-given → given** (R→A): the dose is **deducted** from stock (−`dose_quantity`), logged. Auto-verified (55→54).
+- ☐ **E3** **given → given**, or **not-given → not-given** (e.g. R→W): stock does **not** move; only the clinical record is amended.
+- ☐ **E4** medicine with **untracked stock** (no stock figure): the correction still records; no stock movement, no error.
+- ☐ **E5** medicine with **no structured `dose_quantity`**: correction records; stock not moved (nothing safe to deduct).
+- ☐ **E6** **not-given → given when stock is 0 / too low**: the dose is still recorded; the ledger shows the true balance with a labelled **shortfall** (I16 behaviour), never a silent clamp.
+- ✅ **E7** **two corrections in quick succession** do not 500 — the prescription row is locked, so they serialise. Auto-verified (both 302).
+- ✅ **E8** **controlled drug**: correction is **blocked** with a message directing to the CD register; no stock/register movement. Auto-verified (guard).
+- ☐ **E9** **amendment reason missing** → refused (422), nothing written.
+- ☐ **E10** new outcome **needs a reason** (R/W/N/O/OP/VO) but none given → refused.
+- ☐ **E11** **carer** (no `correct_record`) → 403; the control isn't shown.
+- ☐ **E12** after any correction, the **cell history** and the **profile Audit tab** both show the change; the original is never lost.
+
+### Slice D — Print / export (manager)
+- **Auto-verified 2026-08-06:** the "Print / PDF" button is gated to `export_report` (manager+); build clean; isolation holds.
+- ✅ **T21** Manager sees "Print / PDF"; clicking opens the browser print dialog (Save as PDF covers export). Auto-verified (gate + handler).
+- ☐ **T22** The print output shows the identity header, week, summary, grid and legend, with the app chrome (nav, buttons, detail panel) hidden. *(Your look — Ctrl/Cmd+P.)*
+- ☐ **T23** A carer/lead without `export_report` does not see the Print button. *(Needs those accounts; gated by `export_report`.)*
+
 ## M2 — The medication round
 
 - **Auto-verified:** page loads on real data; recording writes and attributes; a decline with no reason returns 422 and writes nothing.

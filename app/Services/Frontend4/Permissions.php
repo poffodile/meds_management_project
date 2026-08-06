@@ -29,6 +29,9 @@ class Permissions
     public const APPROVE_STOCK_ADJUSTMENT = 'approve_stock_adjustment';
     public const VIEW_CD_REGISTER = 'view_cd_register';
 
+    // ── Clinical record management ────────────────────────────────────────
+    public const MANAGE_PRESCRIPTION = 'manage_prescription'; // pause/stop/change a prescription
+
     // ── Oversight ─────────────────────────────────────────────────────────
     public const VIEW_REPORTS = 'view_reports';
     public const EXPORT_REPORT = 'export_report';
@@ -64,6 +67,10 @@ class Permissions
             self::VIEW_REPORTS,
             self::EXPORT_REPORT,
             self::MANAGE_STAFF,
+            // Manager-and-above may change a prescription (owner decision
+            // 2026-08-05). Pause/stop/change is a clinical-record edit, so it is
+            // written through an append-only change-log — see mar_sheet_changes.
+            self::MANAGE_PRESCRIPTION,
         ],
         RoleResolver::ADMIN => [
             self::DEFINE_ROLES,
@@ -86,6 +93,10 @@ class Permissions
         self::RECORD_ADMINISTRATION,
         self::WITNESS_CONTROLLED_DRUG,
         self::CORRECT_RECORD,
+        // Changing a prescription is a clinical-record edit; an administrator
+        // manages access, not the clinical record. So admin does NOT inherit it,
+        // even though it sits at the manager tier they otherwise inherit.
+        self::MANAGE_PRESCRIPTION,
     ];
 
     /** Least-to-most privileged, for inheritance. */

@@ -264,6 +264,219 @@ Seven places in `BuildsMedicationRound` decide "did the medicine go in?" by comp
 
 **Next:** this is the stop-and-look point. The round works; PRN, witnessing, stock deduction and sign-off wait until it has been seen.
 
+### 2026-08-05 — Two browsable pages; NICE/BNF and Cyber Essentials noted
+
+**What we did:**
+- Built two visual pages the owner works from: an **issue tracker** (all 17 issues, filter + expand + tick off) at https://claude.ai/code/artifact/b9d82fd2-3ffd-4489-ada1-e499e0dcfa9c, and a **build-order ladder** (every page ranked easiest→hardest, UI + functionality) at https://claude.ai/code/artifact/7ba501d2-0d4f-4415-b1c4-e608ef511487.
+- **Standing habit set:** every new frontend4 issue now goes in **all three** — `FRONTEND4-ISSUES.md`, `FRONTEND4-TEST-LOG.md`, and the online issue-tracker artifact. Issues get fixed *as* each page is built (the page pulls in its own database gap: D1→admin workspace, D2→MAR/profile, D3→missed doses, D5→handover, D4→reports).
+- Owner reports they now have a **NICE licence key** (scope TBC) and **Cyber Essentials**. Wrote [FRONTEND4-NICE-AND-BNF.md](FRONTEND4-NICE-AND-BNF.md): where NICE/BNF data plugs in, with an if-have/if-don't fallback for each spot.
+
+**Decisions made:**
+- **NICE/BNF is an enhancement layer, never a dependency.** Nothing is blocked waiting on it; no safety-critical behaviour depends on it (C8 principle). Build every page on its fallback; wire NICE in at the marked points once the key's scope is known.
+- **D1 (structured allergies) is worth doing regardless.** **D2 (coded medicines)** is the one build NICE could reshape — confirm dm+d vs BNF codes before building MAR/Medications to full depth.
+- Easiest genuinely-new page to start with is **People / Clients**, then **Client profile** — neither needs NICE.
+
+**Open / owner action (no rush):** confirm what the NICE licence key actually unlocks (BNF/BNFc, dm+d, or guidance syndication).
+
+**Files touched:** `FRONTEND4-NICE-AND-BNF.md` (new), `scratchpad/frontend4-issues.html` + `frontend4-build-order.html` (artifacts), memory.
+
+### 2026-08-05 — RECORD7 identity, NICE scope confirmed, master build plan written
+
+**What we did:**
+- Recorded the product identity: **RECORD7** standalone / **Care One OS** integrated; the seven rights (six + the Right Record); developer Omega Care Group Ltd. Saved to memory + baked into the plan.
+- Owner supplied the **NICE licence application** — saved verbatim-in-substance as [RECORD7-NICE-LICENCE-APPLICATION.md](RECORD7-NICE-LICENCE-APPLICATION.md). This **confirmed the NICE scope**.
+- Wrote the **master detailed build plan** [RECORD7-BUILD-PLAN.md](RECORD7-BUILD-PLAN.md): product identity, the method (page by page to a Definition of Done), the DoD bar, the external-data layers, the order, and a **per-page functional spec for all 10+ pages** drawn from both specifications.
+
+**Decisions / findings:**
+- **NICE Syndication scope confirmed: guidance / quality standards / information-for-the-public ONLY.** NOT BNF/BNFc/CKS, NOT dm+d. So NICE is a labelled **guidance-panel** layer (attribution + link + date; AI summaries labelled/sourced/never autonomous), **not** a medicines-data source. **D2/I4 is NOT solved by the NICE licence** — dm+d/SNOMED is separate; BNF a separate licence later. Corrected [FRONTEND4-NICE-AND-BNF.md](FRONTEND4-NICE-AND-BNF.md) accordingly.
+- **Cyber Essentials Plus** held (certificate on file) — underwrites the security work (I2, I7, I11).
+- **Build method:** from scratch, page by page, one at a time to Done; fix issues as we go; external data always an enhancement layer, never a dependency (C8).
+
+**Open / owner action:** none blocking. First page to build = **People / Clients** (needs nothing external). dm+d/SNOMED licensing is the one thing to line up before MAR/Medications reach full depth.
+
+**Files touched:** `RECORD7-BUILD-PLAN.md`, `RECORD7-NICE-LICENCE-APPLICATION.md` (new), `FRONTEND4-NICE-AND-BNF.md` (corrected), memory (record7-product-identity, nice-bnf, MEMORY.md).
+
+### 2026-08-05 — Page 1 built: Clients (the service users)
+
+**What we did:**
+- Adopted the **per-page ritual** (spec + Right-Done tick-checklist artifact per page, tick off + verify UI before moving on) — see [[frontend4-per-page-ritual]]. Clients spec: https://claude.ai/code/artifact/48a22e9f-a256-432c-bf7a-faada71e454f
+- Built **Page 1 — Clients** to that spec. New: `ClientsController` (list, home-scoped, read-only) + `ClientProfileController` (stub, real identity header), `F4Pages/Clients.jsx` + `F4Pages/ClientProfile.jsx`, routes `/frontend4/clients` and `/frontend4/clients/{client}`, scoped CSS in `f4.css` (toolbar/search, A–Z heads, `.f4-tag` chips). Clients was already in the sidebar (`roles.js`) — now a working, active link.
+- The list reuses the existing client tables via `ResolvesCurrentHome` + `App\ServiceUser`; search + A–Z grouping happen client-side (data arrives with the page).
+
+**Auto-verified (build + HTTP, not yet a human click-through):**
+- `/frontend4/clients` → 200 as manager, 8 real clients (Neptune House), loads only `f4-*.css`.
+- Home scoping: a client in another home (`id 1`) → **404**. Tap-through `/frontend4/clients/243` → `ClientProfile` with real identity (Amelia Hughes, 12, NHS, Penicillin).
+- Isolation: `/frontend2`, `/frontend3`, `/medication/medication-round` all still 200.
+- Test cases logged in [FRONTEND4-TEST-LOG.md](FRONTEND4-TEST-LOG.md) (Page 1 section).
+
+**Decisions:**
+- Rows link to the profile now; a **minimal profile stub** exists so tap-through is real, not a 404. The full 8-tab profile is **Page 2**, built next.
+- Clients list is deliberately read-only; creating/deactivating a client is an Administration function (Page 10), not here.
+
+**Open / next:** the human look — see it in the browser (desktop + phone), tick the remaining Right-Done checks (T5–T12), then start Page 2 (Client profile).
+
+**Files touched:** `app/Http/Controllers/Frontend4/{ClientsController,ClientProfileController}.php` (new), `resources/js/F4Pages/{Clients,ClientProfile}.jsx` (new), `routes/web.php`, `frontend4/f4.css`.
+
+### 2026-08-05 — Page 2 Slice A built: identity header + Overview
+
+**What we did:**
+- Wrote the Page 2 spec (persistent header + 8 tabs, build slices A–E): https://claude.ai/code/artifact/e3ee4fa5-8f95-41d0-8e7a-e57b21b5755c
+- Built **Slice A**: turned the profile stub into the real shell — a **persistent identity header** (photo, name, key facts, status, allergy safety strip), an accessible **ARIA tablist** (8 tabs, arrow-key nav), and the **Overview tab** on real data. The other seven tabs render an honest "coming next" panel.
+- Overview reads the client's own `service_user` columns, grouped (Key details / Emergency contact / Care & support); empty fields and empty sections are omitted, not shown blank.
+
+**Auto-verified:** `/frontend4/clients/243` → 200, real header + Overview (Key details 5 / Care & support 2); loads only `f4-*.css`; out-of-home client → 404. Test cases in [FRONTEND4-TEST-LOG.md](FRONTEND4-TEST-LOG.md) (Page 2 section).
+
+**Honest gap noted:** `service_user` has **no GP, pharmacy or structured-diagnoses columns**, so Overview shows what is actually recorded and does not invent them — they arrive with the care-plan / GP Connect work, not here. (Candidate for the issues log when we scope that.)
+
+**Next:** owner look, then **Slice B** — Medications + Allergies tabs.
+
+**Files touched:** `app/Http/Controllers/Frontend4/ClientProfileController.php`, `resources/js/F4Pages/ClientProfile.jsx`, `frontend4/f4.css`.
+
+### 2026-08-05 — Page 2 Slice B built: Medications + Allergies tabs
+
+**What we did:**
+- **Medications tab** — lists the client's prescriptions (reuses `MARSheet::forHome()->active()`, active first), each a card: name, strength/form, dose · route · frequency, prescriber + start/end, instruction + indication (kept separate), stock remaining, and a status chip (Active/Paused/Stopped) + Controlled-drug chip. PRN reads "When required (PRN)".
+- **Allergies tab** — the recorded allergens as chips, with an honest note that reaction/severity/source are the D1 upgrade (allergies are still free text).
+
+**Auto-verified:** client 243 → 3 medications (Levetiracetam Active/54 tablets, Paracetamol PRN, Salbutamol PRN inhaled), allergy Penicillin; build clean; loads only `f4-*.css`. Tests in [FRONTEND4-TEST-LOG.md](FRONTEND4-TEST-LOG.md) (Page 2 Slice B).
+
+**Next:** Slice C — PRN protocols + MAR history tabs.
+
+**Files touched:** `app/Http/Controllers/Frontend4/ClientProfileController.php`, `resources/js/F4Pages/ClientProfile.jsx`, `frontend4/f4.css`.
+
+### 2026-08-05 — Page 2 Slice C built: PRN protocols + MAR history tabs
+
+**What we did:**
+- **PRN protocols tab** — the when-required medicines with dose/route, minimum interval, maximum in 24h, indication and the protocol text (`prn_details`). Honest note that symptoms/non-med-steps/escalation/review are a planned data upgrade.
+- **MAR history tab** — this client's administrations (current records only, most recent first, capped at 60): medicine, date/time, staff, witness, reason, and the **outcome as word + tint** via the shared `Outcomes` service and the `Status` atom (never a bare code). `is_late` shows as "· late".
+
+**Auto-verified:** client 243 → 2 PRN meds + 3 MAR rows (Given / Declined "Spat out" by Phil Holt) with correct labels/status. Build clean; loads only `f4-*.css`. Tests in [FRONTEND4-TEST-LOG.md](FRONTEND4-TEST-LOG.md) (Page 2 Slice C).
+
+**Now live: 5 of 8 tabs** (Overview, Medications, PRN protocols, Allergies, MAR history). **Next:** Slice D — Care notes + Documents + Audit history.
+
+**Files touched:** `app/Http/Controllers/Frontend4/ClientProfileController.php`, `resources/js/F4Pages/ClientProfile.jsx`.
+
+### 2026-08-05 — Page 2 Slice D built: Care notes + Documents + Audit history (all 8 tabs live)
+
+**What we did:**
+- **Care notes** — `log_book` entries linked to the client via `su_log_book` (title, plain-text snippet from possibly-HTML details, date · category · staff).
+- **Documents** — `client_document_manages`, **metadata only** (name, type, added/expiry, Confidential chip). Opening/downloading a document is a permissioned action deferred to a later slice.
+- **Audit history** — the append-only **correction chain** on this client's clinical records (`mar_administrations` where `supersedes_id` is set): medicine, corrected outcome, who, when, amendment reason. The general settings/permission audit log is explicitly a separate later feature (D4 / Page 10), and the empty state says so.
+
+**Auto-verified:** page 200, all seven data keys present, joins valid (no SQL error). This home has **no** notes/documents/corrections in demo data, so all three render honest empty states; populated rendering can't be shown here yet. Tests in [FRONTEND4-TEST-LOG.md](FRONTEND4-TEST-LOG.md) (Slice D).
+
+**Page 2 read side is now complete — all 8 tabs live.** The remaining piece is **Slice E — role-gated edits by addendum** (the write-capable part).
+
+**Files touched:** `app/Http/Controllers/Frontend4/ClientProfileController.php`, `resources/js/F4Pages/ClientProfile.jsx`.
+
+### 2026-08-05 — Page 2 Slice E paused: prescription edits can't yet meet the standard (I18)
+
+**What we found (before writing any clinical edit):** `mar_sheets` has only `created_by` and
+`last_audited` — **no `modified_by`, no change-log, no supersede chain.** So a pause/stop/change
+to a prescription would mutate the row without an attributable, reversible record, which breaks
+the Definition of Done ("every edit attributable, by addendum, nothing overwritten"). Logged as
+**[I18](FRONTEND4-ISSUES.md#i18)** in the .md, the test log, and the online issue tracker.
+
+**Second blocker — authority:** no `change_prescription` permission exists; the spec's
+prescription-changer was the **pharmacist**, dropped for now; the matrix has managers *request*
+not *make* changes. So who may change a prescription is currently unassigned.
+
+**Did NOT build clinical writes.** Put the decision to the owner instead (how to proceed on the
+audit-tracking gap + authority). Page 2 read side (all 8 tabs) stands complete and verified.
+
+### 2026-08-05 — Page 2 Slice E built: prescription edits by addendum — PAGE 2 COMPLETE
+
+**Owner decisions (2026-08-05):** ① add a change-log first, then build (the safe path); ② manager-and-above may change a prescription.
+
+**What we did:**
+- Added the append-only **`mar_sheet_changes`** table (prescription, field, before, after, reason, changed_by, timestamps) — new/additive, no existing table reshaped. Migration file written for the record (`database/migrations/2026_08_05_000000_...`); table applied directly (schema-from-dump workflow).
+- New permission **`manage_prescription`** granted to **manager**; **admin excluded** via `ADMIN_EXCLUDES` (managing access ≠ editing the clinical record — a judgement call; one line reverses it if the owner wants admin included).
+- `PrescriptionController::changeStatus` — pause/resume/stop, server-enforced (`requirePermission`), mandatory reason (422 without), **row-locked transaction that writes the log first, then the status**. Route `POST /frontend4/clients/{client}/medications/{sheet}/status`.
+- Medications tab: manager-only Pause/Resume/Stop with an inline reason form (Inertia `useForm`, `preserveState` so the tab stays put). Audit history tab now merges prescription changes with administration corrections.
+
+**Auto-verified live:** pause with reason → 302 + status active→paused + log row (who/when/why); stop without reason → 422, nothing written; resume → restored; audit tab shows both. Closed **[I18](FRONTEND4-ISSUES.md#i18)** in the .md, test log and the online tracker. Tests in [FRONTEND4-TEST-LOG.md](FRONTEND4-TEST-LOG.md) (Slice E).
+
+**Page 2 is complete** — persistent header + all 8 tabs reading real data + attributable, role-gated edits by addendum. **Next page:** per the roadmap, MAR sheet or (owner's choice) another page.
+
+**Files touched:** `mar_sheet_changes` table + migration; `app/Services/Frontend4/Permissions.php`; `frontend4/roles.js`; `app/Http/Controllers/Frontend4/{PrescriptionController,ClientProfileController}.php`; `resources/js/F4Pages/ClientProfile.jsx`; `frontend4/f4.css`; `routes/web.php`.
+
+### 2026-08-05 — Page 4 Slice A built: MAR sheet grid (reached from the profile)
+
+**Placement (owner decision):** MAR is **reached from the client profile**, not the sidebar — a "View full MAR" link on the profile's MAR history tab → `/frontend4/clients/:id/mar`. Spec: https://claude.ai/code/artifact/8ed5a4da-325d-47ab-a15f-0f2b5f4ccb3d
+
+**What we did:**
+- New `MarController` (built fresh in frontend4, mirrors the existing MAR chart's week/grid conventions but touches no shared code) + `F4Pages/MarSheet.jsx`: a week grid (medicines × days), coded cells with full meaning + a 10-code legend, week navigation, an identity header, and a period summary. Reuses `mar_administrations` — a presentation of the record, not a second one. Read-only.
+- Added the "View full MAR" link on the profile MAR history tab.
+
+**Auto-verified:** grid renders real data (Levetiracetam Given cell on the right day), week nav works (prev week shows the 23 Jul dose), Next disabled in the current week, summary 6/1/5, isolation holds (only `f4-*.css`). Tests in [FRONTEND4-TEST-LOG.md](FRONTEND4-TEST-LOG.md) (Page 4 Slice A).
+
+**Known Slice-A limit:** a refused/declined **PRN** dose isn't shown on the grid (only given PRN counts); it is visible on the MAR history list. To handle in the entry-detail slice (B).
+
+**Next:** Slice B — entry detail (open a cell → full record + corrections).
+
+**Files touched:** `app/Http/Controllers/Frontend4/MarController.php` (new), `resources/js/F4Pages/MarSheet.jsx` (new), `resources/js/F4Pages/ClientProfile.jsx`, `frontend4/f4.css`, `routes/web.php`.
+
+### 2026-08-06 — Page 4 Slice B built: MAR entry detail
+
+**What we did:**
+- MAR cells are now **clickable**. Opening one shows an entry-detail panel: outcome (full meaning), scheduled vs recorded time, staff, witness, dose, reason, notes — and a **correction history** (original + every change, current vs superseded) built from *all* records for that dose, not just the current one.
+- PRN cells open the day's doses list. **Resolved the Slice-A limitation:** a refused/declined PRN now shows on the grid as its outcome code (e.g. "R"), not just given counts.
+
+**Auto-verified:** regular cell detail (Levetiracetam → Given, recorded 11:25 by Phil Holt); PRN cell shows a Declined dose at 11:59; correction-history mechanism wired (no corrected record in demo data to populate it). Build clean; isolation holds. Tests in [FRONTEND4-TEST-LOG.md](FRONTEND4-TEST-LOG.md) (Page 4 Slice B).
+
+**Next:** Slice C — corrections & late entries (write, lead+), via the existing administration supersede chain + `correct_record` permission.
+
+**Files touched:** `app/Http/Controllers/Frontend4/MarController.php`, `resources/js/F4Pages/MarSheet.jsx`, `frontend4/f4.css`.
+
+### 2026-08-06 — Page 4 Slice C built: MAR corrections (lead+)
+
+**What we did:**
+- Corrections in the MAR entry-detail panel for **shift lead and above** (`correct_record`). Built on the shared **`MARSheetService::administer()`**, which makes an **append-only amendment** (new row supersedes the original; original + author preserved). Amendment reason required; reason required when the new outcome needs one.
+- **Two deliberate guardrails:** controlled-drug corrections are **blocked** (they belong to the CD register); and stock is **not reconciled** by a correction — logged as **[I19](FRONTEND4-ISSUES.md#i19)** (ties to the stock/discrepancy workflow, M8). The clinical record is correct and audited; only stock can drift.
+
+**Auto-verified live:** A→R correction wrote a superseding row (orig preserved, `is_current` flipped), 422 without an amendment reason, reverted R→A cleanly (chain A→R→A). Corrections now show in the cell's history and on the profile Audit tab. Build clean; isolation holds. Tests in [FRONTEND4-TEST-LOG.md](FRONTEND4-TEST-LOG.md) (Page 4 Slice C).
+
+**Minor note:** one transient HTTP 500 on a rapid successive correction (administer() takes no row lock, unlike the round path); succeeded on retry. Low risk for infrequent lead corrections; noted.
+
+**Page 4 remaining:** Slice D — export / print (manager). Then the MAR page is done.
+
+**Files touched:** `app/Http/Controllers/Frontend4/MarController.php`, `resources/js/F4Pages/MarSheet.jsx`, `frontend4/f4.css`, `routes/web.php`.
+
+### 2026-08-06 — Page 4 Slice D built: MAR print/export — PAGE 4 COMPLETE
+
+**What we did:** a manager-only "Print / PDF" button (gated `export_report`) + a scoped `@media print` stylesheet that strips the app chrome (nav, context bar, buttons, detail panel) and lays the grid flat, so the browser's print / Save-as-PDF produces a clean MAR document — identity header, week, summary, grid, legend. No server PDF engine needed for v1.
+
+**Auto-verified:** button gated correctly; build clean; isolation holds. Tests in [FRONTEND4-TEST-LOG.md](FRONTEND4-TEST-LOG.md) (Page 4 Slice D).
+
+**Page 4 (MAR sheet) is complete** — grid, entry detail + correction chain, corrections (lead+, append-only), print/export. Reached from the client profile per the owner's decision.
+
+**Files touched:** `resources/js/F4Pages/MarSheet.jsx`, `frontend4/f4.css`.
+
+### 2026-08-06 — I19 + the 500 fixed (MAR correction stock reconciliation + row lock)
+
+**What we did:**
+- **I19 closed:** a MAR correction that changes given-ness now reconciles stock through the same audited ledger the round uses — **given→not-given returns** the dose quantity (a `correction` recount up), **not-given→given deducts** it (an `administered` movement, inheriting the I16 shortfall handling). Only for tracked stock + structured `dose_quantity`; CDs stay blocked.
+- **The 500 fixed:** the correction now runs in one transaction with the prescription row **`lockForUpdate()`**, so rapid successive corrections serialise instead of colliding.
+
+**Auto-verified live:** A→R took stock 54→55, R→A took it 55→54, both 302 (no 500), ledger reconciles at each step, record ends truthful (Given). Closed I19 in the .md, test log and the online tracker.
+
+**Edge cases added to the test sheet** (E1–E12): both reconciliation directions, no-move cases, untracked stock, no dose_quantity, insufficient stock (shortfall), CD block, rapid-succession lock, validation, and audit visibility — for the owner to run.
+
+**Remaining on I19's theme:** the discrepancy *alert* (notifying a manager) still rides with the Stock page (I17 / M8).
+
+**Files touched:** `app/Http/Controllers/Frontend4/MarController.php`.
+
+### 2026-08-06 — Owner UI changes (client cluster): status filter + motion
+
+**From the owner's review of the Clients page (Group A passed):**
+- **Status filter** on Clients — a Active / Inactive / All dropdown; the controller now loads all non-deleted clients with a status, defaulting the filter to Active (so the list reads the same by default). An "Inactive" chip shows on inactive rows. *Note: all clients in the data are currently status=1 (Active), so Inactive is empty until such a client exists.*
+- **Smooth arrival** — the page fades in on mount (`.f4-page-enter`, opacity-only so the sticky header is undisturbed), so tapping a client into their profile feels like a transition, not a jump. Applied to Clients + Client profile.
+- **Sliding tabs** — the profile's tab panel slides in from the right each time you move across Overview / Medications / etc. (`.f4-tab-anim`, panel keyed by active tab). Both animations honour `prefers-reduced-motion`.
+
+**Verified:** build clean; status data present on every client; profile + MAR still 200; isolation holds. Visual feel is the owner's to confirm.
+
+**Files touched:** `app/Http/Controllers/Frontend4/ClientsController.php`, `resources/js/F4Pages/{Clients,ClientProfile}.jsx`, `frontend4/f4.css`.
+
 ---
 
 # Part 2 — Conversation record
