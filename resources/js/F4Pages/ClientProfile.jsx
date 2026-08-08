@@ -52,22 +52,41 @@ function initials(name) {
     return p.length ? (p[0][0] + (p.length > 1 ? p[p.length - 1][0] : '')).toUpperCase() : '?';
 }
 
+/** A static section card for the profile tabs — same look as the Overview
+ *  panels (soft-lifted surface, eyebrow + title header), then edge-to-edge rows
+ *  or, with `pad`, a padded body. Keeps every tab visually consistent. */
+function TabPanel({ eyebrow, title, action, note, pad = false, children }) {
+    return (
+        <section className="f4-panel f4-tabsec">
+            {(eyebrow || title || action) ? (
+                <div className="f4-tabsec-head">
+                    <div>
+                        {eyebrow ? <p className="f4-eyebrow">{eyebrow}</p> : null}
+                        {title ? <h2 className="f4-panel-name">{title}</h2> : null}
+                    </div>
+                    {action || null}
+                </div>
+            ) : null}
+            {pad ? <div className="f4-tabsec-body">{children}</div> : children}
+            {note ? <p className="f4-panel-note">{note}</p> : null}
+        </section>
+    );
+}
+
 function CareNotes({ notes }) {
     if (!notes.length) {
         return <Empty title="No care notes" body="No care-log notes are recorded for this client." />;
     }
     return (
-        <div className="f4-stack">
+        <TabPanel eyebrow="Care log" title="Care notes">
             {notes.map((n, i) => (
-                <section className="f4-card" key={i}>
-                    <h3>{n.title}</h3>
-                    {n.body ? <p style={{ marginTop: 'var(--f4-s2)' }}>{n.body}</p> : null}
-                    <p className="f4-row-sub" style={{ marginTop: 'var(--f4-s3)' }}>
-                        {[n.date, n.category, n.staff ? `by ${n.staff}` : null].filter(Boolean).join(' · ')}
-                    </p>
-                </section>
+                <div className="f4-noterow" key={i}>
+                    <div className="f4-noterow-title">{n.title}</div>
+                    {n.body ? <p className="f4-noterow-body">{n.body}</p> : null}
+                    <div className="f4-noterow-meta">{[n.date, n.category, n.staff ? `by ${n.staff}` : null].filter(Boolean).join(' · ')}</div>
+                </div>
             ))}
-        </div>
+        </TabPanel>
     );
 }
 
@@ -76,26 +95,18 @@ function Documents({ docs }) {
         return <Empty title="No documents" body="No documents are attached to this client's record." />;
     }
     return (
-        <>
-            <section className="f4-card" data-pad="none">
-                <div className="f4-rows">
-                    {docs.map((d, i) => (
-                        <div className="f4-row" key={i}>
-                            <span className="f4-row-main">
-                                <span className="f4-row-title">{d.name}</span>
-                                <span className="f4-row-sub">
-                                    {[d.type, d.added ? `added ${d.added}` : null, d.expiry ? `expires ${d.expiry}` : null].filter(Boolean).join(' · ')}
-                                </span>
-                            </span>
-                            {d.confidential ? (
-                                <span className="f4-row-end"><span className="f4-tag" data-tone="caution">Confidential</span></span>
-                            ) : null}
-                        </div>
-                    ))}
+        <TabPanel eyebrow="On file" title="Documents"
+                  note="Opening a document is a permissioned action, added in a later slice. This lists what is on file.">
+            {docs.map((d, i) => (
+                <div className="f4-listrow" key={i}>
+                    <div className="f4-listrow-main">
+                        <span className="f4-listrow-title">{d.name}</span>
+                        <span className="f4-listrow-sub">{[d.type, d.added ? `added ${d.added}` : null, d.expiry ? `expires ${d.expiry}` : null].filter(Boolean).join(' · ')}</span>
+                    </div>
+                    {d.confidential ? <span className="f4-listrow-end"><span className="f4-tag" data-tone="caution">Confidential</span></span> : null}
                 </div>
-            </section>
-            <p className="f4-note">Opening a document is a permissioned action, added in a later slice. This lists what is on file.</p>
-        </>
+            ))}
+        </TabPanel>
     );
 }
 
@@ -109,21 +120,16 @@ function AuditHistory({ rows }) {
         );
     }
     return (
-        <section className="f4-card" data-pad="none">
-            <div className="f4-rows">
-                {rows.map((r, i) => (
-                    <div className="f4-row" key={i}>
-                        <span className="f4-row-main">
-                            <span className="f4-row-title">{r.medicine} — {r.summary}</span>
-                            <span className="f4-row-sub">
-                                {[r.when, r.staff ? `by ${r.staff}` : null].filter(Boolean).join(' · ')}
-                                {r.reason ? ` — ${r.reason}` : ''}
-                            </span>
-                        </span>
+        <TabPanel eyebrow="Record history" title="Corrections">
+            {rows.map((r, i) => (
+                <div className="f4-listrow" key={i}>
+                    <div className="f4-listrow-main">
+                        <span className="f4-listrow-title">{r.medicine} — {r.summary}</span>
+                        <span className="f4-listrow-sub">{[r.when, r.staff ? `by ${r.staff}` : null].filter(Boolean).join(' · ')}{r.reason ? ` — ${r.reason}` : ''}</span>
                     </div>
-                ))}
-            </div>
-        </section>
+                </div>
+            ))}
+        </TabPanel>
     );
 }
 
@@ -199,56 +205,127 @@ function MedManage({ clientId, med }) {
     );
 }
 
-function Medications({ meds, clientId, canManage }) {
+/** One detailed medicine block inside a tab panel — Rx tile, name, status,
+ *  a small meta grid, then the fuller detail. Shared by Medications and PRN. */
+function MedFull({ m, tone, tagLabel, extraTag, grid, sub, lines, note, children }) {
+    return (
+        <div className="f4-medfull">
+            <div className="f4-medfull-top">
+                <span className="f4-rx">Rx</span>
+                <div className="f4-medfull-nm">
+                    <strong>{m.name}</strong>
+                    {m.strength || m.form ? <small>{[m.strength, m.form].filter(Boolean).join(' · ')}</small> : null}
+                </div>
+                <span className="f4-medfull-tags">
+                    <span className="f4-tag" data-tone={tone}>{tagLabel}</span>
+                    {m.isControlled ? <span className="f4-tag" data-tone="info">Controlled drug</span> : null}
+                    {extraTag || null}
+                </span>
+            </div>
+            {sub ? <p className="f4-medfull-sub">{sub}</p> : null}
+            {grid.length ? (
+                <div className="f4-medfull-grid">
+                    {grid.map(([k, v]) => <div key={k}><span className="k">{k}</span><span className="v">{v}</span></div>)}
+                </div>
+            ) : null}
+            {lines.map((l, i) => <p className="f4-medfull-sub" key={i}>{l}</p>)}
+            {children}
+            {note ? <p className="f4-medfull-note">{note}</p> : null}
+        </div>
+    );
+}
+
+/** Small line icons for the PRN guidance cells. */
+function prnIcon(kind) {
+    const p = { width: 15, height: 15, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.8, strokeLinecap: 'round', strokeLinejoin: 'round', 'aria-hidden': true };
+    if (kind === 'age') return <svg {...p}><circle cx="12" cy="8" r="4" /><path d="M4 20.5c0-4 4-6 8-6s8 2 8 6" /></svg>;
+    if (kind === 'weight') return <svg {...p}><path d="M12 3v3M6 6h12l-2.2 8H8.2L6 6zM7.5 20.5h9" /></svg>;
+    if (kind === 'max') return <svg {...p}><circle cx="12" cy="12" r="9" /><path d="M12 7.5V12l3 2" /></svg>;
+    return <svg {...p}><path d="M7 8l-3.5 4L7 16M17 8l3.5 4L17 16M4.5 12h15" /></svg>; // interval
+}
+
+/** A detailed medicine card — label→value rows, a stock bar, and (for PRN
+ *  medicines) a guidance box. Matches the mobile design; works at any width. */
+function MedCard({ m, clientId, canManage, age, weight }) {
+    const rows = [
+        m.dose ? ['Dose', m.dose] : null,
+        m.route ? ['Route', m.route] : null,
+        m.frequency ? ['Frequency', m.frequency] : null,
+        m.indication ? ['Prescribed for', m.indication] : null,
+    ].filter(Boolean);
+
+    // Stock bar: how much headroom above the reorder level. Rough, but honest —
+    // full when comfortably stocked, short as it nears reorder.
+    const stockN = m.stock != null ? Number(m.stock) : null;
+    const reorderN = m.reorder != null ? Number(m.reorder) : null;
+    const pct = stockN != null
+        ? (reorderN && reorderN > 0 ? Math.max(6, Math.min(100, Math.round((stockN / (reorderN * 4)) * 100))) : 100)
+        : null;
+
+    const prnCells = m.asRequired ? [
+        age != null ? ['age', `${age} yrs`, 'Age band'] : null,
+        weight ? ['weight', weight, 'Weight band'] : null,
+        m.maxDaily != null ? ['max', `${m.maxDaily} dose${m.maxDaily === 1 ? '' : 's'}`, 'Max in 24h'] : null,
+        m.minIntervalHours != null ? ['interval', `${Number(m.minIntervalHours)} h`, 'Between doses'] : null,
+    ].filter(Boolean) : [];
+
+    return (
+        <section className="f4-medcard">
+            <div className="f4-medcard-top">
+                <span className="f4-rx">Rx</span>
+                <span className="f4-medcard-tags">
+                    <span className="f4-tag" data-tone={m.statusTone}>{m.statusLabel}</span>
+                    {m.isControlled ? <span className="f4-tag" data-tone="info">Controlled drug</span> : null}
+                </span>
+            </div>
+            <div className="f4-medcard-nm">
+                <strong>{m.name}</strong>
+                {m.strength || m.form ? <small>{[m.strength, m.form].filter(Boolean).join(' · ')}</small> : null}
+            </div>
+
+            <dl className="f4-medcard-rows">
+                {rows.map(([k, v]) => <div key={k}><dt>{k}</dt><dd>{v}</dd></div>)}
+            </dl>
+
+            <div className="f4-medcard-stock">
+                <div className="f4-medcard-stockrow">
+                    <span>Stock remaining</span>
+                    <b data-low={m.lowStock ? 'true' : undefined}>{stockN != null ? `${m.stock}${m.unit ? ` ${m.unit}` : ''}` : 'Not tracked'}</b>
+                </div>
+                {pct != null ? (
+                    <div className="f4-bar"><span style={{ width: `${pct}%` }} data-low={m.lowStock ? 'true' : undefined} /></div>
+                ) : null}
+            </div>
+
+            {prnCells.length ? (
+                <div className="f4-prnbox">
+                    <p className="f4-eyebrow">PRN guidance</p>
+                    <div className="f4-prngrid">
+                        {prnCells.map(([kind, val, lab]) => (
+                            <div className="f4-prncell" key={lab}>
+                                <span className="f4-prnic">{prnIcon(kind)}</span>
+                                <div><b>{val}</b><small>{lab}</small></div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            ) : null}
+
+            {m.instruction ? <p className="f4-medcard-instr">{m.instruction}</p> : null}
+            {canManage ? <MedManage clientId={clientId} med={m} /> : null}
+        </section>
+    );
+}
+
+function Medications({ meds, clientId, canManage, age, weight }) {
     if (!meds.length) {
         return <Empty title="No medicines recorded" body="This client has no prescriptions on record." />;
     }
-
     return (
-        <div className="f4-stack">
-            {meds.map((m) => {
-                const detail = [
-                    m.dose ? ['Dose', m.dose] : null,
-                    m.route ? ['Route', m.route] : null,
-                    m.frequency ? ['Frequency', m.frequency] : null,
-                ].filter(Boolean);
-                const line = [
-                    m.prescriber ? `Prescriber: ${m.prescriber}` : null,
-                    m.started ? `Started ${m.started}` : null,
-                    m.ended ? `Ends ${m.ended}` : null,
-                ].filter(Boolean).join(' · ');
-
-                return (
-                    <section className="f4-card" key={m.id}>
-                        <div className="f4-med-top">
-                            <span className="f4-med-name">{m.name}</span>
-                            <span className="f4-med-tags">
-                                <span className="f4-tag" data-tone={m.statusTone}>{m.statusLabel}</span>
-                                {m.isControlled ? <span className="f4-tag" data-tone="info">Controlled drug</span> : null}
-                            </span>
-                        </div>
-                        {m.strength || m.form ? (
-                            <span className="f4-med-strength">{[m.strength, m.form].filter(Boolean).join(' · ')}</span>
-                        ) : null}
-                        {detail.length ? (
-                            <p className="f4-med-detail">
-                                {detail.map(([k, v], i) => (
-                                    <React.Fragment key={k}>{i > 0 ? ' · ' : ''}<b>{k}:</b> {v}</React.Fragment>
-                                ))}
-                            </p>
-                        ) : null}
-                        {line ? <p className="f4-row-sub" style={{ marginTop: 4 }}>{line}</p> : null}
-                        {m.instruction ? <p className="f4-med-instruction">{m.instruction}</p> : null}
-                        {m.indication ? <p className="f4-row-sub" style={{ marginTop: 4 }}>Prescribed for {m.indication}</p> : null}
-                        <p className="f4-med-stock" data-low={m.lowStock ? 'true' : undefined}>
-                            {m.stock != null
-                                ? <>Stock remaining: <b>{m.stock}{m.unit ? ` ${m.unit}` : ''}</b>{m.lowStock ? ' · low' : ''}</>
-                                : 'Stock not tracked'}
-                        </p>
-                        {canManage ? <MedManage clientId={clientId} med={m} /> : null}
-                    </section>
-                );
-            })}
+        <div className="f4-medcards">
+            {meds.map((m) => (
+                <MedCard key={m.id} m={m} clientId={clientId} canManage={canManage} age={age} weight={weight} />
+            ))}
         </div>
     );
 }
@@ -257,88 +334,61 @@ function Prn({ items }) {
     if (!items.length) {
         return <Empty title="No PRN medicines" body="This client has no when-required (PRN) medicines." />;
     }
-
     return (
-        <div className="f4-stack">
-            {items.map((p) => (
-                <section className="f4-card" key={p.id}>
-                    <div className="f4-med-top">
-                        <span className="f4-med-name">{p.name}</span>
-                        <span className="f4-med-tags">
-                            <span className="f4-tag" data-tone="info">PRN</span>
-                            {p.isControlled ? <span className="f4-tag" data-tone="info">Controlled drug</span> : null}
-                        </span>
-                    </div>
-                    {p.strength || p.form ? (
-                        <span className="f4-med-strength">{[p.strength, p.form].filter(Boolean).join(' · ')}</span>
-                    ) : null}
-                    {p.indication ? <p className="f4-row-sub" style={{ marginTop: 4 }}>For {p.indication}</p> : null}
-
-                    <div className="f4-kv-grid" style={{ marginTop: 'var(--f4-s3)' }}>
-                        {p.dose ? <KV k="Dose" v={p.dose} /> : null}
-                        {p.route ? <KV k="Route" v={p.route} /> : null}
-                        {p.minIntervalHours != null ? <KV k="Minimum interval" v={`${p.minIntervalHours} h`} /> : null}
-                        {p.maxDaily != null ? <KV k="Maximum in 24h" v={`${p.maxDaily}`} /> : null}
-                    </div>
-
-                    {p.protocol ? <p className="f4-med-instruction">{p.protocol}</p> : null}
-                    {p.instruction ? <p className="f4-med-instruction">{p.instruction}</p> : null}
-                    <p className="f4-note">
-                        Symptoms to check, non-medication steps to try first, escalation and the
-                        effectiveness-review requirement are part of the fuller PRN protocol (a planned
-                        data upgrade). Shown here as recorded.
-                    </p>
-                </section>
-            ))}
-        </div>
+        <TabPanel eyebrow="When required" title="PRN protocols"
+                  note="Symptoms to check, non-medication steps to try first, escalation and the effectiveness-review requirement are part of the fuller PRN protocol (a planned data upgrade). Shown here as recorded.">
+            {items.map((p) => {
+                const grid = [
+                    p.dose ? ['Dose', p.dose] : null,
+                    p.route ? ['Route', p.route] : null,
+                    p.minIntervalHours != null ? ['Minimum interval', `${p.minIntervalHours} h`] : null,
+                    p.maxDaily != null ? ['Maximum in 24h', `${p.maxDaily}`] : null,
+                ].filter(Boolean);
+                return (
+                    <MedFull
+                        key={p.id} m={p} tone="info" tagLabel="PRN" grid={grid}
+                        sub={p.indication ? `For ${p.indication}` : null}
+                        lines={[p.protocol || null, p.instruction || null].filter(Boolean)}
+                    />
+                );
+            })}
+        </TabPanel>
     );
 }
 
 function MarHistory({ rows, capped, clientId }) {
-    const fullMar = (
-        <div className="f4-actions" style={{ justifyContent: 'flex-end', marginBottom: 'var(--f4-s4)' }}>
-            <Link href={`/frontend4/clients/${clientId}/mar`} className="f4-btn" data-variant="secondary" data-size="sm">
-                View full MAR
-            </Link>
-        </div>
+    const action = (
+        <Link href={`/frontend4/clients/${clientId}/mar`} className="f4-textbtn">View full MAR →</Link>
     );
-
     if (!rows.length) {
         return (
-            <>
-                {fullMar}
-                <Empty title="No administrations recorded" body="Nothing has been recorded against this client's medicines yet. The full MAR still shows the schedule." />
-            </>
+            <TabPanel eyebrow="Administration record" title="MAR history" action={action}>
+                <p className="f4-panel-note">No administrations recorded yet — the full MAR still shows the schedule.</p>
+            </TabPanel>
         );
     }
-
     return (
-        <>
-            {fullMar}
-            <section className="f4-card" data-pad="none">
-                <div className="f4-rows">
-                    {rows.map((r, i) => {
-                        const sub = [
-                            r.date, r.slot,
-                            r.staff ? `by ${r.staff}` : null,
-                            r.witness ? `witness ${r.witness}` : null,
-                        ].filter(Boolean).join(' · ');
-                        return (
-                            <div className="f4-row" key={i} data-status={r.outcomeStatus}>
-                                <span className="f4-row-main">
-                                    <span className="f4-row-title">{r.medicine}</span>
-                                    <span className="f4-row-sub">{sub}{r.reason ? ` — ${r.reason}` : ''}</span>
-                                </span>
-                                <span className="f4-row-end">
-                                    <Status status={r.outcomeStatus} label={r.outcomeLabel} note={r.isLate ? 'late' : undefined} />
-                                </span>
-                            </div>
-                        );
-                    })}
-                </div>
-            </section>
-            {capped ? <p className="f4-note">Showing the 60 most recent administrations.</p> : null}
-        </>
+        <TabPanel eyebrow="Administration record" title="MAR history" action={action}
+                  note={capped ? 'Showing the 60 most recent administrations.' : null}>
+            {rows.map((r, i) => {
+                const sub = [
+                    r.date, r.slot,
+                    r.staff ? `by ${r.staff}` : null,
+                    r.witness ? `witness ${r.witness}` : null,
+                ].filter(Boolean).join(' · ');
+                return (
+                    <div className="f4-listrow" key={i} data-status={r.outcomeStatus}>
+                        <div className="f4-listrow-main">
+                            <span className="f4-listrow-title">{r.medicine}</span>
+                            <span className="f4-listrow-sub">{sub}{r.reason ? ` — ${r.reason}` : ''}</span>
+                        </div>
+                        <span className="f4-listrow-end">
+                            <Status status={r.outcomeStatus} label={r.outcomeLabel} note={r.isLate ? 'late' : undefined} />
+                        </span>
+                    </div>
+                );
+            })}
+        </TabPanel>
     );
 }
 
@@ -346,18 +396,13 @@ function Allergies({ allergies }) {
     if (!allergies.length) {
         return <Empty title="No allergies recorded" body="No allergies are recorded for this client. If that is wrong, add them on the client's record." />;
     }
-
     return (
-        <section className="f4-card">
-            <h3>Recorded allergies</h3>
-            <div className="f4-tag-list">
+        <TabPanel eyebrow="Safety information" title="Recorded allergies" pad
+                  note="Reaction, severity, source and who recorded each allergy are not yet held as structured data — that is a planned upgrade (D1). Shown here exactly as recorded.">
+            <div className="f4-alglist">
                 {allergies.map((a) => <span className="f4-tag" data-tone="risk" key={a}>{a}</span>)}
             </div>
-            <p className="f4-note">
-                Reaction, severity, source and who recorded each allergy are not yet held as structured
-                data — that is a planned upgrade (D1). Shown here exactly as recorded.
-            </p>
-        </section>
+        </TabPanel>
     );
 }
 
@@ -596,7 +641,7 @@ export default function ClientProfile({
                         onViewMeds={() => setActive('medications')} onViewMar={() => setActive('mar')}
                     />
                 )
-                    : active === 'medications' ? <Medications meds={medications} clientId={client.id} canManage={canManage} />
+                    : active === 'medications' ? <Medications meds={medications} clientId={client.id} canManage={canManage} age={client.age} weight={client.weight} />
                     : active === 'prn' ? <Prn items={prn} />
                     : active === 'allergies' ? <Allergies allergies={client.allergies || []} />
                     : active === 'mar' ? <MarHistory rows={marHistory} capped={marCapped} clientId={client.id} />

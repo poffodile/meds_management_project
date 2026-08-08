@@ -40,7 +40,7 @@
 
   /* ── Type — Manrope headings, Inter interface text ─────────────────────── */
   --f4-font-head: "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --f4-font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --f4-font-body: "Plus Jakarta Sans", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --f4-font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
   --f4-t-page:    1.9375rem;  /* 31px — main page title    */
@@ -1114,6 +1114,96 @@ a.f4-row:focus-visible, button.f4-row:focus-visible {
 .f4-kd dt { font-size: 9px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: var(--f4-muted); }
 .f4-kd dd { margin: 0; font-size: 12px; font-weight: 700; color: var(--f4-ink); }
 @media (max-width: 560px) { .f4-kd { grid-template-columns: 1fr; } }
+
+/* ── Client profile: tab sections (Medications, PRN, Allergies, MAR, …) ──────
+   The same panel language as the Overview — soft-lifted card, eyebrow + title
+   header, refined type, edge-to-edge rows. */
+.f4-tabsec-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 16px 18px 12px; }
+.f4-tabsec-head .f4-eyebrow { margin: 0 0 3px; }
+.f4-tabsec-head .f4-textbtn { margin-top: 2px; }
+.f4-tabsec-body { padding: 6px 18px 18px; }
+
+/* Generic list rows — MAR history, documents, audit history */
+.f4-listrow { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 18px; border-top: 1px solid var(--f4-line); }
+.f4-listrow-main { min-width: 0; }
+.f4-listrow-title { display: block; font-size: 12.5px; font-weight: 650; color: var(--f4-ink); }
+.f4-listrow-sub { display: block; font-size: 10.5px; color: var(--f4-muted); margin-top: 2px; line-height: 1.45; }
+.f4-listrow-end { flex: none; }
+.f4-listrow[data-status] { border-left: 3px solid transparent; }
+.f4-listrow[data-status="given"]    { border-left-color: var(--f4-given-s); }
+.f4-listrow[data-status="refused"]  { border-left-color: var(--f4-ref-s); }
+.f4-listrow[data-status="omitted"]  { border-left-color: var(--f4-omit-s); }
+.f4-listrow[data-status="late"]     { border-left-color: var(--f4-late-s); }
+.f4-listrow[data-status="upcoming"] { border-left-color: var(--f4-upc-s); }
+
+/* Care notes */
+.f4-noterow { padding: 13px 18px; border-top: 1px solid var(--f4-line); }
+.f4-noterow-title { font-size: 12.5px; font-weight: 700; color: var(--f4-ink); }
+.f4-noterow-body { margin: 3px 0 0; font-size: 11.5px; color: var(--f4-body); line-height: 1.55; }
+.f4-noterow-meta { margin-top: 5px; font-size: 10px; color: var(--f4-muted); }
+
+/* Detailed medicine block — Medications + PRN tabs */
+.f4-medfull { padding: 14px 18px; border-top: 1px solid var(--f4-line); }
+.f4-medfull-top { display: flex; align-items: flex-start; gap: 11px; }
+.f4-medfull-nm { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; }
+.f4-medfull-nm strong { font-size: 13px; font-weight: 700; color: var(--f4-ink); }
+.f4-medfull-nm small { font-size: 10.5px; color: var(--f4-muted); margin-top: 1px; }
+.f4-medfull-tags { flex: none; display: flex; flex-wrap: wrap; gap: 5px; justify-content: flex-end; }
+.f4-medfull-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 9px 16px; margin: 11px 0 0; padding: 11px 0 0; border-top: 1px dashed var(--f4-line); }
+.f4-medfull-grid > div { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.f4-medfull-grid .k { font-size: 9px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: var(--f4-muted); }
+.f4-medfull-grid .v { font-size: 12px; font-weight: 650; color: var(--f4-ink); }
+.f4-medfull-sub { margin: 6px 0 0; font-size: 11px; color: var(--f4-body); line-height: 1.5; }
+.f4-medfull-note { margin: 8px 0 0; font-size: 10.5px; color: var(--f4-muted); line-height: 1.5; }
+.f4-medfull-stock { margin: 8px 0 0; font-size: 11px; color: var(--f4-muted); }
+.f4-medfull-stock b { color: var(--f4-ink); font-weight: 700; }
+.f4-medfull-stock[data-low="true"], .f4-medfull-stock[data-low="true"] b { color: var(--f4-late-s); }
+
+/* Allergy chips */
+.f4-alglist { display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* ── Medications tab: the detailed medicine card ─────────────────────────────
+   Rx tile + status chip, label→value rows, a stock bar, a PRN guidance box,
+   and side-by-side pause/stop. One column on a phone; a responsive grid wider. */
+.f4-medcards { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 14px; align-items: start; }
+.f4-medcard { background: var(--f4-surface); border: 1px solid var(--f4-line-hard); border-radius: 15px; box-shadow: var(--f4-lift); padding: 18px; }
+.f4-medcard-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.f4-medcard-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.f4-medcard-nm { margin-top: 12px; display: flex; flex-direction: column; }
+.f4-medcard-nm strong { font-family: var(--f4-font-head); font-size: 17px; font-weight: 700; color: var(--f4-ink); letter-spacing: -.01em; line-height: 1.2; }
+.f4-medcard-nm small { font-size: 11px; color: var(--f4-muted); margin-top: 3px; }
+
+/* Label → value rows */
+.f4-medcard-rows { margin: 14px 0 0; }
+.f4-medcard-rows > div { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; padding: 11px 0; border-top: 1px solid var(--f4-line); }
+.f4-medcard-rows dt { font-size: 9.5px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; color: var(--f4-muted); }
+.f4-medcard-rows dd { margin: 0; text-align: right; font-size: 13px; font-weight: 700; color: var(--f4-ink); }
+
+/* Stock + level bar */
+.f4-medcard-stock { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--f4-line); }
+.f4-medcard-stockrow { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.f4-medcard-stockrow span { font-size: 9.5px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; color: var(--f4-muted); }
+.f4-medcard-stockrow b { font-size: 13px; font-weight: 700; color: var(--f4-ink); }
+.f4-medcard-stockrow b[data-low="true"] { color: var(--f4-late-s); }
+.f4-bar { margin-top: 8px; height: 6px; border-radius: 999px; background: var(--f4-sunken); overflow: hidden; }
+.f4-bar > span { display: block; height: 100%; border-radius: 999px; background: var(--f4-accent); }
+.f4-bar > span[data-low="true"] { background: var(--f4-late-s); }
+
+/* PRN guidance box */
+.f4-prnbox { margin-top: 14px; padding: 14px; background: var(--f4-sunken); border: 1px solid var(--f4-line); border-radius: 12px; }
+.f4-prnbox .f4-eyebrow { margin: 0 0 10px; }
+.f4-prngrid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 14px; }
+.f4-prncell { display: flex; align-items: center; gap: 9px; min-width: 0; }
+.f4-prnic { flex: none; width: 28px; height: 28px; border-radius: 8px; background: var(--f4-surface); border: 1px solid var(--f4-line); color: var(--f4-accent-in); display: grid; place-items: center; }
+.f4-prncell b { display: block; font-size: 12.5px; font-weight: 700; color: var(--f4-ink); }
+.f4-prncell small { display: block; font-size: 9.5px; color: var(--f4-muted); margin-top: 1px; }
+
+.f4-medcard-instr { margin: 12px 0 0; font-size: 11px; color: var(--f4-body); line-height: 1.55; padding: 9px 11px; background: var(--f4-sunken); border-radius: 8px; }
+
+/* Pause / stop: side by side, full width */
+.f4-medcard .f4-med-manage { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--f4-line); }
+.f4-medcard .f4-med-manage .f4-actions { display: flex; gap: 10px; }
+.f4-medcard .f4-med-manage .f4-actions .f4-btn { flex: 1; }
 
 /* Contacts */
 .f4-contacts dl { margin: 0; }

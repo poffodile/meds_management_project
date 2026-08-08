@@ -23,10 +23,12 @@
     --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    {{-- Paint the warm cream background before React mounts so there is no flash. --}}
-    <style>html,body{margin:0;background:#F6F2E9;}</style>
+    {{-- Paint the warm cream background before React mounts so there is no flash,
+         and set the body font so nothing can ever fall back to the serif default
+         (the app font is scoped to .f4-root; this is the safety net for body). --}}
+    <style>html,body{margin:0;background:#F6F2E9;font-family:"Plus Jakarta Sans","Inter","Segoe UI",Arial,sans-serif;}</style>
 
     @viteReactRefresh
     @vite(['resources/js/f4.jsx'])

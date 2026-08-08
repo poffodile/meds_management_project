@@ -185,3 +185,54 @@ From the spec, and non-negotiable:
 1. **Which devices frontend4 is designed around** — this is about screen size and posture, not about who the software is for. Everything in section 0 stays true either way. The question is whether frontend4 is built desktop-and-mobile (the full shell in section 2, all five Phase-1 screens) or phone-first with desktop as a courtesy (drop the left nav and context drawer, Phase 1 shrinks to three screens). It changes how much gets built before there is anything to look at.
 2. **Branch** — frontend4 is currently on the `frontend3` branch. Own branch, or stay?
 3. **Wireframes** — frontend3 got 12 HTML wireframe screens before code. Does frontend4 want the same (scoped `.f4-*` CSS, no React), or straight to built screens from this document?
+
+---
+
+## 10. Typography (current — supersedes the Figtree/cool-indigo notes above)
+
+**Settled 2026-08-06.** Frontend4 pivoted to the warm cream/navy/teal look and a
+two-typeface system. The older mentions of Figtree and the cool/indigo canvas
+above are historical — the live values are here and in `frontend4/f4-theme.css`
+(colours) + `frontend4/f4.css` (the `--f4-t-*` scale and component rules).
+
+**Two typefaces, no more:**
+- **Manrope** — headings, card/section titles, the big numbers (e.g. the "20:00"
+  next-dose time). Loaded 500/600/700/800.
+- **Inter** — everything else: body, labels, values, buttons, table text. Loaded
+  400/500/600/700/800.
+
+Both are loaded in `resources/views/f4.blade.php` (Google Fonts) with Segoe UI /
+Arial as the fallback. `body` is set to Inter there too, so nothing can fall
+back to the serif default outside `.f4-root`.
+
+**The look is layered, not multi-font.** What can read as "three fonts" in a row
+is Manrope on the title and Inter doing three jobs (bold name, muted sub, tiny
+uppercase label). One typeface, three treatments.
+
+### The typographic roles (font · size · weight · treatment · colour)
+
+Worked example — a profile tab section header + a medicine row:
+
+| Role | Where | Font | Size | Weight | Case / tracking | Colour |
+|---|---|---|---|---|---|---|
+| Eyebrow | `CURRENT PRESCRIPTIONS` | Inter | 9px | 800 | UPPERCASE · +0.07em | teal `--colour-teal` |
+| Section title | `Medications` | **Manrope** | 16px | 700 | −0.01em | navy `--colour-navy` |
+| Description | intro line under a title | Inter | 11px | 400 | normal | muted `--colour-text-muted` |
+| Item name | `Pregabalin` | Inter | 12–13px | 700 | normal | ink `--colour-navy` |
+| Item sub | `75 mg capsule` | Inter | 10.5px | 400 | normal | muted |
+| Micro-label | `DOSE & ROUTE` | Inter | 9px | 800 | UPPERCASE · +0.04em | muted |
+| Micro-value | `1 capsule · Oral` | Inter | 11–12px | 650 | normal | ink |
+| Big number | the `20:00` time | **Manrope** | 30px | 700 | −0.02em | ink |
+| Client name (header) | `Aisha Bello` | **Manrope** | 24–27px | 700 | −0.02em | ink |
+
+Container that holds them: ivory surface, 1px `--colour-border`, 15px radius,
+soft lift shadow `--panel-shadow` (`0 10px 30px rgba(23,36,59,.055)`), hairline
+`--colour-divider-soft` between rows, ~16–18px header padding.
+
+### Relationship to the owner's reference (`client-profile.html/.css`)
+
+The Overview layout and this visual language come from the owner's reference.
+**Two deliberate divergences:** (1) titles use **Manrope** (the reference left
+`h2` as Inter); (2) sizes are bumped ~1–3px for readability (the reference runs
+8–10px). The reference's "simple-panel" tab stubs were **not** followed — the
+tabs are built out to the Overview's density (Rx tiles, status tags, meta grid).
