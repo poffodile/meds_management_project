@@ -244,6 +244,21 @@ The cases to work through for corrections + stock reconciliation. ✅ = auto-ver
 - ☐ **T21** Tab through and record a dose using only the keyboard. Focus is always visible.
 - ☐ **T22** With a screen reader, the reason error is announced when recording is refused — not just shown in red.
 
+### Client profile — Overview dashboard (2026-08-06)
+- ☐ **T23** Every value on the Overview is real: name, age/DOB, allergy, active medicines (dose/route/schedule/stock), next dose time, next-of-kin, recent MAR — all match the client's actual record. Nothing is invented.
+- ☐ **T24** A field with no data shows "Not recorded" (or an empty-state line), never a placeholder value — check GP, pharmacy, medication support, capacity, key worker.
+- ☐ **T25** The client name appears **once** (identity card), not also in a shell header band; the page opens at "← Back to clients".
+- ☐ **T26** On a wide screen the content stretches (caps ~1460px, centred) with a clear gutter both sides — it does not hug the sidebar, and the header + cards share one left/right edge.
+- ☐ **T27** "Open medication round" appears in the Next-medication card only (not duplicated in the header); its label is vertically centred in the button.
+
+### Client profile — mobile (≤760px)
+- ☐ **T28** Header centres: avatar over name over Active, then a labelled stat block (Age·Born·Sex / Room·NHS·Adm), three across.
+- ☐ **T29** Info strip stacks vertically — the allergy cell is always visible (no sideways scroll that could hide it).
+- ☐ **T30** Medicine rows stack with **nothing hidden** — name, dose & route, schedule and stock all readable.
+- ☐ **T31** The side cards (Next medication, Contacts, Recent activity) stretch to full width — no empty band on the right.
+- ☐ **T32** No horizontal page scroll at 375px (verified: 0 overflow).
+- ☐ **T33** Colours all come from `f4-theme.css`; changing a `--colour-*` there reskins the profile and does **not** affect frontends 1/2/3.
+
 ---
 
 # Tests for the issue log

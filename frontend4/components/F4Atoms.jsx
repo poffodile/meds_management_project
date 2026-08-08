@@ -157,7 +157,9 @@ export function Progress({ percent, label }) {
 /* ── Identity ─────────────────────────────────────────────────────────────── */
 
 function initials(name) {
-    const parts = String(name || '').trim().split(/\s+/).filter(Boolean);
+    // First letters of the first and last words that start with a letter, so a
+    // leading "#" marker or a trailing "(demo)" doesn't make a junk avatar.
+    const parts = String(name || '').trim().split(/\s+/).filter((w) => /^[a-z]/i.test(w));
     if (!parts.length) return '?';
     return (parts[0][0] + (parts.length > 1 ? parts[parts.length - 1][0] : '')).toUpperCase();
 }

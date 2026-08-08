@@ -479,6 +479,30 @@ audit-tracking gap + authority). Page 2 read side (all 8 tabs) stands complete a
 
 ---
 
+### 2026-08-06 — Warm-theme pivot + profile Overview rebuilt as a dashboard + full mobile pass
+
+**What we did:**
+- **Palette pivot to warm cream / navy / teal.** The owner supplied a full "Quiet Clinical Luxury" spec (cream `#F6F2E9`, ivory panels, navy `#17243B` headings, teal `#176B65` actions, restrained statuses, red reserved for genuine risk). frontend4 was cool-grey/indigo before; it is now warm — same family as frontend3 but its own exact palette.
+- **All f4 colours now live in ONE file: `frontend4/f4-theme.css`**, `@import`ed at the top of `f4.css`. The owner's `--colour-*` names are the editable source; the existing `--f4-*` tokens *forward* onto them, so the whole app reskins from one place. Still scoped to `.f4-root`, still only in the f4 bundle — cannot touch frontends 1/2/3. To reskin, edit only this file.
+- **Client profile Overview rebuilt as a two-column dashboard**, modelled on an owner-supplied reference (`client-profile.html/.css`): identity card, a 4-cell info/safety strip (allergy + medication support / capacity & consent / key worker), then Key details, Active medications (Rx rows), Important care instructions on the left; Next medication + Contacts + Recent activity on the right. Took the reference's *metrics* (soft lift shadow `--f4-lift`, refined small type, edge-to-edge dividers, precise grids) but every colour comes from our theme file.
+- **Everything on it is real data** — pulled from `service_user`, `mar_sheets`, `mar_administrations`. Missing fields show an honest "Not recorded · Add via onboarding", never an invented value.
+- **Layout fixes:** the shell page-header band is skipped on the profile (`bare` prop on `F4Shell`) so the client name isn't shown twice and the content starts at the back-link; the content column now caps at 1460px and centres (stretches wide instead of hugging the sidebar) with a comfortable gutter both sides; the header "Open medication round" button was removed (kept in the Next medication card); the block button's centering was fixed (`display:flex` not `block`).
+- **Full mobile pass on the profile:** header becomes a centred avatar / name / status stack with a labelled 6-stat block (Age·Born·Sex / Room·NHS·Adm, three across); info strip stacks (allergy can't scroll off); medicine rows stack with *nothing hidden* (dose & schedule stay); side cards stretch full width (fixed an `align-items:start` leak from the tablet rule). Verified at a real 375px viewport — zero horizontal overflow.
+
+**Decisions made:**
+- frontend4 look is now warm cream/navy/teal (supersedes the cool/indigo note; the stale hue comment still sits atop `f4.css`). Reskin via `f4-theme.css` only.
+- The mobile header stat block shows all six facts (owner chose "show all six" over the tidier three); the full record also sits in the Key details card.
+
+**Open questions / what's next (this session, continuing):**
+- Tidy the "Not recorded" density (collapse all-empty cards to one calm line).
+- Make the overview boxes collapsible.
+- On mobile, move the Next-medication box up to right after Key details.
+- Still to consider: seeding a showcase client so the design can be judged fully populated; the same mobile pass over Clients / Round / MAR.
+
+**Files touched:** `frontend4/f4-theme.css` (new), `frontend4/f4.css`, `resources/views/f4.blade.php`, `resources/js/F4Pages/ClientProfile.jsx`, `frontend4/components/F4Shell.jsx`, `app/Http/Controllers/Frontend4/ClientProfileController.php`.
+
+---
+
 # Part 2 — Conversation record
 
 ### 2026-08-04

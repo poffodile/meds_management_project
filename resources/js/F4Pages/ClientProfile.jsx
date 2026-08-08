@@ -44,9 +44,11 @@ function tabFromHash() {
     return TABS.some((t) => t.key === key) ? key : 'overview';
 }
 
-/** Initials from a name, for the header avatar. */
+/** Initials from a name, for the header avatar. Uses the first letters of the
+ *  first and last words that actually start with a letter — so markers like a
+ *  leading "#" or a trailing "(demo)" don't produce a junk avatar. */
 function initials(name) {
-    const p = String(name || '').trim().split(/\s+/).filter(Boolean);
+    const p = String(name || '').trim().split(/\s+/).filter((w) => /^[a-z]/i.test(w));
     return p.length ? (p[0][0] + (p.length > 1 ? p[p.length - 1][0] : '')).toUpperCase() : '?';
 }
 
@@ -363,36 +365,51 @@ function Contact({ role, data }) {
     return (
         <div className="f4-contact">
             <dt>{role}</dt>
-            <dd>
-                {data ? (
-                    <>{data.name}{data.sub ? <small>{data.sub}</small> : null}</>
-                ) : (
-                    <><span className="f4-muted-v">Not recorded</span><small>Add via onboarding</small></>
-                )}
-            </dd>
+            <dd>{data.name}{data.sub ? <small>{data.sub}</small> : null}</dd>
         </div>
     );
 }
 
-/** The Overview: a two-column dashboard modelled on the reference layout. */
+/** A collapsible dashboard card. The header is an accordion button; the body
+ *  hides when collapsed. Open by default. */
+function Panel({ eyebrow, title, className = '', children }) {
+    const [open, setOpen] = useState(true);
+    return (
+        <section className={`f4-panel ${className}`.trim()} data-open={open ? 'true' : 'false'}>
+            <h2 className="f4-panel-title">
+                <button type="button" className="f4-panel-toggle" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
+                    <span className="f4-panel-heads">
+                        {eyebrow ? <span className="f4-eyebrow">{eyebrow}</span> : null}
+                        {title ? <span className="f4-panel-name">{title}</span> : null}
+                    </span>
+                    <svg className="f4-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <path d="m6 9 6 6 6-6" />
+                    </svg>
+                </button>
+            </h2>
+            <div className="f4-panel-body" hidden={!open}>{children}</div>
+        </section>
+    );
+}
+
+/** The Overview: a two-column dashboard of collapsible cards. */
 function Overview({ keyDetails, activeMeds, careInstructions, nextMed, contacts, recent, roundUrl, onViewMeds, onViewMar }) {
+    const hasContacts = contacts.gp || contacts.pharmacy || contacts.nextOfKin;
     return (
         <div className="f4-dash">
             <div className="f4-dash-main">
                 {keyDetails.length ? (
-                    <section className="f4-panel f4-keydetails">
-                        <header><div><p className="f4-eyebrow">Client record</p><h2>Key details</h2></div></header>
+                    <Panel eyebrow="Client record" title="Key details" className="f4-keydetails">
                         <dl className="f4-kd">
                             {keyDetails.map((f) => (
                                 <div key={f.label}><dt>{f.label}</dt><dd>{f.value}</dd></div>
                             ))}
                         </dl>
-                    </section>
+                    </Panel>
                 ) : null}
 
-                <section className="f4-panel f4-medpanel">
-                    <header><div><p className="f4-eyebrow">Current prescriptions</p><h2>Active medications</h2></div>
-                        <button type="button" className="f4-textbtn" onClick={onViewMeds}>View all medications →</button></header>
+                <Panel eyebrow="Current prescriptions" title="Active medications" className="f4-medpanel">
                     {activeMeds.length ? activeMeds.map((m) => (
                         <article className="f4-medrow" key={m.id}>
                             <span className="f4-rx">Rx</span>
@@ -402,19 +419,18 @@ function Overview({ keyDetails, activeMeds, careInstructions, nextMed, contacts,
                             <span className="f4-stock" data-low={m.lowStock ? 'true' : undefined}>{m.stock != null ? `${m.stock}${m.unit ? ` ${m.unit}` : ''}` : '—'}</span>
                         </article>
                     )) : <p className="f4-panel-note">No active prescriptions on record.</p>}
-                </section>
+                    <button type="button" className="f4-textbtn f4-viewmar" onClick={onViewMeds}>View all medications →</button>
+                </Panel>
 
-                <section className="f4-panel f4-instructions">
-                    <header><div><p className="f4-eyebrow">Support information</p><h2>Important care instructions</h2></div></header>
+                <Panel eyebrow="Support information" title="Important care instructions" className="f4-instructions">
                     {careInstructions.length ? careInstructions.map((c, i) => (
                         <article key={i}><span>{String(i + 1).padStart(2, '0')}</span><p><strong>{c.title}</strong>{c.body}</p></article>
                     )) : <p className="f4-panel-note">No care instructions recorded yet — these are provided at onboarding.</p>}
-                </section>
+                </Panel>
             </div>
 
             <aside className="f4-dash-side">
-                <section className="f4-panel f4-nextmed">
-                    <p className="f4-eyebrow">Next medication</p>
+                <Panel eyebrow="Next medication" className="f4-nextmed">
                     {nextMed ? (
                         <>
                             <div className="f4-nextrow"><strong>{nextMed.time}</strong><span>{nextMed.count} due{nextMed.nextDay ? ' · next day' : ''}</span></div>
@@ -422,19 +438,19 @@ function Overview({ keyDetails, activeMeds, careInstructions, nextMed, contacts,
                         </>
                     ) : <p className="f4-nextmeds">No scheduled medicine — when-required only.</p>}
                     <a href={roundUrl} className="f4-btn f4-block-btn">Open medication round →</a>
-                </section>
+                </Panel>
 
-                <section className="f4-panel f4-contacts">
-                    <header><div><p className="f4-eyebrow">Care network</p><h2>Contacts</h2></div></header>
-                    <dl>
-                        <Contact role="GP" data={contacts.gp} />
-                        <Contact role="Pharmacy" data={contacts.pharmacy} />
-                        <Contact role="Next of kin" data={contacts.nextOfKin} />
-                    </dl>
-                </section>
+                <Panel eyebrow="Care network" title="Contacts" className="f4-contacts">
+                    {hasContacts ? (
+                        <dl>
+                            {contacts.gp ? <Contact role="GP" data={contacts.gp} /> : null}
+                            {contacts.pharmacy ? <Contact role="Pharmacy" data={contacts.pharmacy} /> : null}
+                            {contacts.nextOfKin ? <Contact role="Next of kin" data={contacts.nextOfKin} /> : null}
+                        </dl>
+                    ) : <p className="f4-panel-note">No contacts recorded yet — added at onboarding.</p>}
+                </Panel>
 
-                <section className="f4-panel f4-recent">
-                    <header><div><p className="f4-eyebrow">Recent activity</p><h2>MAR and notes</h2></div></header>
+                <Panel eyebrow="Recent activity" title="MAR and notes" className="f4-recent">
                     {recent.length ? recent.map((r, i) => (
                         <article key={i}>
                             <span className={r.outcomeStatus === 'given' ? undefined : 'f4-warning'}>{r.outcomeStatus === 'given' ? '✓' : '!'}</span>
@@ -442,7 +458,7 @@ function Overview({ keyDetails, activeMeds, careInstructions, nextMed, contacts,
                         </article>
                     )) : <p className="f4-panel-note">Nothing recorded yet.</p>}
                     <button type="button" className="f4-textbtn f4-viewmar" onClick={onViewMar}>View MAR history →</button>
-                </section>
+                </Panel>
             </aside>
         </div>
     );
@@ -525,23 +541,20 @@ export default function ClientProfile({
                         <div className="f4-infobody">
                             <span className="f4-infolab">Allergy</span>
                             <span className="f4-infobig">{infoStrip.allergy || 'None recorded'}</span>
-                            {infoStrip.allergy ? <span className="f4-infosm">Reaction: not recorded</span> : null}
+                            {infoStrip.allergy ? <span className="f4-infosm">Reaction: {infoStrip.allergyReaction || 'not recorded'}</span> : null}
                         </div>
                     </div>
                     <div className="f4-infocell">
                         <span className="f4-infolab">Medication support</span>
-                        <span className="f4-infobig f4-muted-v">{infoStrip.medSupport || 'Not recorded'}</span>
-                        <span className="f4-infosm">Add via onboarding</span>
+                        <span className={`f4-infobig${infoStrip.medSupport ? '' : ' f4-muted-v'}`}>{infoStrip.medSupport || 'Not recorded'}</span>
                     </div>
                     <div className="f4-infocell">
                         <span className="f4-infolab">Capacity &amp; consent</span>
-                        <span className="f4-infobig f4-muted-v">{infoStrip.capacity || 'Not recorded'}</span>
-                        <span className="f4-infosm">Add via onboarding</span>
+                        <span className={`f4-infobig${infoStrip.capacity ? '' : ' f4-muted-v'}`}>{infoStrip.capacity || 'Not recorded'}</span>
                     </div>
                     <div className="f4-infocell">
                         <span className="f4-infolab">Key worker</span>
-                        <span className="f4-infobig f4-muted-v">{infoStrip.keyWorker || 'Not recorded'}</span>
-                        <span className="f4-infosm">Add via onboarding</span>
+                        <span className={`f4-infobig${infoStrip.keyWorker ? '' : ' f4-muted-v'}`}>{infoStrip.keyWorker || 'Not recorded'}</span>
                     </div>
                 </div>
 

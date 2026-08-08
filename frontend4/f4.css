@@ -1059,9 +1059,21 @@ a.f4-row:focus-visible, button.f4-row:focus-visible {
 .f4-dash { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(290px, .72fr); gap: 14px; align-items: start; }
 .f4-dash-main, .f4-dash-side { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
 .f4-panel { overflow: hidden; }
-.f4-panel > header { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 16px 18px 12px; }
-.f4-eyebrow { margin: 0 0 5px; font-size: 9px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; color: var(--f4-accent-in); }
-.f4-panel h2 { margin: 0; color: var(--f4-ink); font-family: var(--f4-font-head); font-size: 16px; font-weight: 700; letter-spacing: -.01em; }
+/* Collapsible header: the whole title row is an accordion button; a chevron
+   points down when open, right when collapsed; the body hides when closed. */
+.f4-panel-title { margin: 0; }
+.f4-panel-toggle {
+  width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 16px 18px 12px; background: none; border: 0; cursor: pointer; text-align: left; font: inherit;
+}
+.f4-panel-heads { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.f4-eyebrow { margin: 0; font-size: 9px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; color: var(--f4-accent-in); }
+.f4-panel-name { color: var(--f4-ink); font-family: var(--f4-font-head); font-size: 16px; font-weight: 700; letter-spacing: -.01em; }
+.f4-chevron { flex: none; color: var(--f4-muted); transition: transform .18s ease; }
+.f4-panel-toggle[aria-expanded="false"] .f4-chevron { transform: rotate(-90deg); }
+.f4-panel-toggle:hover .f4-chevron { color: var(--f4-ink); }
+.f4-panel-toggle:focus-visible { outline: 2px solid var(--f4-accent); outline-offset: -3px; border-radius: 12px; }
+.f4-panel-body[hidden] { display: none; }
 .f4-textbtn { border: 0; background: none; cursor: pointer; padding: 0; font: inherit; font-size: 10px; font-weight: 750; color: var(--f4-accent-in); white-space: nowrap; }
 .f4-textbtn:hover { text-decoration: underline; }
 .f4-panel-note { margin: 0; padding: 4px 18px 18px; color: var(--f4-muted); font-size: 11px; line-height: 1.5; }
@@ -1087,7 +1099,7 @@ a.f4-row:focus-visible, button.f4-row:focus-visible {
 .f4-instructions article strong { display: block; color: var(--f4-ink); font-size: 11.5px; margin-bottom: 2px; }
 
 /* Next medication */
-.f4-nextmed { padding: 17px; }
+.f4-nextmed .f4-panel-body { padding: 4px 17px 17px; }
 .f4-nextrow { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
 .f4-nextrow strong { font-family: var(--f4-font-head); font-size: 30px; font-weight: 700; color: var(--f4-ink); letter-spacing: -.02em; line-height: 1; }
 .f4-nextrow span { font-size: 10px; font-weight: 750; color: var(--f4-late-s); }
@@ -1159,10 +1171,21 @@ a.f4-row:focus-visible, button.f4-row:focus-visible {
   .f4-infocell { border-left: none; border-top: 1px solid var(--f4-line); }
   .f4-infocell:first-child { border-top: none; }
 
-  /* Side column stacks under the main column. flex-direction and align-items
-     are set explicitly to override the ≤1050 tablet rule (a 3-across grid with
-     align-items:start) — without stretch the cards would not fill the width. */
-  .f4-dash-side { display: flex; flex-direction: column; align-items: stretch; }
+  /* On a phone every card becomes one stacked column, and the order is set
+     explicitly so the Next-medication card sits right under Key details.
+     display:contents dissolves the main/side wrappers so all cards are direct
+     flex children of .f4-dash and `order` can interleave them across columns. */
+  /* align-items:stretch is REQUIRED here — the base .f4-dash grid rule sets
+     align-items:start, which on a flex column stops the cards filling the
+     width (Key details, a narrow grid, shrinks to its content otherwise). */
+  .f4-dash { display: flex; flex-direction: column; gap: 14px; align-items: stretch; }
+  .f4-dash-main, .f4-dash-side { display: contents; }
+  .f4-keydetails   { order: 1; }
+  .f4-nextmed      { order: 2; }
+  .f4-contacts     { order: 3; }
+  .f4-medpanel     { order: 4; }
+  .f4-instructions { order: 5; }
+  .f4-recent       { order: 6; }
 
   /* Medicine rows stack — the Rx tile stays on the left and the name, dose &
      route, schedule and stock read down the right. Nothing is hidden. */

@@ -302,8 +302,12 @@ class ClientProfileController extends F4Controller
         $activeMeds = array_values(array_filter($medications, fn ($m) => $m['statusLabel'] === 'Active'));
 
         $contacts = [
-            'gp' => null,        // no client field yet — see onboarding form
-            'pharmacy' => null,  // no client field yet — see onboarding form
+            'gp' => trim((string) $su->gp_name) !== ''
+                ? ['name' => $su->gp_name, 'sub' => $su->gp_practice ?: null]
+                : null,
+            'pharmacy' => trim((string) $su->pharmacy_name) !== ''
+                ? ['name' => $su->pharmacy_name, 'sub' => $su->pharmacy_phone ?: null]
+                : null,
             'nextOfKin' => trim((string) $su->em_name) !== ''
                 ? ['name' => $su->em_name, 'sub' => trim(implode(' · ', array_filter([$su->relationship ?: null, $su->em_phone ?: null])))]
                 : null,
@@ -320,9 +324,10 @@ class ClientProfileController extends F4Controller
 
         $infoStrip = [
             'allergy' => count($allergies) ? implode(', ', $allergies) : null,
-            'medSupport' => null,  // onboarding
-            'capacity' => null,    // onboarding
-            'keyWorker' => null,   // onboarding
+            'allergyReaction' => $su->allergy_reaction ?: null,
+            'medSupport' => $su->medication_support ?: null,
+            'capacity' => $su->capacity_consent ?: null,
+            'keyWorker' => $su->key_worker ?: null,
         ];
 
         $headerMeta = array_values(array_filter([

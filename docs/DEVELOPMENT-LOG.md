@@ -18,6 +18,16 @@ To run it on this computer: `start-local.bat` (starts the database, the web serv
 | `docs/milestones/M0.md`, `M1.md` | Detail on the first two milestones (the base setup + the medication pages) |
 | `FRONTEND.md`, `FRONTEND-PLAN.md` | A map of the new front-end code + an easy-read plan |
 
+> **frontend4 (the standalone RECORD7 build) keeps its own detailed day-by-day log** in `docs/care-one-os/FRONTEND4/FRONTEND4.md`. Only headline notes are mirrored here.
+
+---
+
+## 2026-08-06 (frontend4)
+
+- **frontend4 pivoted to a warm cream / navy / teal look** (from cool grey/indigo). All of its colours now live in one file, `frontend4/f4-theme.css`, so the whole standalone app reskins from one place — and it still can't affect the older screens (everything scoped, own bundle).
+- **The client profile's overview was rebuilt as a proper dashboard** (identity + safety strip, key details, medications, next dose, contacts, recent activity) and made **fully mobile-friendly** (centred header, stat block, stacking cards, nothing hidden on a phone). Every value on it is real data; missing fields say "Not recorded" rather than inventing anything.
+- Full detail in `FRONTEND4.md` (2026-08-06 entry).
+
 ---
 
 ## 2026-07-16
