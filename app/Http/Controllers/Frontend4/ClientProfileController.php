@@ -115,8 +115,18 @@ class ClientProfileController extends F4Controller
             ->orderBy('medication_name')
             ->get();
 
-        $medications = $sheets->map(function ($s) {
+        $lastAdminBySheet = \Illuminate\Support\Facades\DB::table('mar_administrations')
+            ->whereIn('mar_sheet_id', $sheets->pluck('id'))
+            ->where('is_current', 1)
+            ->orderByDesc('date')
+            ->orderByDesc('time_slot')
+            ->get(['mar_sheet_id', 'date', 'time_slot'])
+            ->groupBy('mar_sheet_id')
+            ->map(fn ($rows) => $rows->first());
+
+        $medications = $sheets->map(function ($s) use ($su, $lastAdminBySheet) {
             [$statusLabel, $statusTone] = $this->medStatus($s);
+            $lastAdmin = $lastAdminBySheet->get($s->id);
 
             return [
                 'id' => $s->id,
@@ -131,9 +141,12 @@ class ClientProfileController extends F4Controller
                     : (is_array($s->time_slots) && count($s->time_slots) ? implode(' · ', $s->time_slots) : ($s->frequency ?: '—')),
                 'frequency' => $s->as_required ? 'When required (PRN)' : ($s->frequency ?: null),
                 // Kept apart on purpose: how to give it vs why it is prescribed.
-                'instruction' => $s->administration_instructions ?: ($s->prn_details ?: null),
+                'instruction' => $s->administration_instructions ?: null,
+                'protocol' => $s->prn_details ?: null,
                 'indication' => $s->reason_for_medication ?: null,
                 'prescriber' => $s->prescriber ?: ($s->prescribed_by ?: null),
+                'pharmacy' => $su->pharmacy_name ?: null,
+                'lastAdministered' => $lastAdmin ? trim($this->fmtDate($lastAdmin->date).' '.$lastAdmin->time_slot) : null,
                 'started' => $this->fmtDate($s->start_date),
                 'ended' => $this->fmtDate($s->end_date),
                 'stock' => $s->stock_level !== null ? $this->trimNumber($s->stock_level) : null,

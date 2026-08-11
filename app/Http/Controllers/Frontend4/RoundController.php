@@ -247,16 +247,10 @@ class RoundController extends F4Controller
 
             $outcomes = app(Outcomes::class);
             $medicines = [];
+            $prnMedicines = [];
 
             foreach ($r['rows'] as $row) {
-                // PRN gets its own section in M3. Showing when-required
-                // medicines in the scheduled list would invite someone to give
-                // one without the interval and maximum checks in front of them.
-                if ($row['as_required'] ?? false) {
-                    continue;
-                }
-
-                $medicines[] = [
+                $payload = [
                     'mar_sheet_id' => $row['mar_sheet_id'],
                     'name' => $row['medication_name'],
                     'strength' => $row['strength'],
@@ -284,9 +278,18 @@ class RoundController extends F4Controller
                     'recordedAt' => $row['recorded_at'],
                     'recordedBy' => $row['recorded_by'],
                 ];
+
+                if ($row['as_required'] ?? false) {
+                    $payload['prn'] = $row['prn'] ?? null;
+                    $prnMedicines[] = $payload;
+                    continue;
+                }
+
+                $medicines[] = $payload;
             }
 
             usort($medicines, fn ($a, $b) => [$a['slot'] ?? '99:99', $a['name']] <=> [$b['slot'] ?? '99:99', $b['name']]);
+            usort($prnMedicines, fn ($a, $b) => [$a['name']] <=> [$b['name']]);
 
             return [
                 'client_id' => $r['client_id'],
@@ -300,6 +303,7 @@ class RoundController extends F4Controller
                     (array) ($r['risk_flags'] ?? [])
                 ))),
                 'medicines' => $medicines,
+                'prnMedicines' => $prnMedicines,
             ];
         }
 

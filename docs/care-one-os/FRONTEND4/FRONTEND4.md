@@ -608,3 +608,21 @@ M0 isolation · M1 design system · M1.5 roles & permissions · M1.6 role-gated 
 | `FRONTEND4-TEST-LOG.md` | a test case per feature and per issue |
 | `FRONTEND4-PLAN.md` | the isolation rules |
 | `FRONTEND4-DESIGN.md` | the design direction |
+
+---
+
+# ▶ RESUME HERE — 2026-08-08
+
+### 2026-08-08 — Option H implemented on desktop medications tab
+
+**Asked:** Implement Feature / Option H from the standalone medications mockup, do not hardcode the data, make the layout visually appealing with transitions, and keep the colour palette mature rather than childish. Follow-up: only the desktop version should change.
+
+**Answered / built:** The real Frontend4 client profile Medications tab now uses the Option H pattern on desktop only: a compact medication register with one horizontally expanded selected row. It is driven entirely from the existing `medications` payload supplied by `ClientProfileController` from real `MARSheet` rows. No mock medicines were copied into the app. Desktop shows computed counts, search, pagination, stock bars, PRN guidance, status/low-stock/controlled-drug information and manager pause/resume/stop controls. Mobile keeps the existing medication-card layout.
+
+**Files changed:** `resources/js/F4Pages/ClientProfile.jsx`, `frontend4/f4.css`.
+
+**Verified:** `npm run build` passed via `npm.cmd`; `/frontend4/clients` returned HTTP 200 after local dev login; Laravel is responding on `127.0.0.1:8000`; Vite is responding on `127.0.0.1:5173`. The in-app browser connector was unavailable in this session, so no screenshot QA was possible here.
+
+**Follow-up correction:** Owner clarified the row should not turn into a sideways detail layout. It should remain exactly like the compact register row at the top, then behave like a collapsible menu with arranged details underneath. Updated the desktop medication row accordingly; mobile remains unchanged. Rebuilt successfully.
+
+**Second visual direction:** Owner supplied a fuller medication-profile screenshot and asked for the medications page to look like that. Updated the desktop Medications tab again: profile heading, KPI strip, filter chips, search, medication-card stack with expanded details underneath the selected row, and right-side safety / related-record panels. Still no hardcoded medicines; all visible medicine rows, counts, stock states and safety values come from the existing client and medication props. Mobile remains on the existing card layout. Rebuilt successfully.

@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Medication Expanded Card Layouts</title>
+  <style>
+    :root {
+      --bg: #f6f2ea;
+      --surface: #fffdf8;
+      --surface-soft: #f4f1ea;
+      --ink: #17243b;
+      --body: #344150;
+      --muted: #68727b;
+      --line: #e5ded3;
+      --line-hard: #cbc3b5;
+      --teal: #176b65;
+      --teal-soft: #e2efeb;
+      --danger: #9c4141;
+      --danger-soft: #f4e6e3;
+      --shadow: 0 16px 42px rgba(23, 36, 59, .08);
+      font-family: Inter, Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+    .page { max-width: 1280px; margin: 0 auto; padding: 28px; }
+    .intro { display: flex; justify-content: space-between; gap: 24px; align-items: flex-end; margin-bottom: 22px; }
+    h1, h2, h3, p { margin: 0; }
+    h1 { font-size: 28px; line-height: 1.08; }
+    .intro p { margin-top: 8px; color: var(--muted); max-width: 760px; }
+    .note {
+      flex: 0 0 320px;
+      padding: 12px 14px;
+      border: 1px solid var(--line-hard);
+      border-radius: 8px;
+      background: var(--surface);
+      color: var(--body);
+      font-size: 12px;
+    }
+    .option {
+      margin-top: 22px;
+      border: 1px solid var(--line-hard);
+      border-radius: 12px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .option-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 18px;
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(180deg, #fffdf8, #f8f4ec);
+    }
+    .option-head h2 { font-size: 18px; }
+    .option-head p { margin-top: 4px; color: var(--muted); font-size: 12px; max-width: 760px; }
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 20px;
+      padding: 0 8px;
+      border-radius: 999px;
+      background: var(--teal-soft);
+      color: var(--teal);
+      font-size: 10px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    .tag.soft { background: var(--surface-soft); color: var(--muted); }
+    .tag.risk { background: var(--danger-soft); color: var(--danger); }
+    .card { margin: 18px; border: 1px solid var(--teal); border-radius: 14px; background: var(--surface); overflow: hidden; }
+    .row {
+      display: grid;
+      grid-template-columns: 34px 42px minmax(0, 1.25fr) minmax(120px, .56fr) minmax(120px, .56fr) minmax(110px, .52fr) 92px;
+      gap: 12px;
+      align-items: center;
+      padding: 16px 18px;
+      background: color-mix(in srgb, var(--teal-soft) 30%, var(--surface));
+      border-left: 4px solid var(--teal);
+    }
+    .num { color: var(--muted); font-weight: 800; text-align: right; }
+    .rx {
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      display: grid;
+      place-items: center;
+      background: var(--teal-soft);
+      color: var(--teal);
+      font-size: 10px;
+      font-weight: 900;
+    }
+    .name strong { display: block; font-size: 14px; line-height: 1.2; }
+    .pills { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 5px; }
+    .name small { display: block; margin-top: 4px; color: var(--muted); font-size: 11px; line-height: 1.3; }
+    .cell span, .field span, .band-label {
+      display: block;
+      color: var(--muted);
+      font-size: 9px;
+      font-weight: 850;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+    .cell b, .field b { display: block; margin-top: 4px; color: var(--ink); font-size: 12px; line-height: 1.35; }
+    .stockbar { height: 6px; max-width: 140px; margin-bottom: 6px; border-radius: 999px; background: var(--surface-soft); overflow: hidden; }
+    .stockbar i { display: block; width: 72%; height: 100%; background: var(--teal); border-radius: inherit; }
+    .status { justify-self: end; }
+    .alert {
+      margin: 0 18px 14px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      background: var(--danger-soft);
+      color: var(--danger);
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    /* Option A */
+    .a-body { padding-bottom: 16px; }
+    .clinical {
+      display: grid;
+      grid-template-columns: minmax(0, 1.6fr) minmax(260px, .8fr);
+      gap: 0;
+      margin: 0 18px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .clinical .field { padding: 14px 16px; border-left: 1px solid var(--line); }
+    .clinical .field:first-child { border-left: 0; }
+    .clinical .field b { font-size: 11.5px; font-weight: 650; }
+    .record-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      margin: 12px 18px 0;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .record-grid .field { padding: 13px 15px; border-left: 1px solid var(--line); border-top: 1px solid var(--line); }
+    .record-grid .field:nth-child(3n+1) { border-left: 0; }
+    .record-grid .field:nth-child(-n+3) { border-top: 0; }
+    .actions { display: flex; gap: 8px; margin: 14px 18px 0; }
+    .actions button {
+      height: 32px;
+      padding: 0 12px;
+      border: 1px solid var(--line-hard);
+      border-radius: 7px;
+      background: var(--surface);
+      color: var(--teal);
+      font-weight: 800;
+      font-size: 10px;
+    }
+
+    /* Option B */
+    .b-body { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 16px; padding: 0 18px 18px; }
+    .b-main, .b-side { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+    .b-main .field { padding: 13px 15px; border-top: 1px solid var(--line); }
+    .b-main .field:first-child { border-top: 0; }
+    .b-side { background: color-mix(in srgb, var(--surface-soft) 50%, var(--surface)); }
+    .b-side .field { padding: 13px 15px; border-top: 1px solid var(--line); }
+    .b-side .field:first-child { border-top: 0; }
+
+    /* Option C */
+    .c-body { padding: 0 18px 18px; }
+    .c-band { margin-top: 10px; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+    .c-band:first-child { margin-top: 0; }
+    .c-band-head { padding: 10px 13px; background: var(--surface-soft); border-bottom: 1px solid var(--line); }
+    .c-band-body { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .c-band-body .field { padding: 13px 15px; border-left: 1px solid var(--line); }
+    .c-band-body .field:first-child { border-left: 0; }
+    .c-band-body .field.wide { grid-column: span 2; }
+
+    @media (max-width: 900px) {
+      .page { padding: 16px; }
+      .intro { display: block; }
+      .note { margin-top: 12px; max-width: none; }
+      .row { grid-template-columns: 34px minmax(0, 1fr); }
+      .row > :not(.num):not(.name) { grid-column: 2; }
+      .rx { display: none; }
+      .clinical, .b-body { grid-template-columns: 1fr; }
+      .record-grid, .c-band-body { grid-template-columns: 1fr; }
+      .record-grid .field, .c-band-body .field, .clinical .field { border-left: 0; border-top: 1px solid var(--line); }
+      .record-grid .field:first-child, .clinical .field:first-child { border-top: 0; }
+      .c-band-body .field.wide { grid-column: auto; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="intro">
+      <div>
+        <h1>Expanded Medication Card Layouts</h1>
+        <p>Standalone mockups for the opened medication row. These are static design options only; the live app should keep using real MAR sheet, stock, pharmacy and administration data.</p>
+      </div>
+      <div class="note">Goal: divide the expanded area so directions, clinical reason, prescription details, stock and actions are readable instead of looking like one crowded table.</div>
+    </div>
+
+    <section class="option">
+      <div class="option-head">
+        <div>
+          <h2>Option A - Divided Bands</h2>
+          <p>Recommended starting point. Directions and reason sit first, then record details, then action buttons.</p>
+        </div>
+        <span class="tag">Recommended</span>
+      </div>
+      <div class="card">
+        <div class="row">
+          <span class="num">1</span>
+          <span class="rx">Rx</span>
+          <div class="name">
+            <div class="pills"><span class="tag soft">Controlled drug</span><span class="tag">Active</span></div>
+            <strong>Pregabalin</strong>
+            <small>75 mg capsule - dm+d 37678911000001103</small>
+          </div>
+          <div class="cell"><span>Dose and route</span><b>ONE capsule<br><small>Oral - twice daily</small></b></div>
+          <div class="cell"><span>Administration times</span><b>08:00 - 20:00<br><small>Next: Today - 20:00</small></b></div>
+          <div class="cell"><div class="stockbar"><i></i></div><b>3 doses</b></div>
+          <span class="tag risk status">Low</span>
+        </div>
+        <div class="a-body">
+          <div class="alert">Low stock - controlled medicine count required</div>
+          <div class="clinical">
+            <div class="field"><span>Directions and special instructions</span><b>Swallow whole with water. Do not crush or open the capsule.</b></div>
+            <div class="field"><span>Reason prescribed</span><b>Neuropathic pain</b></div>
+          </div>
+          <div class="record-grid">
+            <div class="field"><span>Last administered</span><b>Today - 08:11</b></div>
+            <div class="field"><span>Prescription dates</span><b>12 June 2026 - ongoing</b></div>
+            <div class="field"><span>Prescriber</span><b>Dr Helen Ward</b></div>
+            <div class="field"><span>Supplying pharmacy</span><b>Willow Pharmacy</b></div>
+            <div class="field"><span>Current stock</span><b>3 doses</b></div>
+            <div class="field"><span>Stock action</span><b>Count required</b></div>
+          </div>
+          <div class="actions"><button>View original prescription</button><button>View stock history</button><button>View MAR records</button></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="option">
+      <div class="option-head">
+        <div>
+          <h2>Option B - Main Detail + Side Summary</h2>
+          <p>Better if stock and prescription dates need to feel separate from clinical instructions.</p>
+        </div>
+        <span class="tag soft">Alternative</span>
+      </div>
+      <div class="card">
+        <div class="row">
+          <span class="num">1</span><span class="rx">Rx</span>
+          <div class="name"><div class="pills"><span class="tag soft">Controlled drug</span><span class="tag">Active</span></div><strong>Pregabalin</strong><small>75 mg capsule - dm+d 37678911000001103</small></div>
+          <div class="cell"><span>Dose and route</span><b>ONE capsule</b></div>
+          <div class="cell"><span>Administration times</span><b>08:00 - 20:00</b></div>
+          <div class="cell"><div class="stockbar"><i></i></div><b>3 doses</b></div>
+          <span class="tag risk status">Low</span>
+        </div>
+        <div class="alert">Low stock - controlled medicine count required</div>
+        <div class="b-body">
+          <div class="b-main">
+            <div class="field"><span>Directions and special instructions</span><b>Swallow whole with water. Do not crush or open the capsule.</b></div>
+            <div class="field"><span>Reason prescribed</span><b>Neuropathic pain</b></div>
+            <div class="field"><span>Last administered</span><b>Today - 08:11</b></div>
+          </div>
+          <aside class="b-side">
+            <div class="field"><span>Prescription dates</span><b>12 June 2026 - ongoing</b></div>
+            <div class="field"><span>Prescriber</span><b>Dr Helen Ward</b></div>
+            <div class="field"><span>Supplying pharmacy</span><b>Willow Pharmacy</b></div>
+            <div class="field"><span>Current stock</span><b>3 doses</b></div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="option">
+      <div class="option-head">
+        <div>
+          <h2>Option C - Named Sections</h2>
+          <p>Most explicit. Useful if carers need clear grouping between clinical instructions, prescription record and stock supply.</p>
+        </div>
+        <span class="tag soft">Most structured</span>
+      </div>
+      <div class="card">
+        <div class="row">
+          <span class="num">1</span><span class="rx">Rx</span>
+          <div class="name"><div class="pills"><span class="tag soft">Controlled drug</span><span class="tag">Active</span></div><strong>Pregabalin</strong><small>75 mg capsule - dm+d 37678911000001103</small></div>
+          <div class="cell"><span>Dose and route</span><b>ONE capsule</b></div>
+          <div class="cell"><span>Administration times</span><b>08:00 - 20:00</b></div>
+          <div class="cell"><div class="stockbar"><i></i></div><b>3 doses</b></div>
+          <span class="tag risk status">Low</span>
+        </div>
+        <div class="alert">Low stock - controlled medicine count required</div>
+        <div class="c-body">
+          <section class="c-band">
+            <div class="c-band-head"><span class="band-label">Clinical use</span></div>
+            <div class="c-band-body">
+              <div class="field wide"><span>Directions and special instructions</span><b>Swallow whole with water. Do not crush or open the capsule.</b></div>
+              <div class="field"><span>Reason prescribed</span><b>Neuropathic pain</b></div>
+            </div>
+          </section>
+          <section class="c-band">
+            <div class="c-band-head"><span class="band-label">Prescription record</span></div>
+            <div class="c-band-body">
+              <div class="field"><span>Last administered</span><b>Today - 08:11</b></div>
+              <div class="field"><span>Prescription dates</span><b>12 June 2026 - ongoing</b></div>
+              <div class="field"><span>Prescriber</span><b>Dr Helen Ward</b></div>
+            </div>
+          </section>
+          <section class="c-band">
+            <div class="c-band-head"><span class="band-label">Stock and supply</span></div>
+            <div class="c-band-body">
+              <div class="field"><span>Supplying pharmacy</span><b>Willow Pharmacy</b></div>
+              <div class="field"><span>Current stock</span><b>3 doses</b></div>
+              <div class="field"><span>Stock action</span><b>Count required</b></div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

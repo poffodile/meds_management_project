@@ -1,53 +1,53 @@
 /**
- * frontend4 — the medication round.
+ * frontend4 - medication round.
  *
- * Two panes on a desktop: the queue of people on the left, the chosen person's
- * medicines on the right. On a phone it becomes one column — the queue, and
- * tapping someone opens their medicines below it, which is what the
- * specification means by "clicking a person can open their medicines on the
- * same page".
- *
- * SCOPE — M2. Queue, medicines, recording. When-required medicines, witnessing,
- * stock deduction and sign-off arrive in M3, one at a time.
- *
- * Recording goes to the server, which is where every rule actually lives. If it
- * refuses — no reason given, a controlled drug with no witness, a PRN maximum
- * reached — the server's own message is shown against the field. This page
- * never guesses at a rule or pre-empts one.
+ * Layout follows the supplied medication-round reference package, while the
+ * data and recording actions remain wired to the existing Inertia props and
+ * Laravel medication round endpoint.
  */
 
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Head, Link, router, useForm } from '@inertiajs/react';
 import F4Shell from '@frontend4/components/F4Shell';
-import {
-    Empty,
-    Field,
-    Medicine,
-    Person,
-    Progress,
-    Row,
-    RowCard,
-    SafetyStrip,
-    Status,
-} from '@frontend4/components/F4Atoms';
+import { Empty, Field, Progress, SafetyStrip, Status } from '@frontend4/components/F4Atoms';
 import * as Icon from '@frontend4/components/F4Icons';
 
-/** What a person's remaining work amounts to, in words as well as a tint. */
-function queueState(p) {
-    if (p.overdue > 0) return { status: 'overdue', note: `${p.overdue} overdue` };
-    if (p.due > 0) return { status: 'due', note: `${p.due} due now` };
-    if (p.later > 0) return { status: 'upcoming', note: `${p.later} later` };
-    return { status: 'given', note: 'All recorded' };
+function initials(name) {
+    const parts = String(name || '').trim().split(/\s+/).filter(Boolean);
+    if (!parts.length) return '?';
+    return (parts[0][0] + (parts.length > 1 ? parts[parts.length - 1][0] : '')).toUpperCase();
 }
 
-/**
- * The panel for recording one medicine's outcome.
- *
- * The order is deliberate and is the safe sequence: the medicine and its
- * details are read first, then an outcome is chosen, and only then does the
- * reason appear — before the confirm button, never after it. A carer must not
- * be able to commit and then be told what they should have typed.
- */
+function queueState(p) {
+    if (p.needsAttention) return { status: 'late', label: 'Attention', note: 'Review' };
+    if (p.overdue > 0) return { status: 'overdue', label: 'Overdue', note: `${p.overdue} overdue` };
+    if (p.due > 0) return { status: 'due', label: 'Due now', note: `${p.due} due` };
+    if (p.later > 0) return { status: 'upcoming', label: 'Upcoming', note: `${p.later} later` };
+    return { status: 'given', label: 'Completed', note: 'All recorded' };
+}
+
+function medicineState(medicine) {
+    if (medicine.code) {
+        return {
+            status: medicine.outcomeStatus || 'given',
+            label: medicine.outcome || 'Recorded',
+            note: medicine.recordedAt ? `at ${medicine.recordedAt}` : null,
+        };
+    }
+    if (medicine.status === 'overdue') return { status: 'overdue', label: 'Overdue' };
+    if (medicine.status === 'due_now' || medicine.status === 'due') return { status: 'due', label: 'Due now' };
+    return { status: 'upcoming', label: 'Upcoming' };
+}
+
+function stockText(medicine) {
+    if (medicine.stock === null || medicine.stock === undefined || medicine.stock === '') return 'Not recorded';
+    return `${medicine.stock} ${medicine.unit || ''}`.trim();
+}
+
+function medicineDetail(medicine) {
+    return [medicine.strength, medicine.form, medicine.route].filter(Boolean).join(' - ') || 'Prescription details not recorded';
+}
+
 function RecordPanel({ medicine, outcomes, date, round, clientId, recordUrl, onDone }) {
     const form = useForm({
         mar_sheet_id: medicine.mar_sheet_id,
@@ -56,56 +56,97 @@ function RecordPanel({ medicine, outcomes, date, round, clientId, recordUrl, onD
         client: clientId,
         time_slot: medicine.slot || 'PRN',
         code: '',
+        dose_given: medicine.dose || '',
+        witnessed_by: '',
         reason: '',
         notes: '',
     });
 
     const chosen = outcomes.find((o) => o.code === form.data.code);
     const needsReason = chosen?.needsReason;
+    const needsWitness = medicine.isControlled && form.data.code === 'A';
 
     function submit(e) {
         e.preventDefault();
         form.post(recordUrl, {
             preserveScroll: true,
-            onSuccess: () => { form.reset(); onDone?.(); },
+            onSuccess: () => {
+                form.reset();
+                onDone?.();
+            },
         });
     }
 
     return (
-        <form onSubmit={submit} style={{ marginTop: 16 }}>
-            <Field
-                id={`outcome-${medicine.mar_sheet_id}`}
-                label="What happened?"
-                error={form.errors.code}
-                required
-            >
-                {(props) => (
-                    <select
-                        {...props}
-                        className="f4-select"
-                        value={form.data.code}
-                        onChange={(e) => {
-                            form.setData('code', e.target.value);
-                            // Clear a reason typed for a different outcome, so
-                            // nobody submits an explanation that no longer fits.
-                            const next = outcomes.find((o) => o.code === e.target.value);
-                            if (!next?.needsReason) form.setData('reason', '');
-                        }}
-                    >
-                        <option value="">Choose an outcome…</option>
-                        {outcomes.map((o) => (
-                            <option key={o.code} value={o.code}>{o.label}</option>
-                        ))}
-                    </select>
-                )}
-            </Field>
+        <form className="f4-round-record" onSubmit={submit}>
+            <div className="f4-round-record-grid">
+                <Field
+                    id={`outcome-${medicine.mar_sheet_id}-${medicine.slot || 'prn'}`}
+                    label="Outcome"
+                    error={form.errors.code}
+                    required
+                >
+                    {(props) => (
+                        <select
+                            {...props}
+                            className="f4-select"
+                            value={form.data.code}
+                            onChange={(e) => {
+                                form.setData('code', e.target.value);
+                                const next = outcomes.find((o) => o.code === e.target.value);
+                                if (!next?.needsReason) form.setData('reason', '');
+                            }}
+                        >
+                            <option value="">Choose outcome</option>
+                            {outcomes.map((o) => (
+                                <option key={o.code} value={o.code}>{o.label}</option>
+                            ))}
+                        </select>
+                    )}
+                </Field>
 
-            {/* The reason appears BEFORE the confirm button, not after it. The
-                server refuses without one too — both halves, or neither. */}
+                <Field
+                    id={`dose-${medicine.mar_sheet_id}-${medicine.slot || 'prn'}`}
+                    label="Dose given"
+                    error={form.errors.dose_given}
+                >
+                    {(props) => (
+                        <input
+                            {...props}
+                            className="f4-input"
+                            type="text"
+                            value={form.data.dose_given}
+                            onChange={(e) => form.setData('dose_given', e.target.value)}
+                        />
+                    )}
+                </Field>
+            </div>
+
+            {needsWitness ? (
+                <Field
+                    id={`witness-${medicine.mar_sheet_id}-${medicine.slot || 'prn'}`}
+                    label="Witness"
+                    hint="Required by the server when this controlled drug is administered."
+                    error={form.errors.witnessed_by}
+                    required
+                >
+                    {(props) => (
+                        <input
+                            {...props}
+                            className="f4-input"
+                            type="text"
+                            value={form.data.witnessed_by}
+                            onChange={(e) => form.setData('witnessed_by', e.target.value)}
+                            placeholder="Witness name"
+                        />
+                    )}
+                </Field>
+            ) : null}
+
             {needsReason ? (
                 <Field
-                    id={`reason-${medicine.mar_sheet_id}`}
-                    label="Why?"
+                    id={`reason-${medicine.mar_sheet_id}-${medicine.slot || 'prn'}`}
+                    label="Reason"
                     hint={chosen.hint}
                     error={form.errors.reason}
                     required
@@ -122,7 +163,7 @@ function RecordPanel({ medicine, outcomes, date, round, clientId, recordUrl, onD
                 </Field>
             ) : null}
 
-            <Field id={`notes-${medicine.mar_sheet_id}`} label="Notes" error={form.errors.notes}>
+            <Field id={`notes-${medicine.mar_sheet_id}-${medicine.slot || 'prn'}`} label="Notes" error={form.errors.notes}>
                 {(props) => (
                     <textarea
                         {...props}
@@ -134,106 +175,113 @@ function RecordPanel({ medicine, outcomes, date, round, clientId, recordUrl, onD
                 )}
             </Field>
 
-            {/* Anything the server refused that is not tied to a single field —
-                a PRN maximum, a missing witness, a closed round. Shown in the
-                server's own words rather than a generic failure. */}
-            {form.errors.mar_sheet_id || form.errors.witnessed_by || form.errors.code_general ? (
-                <p className="f4-field-error" role="alert" style={{ marginBottom: 12 }}>
-                    {form.errors.mar_sheet_id || form.errors.witnessed_by || form.errors.code_general}
+            {form.errors.mar_sheet_id || form.errors.code_general ? (
+                <p className="f4-field-error" role="alert">
+                    {form.errors.mar_sheet_id || form.errors.code_general}
                 </p>
             ) : null}
 
-            <div className="f4-actions" style={{ marginTop: 0 }}>
-                <button
-                    type="submit"
-                    className="f4-btn"
-                    disabled={!form.data.code || form.processing}
-                >
-                    {form.processing ? 'Recording…' : 'Record'}
-                </button>
-                <button type="button" className="f4-btn" data-variant="quiet" onClick={onDone}>
+            <div className="f4-round-record-actions">
+                <button type="button" className="f4-btn" data-variant="secondary" onClick={onDone}>
                     Cancel
+                </button>
+                <button type="submit" className="f4-btn" disabled={!form.data.code || form.processing}>
+                    {form.processing ? 'Recording...' : 'Record outcome'}
                 </button>
             </div>
         </form>
     );
 }
 
-/** One medicine: what it is, what was recorded, and how to record it. */
-function MedicineRow({ medicine, outcomes, date, round, clientId, recordUrl, canRecord }) {
+function MedicineCard({ medicine, index, outcomes, date, round, clientId, recordUrl, canRecord, prn = false }) {
     const [open, setOpen] = useState(false);
     const recorded = Boolean(medicine.code);
+    const state = medicineState(medicine);
+    const prnMeta = medicine.prn || {};
 
     return (
-        <div className="f4-row" data-status={recorded ? medicine.outcomeStatus : medicine.status === 'overdue' ? 'overdue' : undefined} style={{ display: 'block' }}>
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16, flexWrap: 'wrap' }}>
-                <div style={{ flex: '1 1 320px', minWidth: 0 }}>
-                    <Medicine
-                        name={medicine.name}
-                        strength={medicine.strength}
-                        form={medicine.form}
-                        dose={medicine.dose}
-                        route={medicine.route}
-                        due={medicine.slot}
-                        instruction={medicine.instruction}
-                        indication={medicine.indication}
-                    />
+        <article className="f4-round-med" data-status={state.status} data-recorded={recorded ? 'true' : undefined}>
+            <header className="f4-round-med-head">
+                <span className="f4-round-med-number">{recorded ? <Icon.Given /> : (prn ? 'P' : index + 1)}</span>
+                <span className="f4-round-med-title">
+                    <span>
+                        {prn ? <i className="f4-round-chip">PRN</i> : null}
+                        {medicine.isControlled ? <i className="f4-round-chip" data-tone="witness">Controlled drug</i> : null}
+                    </span>
+                    <strong>{medicine.name}</strong>
+                    <small>{medicineDetail(medicine)}</small>
+                </span>
+                <span className="f4-round-med-time">
+                    <small>{prn ? 'Availability' : 'Scheduled'}</small>
+                    <strong>{prn ? (prnMeta.blocked ? prnMeta.block_reason : 'Available when required') : (medicine.slot || 'Not recorded')}</strong>
+                </span>
+                <span className="f4-round-med-stock">
+                    <small>Stock</small>
+                    <strong>{stockText(medicine)}</strong>
+                </span>
+                <Status status={state.status} label={state.label} note={state.note} fill="soft" />
+            </header>
 
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginTop: 10, alignItems: 'center' }}>
-                        {medicine.isControlled ? (
-                            <Status status="witness" label="Controlled drug" variant="badge" />
-                        ) : null}
-                        {medicine.lowStock ? (
-                            <Status
-                                status={medicine.stock !== null && medicine.stock <= 0 ? 'overdue' : 'late'}
-                                label={medicine.stock !== null && medicine.stock <= 0 ? 'Out of stock' : 'Low stock'}
-                                note={medicine.stock !== null ? `${medicine.stock} ${medicine.unit || ''} left`.trim() : undefined}
-                                variant="badge"
-                            />
-                        ) : (
-                            medicine.stock !== null ? (
-                                <span className="f4-row-sub">
-                                    {medicine.stock} {medicine.unit || ''} in stock
-                                </span>
-                            ) : null
-                        )}
+            <section className="f4-round-instruction">
+                <div>
+                    <small>{prn ? 'PRN protocol' : 'Directions'}</small>
+                    <strong>{medicine.instruction || 'No administration instruction recorded.'}</strong>
+                </div>
+                <div>
+                    <small>Reason prescribed</small>
+                    <strong>{medicine.indication || 'Not recorded'}</strong>
+                </div>
+            </section>
+
+            <section className="f4-round-med-meta">
+                <span><small>Dose</small><strong>{medicine.dose || 'Not recorded'}</strong></span>
+                <span><small>Route</small><strong>{medicine.route || 'Not recorded'}</strong></span>
+                <span><small>Last recorded</small><strong>{medicine.recordedAt || prnMeta.last_given || 'Not recorded'}</strong></span>
+                <span><small>Current stock</small><strong>{stockText(medicine)}</strong></span>
+            </section>
+
+            {prn ? (
+                <section className="f4-round-prn-rules">
+                    <span><small>Given today</small><strong>{prnMeta.given_today ?? 0}</strong></span>
+                    <span><small>Max in 24h</small><strong>{prnMeta.max_daily ?? 'Not recorded'}</strong></span>
+                    <span><small>Minimum interval</small><strong>{prnMeta.interval_hours ? `${prnMeta.interval_hours} h` : 'Not recorded'}</strong></span>
+                    <span><small>Next available</small><strong>{prnMeta.next_available || 'Now'}</strong></span>
+                </section>
+            ) : null}
+
+            {recorded ? (
+                <div className="f4-round-result" data-status={state.status}>
+                    <span><Icon.Given /></span>
+                    <div>
+                        <strong>{medicine.outcome || 'Recorded'}</strong>
+                        <small>
+                            {[medicine.reason ? `Reason: ${medicine.reason}` : null, medicine.notes, medicine.witnessed_by ? `Witness: ${medicine.witnessed_by}` : null]
+                                .filter(Boolean)
+                                .join(' - ') || 'No additional note recorded.'}
+                        </small>
+                        <em>{[medicine.recordedAt ? `Recorded at ${medicine.recordedAt}` : null, medicine.recordedBy ? `by ${medicine.recordedBy}` : null].filter(Boolean).join(' ')}</em>
                     </div>
+                    {canRecord ? (
+                        <button type="button" onClick={() => setOpen((v) => !v)}>
+                            {open ? 'Close' : 'Change'}
+                        </button>
+                    ) : null}
                 </div>
-
-                <div style={{ flex: '0 0 auto', display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'flex-end' }}>
-                    {recorded ? (
-                        <>
-                            <Status status={medicine.outcomeStatus} label={medicine.outcome} />
-                            <span className="f4-row-sub" style={{ textAlign: 'right' }}>
-                                {medicine.recordedAt ? `at ${medicine.recordedAt}` : null}
-                                {medicine.recordedBy ? ` by ${medicine.recordedBy}` : null}
-                            </span>
-                            {medicine.reason ? (
-                                <span className="f4-row-sub" style={{ textAlign: 'right' }}>{medicine.reason}</span>
-                            ) : null}
-                        </>
-                    ) : (
-                        <>
-                            <Status
-                                status={medicine.status === 'overdue' ? 'overdue' : medicine.status === 'due_now' ? 'due' : 'upcoming'}
-                            />
-                            {canRecord ? (
-                                <button
-                                    type="button"
-                                    className="f4-btn"
-                                    data-size="sm"
-                                    data-variant={open ? 'quiet' : undefined}
-                                    onClick={() => setOpen((v) => !v)}
-                                >
-                                    {open ? 'Close' : 'Record'}
-                                </button>
-                            ) : null}
-                        </>
-                    )}
+            ) : (
+                <div className="f4-round-med-actions">
+                    <button
+                        type="button"
+                        className="f4-btn"
+                        disabled={!canRecord || prnMeta.blocked}
+                        onClick={() => setOpen((v) => !v)}
+                    >
+                        {open ? 'Close recording' : prn ? 'Start PRN assessment' : 'Record medicine'}
+                    </button>
+                    {prnMeta.blocked ? <span>{prnMeta.block_reason}</span> : null}
                 </div>
-            </div>
+            )}
 
-            {open && !recorded ? (
+            {open && canRecord ? (
                 <RecordPanel
                     medicine={medicine}
                     outcomes={outcomes}
@@ -244,6 +292,88 @@ function MedicineRow({ medicine, outcomes, date, round, clientId, recordUrl, can
                     onDone={() => setOpen(false)}
                 />
             ) : null}
+        </article>
+    );
+}
+
+function QueueItem({ person, selected, onChoose }) {
+    const state = queueState(person);
+    return (
+        <button
+            type="button"
+            className="f4-round-person"
+            data-active={selected ? 'true' : undefined}
+            data-status={state.status}
+            onClick={onChoose}
+            aria-current={selected ? 'true' : undefined}
+        >
+            <b>{initials(person.name)}</b>
+            <span>
+                <strong>{person.name}</strong>
+                <small>{[person.meta, `${person.total} medicines`].filter(Boolean).join(' - ')}</small>
+                <em>{person.needsAttention ? 'Needs attention' : state.note}</em>
+            </span>
+            <time>
+                {person.nextSlot || '--:--'}
+                <small>{state.label}</small>
+            </time>
+        </button>
+    );
+}
+
+function CompletionReview({ selected, round, progress, onClose }) {
+    if (!selected) return null;
+    const medicines = selected.medicines || [];
+    const prns = selected.prnMedicines || [];
+    const recorded = medicines.filter((m) => m.code).length;
+    const outstanding = medicines.length - recorded;
+
+    return (
+        <div className="f4-round-modal" role="dialog" aria-modal="true" aria-labelledby="round-complete-title">
+            <section className="f4-round-sheet">
+                <header>
+                    <button type="button" onClick={onClose} aria-label="Close review"><Icon.Close /></button>
+                    <div>
+                        <p className="f4-round-eyebrow">Final safety review</p>
+                        <h2 id="round-complete-title">Complete {selected.name}</h2>
+                        <span>{round.label} round - {progress.recorded} of {progress.doses} doses recorded</span>
+                    </div>
+                    <b>{initials(selected.name)}</b>
+                </header>
+
+                {selected.allergies?.length ? (
+                    <div className="f4-round-modal-alert">
+                        <Icon.Alert />
+                        <span><small>Known allergy</small><strong>{selected.allergies.join(' - ')}</strong></span>
+                    </div>
+                ) : null}
+
+                <div className="f4-round-review-stats">
+                    <article><small>Scheduled</small><strong>{medicines.length}</strong><span>medicines</span></article>
+                    <article><small>Recorded</small><strong>{recorded}</strong><span>outcomes</span></article>
+                    <article><small>Outstanding</small><strong data-warn={outstanding > 0 ? 'true' : undefined}>{outstanding}</strong><span>require action</span></article>
+                    <article><small>PRN</small><strong>{prns.length}</strong><span>available</span></article>
+                </div>
+
+                <section className="f4-round-review-list">
+                    <div><p className="f4-round-eyebrow">Administration summary</p><h3>Scheduled medicines</h3></div>
+                    {medicines.length ? medicines.map((medicine) => {
+                        const state = medicineState(medicine);
+                        return (
+                            <article key={`${medicine.mar_sheet_id}-${medicine.slot || 'scheduled'}`}>
+                                <Status status={state.status} label={state.label} fill="soft" />
+                                <span><strong>{medicine.name}</strong><small>{medicineDetail(medicine)}</small></span>
+                                <time>{medicine.recordedAt || 'Not recorded'}</time>
+                            </article>
+                        );
+                    }) : <p>No scheduled medicines for this person in this round.</p>}
+                </section>
+
+                <footer>
+                    <button type="button" className="f4-btn" data-variant="secondary" onClick={onClose}>Return to medicines</button>
+                    <button type="button" className="f4-btn" disabled={outstanding > 0}>Ready for sign-off</button>
+                </footer>
+            </section>
         </div>
     );
 }
@@ -266,13 +396,31 @@ export default function Round({
     recordUrl,
 }) {
     const [search, setSearch] = useState('');
+    const [filter, setFilter] = useState('all');
+    const [showComplete, setShowComplete] = useState(false);
     const canRecord = Array.isArray(can) && can.includes('record_administration');
 
-    const filtered = search.trim()
-        ? queue.filter((p) => p.name.toLowerCase().includes(search.trim().toLowerCase()))
-        : queue;
+    const filters = [
+        { key: 'all', label: 'All' },
+        { key: 'due', label: 'Due now' },
+        { key: 'late', label: 'Attention' },
+        { key: 'given', label: 'Completed' },
+    ];
 
-    const outstanding = queue.filter((p) => p.state === 'overdue' || p.state === 'due').length;
+    const filtered = useMemo(() => {
+        const needle = search.trim().toLowerCase();
+        return (queue || []).filter((p) => {
+            const state = queueState(p).status;
+            const matchesFilter = filter === 'all' || state === filter || (filter === 'due' && state === 'overdue');
+            const matchesSearch = !needle || String(p.name || '').toLowerCase().includes(needle);
+            return matchesFilter && matchesSearch;
+        });
+    }, [queue, search, filter]);
+
+    const outstanding = (queue || []).filter((p) => p.state === 'overdue' || p.state === 'due' || p.needsAttention).length;
+    const selectedMedicines = selected?.medicines || [];
+    const selectedPrns = selected?.prnMedicines || [];
+    const recordedForSelected = selectedMedicines.filter((m) => m.code).length;
 
     function choose(clientId) {
         router.get(
@@ -289,10 +437,10 @@ export default function Round({
             summary={
                 closure
                     ? `${round.label} round closed by ${closure.by || 'a colleague'}${closure.at ? ` at ${closure.at}` : ''}`
-                    : `${progress.recorded} of ${progress.doses} doses recorded · ${outstanding} ${outstanding === 1 ? 'client' : 'clients'} still to see`
+                    : `${progress.recorded} of ${progress.doses} doses recorded - ${outstanding} ${outstanding === 1 ? 'client' : 'clients'} still to see`
             }
             place={place}
-            placeSub={round.window ? `${round.label} · ${round.window}` : round.label}
+            placeSub={round.window ? `${round.label} - ${round.window}` : round.label}
             user={user}
             roleLabel={roleLabel}
             can={can}
@@ -300,165 +448,198 @@ export default function Round({
         >
             <Head title="Medication round" />
 
-            {/* Which round. A carer may be preparing the next one, so this is a
-                choice rather than a fact — but it defaults to the one we are in. */}
-            <div className="f4-actions" style={{ marginTop: 0, marginBottom: 16 }}>
-                {rounds.map((r) => (
-                    <Link
-                        key={r.key}
-                        href={`/frontend4/round?date=${date}&round=${r.key}`}
-                        className="f4-btn"
-                        data-size="sm"
-                        data-variant={r.key === round.key ? undefined : 'quiet'}
-                    >
-                        {r.label}
-                    </Link>
-                ))}
-            </div>
-
-            {closure ? (
-                <div className="f4-offline" role="status" style={{ marginBottom: 16, borderRadius: 10 }}>
-                    <Icon.Shield />
-                    <span>
-                        This round has been closed. Nothing further can be recorded against it
-                        until it is reopened.
-                    </span>
+            <section className="f4-round-page">
+                <div className="f4-round-switcher" aria-label="Medication rounds">
+                    {rounds.map((r) => (
+                        <Link
+                            key={r.key}
+                            href={`/frontend4/round?date=${date}&round=${r.key}`}
+                            className="f4-round-tab"
+                            data-active={r.key === round.key ? 'true' : undefined}
+                        >
+                            <strong>{r.label}</strong>
+                            <small>{r.window || 'No window'}</small>
+                        </Link>
+                    ))}
                 </div>
-            ) : null}
 
-            <section className="f4-card" style={{ marginBottom: 16 }}>
-                <Progress
-                    percent={progress.percent}
-                    label={`${progress.recorded} of ${progress.doses} doses recorded in the ${round.label.toLowerCase()} round`}
-                />
-                <p className="f4-row-sub" style={{ marginTop: 8 }}>
-                    {progress.recorded} of {progress.doses} doses recorded ·{' '}
-                    {progress.peopleDone} of {progress.people} clients complete ·{' '}
-                    {progress.outstanding} still to record
-                </p>
-            </section>
+                <section className="f4-round-hero">
+                    <div>
+                        <p className="f4-round-eyebrow">{date} - {round.window || 'Round window not recorded'}</p>
+                        <h2>{round.label} round</h2>
+                        <p>Record each medicine immediately after administration.</p>
+                    </div>
+                    <div className="f4-round-progress">
+                        <span><b>{progress.recorded}</b> of {progress.doses} doses recorded</span>
+                        <Progress percent={progress.percent} label={`${progress.recorded} of ${progress.doses} doses recorded`} />
+                    </div>
+                </section>
 
-            <div className="f4-cols">
-                {/* ── The queue ───────────────────────────────────────────── */}
-                <div>
-                    <RowCard
-                        title="Clients"
-                        note={outstanding ? `${outstanding} to see` : 'All recorded'}
-                    >
-                        <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--f4-line)' }}>
-                            <label className="f4-sr" htmlFor="round-search">Search clients</label>
+                {closure ? (
+                    <section className="f4-round-alert" data-tone="locked">
+                        <Icon.Shield />
+                        <div><strong>Round closed</strong><span>Nothing further can be recorded until this round is reopened.</span></div>
+                    </section>
+                ) : (
+                    <section className="f4-round-alert">
+                        <Icon.Shield />
+                        <div><strong>Safety check</strong><span>Confirm the right person, medicine, dose, route, time and right to refuse before recording.</span></div>
+                    </section>
+                )}
+
+                <div className="f4-round-layout">
+                    <aside className="f4-round-queue">
+                        <header>
+                            <div><p className="f4-round-eyebrow">Round queue</p><h2>Clients</h2></div>
+                            <span>{outstanding ? `${outstanding} to see` : 'All recorded'}</span>
+                        </header>
+                        <label className="f4-round-search" htmlFor="round-search">
+                            <Icon.Search />
                             <input
                                 id="round-search"
-                                className="f4-input"
                                 type="search"
-                                placeholder="Search by name"
+                                placeholder="Search clients"
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                             />
+                        </label>
+                        <div className="f4-round-filters">
+                            {filters.map((item) => (
+                                <button
+                                    key={item.key}
+                                    type="button"
+                                    className={filter === item.key ? 'active' : ''}
+                                    onClick={() => setFilter(item.key)}
+                                >
+                                    {item.label}
+                                </button>
+                            ))}
                         </div>
-
-                        {filtered.length === 0 ? (
-                            <Empty
-                                title={search ? 'Nobody matches that' : 'Nobody is scheduled in this round'}
-                                body={
-                                    search
-                                        ? 'Try part of the name, or clear the search to see everyone in this round.'
-                                        : `No client has a medicine scheduled in the ${round.label.toLowerCase()} round today. Check the date and the home in the bar above if that looks wrong.`
-                                }
-                            />
-                        ) : (
-                            filtered.map((p) => {
-                                const state = queueState(p);
-                                const isOpen = p.client_id === selectedClientId;
-
-                                return (
-                                    <button
-                                        key={p.client_id}
-                                        type="button"
-                                        className="f4-row"
-                                        data-status={state.status}
-                                        data-done={p.state === 'given' ? 'true' : undefined}
-                                        onClick={() => choose(p.client_id)}
-                                        aria-current={isOpen ? 'true' : undefined}
-                                        style={isOpen ? { background: 'var(--f4-info-b, var(--f4-sunken))' } : undefined}
-                                    >
-                                        <span className="f4-row-main">
-                                            <Person name={p.name} photo={p.photo} meta={p.meta} />
-                                            {p.allergies.length ? (
-                                                <span style={{ display: 'block', marginTop: 6 }}>
-                                                    <SafetyStrip allergies={p.allergies} />
-                                                </span>
-                                            ) : null}
-                                        </span>
-                                        <span className="f4-row-end">
-                                            {p.nextSlot ? <span className="f4-row-time">{p.nextSlot}</span> : null}
-                                            <Status status={state.status} note={state.note} />
-                                        </span>
-                                    </button>
-                                );
-                            })
-                        )}
-                    </RowCard>
-                </div>
-
-                {/* ── The chosen person's medicines ───────────────────────── */}
-                <div>
-                    {!selected ? (
-                        <section className="f4-card">
-                            <Empty
-                                title="Choose a client"
-                                body="Pick someone from the list to see their medicines for this round."
-                            />
-                        </section>
-                    ) : (
-                        <>
-                            {/* Identity and allergies stay above the medicines the
-                                whole time they are being recorded. */}
-                            <section className="f4-card" style={{ marginBottom: 16 }}>
-                                <Person
-                                    name={selected.name}
-                                    photo={selected.photo}
-                                    meta={[selected.meta, selected.dob ? `Born ${selected.dob}` : null].filter(Boolean).join(' · ')}
-                                    size="lg"
+                        <div className="f4-round-people">
+                            {filtered.length ? filtered.map((p) => (
+                                <QueueItem
+                                    key={p.client_id}
+                                    person={p}
+                                    selected={p.client_id === selectedClientId}
+                                    onChoose={() => choose(p.client_id)}
                                 />
-                                {selected.allergies.length || selected.risks.length ? (
-                                    <div style={{ marginTop: 12, display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                                        <SafetyStrip allergies={selected.allergies} />
-                                        {selected.risks.length ? (
-                                            <SafetyStrip risks={selected.risks} tone="caution" />
-                                        ) : null}
-                                    </div>
-                                ) : null}
-                            </section>
+                            )) : (
+                                <Empty
+                                    title={search ? 'Nobody matches that' : 'Nobody is scheduled'}
+                                    body={search ? 'Try a different name.' : `No client has a medicine scheduled in the ${round.label.toLowerCase()} round.`}
+                                />
+                            )}
+                        </div>
+                    </aside>
 
-                            <RowCard
-                                title="Medicines due"
-                                note={`${selected.medicines.length} in this round`}
-                            >
-                                {selected.medicines.length === 0 ? (
-                                    <Empty
-                                        title="Nothing scheduled"
-                                        body={`${selected.name} has no medicine scheduled in the ${round.label.toLowerCase()} round.`}
-                                    />
-                                ) : (
-                                    selected.medicines.map((m) => (
-                                        <MedicineRow
-                                            key={`${m.mar_sheet_id}-${m.slot || 'prn'}`}
-                                            medicine={m}
-                                            outcomes={outcomes}
-                                            date={date}
-                                            round={round.key}
-                                            clientId={selected.client_id}
-                                            recordUrl={recordUrl}
-                                            canRecord={canRecord && !closure}
-                                        />
-                                    ))
-                                )}
-                            </RowCard>
-                        </>
-                    )}
+                    <section className="f4-round-work">
+                        {!selected ? (
+                            <div className="f4-round-empty">
+                                <Empty title="Choose a client" body="Pick someone from the queue to see their medicines for this round." />
+                            </div>
+                        ) : (
+                            <>
+                                <article className="f4-round-person-banner">
+                                    <b>{initials(selected.name)}</b>
+                                    <div>
+                                        <p className="f4-round-eyebrow">Selected client</p>
+                                        <h2>{selected.name}</h2>
+                                        <span>{[selected.meta, selected.dob ? `Born ${selected.dob}` : null].filter(Boolean).join(' - ') || 'Profile details not recorded'}</span>
+                                    </div>
+                                    <div className="f4-round-person-alerts">
+                                        <SafetyStrip allergies={selected.allergies || []} />
+                                        <SafetyStrip risks={selected.risks || []} tone="caution" />
+                                    </div>
+                                </article>
+
+                                <div className="f4-round-summary">
+                                    <span><small>Scheduled time</small><strong>{round.window || 'Not recorded'}</strong></span>
+                                    <span><small>Medicines</small><strong>{selectedMedicines.length}</strong></span>
+                                    <span><small>Recorded</small><strong>{recordedForSelected}</strong></span>
+                                    <span><small>PRN available</small><strong>{selectedPrns.length}</strong></span>
+                                </div>
+
+                                <section className="f4-round-section">
+                                    <header className="f4-round-section-head">
+                                        <div><p className="f4-round-eyebrow">Medication administration</p><h2>Medicines due now</h2></div>
+                                        <span>{recordedForSelected}/{selectedMedicines.length} recorded</span>
+                                    </header>
+                                    <div className="f4-round-meds">
+                                        {selectedMedicines.length ? selectedMedicines.map((medicine, index) => (
+                                            <MedicineCard
+                                                key={`${medicine.mar_sheet_id}-${medicine.slot || 'scheduled'}`}
+                                                medicine={medicine}
+                                                index={index}
+                                                outcomes={outcomes}
+                                                date={date}
+                                                round={round.key}
+                                                clientId={selected.client_id}
+                                                recordUrl={recordUrl}
+                                                canRecord={canRecord && !closure}
+                                            />
+                                        )) : (
+                                            <Empty title="Nothing scheduled" body={`${selected.name} has no scheduled medicine in this round.`} />
+                                        )}
+                                    </div>
+                                </section>
+
+                                <section className="f4-round-section">
+                                    <header className="f4-round-section-head">
+                                        <div><p className="f4-round-eyebrow">When required medicine</p><h2>PRN available</h2></div>
+                                        <span>{selectedPrns.length} available</span>
+                                    </header>
+                                    <div className="f4-round-meds">
+                                        {selectedPrns.length ? selectedPrns.map((medicine, index) => (
+                                            <MedicineCard
+                                                key={`${medicine.mar_sheet_id}-prn-${index}`}
+                                                medicine={medicine}
+                                                index={index}
+                                                prn
+                                                outcomes={outcomes}
+                                                date={date}
+                                                round={round.key}
+                                                clientId={selected.client_id}
+                                                recordUrl={recordUrl}
+                                                canRecord={canRecord && !closure}
+                                            />
+                                        )) : (
+                                            <Empty title="No PRN medicines" body="No when-required medicine is available for this client from the current record." />
+                                        )}
+                                    </div>
+                                </section>
+
+                                <section className="f4-round-audit">
+                                    <header><div><p className="f4-round-eyebrow">Permanent record</p><h2>Activity and change log</h2></div><span>Live MAR record</span></header>
+                                    <article>
+                                        <time>{now || '--:--'}</time>
+                                        <i />
+                                        <div><strong>Current round loaded</strong><p>Administration records are written to the existing MAR service when an outcome is submitted.</p><small>{user || 'Current user'}</small></div>
+                                    </article>
+                                </section>
+
+                                <footer className="f4-round-complete">
+                                    <div>
+                                        <strong>{selectedMedicines.length - recordedForSelected ? `${selectedMedicines.length - recordedForSelected} medicines still require an outcome` : 'All scheduled medicines recorded'}</strong>
+                                        <span>Review the client before moving on.</span>
+                                    </div>
+                                    <button type="button" className="f4-btn" onClick={() => setShowComplete(true)}>
+                                        Review and complete
+                                    </button>
+                                </footer>
+                            </>
+                        )}
+                    </section>
                 </div>
-            </div>
+            </section>
+
+            {showComplete ? (
+                <CompletionReview
+                    selected={selected}
+                    round={round}
+                    progress={progress}
+                    onClose={() => setShowComplete(false)}
+                />
+            ) : null}
         </F4Shell>
     );
 }

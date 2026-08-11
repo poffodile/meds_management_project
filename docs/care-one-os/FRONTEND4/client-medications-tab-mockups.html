@@ -1,0 +1,1063 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Frontend4 Client Medications Tab Mockups</title>
+  <style>
+    :root {
+      --bg: #f6f2ea;
+      --surface: #fffdf8;
+      --surface-2: #f0ebe1;
+      --ink: #172033;
+      --body: #485363;
+      --muted: #6f7a84;
+      --line: #ded7ca;
+      --line-hard: #cbc3b5;
+      --teal: #0f766e;
+      --teal-soft: #dcefeb;
+      --red: #a33c3c;
+      --red-soft: #f2dfdc;
+      --amber: #926719;
+      --amber-soft: #f4e7c7;
+      --navy: #16253d;
+      --shadow: 0 18px 45px rgba(42, 36, 25, .11);
+      font-family: Inter, Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-size: 14px;
+      line-height: 1.4;
+    }
+    .page { max-width: 1440px; margin: 0 auto; padding: 28px; }
+    .intro {
+      display: flex; justify-content: space-between; align-items: flex-end; gap: 20px;
+      margin-bottom: 22px;
+    }
+    h1, h2, h3, p { margin: 0; }
+    h1 { font-size: 28px; line-height: 1.1; letter-spacing: 0; }
+    .intro p { margin-top: 8px; max-width: 760px; color: var(--body); }
+    .note {
+      flex: none;
+      max-width: 360px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      color: var(--body);
+      font-size: 12px;
+    }
+    .option {
+      margin-top: 24px;
+      border: 1px solid var(--line-hard);
+      border-radius: 8px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .option-head {
+      display: flex; justify-content: space-between; align-items: center; gap: 16px;
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(180deg, #fffdf8, #f8f4ec);
+    }
+    .option-head h2 { font-size: 18px; }
+    .option-head p { color: var(--body); font-size: 12.5px; max-width: 720px; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: var(--teal-soft);
+      color: #155e56;
+      font-weight: 750;
+      font-size: 11px;
+      white-space: nowrap;
+    }
+    .content { padding: 20px; }
+    .tabs {
+      display: flex; gap: 4px; overflow-x: auto;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 18px;
+    }
+    .tab {
+      padding: 10px 12px;
+      color: var(--muted);
+      white-space: nowrap;
+      border-bottom: 2px solid transparent;
+    }
+    .tab.active { color: var(--teal); border-color: var(--teal); font-weight: 750; }
+    .pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 9px; border-radius: 999px;
+      background: var(--teal-soft); color: #155e56;
+      font-size: 11px; font-weight: 750;
+    }
+    .pill.red { background: var(--red-soft); color: var(--red); }
+    .pill.amber { background: var(--amber-soft); color: var(--amber); }
+    .rx {
+      width: 34px; height: 34px; border-radius: 9px;
+      display: grid; place-items: center;
+      background: var(--teal-soft); color: var(--teal);
+      font-size: 10px; font-weight: 850;
+    }
+    .mini { color: var(--muted); font-size: 11px; }
+    .k { color: var(--muted); font-size: 9.5px; font-weight: 850; text-transform: uppercase; letter-spacing: .05em; }
+    .v { color: var(--ink); font-weight: 750; }
+    .bar { height: 7px; background: var(--surface-2); border-radius: 99px; overflow: hidden; }
+    .bar span { display: block; height: 100%; border-radius: 99px; background: var(--teal); }
+    .bar.low span { background: var(--red); }
+
+    /* Option A */
+    .board {
+      display: grid; grid-template-columns: minmax(0, 1.1fr) 330px; gap: 18px;
+    }
+    .hero-med {
+      border: 1px solid var(--line-hard);
+      border-radius: 8px;
+      background: #fffefa;
+      padding: 18px;
+    }
+    .hero-med-top { display: grid; grid-template-columns: 42px minmax(0, 1fr) auto; gap: 13px; align-items: start; }
+    .hero-med h3 { font-size: 21px; line-height: 1.15; }
+    .tile-grid { margin-top: 18px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    .tile { padding: 13px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface-2); }
+    .stock-card { margin-top: 16px; padding: 14px; border: 1px solid var(--line); border-radius: 8px; }
+    .side-list { display: grid; gap: 10px; }
+    .side-med {
+      display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; gap: 10px;
+      padding: 12px; border: 1px solid var(--line); border-radius: 8px; background: #fffefa;
+    }
+
+    /* Option B */
+    .split {
+      display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: 18px;
+    }
+    .filters, .detail {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fffefa;
+    }
+    .filters { padding: 14px; }
+    .filter-row { display: flex; justify-content: space-between; gap: 10px; padding: 10px 0; border-top: 1px solid var(--line); }
+    .filter-row:first-child { border-top: 0; padding-top: 0; }
+    .med-table { width: 100%; border-collapse: collapse; }
+    .med-table th, .med-table td { padding: 13px 14px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    .med-table th { color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: .05em; }
+    .med-table td:last-child, .med-table th:last-child { text-align: right; }
+    .detail-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 14px; }
+
+    /* Option C */
+    .groups { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+    .group { border: 1px solid var(--line); border-radius: 8px; background: #fffefa; overflow: hidden; }
+    .group-head { padding: 14px; background: var(--surface-2); border-bottom: 1px solid var(--line); }
+    .group-head h3 { font-size: 15px; }
+    .group-body { display: grid; gap: 10px; padding: 12px; }
+    .stack-card { padding: 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+    .stack-top { display: flex; justify-content: space-between; align-items: start; gap: 10px; }
+    .stack-meta { margin-top: 11px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+    /* Option D */
+    .dense-top { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 14px; }
+    .metric { padding: 13px; border: 1px solid var(--line); border-radius: 8px; background: #fffefa; }
+    .ledger { border: 1px solid var(--line); border-radius: 8px; background: #fffefa; overflow: hidden; }
+    .ledger-row {
+      display: grid; grid-template-columns: 38px minmax(180px, 1.3fr) minmax(130px, .9fr) minmax(130px, .9fr) 140px 110px;
+      gap: 12px; align-items: center;
+      padding: 13px 14px; border-top: 1px solid var(--line);
+    }
+    .ledger-row:first-child { border-top: 0; }
+    .ledger-name strong { display: block; }
+    .stock-mini { display: grid; gap: 6px; }
+
+    /* Option E */
+    .saas-toolbar {
+      display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px;
+      margin-bottom: 14px;
+    }
+    .saas-metric {
+      padding: 13px 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fffefa;
+    }
+    .saas-metric strong { display: block; margin-top: 4px; font-size: 18px; }
+    .saas-controls {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fffefa;
+      margin-bottom: 14px;
+    }
+    .saas-search {
+      flex: 1 1 auto;
+      min-width: 180px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: var(--surface);
+      color: var(--muted);
+    }
+    .seg { display: flex; flex-wrap: wrap; gap: 6px; }
+    .seg span {
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      color: var(--body);
+      background: var(--surface);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .seg span.active { border-color: var(--teal); color: var(--teal); background: var(--teal-soft); }
+    .saas-layout { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 16px; align-items: start; }
+    .saas-register, .saas-detail {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fffefa;
+      overflow: hidden;
+    }
+    .saas-row {
+      display: grid;
+      grid-template-columns: 38px minmax(210px, 1.25fr) minmax(115px, .72fr) minmax(150px, .86fr) minmax(145px, .75fr) 102px;
+      gap: 12px;
+      align-items: center;
+      padding: 13px 14px;
+      border-top: 1px solid var(--line);
+    }
+    .saas-row:first-child { border-top: 0; }
+    .saas-head {
+      background: var(--surface-2);
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 850;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+    .saas-head .rx { visibility: hidden; }
+    .saas-name strong { display: block; }
+    .saas-detail-head { padding: 16px; border-bottom: 1px solid var(--line); }
+    .saas-detail-head h3 { margin-top: 8px; font-size: 19px; line-height: 1.15; }
+    .saas-detail-body { padding: 14px; display: grid; gap: 10px; }
+    .detail-card {
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+    }
+    .detail-card p { margin-top: 4px; color: var(--body); font-size: 12px; }
+    .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px; }
+    .btn {
+      display: grid; place-items: center;
+      min-height: 36px;
+      border: 1px solid var(--line-hard);
+      border-radius: 7px;
+      color: var(--navy);
+      background: var(--surface);
+      font-weight: 750;
+    }
+
+    /* Option F */
+    .full-register { display: grid; gap: 14px; }
+    .full-table {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fffefa;
+      overflow: hidden;
+    }
+    .full-row {
+      display: grid;
+      grid-template-columns: 38px minmax(230px, 1.35fr) minmax(130px, .75fr) minmax(160px, .9fr) minmax(150px, .75fr) 105px;
+      gap: 14px;
+      align-items: center;
+      padding: 14px 16px;
+      border-top: 1px solid var(--line);
+    }
+    .full-row:first-child { border-top: 0; }
+    .full-head {
+      background: var(--surface-2);
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 850;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+    .full-head .rx { visibility: hidden; }
+    .full-name strong { display: block; }
+    .full-row.selected { background: linear-gradient(90deg, var(--teal-soft), #fffefa 42%); box-shadow: inset 4px 0 0 var(--teal); }
+    .inline-detail {
+      border: 1px solid var(--line-hard);
+      border-radius: 8px;
+      background: #fffefa;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .inline-detail-head {
+      display: flex; align-items: flex-start; justify-content: space-between; gap: 14px;
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(180deg, #fffefa, #f8f4ec);
+    }
+    .inline-detail-head h3 { font-size: 20px; line-height: 1.15; }
+    .inline-subgrid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--line);
+    }
+    .inline-note-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      padding: 14px 18px 18px;
+    }
+    .inline-note {
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+    }
+    .inline-note p { margin-top: 5px; color: var(--body); font-size: 12px; }
+
+    /* Option G */
+    .paged-shell { display: grid; gap: 14px; }
+    .paged-summary {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .paged-count {
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fffefa;
+    }
+    .paged-count strong { display: block; margin-top: 3px; font-size: 18px; }
+    .paged-controls {
+      display: grid;
+      grid-template-columns: minmax(220px, 1fr) auto auto;
+      gap: 10px;
+      align-items: center;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fffefa;
+    }
+    .page-select, .pager {
+      min-height: 38px;
+      display: flex; align-items: center; gap: 8px;
+      padding: 0 10px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: var(--surface);
+      color: var(--body);
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .pager b { color: var(--ink); }
+    .compact-list {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fffefa;
+      overflow: hidden;
+    }
+    .compact-row {
+      display: grid;
+      grid-template-columns: 34px 42px minmax(220px, 1.4fr) minmax(120px, .7fr) minmax(130px, .8fr) minmax(120px, .7fr) 96px;
+      gap: 12px;
+      align-items: center;
+      padding: 11px 14px;
+      border-top: 1px solid var(--line);
+    }
+    .compact-row:first-child { border-top: 0; }
+    .compact-row > * { min-width: 0; }
+    .compact-head {
+      background: var(--surface-2);
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 850;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+    .compact-head .rx { visibility: hidden; }
+    .compact-name { min-width: 0; }
+    .compact-name strong {
+      display: block;
+      color: var(--ink);
+      line-height: 1.2;
+      overflow-wrap: anywhere;
+    }
+    .compact-name .mini {
+      display: block;
+      margin-top: 4px;
+      line-height: 1.35;
+    }
+    .row-num {
+      width: 28px; height: 28px; border-radius: 7px;
+      display: grid; place-items: center;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--muted);
+      font-weight: 850;
+      font-size: 12px;
+    }
+    .compact-row.selected { background: linear-gradient(90deg, var(--teal-soft), #fffefa 36%); box-shadow: inset 4px 0 0 var(--teal); }
+    .drawer {
+      border: 1px solid var(--line-hard);
+      border-radius: 8px;
+      background: #fffefa;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .drawer-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 14px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(180deg, #fffefa, #f8f4ec);
+    }
+    .drawer-head h3 { font-size: 18px; }
+    .drawer-body {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      padding: 14px 16px;
+    }
+    .short-note {
+      grid-column: 1 / -1;
+      padding: 11px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      color: var(--body);
+      font-size: 12px;
+    }
+    .collapsed-policy {
+      grid-column: 1 / -1;
+      display: flex; justify-content: space-between; align-items: center; gap: 12px;
+      padding: 11px 12px;
+      border: 1px dashed var(--line-hard);
+      border-radius: 8px;
+      color: var(--body);
+      background: var(--surface-2);
+      font-size: 12px;
+    }
+
+    /* Option H */
+    .h-shell { display: grid; gap: 14px; }
+    .h-list {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fffefa;
+      overflow: hidden;
+    }
+    .h-row {
+      display: grid;
+      grid-template-columns: 34px 42px minmax(230px, 1.1fr) minmax(125px, .6fr) minmax(125px, .6fr) minmax(130px, .6fr) 98px;
+      gap: 12px;
+      align-items: center;
+      padding: 12px 14px;
+      border-top: 1px solid var(--line);
+    }
+    .h-row:first-child { border-top: 0; }
+    .h-row > * { min-width: 0; }
+    .h-head {
+      background: var(--surface-2);
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 850;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+    .h-head .rx { visibility: hidden; }
+    .h-name strong { display: block; line-height: 1.2; overflow-wrap: anywhere; }
+    .h-name .mini { display: block; margin-top: 4px; line-height: 1.35; }
+    .h-row.open {
+      grid-template-columns: 34px 42px minmax(210px, .9fr) minmax(0, 1.7fr) 98px;
+      align-items: stretch;
+      background: linear-gradient(90deg, var(--teal-soft), #fffefa 34%);
+      box-shadow: inset 4px 0 0 var(--teal);
+    }
+    .h-row.open .h-status { align-self: start; justify-self: end; }
+    .h-detail {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      align-items: stretch;
+    }
+    .h-cell {
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+    }
+    .h-cell.wide { grid-column: span 2; }
+    .h-cell p { margin-top: 4px; color: var(--body); font-size: 12px; line-height: 1.4; }
+    .h-more {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      padding: 10px;
+      border: 1px dashed var(--line-hard);
+      border-radius: 8px;
+      background: var(--surface-2);
+      color: var(--body);
+      font-size: 12px;
+    }
+
+    @media (max-width: 900px) {
+      .page { padding: 16px; }
+      .intro { display: block; }
+      .note { margin-top: 14px; max-width: none; }
+      .option-head { display: block; }
+      .option-head .badge { margin-top: 10px; }
+      .board, .split, .groups { grid-template-columns: 1fr; }
+      .tile-grid, .detail-strip, .dense-top { grid-template-columns: 1fr 1fr; }
+      .saas-toolbar { grid-template-columns: 1fr 1fr; }
+      .paged-summary { grid-template-columns: 1fr 1fr; }
+      .paged-controls { grid-template-columns: 1fr; }
+      .saas-controls { align-items: stretch; flex-direction: column; }
+      .saas-layout { grid-template-columns: 1fr; }
+      .saas-detail { order: -1; }
+      .saas-head { display: none; }
+      .saas-register { border: 0; background: transparent; display: grid; gap: 10px; }
+      .saas-row {
+        grid-template-columns: 34px minmax(0, 1fr);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fffefa;
+      }
+      .saas-row > :not(.rx):not(.saas-name) { grid-column: 2; }
+      .full-head { display: none; }
+      .full-table { border: 0; background: transparent; display: grid; gap: 10px; }
+      .full-row {
+        grid-template-columns: 34px minmax(0, 1fr);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fffefa;
+      }
+      .full-row > :not(.rx):not(.full-name) { grid-column: 2; }
+      .compact-head { display: none; }
+      .compact-list { border: 0; background: transparent; display: grid; gap: 10px; }
+      .compact-row {
+        grid-template-columns: 30px minmax(0, 1fr);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fffefa;
+        gap: 8px 10px;
+        align-items: start;
+      }
+      .compact-row .rx { display: none; }
+      .compact-row .compact-name { grid-column: 2; }
+      .compact-row > :not(.row-num):not(.rx):not(.compact-name) { grid-column: 2; }
+      .compact-row .pill { justify-self: start; }
+      .drawer-head { grid-template-columns: 1fr; }
+      .drawer-body { grid-template-columns: 1fr 1fr; }
+      .h-head { display: none; }
+      .h-list { border: 0; background: transparent; display: grid; gap: 10px; }
+      .h-row,
+      .h-row.open {
+        grid-template-columns: 30px minmax(0, 1fr);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fffefa;
+        align-items: start;
+      }
+      .h-row .rx { display: none; }
+      .h-row .h-name { grid-column: 2; }
+      .h-row > :not(.row-num):not(.rx):not(.h-name) { grid-column: 2; }
+      .h-row .pill, .h-row.open .h-status { justify-self: start; }
+      .h-detail { grid-template-columns: 1fr 1fr; }
+      .inline-detail-head { display: block; }
+      .inline-detail-head .pill { margin-top: 10px; }
+      .inline-subgrid, .inline-note-grid { grid-template-columns: 1fr 1fr; }
+      .ledger { border: 0; background: transparent; display: grid; gap: 10px; }
+      .ledger-row {
+        grid-template-columns: 34px minmax(0, 1fr);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fffefa;
+      }
+      .ledger-row > :not(.rx):not(.ledger-name) { grid-column: 2; }
+      .med-table, .med-table tbody, .med-table tr, .med-table td { display: block; width: 100%; }
+      .med-table thead { display: none; }
+      .med-table tr { border: 1px solid var(--line); border-radius: 8px; margin-bottom: 10px; background: #fffefa; }
+      .med-table td { border-bottom: 0; padding: 8px 12px; }
+      .med-table td:last-child { text-align: left; padding-bottom: 12px; }
+    }
+
+    @media (max-width: 560px) {
+      .tile-grid, .detail-strip, .dense-top, .stack-meta { grid-template-columns: 1fr; }
+      .saas-toolbar { grid-template-columns: 1fr; }
+      .paged-summary, .drawer-body { grid-template-columns: 1fr; }
+      .h-detail { grid-template-columns: 1fr; }
+      .h-cell.wide { grid-column: auto; }
+      .inline-subgrid, .inline-note-grid { grid-template-columns: 1fr; }
+      .hero-med-top, .side-med { grid-template-columns: 34px minmax(0, 1fr); }
+      .hero-med-top .pill, .side-med .pill { grid-column: 2; justify-self: start; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="intro">
+      <div>
+        <h1>Client Profile - Medications Tab Mockups</h1>
+        <p>Standalone UI directions for the medication area. These are not wired to Laravel and do not change live behavior. They are here so we can choose a direction before applying it to Frontend4.</p>
+      </div>
+      <div class="note">Stress case shown: regular medicine, PRN medicine, inhaler, low stock, paused medicine, and enough items to test desktop and mobile spacing.</div>
+    </section>
+
+    <section class="option">
+      <div class="option-head">
+        <div>
+          <h2>Option A - Clinical Board</h2>
+          <p>Best when one medicine needs clear focus, with the rest kept as a scannable side list. Good for detail and richer clinical context.</p>
+        </div>
+        <span class="badge">Spacious</span>
+      </div>
+      <div class="content">
+        <div class="tabs"><span class="tab">Overview</span><span class="tab active">Medications</span><span class="tab">PRN protocols</span><span class="tab">Allergies</span><span class="tab">MAR history</span></div>
+        <div class="board">
+          <article class="hero-med">
+            <div class="hero-med-top">
+              <span class="rx">Rx</span>
+              <div>
+                <h3>Paracetamol 250mg/5ml oral suspension</h3>
+                <p class="mini">250mg/5ml · Oral suspension</p>
+              </div>
+              <span class="pill">Active</span>
+            </div>
+            <div class="tile-grid">
+              <div class="tile"><div class="k">Dose</div><div class="v">10 ml (500mg)</div></div>
+              <div class="tile"><div class="k">Route</div><div class="v">Oral</div></div>
+              <div class="tile"><div class="k">Frequency</div><div class="v">When required</div></div>
+              <div class="tile"><div class="k">PRN limit</div><div class="v">4 doses in 24h</div></div>
+            </div>
+            <div class="stock-card">
+              <div style="display:flex;justify-content:space-between;gap:12px"><div><div class="k">Stock remaining</div><div class="mini">Reorder at 20 ml</div></div><strong>60 ml</strong></div>
+              <div class="bar" style="margin-top:12px"><span style="width:75%"></span></div>
+            </div>
+            <div class="tile" style="margin-top:14px"><div class="k">Clinical note</div><div class="v">Pain or fever. Age/weight banded: 16 yrs, 38kg. Minimum 4h apart.</div></div>
+          </article>
+          <aside class="side-list">
+            <article class="side-med"><span class="rx">Rx</span><div><strong>Levetiracetam 250mg tablets</strong><p class="mini">1 tablet · Oral · Daily</p></div><span class="pill">Active</span></article>
+            <article class="side-med"><span class="rx">Rx</span><div><strong>Salbutamol inhaler</strong><p class="mini">2 puffs · Inhaled · PRN</p></div><span class="pill">Active</span></article>
+            <article class="side-med"><span class="rx">Rx</span><div><strong>Melatonin 2mg tablets</strong><p class="mini">1 tablet · Night</p></div><span class="pill amber">Paused</span></article>
+            <article class="side-med"><span class="rx">Rx</span><div><strong>Loratadine 10mg tablets</strong><p class="mini">1 tablet · Morning</p></div><span class="pill red">Low stock</span></article>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="option">
+      <div class="option-head">
+        <div>
+          <h2>Option B - Medication Register</h2>
+          <p>Best when the person has many medicines. The table stays compact on desktop and turns into stacked cards on mobile.</p>
+        </div>
+        <span class="badge">Many meds</span>
+      </div>
+      <div class="content split">
+        <aside class="filters">
+          <div class="filter-row"><span>All medicines</span><strong>12</strong></div>
+          <div class="filter-row"><span>Regular</span><strong>7</strong></div>
+          <div class="filter-row"><span>PRN</span><strong>3</strong></div>
+          <div class="filter-row"><span>Low stock</span><strong>2</strong></div>
+          <div class="filter-row"><span>Paused</span><strong>1</strong></div>
+        </aside>
+        <section class="detail">
+          <table class="med-table">
+            <thead><tr><th>Medicine</th><th>Dose</th><th>Schedule</th><th>Stock</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Levetiracetam 250mg tablets</strong><div class="mini">Epilepsy - time critical</div></td><td>1 tablet · Oral</td><td>Daily</td><td>54 tablets</td><td><span class="pill">Active</span></td></tr>
+              <tr><td><strong>Paracetamol suspension</strong><div class="mini">Pain or fever</div></td><td>10 ml · Oral</td><td>PRN, min 4h</td><td>60 ml</td><td><span class="pill">Active</span></td></tr>
+              <tr><td><strong>Salbutamol inhaler</strong><div class="mini">Wheeze or breathlessness</div></td><td>2 puffs</td><td>PRN</td><td>12 puffs</td><td><span class="pill">Active</span></td></tr>
+              <tr><td><strong>Loratadine 10mg tablets</strong><div class="mini">Hay fever</div></td><td>1 tablet</td><td>Morning</td><td>4 tablets</td><td><span class="pill red">Low stock</span></td></tr>
+              <tr><td><strong>Melatonin 2mg tablets</strong><div class="mini">Sleep support</div></td><td>1 tablet</td><td>Night</td><td>Paused</td><td><span class="pill amber">Paused</span></td></tr>
+            </tbody>
+          </table>
+          <div class="detail-strip">
+            <div class="tile"><div class="k">Selected PRN</div><div class="v">Max 4 doses in 24h</div></div>
+            <div class="tile"><div class="k">Age band</div><div class="v">16 yrs</div></div>
+            <div class="tile"><div class="k">Weight band</div><div class="v">38 kg</div></div>
+            <div class="tile"><div class="k">Review</div><div class="v">Effectiveness required</div></div>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section class="option">
+      <div class="option-head">
+        <div>
+          <h2>Option C - Grouped By Use</h2>
+          <p>Best when staff think by workflow: regular daily medicines, PRN medicines, and exceptions or stock risks.</p>
+        </div>
+        <span class="badge">Workflow-led</span>
+      </div>
+      <div class="content groups">
+        <section class="group">
+          <div class="group-head"><h3>Regular medicines</h3><p class="mini">Given on schedule</p></div>
+          <div class="group-body">
+            <article class="stack-card"><div class="stack-top"><strong>Levetiracetam 250mg</strong><span class="pill">Active</span></div><div class="stack-meta"><div><div class="k">Dose</div><div class="v">1 tablet</div></div><div><div class="k">Stock</div><div class="v">54 tablets</div></div></div></article>
+            <article class="stack-card"><div class="stack-top"><strong>Loratadine 10mg</strong><span class="pill red">Low</span></div><div class="stack-meta"><div><div class="k">Dose</div><div class="v">1 tablet</div></div><div><div class="k">Stock</div><div class="v">4 tablets</div></div></div></article>
+          </div>
+        </section>
+        <section class="group">
+          <div class="group-head"><h3>PRN medicines</h3><p class="mini">Check protocol before giving</p></div>
+          <div class="group-body">
+            <article class="stack-card"><div class="stack-top"><strong>Paracetamol suspension</strong><span class="pill">PRN</span></div><div class="stack-meta"><div><div class="k">Max</div><div class="v">4 doses</div></div><div><div class="k">Gap</div><div class="v">4h</div></div></div></article>
+            <article class="stack-card"><div class="stack-top"><strong>Salbutamol inhaler</strong><span class="pill">PRN</span></div><div class="stack-meta"><div><div class="k">Dose</div><div class="v">2 puffs</div></div><div><div class="k">Stock</div><div class="v">12 puffs</div></div></div></article>
+          </div>
+        </section>
+        <section class="group">
+          <div class="group-head"><h3>Needs attention</h3><p class="mini">Stock, pause, clinical flags</p></div>
+          <div class="group-body">
+            <article class="stack-card"><div class="stack-top"><strong>Melatonin 2mg</strong><span class="pill amber">Paused</span></div><p class="mini" style="margin-top:8px">Paused by manager. Do not show in round until reactivated.</p></article>
+            <article class="stack-card"><div class="stack-top"><strong>Penicillin allergy</strong><span class="pill red">Risk</span></div><p class="mini" style="margin-top:8px">Reaction: rash and swelling. Visible beside medication decisions.</p></article>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section class="option">
+      <div class="option-head">
+        <div>
+          <h2>Option D - Dense Clinical Ledger</h2>
+          <p>Best for experienced staff and managers who need fast scanning across many active medicines without opening each card.</p>
+        </div>
+        <span class="badge">Compact</span>
+      </div>
+      <div class="content">
+        <div class="dense-top">
+          <div class="metric"><div class="k">Active</div><div class="v">9 medicines</div></div>
+          <div class="metric"><div class="k">PRN</div><div class="v">3 protocols</div></div>
+          <div class="metric"><div class="k">Low stock</div><div class="v">2 warnings</div></div>
+          <div class="metric"><div class="k">Allergies</div><div class="v">Penicillin, latex</div></div>
+        </div>
+        <div class="ledger">
+          <article class="ledger-row"><span class="rx">Rx</span><div class="ledger-name"><strong>Levetiracetam 250mg tablets</strong><span class="mini">Epilepsy - time critical</span></div><div><div class="k">Dose</div><div class="v">1 tablet</div></div><div><div class="k">Route</div><div class="v">Oral</div></div><div class="stock-mini"><div class="bar"><span style="width:96%"></span></div><span class="mini">54 tablets</span></div><span class="pill">Active</span></article>
+          <article class="ledger-row"><span class="rx">Rx</span><div class="ledger-name"><strong>Paracetamol suspension</strong><span class="mini">Pain or fever</span></div><div><div class="k">Dose</div><div class="v">10 ml</div></div><div><div class="k">PRN</div><div class="v">Max 4, min 4h</div></div><div class="stock-mini"><div class="bar"><span style="width:75%"></span></div><span class="mini">60 ml</span></div><span class="pill">Active</span></article>
+          <article class="ledger-row"><span class="rx">Rx</span><div class="ledger-name"><strong>Loratadine 10mg tablets</strong><span class="mini">Hay fever</span></div><div><div class="k">Dose</div><div class="v">1 tablet</div></div><div><div class="k">Schedule</div><div class="v">Morning</div></div><div class="stock-mini"><div class="bar low"><span style="width:18%"></span></div><span class="mini">4 tablets</span></div><span class="pill red">Low stock</span></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="option">
+      <div class="option-head">
+        <div>
+          <h2>Option E - Recommended SaaS Register + Detail Panel</h2>
+          <p>The scalable direction: compact enough for many medicines, still polished, with richer clinical detail shown beside the register when one item is selected.</p>
+        </div>
+        <span class="badge">Recommended</span>
+      </div>
+      <div class="content">
+        <div class="tabs"><span class="tab">Overview</span><span class="tab active">Medications</span><span class="tab">PRN protocols</span><span class="tab">Allergies</span><span class="tab">MAR history</span></div>
+
+        <div class="saas-toolbar">
+          <div class="saas-metric"><div class="k">Active</div><strong>9</strong><span class="mini">Current medicines</span></div>
+          <div class="saas-metric"><div class="k">PRN</div><strong>3</strong><span class="mini">Protocol required</span></div>
+          <div class="saas-metric"><div class="k">Low stock</div><strong>2</strong><span class="mini">Needs reorder</span></div>
+          <div class="saas-metric"><div class="k">Paused</div><strong>1</strong><span class="mini">Hidden from round</span></div>
+          <div class="saas-metric"><div class="k">Risk flags</div><strong>2</strong><span class="mini">Allergy / stock</span></div>
+        </div>
+
+        <div class="saas-controls">
+          <div class="saas-search">Search medicines, indication, route...</div>
+          <div class="seg"><span class="active">All</span><span>Regular</span><span>PRN</span><span>Low stock</span><span>Paused</span></div>
+        </div>
+
+        <div class="saas-layout">
+          <section class="saas-register">
+            <div class="saas-row saas-head"><span class="rx">Rx</span><span>Medicine</span><span>Dose / route</span><span>Schedule</span><span>Stock</span><span>Status</span></div>
+            <article class="saas-row">
+              <span class="rx">Rx</span>
+              <div class="saas-name"><strong>Levetiracetam 250mg tablets</strong><span class="mini">Epilepsy - seizure prevention. Time critical.</span></div>
+              <div><div class="k">Dose</div><div class="v">1 tablet · Oral</div></div>
+              <div><div class="k">Schedule</div><div class="v">Daily</div></div>
+              <div class="stock-mini"><div class="bar"><span style="width:96%"></span></div><span class="mini">54 tablets · reorder 14</span></div>
+              <span class="pill">Active</span>
+            </article>
+            <article class="saas-row">
+              <span class="rx">Rx</span>
+              <div class="saas-name"><strong>Paracetamol 250mg/5ml oral suspension</strong><span class="mini">Pain or fever. Age/weight banded.</span></div>
+              <div><div class="k">Dose</div><div class="v">10 ml · Oral</div></div>
+              <div><div class="k">PRN</div><div class="v">Max 4 doses, min 4h</div></div>
+              <div class="stock-mini"><div class="bar"><span style="width:75%"></span></div><span class="mini">60 ml · reorder 20</span></div>
+              <span class="pill">Active</span>
+            </article>
+            <article class="saas-row">
+              <span class="rx">Rx</span>
+              <div class="saas-name"><strong>Salbutamol 100micrograms/dose inhaler</strong><span class="mini">Wheeze or breathlessness.</span></div>
+              <div><div class="k">Dose</div><div class="v">2 puffs · Inhaled</div></div>
+              <div><div class="k">PRN</div><div class="v">Check symptoms first</div></div>
+              <div class="stock-mini"><div class="bar"><span style="width:60%"></span></div><span class="mini">12 puffs · reorder 5</span></div>
+              <span class="pill">Active</span>
+            </article>
+            <article class="saas-row">
+              <span class="rx">Rx</span>
+              <div class="saas-name"><strong>Loratadine 10mg tablets</strong><span class="mini">Hay fever.</span></div>
+              <div><div class="k">Dose</div><div class="v">1 tablet · Oral</div></div>
+              <div><div class="k">Schedule</div><div class="v">Morning</div></div>
+              <div class="stock-mini"><div class="bar low"><span style="width:18%"></span></div><span class="mini">4 tablets · reorder 10</span></div>
+              <span class="pill red">Low stock</span>
+            </article>
+            <article class="saas-row">
+              <span class="rx">Rx</span>
+              <div class="saas-name"><strong>Melatonin 2mg tablets</strong><span class="mini">Sleep support.</span></div>
+              <div><div class="k">Dose</div><div class="v">1 tablet · Oral</div></div>
+              <div><div class="k">Schedule</div><div class="v">Night</div></div>
+              <div class="stock-mini"><div class="bar"><span style="width:42%"></span></div><span class="mini">Paused stock count</span></div>
+              <span class="pill amber">Paused</span>
+            </article>
+          </section>
+
+          <aside class="saas-detail">
+            <div class="saas-detail-head">
+              <span class="pill">Selected medicine</span>
+              <h3>Paracetamol 250mg/5ml oral suspension</h3>
+              <p class="mini">PRN medicine · pain or fever · active</p>
+            </div>
+            <div class="saas-detail-body">
+              <div class="detail-card"><div class="k">PRN guardrails</div><p><strong>Max 4 doses in 24h.</strong> Minimum 4 hours between doses. Check symptoms and record effectiveness.</p></div>
+              <div class="detail-card"><div class="k">Client band</div><p><strong>16 yrs · 38 kg.</strong> Dose display stays visible beside the selected medicine.</p></div>
+              <div class="detail-card"><div class="k">Stock</div><p><strong>60 ml remaining.</strong> Reorder threshold 20 ml. Stock risk appears in the register before opening detail.</p></div>
+              <div class="detail-card"><div class="k">Medication round</div><p>Open the round from the client context only when the medicine is active and due.</p></div>
+              <div class="actions"><span class="btn">Pause</span><span class="btn">Stop</span></div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="option">
+      <div class="option-head">
+        <div>
+          <h2>Option F - Full Width Register + Inline Detail</h2>
+          <p>No side panel and no dot-separated clinical strings. The register gets the full page width, and the selected medicine opens into a wide detail block below the list.</p>
+        </div>
+        <span class="badge">Cleaner scale</span>
+      </div>
+      <div class="content full-register">
+        <div class="tabs"><span class="tab">Overview</span><span class="tab active">Medications</span><span class="tab">PRN protocols</span><span class="tab">Allergies</span><span class="tab">MAR history</span></div>
+
+        <div class="saas-toolbar">
+          <div class="saas-metric"><div class="k">Active medicines</div><strong>9</strong><span class="mini">Shown in medication round</span></div>
+          <div class="saas-metric"><div class="k">PRN protocols</div><strong>3</strong><span class="mini">Check before giving</span></div>
+          <div class="saas-metric"><div class="k">Low stock</div><strong>2</strong><span class="mini">Reorder needed</span></div>
+          <div class="saas-metric"><div class="k">Paused</div><strong>1</strong><span class="mini">Hidden from round</span></div>
+          <div class="saas-metric"><div class="k">Allergy risks</div><strong>2</strong><span class="mini">Penicillin and latex</span></div>
+        </div>
+
+        <div class="saas-controls">
+          <div class="saas-search">Search medicines, indication, route...</div>
+          <div class="seg"><span class="active">All</span><span>Regular</span><span>PRN</span><span>Low stock</span><span>Paused</span></div>
+        </div>
+
+        <section class="full-table">
+          <div class="full-row full-head"><span class="rx">Rx</span><span>Medicine</span><span>Dose</span><span>Schedule</span><span>Stock</span><span>Status</span></div>
+          <article class="full-row">
+            <span class="rx">Rx</span>
+            <div class="full-name"><strong>Levetiracetam 250mg tablets</strong><span class="mini">Epilepsy. Time critical medicine.</span></div>
+            <div><div class="k">Dose and route</div><div class="v">1 tablet by mouth</div></div>
+            <div><div class="k">Schedule</div><div class="v">Daily</div></div>
+            <div class="stock-mini"><div class="bar"><span style="width:96%"></span></div><span class="mini">54 tablets. Reorder at 14.</span></div>
+            <span class="pill">Active</span>
+          </article>
+          <article class="full-row selected">
+            <span class="rx">Rx</span>
+            <div class="full-name"><strong>Paracetamol 250mg/5ml oral suspension</strong><span class="mini">Pain or fever. PRN medicine.</span></div>
+            <div><div class="k">Dose and route</div><div class="v">10 ml by mouth</div></div>
+            <div><div class="k">PRN schedule</div><div class="v">When required</div></div>
+            <div class="stock-mini"><div class="bar"><span style="width:75%"></span></div><span class="mini">60 ml. Reorder at 20.</span></div>
+            <span class="pill">Selected</span>
+          </article>
+          <article class="full-row">
+            <span class="rx">Rx</span>
+            <div class="full-name"><strong>Salbutamol inhaler</strong><span class="mini">Wheeze or breathlessness. PRN medicine.</span></div>
+            <div><div class="k">Dose and route</div><div class="v">2 puffs inhaled</div></div>
+            <div><div class="k">PRN schedule</div><div class="v">Check symptoms first</div></div>
+            <div class="stock-mini"><div class="bar"><span style="width:60%"></span></div><span class="mini">12 puffs. Reorder at 5.</span></div>
+            <span class="pill">Active</span>
+          </article>
+          <article class="full-row">
+            <span class="rx">Rx</span>
+            <div class="full-name"><strong>Loratadine 10mg tablets</strong><span class="mini">Hay fever.</span></div>
+            <div><div class="k">Dose and route</div><div class="v">1 tablet by mouth</div></div>
+            <div><div class="k">Schedule</div><div class="v">Morning</div></div>
+            <div class="stock-mini"><div class="bar low"><span style="width:18%"></span></div><span class="mini">4 tablets. Reorder at 10.</span></div>
+            <span class="pill red">Low stock</span>
+          </article>
+        </section>
+
+        <section class="inline-detail">
+          <div class="inline-detail-head">
+            <div>
+              <span class="pill">Selected medicine</span>
+              <h3>Paracetamol 250mg/5ml oral suspension</h3>
+            </div>
+            <div class="actions" style="min-width:220px"><span class="btn">Pause</span><span class="btn">Stop</span></div>
+          </div>
+          <div class="inline-subgrid">
+            <div class="tile"><div class="k">Dose</div><div class="v">10 ml by mouth</div></div>
+            <div class="tile"><div class="k">PRN limit</div><div class="v">Maximum 4 doses in 24 hours</div></div>
+            <div class="tile"><div class="k">Minimum interval</div><div class="v">4 hours between doses</div></div>
+            <div class="tile"><div class="k">Client band</div><div class="v">16 years. 38 kg.</div></div>
+          </div>
+          <div class="inline-note-grid">
+            <article class="inline-note"><div class="k">Before giving</div><p>Check for pain or fever. Use non-medicine support first where the protocol requires it.</p></article>
+            <article class="inline-note"><div class="k">After giving</div><p>Record the dose, time, reason, and effectiveness review. Escalate if symptoms continue.</p></article>
+            <article class="inline-note"><div class="k">Stock</div><p>60 ml remaining. Reorder threshold is 20 ml. Low stock warnings stay visible in the register.</p></article>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section class="option">
+      <div class="option-head">
+        <div>
+          <h2>Option G - High Volume Register + Short Drawer</h2>
+          <p>Designed for clients with lots of medicines. Rows are numbered, the list is paged, and long PRN or policy text stays collapsed until staff open it.</p>
+        </div>
+        <span class="badge">High volume</span>
+      </div>
+      <div class="content paged-shell">
+        <div class="tabs"><span class="tab">Overview</span><span class="tab active">Medications</span><span class="tab">PRN protocols</span><span class="tab">Allergies</span><span class="tab">MAR history</span></div>
+
+        <div class="paged-summary">
+          <div class="paged-count"><div class="k">Total</div><strong>27</strong><span class="mini">Medicines on record</span></div>
+          <div class="paged-count"><div class="k">Showing</div><strong>1-10</strong><span class="mini">of 27 medicines</span></div>
+          <div class="paged-count"><div class="k">Active</div><strong>21</strong><span class="mini">Visible in workflows</span></div>
+          <div class="paged-count"><div class="k">PRN</div><strong>5</strong><span class="mini">Protocol required</span></div>
+          <div class="paged-count"><div class="k">Low stock</div><strong>3</strong><span class="mini">Needs action</span></div>
+          <div class="paged-count"><div class="k">Paused</div><strong>2</strong><span class="mini">Hidden from round</span></div>
+        </div>
+
+        <div class="paged-controls">
+          <div class="saas-search">Search medicines, indication, route...</div>
+          <div class="page-select">Rows per page: <b>10</b></div>
+          <div class="pager"><span>Prev</span><b>Page 1 of 3</b><span>Next</span></div>
+        </div>
+
+        <section class="compact-list">
+          <div class="compact-row compact-head"><span></span><span class="rx">Rx</span><span>Medicine</span><span>Dose</span><span>Schedule</span><span>Stock</span><span>Status</span></div>
+          <article class="compact-row">
+            <span class="row-num">1</span><span class="rx">Rx</span>
+            <div class="compact-name"><strong>Levetiracetam 250mg tablets</strong><span class="mini">Epilepsy. Time critical.</span></div>
+            <div><div class="k">Dose</div><div class="v">1 tablet oral</div></div>
+            <div><div class="k">Schedule</div><div class="v">Daily</div></div>
+            <div class="stock-mini"><div class="bar"><span style="width:96%"></span></div><span class="mini">54 tabs</span></div>
+            <span class="pill">Active</span>
+          </article>
+          <article class="compact-row selected">
+            <span class="row-num">2</span><span class="rx">Rx</span>
+            <div class="compact-name"><strong>Paracetamol 250mg/5ml suspension</strong><span class="mini">Pain or fever. PRN.</span></div>
+            <div><div class="k">Dose</div><div class="v">10 ml oral</div></div>
+            <div><div class="k">PRN</div><div class="v">Max 4 daily</div></div>
+            <div class="stock-mini"><div class="bar"><span style="width:75%"></span></div><span class="mini">60 ml</span></div>
+            <span class="pill">Selected</span>
+          </article>
+          <article class="compact-row"><span class="row-num">3</span><span class="rx">Rx</span><div class="compact-name"><strong>Salbutamol inhaler</strong><span class="mini">Wheeze or breathlessness. PRN.</span></div><div><div class="k">Dose</div><div class="v">2 puffs</div></div><div><div class="k">PRN</div><div class="v">Check symptoms</div></div><div class="stock-mini"><div class="bar"><span style="width:60%"></span></div><span class="mini">12 puffs</span></div><span class="pill">Active</span></article>
+          <article class="compact-row"><span class="row-num">4</span><span class="rx">Rx</span><div class="compact-name"><strong>Loratadine 10mg tablets</strong><span class="mini">Hay fever.</span></div><div><div class="k">Dose</div><div class="v">1 tablet</div></div><div><div class="k">Schedule</div><div class="v">Morning</div></div><div class="stock-mini"><div class="bar low"><span style="width:18%"></span></div><span class="mini">4 tabs</span></div><span class="pill red">Low stock</span></article>
+          <article class="compact-row"><span class="row-num">5</span><span class="rx">Rx</span><div class="compact-name"><strong>Melatonin 2mg tablets</strong><span class="mini">Sleep support.</span></div><div><div class="k">Dose</div><div class="v">1 tablet</div></div><div><div class="k">Schedule</div><div class="v">Night</div></div><div class="stock-mini"><div class="bar"><span style="width:42%"></span></div><span class="mini">Paused</span></div><span class="pill amber">Paused</span></article>
+        </section>
+
+        <section class="drawer">
+          <div class="drawer-head">
+            <div>
+              <span class="pill">Selected medicine 2 of 27</span>
+              <h3>Paracetamol 250mg/5ml oral suspension</h3>
+              <p class="mini">Short detail only. Longer policy/protocol text is opened on demand.</p>
+            </div>
+            <div class="actions" style="min-width:220px"><span class="btn">Pause</span><span class="btn">Stop</span></div>
+          </div>
+          <div class="drawer-body">
+            <div class="tile"><div class="k">Dose</div><div class="v">10 ml by mouth</div></div>
+            <div class="tile"><div class="k">PRN limit</div><div class="v">4 doses in 24 hours</div></div>
+            <div class="tile"><div class="k">Minimum interval</div><div class="v">4 hours</div></div>
+            <div class="tile"><div class="k">Stock</div><div class="v">60 ml. Reorder at 20 ml.</div></div>
+            <div class="short-note"><strong>Before giving:</strong> check for pain or fever and record the reason. <strong>After giving:</strong> record effectiveness review.</div>
+            <div class="collapsed-policy"><span>Full PRN protocol and long policy notes are collapsed here.</span><strong>Open protocol</strong></div>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section class="option">
+      <div class="option-head">
+        <div>
+          <h2>Option H - Horizontal Open Row</h2>
+          <p>The list stays compact. Selecting a medicine opens that row horizontally, so detail appears beside the medicine rather than as a long block underneath.</p>
+        </div>
+        <span class="badge">Horizontal detail</span>
+      </div>
+      <div class="content h-shell">
+        <div class="tabs"><span class="tab">Overview</span><span class="tab active">Medications</span><span class="tab">PRN protocols</span><span class="tab">Allergies</span><span class="tab">MAR history</span></div>
+
+        <div class="paged-summary">
+          <div class="paged-count"><div class="k">Total</div><strong>27</strong><span class="mini">Medicines on record</span></div>
+          <div class="paged-count"><div class="k">Showing</div><strong>1-10</strong><span class="mini">Page 1 of 3</span></div>
+          <div class="paged-count"><div class="k">PRN</div><strong>5</strong><span class="mini">Protocol required</span></div>
+          <div class="paged-count"><div class="k">Low stock</div><strong>3</strong><span class="mini">Needs action</span></div>
+          <div class="paged-count"><div class="k">Paused</div><strong>2</strong><span class="mini">Hidden from round</span></div>
+          <div class="paged-count"><div class="k">Risk</div><strong>2</strong><span class="mini">Allergy / stock</span></div>
+        </div>
+
+        <div class="paged-controls">
+          <div class="saas-search">Search medicines, indication, route...</div>
+          <div class="page-select">Rows per page: <b>10</b></div>
+          <div class="pager"><span>Prev</span><b>Page 1 of 3</b><span>Next</span></div>
+        </div>
+
+        <section class="h-list">
+          <div class="h-row h-head"><span></span><span class="rx">Rx</span><span>Medicine</span><span>Dose</span><span>Schedule</span><span>Stock</span><span>Status</span></div>
+          <article class="h-row">
+            <span class="row-num">1</span><span class="rx">Rx</span>
+            <div class="h-name"><strong>Levetiracetam 250mg tablets</strong><span class="mini">Epilepsy. Time critical.</span></div>
+            <div><div class="k">Dose</div><div class="v">1 tablet oral</div></div>
+            <div><div class="k">Schedule</div><div class="v">Daily</div></div>
+            <div class="stock-mini"><div class="bar"><span style="width:96%"></span></div><span class="mini">54 tabs</span></div>
+            <span class="pill">Active</span>
+          </article>
+          <article class="h-row open">
+            <span class="row-num">2</span><span class="rx">Rx</span>
+            <div class="h-name">
+              <strong>Paracetamol 250mg/5ml suspension</strong>
+              <span class="mini">Pain or fever. PRN medicine.</span>
+            </div>
+            <div class="h-detail">
+              <div class="h-cell"><div class="k">Dose</div><div class="v">10 ml by mouth</div></div>
+              <div class="h-cell"><div class="k">PRN limit</div><div class="v">4 doses in 24h</div></div>
+              <div class="h-cell"><div class="k">Minimum interval</div><div class="v">4 hours</div></div>
+              <div class="h-cell"><div class="k">Stock</div><div class="v">60 ml. Reorder at 20.</div></div>
+              <div class="h-cell wide"><div class="k">Before giving</div><p>Check pain or fever and record the reason.</p></div>
+              <div class="h-more"><span>Full PRN protocol collapsed</span><strong>Open</strong></div>
+            </div>
+            <span class="pill h-status">Selected</span>
+          </article>
+          <article class="h-row">
+            <span class="row-num">3</span><span class="rx">Rx</span>
+            <div class="h-name"><strong>Salbutamol inhaler</strong><span class="mini">Wheeze or breathlessness. PRN.</span></div>
+            <div><div class="k">Dose</div><div class="v">2 puffs</div></div>
+            <div><div class="k">PRN</div><div class="v">Check symptoms</div></div>
+            <div class="stock-mini"><div class="bar"><span style="width:60%"></span></div><span class="mini">12 puffs</span></div>
+            <span class="pill">Active</span>
+          </article>
+          <article class="h-row">
+            <span class="row-num">4</span><span class="rx">Rx</span>
+            <div class="h-name"><strong>Loratadine 10mg tablets</strong><span class="mini">Hay fever.</span></div>
+            <div><div class="k">Dose</div><div class="v">1 tablet</div></div>
+            <div><div class="k">Schedule</div><div class="v">Morning</div></div>
+            <div class="stock-mini"><div class="bar low"><span style="width:18%"></span></div><span class="mini">4 tabs</span></div>
+            <span class="pill red">Low stock</span>
+          </article>
+        </section>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

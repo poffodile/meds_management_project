@@ -432,3 +432,51 @@ be deleted or marked, not left looking like roles.
 
 `access_right@nov08old` and `24_oct_access_right` sit alongside `access_right` in a
 249-table schema. Someone should confirm nothing reads them before the schema grows further.
+
+---
+
+## I20 — Medications tab mixes directions, PRN protocol text and reason prescribed 🟠 {#i20}
+
+**What:** the Frontend4 client Medications tab has shown medication wording in the wrong
+places during the Page 2 medication-card work. In particular, `reason_for_medication`,
+`administration_instructions` and `prn_details` can read as one jumbled paragraph on the
+expanded medication card instead of three distinct concepts:
+
+- **Reason prescribed** — why the medicine exists, for example pain, fever or asthma relief.
+- **Directions and special instructions** — how to administer it, for example swallow whole,
+  do not crush, use with spacer.
+- **PRN protocol / guidance** — limits and conditions, for example maximum doses in 24h,
+  minimum interval, age/weight-banded text.
+
+**Why it matters:** carers need to distinguish clinical indication from administration
+instructions and PRN rules. If those are blended together, the UI becomes harder to scan and
+can make it look as if the same clinical information is duplicated or contradicted.
+
+**Current status:** partly improved during the 2026-08-09 medication-card iteration by
+separating `administration_instructions` from `prn_details` in the controller payload, but
+the tab still needs a deliberate final pass against populated PRN and regular medicines.
+
+**What has to happen:** define a stable display contract for medicine text fields and test
+it with regular scheduled medicines, PRN-only protocol text, PRN medicines with both
+directions and protocol text, and medicines with a reason prescribed but no directions.
+
+---
+
+## I21 — Medications tab is not yet responsive enough for real use 🟠 {#i21}
+
+**What:** the Frontend4 client Medications tab has been designed primarily from desktop
+screenshots and is not yet proven responsive. The expanded medication card, right-side
+Safety / Quick Links rail, KPI strip, filter/search row and PRN/action band may not fit
+cleanly across laptop, tablet and mobile widths.
+
+**Why it matters:** medication records are used on constrained screens. Text spilling out of
+boxes, side panels overlapping medication rows, or controls wrapping badly can hide important
+clinical information or make the page feel unreliable.
+
+**Current status:** desktop layout is still being iterated from screenshots. Mobile has been
+intentionally preserved in places, but the final Medications tab as a whole has not had a
+proper responsive QA pass.
+
+**What has to happen:** complete a responsive review for the Medications tab at 1366px,
+1024px, 768px and mobile widths, including long medicine names, long PRN protocol text,
+low-stock and controlled-drug states, and expanded/collapsed rows.
