@@ -19,8 +19,8 @@ import { navFor } from '@frontend4/roles';
  * Icons for the navigation, keyed to frontend4/roles.js.
  *
  * The navigation itself lives in roles.js, not here, because what a person sees
- * is a permission question rather than a layout one. A support worker gets five
- * items; everything else is added by role. Nothing is deleted — it is gated.
+ * is a permission question rather than a layout one. Only implemented,
+ * permitted workspaces are returned; planned routes remain hidden.
  */
 const NAV_ICONS = {
     today:    Icon.Today,
@@ -35,14 +35,13 @@ const NAV_ICONS = {
 };
 
 /**
- * Phone bottom bar. Four fixed items — a bottom bar that changed length by role
- * would move the target a carer reaches for without looking.
+ * Phone bottom bar candidates. The shell keeps only implemented items also
+ * present in the signed-in user's permission-filtered navigation.
  */
 const BOTTOM = [
     { key: 'today',    label: 'Today',   Icon: Icon.Today,   href: '/frontend4' },
-    { key: 'round',    label: 'Round',   Icon: Icon.Round,   href: null },
-    { key: 'missed',   label: 'Missed',  Icon: Icon.Alert,   href: null },
-    { key: 'handover', label: 'Handover',Icon: Icon.Message, href: null },
+    { key: 'round',    label: 'Round',   Icon: Icon.Round,   href: '/frontend4/round' },
+    { key: 'clients',  label: 'Clients', Icon: Icon.People,  href: '/frontend4/clients' },
 ];
 
 /** Initials for an avatar, without assuming how many parts a name has. */
@@ -196,7 +195,7 @@ export default function F4Shell({
             </div>
 
             <nav className="f4-bottomnav" aria-label="Main">
-                {BOTTOM.map((item) => {
+                {BOTTOM.filter((item) => item.href && navFor(can).some((group) => group.items.some((nav) => nav.key === item.key))).map((item) => {
                     const Glyph = item.Icon;
 
                     return item.href ? (

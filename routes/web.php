@@ -2010,19 +2010,28 @@ Route::prefix('frontend4')->name('frontend4.')->group(function () {
 
     Route::middleware('frontend4.auth')->group(function () {
         Route::post('/logout', [Frontend4AuthenticationController::class, 'logout'])->name('logout');
-        Route::get('/', [Frontend4TodayController::class, 'index'])->name('today');
-        Route::get('/round', [Frontend4RoundController::class, 'index'])->name('round');
-        Route::post('/round/record', [Frontend4RoundController::class, 'record'])->name('round.record');
-        Route::get('/clients', [Frontend4ClientsController::class, 'index'])->name('clients');
+        Route::get('/', [Frontend4TodayController::class, 'index'])
+            ->middleware('frontend4.can:view_today')->name('today');
+        Route::get('/round', [Frontend4RoundController::class, 'index'])
+            ->middleware('frontend4.can:view_round')->name('round');
+        Route::post('/round/record', [Frontend4RoundController::class, 'record'])
+            ->middleware('frontend4.can:record_administration')->name('round.record');
+        Route::get('/clients', [Frontend4ClientsController::class, 'index'])
+            ->middleware('frontend4.can:view_clients')->name('clients');
         Route::get('/clients/{client}', [Frontend4ClientProfileController::class, 'index'])
+            ->middleware('frontend4.can:view_clients')
             ->where('client', '[0-9]+')->name('clients.show');
         Route::post('/clients/{client}/medications/{sheet}/status', [\App\Http\Controllers\Frontend4\PrescriptionController::class, 'changeStatus'])
+            ->middleware('frontend4.can:manage_prescription')
             ->where(['client' => '[0-9]+', 'sheet' => '[0-9]+'])->name('clients.medication.status');
         Route::get('/clients/{client}/mar', [\App\Http\Controllers\Frontend4\MarController::class, 'index'])
+            ->middleware('frontend4.can:view_mar')
             ->where('client', '[0-9]+')->name('clients.mar');
         Route::post('/clients/{client}/mar/{sheet}/correct', [\App\Http\Controllers\Frontend4\MarController::class, 'correct'])
+            ->middleware('frontend4.can:correct_record')
             ->where(['client' => '[0-9]+', 'sheet' => '[0-9]+'])->name('clients.mar.correct');
-        Route::get('/start', [Frontend4Controller::class, 'index'])->name('start');
+        Route::get('/start', [Frontend4Controller::class, 'index'])
+            ->middleware('frontend4.can:manage_settings')->name('start');
     });
 });
 

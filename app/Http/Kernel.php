@@ -70,5 +70,6 @@ class Kernel extends HttpKernel
         'lock' => \App\Http\Middleware\LockAccount::class,
         'PreventBack' => \App\Http\Middleware\PreventBack::class,
         'frontend4.auth' => \App\Http\Middleware\Frontend4Authenticate::class,
+        'frontend4.can' => \App\Http\Middleware\Frontend4Authorize::class,
     ];
 }

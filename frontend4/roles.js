@@ -34,6 +34,10 @@ export const ROLE_LABELS = {
 
 /** Permission names. Mirrors the constants in Permissions.php. */
 export const P = {
+    VIEW_TODAY:               'view_today',
+    VIEW_ROUND:               'view_round',
+    VIEW_CLIENTS:             'view_clients',
+    VIEW_MAR:                 'view_mar',
     RECORD_ADMINISTRATION:    'record_administration',
     WITNESS_CONTROLLED_DRUG:  'witness_controlled_drug',
     CORRECT_RECORD:           'correct_record',
@@ -62,28 +66,26 @@ export function allows(can, permission) {
 /**
  * Which sidebar items a role sees.
  *
- * This is the answer to "I don't want to see all those options" — a support
- * worker gets five, and everything else is added by role rather than shown to
- * everybody. Nothing is deleted; it is gated.
- *
- * `permission: null` means every role with medication access sees it.
+ * A support worker sees only implemented workspaces they may use, and
+ * everything else is added by permission rather than shown to everybody.
+ * `available: false` keeps planned pages out until their server route exists.
  */
 export const NAV = [
-    { key: 'today',      label: 'Today',            href: '/frontend4',                permission: null },
-    { key: 'round',      label: 'Medication round', href: '/frontend4/round',          permission: null },
-    { key: 'missed',     label: 'Missed doses',     href: '/frontend4/missed-doses',   permission: null },
-    { key: 'clients',    label: 'Clients',          href: '/frontend4/clients',        permission: null },
-    { key: 'handover',   label: 'Handover',         href: '/frontend4/handover',       permission: null },
+    { key: 'today',      label: 'Today',            href: '/frontend4',                permission: P.VIEW_TODAY,   available: true },
+    { key: 'round',      label: 'Medication round', href: '/frontend4/round',          permission: P.VIEW_ROUND,   available: true },
+    { key: 'missed',     label: 'Missed doses',     href: '/frontend4/missed-doses',   permission: P.VIEW_ROUND,   available: false },
+    { key: 'clients',    label: 'Clients',          href: '/frontend4/clients',        permission: P.VIEW_CLIENTS, available: true },
+    { key: 'handover',   label: 'Handover',         href: '/frontend4/handover',       permission: P.VIEW_TODAY,   available: false },
 
     // ── Added for a shift lead and above ──────────────────────────────────
-    { key: 'cd',         label: 'Controlled drugs', href: '/frontend4/controlled-drugs', permission: P.VIEW_CD_REGISTER, group: 'Oversight' },
-    { key: 'stock',      label: 'Stock',            href: '/frontend4/stock',            permission: P.RECEIVE_DELIVERY, group: 'Oversight' },
+    { key: 'cd',         label: 'Controlled drugs', href: '/frontend4/controlled-drugs', permission: P.VIEW_CD_REGISTER, group: 'Oversight', available: false },
+    { key: 'stock',      label: 'Stock',            href: '/frontend4/stock',            permission: P.RECEIVE_DELIVERY, group: 'Oversight', available: false },
 
     // ── Manager and above ─────────────────────────────────────────────────
-    { key: 'reports',    label: 'Reports & audit',  href: '/frontend4/reports',          permission: P.VIEW_REPORTS,     group: 'Oversight' },
+    { key: 'reports',    label: 'Reports & audit',  href: '/frontend4/reports',          permission: P.VIEW_REPORTS,     group: 'Oversight', available: false },
 
     // ── Administrator ─────────────────────────────────────────────────────
-    { key: 'admin',      label: 'Administration',   href: '/frontend4/admin',            permission: P.MANAGE_SETTINGS,  group: 'Control plane' },
+    { key: 'admin',      label: 'Administration',   href: '/frontend4/admin',            permission: P.MANAGE_SETTINGS,  group: 'Control plane', available: false },
 ];
 
 /**
@@ -98,7 +100,7 @@ export const NAV = [
  * permission that means "this is your workspace".
  */
 export function navFor(can) {
-    const visible = NAV.filter((item) => item.permission === null || allows(can, item.permission));
+    const visible = NAV.filter((item) => item.available && allows(can, item.permission));
 
     const groups = [];
     visible.forEach((item) => {

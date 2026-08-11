@@ -68,9 +68,9 @@ Primary implementation files:
 - `resources/js/F4Pages/Auth/`
 - `tests/Feature/Frontend4AuthenticationIsolationTest.php`
 
-## Required migration before authentication testing
+## Authentication migration and test status
 
-The migration has not been run from the ChatGPT scratch environment because PHP and a configured application database were unavailable there.
+The owner confirmed on 11 August 2026 that the dedicated authentication migration was applied locally to both the development and test databases. Exactly the three Frontend 4 authentication tables were added. `Frontend4AuthenticationIsolationTest` passed with 4 tests and 14 assertions. Two unrelated migrations were deliberately left pending.
 
 Run this first in a configured local or staging environment—not production:
 
@@ -122,19 +122,28 @@ When changing Frontend 4 authentication or permissions:
 - Keep all Frontend 4 styles under `.f4-root` and out of global stylesheets.
 - Preserve organisation/service scoping and revalidate selected service IDs server-side.
 
-## Next production requirement
+## Requirement 3: role permissions
 
-The next requirement is Requirement 3: role permissions.
+Requirement 3 is implemented on this branch and awaits execution of its PHP feature test in the configured local environment.
 
-Frontend 4 already contains `App\Services\Frontend4\RoleResolver` and `Permissions`, but they are only a starting point. The next engineer should:
+What was added:
 
-1. Inventory every Frontend 4 page and write action.
-2. Confirm the owner's official role matrix.
-3. Enforce permissions on Laravel routes/controllers, not only React controls.
-4. Scope every query and mutation to the signed-in user's permitted organisation and service.
-5. Protect MAR corrections, prescription changes, controlled-drug witnessing, round reopening and administrative actions.
-6. Hide unavailable navigation/actions without treating hidden UI as security.
-7. Add tests for allowed, denied, direct-URL and cross-service access for every role.
-8. Record high-risk permission denials and clinical actions in the appropriate append-only audit trail.
+- Explicit page permissions for Today, Round, Clients and MAR.
+- Route middleware enforcement before controllers are reached, plus controller checks for defence in depth.
+- Append-only `permission_denied` authentication audit events with permission and route metadata only.
+- Fail-closed handling for explicit, unrecognised access-level names.
+- Clinical separation preventing administrators from recording doses, witnessing controlled drugs, correcting MAR or changing prescriptions.
+- Navigation gating that hides unfinished Frontend 4 routes rather than sending users to 404 pages.
+- Tests covering the role matrix, direct URL/post denials, denial audit and cross-service client access.
 
-Do not begin Requirement 3 until the migration and Frontend 4 authentication feature tests have been run in the configured local or staging environment, unless the owner explicitly asks to proceed in parallel.
+The authoritative matrix and route map are in `docs/care-one-os/FRONTEND4/ROLE-PERMISSION-MATRIX.md`.
+
+Run locally:
+
+```bash
+php artisan test --filter=Frontend4PermissionTest
+npm test
+npm run build
+```
+
+The next production requirement after these tests pass is Requirement 4: organisation, service and location separation.

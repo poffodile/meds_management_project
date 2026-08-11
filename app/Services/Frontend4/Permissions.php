@@ -17,6 +17,12 @@ namespace App\Services\Frontend4;
  */
 class Permissions
 {
+    // ── Workspaces / read access ──────────────────────────────────────────
+    public const VIEW_TODAY = 'view_today';
+    public const VIEW_ROUND = 'view_round';
+    public const VIEW_CLIENTS = 'view_clients';
+    public const VIEW_MAR = 'view_mar';
+
     // ── Clinical ──────────────────────────────────────────────────────────
     public const RECORD_ADMINISTRATION = 'record_administration';
     public const WITNESS_CONTROLLED_DRUG = 'witness_controlled_drug';
@@ -52,6 +58,10 @@ class Permissions
      */
     private const GRANTS = [
         RoleResolver::CARER => [
+            self::VIEW_TODAY,
+            self::VIEW_ROUND,
+            self::VIEW_CLIENTS,
+            self::VIEW_MAR,
             self::RECORD_ADMINISTRATION,
             self::VIEW_STOCK,   // reads "stock remaining" on a medicine; cannot change it
         ],

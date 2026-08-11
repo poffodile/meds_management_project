@@ -45,7 +45,7 @@ class ClientsController extends F4Controller
     public function index(Request $request)
     {
         $this->useF4Layout();
-        $this->requireMedicationAccess();
+        $this->requirePermission(\App\Services\Frontend4\Permissions::VIEW_CLIENTS);
 
         $homeId = $this->currentHomeId();
 
@@ -191,4 +191,3 @@ class ClientsController extends F4Controller
         return ctype_alpha($c) ? $c : '#';
     }
 }
-

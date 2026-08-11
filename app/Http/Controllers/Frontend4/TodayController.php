@@ -91,7 +91,7 @@ class TodayController extends F4Controller
         // management. It now refuses anyone whose access level maps to no
         // medication access, including finance accounts whose account type
         // happens to say admin. See App\Services\Frontend4\RoleResolver.
-        $this->requireMedicationAccess();
+        $this->requirePermission(\App\Services\Frontend4\Permissions::VIEW_TODAY);
 
         $props = $this->buildRoundProps($request);
         $grid = $props['grid'] ?? [];

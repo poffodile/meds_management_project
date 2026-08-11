@@ -23,6 +23,7 @@ class Frontend4Controller extends F4Controller
     public function index(Request $request)
     {
         $this->useF4Layout();
+        $this->requirePermission(\App\Services\Frontend4\Permissions::MANAGE_SETTINGS);
 
         return Inertia::render('Home', [
             'buildLabel' => 'Starter build',

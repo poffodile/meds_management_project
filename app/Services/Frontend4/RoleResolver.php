@@ -85,6 +85,9 @@ class RoleResolver
         // which stops a controlled drug being given at all.
         'senior staff'  => self::LEAD,
         'senior rsw'    => self::LEAD,
+        'senior support worker' => self::LEAD,
+        'senior carer'  => self::LEAD,
+        'nurse'         => self::LEAD,
         'team leader'   => self::LEAD,
         'sr supervisor' => self::LEAD,
 
@@ -124,16 +127,11 @@ class RoleResolver
     ];
 
     /**
-     * Fallback when a user has no access level, or one this class has not seen.
+     * Fallback when a user has no access level.
      *
-     * Deliberately NOT deny-by-default. Denying a real support worker because
-     * their home invented "Support Worker Level 2" last week would stop
-     * medicines being given, which is a worse outcome than the mild
-     * over-permission this risks. Note that `N` — 281 of the 414 accounts —
-     * lands on the least privileged role anyway.
-     *
-     * Unrecognised names are reported by {@see unmappedLevels()} so they can be
-     * added here rather than silently relied upon.
+     * An account with an explicit but unrecognised access level fails closed in
+     * resolve(). Otherwise a newly invented or misspelled level could silently
+     * acquire clinical access from the coarse account type.
      */
     private const BY_USER_TYPE = [
         'N'  => self::CARER,
@@ -159,10 +157,15 @@ class RoleResolver
             return self::NONE;
         }
 
-        $name = $this->levelName($user->access_level ?? null);
+        $accessLevelId = (int) ($user->access_level ?? 0);
+        $name = $this->levelName($accessLevelId);
 
         if ($name !== null && isset(self::BY_NAME[$name])) {
             return self::BY_NAME[$name];
+        }
+
+        if ($accessLevelId > 0) {
+            return self::NONE;
         }
 
         return self::BY_USER_TYPE[$user->user_type ?? ''] ?? self::NONE;
@@ -182,8 +185,8 @@ class RoleResolver
     /**
      * Access-level rows whose name this class does not recognise.
      *
-     * For an administration screen: these are the levels currently falling back
-     * to the account type, and each one is a mapping somebody should confirm.
+     * For an administration screen: these levels are denied until somebody
+     * confirms and explicitly maps them.
      * Returns ['id' => ..., 'name' => ..., 'home_id' => ...].
      */
     public function unmappedLevels(): array

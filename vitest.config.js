@@ -8,6 +8,7 @@ export default defineConfig({
     resolve: {
         alias: {
             '@frontend': fileURLToPath(new URL('./frontend', import.meta.url)),
+            '@frontend4': fileURLToPath(new URL('./frontend4', import.meta.url)),
         },
     },
     test: {

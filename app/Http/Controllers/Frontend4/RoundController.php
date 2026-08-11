@@ -51,7 +51,7 @@ class RoundController extends F4Controller
     public function index(Request $request)
     {
         $this->useF4Layout();
-        $this->requireMedicationAccess();
+        $this->requirePermission(\App\Services\Frontend4\Permissions::VIEW_ROUND);
 
         $props = $this->buildRoundProps($request);
         $rounds = $props['rounds'] ?? [];

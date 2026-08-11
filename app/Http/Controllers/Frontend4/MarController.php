@@ -47,7 +47,7 @@ class MarController extends F4Controller
     public function index(Request $request, int $client)
     {
         $this->useF4Layout();
-        $this->requireMedicationAccess();
+        $this->requirePermission(\App\Services\Frontend4\Permissions::VIEW_MAR);
         $request->validate(['week_start' => 'nullable|date']);
 
         $homeId = $this->currentHomeId();
