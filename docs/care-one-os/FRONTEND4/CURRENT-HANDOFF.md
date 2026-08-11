@@ -1,0 +1,140 @@
+# Care One OS current engineering handoff
+
+Last updated: 11 August 2026
+
+This is the current starting point for Codex, Claude Code or another engineer. Read it before editing the repository. The older `CODEX-CLAUDE-HANDOVER.md` remains historical context; where it conflicts with this file, this file is authoritative.
+
+## Repository and branch safety
+
+- Repository: `poffodile/meds_management_project`
+- Active integration branch: `care-one-integration`
+- Preserved baseline branch: `frontend4`
+- Do not commit directly to, merge into, rebase or rewrite `frontend4`.
+- Continue production-readiness work only on `care-one-integration` unless the owner explicitly changes this instruction.
+- GitHub commits must not name Codex, ChatGPT, Claude, Anthropic or OpenAI as author or co-author.
+- The latest published isolation commit is `29cb5ea975f5c059c9274867f836e85412d4f193`.
+
+## Why this branch exists
+
+The user wanted a safe copy of the existing Laravel project so production work could continue without changing the working Frontend 4 baseline. `care-one-integration` is that copy. It will receive database, authentication, permissions and other production requirements one at a time.
+
+Frontend 4 already has isolated React, Inertia and CSS entry points. Authentication originally still used shared legacy routes, which meant hardening `/login`, `/admin/login`, `/logout` and mobile API login could affect Frontends 1–3. That was not acceptable to the owner.
+
+## Requirement 1: database structure
+
+The supplied MySQL dump was inspected as confidential material. It contains the Laravel system's real schema and data, including medication, MAR, stock, controlled-drug, handover, client and account tables. Do not reproduce personal information, password hashes, API keys or sensitive records in documentation, logs, fixtures or commits.
+
+Important ongoing database concerns include weak explicit foreign-key coverage, duplicated/hardcoded clinical units and values, and relationships enforced mainly by application code. These require staged review; do not make broad destructive schema changes.
+
+## Requirement 2: login and password handling
+
+Requirement 2 is implemented specifically for Frontend 4.
+
+What was done:
+
+- Added a separate `frontend4` Laravel session guard and provider.
+- Added a dedicated Care One OS login at `/frontend4/login`.
+- Added Frontend 4-only logout, forgotten-password and reset-password routes.
+- Added server-side throttling, persistent lockouts, generic failure responses and 30-minute idle handling.
+- Added strong 12-character password validation for Frontend 4 resets.
+- Added one-use, hashed and expiring Frontend 4 password tokens.
+- Added append-only Frontend 4 authentication events.
+- Added a responsive React login/reset experience using only the isolated `f4` bundle and `.f4-root` CSS.
+- Moved every Frontend 4 clinical route outside the legacy `checkUserAuth` group and behind `frontend4.auth`.
+- Added a Frontend 4 sign-out action to its own shell.
+
+Why separate credential tables were used:
+
+- A Frontend 4 password reset must not change the legacy `user.password` value.
+- Frontend 4 lockouts and sessions must not lock users out of the older application.
+- Legacy `/login`, `/logout`, `/admin/login`, API login controllers, views and session configuration had to remain unchanged.
+- When a Frontend 4 credential is first needed, it starts from the existing one-way password hash. Plaintext passwords are never copied or stored.
+
+Dedicated tables:
+
+- `frontend4_credentials`
+- `frontend4_password_tokens`
+- `frontend4_authentication_events`
+
+Primary implementation files:
+
+- `app/Http/Controllers/Frontend4/AuthenticationController.php`
+- `app/Http/Middleware/Frontend4Authenticate.php`
+- `app/Services/Frontend4/AuthenticationSecurityService.php`
+- `app/Models/Frontend4Credential.php`
+- `app/Models/Frontend4PasswordToken.php`
+- `app/Models/Frontend4AuthenticationEvent.php`
+- `database/migrations/2026_08_11_000001_create_frontend4_authentication_tables.php`
+- `resources/js/F4Pages/Auth/`
+- `tests/Feature/Frontend4AuthenticationIsolationTest.php`
+
+## Required migration before authentication testing
+
+The migration has not been run from the ChatGPT scratch environment because PHP and a configured application database were unavailable there.
+
+Run this first in a configured local or staging environment—not production:
+
+```bash
+php artisan migrate:status
+php artisan migrate
+```
+
+On the owner's Windows/Laragon setup, PHP may not be globally available. If needed, use the configured Laragon PHP executable from the project environment. Do not guess a production database target.
+
+After migrating, verify that only the three `frontend4_*` authentication tables were added. This migration must not alter `user`, `admin`, `service_user` or the legacy password/session tables.
+
+Then run:
+
+```bash
+php artisan route:list --path=frontend4
+php artisan test --filter=Frontend4AuthenticationIsolationTest
+npm test
+npm run build
+```
+
+Before any production migration:
+
+1. Confirm the environment and database name.
+2. Take and verify a restorable backup.
+3. Review the migration SQL or use `php artisan migrate --pretend`.
+4. Test login, reset, logout and legacy-login isolation in staging.
+5. Prepare and test rollback.
+6. Obtain explicit production approval.
+
+## Verification already completed
+
+- All 20 available JavaScript tests passed.
+- The Vite production build passed.
+- All changed PHP files passed PHP syntax parsing.
+- Full Laravel/PHP feature tests remain to be executed after the migration in a configured PHP environment.
+- GitHub confirmed the integration branch is two commits ahead of `frontend4` and that the baseline is unchanged.
+
+## Non-negotiable isolation checks
+
+When changing Frontend 4 authentication or permissions:
+
+- Do not replace or redirect `/login`, `/logout` or `/admin/login`.
+- Do not change legacy API authentication routes.
+- Do not use the default `web` guard for Frontend 4.
+- Do not write Frontend 4 reset passwords into `user.password`.
+- Do not store plaintext passwords, reset tokens or API secrets.
+- Do not place Frontend 4 routes back inside `checkUserAuth`.
+- Keep all Frontend 4 styles under `.f4-root` and out of global stylesheets.
+- Preserve organisation/service scoping and revalidate selected service IDs server-side.
+
+## Next production requirement
+
+The next requirement is Requirement 3: role permissions.
+
+Frontend 4 already contains `App\Services\Frontend4\RoleResolver` and `Permissions`, but they are only a starting point. The next engineer should:
+
+1. Inventory every Frontend 4 page and write action.
+2. Confirm the owner's official role matrix.
+3. Enforce permissions on Laravel routes/controllers, not only React controls.
+4. Scope every query and mutation to the signed-in user's permitted organisation and service.
+5. Protect MAR corrections, prescription changes, controlled-drug witnessing, round reopening and administrative actions.
+6. Hide unavailable navigation/actions without treating hidden UI as security.
+7. Add tests for allowed, denied, direct-URL and cross-service access for every role.
+8. Record high-risk permission denials and clinical actions in the appropriate append-only audit trail.
+
+Do not begin Requirement 3 until the migration and Frontend 4 authentication feature tests have been run in the configured local or staging environment, unless the owner explicitly asks to proceed in parallel.
