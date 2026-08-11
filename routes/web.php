@@ -135,6 +135,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 Route::get('clear', function () {
+    abort_unless(app()->environment('local'), 404);
     Artisan::call('cache:clear');
 
     return 'Cleared!';
@@ -181,19 +182,23 @@ Route::match(['get', 'post'], '/change-design-layout/{design_layout_id}', 'App\H
 
 /* Change Password */
 Route::post('api/change-password', 'App\Http\Controllers\Api\ServiceUser\UserController@change_password');
-Route::post('api/forgot-password', 'App\Http\Controllers\Api\ServiceUser\UserController@forgot_password');
-Route::get('/reset-password/{user_name}/{security_code}', 'App\Http\Controllers\Api\ServiceUser\UserController@show_forget_password_form');
-Route::post('/reset-password/save', 'App\Http\Controllers\Api\ServiceUser\UserController@set_forget_password');
+Route::post('api/forgot-password', 'App\Http\Controllers\Api\PasswordController@requestReset')
+    ->middleware('throttle:5,1');
+Route::get('/reset-password/{token}', 'App\Http\Controllers\PasswordActionController@show')
+    ->middleware('throttle:10,1');
+Route::post('/reset-password/save', 'App\Http\Controllers\PasswordActionController@update')
+    ->middleware('throttle:10,1');
 Route::post('api/remove-device', 'App\Http\Controllers\Api\DeviceController@remove_device');
 /* ------Api Routes End here------- */
 
 // Route::match(['get','post'], '/login', 'App\Http\Controllers\frontEnd\UserController@login');
 Route::match(['get', 'post'], '/login', 'App\Http\Controllers\frontEnd\UserController@login')->middleware('PreventBack')->name('login');
-Route::get('/yes_logout', 'App\Http\Controllers\frontEnd\UserController@yes_logout');
+Route::post('/yes_logout', 'App\Http\Controllers\frontEnd\UserController@yes_logout');
 Route::post('/no_logout', 'App\Http\Controllers\frontEnd\UserController@no_logout');
 
-Route::get('/logout', 'App\Http\Controllers\frontEnd\UserController@logout');
-Route::post('/forgot-password', 'App\Http\Controllers\frontEnd\ForgotPasswordController@send_forgot_pass_link_mail');
+Route::post('/logout', 'App\Http\Controllers\frontEnd\UserController@logout');
+Route::post('/forgot-password', 'App\Http\Controllers\frontEnd\ForgotPasswordController@send_forgot_pass_link_mail')
+    ->middleware('throttle:5,1');
 Route::match(['get', 'post'], '/check-email-exists', 'App\Http\Controllers\frontEnd\ForgotPasswordController@check_email_exists');
 
 Route::get('/fb_close', 'App\Http\Controllers\Controller@fb_close');
@@ -2023,14 +2028,17 @@ Route::get('/system-guide/search/{ques}', 'App\Http\Controllers\frontEnd\SystemG
 // Route::match(['get','post'], 'staff/check-staff-username-exists', 'App\Http\Controllers\frontEnd\UserController@check_staff_username_exists');
 
 Route::match(['get', 'post'], '/check-username-exists', 'App\Http\Controllers\frontEnd\UserController@check_username_exists');
-Route::match('get', '/set-password/{user_id}/{security_code}', 'App\Http\Controllers\frontEnd\UserController@show_set_password_form');
-Route::match('post', 'users/set-password', 'App\Http\Controllers\frontEnd\UserController@set_password');
+Route::get('/set-password/{token}', 'App\Http\Controllers\frontEnd\UserController@show_set_password_form')
+    ->middleware('throttle:10,1');
+Route::post('users/set-password', 'App\Http\Controllers\frontEnd\UserController@set_password')
+    ->middleware('throttle:10,1');
 Route::get('get-homes/{company_name}', 'App\Http\Controllers\frontEnd\UserController@get_homes');
 
 // lockscreen (not required to saved in db)
 Route::get('lock', 'App\Http\Controllers\frontEnd\LockAccountController@lock');
 Route::get('lockscreen', 'App\Http\Controllers\frontEnd\LockAccountController@lockscreen');
-Route::post('lockscreen', 'App\Http\Controllers\frontEnd\LockAccountController@unlock');
+Route::post('lockscreen', 'App\Http\Controllers\frontEnd\LockAccountController@unlock')
+    ->middleware('throttle:5,1');
 
 // care center message module (not saved)
 Route::get('/service/care-center/message-office/{service_user_id}', 'App\Http\Controllers\frontEnd\ServiceUserManagement\CareCenterController@office_messages');
@@ -2059,18 +2067,21 @@ Route::get('user/payments', 'App\Http\Controllers\CronController@recurring_home_
 
 // ______________________________________________________________________________BACKEND_ROUTES_START___________________________________________________________________________//
 
-Route::match(['get', 'post'], 'admin/login', 'App\Http\Controllers\backEnd\AdminController@login');
-Route::match(['get', 'post'], 'admin/logout', 'App\Http\Controllers\backEnd\AdminController@logout');
-Route::match(['get', 'post'], 'admin/check-email-exists', 'App\Http\Controllers\backEnd\ForgotPasswordController@check_admin_email_exists');
-Route::match(['get', 'post'], 'admin/forgot-password', 'App\Http\Controllers\backEnd\ForgotPasswordController@send_forgot_pass_link_mail');
+Route::match(['get', 'post'], 'admin/login', 'App\Http\Controllers\backEnd\SecureAdminAuthenticationController@login');
+Route::post('admin/logout', 'App\Http\Controllers\backEnd\SecureAdminAuthenticationController@logout');
+Route::match(['get', 'post'], 'admin/check-email-exists', 'App\Http\Controllers\backEnd\AdminPasswordController@checkEmail');
+Route::post('admin/forgot-password', 'App\Http\Controllers\backEnd\AdminPasswordController@requestReset')
+    ->middleware('throttle:5,1');
 
 Route::get('admin/get-homes/{company_name}', 'App\Http\Controllers\backEnd\WelcomeController@get_homes');
 
 // show admin set password page
-Route::match('get', 'admin/set-password/{system_admin_id}/{security_code}', 'App\Http\Controllers\backEnd\superAdmin\AdminController@show_set_password_form_system_admin');
+Route::get('admin/set-password/{token}', 'App\Http\Controllers\backEnd\AdminPasswordController@show')
+    ->middleware('throttle:10,1');
 
 // save admin new password after set password page
-Route::match(['get', 'post'], 'admin/system-admin/set-password', 'App\Http\Controllers\backEnd\superAdmin\AdminController@set_password_system_admin');
+Route::post('admin/system-admin/set-password', 'App\Http\Controllers\backEnd\AdminPasswordController@update')
+    ->middleware('throttle:10,1');
 // paypal
 Route::match(['get', 'post'], '/system-admin/home/payment/success/{system_admin_id}', 'App\Http\Controllers\backEnd\superAdmin\HomeController@success');
 
@@ -2089,7 +2100,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'CheckAdminAuth'], function (
     // personal Mangement(profile)
     Route::get('/profile', 'App\Http\Controllers\backEnd\myProfile\ProfileController@profile');
     Route::match(['get', 'post'], '/profile/edit', 'App\Http\Controllers\backEnd\myProfile\ProfileController@edit');
-    Route::match(['get', 'post'], '/profile/change-password', 'App\Http\Controllers\backEnd\myProfile\ProfileController@change_password');
+    Route::post('/profile/change-password', 'App\Http\Controllers\backEnd\AdminProfilePasswordController@update');
 
     Route::match(['get', 'post'], '/welcome', 'App\Http\Controllers\backEnd\WelcomeController@welcome');
     Route::get('/welcome/get-homes/{company_name}', 'App\Http\Controllers\backEnd\WelcomeController@welcome_get_homes');
@@ -3040,10 +3051,6 @@ Route::group(['prefix' => 'super-admin', 'middleware' => 'CheckAdminAuth'], func
     Route::match(['get', 'post'], '/users', 'App\Http\Controllers\backEnd\superAdmin\UserController@index');
 
     Route::match(['get', 'post'], '/user/send-set-pass-link/{user_id}', 'App\Http\Controllers\backEnd\superAdmin\UserController@send_set_password_link_mail');
-
-    Route::match('get', 'user/set-password/{super_admin_id}/{security_code}', 'App\Http\Controllers\backEnd\superAdmin\UserController@show_set_password_form_super_admin');
-
-    Route::match(['get', 'post'], 'user/super-admin/set-password', 'App\Http\Controllers\backEnd\superAdmin\UserController@set_password_super_admin');
 
     // home-admin
     Route::match(['get', 'post'], '/home-admin/{home_id}', 'App\Http\Controllers\backEnd\superAdmin\HomeAdminController@index');

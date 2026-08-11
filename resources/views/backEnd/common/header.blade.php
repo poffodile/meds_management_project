@@ -50,7 +50,12 @@
                 <ul class="dropdown-menu extended logout">
                     <li><a href="{{ url('admin/profile') }}"><i class=" fa fa-suitcase"></i>Profile</a></li>
                     <!-- <li><a href="#"><i class="fa fa-cog"></i> Settings</a></li> -->
-                    <li><a href="{{ url('admin/logout') }}"><i class="fa fa-key"></i> Log Out</a></li>
+                    <li>
+                        <form action="{{ url('admin/logout') }}" method="post">
+                            @csrf
+                            <button type="submit" class="btn btn-link"><i class="fa fa-key"></i> Log Out</button>
+                        </form>
+                    </li>
                 </ul>
             </li>
             <!-- user login dropdown end -->

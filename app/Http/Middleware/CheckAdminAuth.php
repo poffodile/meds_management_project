@@ -16,9 +16,20 @@ class CheckAdminAuth
                     $admin = \App\Admin::where('id', $user->admn_id)->where('is_deleted', 0)->first();
                     if (!empty($admin)) {
                         $admin->home_id = $user->home_id;
-                        Session::put('scitsAdminSession', $admin);
+                        Session::put('scitsAdminSession', (object) $admin->only([
+                            'id',
+                            'name',
+                            'user_name',
+                            'email',
+                            'company',
+                            'access_type',
+                            'home_id',
+                            'image',
+                        ]));
                         if ($user->user_type == 'A') {
-                            Session::put('scitsAgentSession', $user);
+                            Session::put('scitsAgentSession', (object) $user->only([
+                                'id', 'name', 'image', 'home_id', 'user_type', 'admn_id',
+                            ]));
                         }
                     } else {
                         return redirect('admin/login');

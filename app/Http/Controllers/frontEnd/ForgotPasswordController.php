@@ -11,7 +11,9 @@ class ForgotPasswordController extends Controller
 {
 	public function send_forgot_pass_link_mail(Request $request) {
 
-        $data = $request->input();
+        $data = $request->validate([
+            'email' => ['required', 'email:rfc', 'max:255'],
+        ]);
 
         $user_id = DB::table('user')
                         ->where('email', $data['email'])
@@ -21,16 +23,21 @@ class ForgotPasswordController extends Controller
         if(!empty($user_id)) {
 
         	// send credentials for user
-	        $response = User::sendCredentials($user_id);
-	        if(!empty($response)) {
-	        	return redirect('/login')->with('success', 'Email sent to ' .$data['email']. ' successfully.');
-	        } else {
-	        	return redirect('/login')->with('error', COMMON_ERROR);
+	        try {
+	            User::sendCredentials($user_id, 'password_reset');
+	        } catch (\Throwable $exception) {
+	            \Illuminate\Support\Facades\Log::error('Password reset email failed.', [
+	                'account_type' => 'user',
+	                'account_id' => $user_id,
+	                'exception' => $exception,
+	            ]);
 	        }
-	    } else {
-		    return redirect('/login')->with('User not Found');
-		    // return $resp = array('response'=>'not_found');
 	    }
+
+	    return redirect('/login')->with(
+	        'success',
+	        'If the account exists, a password link has been sent.'
+	    );
 	}
 
 	public function check_email_exists(Request $request){
@@ -43,8 +50,7 @@ class ForgotPasswordController extends Controller
 	    	$email = $email_arr[0];
     	}
 
-    	$response = Home::check_email_exists($email);
-    	echo json_encode($response);
+		return response()->json(true);
     	//echo $response; die;	   	
     }
 

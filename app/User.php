@@ -15,10 +15,11 @@ use App\Models\ClientCareScheduleDay;
 use App\Models\ClientCareWorkPrefer;
 use App\Models\ClientCareUnavailableDate;
 use Illuminate\Support\Facades\Session;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use Notifiable;
+    use HasApiTokens, Notifiable;
     protected $table = 'user';
     /**
      * The attributes that are mass assignable.
@@ -40,6 +41,15 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'security_code',
+        'session_token',
+    ];
+
+    protected $casts = [
+        'locked_until' => 'datetime',
+        'last_login_at' => 'datetime',
+        'password_changed_at' => 'datetime',
+        'force_password_reset' => 'boolean',
     ];
 
     public static function getHomeUsers($home_id)
@@ -73,22 +83,25 @@ public function working_hours()
         return $this->hasMany(ClientCareUnavailableDate::class, 'carer_id');
     }
     //send set password link to user
-    public static function sendCredentials($user_id = null)
+    public static function sendCredentials($user_id = null, string $purpose = 'password_setup')
     {
+        $user                 = User::where('id', $user_id)->where('is_deleted', 0)->first();
 
-        $user                 = User::where('id', $user_id)->first();
+        if (! $user) {
+            return false;
+        }
+
         $home_security_policy = Home::where('id', $user->home_id)->value('security_policy');
-        $random_no            = rand(111111, 999999);
-        $security_code        = base64_encode(convert_uuencode($random_no));
-        $user_id              = base64_encode(convert_uuencode($user->id));
         $email                = $user->email;
         $name                 = $user->name;
-        $user->security_code  = $random_no;
         $user_name            = $user->user_name;
         $company_name         = PROJECT_NAME;
 
-        if ($user->save()) {
-            $set_password_url = url('/set-password' . '/' . $user_id . '/' . $security_code);
+        if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $token = app(\App\Services\AuthenticationSecurityService::class)
+                ->issuePasswordToken($user, request(), $purpose);
+            $set_password_url = url('/set-password/'.$token);
+
             if (!filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
                 // Mail::send('emails.user_set_password_mail', ['name'=>$name, 'user_name'=>$user_name, 'set_password_url'=>$set_password_url, 'home_security_policy'=>$home_security_policy], function($message) use ($email,$company_name)
                 // {
@@ -102,8 +115,6 @@ public function working_hours()
                     $message->to($email, $company_name)
 
                         ->subject('Care One OS set Password Mail');
-
-                    $message->from('mobappssolutions153@gmail.com', $company_name);
                 });
 
                 //print_r($arr);

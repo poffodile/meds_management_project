@@ -8,10 +8,25 @@ use App\ServiceUserAFC;
 use App\Models\suUserCourse;
 use App\Models\SuUserPreferredCarers;
 use Illuminate\Support\Facades\Auth;
+use Laravel\Sanctum\HasApiTokens;
 
 class ServiceUser extends Model
 {
+    use HasApiTokens;
+
     protected $table = 'service_user';
+
+    protected $hidden = [
+        'password',
+        'security_code',
+    ];
+
+    protected $casts = [
+        'locked_until' => 'datetime',
+        'last_login_at' => 'datetime',
+        'password_changed_at' => 'datetime',
+        'force_password_reset' => 'boolean',
+    ];
 
 
     public static function get_afc_status($service_user_id = null) {
@@ -36,47 +51,34 @@ class ServiceUser extends Model
     }
 
     //send set password link to user
-    public static function sendCredentials($user_id = null){
+    public static function sendCredentials($user_id = null, string $purpose = 'password_setup')
+    {
+        $user = self::query()
+            ->whereKey($user_id)
+            ->where('is_deleted', 0)
+            ->first();
 
-        $user           = ServiceUser::where('id',$user_id)->first();
-
-        $home_security_policy = Home::where('id',$user->home_id)->value('security_policy');
-
-        $random_no      = rand(111111,999999);
-
-        $user->password = Hash::make($random_no);
-
-        // $company_name = 'Care One OS set Password Mail';
-        $company_name = PROJECT_NAME;
-        $email        = $user->email;
-        $name         = $user->name;
-        $user_name    = $user->user_name;        
-        $password     = $random_no;        
-
-        /*echo '$user_name = '.$user_name;
-        echo '$random_no = '.$random_no;
-        die;*/
-        if($user->save())
-        {  
-            if (!filter_var($email, FILTER_VALIDATE_EMAIL) === false) 
-            {
-                // Mail::send('emails.service_user_send_password_mail', ['name'=>$name, 'user_name'=>$user_name, 'password'=>$password,'home_security_policy'=>$home_security_policy], function($message) use ($email,$company_name)
-                // {
-                //     $message->to($email, $company_name)->subject('Care One OS Welcome');
-                // });
-                $arr = ['name'=>$name, 'user_name'=>$user_name, 'password'=>$password,'home_security_policy'=>$home_security_policy];
-                Mail::send('emails.service_user_send_password_mail', $arr, function ($message) use ($arr, $email, $company_name) {
-
-                    $message->to($email, $company_name)
-
-                        ->subject('Care One OS Welcome');
-
-                    $message->from('mobappssolutions153@gmail.com', $company_name);
-                });
-                return true; 
-            } 
+        if (! $user || ! filter_var($user->email, FILTER_VALIDATE_EMAIL)) {
+            return false;
         }
-        return false;
+
+        $homeSecurityPolicy = Home::whereKey($user->home_id)->value('security_policy');
+        $token = app(\App\Services\AuthenticationSecurityService::class)
+            ->issuePasswordToken($user, request(), $purpose);
+        $setPasswordUrl = url('/reset-password/'.$token);
+        $companyName = defined('PROJECT_NAME') ? PROJECT_NAME : config('app.name');
+
+        Mail::send('emails.user_set_password_mail', [
+            'name' => $user->name,
+            'user_name' => $user->user_name,
+            'set_password_url' => $setPasswordUrl,
+            'home_security_policy' => $homeSecurityPolicy,
+        ], function ($message) use ($user, $companyName) {
+            $message->to($user->email, $user->name)
+                ->subject($companyName.' password setup');
+        });
+
+        return true;
     }
 
     public static function getLongLat($address)

@@ -8,7 +8,12 @@
           <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><img src="{{ asset('/public/images/userProfileImages/default_user.jpg') }}"> Admin <span class="caret"></span></a>
             <ul class="dropdown-menu" role="menu">
-              <li><a href="{{ url('admin/logout') }}"><i class="fa fa-key"></i> Log Out</a></li>
+              <li>
+                <form action="{{ url('admin/logout') }}" method="post">
+                  @csrf
+                  <button type="submit" class="btn btn-link"><i class="fa fa-key"></i> Log Out</button>
+                </form>
+              </li>
             </ul>
           </li>
         </ul>

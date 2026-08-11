@@ -10,6 +10,7 @@ use Hash, DB;
 use App\User, App\Admin, App\Home;
 use App\LeaveType, App\Staffleaves, App\LoginInActivity, App\ServiceUser;
 use App\Models\ScheduledShift;
+use App\Services\AuthenticationSecurityService;
 
 
 class AndroidApiController extends Controller
@@ -139,26 +140,35 @@ class AndroidApiController extends Controller
     }
     public function user_login(Request $request)
     {
-        if ($request->user_name === null) {
-            return response()->json(['success' => false, 'message' => 'Please provide username..!'], 200);
-        }
-        if ($request->password == null) {
-            return response()->json(['success' => false, 'message' => 'Please provide valid password..!'], 200);
-        }
+        $credentials = $request->validate([
+            'user_name' => ['required', 'string', 'max:255'],
+            'password' => ['required', 'string', 'max:1024'],
+        ]);
         // if($request->home_id == null){
         //     return response()->json(['success'=> false, 'message'=>'Please provide home id..!'], 200);
         // }
 
         $recordArray = array();
         // $check_username = ServiceUser::where('user_name', $request->user_name)->first();
-        $check_username = User::where('user_name', $request->user_name)->first();
+        $check_username = User::where('user_name', $credentials['user_name'])
+            ->where('status', 1)
+            ->where('is_deleted', 0)
+            ->first();
+        $security = app(AuthenticationSecurityService::class);
         if (!$check_username) {
-            return response()->json(['success' => false, 'message' => 'Invalid Email Address!'], 200);
+            $security->record($request, 'android_login_failed', false, null, $credentials['user_name']);
+            return response()->json(['success' => false, 'message' => 'We could not sign you in with those details.'], 401);
         }
-        if (!Hash::check($request->password, $check_username->password)) {
+        if ($security->isLocked($check_username)) {
+            return response()->json(['success' => false, 'message' => 'We could not sign you in with those details.'], 401);
+        }
+        if (!Hash::check($credentials['password'], $check_username->password)) {
 
-            return response()->json(['success' => false, 'message' => 'Invalid Password!'], 200);
+            $security->registerFailure($check_username, $request, $credentials['user_name']);
+            return response()->json(['success' => false, 'message' => 'We could not sign you in with those details.'], 401);
         } else {
+            $security->registerSuccess($check_username, $request, $credentials['user_name']);
+            $token = $check_username->createToken('android', ['mobile'], now()->addHours(12))->plainTextToken;
             $data['id'] = $check_username->id;
             $data['home_id'] = $check_username->home_id;
             // $data['home_id'] = $request->home_id;
@@ -186,6 +196,9 @@ class AndroidApiController extends Controller
             // $data['last_loc_area_type'] = $check_username->last_loc_area_type;
             // $data['location_get_interval'] = $check_username->location_get_interval;
             $data['created_at'] = $check_username->created_at;
+            $data['token'] = $token;
+            $data['token_type'] = 'Bearer';
+            $data['expires_in'] = 43200;
             array_push($recordArray, $data);
             return response()->json(['success' => true, 'message' => 'You have successfully logged in.', 'user_data' => $recordArray[0]], 200);
         }
@@ -755,7 +768,6 @@ class AndroidApiController extends Controller
             'access_type'   => $details->access_type,
             'home_id'       => $details->home_id,
             'image'         => $details->image,
-            'security_code' => $details->security_code,
             'qr_code_id'    => $details->qr_code_id,
             'address'       => $details->address,
             'latitude'      => $details->latitude,
