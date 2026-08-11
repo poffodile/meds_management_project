@@ -53,7 +53,7 @@ class ClientsController extends F4Controller
         // offer a status filter (Active / Inactive). The React side defaults the
         // filter to Active, so the list reads the same as before unless the user
         // asks for inactive.
-        $clients = ServiceUser::where('home_id', $homeId)
+        $clients = $this->scopeFrontend4Clients(ServiceUser::query())
             ->where('is_deleted', 0)
             ->orderBy('name')
             ->get([

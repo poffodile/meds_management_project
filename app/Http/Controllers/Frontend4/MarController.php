@@ -51,7 +51,8 @@ class MarController extends F4Controller
         $request->validate(['week_start' => 'nullable|date']);
 
         $homeId = $this->currentHomeId();
-        $su = ServiceUser::where('home_id', $homeId)->where('is_deleted', 0)->where('id', $client)->first();
+        $su = $this->scopeFrontend4Clients(ServiceUser::query())
+            ->where('is_deleted', 0)->where('id', $client)->first();
         if (! $su) {
             abort(404);
         }
@@ -87,6 +88,7 @@ class MarController extends F4Controller
                 ->leftJoin('user as u', 'u.id', '=', 'a.administered_by')
                 ->leftJoin('user as w', 'w.id', '=', 'a.witnessed_by')
                 ->whereIn('a.mar_sheet_id', $sheetIds)
+                ->where('a.home_id', $homeId)
                 ->whereBetween('a.date', [$weekStart->toDateString(), $weekEnd->toDateString()])
                 ->orderBy('a.created_at')
                 ->get([
@@ -306,6 +308,14 @@ class MarController extends F4Controller
         $homeId = $this->currentHomeId();
         $userId = (int) Auth::id();
 
+        $clientAllowed = $this->scopeFrontend4Clients(ServiceUser::query())
+            ->where('is_deleted', 0)
+            ->where('id', $client)
+            ->exists();
+        if (! $clientAllowed) {
+            abort(404);
+        }
+
         // The whole correction runs in ONE transaction with the prescription row
         // LOCKED (I19/500 fix). The lock serialises rapid corrections — the shared
         // administer() takes no lock of its own, so two in quick succession could
@@ -328,6 +338,7 @@ class MarController extends F4Controller
 
             // Was the dose recorded as given before this correction?
             $existing = MARAdministration::where('mar_sheet_id', $sheetRow->id)
+                ->where('home_id', $homeId)
                 ->where('date', $data['date'])
                 ->where('time_slot', $data['time_slot'])
                 ->where('is_current', 1)
@@ -353,7 +364,7 @@ class MarController extends F4Controller
                 ? (float) $sheetRow->dose_quantity : null;
 
             if ($qty !== null && ! is_null($sheetRow->stock_level) && $oldGiven !== $newGiven) {
-                $clientName = ServiceUser::where('id', $client)->value('name');
+                $clientName = ServiceUser::where('home_id', $homeId)->where('id', $client)->value('name');
 
                 if ($newGiven) {
                     // Not-given → given: the dose was taken. Deduct it.

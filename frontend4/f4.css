@@ -184,6 +184,31 @@
 }
 .f4-place-sub { font-size: var(--f4-t-support); color: var(--f4-muted); white-space: nowrap; }
 
+.f4-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.f4-context-switchers { display: flex; align-items: center; gap: var(--f4-s2); min-width: 0; }
+.f4-context-org { font-size: var(--f4-t-support); color: var(--f4-muted); white-space: nowrap; }
+.f4-context-switchers select {
+  max-width: 180px;
+  height: 34px;
+  padding: 0 28px 0 10px;
+  border: var(--f4-hair);
+  border-radius: var(--f4-r-sm);
+  background: var(--f4-surface);
+  color: var(--f4-body);
+  font: inherit;
+  font-size: var(--f4-t-support);
+}
+
 .f4-context-end { display: flex; align-items: center; gap: var(--f4-s4); margin-left: auto; }
 
 /* Connectivity. Dot AND word — a dot alone tells a colour-blind user nothing,
@@ -860,7 +885,8 @@ a.f4-row:hover, button.f4-row:hover { background: var(--f4-upc-f); text-decorati
   .f4-context { gap: var(--f4-s3); padding: 0 var(--f4-s4); }
   /* The shift and the profile name go; the place and connectivity stay,
      because those two decide whether the screen can be trusted. */
-  .f4-place-sub, .f4-who-name { display: none; }
+  .f4-place-sub, .f4-who-name, .f4-context-org, .f4-context-switchers label:last-child { display: none; }
+  .f4-context-switchers select { max-width: 120px; }
 
   .f4-page-header { padding: var(--f4-s4); }
   .f4-page-header-action { width: 100%; margin-left: 0; }

@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Frontend4;
 use App\Http\Controllers\Controller;
 use App\Services\Frontend4\Permissions;
 use App\Services\Frontend4\RoleResolver;
+use App\Services\Frontend4\AccessContext;
+use App\Models\Frontend4User;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
@@ -101,6 +103,30 @@ abstract class F4Controller extends Controller
             'role' => $role,
             'roleLabel' => app(RoleResolver::class)->label($role),
             'can' => app(Permissions::class)->forRole($role),
+            'accessContext' => Auth::guard('frontend4')->user() instanceof Frontend4User
+                ? app(AccessContext::class)->props(Auth::guard('frontend4')->user())
+                : null,
         ];
+    }
+
+    /** Apply Frontend 4's service/location client boundary to an Eloquent query. */
+    protected function scopeFrontend4Clients($query)
+    {
+        $user = Auth::guard('frontend4')->user();
+        abort_unless($user instanceof Frontend4User, 403);
+
+        return app(AccessContext::class)->scopeClients($query, $user);
+    }
+
+    /** Hook used only when the shared round builder is composed by Frontend 4. */
+    protected function scopeMedicationRoundSheetsForAccess($query, int $homeId)
+    {
+        $user = Auth::guard('frontend4')->user();
+        abort_unless($user instanceof Frontend4User, 403);
+
+        return $query->whereIn(
+            'client_id',
+            app(AccessContext::class)->allowedClientIds($user)
+        );
     }
 }

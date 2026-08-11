@@ -12,13 +12,16 @@ import { Head } from '@inertiajs/react';
 import F4Shell from '@frontend4/components/F4Shell';
 import { Status } from '@frontend4/components/F4Atoms';
 
-export default function Home({ buildLabel }) {
+export default function Home({ buildLabel, can = [], roleLabel = null, accessContext = null }) {
     return (
         <F4Shell
             title="Frontend 4"
             summary="A fourth front end, running beside frontends 1, 2 and 3 in the same application."
             placeSub={buildLabel}
             width="narrow"
+            can={can}
+            roleLabel={roleLabel}
+            accessContext={accessContext}
         >
             <Head title="Frontend 4" />
 

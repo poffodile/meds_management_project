@@ -12,7 +12,7 @@ This is the current starting point for Codex, Claude Code or another engineer. R
 - Do not commit directly to, merge into, rebase or rewrite `frontend4`.
 - Continue production-readiness work only on `care-one-integration` unless the owner explicitly changes this instruction.
 - GitHub commits must not name Codex, ChatGPT, Claude, Anthropic or OpenAI as author or co-author.
-- The latest published isolation commit is `29cb5ea975f5c059c9274867f836e85412d4f193`.
+- The latest confirmed Requirement 3 commit is `67d6eb85d11a4434558d5531ea934f4c8c40d090`.
 
 ## Why this branch exists
 
@@ -103,7 +103,7 @@ Before any production migration:
 
 ## Verification already completed
 
-- All 20 available JavaScript tests passed.
+- All 22 available JavaScript tests passed.
 - The Vite production build passed.
 - All changed PHP files passed PHP syntax parsing.
 - Full Laravel/PHP feature tests remain to be executed after the migration in a configured PHP environment.
@@ -124,7 +124,7 @@ When changing Frontend 4 authentication or permissions:
 
 ## Requirement 3: role permissions
 
-Requirement 3 is implemented on this branch and awaits execution of its PHP feature test in the configured local environment.
+Requirement 3 is implemented and confirmed. On 11 August 2026, `Frontend4PermissionTest` passed with 6 tests and 40 assertions against the isolated `laravel_test` database.
 
 What was added:
 
@@ -146,4 +146,22 @@ npm test
 npm run build
 ```
 
-The next production requirement after these tests pass is Requirement 4: organisation, service and location separation.
+## Requirement 4: organisation, service and location separation
+
+Requirement 4 is implemented and awaits its dedicated migration and PHP feature test in the configured local environment.
+
+The confirmed hierarchy is organisation = `admin`, service = `home`, and location = `home_areas`. The implementation adds:
+
+- a Frontend 4-only access context revalidated on every request;
+- explicit service and location assignment tables with legacy compatibility;
+- structured `service_user.home_area_id` location assignment;
+- cross-organisation, cross-service, deleted-service and tampered-session refusal;
+- Frontend 4-only client, round, MAR and prescription query scoping;
+- audited service/location switching;
+- organisation-scoped password reset and username-scoped service discovery;
+- context selectors in the isolated Frontend 4 header;
+- `Frontend4AccessScopeTest` for the new boundary.
+
+Read `docs/care-one-os/FRONTEND4/ACCESS-SCOPE.md` before applying the new migration. Because unrelated migrations may still be pending, apply `2026_08_11_000002_create_frontend4_access_scope_tables.php` by path in local and test databases first.
+
+The next production requirement after Requirement 4 is confirmed is Requirement 5: real client records and lifecycle rules.

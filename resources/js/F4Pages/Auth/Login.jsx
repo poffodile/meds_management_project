@@ -9,21 +9,22 @@ export default function Login({ servicesUrl, loginUrl, forgotUrl, status, error 
         password: '',
     });
     const [services, setServices] = useState([]);
-    const [serviceMessage, setServiceMessage] = useState('Enter your organisation, then load its services.');
+    const [serviceMessage, setServiceMessage] = useState('Enter your organisation and username, then load your services.');
     const [loadingServices, setLoadingServices] = useState(false);
 
     async function loadServices() {
         const company = data.company_name.trim();
-        if (!company) {
+        const username = data.username.trim();
+        if (!company || !username) {
             setServices([]);
-            setServiceMessage('Enter your organisation name first.');
+            setServiceMessage('Enter your organisation and username first.');
             return;
         }
 
         setLoadingServices(true);
         setServiceMessage('Loading services…');
         try {
-            const response = await fetch(`${servicesUrl}?company_name=${encodeURIComponent(company)}`, {
+            const response = await fetch(`${servicesUrl}?company_name=${encodeURIComponent(company)}&username=${encodeURIComponent(username)}`, {
                 headers: { Accept: 'application/json' },
                 credentials: 'same-origin',
             });
@@ -88,18 +89,18 @@ export default function Login({ servicesUrl, loginUrl, forgotUrl, status, error 
                     </label>
 
                     <label>
+                        <span>Username</span>
+                        <input value={data.username} onChange={(e) => { setData('username', e.target.value); setServices([]); setData('home', ''); }} autoComplete="username" required />
+                        {errors.username ? <small className="f4-auth-error">{errors.username}</small> : null}
+                    </label>
+
+                    <label>
                         <span>Service</span>
                         <select value={data.home} onChange={(e) => setData('home', e.target.value)} required disabled={!services.length}>
                             <option value="">Select your service</option>
                             {services.map((service) => <option key={service.id} value={service.id}>{service.name}</option>)}
                         </select>
                         <small className={errors.home ? 'f4-auth-error' : 'f4-auth-help'}>{errors.home || serviceMessage}</small>
-                    </label>
-
-                    <label>
-                        <span>Username</span>
-                        <input value={data.username} onChange={(e) => setData('username', e.target.value)} autoComplete="username" required />
-                        {errors.username ? <small className="f4-auth-error">{errors.username}</small> : null}
                     </label>
 
                     <label>

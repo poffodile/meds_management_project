@@ -11,7 +11,7 @@
  */
 
 import React from 'react';
-import { Link } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import * as Icon from '@frontend4/components/F4Icons';
 import { navFor } from '@frontend4/roles';
 
@@ -100,6 +100,7 @@ export default function F4Shell({
      */
     can = [],
     roleLabel = null,
+    accessContext = null,
     /** Offline is a persistent banner, never a toast. */
     offline = false,
     queued = 0,
@@ -122,6 +123,35 @@ export default function F4Shell({
                     <span className="f4-place-name">{place || 'Care One OS'}</span>
                     {placeSub ? <span className="f4-place-sub">{placeSub}</span> : null}
                 </span>
+
+                {accessContext ? (
+                    <span className="f4-context-switchers">
+                        <span className="f4-context-org">{accessContext.organisation}</span>
+                        {accessContext.services?.length > 1 ? (
+                            <label>
+                                <span className="f4-sr-only">Service</span>
+                                <select
+                                    value={String(accessContext.serviceId)}
+                                    onChange={(event) => router.post(accessContext.serviceSwitchUrl, { service_id: Number(event.target.value) })}
+                                >
+                                    {accessContext.services.map((service) => <option key={service.id} value={service.id}>{service.name}</option>)}
+                                </select>
+                            </label>
+                        ) : null}
+                        {accessContext.locations?.length ? (
+                            <label>
+                                <span className="f4-sr-only">Location</span>
+                                <select
+                                    value={accessContext.locationId ? String(accessContext.locationId) : ''}
+                                    onChange={(event) => router.post(accessContext.locationSwitchUrl, { location_id: event.target.value ? Number(event.target.value) : null })}
+                                >
+                                    <option value="">All permitted locations</option>
+                                    {accessContext.locations.map((location) => <option key={location.id} value={location.id}>{location.name}</option>)}
+                                </select>
+                            </label>
+                        ) : null}
+                    </span>
+                ) : null}
 
                 <span className="f4-context-end">
                     <span className="f4-conn" data-state={offline ? 'offline' : 'online'}>

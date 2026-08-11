@@ -28,7 +28,7 @@ class AuthenticationSecurityService
         return $credential?->locked_until !== null && now()->isBefore($credential->locked_until);
     }
 
-    public function registerFailure(Frontend4User $user, Request $request, string $identifier): void
+    public function registerFailure(Frontend4User $user, Request $request, string $identifier, array $metadata = []): void
     {
         $credential = $this->credentialFor($user);
         $attempts = ((int) $credential->failed_login_attempts) + 1;
@@ -39,10 +39,10 @@ class AuthenticationSecurityService
         }
 
         $credential->save();
-        $this->record($request, 'login_failed', false, $user, $identifier);
+        $this->record($request, 'login_failed', false, $user, $identifier, $metadata);
     }
 
-    public function registerSuccess(Frontend4User $user, Request $request, string $identifier): void
+    public function registerSuccess(Frontend4User $user, Request $request, string $identifier, array $metadata = []): void
     {
         $this->credentialFor($user)->forceFill([
             'failed_login_attempts' => 0,
@@ -51,12 +51,12 @@ class AuthenticationSecurityService
             'last_login_ip' => $request->ip(),
         ])->save();
 
-        $this->record($request, 'login_succeeded', true, $user, $identifier);
+        $this->record($request, 'login_succeeded', true, $user, $identifier, $metadata);
     }
 
-    public function issuePasswordToken(Frontend4User $user, Request $request): string
+    public function issuePasswordToken(Frontend4User $user, Request $request, array $metadata = []): string
     {
-        return DB::transaction(function () use ($user, $request) {
+        return DB::transaction(function () use ($user, $request, $metadata) {
             Frontend4PasswordToken::where('user_id', $user->id)
                 ->whereNull('used_at')
                 ->update(['used_at' => now()]);
@@ -71,7 +71,7 @@ class AuthenticationSecurityService
                 'created_at' => now(),
             ]);
 
-            $this->record($request, 'password_reset_requested', true, $user, $user->email);
+            $this->record($request, 'password_reset_requested', true, $user, $user->email, $metadata);
 
             return $plainToken;
         });

@@ -29,7 +29,7 @@ export default function ClientProfile({
     careNotes = [], documents = [], audit = [],
     nextMed = null, keyDetails = [], activeMeds = [], contacts = {}, careInstructions = [], recent = [],
     infoStrip = {}, headerMeta = [], headerStats = [], roundUrl = '/frontend4/round',
-    place = null, user = null, roleLabel = null, can = [],
+    place = null, user = null, roleLabel = null, can = [], accessContext = null,
 }) {
     const [active, setActive] = useState(tabFromHash);
     const tabRefs = useRef({});
@@ -60,7 +60,7 @@ export default function ClientProfile({
 
     return (
         <F4Shell area="clients" title={client.name} summary="Client profile" bare
-                 place={place} user={user} roleLabel={roleLabel} can={can}>
+                 place={place} user={user} roleLabel={roleLabel} can={can} accessContext={accessContext}>
             <Head title={`${client.name} — Care One OS`} />
 
             <div className="f4-page-enter">
@@ -170,4 +170,3 @@ export default function ClientProfile({
         </F4Shell>
     );
 }
-

@@ -380,6 +380,7 @@ function CompletionReview({ selected, round, progress, onClose }) {
 
 export default function Round({
     can,
+    accessContext,
     roleLabel,
     place,
     date,
@@ -444,6 +445,7 @@ export default function Round({
             user={user}
             roleLabel={roleLabel}
             can={can}
+            accessContext={accessContext}
             lastSync={now}
         >
             <Head title="Medication round" />

@@ -93,17 +93,29 @@ trait BuildsMedicationRound
         $homeId = $this->getHomeId();
         $date = $request->input('date', now()->toDateString());
 
-        $sheets = MARSheet::forHome($homeId)
+        $sheetsQuery = MARSheet::forHome($homeId)
             ->active()
-            ->currentlyActive()
-            ->with(['administrations' => function ($q) use ($date) {
+            ->currentlyActive();
+        $frontend4Scoped = method_exists($this, 'scopeMedicationRoundSheetsForAccess');
+        if ($frontend4Scoped) {
+            $sheetsQuery = $this->scopeMedicationRoundSheetsForAccess($sheetsQuery, $homeId);
+        }
+        $sheets = $sheetsQuery
+            ->with(['administrations' => function ($q) use ($date, $homeId, $frontend4Scoped) {
+                if ($frontend4Scoped) {
+                    $q->where('home_id', $homeId);
+                }
                 $q->where('date', $date)->with('administeredByUser:id,name');
             }])
             ->orderBy('medication_name')
             ->get();
 
         $clientIds = $sheets->pluck('client_id')->unique()->values();
-        $residents = ServiceUser::whereIn('id', $clientIds)->get()->keyBy('id');
+        $residentQuery = ServiceUser::whereIn('id', $clientIds);
+        if ($frontend4Scoped) {
+            $residentQuery->where('home_id', $homeId);
+        }
+        $residents = $residentQuery->get()->keyBy('id');
 
         // Current weight from the dated series (append-only) — derived, never the stale
         // single-value column. One query for the whole round (no N+1). Carries the
@@ -122,8 +134,11 @@ trait BuildsMedicationRound
         }
 
         // Per-resident active risks (generic — surfaced with their impact level).
-        $risksByClient = \DB::table('care_plan_risks')
-            ->whereIn('client_id', $clientIds)
+        $riskQuery = \DB::table('care_plan_risks')->whereIn('client_id', $clientIds);
+        if ($frontend4Scoped) {
+            $riskQuery->where('home_id', $homeId);
+        }
+        $risksByClient = $riskQuery
             ->where('status', 1)
             ->whereNull('deleted_at')
             ->get(['client_id', 'description', 'impact'])
@@ -411,7 +426,11 @@ trait BuildsMedicationRound
         // while the PRN branch, which had just been changed to insert blindly, took no
         // lock at all.)
         return DB::transaction(function () use ($request, $marSheetService, $homeId, $userId) {
-            $sheet = MARSheet::forHome($homeId)->active()
+            $sheetQuery = MARSheet::forHome($homeId)->active();
+            if (method_exists($this, 'scopeMedicationRoundSheetsForAccess')) {
+                $sheetQuery = $this->scopeMedicationRoundSheetsForAccess($sheetQuery, $homeId);
+            }
+            $sheet = $sheetQuery
                 ->lockForUpdate()
                 ->find($request->input('mar_sheet_id'));
 
@@ -506,7 +525,11 @@ trait BuildsMedicationRound
         // idempotency key so the server can identify the event rather than infer it from
         // the clock. Recorded as such; do not mistake this for a solved problem.
         if ($sheet->as_required) {
-            $duplicate = MARAdministration::where('mar_sheet_id', $sheet->id)
+            $duplicateQuery = MARAdministration::where('mar_sheet_id', $sheet->id);
+            if (method_exists($this, 'scopeMedicationRoundSheetsForAccess')) {
+                $duplicateQuery->where('home_id', $homeId);
+            }
+            $duplicate = $duplicateQuery
                 ->where('date', $request->input('date'))
                 ->where('code', $request->input('code'))
                 ->where('administered_by', $userId)
@@ -532,7 +555,11 @@ trait BuildsMedicationRound
         // (S) must never consume a PRN allowance — a child who received nothing and
         // then wakes in pain must not be locked out.
         if ($sheet->as_required && DoseOutcome::isGiven($request->input('code'))) {
-            $given = MARAdministration::where('mar_sheet_id', $sheet->id)
+            $givenQuery = MARAdministration::where('mar_sheet_id', $sheet->id);
+            if (method_exists($this, 'scopeMedicationRoundSheetsForAccess')) {
+                $givenQuery->where('home_id', $homeId);
+            }
+            $given = $givenQuery
                 ->where('date', $request->input('date'))
                 ->where('code', 'A')
                 ->get();
@@ -572,7 +599,11 @@ trait BuildsMedicationRound
         if ($sheet->as_required) {
             $wasGiven = false;
         } else {
-            $existing = MARAdministration::where('mar_sheet_id', $request->input('mar_sheet_id'))
+            $existingQuery = MARAdministration::where('mar_sheet_id', $request->input('mar_sheet_id'));
+            if (method_exists($this, 'scopeMedicationRoundSheetsForAccess')) {
+                $existingQuery->where('home_id', $homeId);
+            }
+            $existing = $existingQuery
                 ->where('date', $request->input('date'))
                 ->where('time_slot', $request->input('time_slot'))
                 ->first();
@@ -596,7 +627,11 @@ trait BuildsMedicationRound
             $qty = $this->deductionQuantity($sheet);
 
             if ($qty !== null) {
-                $resident = ServiceUser::where('id', $sheet->client_id)->first();
+                $residentQuery = ServiceUser::where('id', $sheet->client_id);
+                if (method_exists($this, 'scopeMedicationRoundSheetsForAccess')) {
+                    $residentQuery->where('home_id', $homeId);
+                }
+                $resident = $residentQuery->first();
 
                 // Record the CD register movement FIRST, while $sheet->stock_level still
                 // holds the pre-administration balance — the register's opening balance for

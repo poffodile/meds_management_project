@@ -75,7 +75,7 @@ function ClientPreview({ client, onClose }) {
 }
 
 export default function Clients({
-    clients = [], total = 0, place = null, user = null, roleLabel = null, can = [], terms = {},
+    clients = [], total = 0, place = null, user = null, roleLabel = null, can = [], accessContext = null, terms = {},
 }) {
     const [query, setQuery] = useState('');
     const [location, setLocation] = useState('');
@@ -138,7 +138,7 @@ export default function Clients({
 
     return (
         <F4Shell area="clients" title="Clients" summary={pageSummary}
-                 place={place} user={user} roleLabel={roleLabel} can={can}>
+                 place={place} user={user} roleLabel={roleLabel} can={can} accessContext={accessContext}>
             <Head title="Clients - Care One OS" />
 
             <div className="f4-page-enter f4-clients-page">

@@ -7,12 +7,14 @@ use App\Home;
 use App\Http\Controllers\Controller;
 use App\Models\Frontend4User;
 use App\Services\Frontend4\AuthenticationSecurityService;
+use App\Services\Frontend4\AccessContext;
 use App\Services\Frontend4\RoleResolver;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
@@ -36,10 +38,11 @@ class AuthenticationController extends Controller
         ]);
     }
 
-    public function services(Request $request)
+    public function services(Request $request, AccessContext $context)
     {
         $data = $request->validate([
             'company_name' => ['required', 'string', 'max:255'],
+            'username' => ['required', 'string', 'max:255'],
         ]);
         $adminId = $this->organisationId($data['company_name']);
 
@@ -47,8 +50,18 @@ class AuthenticationController extends Controller
             return response()->json(['services' => []]);
         }
 
+        $serviceIds = Frontend4User::where('user_name', trim($data['username']))
+            ->where('status', 1)
+            ->where('is_deleted', 0)
+            ->get()
+            ->flatMap(fn (Frontend4User $user) => $context->allowedServiceIds($user, $adminId))
+            ->unique()
+            ->values()
+            ->all();
+
         return response()->json([
             'services' => Home::where('admin_id', $adminId)
+                ->whereIn('id', $serviceIds)
                 ->where('is_deleted', 0)
                 ->orderBy('title')
                 ->get(['id', 'title'])
@@ -57,7 +70,7 @@ class AuthenticationController extends Controller
         ]);
     }
 
-    public function login(Request $request, AuthenticationSecurityService $security)
+    public function login(Request $request, AuthenticationSecurityService $security, AccessContext $context)
     {
         $data = $request->validate([
             'company_name' => ['required', 'string', 'max:255'],
@@ -72,23 +85,33 @@ class AuthenticationController extends Controller
             return back()->withInput($request->except('password'))->with('error', $this->failureMessage());
         }
 
-        $user = Frontend4User::where('user_name', $identifier)
-            ->where('status', 1)
-            ->where('is_deleted', 0)
-            ->first();
-
-        if (! $user) {
-            RateLimiter::hit($throttleKey, config('frontend4_auth.decay_seconds'));
-            $security->record($request, 'login_failed', false, null, $identifier);
-
-            return back()->withInput($request->except('password'))->with('error', $this->failureMessage());
-        }
-
         $adminId = $this->organisationId($data['company_name']);
         $home = $adminId
             ? Home::whereKey($data['home'])->where('admin_id', $adminId)->where('is_deleted', 0)->first()
             : null;
-        $allowedHomeIds = $this->allowedHomeIds($user);
+        $user = $home
+            ? Frontend4User::where('user_name', $identifier)
+                ->where('status', 1)
+                ->where('is_deleted', 0)
+                ->get()
+                ->first(fn (Frontend4User $candidate) => in_array(
+                    (int) $home->id,
+                    $context->allowedServiceIds($candidate, (int) $adminId),
+                    true
+                ))
+            : null;
+
+        if (! $user) {
+            RateLimiter::hit($throttleKey, config('frontend4_auth.decay_seconds'));
+            $security->record($request, 'login_failed', false, null, $identifier, [
+                'organisation_id' => $adminId,
+                'service_id' => $home?->id,
+            ]);
+
+            return back()->withInput($request->except('password'))->with('error', $this->failureMessage());
+        }
+
+        $allowedHomeIds = $context->allowedServiceIds($user, (int) $adminId);
         $mayUseMedication = app(RoleResolver::class)->hasAccess($user);
 
         if (
@@ -99,40 +122,43 @@ class AuthenticationController extends Controller
             || ! $security->passwordMatches($user, $data['password'])
         ) {
             RateLimiter::hit($throttleKey, config('frontend4_auth.decay_seconds'));
-            $security->registerFailure($user, $request, $identifier);
+            $security->registerFailure($user, $request, $identifier, [
+                'organisation_id' => (int) $adminId,
+                'service_id' => (int) $home->id,
+            ]);
 
             return back()->withInput($request->except('password'))->with('error', $this->failureMessage());
         }
 
         RateLimiter::clear($throttleKey);
-        $security->registerSuccess($user, $request, $identifier);
+        $security->registerSuccess($user, $request, $identifier, [
+            'organisation_id' => (int) $adminId,
+            'service_id' => (int) $home->id,
+        ]);
         Auth::guard('frontend4')->login($user);
         $request->session()->regenerate();
-        $request->session()->put([
-            'frontend4.active_home_id' => (int) $home->id,
-            'frontend4.allowed_home_ids' => $allowedHomeIds,
-            'frontend4.last_activity' => time(),
-        ]);
+        $context->putSession($user, (int) $adminId, (int) $home->id);
+        $request->session()->put('frontend4.last_activity', time());
 
         $intended = $request->session()->pull('frontend4.intended');
 
         return $intended ? redirect()->to($intended) : redirect()->route('frontend4.today');
     }
 
-    public function logout(Request $request, AuthenticationSecurityService $security)
+    public function logout(Request $request, AuthenticationSecurityService $security, AccessContext $context)
     {
         $user = Auth::guard('frontend4')->user();
         if ($user) {
-            $security->record($request, 'logout', true, $user, $user->user_name);
+            $security->record($request, 'logout', true, $user, $user->user_name, [
+                'organisation_id' => $context->organisationId(),
+                'service_id' => $context->serviceId(),
+                'location_id' => $context->locationId(),
+            ]);
         }
 
         Auth::guard('frontend4')->logout();
-        $request->session()->forget([
-            'frontend4.active_home_id',
-            'frontend4.allowed_home_ids',
-            'frontend4.last_activity',
-            'frontend4.intended',
-        ]);
+        $context->forgetSession();
+        $request->session()->forget(['frontend4.last_activity', 'frontend4.intended']);
         $request->session()->regenerateToken();
 
         return redirect()->route('frontend4.login')->with('status', 'You have signed out of Care One OS.');
@@ -149,17 +175,26 @@ class AuthenticationController extends Controller
         ]);
     }
 
-    public function sendResetLink(Request $request, AuthenticationSecurityService $security)
+    public function sendResetLink(Request $request, AuthenticationSecurityService $security, AccessContext $context)
     {
-        $data = $request->validate(['email' => ['required', 'email:rfc', 'max:255']]);
-        $user = Frontend4User::where('email', $data['email'])
-            ->where('status', 1)
-            ->where('is_deleted', 0)
-            ->first();
+        $data = $request->validate([
+            'company_name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email:rfc', 'max:255'],
+        ]);
+        $adminId = $this->organisationId($data['company_name']);
+        $user = $adminId
+            ? Frontend4User::where('email', $data['email'])
+                ->where('status', 1)
+                ->where('is_deleted', 0)
+                ->get()
+                ->first(fn (Frontend4User $candidate) => $context->allowedServiceIds($candidate, $adminId) !== [])
+            : null;
 
         if ($user && app(RoleResolver::class)->hasAccess($user)) {
             try {
-                $token = $security->issuePasswordToken($user, $request);
+                $token = $security->issuePasswordToken($user, $request, [
+                    'organisation_id' => $adminId,
+                ]);
                 $url = route('frontend4.password.reset', ['token' => $token]);
                 $company = config('app.name', 'Care One OS');
                 Mail::send('emails.user_set_password_mail', [
@@ -178,7 +213,9 @@ class AuthenticationController extends Controller
                 ]);
             }
         } else {
-            $security->record($request, 'password_reset_requested', true, null, $data['email']);
+            $security->record($request, 'password_reset_requested', true, null, $data['email'], [
+                'organisation_id' => $adminId,
+            ]);
         }
 
         return back()->with('status', 'If the account exists, a Care One OS password link has been sent.');
@@ -222,21 +259,19 @@ class AuthenticationController extends Controller
 
     private function organisationId(string $companyName): ?int
     {
-        $id = Admin::whereRaw('LOWER(company) = ?', [Str::lower(trim($companyName))])
-            ->where('is_deleted', 0)
-            ->value('id');
+        $identifier = Str::lower(trim($companyName));
+        $query = Admin::where('is_deleted', 0)
+            ->where(function ($query) use ($identifier) {
+                $query->whereRaw('LOWER(company) = ?', [$identifier]);
+                if (Schema::hasColumn('admin', 'frontend4_slug')) {
+                    $query->orWhereRaw('LOWER(frontend4_slug) = ?', [$identifier]);
+                }
+            });
+        $ids = $query->limit(2)->pluck('id');
 
-        return $id ? (int) $id : null;
-    }
-
-    private function allowedHomeIds(Frontend4User $user): array
-    {
-        return collect(explode(',', (string) $user->real_home_id))
-            ->map(fn ($id) => (int) trim($id))
-            ->filter()
-            ->unique()
-            ->values()
-            ->all();
+        // A display name is usable only when it identifies exactly one
+        // organisation. Duplicate names must use the unique Frontend 4 slug.
+        return $ids->count() === 1 ? (int) $ids->first() : null;
     }
 
     private function failureMessage(): string

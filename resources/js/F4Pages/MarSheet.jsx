@@ -190,7 +190,7 @@ function MarDetail({ detail, onClose, canCorrect, outcomes, clientId, weekStart 
 export default function MarSheet({
     client, days = [], meds = [], summary = {}, legend = [], outcomes = [],
     weekLabel, weekStart, prevWeek, nextWeek, isThisWeek,
-    place = null, user = null, roleLabel = null, can = [],
+    place = null, user = null, roleLabel = null, can = [], accessContext = null,
 }) {
     const marUrl = (week) => `/frontend4/clients/${client.id}/mar?week_start=${week}`;
     const [detail, setDetail] = useState(null);
@@ -198,7 +198,7 @@ export default function MarSheet({
     const canExport = allows(can, 'export_report');
 
     return (
-        <F4Shell area="clients" title="MAR sheet" summary={client.name} place={place} user={user} roleLabel={roleLabel} can={can}>
+        <F4Shell area="clients" title="MAR sheet" summary={client.name} place={place} user={user} roleLabel={roleLabel} can={can} accessContext={accessContext}>
             <Head title={`MAR — ${client.name}`} />
 
             {/* Identity + allergies stay in view — this is a clinical record. */}

@@ -2010,6 +2010,10 @@ Route::prefix('frontend4')->name('frontend4.')->group(function () {
 
     Route::middleware('frontend4.auth')->group(function () {
         Route::post('/logout', [Frontend4AuthenticationController::class, 'logout'])->name('logout');
+        Route::post('/context/service', [\App\Http\Controllers\Frontend4\ContextController::class, 'switchService'])
+            ->name('context.service');
+        Route::post('/context/location', [\App\Http\Controllers\Frontend4\ContextController::class, 'switchLocation'])
+            ->name('context.location');
         Route::get('/', [Frontend4TodayController::class, 'index'])
             ->middleware('frontend4.can:view_today')->name('today');
         Route::get('/round', [Frontend4RoundController::class, 'index'])

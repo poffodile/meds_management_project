@@ -68,6 +68,7 @@ function personState(p) {
 
 export default function Today({
     can,
+    accessContext,
     roleLabel,
     terms,
     place,
@@ -101,6 +102,7 @@ export default function Today({
             user={user}
             roleLabel={roleLabel}
             can={can}
+            accessContext={accessContext}
             lastSync={now}
         >
             <Head title="Today" />

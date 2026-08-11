@@ -57,6 +57,14 @@ class PrescriptionController extends F4Controller
         $homeId = $this->currentHomeId();
         $userId = Auth::id();
 
+        $clientAllowed = $this->scopeFrontend4Clients(\App\ServiceUser::query())
+            ->where('is_deleted', 0)
+            ->where('id', $client)
+            ->exists();
+        if (! $clientAllowed) {
+            abort(404);
+        }
+
         DB::transaction(function () use ($data, $homeId, $userId, $client, $sheet) {
             // Locked so two managers cannot change the same prescription at once.
             $row = MARSheet::forHome($homeId)

@@ -49,7 +49,7 @@ class ClientProfileController extends F4Controller
 
         $homeId = $this->currentHomeId();
 
-        $su = ServiceUser::where('home_id', $homeId)
+        $su = $this->scopeFrontend4Clients(ServiceUser::query())
             ->where('is_deleted', 0)
             ->where('id', $client)
             ->first();
@@ -268,6 +268,8 @@ class ClientProfileController extends F4Controller
             ->join('mar_sheets as m', 'm.id', '=', 'c.mar_sheet_id')
             ->leftJoin('user as u', 'u.id', '=', 'c.changed_by')
             ->where('c.client_id', $su->id)
+            ->where('c.home_id', $homeId)
+            ->where('m.home_id', $homeId)
             ->orderByDesc('c.id')->limit(50)
             ->get(['c.change_type', 'c.old_value', 'c.new_value', 'c.reason', 'c.created_at', 'm.medication_name', 'u.name as staff']) as $r) {
             $auditRaw[] = [
