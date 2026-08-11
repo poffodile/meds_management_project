@@ -129,14 +129,17 @@ export default function F4Shell({
                         {offline ? 'Offline' : 'Online'}
                     </span>
                     {user ? (
-                        <span className="f4-who">
-                            <span className="f4-avatar" aria-hidden="true">{initials(user)}</span>
-                            {/* The role is shown, not just the name — someone
-                                covering a shift needs to know which account
-                                they are on before they record anything. */}
-                            <span className="f4-who-name">
-                                {user}{roleLabel ? ` · ${roleLabel}` : ''}
+                        <span className="f4-who-wrap">
+                            <span className="f4-who">
+                                <span className="f4-avatar" aria-hidden="true">{initials(user)}</span>
+                                {/* The role is shown, not just the name — someone
+                                    covering a shift needs to know which account
+                                    they are on before they record anything. */}
+                                <span className="f4-who-name">
+                                    {user}{roleLabel ? ` · ${roleLabel}` : ''}
+                                </span>
                             </span>
+                            <Link href="/frontend4/logout" method="post" as="button" className="f4-signout">Sign out</Link>
                         </span>
                     ) : null}
                 </span>

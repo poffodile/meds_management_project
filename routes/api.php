@@ -22,10 +22,7 @@ use App\Http\Controllers\Api\DailyLogApiController;
 //     return $request->user();
 // })->middleware('auth:api');
 
-Route::post('/user-login', 'App\Http\Controllers\Android\AndroidApiController@user_login')
-	->middleware('throttle:5,1');
-Route::post('/user-logout', 'App\Http\Controllers\Api\SecureLoginController@logout')
-	->middleware('auth:sanctum');
+Route::post('/user-login', 'App\Http\Controllers\Android\AndroidApiController@user_login');
 Route::get('/get-leave-list', 'App\Http\Controllers\Android\AndroidApiController@get_leave_list');
 Route::post('/add-user-leave', 'App\Http\Controllers\Android\AndroidApiController@add_user_leave');
 Route::post('/get-user-leave', 'App\Http\Controllers\Android\AndroidApiController@get_user_leave');
@@ -43,10 +40,7 @@ Route::get('/courses-list', 'App\Http\Controllers\Api\Staff\UserController@courc
 Route::post('get-homes', [AndroidApiController::class, 'get_homes']);
 
 Route::group(['prefix' => '/service'], function () {
-	Route::post('/login', 'App\Http\Controllers\Api\SecureLoginController@login')
-		->middleware('throttle:5,1');
-	Route::post('/logout', 'App\Http\Controllers\Api\SecureLoginController@logout')
-		->middleware('auth:sanctum');
+	Route::post('/login', 'App\Http\Controllers\Api\ServiceUser\UserController@login');
 	Route::post('/contact-us', 'App\Http\Controllers\Api\ContactUsController@add_contact_us');
 	Route::get('/personal-detail/{service_user_id}', 'App\Http\Controllers\Api\ServiceUser\UserController@personal_details');
 
@@ -154,8 +148,7 @@ Route::group(['prefix' => '/daily-log'], function () {
 });
 
 
-Route::post('/forget-password', 'App\Http\Controllers\Api\PasswordController@requestReset')
-	->middleware('throttle:5,1');
+Route::post('/forget-password', 'App\Http\Controllers\Api\Staff\UserController@forget_password');
 
 Route::group(['prefix' => '/staff'], function () {
 

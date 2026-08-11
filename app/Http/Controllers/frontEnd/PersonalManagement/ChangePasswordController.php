@@ -4,22 +4,12 @@ use App\Http\Controllers\frontEnd\PersonalManagement;
 use Illuminate\Http\Request;
 use App\User;
 use DB, Auth, Hash;
-use Illuminate\Validation\Rules\Password;
-use App\Services\AuthenticationSecurityService;
 
 class ChangePasswordController extends ProfileController
 {   
     public function change_password(Request $request) 
     {
-        $data = $request->validate([
-            'current_password' => ['required', 'string'],
-            'new_password' => [
-                'required',
-                'same:confirm_password',
-                Password::min(12)->mixedCase()->numbers()->symbols(),
-            ],
-            'confirm_password' => ['required', 'string'],
-        ]);
+        $data = $request->input();
         $home_id = Auth::User()->home_id;
         $user_id = Auth::User()->id;
 
@@ -39,19 +29,8 @@ class ChangePasswordController extends ProfileController
 
                 //$user = User::find($user_id);
                 $user->password = Hash::make($data['new_password']);
-                $user->password_changed_at = now();
-                $user->force_password_reset = false;
-                $user->session_token = csrf_token();
 
                 if($user->save()) {
-                    $request->session()->regenerate();
-                    app(AuthenticationSecurityService::class)->record(
-                        $request,
-                        'password_changed',
-                        true,
-                        $user,
-                        $user->user_name
-                    );
                     
                     return $resp = array('response'=>'ok');
                 } else {

@@ -136,7 +136,7 @@
                                     <label class="col-md-2 col-sm-3 col-xs-12 p-0 control-label">New Password: </label>
                                     <div class="col-md-10 col-sm-9 col-xs-12">
                                         <div class="" style="width: 100%">
-                                            <input type="password" name="new_password" autocomplete="new-password" required minlength="12" maxlength="128" placeholder="New Password" id="new_password" class="form-control placeholder-no-fix">
+                                            <input type="password" name="new_password" auto-complete="off" required placeholder="New Password" id="new_password" class="form-control placeholder-no-fix">
                                             <!-- <input type="text" name="new_password" required placeholder="New Password" id="new_password" class="form-control placeholder-no-fix"> -->
                                         </div>
                                     </div>
@@ -146,7 +146,7 @@
                                     <label class="col-md-2 col-sm-3 col-xs-12 p-0 control-label">Confirm Password : </label>
                                     <div class="col-md-10 col-sm-9 col-xs-12">
                                         <div class="" style="width: 100%">
-                                            <input type="password" name="confirm_password" autocomplete="new-password" required minlength="12" maxlength="128" placeholder="Confirm Password" class="form-control placeholder-no-fix">
+                                            <input type="password" name="confirm_password" auto-complete="off" placeholder="Confirm Password" class="form-control placeholder-no-fix">
                                             <!-- <input type="text" name="confirm_password" placeholder="Confirm Password" class="form-control placeholder-no-fix"> -->
                                         </div>
                                     </div>                                    
@@ -175,9 +175,9 @@
                 password:"required",
                 new_password:{
                     required:true,
-                    minlength:12,
-                    maxlength:128,
-                    regex:"^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[^A-Za-z0-9]).{12,}$"
+                    minlength:4,
+                    maxlength:20,
+                    regex:"^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{4,}$"
                 },
                 confirm_password: {
                     required:true,

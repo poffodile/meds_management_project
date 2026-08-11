@@ -72,7 +72,7 @@ class TodayController extends F4Controller
         // it runs as part of the pipeline it is registered into. The root view
         // is the thing that must not be set here; see F4Controller.
         $this->middleware(function ($request, $next) {
-            if (! Auth::check()) {
+            if (! Auth::guard('frontend4')->check()) {
                 abort(403, 'You do not have access to medication management.');
             }
 

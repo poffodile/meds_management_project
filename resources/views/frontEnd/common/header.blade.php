@@ -139,12 +139,7 @@ $allowed_ids = array_filter(explode(',', str_replace(' ', '', $raw_home_id)));
                         <ul class="dropdown-menu extended logout">
                             <li><a href="{{ url('/my-profile/'.$user_id) }}"> <i class="fa fa-user-circle"></i> My Profile </a></li>
                             <li><a href="{{ url('/lock?path='.$current_path) }}"><i class="fa fa-lock"> </i> Lock</a></li>
-                            <li>
-                                <form action="{{ url('/logout') }}" method="post">
-                                    @csrf
-                                    <button type="submit" class="btn btn-link"><i class="fa fa-key"></i> Log Out</button>
-                                </form>
-                            </li>
+                            <li><a href="{{ url('/logout') }}"><i class="fa fa-key"></i> Log Out</a></li>
                             <!-- Code given By Ethan start -->
                             <!-- @if(Auth::user()->user_type == "A" || Auth::user()->user_type == "M")
                             <li id="switch_menu_itm"><a href="{{ url('/switch_home') }}"><i class="fa fa-home"></i> Switch Home</a></li>

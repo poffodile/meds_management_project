@@ -10,10 +10,6 @@ use Hash, Session;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\RateLimiter;
-use Illuminate\Support\Str;
-use Illuminate\Validation\Rules\Password;
-use App\Services\AuthenticationSecurityService;
 
 class UserController extends Controller
 {
@@ -27,45 +23,22 @@ class UserController extends Controller
 			// return redirect('/');
 		}
 		if ($request->isMethod('post')) {
-			$data = $request->validate([
-				'username' => ['required', 'string', 'max:255'],
-				'password' => ['required', 'string', 'max:1024'],
-				'home' => ['required', 'integer'],
-			]);
-			$data['username'] = trim($data['username']);
-			$throttleKey = $this->loginThrottleKey($request, $data['username']);
-
-			if (RateLimiter::tooManyAttempts($throttleKey, config('auth_security.max_attempts'))) {
-				return redirect()->back()->with('error', $this->loginFailureMessage());
-			}
-
+			// dd($request);
+			$data 		  = $request->input();
 			$username 	  = $data['username'];
 			$hme_id 	  = $data['home'];
 			$current_date = date('m/d/Y');
 
 			// $current_date = '10/03/2018';
 			// echo "<pre>"; print_r($current_date);  
-			$user_info 	= user::select(
-				'id',
-				'home_id',
-				'admn_id',
-				'user_type',
-				'login_date',
-				'login_home_id',
-				'failed_login_attempts',
-				'locked_until'
-			)
+			$user_info 	= user::select('id', 'home_id', 'admn_id', 'user_type', 'login_date', 'login_home_id')
 				->where('user_name', $username)
 				->where('is_deleted', '0')
-				->where('status', '1')
 				->first();
 			//echo "<pre>"; print_r($user_info->login_date); 
 			//echo "<pre>"; print_r($user_info);  
 
 			if (!empty($user_info)) {
-				if (app(AuthenticationSecurityService::class)->isLocked($user_info)) {
-					return redirect()->back()->with('error', $this->loginFailureMessage());
-				}
 				$login_ip = $request->ip();
 				// print_r($login_ip);die;
 				$assigned_homes = explode(',', $user_info->real_home_id);
@@ -104,11 +77,9 @@ class UserController extends Controller
 									if ($diff_mint > SESSION_TIMEOUT) {
 									} else {
 										Auth::logout();
-										Session::put('pending_login', [
-											'user_id' => $user_info->id,
-											'home_id' => (int) $data['home'],
-											'expires_at' => now()->addMinutes(5)->timestamp,
-										]);
+										Session::put('user_name', $data['username']);
+										Session::put('password', $data['password']);
+										Session::put('home_id', $data['home']);
 										// return redirect()->back()->with('error', 'You are already logged in from some other device.');
 										return redirect()->back()->with('login_error', 'This account is currently logged in on another device.Do you want to log out from the other device and continue logging in here?');
 									}
@@ -116,7 +87,6 @@ class UserController extends Controller
 								$session_id_update = User::find(Auth::user()->id);
 								$session_id_update->login_ip = $login_ip;
 								$session_id_update->save();
-								$this->completeLogin($request, Auth::user(), $username);
 								User::setUserLogInStatus(1);
 								//echo csrf_token(); die;
 								//echo "222"; die;
@@ -124,7 +94,7 @@ class UserController extends Controller
 								return redirect('/roster')->with('success', 'Welcome back ' . Auth::user()->user_name);
 								// return redirect('/roster/')->with('success', 'Welcome back ' . Auth::user()->user_name);
 							} else {
-								return $this->failedLogin($request, $user_info, $username);
+								return redirect()->back()->with('error', 'Incorrect email or password combination.');
 							}
 						} elseif ($user_info->user_type == 'N') {
 
@@ -155,11 +125,9 @@ class UserController extends Controller
 										if ($diff_mint > SESSION_TIMEOUT) {
 										} else {
 											Auth::logout();
-											Session::put('pending_login', [
-												'user_id' => $user_info->id,
-												'home_id' => (int) $data['home'],
-												'expires_at' => now()->addMinutes(5)->timestamp,
-											]);
+											Session::put('user_name', $data['username']);
+											Session::put('password', $data['password']);
+											Session::put('home_id', $data['home']);
 											return redirect()->back()->with('login_error', 'This account is currently logged in on another device.Do you want to log out from the other device and continue logging in here?');
 										}
 									}
@@ -178,79 +146,67 @@ class UserController extends Controller
 									$session_id_update = User::find(Auth::user()->id);
 									$session_id_update->login_ip = $login_ip;
 									$session_id_update->save();
-									$this->completeLogin($request, Auth::user(), $username);
 									User::setUserLogInStatus(1);
 									//echo csrf_token(); die;
 									// return redirect('/roster/')->with('success', 'Welcome back ' . Auth::user()->user_name);
 									$this->handleManagerSession($hme_id);
 									return redirect('/roster')->with('success', 'Welcome back ' . Auth::user()->user_name);
 								} else {  //echo "string3"; die;
-									return $this->failedLogin($request, $user_info, $username);
+									return redirect()->back()->with('error', 'Incorrect email or password combination.');
 								}
 							} else {  //echo "string4"; die;
-								return $this->failedLogin($request, $user_info, $username);
+								return redirect()->back()->with('error', 'Incorrect email or password combination.');
 							}
 						}
 					} else {
-						app(AuthenticationSecurityService::class)->record(
-							$request,
-							'login_wrong_service',
-							false,
-							$user_info,
-							$username,
-							['home_id' => (int) $hme_id]
-						);
-						return redirect()->back()->with('error', $this->loginFailureMessage());
+						return redirect()->back()->with('error', 'You are not authorized to access this home.');
 					}
-				}
-			} else {
-				RateLimiter::hit($throttleKey, config('auth_security.decay_seconds'));
-				app(AuthenticationSecurityService::class)->record(
-					$request,
-					'login_failed',
-					false,
-					null,
-					$username
-				);
-				return redirect()->back()->with('error', $this->loginFailureMessage());
 			}
+		}
 		return view('frontEnd.login');
 	}
 	public function yes_logout(Request $request)
 	{
-		$pending = Session::pull('pending_login');
+		try {
+			if (Auth::attempt(['user_name' => Session()->get('user_name'), 'password' => Session()->get('password')])) {
 
-		if (! is_array($pending) || ($pending['expires_at'] ?? 0) < now()->timestamp) {
-			return redirect('/login')->with('error', 'Please sign in again.');
+				DB::beginTransaction();
+				$user = User::find(Auth::user()->id);
+				$user->login_ip = '';
+				$user->session_token = '';
+				$user->logged_in = 0;
+				$user->save();
+				DB::commit();
+				$request->merge([
+					'username' => Session::get('user_name'),
+					'password' => Session::get('password'),
+					'home'     => Session::get('home_id'),
+					'_token'   => csrf_token(),
+				]);
+				$request->setMethod('POST');
+				Auth::logout();
+				Session::forget('user_name');
+				Session::forget('password');
+				Session::forget('home_id');
+				return app()->call([new self, 'login'], ['request' => $request]);
+			} else {
+				return response()->json(['success' => false, 'message' => 'Something went wrong! Please try again later']);
+			}
+		} catch (\Exception $e) {
+			DB::rollBack();
+			Log::error("Yes Logout Error:(" . date('d-m-Y H:i') . "): " . $e->getMessage());
+			return response()->json([
+				'success' => false,
+				'message' => 'Something went wrong!',
+				'data'   => $e->getMessage()
+			], 500);
 		}
-
-		$user = User::query()
-			->whereKey($pending['user_id'] ?? 0)
-			->where('status', 1)
-			->where('is_deleted', 0)
-			->first();
-
-		if (! $user) {
-			return redirect('/login')->with('error', 'Please sign in again.');
-		}
-
-		$user->forceFill([
-			'login_ip' => null,
-			'session_token' => null,
-			'logged_in' => 0,
-		])->save();
-
-		Auth::login($user);
-		$request->session()->regenerate();
-		$this->handleManagerSession((int) $pending['home_id']);
-		$this->completeLogin($request, $user, $user->user_name);
-		User::setUserLogInStatus(1);
-
-		return redirect('/roster')->with('success', 'Welcome back '.$user->user_name);
 	}
 	public function no_logout()
 	{
-		Session::forget('pending_login');
+		Session::forget('user_name');
+		Session::forget('password');
+		Session::forget('home_id');
 		return response()->json(['success' => true, 'message' => 'Session Deleted']);
 	}
 	function login_staff_user($data, $user_info)
@@ -281,15 +237,14 @@ class UserController extends Controller
 					$update  = User::where('id',$user_info->id)->update(['home_id'=>$home_id]);
 		    	}					
 	    	}*/
-			$this->completeLogin(request(), Auth::user(), $data['username']);
 			User::setUserLogInStatus(1);
 			//echo csrf_token(); die;
 			return redirect('/roster')->with('success', 'Welcome back ' . Auth::user()->user_name);
 		} else {
-			return $this->failedLogin(request(), $user_info, $data['username']);
+			return redirect()->back()->with('error', 'Incorrect email or password combination.');
 		}
 	}
-	public function logout(Request $request)
+	public function logout()
 	{
 
 		if (Auth::check()) {
@@ -298,50 +253,50 @@ class UserController extends Controller
 			$user->login_ip = null;
 			$user->save();
 			Auth::logout();
-			$request->session()->invalidate();
-			$request->session()->regenerateToken();
+			Session::forget('LAST_ACTIVITY');
+			Session::forget('active_home_id');
+			Session::forget('allowed_home_ids');
 		}
 		return redirect('/login');
 	}
-	public function show_set_password_form(Request $request, string $token)
+	public function show_set_password_form(Request $request, $user_id = null, $security_code = null)
 	{
-		$security = app(AuthenticationSecurityService::class);
-		$passwordToken = $security->validPasswordToken($token);
-		$user = $passwordToken && $passwordToken->authenticatable_type === 'user'
-			? $security->accountModel($passwordToken)
-			: null;
 
-		if (! $user || $user->is_deleted || ! $user->status) {
-			return redirect('/login')->with('error', 'This password link is invalid or has expired.');
+		$decoded_user_id = convert_uudecode(base64_decode($user_id));
+		$decoded_security_code = convert_uudecode(base64_decode($security_code));
+		$count = User::where('id', $decoded_user_id)
+			->where('security_code', $decoded_security_code)
+			->first();
+
+		if (!empty($count)) {
+			$user_name = $count->user_name;
+			return view('frontEnd.user_set_password', compact('user_id', 'security_code', 'user_name'));
+		} else {
+			return redirect('/login')->with('error', 'This link has been already used.');
 		}
-
-		$user_name = $user->user_name;
-		return view('frontEnd.user_set_password', compact('token', 'user_name'));
 	}
 	public function set_password(Request $request)
 	{
-		$data = $request->validate([
-			'token' => ['required', 'string', 'size:64'],
-			'password' => [
-				'required',
-				'confirmed',
-				Password::min(12)->mixedCase()->numbers()->symbols(),
-			],
-		]);
-
-		$security = app(AuthenticationSecurityService::class);
-		$passwordToken = $security->validPasswordToken($data['token']);
-		$user = $passwordToken && $passwordToken->authenticatable_type === 'user'
-			? $security->accountModel($passwordToken)
-			: null;
-
-		if (! $user || $user->is_deleted || ! $user->status) {
-			return redirect('/login')->with('error', 'This password link is invalid or has expired.');
+		$data = $request->input();
+		if (empty($data['password'])) {
+			return redirect()->back()->with('error', 'Please Enter Password');
+		} else if ($data['password'] != $data['confirm_password']) {
+			return redirect()->back()->with('error', 'Password & confirm password does not matched.');
 		}
+		$user_id = convert_uudecode(base64_decode($data['user_id']));
+		$security_code = convert_uudecode(base64_decode($data['security_code']));
 
-		$security->consumePasswordToken($passwordToken, $user, $request, Hash::make($data['password']));
-
-		return redirect('/login')->with('success', 'Your password has been set successfully.');
+		$user = User::where('id', $user_id)
+			->where('security_code', $security_code)
+			->first();
+		// $user->security_code = '';
+		$user->password =	Hash::make($data['password']);
+		//echo $data['password']; die;
+		if ($user->save()) {
+			return redirect('/login')->with('success', 'You have set your password successfully.');
+		} else {
+			return redirect('/login')->with('error', 'Some error occured. Please try again later');
+		}
 	}
 	public function get_homes(Request $request, $company_name = null)
 	{
@@ -416,35 +371,6 @@ class UserController extends Controller
 		User::where('id', Auth::user()->id)->update(['home_id' => $string]);
 
 		return redirect('/roster');
-	}
-
-	private function completeLogin(Request $request, User $user, string $identifier): void
-	{
-		$request->session()->regenerate();
-		RateLimiter::clear($this->loginThrottleKey($request, $identifier));
-		app(AuthenticationSecurityService::class)->registerSuccess($user, $request, $identifier);
-	}
-
-	private function failedLogin(Request $request, User $user, string $identifier)
-	{
-		Auth::logout();
-		RateLimiter::hit(
-			$this->loginThrottleKey($request, $identifier),
-			config('auth_security.decay_seconds')
-		);
-		app(AuthenticationSecurityService::class)->registerFailure($user, $request, $identifier);
-
-		return redirect()->back()->with('error', $this->loginFailureMessage());
-	}
-
-	private function loginThrottleKey(Request $request, string $identifier): string
-	{
-		return 'staff-login:'.hash('sha256', Str::lower(trim($identifier)).'|'.$request->ip());
-	}
-
-	private function loginFailureMessage(): string
-	{
-		return 'We could not sign you in with those details. Please check them or try again later.';
 	}
 	// code given by Ethan End
 

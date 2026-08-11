@@ -40,6 +40,12 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        // Care One OS (Frontend 4) keeps a separate session identity. The
+        // legacy web guard and its login routes remain completely unchanged.
+        'frontend4' => [
+            'driver' => 'session',
+            'provider' => 'frontend4_users',
+        ],
     ],
 
     /*
@@ -63,6 +69,10 @@ return [
         'users' => [
             'driver' => 'eloquent',
             'model' => App\User::class,
+        ],
+        'frontend4_users' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Frontend4User::class,
         ],
 
         // 'users' => [

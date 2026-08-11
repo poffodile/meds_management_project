@@ -34,7 +34,7 @@ class ClientsController extends F4Controller
     public function __construct()
     {
         $this->middleware(function ($request, $next) {
-            if (! Auth::check()) {
+            if (! Auth::guard('frontend4')->check()) {
                 abort(403, 'You do not have access to medication management.');
             }
 
@@ -191,5 +191,4 @@ class ClientsController extends F4Controller
         return ctype_alpha($c) ? $c : '#';
     }
 }
-
 

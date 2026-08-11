@@ -35,7 +35,11 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
-        $user = $request->user();
+        // Frontend 4 has its own guard. Selecting it only for /frontend4 keeps
+        // legacy Inertia pages on the unchanged default web guard and prevents
+        // a legacy account from being shared into the Care One OS bundle.
+        $isFrontend4 = $request->is('frontend4', 'frontend4/*');
+        $user = $isFrontend4 ? $request->user('frontend4') : $request->user();
 
         // Manager-level roles (can edit/approve/override). Everyone else = carer view.
         // Mirrors App\Models\ShiftHandover::MANAGER_TYPES.
@@ -54,7 +58,7 @@ class HandleInertiaRequests extends Middleware
             // The homes this user may switch between, and which one is active. Drives the
             // header home-switcher (CR-06). A single home ⇒ no switcher shown. Re-validates
             // the active id against the user's own list, never trusting the session alone.
-            'homes' => fn () => $this->homesForSwitcher($request),
+            'homes' => fn () => $isFrontend4 ? null : $this->homesForSwitcher($request),
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
                 'error'   => fn () => $request->session()->get('error'),

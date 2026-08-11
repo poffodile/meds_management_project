@@ -27,7 +27,7 @@
                             <label class="col-md-2 col-sm-3 col-xs-12 p-0 control-label">New Password : </label>
                             <div class="col-md-10 col-sm-9 col-xs-12">
                                 <div class="" style="width: 100%">
-                                  <input name="new_password" id="new_password" required value="" class="form-control" placeholder='New password' minlength="12" maxlength="128" type="password">
+                                  <input name="new_password" id="new_password" required value="" class="form-control" placeholder='New password' minlength="4" maxlength="30" type="password">
                                 </div>
                             </div>
                         </div>
@@ -36,7 +36,7 @@
                             <label class="col-md-2 col-sm-3 col-xs-12 p-0 control-label">Confirm Password : </label>
                             <div class="col-md-10 col-sm-9 col-xs-12">
                                 <div class="" style="width: 100%">
-                                  <input name="confirm_password" value="" class="form-control m-t-10" placeholder='Confirm password' maxlength="128" type="password">
+                                  <input name="confirm_password" value="" class="form-control m-t-10" placeholder='Confirm password' maxlength="30" type="password">
                                 </div>
                             </div>
                         </div>
@@ -72,9 +72,9 @@
                 current_password: "required",
                 new_password:{
                     required:true,
-                    minlength:12,
-                    maxlength:128,
-                    regex:"^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[^A-Za-z0-9]).{12,}$"
+                    minlength:4,
+                    maxlength:20,
+                    regex:"^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{4,}$"
                 },
                 confirm_password: {
                     equalTo :"#new_password"
@@ -82,7 +82,7 @@
             },
             messages:{
                 new_password:{
-                    regex:"Use at least 12 characters with upper and lower-case letters, a number and a symbol."
+                    regex:"New password contain at least 1 capital letter, 1 small and 1 number"
                 },
                 confirm_password:"New password and confirm password mismatch." 
             },
