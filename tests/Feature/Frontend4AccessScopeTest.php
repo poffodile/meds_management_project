@@ -13,7 +13,6 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Str;
 use Mockery;
 use Tests\TestCase;
 
@@ -61,25 +60,10 @@ class Frontend4AccessScopeTest extends TestCase
         $this->assertNotContains((int) $other->id, $allowed);
     }
 
-    public function test_service_discovery_returns_only_that_users_services_in_the_organisation(): void
+    public function test_services_cannot_be_discovered_before_authentication(): void
     {
-        $this->requireScopeSchema();
-        [$user, $service] = $this->userAndService();
-        $organisationIdentifier = 'scope-test-'.Str::uuid();
-        DB::table('admin')->where('id', $service->admin_id)->update([
-            'frontend4_slug' => $organisationIdentifier,
-        ]);
-
-        $response = $this->getJson('/frontend4/services?company_name='.urlencode($organisationIdentifier).'&username='.urlencode($user->user_name));
-        $response->assertOk();
-        $ids = collect($response->json('services'))->pluck('id')->map(fn ($id) => (int) $id)->all();
-
-        $this->assertContains((int) $service->id, $ids);
-        $this->assertSame(0, Home::whereIn('id', $ids)->where('admin_id', '!=', $service->admin_id)->count());
-        $this->assertEqualsCanonicalizing(
-            app(AccessContext::class)->allowedServiceIds($user, (int) $service->admin_id),
-            $ids
-        );
+        $this->getJson('/frontend4/services?company_name=example&username=example')
+            ->assertNotFound();
     }
 
     public function test_password_reset_does_not_select_the_same_email_from_another_organisation(): void

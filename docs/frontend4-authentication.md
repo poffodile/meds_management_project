@@ -16,13 +16,17 @@ Care One OS uses a separate authentication boundary under `/frontend4`.
 ## Routes
 
 - `GET /frontend4/login`
+- `POST /frontend4/login/organisation`
 - `POST /frontend4/login`
+- `GET|POST /frontend4/select-service`
 - `POST /frontend4/logout`
 - `GET|POST /frontend4/forgot-password`
 - `GET /frontend4/reset-password/{token}`
 - `POST /frontend4/reset-password`
 
-Every clinical Frontend 4 route is behind `frontend4.auth`. Unauthenticated requests are redirected only to `/frontend4/login`.
+The login is a server-controlled three-step flow: organisation, username/password, then service. Service names are never returned before password verification. An account with one active service is routed into it automatically; an account with several active services uses the post-authentication picker. An account with no active service is signed back out and told to contact its manager.
+
+`frontend4.identity` protects service selection and logout after the password has been verified. Every clinical Frontend 4 route remains behind `frontend4.auth`, which additionally requires and revalidates a selected service. A password-verified user without a service is redirected to `/frontend4/select-service`, never admitted to clinical pages.
 
 ## Deployment
 

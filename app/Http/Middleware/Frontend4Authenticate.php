@@ -58,6 +58,22 @@ class Frontend4Authenticate
         }
         $locationId = $this->context->locationId();
 
+        if (
+            $serviceId <= 0
+            && $organisationId > 0
+            && $this->context->belongsToOrganisation($user, $organisationId)
+        ) {
+            $this->context->putOrganisationSession($user, $organisationId);
+            if ($request->expectsJson()) {
+                abort(409, 'Select a service before accessing clinical information.');
+            }
+            if ($request->isMethod('get')) {
+                session(['frontend4.intended' => $request->fullUrl()]);
+            }
+
+            return redirect()->route('frontend4.service-selection.show');
+        }
+
         if (! $this->context->validContext($user, $organisationId, $serviceId, $locationId)) {
             $this->security->record($request, 'access_scope_denied', false, $user, null, [
                 'organisation_id' => $organisationId ?: null,

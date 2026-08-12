@@ -1995,10 +1995,10 @@ Route::group(['middleware' => ['checkUserAuth', 'lock']], function () {
 */
 Route::prefix('frontend4')->name('frontend4.')->group(function () {
     Route::get('/login', [Frontend4AuthenticationController::class, 'showLogin'])->name('login');
+    Route::post('/login/organisation', [Frontend4AuthenticationController::class, 'chooseOrganisation'])
+        ->middleware('throttle:10,1')->name('login.organisation');
     Route::post('/login', [Frontend4AuthenticationController::class, 'login'])
         ->middleware('throttle:5,1')->name('login.store');
-    Route::get('/services', [Frontend4AuthenticationController::class, 'services'])
-        ->middleware('throttle:20,1')->name('services');
     Route::get('/forgot-password', [Frontend4AuthenticationController::class, 'showForgotPassword'])
         ->name('password.request');
     Route::post('/forgot-password', [Frontend4AuthenticationController::class, 'sendResetLink'])
@@ -2008,8 +2008,15 @@ Route::prefix('frontend4')->name('frontend4.')->group(function () {
     Route::post('/reset-password', [Frontend4AuthenticationController::class, 'resetPassword'])
         ->middleware('throttle:10,1')->name('password.update');
 
-    Route::middleware('frontend4.auth')->group(function () {
+    Route::middleware('frontend4.identity')->group(function () {
         Route::post('/logout', [Frontend4AuthenticationController::class, 'logout'])->name('logout');
+        Route::get('/select-service', [Frontend4AuthenticationController::class, 'showServiceSelection'])
+            ->name('service-selection.show');
+        Route::post('/select-service', [Frontend4AuthenticationController::class, 'selectService'])
+            ->middleware('throttle:20,1')->name('service-selection.store');
+    });
+
+    Route::middleware('frontend4.auth')->group(function () {
         Route::post('/context/service', [\App\Http\Controllers\Frontend4\ContextController::class, 'switchService'])
             ->name('context.service');
         Route::post('/context/location', [\App\Http\Controllers\Frontend4\ContextController::class, 'switchLocation'])

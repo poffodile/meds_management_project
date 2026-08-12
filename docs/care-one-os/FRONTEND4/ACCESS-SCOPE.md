@@ -1,6 +1,6 @@
 # Frontend 4 organisation, service and location scope
 
-Last updated: 11 August 2026
+Last updated: 12 August 2026
 
 ## Canonical hierarchy
 
@@ -62,3 +62,5 @@ Apply the same migration to the isolated test database before running the featur
 The context bar shows the organisation and offers service switching when the account has more than one permitted service. It offers location filtering only for structured locations that currently have assigned clients. Every switch is checked on the server and audited.
 
 The shared medication-round logic invokes a Frontend 4-only scope hook. Frontends 1, 2 and 3 continue using their existing behaviour.
+
+Service discovery is post-authentication. The former public `/frontend4/services` lookup has been removed, so an unauthenticated visitor cannot enumerate a username's allocated services. The selected organisation is kept in the server session, credentials are verified next, and only then are the authenticated user's active services returned by the service-selection screen.

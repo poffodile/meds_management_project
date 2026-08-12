@@ -17,6 +17,33 @@ use Illuminate\Support\Facades\Schema;
  */
 class AccessContext
 {
+    public function belongsToOrganisation(Frontend4User $user, int $organisationId): bool
+    {
+        if ($organisationId <= 0) {
+            return false;
+        }
+
+        if ($user->user_type === 'O' && (int) $user->admn_id === $organisationId) {
+            return true;
+        }
+
+        if (
+            Schema::hasTable('frontend4_user_service_access')
+            && DB::table('frontend4_user_service_access as access')
+                ->join('home as service', 'service.id', '=', 'access.service_id')
+                ->where('access.user_id', $user->id)
+                ->where('access.organisation_id', $organisationId)
+                ->where('service.admin_id', $organisationId)
+                ->exists()
+        ) {
+            return true;
+        }
+
+        return Home::whereIn('id', $this->legacyServiceIds($user))
+            ->where('admin_id', $organisationId)
+            ->exists();
+    }
+
     public function allowedServiceIds(Frontend4User $user, int $organisationId): array
     {
         $explicit = $this->explicitServiceIds($user, $organisationId);
@@ -137,6 +164,20 @@ class AccessContext
             // Compatibility aliases for the medication code shared with legacy UIs.
             'frontend4.active_home_id' => $serviceId,
             'frontend4.allowed_home_ids' => $allowedServices,
+        ]);
+    }
+
+    public function putOrganisationSession(Frontend4User $user, int $organisationId): void
+    {
+        session([
+            'frontend4.organisation_id' => $organisationId,
+            'frontend4.allowed_service_ids' => $this->allowedServiceIds($user, $organisationId),
+        ]);
+        session()->forget([
+            'frontend4.active_service_id',
+            'frontend4.active_location_id',
+            'frontend4.active_home_id',
+            'frontend4.allowed_home_ids',
         ]);
     }
 

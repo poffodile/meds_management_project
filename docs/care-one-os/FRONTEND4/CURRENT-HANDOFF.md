@@ -1,6 +1,6 @@
 # Care One OS current engineering handoff
 
-Last updated: 11 August 2026
+Last updated: 12 August 2026
 
 This is the current starting point for Codex, Claude Code or another engineer. Read it before editing the repository. The older `CODEX-CLAUDE-HANDOVER.md` remains historical context; where it conflicts with this file, this file is authoritative.
 
@@ -148,7 +148,7 @@ npm run build
 
 ## Requirement 4: organisation, service and location separation
 
-Requirement 4 is implemented and awaits its dedicated migration and PHP feature test in the configured local environment.
+Requirement 4 is implemented and confirmed. On 12 August 2026, `Frontend4AccessScopeTest` passed 8/8 and `Frontend4PermissionTest` passed 6/6 against the owner's isolated test database.
 
 The confirmed hierarchy is organisation = `admin`, service = `home`, and location = `home_areas`. The implementation adds:
 
@@ -158,10 +158,35 @@ The confirmed hierarchy is organisation = `admin`, service = `home`, and locatio
 - cross-organisation, cross-service, deleted-service and tampered-session refusal;
 - Frontend 4-only client, round, MAR and prescription query scoping;
 - audited service/location switching;
-- organisation-scoped password reset and username-scoped service discovery;
+- organisation-scoped password reset and post-authentication service selection;
 - context selectors in the isolated Frontend 4 header;
 - `Frontend4AccessScopeTest` for the new boundary.
 
 Read `docs/care-one-os/FRONTEND4/ACCESS-SCOPE.md` before applying the new migration. Because unrelated migrations may still be pending, apply `2026_08_11_000002_create_frontend4_access_scope_tables.php` by path in local and test databases first.
 
-The next production requirement after Requirement 4 is confirmed is Requirement 5: real client records and lifecycle rules.
+## Requirement 2b: step-based login
+
+Requirement 2b is implemented and awaits the database-backed PHP suites in the configured local environment. It changes only Frontend 4:
+
+- Step 1 resolves an active, unique organisation into the server session.
+- Step 2 verifies username and password without accepting a service ID.
+- Step 3 displays services only after authentication.
+- One active service is selected automatically; several services open a picker.
+- No active service ends the partial session and records `no_active_service`.
+- `frontend4.identity` permits only service selection and logout before a service is selected.
+- Clinical routes still require `frontend4.auth` and redirect an authenticated user without a service to the picker.
+- Invalid selections are rejected and recorded as `service_selection_denied`.
+- The former unauthenticated `/frontend4/services` endpoint is removed.
+- Legacy login, admin login, logout and API authentication routes remain unchanged.
+
+No new database migration is required. Run:
+
+```bash
+php artisan test --filter=Frontend4AuthenticationIsolationTest
+php artisan test --filter=Frontend4AccessScopeTest
+php artisan test --filter=Frontend4PermissionTest
+npm test
+npm run build
+```
+
+The next production requirement after Requirement 2b is confirmed is Requirement 5: real client records and lifecycle rules.
