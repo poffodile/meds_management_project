@@ -2,9 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Home;
 use App\Models\Frontend4AuthenticationEvent;
 use App\Models\Frontend4User;
 use App\ServiceUser;
+use App\Services\Frontend4\AccessContext;
 use App\Services\Frontend4\Permissions;
 use App\Services\Frontend4\RoleResolver;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -144,10 +146,17 @@ class Frontend4PermissionTest extends TestCase
 
     private function frontend4Session(Frontend4User $user, ?int $currentHome = null): array
     {
-        $allowed = $this->allowedHomeIds($user);
+        $serviceId = $currentHome ?? ($this->allowedHomeIds($user)[0] ?? 0);
+        $service = Home::whereKey($serviceId)->where('is_deleted', 0)->firstOrFail();
+        $organisationId = (int) $service->admin_id;
+        $allowed = app(AccessContext::class)->allowedServiceIds($user, $organisationId);
 
         return [
-            'frontend4.active_home_id' => $currentHome ?? ($allowed[0] ?? 0),
+            'frontend4.organisation_id' => $organisationId,
+            'frontend4.active_service_id' => $serviceId,
+            'frontend4.allowed_service_ids' => $allowed,
+            'frontend4.active_location_id' => null,
+            'frontend4.active_home_id' => $serviceId,
             'frontend4.allowed_home_ids' => $allowed,
             'frontend4.last_activity' => time(),
         ];
