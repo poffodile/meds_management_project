@@ -110,11 +110,7 @@ class Frontend4PermissionTest extends TestCase
     public function test_client_direct_url_cannot_cross_service_boundary(): void
     {
         $user = $this->activeUser();
-        $allowed = $this->allowedHomeIds($user);
-        $currentHome = $allowed[0] ?? null;
-        if (! $currentHome) {
-            $this->markTestSkipped('The fixture user has no service assignment.');
-        }
+        $currentHome = (int) $this->accessibleService($user)->id;
 
         $otherClient = ServiceUser::where('is_deleted', 0)
             ->where('home_id', '!=', $currentHome)
@@ -133,7 +129,15 @@ class Frontend4PermissionTest extends TestCase
 
     private function activeUser(): Frontend4User
     {
-        return Frontend4User::where('status', 1)->where('is_deleted', 0)->firstOrFail();
+        $users = Frontend4User::where('status', 1)->where('is_deleted', 0)->get();
+
+        foreach ($users as $user) {
+            if ($this->accessibleService($user)) {
+                return $user;
+            }
+        }
+
+        $this->markTestSkipped('The fixture database has no active Frontend 4 user with access to a live service.');
     }
 
     private function bindRole(string $role): void
@@ -146,8 +150,12 @@ class Frontend4PermissionTest extends TestCase
 
     private function frontend4Session(Frontend4User $user, ?int $currentHome = null): array
     {
-        $serviceId = $currentHome ?? ($this->allowedHomeIds($user)[0] ?? 0);
-        $service = Home::whereKey($serviceId)->where('is_deleted', 0)->firstOrFail();
+        $service = $this->accessibleService($user, $currentHome);
+        if (! $service) {
+            $this->markTestSkipped('The fixture user does not have access to the requested live service.');
+        }
+
+        $serviceId = (int) $service->id;
         $organisationId = (int) $service->admin_id;
         $allowed = app(AccessContext::class)->allowedServiceIds($user, $organisationId);
 
@@ -162,13 +170,25 @@ class Frontend4PermissionTest extends TestCase
         ];
     }
 
-    private function allowedHomeIds(Frontend4User $user): array
+    private function accessibleService(Frontend4User $user, ?int $serviceId = null): ?Home
     {
-        return collect(explode(',', (string) $user->real_home_id))
-            ->map(fn ($id) => (int) trim($id))
-            ->filter()
-            ->values()
-            ->all();
+        $services = Home::where('home.is_deleted', 0)
+            ->when($serviceId !== null, fn ($query) => $query->where('home.id', $serviceId))
+            ->whereExists(function ($query) {
+                $query->selectRaw('1')
+                    ->from('admin')
+                    ->whereColumn('admin.id', 'home.admin_id')
+                    ->where('admin.is_deleted', 0);
+            })
+            ->get();
+
+        $context = app(AccessContext::class);
+
+        return $services->first(fn (Home $service) => in_array(
+            (int) $service->id,
+            $context->allowedServiceIds($user, (int) $service->admin_id),
+            true
+        ));
     }
 
     private function requireAuthenticationEventsTable(): void
