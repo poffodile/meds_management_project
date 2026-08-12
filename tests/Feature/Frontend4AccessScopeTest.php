@@ -11,8 +11,9 @@ use App\Services\Frontend4\AccessContext;
 use App\Services\Frontend4\RoleResolver;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 use Mockery;
 use Tests\TestCase;
 
@@ -62,13 +63,14 @@ class Frontend4AccessScopeTest extends TestCase
 
     public function test_service_discovery_returns_only_that_users_services_in_the_organisation(): void
     {
+        $this->requireScopeSchema();
         [$user, $service] = $this->userAndService();
-        $company = DB::table('admin')->where('id', $service->admin_id)->value('company');
-        if (! $company) {
-            $this->markTestSkipped('The fixture organisation has no company name.');
-        }
+        $organisationIdentifier = 'scope-test-'.Str::uuid();
+        DB::table('admin')->where('id', $service->admin_id)->update([
+            'frontend4_slug' => $organisationIdentifier,
+        ]);
 
-        $response = $this->getJson('/frontend4/services?company_name='.urlencode($company).'&username='.urlencode($user->user_name));
+        $response = $this->getJson('/frontend4/services?company_name='.urlencode($organisationIdentifier).'&username='.urlencode($user->user_name));
         $response->assertOk();
         $ids = collect($response->json('services'))->pluck('id')->map(fn ($id) => (int) $id)->all();
 
@@ -219,7 +221,15 @@ class Frontend4AccessScopeTest extends TestCase
     {
         $users = Frontend4User::where('status', 1)->where('is_deleted', 0)->get();
         foreach ($users as $user) {
-            $services = Home::whereIn('id', $this->legacyServiceIds($user))->where('is_deleted', 0)->get();
+            $services = Home::whereIn('id', $this->legacyServiceIds($user))
+                ->where('home.is_deleted', 0)
+                ->whereExists(function ($query) {
+                    $query->selectRaw('1')
+                        ->from('admin')
+                        ->whereColumn('admin.id', 'home.admin_id')
+                        ->where('admin.is_deleted', 0);
+                })
+                ->get();
             if ($services->isEmpty()) {
                 continue;
             }
@@ -254,6 +264,7 @@ class Frontend4AccessScopeTest extends TestCase
         if (
             ! Schema::hasTable('frontend4_user_service_access')
             || ! Schema::hasTable('frontend4_user_location_access')
+            || ! Schema::hasColumn('admin', 'frontend4_slug')
             || ! Schema::hasColumn('service_user', 'home_area_id')
             || ! Schema::hasTable('frontend4_authentication_events')
         ) {
