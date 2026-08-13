@@ -186,7 +186,7 @@ class HandoverController extends F4Controller
     { return Frontend4MedicationIncident::forContext($context->organisationId(), $context->serviceId())->whereKey($id)->firstOrFail(); }
     private function user(): Frontend4User
     { $user = Auth::guard('frontend4')->user(); abort_unless($user instanceof Frontend4User, 403); return $user; }
-    private function role(): string
+    protected function role(): string
     { return app(\App\Services\Frontend4\RoleResolver::class)->resolve($this->user()); }
     private function placeName(int $serviceId): string
     { return \App\Home::whereKey($serviceId)->value('title') ?: 'Current service'; }
