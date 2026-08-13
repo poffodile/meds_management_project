@@ -259,7 +259,7 @@ npm run build
 
 ## Requirement 7: handover and medication incidents
 
-Requirement 7 is implemented on the integration branch and awaits database-backed verification. Read `HANDOVER-AND-MEDICATION-INCIDENTS.md` before applying its migration.
+Requirement 7 is implemented and owner-verified on the integration branch. Read `HANDOVER-AND-MEDICATION-INCIDENTS.md` before applying its migration.
 
 It adds:
 
@@ -286,7 +286,41 @@ npm test
 npm run build
 ```
 
+Owner-confirmed result: Handover/incident 9/9, Prescription lifecycle 8/8, Client lifecycle 6/6, Authentication 8/8, Access Scope 8/8 and Permissions 6/6; all 22 JavaScript tests and the production build passed.
+
+## Requirement 8: manager assurance and controlled reporting
+
+Requirement 8 is implemented on the integration branch and awaits database-backed verification. Read `MANAGER-ASSURANCE-AND-REPORTING.md` before applying its migration.
+
+It adds:
+
+- real Assurance and Reports workspaces based on the approved Frontend 4 design;
+- factual service/location/date-scoped medication evidence without a fabricated assurance score;
+- separate zero and source-unavailable states;
+- append-only manager review snapshots with notes and actions;
+- summary-only or identifiable CSV exports requiring a reason and explicit confirmation;
+- append-only export access events with requester, scope, period and row count;
+- bounded periods and refusal to silently truncate exports over 10,000 rows;
+- manager-only clinical assurance sign-off while administrators retain non-clinical report/export access;
+- dedicated feature coverage plus route-permission and navigation regression coverage.
+
+Apply only:
+
+```bash
+php artisan migrate --path=database/migrations/2026_08_13_000006_create_frontend4_assurance_and_exports.php
+php artisan test --filter=Frontend4AssuranceReportingTest
+php artisan test --filter=Frontend4HandoverIncidentTest
+php artisan test --filter=Frontend4PrescriptionLifecycleTest
+php artisan test --filter=Frontend4ClientLifecycleTest
+php artisan test --filter=Frontend4AuthenticationIsolationTest
+php artisan test --filter=Frontend4AccessScopeTest
+php artisan test --filter=Frontend4PermissionTest
+npm test
+npm run build
+```
+
+The complete approved NHS dm+d import remains outstanding. R8 does not alter the shared catalogue or add integrations.
+
 ## Outstanding reminder
 
 The complete approved NHS dm+d catalogue data still needs to be imported into `medicine_catalogue`. The R6 structure and picker are complete, but no dm+d release was bundled or fabricated.
-

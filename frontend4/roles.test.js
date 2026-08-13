@@ -12,17 +12,17 @@ describe('Frontend 4 navigation permissions', () => {
         ]);
     });
 
-    it('exposes shipped handover but keeps unfinished routes hidden', () => {
+    it('exposes shipped handover and assurance routes but keeps unfinished routes hidden', () => {
         const visible = keys(Object.values(P));
 
         expect(visible).not.toContain('missed');
         expect(keys([P.VIEW_HANDOVER])).toContain('handover');
         expect(visible).not.toContain('cd');
         expect(visible).not.toContain('stock');
-        expect(visible).not.toContain('reports');
+        expect(keys([P.VIEW_REPORTS])).toEqual(['assurance', 'reports']);
         expect(visible).not.toContain('admin');
         expect(NAV.filter((item) => item.available).map((item) => item.key)).toEqual([
-            'today', 'round', 'clients', 'handover',
+            'today', 'round', 'clients', 'handover', 'assurance', 'reports',
         ]);
     });
 });

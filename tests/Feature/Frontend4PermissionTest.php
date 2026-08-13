@@ -38,6 +38,7 @@ class Frontend4PermissionTest extends TestCase
         $this->assertTrue($permissions->allows(RoleResolver::MANAGER, Permissions::MANAGE_PRESCRIPTION));
         $this->assertTrue($permissions->allows(RoleResolver::MANAGER, Permissions::MANAGE_CLIENTS));
         $this->assertTrue($permissions->allows(RoleResolver::MANAGER, Permissions::EXPORT_REPORT));
+        $this->assertTrue($permissions->allows(RoleResolver::MANAGER, Permissions::COMPLETE_ASSURANCE_REVIEW));
         $this->assertTrue($permissions->allows(RoleResolver::MANAGER, Permissions::INVESTIGATE_MEDICATION_INCIDENT));
 
         $this->assertTrue($permissions->allows(RoleResolver::ADMIN, Permissions::MANAGE_SETTINGS));
@@ -49,6 +50,9 @@ class Frontend4PermissionTest extends TestCase
         $this->assertTrue($permissions->allows(RoleResolver::ADMIN, Permissions::VIEW_HANDOVER));
         $this->assertFalse($permissions->allows(RoleResolver::ADMIN, Permissions::RECORD_HANDOVER));
         $this->assertFalse($permissions->allows(RoleResolver::ADMIN, Permissions::INVESTIGATE_MEDICATION_INCIDENT));
+        $this->assertTrue($permissions->allows(RoleResolver::ADMIN, Permissions::VIEW_REPORTS));
+        $this->assertTrue($permissions->allows(RoleResolver::ADMIN, Permissions::EXPORT_REPORT));
+        $this->assertFalse($permissions->allows(RoleResolver::ADMIN, Permissions::COMPLETE_ASSURANCE_REVIEW));
         $this->assertSame([], $permissions->forRole(RoleResolver::NONE));
         $this->assertSame([], $permissions->forRole('unrecognised-role'));
     }
@@ -79,6 +83,10 @@ class Frontend4PermissionTest extends TestCase
             'frontend4.handover.incidents.store' => Permissions::REPORT_MEDICATION_INCIDENT,
             'frontend4.handover.incidents.investigate' => Permissions::INVESTIGATE_MEDICATION_INCIDENT,
             'frontend4.handover.incidents.close' => Permissions::INVESTIGATE_MEDICATION_INCIDENT,
+            'frontend4.assurance' => Permissions::VIEW_REPORTS,
+            'frontend4.assurance.reviews.store' => Permissions::COMPLETE_ASSURANCE_REVIEW,
+            'frontend4.reports' => Permissions::VIEW_REPORTS,
+            'frontend4.reports.export' => Permissions::EXPORT_REPORT,
             'frontend4.clients' => Permissions::VIEW_CLIENTS,
             'frontend4.clients.create' => Permissions::MANAGE_CLIENTS,
             'frontend4.clients.store' => Permissions::MANAGE_CLIENTS,
@@ -232,5 +240,4 @@ class Frontend4PermissionTest extends TestCase
         }
     }
 }
-
 

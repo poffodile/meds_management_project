@@ -2047,6 +2047,14 @@ Route::prefix('frontend4')->name('frontend4.')->group(function () {
             ->middleware('frontend4.can:investigate_medication_incident')->where('incident', '[0-9]+')->name('handover.incidents.investigate');
         Route::post('/handover/incidents/{incident}/close', [\App\Http\Controllers\Frontend4\HandoverController::class, 'closeIncident'])
             ->middleware('frontend4.can:investigate_medication_incident')->where('incident', '[0-9]+')->name('handover.incidents.close');
+        Route::get('/assurance', [\App\Http\Controllers\Frontend4\AssuranceReportController::class, 'assurance'])
+            ->middleware('frontend4.can:view_reports')->name('assurance');
+        Route::post('/assurance/reviews', [\App\Http\Controllers\Frontend4\AssuranceReportController::class, 'review'])
+            ->middleware('frontend4.can:complete_assurance_review')->name('assurance.reviews.store');
+        Route::get('/reports', [\App\Http\Controllers\Frontend4\AssuranceReportController::class, 'reports'])
+            ->middleware('frontend4.can:view_reports')->name('reports');
+        Route::post('/reports/export', [\App\Http\Controllers\Frontend4\AssuranceReportController::class, 'export'])
+            ->middleware('frontend4.can:export_report')->name('reports.export');
         Route::get('/clients', [Frontend4ClientsController::class, 'index'])
             ->middleware('frontend4.can:view_clients')->name('clients');
         Route::get('/clients/create', [\App\Http\Controllers\Frontend4\ClientRecordController::class, 'create'])
@@ -3166,5 +3174,4 @@ Route::post('/roster/supervision/form_template/fetch', [SupervisionController::c
 Route::get('/roster/schedule-shift/form_template/view/{schedule_shift_id}', [ScheduleShiftController::class, 'schedule_shift_webview_form']);
 Route::post('/roster/schedule-shift/form_template/save', [ScheduleShiftController::class, 'scheduleShiftFormSave'])->name('web.roster.schedule_shift.form.save');
 Route::post('/roster/schedule-shift/form_template/fetch', [ScheduleShiftController::class, 'scheduleShiftFormFetch'])->name('web.roster.schedule_shift.form.fetch');
-
 

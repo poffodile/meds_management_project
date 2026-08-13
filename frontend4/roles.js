@@ -56,6 +56,7 @@ export const P = {
     MANAGE_PRESCRIPTION:      'manage_prescription',
     VIEW_REPORTS:             'view_reports',
     EXPORT_REPORT:            'export_report',
+    COMPLETE_ASSURANCE_REVIEW: 'complete_assurance_review',
     MANAGE_STAFF:             'manage_staff',
     DEFINE_ROLES:             'define_roles',
     MANAGE_SETTINGS:          'manage_settings',
@@ -89,7 +90,8 @@ export const NAV = [
     { key: 'stock',      label: 'Stock',            href: '/frontend4/stock',            permission: P.RECEIVE_DELIVERY, group: 'Oversight', available: false },
 
     // ── Manager and above ─────────────────────────────────────────────────
-    { key: 'reports',    label: 'Reports & audit',  href: '/frontend4/reports',          permission: P.VIEW_REPORTS,     group: 'Oversight', available: false },
+    { key: 'assurance',  label: 'Assurance',        href: '/frontend4/assurance',        permission: P.VIEW_REPORTS,     group: 'Oversight', available: true },
+    { key: 'reports',    label: 'Reports & audit',  href: '/frontend4/reports',          permission: P.VIEW_REPORTS,     group: 'Oversight', available: true },
 
     // ── Administrator ─────────────────────────────────────────────────────
     { key: 'admin',      label: 'Administration',   href: '/frontend4/admin',            permission: P.MANAGE_SETTINGS,  group: 'Control plane', available: false },
@@ -122,4 +124,3 @@ export function navFor(can) {
 
     return groups;
 }
-

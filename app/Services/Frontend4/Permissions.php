@@ -48,6 +48,7 @@ class Permissions
     // ── Oversight ─────────────────────────────────────────────────────────
     public const VIEW_REPORTS = 'view_reports';
     public const EXPORT_REPORT = 'export_report';
+    public const COMPLETE_ASSURANCE_REVIEW = 'complete_assurance_review';
 
     // ── Control plane ─────────────────────────────────────────────────────
     public const MANAGE_STAFF = 'manage_staff';   // within their own homes
@@ -90,6 +91,7 @@ class Permissions
             self::APPROVE_STOCK_ADJUSTMENT,
             self::VIEW_REPORTS,
             self::EXPORT_REPORT,
+            self::COMPLETE_ASSURANCE_REVIEW,
             self::MANAGE_STAFF,
             self::MANAGE_CLIENTS,
             // Manager-and-above may change a prescription (owner decision
@@ -129,6 +131,7 @@ class Permissions
         self::REPORT_MEDICATION_INCIDENT,
         self::MANAGE_HANDOVER,
         self::INVESTIGATE_MEDICATION_INCIDENT,
+        self::COMPLETE_ASSURANCE_REVIEW,
     ];
 
     /** Least-to-most privileged, for inheritance. */
@@ -174,4 +177,3 @@ class Permissions
         return array_values(array_unique($granted));
     }
 }
-
