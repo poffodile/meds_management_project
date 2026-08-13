@@ -27,7 +27,7 @@ Exports require:
 - an explicit authorisation confirmation; and
 - a choice between summary-only and identifiable client detail.
 
-Each successful export creates an append-only event containing the requester, organisation, service, optional location, period, report type, identifiable-detail choice, reason, format, row count and generation time. The CSV content is streamed and is not copied into the audit table. Responses use `Cache-Control: no-store, private`.
+Each successful export creates an append-only event containing the requester, organisation, service, optional location, period, report type, identifiable-detail choice, reason, format, row count and generation time. CSV generation is capped at 10,000 rows, returned as a downloadable response and not copied into the audit table. Responses use `Cache-Control: no-store, private`.
 
 No automatic email delivery or scheduled distribution is included. Those features need separate recipient verification, retention, delivery-security and failure-handling requirements.
 

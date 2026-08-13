@@ -11,11 +11,11 @@ use App\Services\Frontend4\AssuranceReportingService;
 use App\Services\Frontend4\Permissions;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class AssuranceReportController extends F4Controller
 {
@@ -107,7 +107,7 @@ class AssuranceReportController extends F4Controller
             ->with('success', 'Assurance review signed. The snapshot is append-only.');
     }
 
-    public function export(Request $request, AccessContext $context, AssuranceReportingService $reporting): StreamedResponse
+    public function export(Request $request, AccessContext $context, AssuranceReportingService $reporting): Response
     {
         $this->requirePermission(Permissions::EXPORT_REPORT);
         $data = $request->validate([
@@ -130,15 +130,26 @@ class AssuranceReportController extends F4Controller
         ]);
 
         $filename = 'care-one-'.$data['report_type'].'-'.$start->format('Ymd').'-'.$end->format('Ymd').'.csv';
-        return response()->streamDownload(function () use ($rows) {
-            $stream = fopen('php://output', 'w');
-            fwrite($stream, "\xEF\xBB\xBF");
-            if ($rows !== []) {
-                fputcsv($stream, array_keys($rows[0]));
-                foreach ($rows as $row) fputcsv($stream, array_values($row));
+        $csv = "\xEF\xBB\xBF";
+        if ($rows !== []) {
+            $stream = fopen('php://temp', 'r+');
+            if ($stream === false) {
+                abort(500, 'The report could not be generated.');
             }
+            fputcsv($stream, array_keys($rows[0]));
+            foreach ($rows as $row) {
+                fputcsv($stream, array_values($row));
+            }
+            rewind($stream);
+            $csv .= stream_get_contents($stream);
             fclose($stream);
-        }, $filename, ['Content-Type' => 'text/csv; charset=UTF-8', 'Cache-Control' => 'no-store, private']);
+        }
+
+        return response($csv, 200, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
+            'Cache-Control' => 'no-store, private',
+        ]);
     }
 
     private function period(Request $request): array

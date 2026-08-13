@@ -90,7 +90,7 @@ class Frontend4AssuranceReportingTest extends TestCase
                 'reason' => 'Weekly medication governance meeting.', 'authorised' => 1,
             ])->assertOk();
 
-        $content = $response->streamedContent();
+        $content = $response->getContent();
         $this->assertStringContainsString('metric,value', str_replace("\r", '', $content));
         $this->assertStringNotContainsString($client->name, $content);
         $this->assertDatabaseHas('frontend4_report_export_events', [
@@ -112,7 +112,7 @@ class Frontend4AssuranceReportingTest extends TestCase
                 'reason' => 'Authorised investigation of an administration record.', 'authorised' => 1,
             ])->assertOk();
 
-        $this->assertStringContainsString($client->name, $response->streamedContent());
+        $this->assertStringContainsString($client->name, $response->getContent());
         $event = Frontend4ReportExportEvent::where('service_id', $service->id)->latest('id')->firstOrFail();
         $this->assertTrue($event->identifiable);
         $this->expectException(LogicException::class);
