@@ -231,6 +231,7 @@ function MedManage({ clientId, med }) {
         <div className="f4-med-manage">
             {!open ? (
                 <div className="f4-actions">
+                    {med.coded ? <Link href={`/frontend4/clients/${clientId}/medications/${med.id}/edit`} className="f4-btn" data-variant="secondary" data-size="sm">Amend</Link> : null}
                     {actions.map(([a, label]) => (
                         <button key={a} type="button" className="f4-btn" data-variant="secondary" data-size="sm"
                                 onClick={() => { form.clearErrors(); form.setData('reason', ''); setOpen(a); }}>
@@ -405,6 +406,7 @@ function MedDesktopRow({ m, index, open, onOpen, clientId, canManage, age, weigh
     const titleMeta = [
         m.asRequired ? 'PRN' : 'Regular',
         m.isControlled ? 'Controlled drug' : null,
+        m.coded ? (m.dmdCode ? 'dm+d coded' : 'Catalogue item') : 'Legacy unmapped',
         m.statusLabel || null,
     ].filter(Boolean);
 
@@ -455,6 +457,9 @@ function MedDesktopRow({ m, index, open, onOpen, clientId, canManage, age, weigh
                                 <div className="f4-medh-recordcell"><span>Last administered</span><b>{m.lastAdministered || 'Not recorded'}</b></div>
                                 <div className="f4-medh-recordcell"><span>Prescription dates</span><b>{prescriptionDates}</b></div>
                                 <div className="f4-medh-recordcell"><span>Prescriber</span><b>{m.prescriber || 'Not recorded'}</b></div>
+                                <div className="f4-medh-recordcell"><span>Catalogue identity</span><b>{m.dmdCode ? `dm+d ${m.dmdCode}` : (m.coded ? 'Local catalogue item' : 'Legacy - mapping required')}</b></div>
+                                <div className="f4-medh-recordcell"><span>Prescription version</span><b>{m.version || 1}</b></div>
+                                <div className="f4-medh-recordcell"><span>Review due</span><b>{m.reviewDue || 'Not recorded'}</b></div>
                             </div>
                         </section>
                         <section className="f4-medh-band">
@@ -523,11 +528,12 @@ function Medications({ meds, client, clientId, canManage, age, weight, infoStrip
                 eyebrow="Medication profile"
                 title="Prescribed medicines"
                 body="This client has no prescriptions on record."
+                actions={canManage ? <Link href={`/frontend4/clients/${clientId}/medications/create`} className="f4-btn" data-size="sm">Add prescription</Link> : null}
                 cells={[
                     ['Current medicines', '0', 'No active or previous prescriptions found'],
                     ['Next scheduled', 'Not scheduled', 'No scheduled medicines are recorded'],
                     ['Stock attention', '0', 'No medicine stock records to check'],
-                    ['Last prescription review', 'Not recorded', 'No structured review date held'],
+                    ['Next prescription review', 'Not recorded', 'No structured review date held'],
                 ]}
             />
         );
@@ -537,7 +543,7 @@ function Medications({ meds, client, clientId, canManage, age, weight, infoStrip
         ['Current medicines', meds.filter((m) => m.statusLabel === 'Active').length, `${meds.filter((m) => !m.asRequired).length} scheduled · ${meds.filter((m) => m.asRequired).length} PRN`],
         ['Next scheduled', meds.find((m) => !m.asRequired && m.schedule)?.schedule || 'Not recorded', meds.find((m) => !m.asRequired && m.name)?.name || 'No scheduled medicine'],
         ['Stock attention', meds.filter((m) => m.lowStock).length, meds.find((m) => m.lowStock)?.name || 'No low-stock medicines'],
-        ['Last prescription review', 'Not recorded', 'No structured review date held'],
+        ['Next prescription review', meds.find((m) => m.reviewDue)?.reviewDue || 'Not recorded', meds.find((m) => m.reviewDue)?.name || 'No structured review date held'],
     ];
     const filters = [
         ['Current', meds.filter((m) => m.statusLabel === 'Active').length],
@@ -570,8 +576,8 @@ function Medications({ meds, client, clientId, canManage, age, weight, infoStrip
                             <p>Current prescriptions, administration instructions and medicine status for {client.name}.</p>
                         </div>
                         <div className="f4-medh-titleactions">
-                            <button type="button" className="f4-btn" data-variant="secondary" data-size="sm">Report medication concern</button>
-                            <span className="f4-medh-lock">Prescription changes restricted</span>
+                            {canManage ? <Link href={`/frontend4/clients/${clientId}/medications/create`} className="f4-btn" data-size="sm">Add prescription</Link> : null}
+                            <span className="f4-medh-lock">{canManage ? 'Catalogue selection required' : 'Prescription changes restricted'}</span>
                         </div>
                     </div>
                     <div className="f4-medh-summary f4-medh-kpis">

@@ -98,7 +98,7 @@ trait BuildsMedicationRound
             ->currentlyActive();
         $frontend4Scoped = method_exists($this, 'scopeMedicationRoundSheetsForAccess');
         if ($frontend4Scoped) {
-            $sheetsQuery = $this->scopeMedicationRoundSheetsForAccess($sheetsQuery, $homeId);
+            $sheetsQuery = $this->scopeMedicationRoundSheetsForAccess($sheetsQuery, $homeId, $date);
         }
         $sheets = $sheetsQuery
             ->with(['administrations' => function ($q) use ($date, $homeId, $frontend4Scoped) {
@@ -428,7 +428,7 @@ trait BuildsMedicationRound
         return DB::transaction(function () use ($request, $marSheetService, $homeId, $userId) {
             $sheetQuery = MARSheet::forHome($homeId)->active();
             if (method_exists($this, 'scopeMedicationRoundSheetsForAccess')) {
-                $sheetQuery = $this->scopeMedicationRoundSheetsForAccess($sheetQuery, $homeId);
+                $sheetQuery = $this->scopeMedicationRoundSheetsForAccess($sheetQuery, $homeId, (string) $request->input('date', now()->toDateString()));
             }
             $sheet = $sheetQuery
                 ->lockForUpdate()
@@ -719,3 +719,4 @@ trait BuildsMedicationRound
         return (float) $qty;
     }
 }
+

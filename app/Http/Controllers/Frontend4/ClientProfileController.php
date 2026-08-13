@@ -110,6 +110,7 @@ class ClientProfileController extends F4Controller
         // Medications tab — active + previous prescriptions, active first. Reuses
         // the same rows the round records against; nothing is duplicated.
         $sheets = MARSheet::forHome($homeId)->active()
+            ->with('medicine')
             ->where('client_id', $su->id)
             ->orderByRaw("mar_status = 'active' desc")
             ->orderBy('medication_name')
@@ -131,6 +132,12 @@ class ClientProfileController extends F4Controller
             return [
                 'id' => $s->id,
                 'name' => $s->medication_name,
+                'coded' => (bool) $s->medicine_id,
+                'dmdCode' => $s->medicine?->dmd_code,
+                'catalogueStatus' => $s->medicine?->dmd_status,
+                'catalogueConcept' => $s->medicine?->dmd_concept_level,
+                'version' => (int) ($s->prescription_version ?: 1),
+                'reviewDue' => $this->fmtDate($s->review_due_date),
                 'strength' => $s->dosage ?: null,
                 'form' => $s->form ?: null,
                 'dose' => $s->dose ?: null,
@@ -145,7 +152,7 @@ class ClientProfileController extends F4Controller
                 'protocol' => $s->prn_details ?: null,
                 'indication' => $s->reason_for_medication ?: null,
                 'prescriber' => $s->prescriber ?: ($s->prescribed_by ?: null),
-                'pharmacy' => $su->pharmacy_name ?: null,
+                'pharmacy' => $s->pharmacy ?: ($su->pharmacy_name ?: null),
                 'lastAdministered' => $lastAdmin ? trim($this->fmtDate($lastAdmin->date).' '.$lastAdmin->time_slot) : null,
                 'started' => $this->fmtDate($s->start_date),
                 'ended' => $this->fmtDate($s->end_date),
@@ -281,6 +288,26 @@ class ClientProfileController extends F4Controller
             ];
         }
 
+        // Catalogue-backed creation and amendment events. Status events remain
+        // represented by mar_sheet_changes above to avoid duplicate timeline rows.
+        if (\Illuminate\Support\Facades\Schema::hasTable('frontend4_prescription_events')) {
+            foreach (\Illuminate\Support\Facades\DB::table('frontend4_prescription_events as e')
+                ->join('mar_sheets as m', 'm.id', '=', 'e.mar_sheet_id')
+                ->leftJoin('user as u', 'u.id', '=', 'e.actor_user_id')
+                ->where('e.client_id', $su->id)->where('e.service_id', $homeId)
+                ->whereIn('e.event_type', ['created', 'amended'])
+                ->orderByDesc('e.id')->limit(50)
+                ->get(['e.event_type', 'e.reason', 'e.created_at', 'm.medication_name', 'u.name as staff']) as $r) {
+                $auditRaw[] = [
+                    'ts' => (string) $r->created_at,
+                    'medicine' => $r->medication_name,
+                    'summary' => 'Prescription '.$r->event_type,
+                    'reason' => $r->reason,
+                    'staff' => $r->staff,
+                ];
+            }
+        }
+
         usort($auditRaw, fn ($a, $b) => strcmp($b['ts'], $a['ts']));
 
         $audit = array_map(fn ($r) => [
@@ -298,7 +325,7 @@ class ClientProfileController extends F4Controller
         $now = now()->format('H:i');
         $slotMap = [];
         foreach ($sheets as $s) {
-            if ($s->as_required || ! in_array(strtolower((string) $s->mar_status), ['active', 'paused'], true)) {
+            if ($s->as_required || strtolower((string) $s->mar_status) !== 'active') {
                 continue;
             }
             foreach ((is_array($s->time_slots) ? $s->time_slots : []) as $slot) {

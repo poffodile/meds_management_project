@@ -3203,3 +3203,40 @@ a.f4-row:focus-visible, button.f4-row:focus-visible {
   .f4-client-heading-actions { align-items: stretch; flex-direction: column; }
   .f4-record-card { padding: var(--f4-s4); }
 }
+
+/* Requirement 6: catalogue-backed prescription entry. */
+.f4-root .f4-rx-page { max-width: 1120px; margin: 0 auto; }
+.f4-root .f4-rx-picker { position: relative; }
+.f4-root .f4-rx-results {
+    display: grid; gap: 6px; margin-top: 8px; padding: 8px;
+    border: 1px solid var(--f4-line); border-radius: 14px; background: var(--f4-surface);
+    max-height: 320px; overflow-y: auto;
+}
+.f4-root .f4-rx-results button {
+    display: grid; gap: 4px; width: 100%; padding: 12px 14px; text-align: left;
+    border: 1px solid transparent; border-radius: 10px; background: transparent; color: var(--f4-ink);
+    font: inherit; cursor: pointer;
+}
+.f4-root .f4-rx-results button:hover,
+.f4-root .f4-rx-results button:focus-visible { border-color: var(--f4-accent); background: var(--f4-accent-soft); outline: none; }
+.f4-root .f4-rx-results button strong { font-size: 14px; }
+.f4-root .f4-rx-results button span { color: var(--f4-muted); font-size: 12px; }
+.f4-root .f4-rx-medicine {
+    margin: 18px 0; padding: 18px; border: 1px solid var(--f4-line); border-left: 4px solid var(--f4-accent);
+    border-radius: 14px; background: var(--f4-sunken);
+}
+.f4-root .f4-rx-medicine[data-controlled="true"] { border-left-color: var(--f4-over-s); }
+.f4-root .f4-rx-medicine h3 { margin: 3px 0 14px; font-size: 19px; }
+.f4-root .f4-rx-medicine dl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 0; }
+.f4-root .f4-rx-medicine dl div { min-width: 0; }
+.f4-root .f4-rx-medicine dt { color: var(--f4-muted); font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+.f4-root .f4-rx-medicine dd { margin: 4px 0 0; font-size: 13px; font-weight: 650; overflow-wrap: anywhere; }
+.f4-root .f4-rx-check { display: flex; align-items: center; gap: 9px; min-height: 42px; font-weight: 600; }
+.f4-root .f4-rx-check input { width: 18px; height: 18px; }
+
+@media (max-width: 760px) {
+    .f4-root .f4-rx-medicine dl { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 480px) {
+    .f4-root .f4-rx-medicine dl { grid-template-columns: 1fr; }
+}

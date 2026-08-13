@@ -193,7 +193,7 @@ Owner-confirmed result: Authentication 8/8, Access Scope 8/8 and Permissions 6/6
 
 ## Requirement 5: real client records and lifecycle rules
 
-Requirement 5 is implemented on the integration branch and awaits database-backed PHP verification in the owner's configured Laragon environment. Read `CLIENT-LIFECYCLE.md` before applying its migration.
+Requirement 5 is implemented and confirmed in the owner's configured Laragon environment. Read `CLIENT-LIFECYCLE.md` before applying its migration.
 
 The implementation adds:
 
@@ -221,3 +221,37 @@ npm run build
 ```
 
 Do not approve/apply transfers by changing only `service_user.home_id`: the supplied database contains more than 90 client-linked table families. Transfer application needs its own later reconciliation workflow for MAR, prescriptions, stock, controlled drugs, documents and care records.
+
+Owner-confirmed result: Client lifecycle 6/6, Authentication 8/8, Access Scope 8/8 and Permissions 6/6, with no failures.
+
+## Requirement 6: medicine catalogue and prescription lifecycle
+
+Requirement 6 is implemented on the integration branch and awaits database-backed PHP verification. Read `MEDICINE-CATALOGUE-AND-PRESCRIPTIONS.md` before applying its migration.
+
+The implementation adds:
+
+- a shared, tenant-neutral `medicine_catalogue` prepared for official dm+d/SNOMED CT identifiers;
+- catalogue selection for every new Frontend 4 prescription, while existing free-text prescriptions remain readable and unmapped;
+- prescribed dose, source, review date and prescription-version fields on the existing MAR anchor;
+- exact structured quantity derivation without parsing or guessing free text;
+- controlled-drug classification derived from the catalogue rather than accepted from the prescription form;
+- duplicate active-prescription protection;
+- append-only creation, amendment and lifecycle events;
+- a terminal state machine: active -> paused/discontinued, paused -> active/discontinued, and no resume from discontinued;
+- catalogue-backed create/amend screens inside the isolated Frontend 4 bundle;
+- effective-date filtering for Frontend 4 medication rounds;
+- a dedicated feature suite plus permission-route regression coverage.
+
+The migration deliberately does not bundle a dm+d release, map legacy strings or add BNF/BNFc dose checking. Apply only:
+
+```bash
+php artisan migrate --path=database/migrations/2026_08_13_000004_create_frontend4_medicine_catalogue.php
+php artisan test --filter=Frontend4PrescriptionLifecycleTest
+php artisan test --filter=Frontend4ClientLifecycleTest
+php artisan test --filter=Frontend4AuthenticationIsolationTest
+php artisan test --filter=Frontend4AccessScopeTest
+php artisan test --filter=Frontend4PermissionTest
+npm test
+npm run build
+```
+

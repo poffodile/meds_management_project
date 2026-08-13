@@ -68,6 +68,11 @@ class Frontend4PermissionTest extends TestCase
             'frontend4.clients.restore' => Permissions::MANAGE_CLIENTS,
             'frontend4.clients.transfer' => Permissions::MANAGE_CLIENTS,
             'frontend4.clients.show' => Permissions::VIEW_CLIENTS,
+            'frontend4.catalogue.medicines' => Permissions::MANAGE_PRESCRIPTION,
+            'frontend4.clients.medications.create' => Permissions::MANAGE_PRESCRIPTION,
+            'frontend4.clients.medications.store' => Permissions::MANAGE_PRESCRIPTION,
+            'frontend4.clients.medications.edit' => Permissions::MANAGE_PRESCRIPTION,
+            'frontend4.clients.medications.update' => Permissions::MANAGE_PRESCRIPTION,
             'frontend4.clients.medication.status' => Permissions::MANAGE_PRESCRIPTION,
             'frontend4.clients.mar' => Permissions::VIEW_MAR,
             'frontend4.clients.mar.correct' => Permissions::CORRECT_RECORD,
@@ -207,3 +212,4 @@ class Frontend4PermissionTest extends TestCase
         }
     }
 }
+

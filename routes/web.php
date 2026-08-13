@@ -2046,6 +2046,18 @@ Route::prefix('frontend4')->name('frontend4.')->group(function () {
         Route::get('/clients/{client}', [Frontend4ClientProfileController::class, 'index'])
             ->middleware('frontend4.can:view_clients')
             ->where('client', '[0-9]+')->name('clients.show');
+        Route::get('/catalogue/medicines', [\App\Http\Controllers\Frontend4\PrescriptionController::class, 'catalogue'])
+            ->middleware('frontend4.can:manage_prescription')->name('catalogue.medicines');
+        Route::get('/clients/{client}/medications/create', [\App\Http\Controllers\Frontend4\PrescriptionController::class, 'create'])
+            ->middleware('frontend4.can:manage_prescription')->where('client', '[0-9]+')->name('clients.medications.create');
+        Route::post('/clients/{client}/medications', [\App\Http\Controllers\Frontend4\PrescriptionController::class, 'store'])
+            ->middleware('frontend4.can:manage_prescription')->where('client', '[0-9]+')->name('clients.medications.store');
+        Route::get('/clients/{client}/medications/{sheet}/edit', [\App\Http\Controllers\Frontend4\PrescriptionController::class, 'edit'])
+            ->middleware('frontend4.can:manage_prescription')
+            ->where(['client' => '[0-9]+', 'sheet' => '[0-9]+'])->name('clients.medications.edit');
+        Route::put('/clients/{client}/medications/{sheet}', [\App\Http\Controllers\Frontend4\PrescriptionController::class, 'update'])
+            ->middleware('frontend4.can:manage_prescription')
+            ->where(['client' => '[0-9]+', 'sheet' => '[0-9]+'])->name('clients.medications.update');
         Route::post('/clients/{client}/medications/{sheet}/status', [\App\Http\Controllers\Frontend4\PrescriptionController::class, 'changeStatus'])
             ->middleware('frontend4.can:manage_prescription')
             ->where(['client' => '[0-9]+', 'sheet' => '[0-9]+'])->name('clients.medication.status');
@@ -3134,3 +3146,4 @@ Route::post('/roster/supervision/form_template/fetch', [SupervisionController::c
 Route::get('/roster/schedule-shift/form_template/view/{schedule_shift_id}', [ScheduleShiftController::class, 'schedule_shift_webview_form']);
 Route::post('/roster/schedule-shift/form_template/save', [ScheduleShiftController::class, 'scheduleShiftFormSave'])->name('web.roster.schedule_shift.form.save');
 Route::post('/roster/schedule-shift/form_template/fetch', [ScheduleShiftController::class, 'scheduleShiftFormFetch'])->name('web.roster.schedule_shift.form.fetch');
+

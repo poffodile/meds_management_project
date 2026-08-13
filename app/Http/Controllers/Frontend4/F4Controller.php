@@ -119,14 +119,14 @@ abstract class F4Controller extends Controller
     }
 
     /** Hook used only when the shared round builder is composed by Frontend 4. */
-    protected function scopeMedicationRoundSheetsForAccess($query, int $homeId)
+    protected function scopeMedicationRoundSheetsForAccess($query, int $homeId, ?string $date = null)
     {
         $user = Auth::guard('frontend4')->user();
         abort_unless($user instanceof Frontend4User, 403);
 
-        return $query->whereIn(
-            'client_id',
-            app(AccessContext::class)->allowedClientIds($user)
-        );
+        $query->whereIn('client_id', app(AccessContext::class)->allowedClientIds($user))
+            ->currentlyActive();
+
+        return $date ? $query->effectiveOn($date) : $query;
     }
 }
