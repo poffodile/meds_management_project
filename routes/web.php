@@ -2029,6 +2029,20 @@ Route::prefix('frontend4')->name('frontend4.')->group(function () {
             ->middleware('frontend4.can:record_administration')->name('round.record');
         Route::get('/clients', [Frontend4ClientsController::class, 'index'])
             ->middleware('frontend4.can:view_clients')->name('clients');
+        Route::get('/clients/create', [\App\Http\Controllers\Frontend4\ClientRecordController::class, 'create'])
+            ->middleware('frontend4.can:manage_clients')->name('clients.create');
+        Route::post('/clients', [\App\Http\Controllers\Frontend4\ClientRecordController::class, 'store'])
+            ->middleware('frontend4.can:manage_clients')->name('clients.store');
+        Route::get('/clients/{client}/edit', [\App\Http\Controllers\Frontend4\ClientRecordController::class, 'edit'])
+            ->middleware('frontend4.can:manage_clients')->where('client', '[0-9]+')->name('clients.edit');
+        Route::put('/clients/{client}', [\App\Http\Controllers\Frontend4\ClientRecordController::class, 'update'])
+            ->middleware('frontend4.can:manage_clients')->where('client', '[0-9]+')->name('clients.update');
+        Route::post('/clients/{client}/lifecycle', [\App\Http\Controllers\Frontend4\ClientRecordController::class, 'lifecycle'])
+            ->middleware('frontend4.can:manage_clients')->where('client', '[0-9]+')->name('clients.lifecycle');
+        Route::post('/clients/{client}/restore', [\App\Http\Controllers\Frontend4\ClientRecordController::class, 'restore'])
+            ->middleware('frontend4.can:manage_clients')->where('client', '[0-9]+')->name('clients.restore');
+        Route::post('/clients/{client}/transfer', [\App\Http\Controllers\Frontend4\ClientRecordController::class, 'transfer'])
+            ->middleware('frontend4.can:manage_clients')->where('client', '[0-9]+')->name('clients.transfer');
         Route::get('/clients/{client}', [Frontend4ClientProfileController::class, 'index'])
             ->middleware('frontend4.can:view_clients')
             ->where('client', '[0-9]+')->name('clients.show');

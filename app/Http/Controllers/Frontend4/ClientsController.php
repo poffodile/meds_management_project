@@ -16,8 +16,8 @@ use Inertia\Inertia;
  *
  * Page 1 of the build: the way IN. A searchable list of the people this user is
  * responsible for; tapping one opens their profile (Page 2). Deliberately
- * read-only — no client is created or edited here. Creating and deactivating a
- * client is an Administration function, not this page.
+ * The directory remains read-only for carers and leads. Managers/admins receive
+ * a link into the separately permissioned identity/lifecycle controller.
  *
  * SCOPING
  * Always the signed-in user's own home, resolved server-side by
@@ -25,7 +25,7 @@ use Inertia\Inertia;
  * "Client" is the canonical concept (client_id in 37 tables); the display label
  * stays configurable via `terms`.
  *
- * This controller is read-only. It records nothing.
+ * This controller itself is read-only. It records nothing.
  */
 class ClientsController extends F4Controller
 {
@@ -49,18 +49,16 @@ class ClientsController extends F4Controller
 
         $homeId = $this->currentHomeId();
 
-        // Clients of this home. Not deleted; every status is loaded so the page can
-        // offer a status filter (Active / Inactive). The React side defaults the
-        // filter to Active, so the list reads the same as before unless the user
-        // asks for inactive.
+        // Managers can find archived records to restore them. Other roles never
+        // receive archived identities. The React side defaults to active clients.
         $clients = $this->scopeFrontend4Clients(ServiceUser::query())
-            ->where('is_deleted', 0)
+            ->when(! $this->can(\App\Services\Frontend4\Permissions::MANAGE_CLIENTS), fn ($query) => $query->where('is_deleted', 0))
             ->orderBy('name')
             ->get([
                 'id', 'name', 'image', 'date_of_birth', 'room_number', 'nhs_number',
                 'allergies', 'allergy_reaction', 'status', 'medication_support',
                 'key_worker', 'gp_name', 'gp_practice', 'pharmacy_name', 'pharmacy_phone',
-                'em_name', 'relationship', 'em_phone',
+                'em_name', 'relationship', 'em_phone', 'lifecycle_status',
             ]);
 
         $medsByClient = MARSheet::forHome($homeId)->active()
@@ -125,8 +123,9 @@ class ClientsController extends F4Controller
                 'reaction' => $su->allergy_reaction ?: null,
                 'hasAllergy' => count($allergies) > 0,
                 'letter' => $this->groupLetter($name),
-                'active' => (int) $su->status === 1,
-                'statusLabel' => (int) $su->status === 1 ? 'Active' : 'Inactive',
+                'active' => ($su->lifecycle_status ?: ((int) $su->status === 1 ? 'active' : 'inactive')) === 'active',
+                'lifecycleStatus' => $su->lifecycle_status ?: ((int) $su->status === 1 ? 'active' : 'inactive'),
+                'statusLabel' => ucfirst($su->lifecycle_status ?: ((int) $su->status === 1 ? 'active' : 'inactive')),
                 'support' => $su->medication_support ?: null,
                 'keyWorker' => $su->key_worker ?: null,
                 'gp' => trim((string) $su->gp_name) !== ''

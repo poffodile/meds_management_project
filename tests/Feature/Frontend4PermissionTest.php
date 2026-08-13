@@ -30,10 +30,12 @@ class Frontend4PermissionTest extends TestCase
         $this->assertFalse($permissions->allows(RoleResolver::LEAD, Permissions::MANAGE_PRESCRIPTION));
 
         $this->assertTrue($permissions->allows(RoleResolver::MANAGER, Permissions::MANAGE_PRESCRIPTION));
+        $this->assertTrue($permissions->allows(RoleResolver::MANAGER, Permissions::MANAGE_CLIENTS));
         $this->assertTrue($permissions->allows(RoleResolver::MANAGER, Permissions::EXPORT_REPORT));
 
         $this->assertTrue($permissions->allows(RoleResolver::ADMIN, Permissions::MANAGE_SETTINGS));
         $this->assertTrue($permissions->allows(RoleResolver::ADMIN, Permissions::VIEW_CLIENTS));
+        $this->assertTrue($permissions->allows(RoleResolver::ADMIN, Permissions::MANAGE_CLIENTS));
         $this->assertFalse($permissions->allows(RoleResolver::ADMIN, Permissions::RECORD_ADMINISTRATION));
         $this->assertFalse($permissions->allows(RoleResolver::ADMIN, Permissions::CORRECT_RECORD));
         $this->assertFalse($permissions->allows(RoleResolver::ADMIN, Permissions::MANAGE_PRESCRIPTION));
@@ -58,6 +60,13 @@ class Frontend4PermissionTest extends TestCase
             'frontend4.round' => Permissions::VIEW_ROUND,
             'frontend4.round.record' => Permissions::RECORD_ADMINISTRATION,
             'frontend4.clients' => Permissions::VIEW_CLIENTS,
+            'frontend4.clients.create' => Permissions::MANAGE_CLIENTS,
+            'frontend4.clients.store' => Permissions::MANAGE_CLIENTS,
+            'frontend4.clients.edit' => Permissions::MANAGE_CLIENTS,
+            'frontend4.clients.update' => Permissions::MANAGE_CLIENTS,
+            'frontend4.clients.lifecycle' => Permissions::MANAGE_CLIENTS,
+            'frontend4.clients.restore' => Permissions::MANAGE_CLIENTS,
+            'frontend4.clients.transfer' => Permissions::MANAGE_CLIENTS,
             'frontend4.clients.show' => Permissions::VIEW_CLIENTS,
             'frontend4.clients.medication.status' => Permissions::MANAGE_PRESCRIPTION,
             'frontend4.clients.mar' => Permissions::VIEW_MAR,

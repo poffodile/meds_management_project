@@ -10,6 +10,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import F4Shell from '@frontend4/components/F4Shell';
 import { Empty, term } from '@frontend4/components/F4Atoms';
+import { allows } from '@frontend4/roles';
 
 function initials(name) {
     const parts = String(name || '').trim().split(/\s+/).filter(Boolean);
@@ -25,7 +26,7 @@ function SummaryButton({ active, label, count, onClick }) {
     );
 }
 
-function ClientPreview({ client, onClose }) {
+function ClientPreview({ client, onClose, can = [] }) {
     if (!client) return null;
     const meta = [client.age != null ? `${client.age} years` : null, client.dob, client.location, client.nhs ? `NHS ${client.nhs}` : null].filter(Boolean);
     const meds = client.medicines || [];
@@ -65,7 +66,8 @@ function ClientPreview({ client, onClose }) {
                     <div><span>Next of kin</span><strong>{client.nextOfKin?.name || 'Not recorded'}</strong>{client.nextOfKin?.sub ? <small>{client.nextOfKin.sub}</small> : null}</div>
                 </section>
                 <div className="f4-preview-actions">
-                    <Link className="f4-btn" href={`/frontend4/clients/${client.id}`}>Open full profile</Link>
+                    {client.lifecycleStatus !== 'archived' ? <Link className="f4-btn" href={`/frontend4/clients/${client.id}`}>Open full profile</Link> : null}
+                    {allows(can, 'manage_clients') ? <Link className="f4-btn" data-variant="secondary" href={`/frontend4/clients/${client.id}/edit`}>Manage record</Link> : null}
                     <Link className="f4-btn" data-variant="secondary" href={`/frontend4/clients/${client.id}#medications`}>View medications</Link>
                     <Link className="f4-btn" data-variant="secondary" href={`/frontend4/clients/${client.id}#mar`}>View MAR</Link>
                 </div>
@@ -148,7 +150,10 @@ export default function Clients({
                         <h1>Clients</h1>
                         <p>People supported across {place || 'your assigned home'}</p>
                     </div>
-                    <span className="f4-visible-count"><strong>{filtered.length}</strong> visible</span>
+                    <div className="f4-client-heading-actions">
+                        <span className="f4-visible-count"><strong>{filtered.length}</strong> visible</span>
+                        {allows(can, 'manage_clients') ? <Link className="f4-btn" href="/frontend4/clients/create">Add client</Link> : null}
+                    </div>
                 </header>
 
                 <div className="f4-client-toolbar">
@@ -165,7 +170,7 @@ export default function Clients({
                     ) : null}
                     <select value={status} onChange={(e) => setStatus(e.target.value)} aria-label="Filter by status">
                         <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
+                        <option value="inactive">Not active</option>
                         <option value="all">All statuses</option>
                     </select>
                     {supportLevels.length ? (
@@ -217,7 +222,7 @@ export default function Clients({
                     </section>
                 )}
             </div>
-            <ClientPreview client={selected} onClose={() => setSelected(null)} />
+            <ClientPreview client={selected} onClose={() => setSelected(null)} can={can} />
         </F4Shell>
     );
 }

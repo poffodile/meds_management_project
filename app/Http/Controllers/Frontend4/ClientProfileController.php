@@ -50,7 +50,7 @@ class ClientProfileController extends F4Controller
         $homeId = $this->currentHomeId();
 
         $su = $this->scopeFrontend4Clients(ServiceUser::query())
-            ->where('is_deleted', 0)
+            ->when(! $this->can(\App\Services\Frontend4\Permissions::MANAGE_CLIENTS), fn ($query) => $query->where('is_deleted', 0))
             ->where('id', $client)
             ->first();
 
@@ -406,7 +406,7 @@ class ClientProfileController extends F4Controller
                 'weight' => trim((string) $su->weight) !== '' ? trim((string) $su->weight).' '.($su->weight_unit ?: 'kg') : null,
                 'location' => $su->room_number ?: null,
                 'nhs' => $su->nhs_number ?: null,
-                'status' => (int) $su->status === 1 ? 'Active' : null,
+                'status' => ucfirst($su->lifecycle_status ?: ((int) $su->status === 1 ? 'active' : 'inactive')),
                 'allergies' => $allergies,
             ],
             'overview' => $overview,

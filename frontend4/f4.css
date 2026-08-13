@@ -3167,3 +3167,39 @@ a.f4-row:focus-visible, button.f4-row:focus-visible {
   .f4-auth-card { padding: var(--f4-s5) var(--f4-s4); }
   .f4-auth-intro > p:last-of-type { display: none; }
 }
+
+/* Client identity and lifecycle maintenance (Frontend 4 only). */
+.f4-client-heading-actions { display: flex; align-items: center; gap: var(--f4-s3); }
+.f4-profile-back { display: flex; align-items: center; justify-content: space-between; gap: var(--f4-s3); }
+.f4-record-page { display: grid; gap: var(--f4-s5); max-width: 1120px; margin: 0 auto; }
+.f4-record-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--f4-s4); }
+.f4-record-heading h1 { margin: 4px 0 8px; }
+.f4-record-heading p { max-width: 760px; color: var(--f4-muted); }
+.f4-record-form, .f4-record-operations { display: grid; gap: var(--f4-s4); }
+.f4-record-card { padding: var(--f4-s5); border: var(--f4-hair); border-radius: var(--f4-r-lg); background: var(--f4-paper); box-shadow: var(--f4-shadow-sm); }
+.f4-record-card-head { margin-bottom: var(--f4-s4); }
+.f4-record-card-head h2 { margin: 0 0 4px; font-size: var(--f4-t-section); }
+.f4-record-card-head p, .f4-record-card > p { margin: 0; color: var(--f4-muted); }
+.f4-record-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--f4-s4); }
+.f4-record-field { display: grid; align-content: start; gap: 7px; color: var(--f4-ink); font-size: var(--f4-t-support); font-weight: 750; }
+.f4-record-field input, .f4-record-field select, .f4-record-field textarea {
+  width: 100%; min-height: 42px; padding: 10px 12px; border: var(--f4-hair); border-radius: var(--f4-r-sm);
+  background: var(--f4-paper); color: var(--f4-ink); font: inherit; font-weight: 500;
+}
+.f4-record-field textarea { resize: vertical; }
+.f4-record-field input:focus, .f4-record-field select:focus, .f4-record-field textarea:focus { border-color: var(--f4-accent); outline: 3px solid color-mix(in srgb, var(--f4-accent) 13%, transparent); }
+.f4-record-actions { display: flex; justify-content: flex-end; gap: var(--f4-s3); }
+.f4-record-inline { display: grid; grid-template-columns: minmax(180px, .65fr) minmax(260px, 1fr); gap: var(--f4-s4); align-items: end; }
+.f4-record-inline .f4-btn { justify-self: start; }
+.f4-record-notice { padding: 12px 14px; border-radius: var(--f4-r-sm); background: var(--f4-warn-b); color: var(--f4-warn-s); font-weight: 750; }
+.f4-record-history { display: grid; gap: var(--f4-s3); margin: 0; padding-left: 22px; }
+.f4-record-history li { padding-left: 6px; }
+.f4-record-history strong { display: block; text-transform: capitalize; }
+.f4-record-history span { color: var(--f4-muted); font-size: var(--f4-t-support); }
+
+@media (max-width: 760px) {
+  .f4-record-grid, .f4-record-inline { grid-template-columns: 1fr; }
+  .f4-record-heading, .f4-profile-back { align-items: stretch; flex-direction: column; }
+  .f4-client-heading-actions { align-items: stretch; flex-direction: column; }
+  .f4-record-card { padding: var(--f4-s4); }
+}

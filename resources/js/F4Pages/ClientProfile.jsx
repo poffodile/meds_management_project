@@ -34,6 +34,7 @@ export default function ClientProfile({
     const [active, setActive] = useState(tabFromHash);
     const tabRefs = useRef({});
     const canManage = allows(can, 'manage_prescription');
+    const canManageClient = allows(can, 'manage_clients');
 
     // Keep the open tab in the URL hash so Back and refresh return to it. Uses
     // replaceState (no new history entry, no scroll, no server round-trip).
@@ -72,6 +73,7 @@ export default function ClientProfile({
                     </svg>
                     Back to clients
                 </Link>
+                {canManageClient ? <Link href={`/frontend4/clients/${client.id}/edit`} className="f4-btn" data-size="sm">Manage client record</Link> : null}
             </div>
             {/* Identity, the info strip, and the tabs. */}
             <div className="f4-profile-head">
@@ -80,7 +82,7 @@ export default function ClientProfile({
                     <div className="f4-profile-idmain">
                         <div className="f4-profile-nmrow">
                             <span className="f4-profile-nm">{client.name}</span>
-                            {client.status ? <span className="f4-tag" data-tone="good">{client.status}</span> : null}
+                            {client.status ? <span className="f4-tag" data-tone={client.status === 'Active' ? 'good' : 'muted'}>{client.status}</span> : null}
                         </div>
                         {headerMeta.length ? (
                             <div className="f4-idmeta">{headerMeta.map((m, i) => <span key={i}>{m}</span>)}</div>

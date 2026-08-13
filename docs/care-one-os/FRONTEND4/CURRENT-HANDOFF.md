@@ -1,6 +1,6 @@
 # Care One OS current engineering handoff
 
-Last updated: 12 August 2026
+Last updated: 13 August 2026
 
 This is the current starting point for Codex, Claude Code or another engineer. Read it before editing the repository. The older `CODEX-CLAUDE-HANDOVER.md` remains historical context; where it conflicts with this file, this file is authoritative.
 
@@ -12,7 +12,7 @@ This is the current starting point for Codex, Claude Code or another engineer. R
 - Do not commit directly to, merge into, rebase or rewrite `frontend4`.
 - Continue production-readiness work only on `care-one-integration` unless the owner explicitly changes this instruction.
 - GitHub commits must not name Codex, ChatGPT, Claude, Anthropic or OpenAI as author or co-author.
-- The latest confirmed Requirement 3 commit is `67d6eb85d11a4434558d5531ea934f4c8c40d090`.
+- The latest confirmed Requirement 2b commit is `2199a57ffc7982a673e63c2781fbe49da2738e3e`.
 
 ## Why this branch exists
 
@@ -166,7 +166,7 @@ Read `docs/care-one-os/FRONTEND4/ACCESS-SCOPE.md` before applying the new migrat
 
 ## Requirement 2b: step-based login
 
-Requirement 2b is implemented and awaits the database-backed PHP suites in the configured local environment. It changes only Frontend 4:
+Requirement 2b is implemented and confirmed in the configured local environment. It changes only Frontend 4:
 
 - Step 1 resolves an active, unique organisation into the server session.
 - Step 2 verifies username and password without accepting a service ID.
@@ -189,4 +189,35 @@ npm test
 npm run build
 ```
 
-The next production requirement after Requirement 2b is confirmed is Requirement 5: real client records and lifecycle rules.
+Owner-confirmed result: Authentication 8/8, Access Scope 8/8 and Permissions 6/6; 22 tests and 88 assertions total, with no failures.
+
+## Requirement 5: real client records and lifecycle rules
+
+Requirement 5 is implemented on the integration branch and awaits database-backed PHP verification in the owner's configured Laragon environment. Read `CLIENT-LIFECYCLE.md` before applying its migration.
+
+The implementation adds:
+
+- manager/admin client creation and editing within the active service/location boundary;
+- NHS number checksum and duplicate validation;
+- explicit active, inactive, discharged, deceased and archived states;
+- archive/restore instead of destructive deletion;
+- append-only client events for creation, edits, lifecycle changes and transfer requests;
+- reviewable transfer requests that deliberately do not change `service_user.home_id`;
+- active-client filtering for live medication rounds while historical records stay viewable;
+- nullable legacy placeholder fields so unknown measurements, units, usernames, passwords and narrative values are no longer fabricated;
+- preferred name, pronouns, language, communication and record provenance fields.
+
+Apply the pending profile migration and R5 migration by path to local and test databases, after checking the database target and taking a backup:
+
+```bash
+php artisan migrate --path=database/migrations/2026_08_06_120000_add_profile_fields_to_service_user.php
+php artisan migrate --path=database/migrations/2026_08_12_000003_create_frontend4_client_lifecycle.php
+php artisan test --filter=Frontend4ClientLifecycleTest
+php artisan test --filter=Frontend4AuthenticationIsolationTest
+php artisan test --filter=Frontend4AccessScopeTest
+php artisan test --filter=Frontend4PermissionTest
+npm test
+npm run build
+```
+
+Do not approve/apply transfers by changing only `service_user.home_id`: the supplied database contains more than 90 client-linked table families. Transfer application needs its own later reconciliation workflow for MAR, prescriptions, stock, controlled drugs, documents and care records.

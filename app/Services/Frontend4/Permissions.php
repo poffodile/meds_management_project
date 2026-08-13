@@ -44,6 +44,7 @@ class Permissions
 
     // ── Control plane ─────────────────────────────────────────────────────
     public const MANAGE_STAFF = 'manage_staff';   // within their own homes
+    public const MANAGE_CLIENTS = 'manage_clients'; // identity and lifecycle, never medication administration
     public const DEFINE_ROLES = 'define_roles';   // what a role is allowed to do
     public const MANAGE_SETTINGS = 'manage_settings';
 
@@ -77,6 +78,7 @@ class Permissions
             self::VIEW_REPORTS,
             self::EXPORT_REPORT,
             self::MANAGE_STAFF,
+            self::MANAGE_CLIENTS,
             // Manager-and-above may change a prescription (owner decision
             // 2026-08-05). Pause/stop/change is a clinical-record edit, so it is
             // written through an append-only change-log — see mar_sheet_changes.

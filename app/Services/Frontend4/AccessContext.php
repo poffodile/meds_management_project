@@ -142,8 +142,25 @@ class AccessContext
 
     public function allowedClientIds(Frontend4User $user): array
     {
-        return $this->scopeClients(\App\ServiceUser::query(), $user)
-            ->where('is_deleted', 0)
+        $query = $this->scopeClients(\App\ServiceUser::query(), $user)
+            ->where('is_deleted', 0);
+
+        // Medication rounds are live-care workflows. Historical client profiles
+        // remain viewable through scopeClients(), but cannot leak into a round.
+        if (Schema::hasColumn('service_user', 'lifecycle_status')) {
+            $query->where(function ($active) {
+                $active->where('lifecycle_status', 'active')
+                    // Compatibility for a client added by the legacy UI after
+                    // this migration; legacy code does not know the new column.
+                    ->orWhere(function ($legacy) {
+                        $legacy->whereNull('lifecycle_status')->where('status', 1);
+                    });
+            });
+        } else {
+            $query->where('status', 1);
+        }
+
+        return $query
             ->pluck('id')
             ->map(fn ($id) => (int) $id)
             ->all();
