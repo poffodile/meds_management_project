@@ -25,13 +25,20 @@ class Frontend4PermissionTest extends TestCase
         $this->assertTrue($permissions->allows(RoleResolver::CARER, Permissions::VIEW_CLIENTS));
         $this->assertTrue($permissions->allows(RoleResolver::CARER, Permissions::RECORD_ADMINISTRATION));
         $this->assertFalse($permissions->allows(RoleResolver::CARER, Permissions::CORRECT_RECORD));
+        $this->assertTrue($permissions->allows(RoleResolver::CARER, Permissions::VIEW_HANDOVER));
+        $this->assertTrue($permissions->allows(RoleResolver::CARER, Permissions::RECORD_HANDOVER));
+        $this->assertTrue($permissions->allows(RoleResolver::CARER, Permissions::ACKNOWLEDGE_HANDOVER));
+        $this->assertTrue($permissions->allows(RoleResolver::CARER, Permissions::REPORT_MEDICATION_INCIDENT));
+        $this->assertFalse($permissions->allows(RoleResolver::CARER, Permissions::INVESTIGATE_MEDICATION_INCIDENT));
 
         $this->assertTrue($permissions->allows(RoleResolver::LEAD, Permissions::CORRECT_RECORD));
         $this->assertFalse($permissions->allows(RoleResolver::LEAD, Permissions::MANAGE_PRESCRIPTION));
+        $this->assertTrue($permissions->allows(RoleResolver::LEAD, Permissions::MANAGE_HANDOVER));
 
         $this->assertTrue($permissions->allows(RoleResolver::MANAGER, Permissions::MANAGE_PRESCRIPTION));
         $this->assertTrue($permissions->allows(RoleResolver::MANAGER, Permissions::MANAGE_CLIENTS));
         $this->assertTrue($permissions->allows(RoleResolver::MANAGER, Permissions::EXPORT_REPORT));
+        $this->assertTrue($permissions->allows(RoleResolver::MANAGER, Permissions::INVESTIGATE_MEDICATION_INCIDENT));
 
         $this->assertTrue($permissions->allows(RoleResolver::ADMIN, Permissions::MANAGE_SETTINGS));
         $this->assertTrue($permissions->allows(RoleResolver::ADMIN, Permissions::VIEW_CLIENTS));
@@ -39,6 +46,9 @@ class Frontend4PermissionTest extends TestCase
         $this->assertFalse($permissions->allows(RoleResolver::ADMIN, Permissions::RECORD_ADMINISTRATION));
         $this->assertFalse($permissions->allows(RoleResolver::ADMIN, Permissions::CORRECT_RECORD));
         $this->assertFalse($permissions->allows(RoleResolver::ADMIN, Permissions::MANAGE_PRESCRIPTION));
+        $this->assertTrue($permissions->allows(RoleResolver::ADMIN, Permissions::VIEW_HANDOVER));
+        $this->assertFalse($permissions->allows(RoleResolver::ADMIN, Permissions::RECORD_HANDOVER));
+        $this->assertFalse($permissions->allows(RoleResolver::ADMIN, Permissions::INVESTIGATE_MEDICATION_INCIDENT));
         $this->assertSame([], $permissions->forRole(RoleResolver::NONE));
         $this->assertSame([], $permissions->forRole('unrecognised-role'));
     }
@@ -59,6 +69,16 @@ class Frontend4PermissionTest extends TestCase
             'frontend4.today' => Permissions::VIEW_TODAY,
             'frontend4.round' => Permissions::VIEW_ROUND,
             'frontend4.round.record' => Permissions::RECORD_ADMINISTRATION,
+            'frontend4.handover' => Permissions::VIEW_HANDOVER,
+            'frontend4.handover.drafts.store' => Permissions::RECORD_HANDOVER,
+            'frontend4.handover.update' => Permissions::RECORD_HANDOVER,
+            'frontend4.handover.submit' => Permissions::RECORD_HANDOVER,
+            'frontend4.handover.acknowledge' => Permissions::ACKNOWLEDGE_HANDOVER,
+            'frontend4.handover.tasks.store' => Permissions::RECORD_HANDOVER,
+            'frontend4.handover.tasks.complete' => Permissions::COMPLETE_HANDOVER_TASK,
+            'frontend4.handover.incidents.store' => Permissions::REPORT_MEDICATION_INCIDENT,
+            'frontend4.handover.incidents.investigate' => Permissions::INVESTIGATE_MEDICATION_INCIDENT,
+            'frontend4.handover.incidents.close' => Permissions::INVESTIGATE_MEDICATION_INCIDENT,
             'frontend4.clients' => Permissions::VIEW_CLIENTS,
             'frontend4.clients.create' => Permissions::MANAGE_CLIENTS,
             'frontend4.clients.store' => Permissions::MANAGE_CLIENTS,
@@ -212,4 +232,5 @@ class Frontend4PermissionTest extends TestCase
         }
     }
 }
+
 

@@ -2027,6 +2027,26 @@ Route::prefix('frontend4')->name('frontend4.')->group(function () {
             ->middleware('frontend4.can:view_round')->name('round');
         Route::post('/round/record', [Frontend4RoundController::class, 'record'])
             ->middleware('frontend4.can:record_administration')->name('round.record');
+        Route::get('/handover', [\App\Http\Controllers\Frontend4\HandoverController::class, 'index'])
+            ->middleware('frontend4.can:view_handover')->name('handover');
+        Route::post('/handover/drafts', [\App\Http\Controllers\Frontend4\HandoverController::class, 'createDraft'])
+            ->middleware('frontend4.can:record_handover')->name('handover.drafts.store');
+        Route::put('/handover/{handover}', [\App\Http\Controllers\Frontend4\HandoverController::class, 'updateDraft'])
+            ->middleware('frontend4.can:record_handover')->where('handover', '[0-9]+')->name('handover.update');
+        Route::post('/handover/{handover}/submit', [\App\Http\Controllers\Frontend4\HandoverController::class, 'submit'])
+            ->middleware('frontend4.can:record_handover')->where('handover', '[0-9]+')->name('handover.submit');
+        Route::post('/handover/{handover}/acknowledge', [\App\Http\Controllers\Frontend4\HandoverController::class, 'acknowledge'])
+            ->middleware('frontend4.can:acknowledge_handover')->where('handover', '[0-9]+')->name('handover.acknowledge');
+        Route::post('/handover/tasks', [\App\Http\Controllers\Frontend4\HandoverController::class, 'createTask'])
+            ->middleware('frontend4.can:record_handover')->name('handover.tasks.store');
+        Route::post('/handover/tasks/{task}/complete', [\App\Http\Controllers\Frontend4\HandoverController::class, 'completeTask'])
+            ->middleware('frontend4.can:complete_handover_task')->where('task', '[0-9]+')->name('handover.tasks.complete');
+        Route::post('/handover/incidents', [\App\Http\Controllers\Frontend4\HandoverController::class, 'reportIncident'])
+            ->middleware('frontend4.can:report_medication_incident')->name('handover.incidents.store');
+        Route::post('/handover/incidents/{incident}/investigate', [\App\Http\Controllers\Frontend4\HandoverController::class, 'investigate'])
+            ->middleware('frontend4.can:investigate_medication_incident')->where('incident', '[0-9]+')->name('handover.incidents.investigate');
+        Route::post('/handover/incidents/{incident}/close', [\App\Http\Controllers\Frontend4\HandoverController::class, 'closeIncident'])
+            ->middleware('frontend4.can:investigate_medication_incident')->where('incident', '[0-9]+')->name('handover.incidents.close');
         Route::get('/clients', [Frontend4ClientsController::class, 'index'])
             ->middleware('frontend4.can:view_clients')->name('clients');
         Route::get('/clients/create', [\App\Http\Controllers\Frontend4\ClientRecordController::class, 'create'])
@@ -3146,4 +3166,5 @@ Route::post('/roster/supervision/form_template/fetch', [SupervisionController::c
 Route::get('/roster/schedule-shift/form_template/view/{schedule_shift_id}', [ScheduleShiftController::class, 'schedule_shift_webview_form']);
 Route::post('/roster/schedule-shift/form_template/save', [ScheduleShiftController::class, 'scheduleShiftFormSave'])->name('web.roster.schedule_shift.form.save');
 Route::post('/roster/schedule-shift/form_template/fetch', [ScheduleShiftController::class, 'scheduleShiftFormFetch'])->name('web.roster.schedule_shift.form.fetch');
+
 

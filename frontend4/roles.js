@@ -38,10 +38,17 @@ export const P = {
     VIEW_ROUND:               'view_round',
     VIEW_CLIENTS:             'view_clients',
     VIEW_MAR:                 'view_mar',
+    VIEW_HANDOVER:            'view_handover',
     RECORD_ADMINISTRATION:    'record_administration',
     WITNESS_CONTROLLED_DRUG:  'witness_controlled_drug',
     CORRECT_RECORD:           'correct_record',
     REOPEN_ROUND:             'reopen_round',
+    RECORD_HANDOVER:          'record_handover',
+    ACKNOWLEDGE_HANDOVER:     'acknowledge_handover',
+    COMPLETE_HANDOVER_TASK:   'complete_handover_task',
+    REPORT_MEDICATION_INCIDENT: 'report_medication_incident',
+    MANAGE_HANDOVER:          'manage_handover',
+    INVESTIGATE_MEDICATION_INCIDENT: 'investigate_medication_incident',
     VIEW_STOCK:               'view_stock',
     RECEIVE_DELIVERY:         'receive_delivery',
     APPROVE_STOCK_ADJUSTMENT: 'approve_stock_adjustment',
@@ -75,7 +82,7 @@ export const NAV = [
     { key: 'round',      label: 'Medication round', href: '/frontend4/round',          permission: P.VIEW_ROUND,   available: true },
     { key: 'missed',     label: 'Missed doses',     href: '/frontend4/missed-doses',   permission: P.VIEW_ROUND,   available: false },
     { key: 'clients',    label: 'Clients',          href: '/frontend4/clients',        permission: P.VIEW_CLIENTS, available: true },
-    { key: 'handover',   label: 'Handover',         href: '/frontend4/handover',       permission: P.VIEW_TODAY,   available: false },
+    { key: 'handover',   label: 'Handover',         href: '/frontend4/handover',       permission: P.VIEW_HANDOVER, available: true },
 
     // ── Added for a shift lead and above ──────────────────────────────────
     { key: 'cd',         label: 'Controlled drugs', href: '/frontend4/controlled-drugs', permission: P.VIEW_CD_REGISTER, group: 'Oversight', available: false },
@@ -115,3 +122,4 @@ export function navFor(can) {
 
     return groups;
 }
+

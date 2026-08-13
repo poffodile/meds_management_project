@@ -226,7 +226,7 @@ Owner-confirmed result: Client lifecycle 6/6, Authentication 8/8, Access Scope 8
 
 ## Requirement 6: medicine catalogue and prescription lifecycle
 
-Requirement 6 is implemented on the integration branch and awaits database-backed PHP verification. Read `MEDICINE-CATALOGUE-AND-PRESCRIPTIONS.md` before applying its migration.
+Requirement 6 is implemented and owner-verified on the integration branch. All 8 Requirement 6 tests, the regression suites, all 22 JavaScript tests and the production build passed. Read `MEDICINE-CATALOGUE-AND-PRESCRIPTIONS.md` before applying its migration.
 
 The implementation adds:
 
@@ -254,4 +254,39 @@ php artisan test --filter=Frontend4PermissionTest
 npm test
 npm run build
 ```
+
+
+
+## Requirement 7: handover and medication incidents
+
+Requirement 7 is implemented on the integration branch and awaits database-backed verification. Read `HANDOVER-AND-MEDICATION-INCIDENTS.md` before applying its migration.
+
+It adds:
+
+- automatic source-linked handover drafts for dose exceptions, PRN reviews, controlled-drug discrepancies, stock concerns and prescription changes;
+- frozen submitted handovers and append-only lifecycle events;
+- incoming-shift acknowledgement kept separate from task completion;
+- follow-up work with a named owner, deadline and escalation time;
+- medication incident reporting, investigation and closure with outcome and learning;
+- Frontend 4 server permissions and organisation/service/client scoping;
+- a responsive isolated Frontend 4 handover workspace;
+- dedicated feature tests and route-permission regression coverage.
+
+Apply only:
+
+```bash
+php artisan migrate --path=database/migrations/2026_08_13_000005_create_frontend4_handover_and_incidents.php
+php artisan test --filter=Frontend4HandoverIncidentTest
+php artisan test --filter=Frontend4PrescriptionLifecycleTest
+php artisan test --filter=Frontend4ClientLifecycleTest
+php artisan test --filter=Frontend4AuthenticationIsolationTest
+php artisan test --filter=Frontend4AccessScopeTest
+php artisan test --filter=Frontend4PermissionTest
+npm test
+npm run build
+```
+
+## Outstanding reminder
+
+The complete approved NHS dm+d catalogue data still needs to be imported into `medicine_catalogue`. The R6 structure and picker are complete, but no dm+d release was bundled or fabricated.
 

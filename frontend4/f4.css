@@ -3240,3 +3240,30 @@ a.f4-row:focus-visible, button.f4-row:focus-visible {
 @media (max-width: 480px) {
     .f4-root .f4-rx-medicine dl { grid-template-columns: 1fr; }
 }
+
+
+/* Requirement 7 — structured handover, follow-up and incident lifecycle. */
+.f4-root .f4-handover-page { padding-bottom: 48px; }
+.f4-root .f4-handover-create { display: grid; grid-template-columns: minmax(0, 1fr) minmax(340px, .8fr); gap: 24px; align-items: end; }
+.f4-root .f4-section-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 14px; }
+.f4-root .f4-section-heading h2, .f4-root .f4-handover-create h2 { margin: 0; }
+.f4-root .f4-handover-card { border: 1px solid var(--f4-line); border-radius: var(--f4-radius); background: var(--f4-surface); margin-bottom: 10px; overflow: hidden; }
+.f4-root .f4-handover-card[data-status="submitted"] { border-left: 3px solid var(--f4-caution); }
+.f4-root .f4-handover-card[data-status="acknowledged"] { border-left: 3px solid var(--f4-good); }
+.f4-root .f4-handover-summary { width: 100%; border: 0; background: transparent; color: inherit; padding: 16px 18px; display: flex; justify-content: space-between; gap: 18px; align-items: center; text-align: left; cursor: pointer; }
+.f4-root .f4-handover-summary span:first-child, .f4-root .f4-handover-item > span:first-child, .f4-root .f4-task > span:first-child { display: grid; gap: 4px; }
+.f4-root .f4-handover-summary small, .f4-root .f4-handover-item small, .f4-root .f4-task small, .f4-root .f4-incident small { color: var(--f4-text-quiet); }
+.f4-root .f4-handover-body { border-top: 1px solid var(--f4-line); padding: 16px 18px 18px; }
+.f4-root .f4-handover-items, .f4-root .f4-task-list, .f4-root .f4-incident-list { display: grid; gap: 8px; }
+.f4-root .f4-handover-item, .f4-root .f4-task, .f4-root .f4-incident { display: flex; justify-content: space-between; align-items: flex-start; gap: 18px; padding: 12px; border: 1px solid var(--f4-line); border-radius: 10px; }
+.f4-root .f4-handover-item[data-priority="urgent"], .f4-root .f4-task[data-escalated="true"] { border-left: 3px solid var(--f4-risk); }
+.f4-root .f4-handover-item > span:last-child, .f4-root .f4-task > span:last-child, .f4-root .f4-incident > div:last-child { display: grid; justify-items: end; gap: 8px; }
+.f4-root .f4-inline-form { padding: 16px; margin-bottom: 18px; border: 1px solid var(--f4-line); border-radius: 12px; background: var(--f4-surface-soft); }
+.f4-root .f4-task p, .f4-root .f4-incident p { margin: 5px 0; }
+.f4-root .f4-incident small { display: block; margin-top: 5px; }
+@media (max-width: 800px) {
+    .f4-root .f4-handover-create { grid-template-columns: 1fr; }
+    .f4-root .f4-handover-item, .f4-root .f4-task, .f4-root .f4-incident { display: grid; }
+    .f4-root .f4-handover-item > span:last-child, .f4-root .f4-task > span:last-child, .f4-root .f4-incident > div:last-child { justify-items: start; }
+}
+

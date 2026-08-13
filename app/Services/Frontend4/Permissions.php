@@ -22,12 +22,19 @@ class Permissions
     public const VIEW_ROUND = 'view_round';
     public const VIEW_CLIENTS = 'view_clients';
     public const VIEW_MAR = 'view_mar';
+    public const VIEW_HANDOVER = 'view_handover';
 
     // ── Clinical ──────────────────────────────────────────────────────────
     public const RECORD_ADMINISTRATION = 'record_administration';
     public const WITNESS_CONTROLLED_DRUG = 'witness_controlled_drug';
     public const CORRECT_RECORD = 'correct_record';
     public const REOPEN_ROUND = 'reopen_round';
+    public const RECORD_HANDOVER = 'record_handover';
+    public const ACKNOWLEDGE_HANDOVER = 'acknowledge_handover';
+    public const COMPLETE_HANDOVER_TASK = 'complete_handover_task';
+    public const REPORT_MEDICATION_INCIDENT = 'report_medication_incident';
+    public const MANAGE_HANDOVER = 'manage_handover';
+    public const INVESTIGATE_MEDICATION_INCIDENT = 'investigate_medication_incident';
 
     // ── Supply ────────────────────────────────────────────────────────────
     public const VIEW_STOCK = 'view_stock';
@@ -63,7 +70,12 @@ class Permissions
             self::VIEW_ROUND,
             self::VIEW_CLIENTS,
             self::VIEW_MAR,
+            self::VIEW_HANDOVER,
             self::RECORD_ADMINISTRATION,
+            self::RECORD_HANDOVER,
+            self::ACKNOWLEDGE_HANDOVER,
+            self::COMPLETE_HANDOVER_TASK,
+            self::REPORT_MEDICATION_INCIDENT,
             self::VIEW_STOCK,   // reads "stock remaining" on a medicine; cannot change it
         ],
         RoleResolver::LEAD => [
@@ -72,6 +84,7 @@ class Permissions
             self::REOPEN_ROUND,
             self::RECEIVE_DELIVERY,
             self::VIEW_CD_REGISTER,
+            self::MANAGE_HANDOVER,
         ],
         RoleResolver::MANAGER => [
             self::APPROVE_STOCK_ADJUSTMENT,
@@ -83,6 +96,7 @@ class Permissions
             // 2026-08-05). Pause/stop/change is a clinical-record edit, so it is
             // written through an append-only change-log — see mar_sheet_changes.
             self::MANAGE_PRESCRIPTION,
+            self::INVESTIGATE_MEDICATION_INCIDENT,
         ],
         RoleResolver::ADMIN => [
             self::DEFINE_ROLES,
@@ -109,6 +123,12 @@ class Permissions
         // manages access, not the clinical record. So admin does NOT inherit it,
         // even though it sits at the manager tier they otherwise inherit.
         self::MANAGE_PRESCRIPTION,
+        self::RECORD_HANDOVER,
+        self::ACKNOWLEDGE_HANDOVER,
+        self::COMPLETE_HANDOVER_TASK,
+        self::REPORT_MEDICATION_INCIDENT,
+        self::MANAGE_HANDOVER,
+        self::INVESTIGATE_MEDICATION_INCIDENT,
     ];
 
     /** Least-to-most privileged, for inheritance. */
@@ -154,3 +174,4 @@ class Permissions
         return array_values(array_unique($granted));
     }
 }
+
