@@ -83,7 +83,12 @@ class DmdReleaseReader
                     if (! $node) {
                         $this->invalid('A controlled-drug classification record is malformed.');
                     }
-                    $code = $this->code($this->value($node, 'VPID'), 'VPID');
+                    $vpid = $this->value($node, 'VPID');
+                    if ($vpid === null || trim($vpid) === '') {
+                        // Nested inside a VMP; controlSchedule() already read this classification.
+                        continue;
+                    }
+                    $code = $this->code($vpid, 'VPID');
                     $category = trim((string) ($this->value($node, 'CATCD') ?? $this->value($node, 'CD')));
                     yield [
                         'type' => 'classification',
