@@ -290,7 +290,7 @@ Owner-confirmed result: Handover/incident 9/9, Prescription lifecycle 8/8, Clien
 
 ## Requirement 8: manager assurance and controlled reporting
 
-Requirement 8 is implemented on the integration branch and awaits database-backed verification. Read `MANAGER-ASSURANCE-AND-REPORTING.md` before applying its migration.
+Requirement 8 is implemented and owner-verified on the integration branch. Read `MANAGER-ASSURANCE-AND-REPORTING.md` before applying its migration.
 
 It adds:
 
@@ -321,6 +321,38 @@ npm run build
 
 The complete approved NHS dm+d import remains outstanding. R8 does not alter the shared catalogue or add integrations.
 
+## Requirement 9a: NHS dm+d catalogue import and synchronisation
+
+Requirement 9a is implemented on the integration branch and awaits database-backed verification with an approved extracted NHS dm+d release. Read `DMD-CATALOGUE-SYNCHRONISATION.md` before applying its migration or importing data.
+
+It adds:
+
+- a streaming, non-network XML reader for all five dm+d concept levels;
+- official identifier, description, status and product-hierarchy synchronisation;
+- separate controlled-drug category and AMPP/GTIN file support;
+- explicit historic replacement links without rewriting prescription identity;
+- append-only release provenance with SHA-256, dry runs and sanitised failure events;
+- duplicate-release, unexpectedly-small-release, DTD, symbolic-link and malformed-identifier safeguards;
+- transactional batched catalogue updates and a dedicated feature suite.
+
+Apply and validate only:
+
+```bash
+php artisan migrate --path=database/migrations/2026_08_13_000007_create_frontend4_dmd_synchronisation.php
+php artisan test --filter=Frontend4DmdSynchronisationTest
+php artisan test --filter=Frontend4PrescriptionLifecycleTest
+php artisan test --filter=Frontend4HandoverIncidentTest
+php artisan test --filter=Frontend4AssuranceReportingTest
+php artisan test --filter=Frontend4ClientLifecycleTest
+php artisan test --filter=Frontend4AuthenticationIsolationTest
+php artisan test --filter=Frontend4AccessScopeTest
+php artisan test --filter=Frontend4PermissionTest
+npm test
+npm run build
+```
+
+The importer does not download TRUD content and contains no API key. The company-controlled TRUD account/subscription/key are separate from the NICE Syndication test key.
+
 ## Outstanding reminder
 
-The complete approved NHS dm+d catalogue data still needs to be imported into `medicine_catalogue`. The R6 structure and picker are complete, but no dm+d release was bundled or fabricated.
+The complete approved NHS dm+d release data still needs to be obtained through the company-controlled TRUD account, dry-run reviewed and imported into `medicine_catalogue`. Publishing Requirement 9a provides the importer; it does not claim the real catalogue data has already been loaded.
