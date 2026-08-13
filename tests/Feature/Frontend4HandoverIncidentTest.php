@@ -37,7 +37,8 @@ class Frontend4HandoverIncidentTest extends TestCase
         $administration->home_id = $service->id; $administration->mar_sheet_id = $sheet->id;
         $administration->date = now()->toDateString(); $administration->time_slot = now()->format('H:i');
         $administration->administered_at = now(); $administration->given = 0; $administration->code = 'R';
-        $administration->reason = 'Person declined after support was offered'; $administration->is_current = 1;
+        $administration->reason = 'Person declined after support was offered'; $administration->administered_by = $user->id;
+        $administration->is_current = 1;
         $administration->save();
 
         $handover = app(HandoverIncidentService::class)->createDraft((int) $service->admin_id, (int) $service->id, null,
