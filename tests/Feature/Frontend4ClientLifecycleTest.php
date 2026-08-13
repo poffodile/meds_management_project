@@ -129,7 +129,10 @@ class Frontend4ClientLifecycleTest extends TestCase
     {
         [$user, $service] = $this->userAndService();
         $client = $this->clientFor($service, $user);
-        $client->update(['lifecycle_status' => 'inactive', 'status' => 0, 'is_deleted' => 0]);
+        $client->lifecycle_status = 'inactive';
+        $client->status = 0;
+        $client->is_deleted = 0;
+        $client->save();
         session($this->sessionFor($user, $service));
 
         $this->assertNotContains((int) $client->id, app(AccessContext::class)->allowedClientIds($user));
