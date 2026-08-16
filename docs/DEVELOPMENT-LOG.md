@@ -819,3 +819,27 @@ Front-end build + PHP lint clean throughout. Decisions recorded in the decision 
 - A few **workflow questions** still open (when a round officially "starts", two carers at once, how late counts as overdue, etc.).
 
 **Things the owner told us:** carers do **one resident at a time**; **controlled drugs always need a witness**; barcode scanners are a "later" idea.
+
+---
+
+## 2026-08-16 — Frontend 4 backend verification (branch `care-one-integration`)
+
+Working as the **local database verifier** for the Frontend 4 backend. Another engineer builds each numbered Requirement and publishes it; I pull it onto this machine, apply just that requirement's database change, run the test suites against the local database (never production), and report back the full results plus a plain diagnosis of anything that fails.
+
+**Verified working so far (all green locally):**
+- R2 / R2b — login (organisation → username/password → pick service)
+- R3 — role permissions
+- R4 — organisation / service / location data separation
+- R5 — real client records + lifecycle (create, archive-not-delete, restore, transfer request)
+- R6 — medicine-catalogue-backed prescriptions (create, amend keeping the same MAR, pause/resume/stop, controlled-drug flag only from the catalogue)
+- R7 — shift handover + medication incident reporting
+- R8 — manager assurance + reports, with controlled CSV export (identifiable vs summary, mandatory reason, audited)
+- R9a — NHS dm+d medicine-catalogue importer (verified against test data only)
+
+Latest verified commit: `173ad2fe`. Total: 65 backend tests + 22 front-end tests passing, nothing failing.
+
+**Bumps found and fixed along the way** (each fixed by the other engineer after I pinpointed it): a client-lifecycle test used the wrong save style; a handover controller method was declared too privately (crashed the class); a handover test forgot to record who administered a dose; a navigation test wasn't updated when the Handover page shipped; the CSV export crashed inside old shared "prevent back button" code (fixed by returning a normal download); and the dm+d importer rejected controlled-drug info that sits *inside* each medicine record — the same shape the real NHS files use, so that one mattered beyond the test.
+
+**Still to do:** load the **real** NHS dm+d release (importer proven on synthetic data only — dry-run first, no `--allow-small` for real data); await the next requirement handoff.
+
+**Resume note:** see memory `care-one-integration-verification.md` for the exact restart steps (MySQL/PHP server commands) and the per-requirement checking loop.
