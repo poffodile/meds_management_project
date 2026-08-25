@@ -843,3 +843,104 @@ Latest verified commit: `173ad2fe`. Total: 65 backend tests + 22 front-end tests
 **Still to do:** load the **real** NHS dm+d release (importer proven on synthetic data only — dry-run first, no `--allow-small` for real data); await the next requirement handoff.
 
 **Resume note:** see memory `care-one-integration-verification.md` for the exact restart steps (MySQL/PHP server commands) and the per-requirement checking loop.
+
+## 2026-08-25 — Record7 Section 0 (access) scaffolded on its own branch
+
+Started Record7 as a genuinely separate, fifth front end inside the same
+repository. New branch `record7-section0-access`, based on
+`care-one-integration` (commit 87baa07a) because that is the only branch with
+the verified authentication, permissions, organisation/service scoping and
+database migrations. The old `record7-section0-access` on the remote was an
+empty branch pointing at `main`, so nothing was lost by starting again.
+
+**What Record7 is.** Its own sign-in journey, its own screens, its own design
+system. It reuses the verified *backend* — the same accounts, the same
+database, the same security services — and reuses none of the Frontend 4 UI.
+
+**Its own design system, from scratch.** IBM Plex Sans and Mono, a bone-paper
+ground with graphite ink and a single muted moss accent, squarer corners and
+hairline rules. Deliberately unlike Frontend 4's warm cream, navy and teal set
+in Manrope and Plus Jakarta. No token, colour, component or layout was copied.
+
+**Everything new lives in Record7's own places:** `/record7` routes,
+`resources/js/r7.jsx`, `resources/js/R7Pages/`, `resources/js/record7/`,
+`resources/css/record7/r7.css`, `resources/views/r7.blade.php`,
+`app/Http/Controllers/Record7/`, `tests/Feature/Record7/`. All CSS is scoped
+under `.r7-root`, and a test parses the stylesheet and fails the build on any
+unscoped selector, including inside a media query.
+
+**Only two shared files were touched, both append-only:** a route block at the
+end of `routes/web.php`, and one entry plus one alias in `vite.config.js`.
+Middleware is referenced by class name rather than a Kernel alias, so even
+`app/Http/Kernel.php` needed no change. No legacy page, no Frontend 3, no
+Frontend 4 file was modified — the f4 bundle builds to exactly the same size
+as before.
+
+**Two real problems found and fixed while building.**
+
+1. The globally shared Inertia props exempt `/frontend4` but not `/record7`, so
+   the legacy home switcher ran against Record7 and crashed the page — it
+   selects a column the `home` table does not have. Fixed inside Record7's own
+   layout call, so the shared middleware stays untouched.
+2. A role-caching bug. Laravel stores the controller instance on the Route
+   object, and the route collection outlives a single request whenever the
+   application is reused. Caching the resolved role on the controller with a
+   plain "already resolved?" check therefore served the first user's role to
+   every later user of the same route — a carer signing in after a manager was
+   handed the manager's permission set. Record7 keys the cache to the user id.
+   Worth knowing: `F4Controller` has the same pattern. It is harmless in
+   production, where each request is a fresh application, but it is a trap.
+
+**Tests:** Record7 24 passed. Frontend 4 still exactly 64 passed, unchanged.
+JavaScript 22 passed. Production build clean.
+
+**Still to do:** run the fictional-data seeder (it needs a password you type),
+then look at the screens. Nothing is committed yet.
+
+## 2026-08-25 (later) — Record7 Section 0 completed on its own database
+
+Section 0.1 to 0.10 is built, against the supplied Omega Care Group test-data
+package rather than any invented fixture.
+
+**Its own database.** Record7 no longer borrows the legacy schema. It has a
+separate connection and two separate databases, record7_local and record7_test,
+holding sixteen record7_* tables. Nothing fictional was added to the existing
+Omega Care Group database, and a Record7 model cannot reach a legacy table —
+there is a test that proves it.
+
+**What the ten sections now do.** Organisation matching that collapses repeated
+spaces and never lists organisations. Credentials checked only inside that
+organisation. A security verification step, after which the session actually
+begins. House selection that opens the only house automatically, requires a
+choice when there are several, and refuses an inactive one such as Willow House
+even by id. Authorisation resolved through five layers in order: account state,
+service access, access type, per-user allow and deny rules, then competency.
+First-time activation from an invitation. Password recovery that answers the
+same way whether the account exists or not. Locked, suspended, expired, invited
+and time-expired states all refused before any house is revealed. A lock screen
+that keeps the session and the house and asks only for the password. And an
+append-only access audit with a manager's screen, scoped to the houses the
+reader can actually reach.
+
+**Append-only means append-only.** The audit table carries BEFORE UPDATE and
+BEFORE DELETE triggers that raise in MySQL, the model refuses both in PHP, and
+each event stores the uuid of the one before it, so a row removed some other way
+leaves a visible break rather than a silent hole. All three are tested.
+
+**The look is now the documented direction.** Sora headings, Outfit body,
+Midnight Mineral on warm cream, mobile first, and every dot separator removed.
+The IBM Plex and cool ledger styling is gone. There is a test that fails the
+build if a Record7 file reintroduces a dot separator or the wrong typeface.
+
+**Two real problems found and fixed while building.** The shared Inertia props
+were publishing the permission list onto the lock screen, which a locked device
+should not carry — fixed by not sharing context there. And a stale public/hot
+from 20 August was pointing every front end at a Vite dev server that is not
+running, which would have rendered the pages blank in a browser; it has been
+moved aside so the built assets are used.
+
+**Tests.** Record7 108 passed. Frontend 4 still exactly 64, unchanged.
+JavaScript 22. Production build clean.
+
+**Not done, deliberately.** The Frontend 4 role-cache issue (R7-ISSUE-001) is
+recorded but not fixed. Nothing is committed.

@@ -1,0 +1,273 @@
+/* ============================================================================
+   Record7 — design tokens
+
+   THE SINGLE SOURCE OF TRUTH FOR EVERY RECORD7 SCREEN.
+
+   Change a value here and every Record7 screen that uses it changes. No
+   Record7 page, component or stylesheet may contain a hard-coded colour,
+   size, spacing, radius or shadow — Record7DesignSystemTest reads the source
+   and fails the build if one appears.
+
+   THE DOCUMENTED DIRECTION
+   Sora for headings, Outfit for body and interface text, Midnight Mineral
+   colours on warm cream surfaces, premium warm-professional, mobile first.
+
+   WHAT MIDNIGHT MINERAL MEANS
+   A deep midnight blue carrying a mineral green-blue undertone, warmed by the
+   cream it sits on. Midnight is the ink; its lighter mineral cousin is the one
+   accent. Nothing else is saturated. The warmth comes from the ground and the
+   hairlines rather than a second bright hue, and that is what keeps it
+   professional rather than decorative.
+
+   NAMING
+     --r7-colour-*    brand and accent hues
+     --r7-surface-*   things you put content on
+     --r7-text-*      things you write with
+     --r7-border-*    hairlines and edges
+     --r7-state-*     success, warning, error, information
+     --r7-space-*     spacing scale
+     --r7-radius-*    corner radius
+     --r7-shadow-*    elevation
+     --r7-font-*      families
+     --r7-size-*      type scale
+     --r7-weight-*    weights
+     --r7-leading-*   line heights
+     --r7-focus-*     focus treatment
+     --r7-control-*   interactive sizing
+
+   NO DOT SEPARATORS ANYWHERE
+   Groups are separated by space, a hairline, or by being separate elements.
+
+   Everything is scoped under .r7-root. See r7.css for the isolation rule.
+   ========================================================================= */
+
+.r7-root {
+
+  /* ══ COLOUR ═════════════════════════════════════════════════════════════
+     The brand hues. Surfaces and text derive from these but are named
+     separately, so a screen asks for "the page" rather than for a hex.      */
+
+  --r7-colour-primary:        #142330;  /* midnight — the ink and the mark  */
+  --r7-colour-primary-strong: #0B141D;
+  --r7-colour-primary-soft:   #1E3240;
+
+  --r7-colour-accent:         #2C6070;  /* mineral — links, focus, emphasis */
+  --r7-colour-accent-strong:  #1F4A57;
+  --r7-colour-accent-soft:    #E9F0F1;
+  --r7-colour-accent-border:  #C2D6DA;
+
+  /* ══ SURFACE ════════════════════════════════════════════════════════════ */
+
+  --r7-surface-page:     #FAF4E9;  /* warm cream — the page itself          */
+  --r7-surface-raised:   #FFFCF5;  /* cards, panels, inputs                 */
+  --r7-surface-sunken:   #F2EADB;  /* wells, table heads, quiet rows        */
+  --r7-surface-accent:   #E9F0F1;  /* tinted, for accent regions            */
+  --r7-surface-overlay:  rgba(20, 35, 48, .42);  /* behind a modal          */
+
+  /* The one strong filled surface: primary buttons, the brand tile, the
+     selected filter. Kept SEPARATE from --r7-colour-primary on purpose —
+     primary is also the ink, and on the dark theme the ink becomes the page.
+     A filled control that borrowed it would be invisible. */
+  --r7-surface-solid:        #142330;
+  --r7-surface-solid-hover:  #1F4A57;
+  --r7-surface-solid-active: #0B141D;
+
+  /* ══ TEXT ═══════════════════════════════════════════════════════════════ */
+
+  --r7-text-primary:    #142330;  /* body and headings                      */
+  --r7-text-secondary:  #56656F;  /* supporting copy                        */
+  --r7-text-muted:      #8B98A0;  /* labels, timestamps, placeholders       */
+  --r7-text-on-solid:   #FDF9F1;  /* on --r7-surface-solid                  */
+  --r7-text-accent:     #1F4A57;  /* links on cream                         */
+
+  /* ══ BORDER ═════════════════════════════════════════════════════════════ */
+
+  --r7-border-subtle:  #E8DCC7;  /* the standard warm hairline              */
+  --r7-border-strong:  #D5C4A6;  /* input edges, emphasis                   */
+  --r7-border-width:   1px;
+  --r7-border-emphasis-width: 3px;  /* the left rule on a notice            */
+
+  /* ══ STATE ══════════════════════════════════════════════════════════════
+     Muted, and never the only signal — every state is also named in words.  */
+
+  --r7-state-success:         #2E6B50;
+  --r7-state-success-surface: #E7F0E9;
+  --r7-state-success-border:  #A9C7B5;
+
+  --r7-state-warning:         #8A6416;
+  --r7-state-warning-surface: #F7EFDC;
+  --r7-state-warning-border:  #D9BE86;
+
+  --r7-state-error:           #9C4030;
+  --r7-state-error-surface:   #F7E7E2;
+  --r7-state-error-border:    #DBAA9C;
+
+  --r7-state-info:            #2C6070;
+  --r7-state-info-surface:    #E9F0F1;
+  --r7-state-info-border:     #C2D6DA;
+
+  /* Safety warnings are louder than an error on purpose: an error is
+     something that went wrong, a safety warning is something that could
+     harm someone. */
+  --r7-state-danger:          #8C2F22;
+  --r7-state-danger-surface:  #F6E2DD;
+  --r7-state-danger-border:   #C98A7B;
+
+  /* ══ TYPOGRAPHY ═════════════════════════════════════════════════════════ */
+
+  --r7-font-display: "Sora", "Outfit", "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+  --r7-font-body:    "Outfit", "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+
+  /* Comfortably sized, as the direction asks. 17px base — this is read on a
+     phone, in a corridor, sometimes through reading glasses. */
+  --r7-size-2xs:  12px;
+  --r7-size-xs:   13px;
+  --r7-size-sm:   15px;
+  --r7-size-base: 17px;
+  --r7-size-md:   19px;
+  --r7-size-lg:   23px;
+  --r7-size-xl:   28px;
+  --r7-size-2xl:  34px;
+  --r7-size-3xl:  42px;
+
+  --r7-weight-light:  300;
+  --r7-weight-normal: 400;
+  --r7-weight-medium: 500;
+  --r7-weight-semi:   600;
+  --r7-weight-bold:   700;
+
+  --r7-leading-tight: 1.18;
+  --r7-leading-snug:  1.35;
+  --r7-leading-body:  1.6;
+
+  --r7-tracking-tight: -.022em;
+  --r7-tracking-label:  .09em;
+
+  /* ══ SPACE ══════════════════════════════════════════════════════════════ */
+
+  --r7-space-1:  4px;
+  --r7-space-2:  8px;
+  --r7-space-3: 12px;
+  --r7-space-4: 16px;
+  --r7-space-5: 24px;
+  --r7-space-6: 32px;
+  --r7-space-7: 44px;
+  --r7-space-8: 64px;
+  --r7-space-9: 96px;
+
+  /* ══ RADIUS ═════════════════════════════════════════════════════════════ */
+
+  --r7-radius-sm:   6px;
+  --r7-radius-md:  10px;
+  --r7-radius-lg:  16px;
+  --r7-radius-xl:  22px;
+  --r7-radius-pill: 999px;
+
+  /* ══ SHADOW ═════════════════════════════════════════════════════════════
+     Warm, low, never theatrical.                                           */
+
+  --r7-shadow-sm: 0 1px 2px rgba(20, 35, 48, .05);
+  --r7-shadow-md: 0 4px 16px rgba(20, 35, 48, .07), 0 1px 3px rgba(20, 35, 48, .05);
+  --r7-shadow-lg: 0 12px 32px rgba(20, 35, 48, .10), 0 2px 6px rgba(20, 35, 48, .06);
+
+  /* ══ FOCUS AND HOVER ════════════════════════════════════════════════════
+     Focus is never removed, only shaped. Two rings so it reads on any
+     surface: the page colour first, then the accent.                       */
+
+  --r7-focus-colour: var(--r7-colour-accent);
+  --r7-focus-ring: 0 0 0 2px var(--r7-surface-page), 0 0 0 4px var(--r7-focus-colour);
+  --r7-focus-offset: 2px;
+
+  --r7-hover-tint:  var(--r7-surface-sunken);
+  --r7-hover-border: var(--r7-colour-accent);
+
+  /* ══ CONTROLS ═══════════════════════════════════════════════════════════
+     Gloved hands, phones, a moving corridor. 48px is the floor.            */
+
+  --r7-control-height:       48px;
+  --r7-control-height-small: 40px;
+  --r7-control-padding-x:    var(--r7-space-5);
+
+  /* ══ MOTION ═════════════════════════════════════════════════════════════ */
+
+  --r7-motion-fast: 120ms cubic-bezier(.32, .06, .18, 1);
+  --r7-motion:      160ms cubic-bezier(.32, .06, .18, 1);
+
+  /* ══ LAYOUT ═════════════════════════════════════════════════════════════ */
+
+  --r7-measure:      62ch;   /* readable line length                        */
+  --r7-width-card:      440px;
+  --r7-width-card-wide: 620px;
+  --r7-width-app:      1140px;
+  --r7-width-sidebar:   248px;
+}
+
+/* ══ DARK ═══════════════════════════════════════════════════════════════════
+   Midnight becomes the ground and the cream becomes the ink. The accent lifts
+   so it still carries on a dark surface. ONLY tokens change below — no
+   component has a second set of rules.
+
+   WHY THIS IS A CHOICE AND NOT THE OPERATING SYSTEM'S
+   The documented direction is warm cream, so warm cream is what Record7 shows
+   by default on every device. Arriving at a medicines product in an unexpected
+   colour scheme is disorienting, and it is not the look that was signed off.
+   Dark is offered because night shifts are real, but a person turns it on and
+   Record7 remembers it on that device.
+   ========================================================================= */
+
+.r7-root[data-theme="dark"] {
+
+  --r7-colour-primary:        #0E1922;
+  --r7-colour-primary-strong: #060D13;
+  --r7-colour-primary-soft:   #17262F;
+
+  --r7-colour-accent:         #7FB2BE;
+  --r7-colour-accent-strong:  #9BC6D0;
+  --r7-colour-accent-soft:    #16262C;
+  --r7-colour-accent-border:  #2E4A53;
+
+  --r7-surface-page:     #0E1922;
+  --r7-surface-raised:   #16232C;
+  --r7-surface-sunken:   #1C2A34;
+  --r7-surface-accent:   #16262C;
+  --r7-surface-overlay:  rgba(0, 0, 0, .58);
+
+  /* Lifts to the accent, with deep midnight text on it. Either way a filled
+     control reads as a control. */
+  --r7-surface-solid:        #7FB2BE;
+  --r7-surface-solid-hover:  #9BC6D0;
+  --r7-surface-solid-active: #6FA3AF;
+
+  --r7-text-primary:    #F0E9DC;
+  --r7-text-secondary:  #A9B4BC;
+  --r7-text-muted:      #7A868F;
+  --r7-text-on-solid:   #0E1922;
+  --r7-text-accent:     #9BC6D0;
+
+  --r7-border-subtle:  #253440;
+  --r7-border-strong:  #354855;
+
+  --r7-state-success:         #7FB394;
+  --r7-state-success-surface: #16241C;
+  --r7-state-success-border:  #35573F;
+
+  --r7-state-warning:         #CFA458;
+  --r7-state-warning-surface: #262013;
+  --r7-state-warning-border:  #574828;
+
+  --r7-state-error:           #D18874;
+  --r7-state-error-surface:   #291815;
+  --r7-state-error-border:    #5C332A;
+
+  --r7-state-info:            #7FB2BE;
+  --r7-state-info-surface:    #16262C;
+  --r7-state-info-border:     #2E4A53;
+
+  --r7-state-danger:          #E09480;
+  --r7-state-danger-surface:  #2E1712;
+  --r7-state-danger-border:   #6B3225;
+
+  --r7-shadow-sm: 0 1px 2px rgba(0, 0, 0, .40);
+  --r7-shadow-md: 0 4px 16px rgba(0, 0, 0, .45), 0 1px 3px rgba(0, 0, 0, .30);
+  --r7-shadow-lg: 0 12px 32px rgba(0, 0, 0, .50), 0 2px 6px rgba(0, 0, 0, .35);
+}

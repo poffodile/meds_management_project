@@ -6,11 +6,17 @@ import { fileURLToPath, URL } from 'node:url';
 export default defineConfig({
     plugins: [
         laravel({
-            // Three independent entries. app.jsx is frontend1/frontend2; f3.jsx is
-            // frontend3 and f4.jsx is frontend4, and neither shares anything with
-            // it — each has its own theme, its own stylesheet, its own page
-            // directory. Adding an entry here does not change the other bundles.
-            input: ['resources/js/app.jsx', 'resources/js/f3.jsx', 'resources/js/f4.jsx'],
+            // Four independent entries. app.jsx is frontend1/frontend2; f3.jsx is
+            // frontend3, f4.jsx is frontend4 and r7.jsx is Record7, and none
+            // shares anything with the others — each has its own theme, its own
+            // stylesheet, its own page directory. Adding an entry here does not
+            // change the other bundles.
+            input: [
+                'resources/js/app.jsx',
+                'resources/js/f3.jsx',
+                'resources/js/f4.jsx',
+                'resources/js/r7.jsx',
+            ],
             refresh: true,
         }),
         react(),
@@ -28,6 +34,11 @@ export default defineConfig({
             // /frontend4 — import via '@frontend4/...'. Same rule as above:
             // nothing outside may import from here, and vice versa.
             '@frontend4': fileURLToPath(new URL('./frontend4', import.meta.url)),
+            // Record7 — its own components, hooks and design system, under
+            // resources/js/record7. Import via '@record7/...'. Record7 imports
+            // from none of the aliases above and none of them may import from
+            // it: that mutual ban is what keeps the four front ends separable.
+            '@record7': fileURLToPath(new URL('./resources/js/record7', import.meta.url)),
         },
     },
     server: {

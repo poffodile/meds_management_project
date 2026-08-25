@@ -26,6 +26,10 @@
              otherwise DROP the working database. force="true" so this wins over .env.
              Re-clone with:  mysqldump laravel | mysql laravel_test  -->
         <env name="DB_DATABASE" value="laravel_test" force="true"/>
+        <!-- Record7 keeps its own database, and its tests keep their own copy of it. -->
+        <env name="RECORD7_DB_DATABASE" value="record7_test" force="true"/>
+        <env name="RECORD7_PROTOTYPE_MFA_CODE" value="246810" force="true"/>
+        <env name="RECORD7_ALLOW_FIXTURE_SEED" value="true" force="true"/>
         <env name="MAIL_MAILER" value="array"/>
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>

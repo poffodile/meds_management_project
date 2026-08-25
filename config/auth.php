@@ -46,6 +46,13 @@ return [
             'driver' => 'session',
             'provider' => 'frontend4_users',
         ],
+        // Record7 keeps a third, entirely separate identity — its own accounts
+        // in its own database. It shares no login with the legacy system or
+        // with Frontend 4, and neither of those is affected by this guard.
+        'record7' => [
+            'driver' => 'session',
+            'provider' => 'record7_users',
+        ],
     ],
 
     /*
@@ -73,6 +80,10 @@ return [
         'frontend4_users' => [
             'driver' => 'eloquent',
             'model' => App\Models\Frontend4User::class,
+        ],
+        'record7_users' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Record7\User::class,
         ],
 
         // 'users' => [

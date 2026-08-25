@@ -3175,3 +3175,93 @@ Route::get('/roster/schedule-shift/form_template/view/{schedule_shift_id}', [Sch
 Route::post('/roster/schedule-shift/form_template/save', [ScheduleShiftController::class, 'scheduleShiftFormSave'])->name('web.roster.schedule_shift.form.save');
 Route::post('/roster/schedule-shift/form_template/fetch', [ScheduleShiftController::class, 'scheduleShiftFormFetch'])->name('web.roster.schedule_shift.form.fetch');
 
+
+
+/*
+|--------------------------------------------------------------------------
+| Record7
+|--------------------------------------------------------------------------
+|
+| Record7's entire route table, appended and never interleaved. Nothing above
+| this line is touched, and deleting this block removes Record7 completely.
+|
+| Deliberately outside the legacy checkUserAuth group and separate from the
+| /frontend4 block. Nothing here changes /login, /logout, /admin/login, the
+| existing APIs, or any Frontend 3 or Frontend 4 route.
+|
+| Middleware is referenced by class name rather than a Kernel alias, so
+| Record7 needs no entry in app/Http/Kernel.php.
+|
+| GATES
+|   (open)      organisation, credentials, activation, password recovery
+|   Pending     password proven, second factor not yet given
+|   Identity    signed in, no house chosen yet
+|   Authenticate signed in, verified, house chosen, not locked
+|   Authorize   a named permission, checked in the current house
+|
+*/
+
+use App\Http\Controllers\Record7\AuditController as R7Audit;
+use App\Http\Controllers\Record7\HouseController as R7House;
+use App\Http\Controllers\Record7\SessionController as R7Session;
+use App\Http\Controllers\Record7\SignInController as R7SignIn;
+use App\Http\Controllers\Record7\TodayController as R7Today;
+use App\Http\Middleware\Record7\Authenticate as R7Authenticate;
+use App\Http\Middleware\Record7\Authorize as R7Authorize;
+use App\Http\Middleware\Record7\Identity as R7Identity;
+use App\Http\Middleware\Record7\PendingVerification as R7Pending;
+
+Route::prefix('record7')->name('record7.')->group(function () {
+
+    /* 0.1 + 0.2 — organisation, then credentials. Open to anyone. */
+    Route::get('/login', [R7SignIn::class, 'show'])->name('login');
+    Route::post('/login/organisation', [R7SignIn::class, 'chooseOrganisation'])
+        ->middleware('throttle:12,1')->name('login.organisation');
+    Route::post('/login/credentials', [R7SignIn::class, 'credentials'])
+        ->middleware('throttle:8,1')->name('login.credentials');
+
+    /* 0.6 — first-time activation. Open: the person has no password yet. */
+    Route::get('/activate/{token}', [R7SignIn::class, 'showActivation'])
+        ->middleware('throttle:20,1')->name('activate.show');
+    Route::post('/activate/{token}', [R7SignIn::class, 'activate'])
+        ->middleware('throttle:10,1')->name('activate.store');
+
+    /* 0.7 — password recovery. Open, and rate limited hard. */
+    Route::get('/forgot-password', [R7SignIn::class, 'showForgotPassword'])->name('password.request');
+    Route::post('/forgot-password', [R7SignIn::class, 'sendResetLink'])
+        ->middleware('throttle:5,1')->name('password.email');
+    Route::get('/reset-password/{token}', [R7SignIn::class, 'showResetPassword'])
+        ->middleware('throttle:20,1')->name('password.reset');
+    Route::post('/reset-password/{token}', [R7SignIn::class, 'resetPassword'])
+        ->middleware('throttle:10,1')->name('password.update');
+
+    /* 0.3 — security verification. Partial authentication only. */
+    Route::middleware(R7Pending::class)->group(function () {
+        Route::get('/verify', [R7SignIn::class, 'showVerification'])->name('verify');
+        Route::post('/verify', [R7SignIn::class, 'verify'])
+            ->middleware('throttle:10,1')->name('verify.check');
+    });
+
+    /* 0.4 + 0.9 — house choice, locking and sign-out need identity only. */
+    Route::middleware(R7Identity::class)->group(function () {
+        Route::get('/houses', [R7House::class, 'index'])->name('houses');
+        Route::post('/houses', [R7House::class, 'choose'])
+            ->middleware('throttle:30,1')->name('houses.choose');
+
+        Route::get('/locked', [R7Session::class, 'showLock'])->name('lock');
+        Route::post('/lock', [R7Session::class, 'lock'])->name('lock.now');
+        Route::post('/unlock', [R7Session::class, 'unlock'])
+            ->middleware('throttle:10,1')->name('unlock');
+        Route::post('/sign-out', [R7Session::class, 'signOut'])->name('signout');
+    });
+
+    /* Scoped to a house, re-checked every request. */
+    Route::middleware(R7Authenticate::class)->group(function () {
+        Route::get('/', [R7Today::class, 'index'])
+            ->middleware(R7Authorize::class.':view_dashboard')->name('today');
+
+        /* 0.10 — the manager access-audit screen. */
+        Route::get('/access-audit', [R7Audit::class, 'index'])
+            ->middleware(R7Authorize::class.':view_access_audit')->name('audit');
+    });
+});
