@@ -51,7 +51,13 @@ class Record7HouseAccessTest extends Record7TestCase
 
         $willow = Service::where('name', 'Willow House')->firstOrFail();
 
-        $this->post('/record7/houses', ['house_id' => $willow->id])->assertForbidden();
+        // Refused with an inline message rather than a bare 403 page, but
+        // refused all the same: the house is never opened.
+        $this->post('/record7/houses', ['house_id' => $willow->id])
+            ->assertRedirect()
+            ->assertSessionHas('error');
+
+        $this->assertNull(session(\App\Services\Record7\SessionManager::SERVICE));
     }
 
     public function test_a_house_the_account_does_not_hold_is_refused_and_audited(): void
@@ -60,7 +66,14 @@ class Record7HouseAccessTest extends Record7TestCase
         $this->signIn('noah.williams');
 
         $this->post('/record7/houses', ['house_id' => $this->house('Rosewood House')->id])
-            ->assertForbidden();
+            ->assertRedirect()
+            ->assertSessionHas('error');
+
+        // Refused means refused: Rosewood is not the open house.
+        $this->assertNotSame(
+            $this->house('Rosewood House')->id,
+            session(\App\Services\Record7\SessionManager::SERVICE)
+        );
 
         $event = AccessAuditEvent::where('event_type', 'house_selection')
             ->where('event_result', 'denied')->latest('id')->first();

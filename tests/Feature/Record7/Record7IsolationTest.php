@@ -72,6 +72,11 @@ class Record7IsolationTest extends TestCase
             $this->assertFileExists($path);
 
             $css = $this->withoutComments(file_get_contents($path));
+
+            // Keyframe stops (0%, 50%, 100%) are not element selectors and
+            // cannot carry a scope, so the animation blocks come out first.
+            $css = preg_replace('/@keyframes[^{]*\{(?:[^{}]*\{[^{}]*\})*[^{}]*\}/s', '', $css);
+
             $unscoped = [];
 
             preg_match_all('/([^{}]*)\{/', $css, $matches);
@@ -128,9 +133,9 @@ class Record7IsolationTest extends TestCase
     {
         $tokens = file_get_contents(resource_path('css/record7/r7-tokens.css'));
 
-        $this->assertStringContainsString('--r7-midnight', $tokens);
-        $this->assertStringContainsString('--r7-mineral', $tokens);
-        $this->assertMatchesRegularExpression('/--r7-page:\s*#FAF4E9/i', $tokens,
+        $this->assertStringContainsString('--r7-colour-primary', $tokens);
+        $this->assertStringContainsString('--r7-colour-accent', $tokens);
+        $this->assertMatchesRegularExpression('/--r7-surface-page:\s*#FAF4E9/i', $tokens,
             'The page ground must be the documented warm cream');
     }
 

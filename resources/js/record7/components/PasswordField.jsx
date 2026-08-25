@@ -1,3 +1,4 @@
+import InlineError from './InlineError.jsx';
 import React, { useId, useState } from 'react';
 
 /**
@@ -53,7 +54,7 @@ export default function PasswordField({
                 </button>
             </span>
 
-            {error ? <span className="r7-field__error" id={errorId}>{error}</span> : null}
+            {error ? <InlineError id={errorId}>{error}</InlineError> : null}
         </div>
     );
 }

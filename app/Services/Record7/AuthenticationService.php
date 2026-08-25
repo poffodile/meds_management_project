@@ -6,6 +6,7 @@ use App\Models\Record7\AccountInvitation;
 use App\Models\Record7\MfaMethod;
 use App\Models\Record7\Organisation;
 use App\Models\Record7\PasswordReset;
+use App\Models\Record7\RecoveryCode;
 use App\Models\Record7\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -97,23 +98,84 @@ class AuthenticationService
     /* ── Security verification, Section 0.3 ──────────────────────────────── */
 
     /**
-     * The verification code accepted by this environment.
+     * The fixed verification code this environment will accept.
      *
-     * PROTOTYPE ONLY. The supplied test package fixes the code at 246810 so the
-     * journey can be walked locally without a real second factor. Production
-     * must issue a real challenge; config('record7.mfa.prototype_code') is
-     * deliberately null unless RECORD7_PROTOTYPE_MFA_CODE is set, and
-     * verifyCode() refuses every code when it is null.
+     * LOCAL DEVELOPMENT ONLY, AND IMPOSSIBLE IN PRODUCTION.
+     *
+     * The supplied Section 0 package fixes a code so the journey can be walked
+     * without a real second factor. Three independent conditions must all hold
+     * before it is honoured, so no single mistake can carry it into a live
+     * deployment:
+     *
+     *   1. The environment must not be production.
+     *   2. config('record7.mfa.allow_prototype_code') must be explicitly true.
+     *   3. RECORD7_PROTOTYPE_MFA_CODE must be set to a value.
+     *
+     * When any of those fails this returns null, and verifyCode() then refuses
+     * EVERY code rather than falling back to something permissive. A deployment
+     * that forgets to configure real verification fails closed.
      */
+    /**
+     * Which verification mode this environment is running in.
+     *
+     * A live system is always 'production', whatever configuration says. The
+     * mode is a development convenience and must never be able to switch
+     * verification off on a real deployment.
+     */
+    public function verificationMode(): string
+    {
+        if (app()->environment('production')) {
+            return 'production';
+        }
+
+        $mode = (string) config('record7.mfa.mode', 'off');
+
+        return in_array($mode, ['off', 'test', 'production'], true) ? $mode : 'off';
+    }
+
+    /** Is the verification step part of the journey at all? */
+    public function verificationStepEnabled(): bool
+    {
+        return $this->verificationMode() !== 'off';
+    }
+
+    /**
+     * Is there any real way to verify?
+     *
+     * No, and there will not be until an authenticator, a passkey or a
+     * delivery channel is integrated. In 'production' mode that means
+     * verification is demanded and then refuses everything, so nobody signs
+     * in. That is deliberate: an unfinished security control must fail closed
+     * rather than wave people through.
+     */
+    public function hasRealVerificationProvider(): bool
+    {
+        return false;
+    }
+
     public function prototypeCode(): ?string
     {
         if (app()->environment('production')) {
             return null;
         }
 
+        if ($this->verificationMode() !== 'test') {
+            return null;
+        }
+
+        if (! config('record7.mfa.allow_prototype_code')) {
+            return null;
+        }
+
         $code = config('record7.mfa.prototype_code');
 
         return is_string($code) && $code !== '' ? $code : null;
+    }
+
+    /** Is this environment running with the fictional code enabled? */
+    public function usingPrototypeCode(): bool
+    {
+        return $this->prototypeCode() !== null;
     }
 
     public function requiresVerification(User $user): bool
@@ -127,24 +189,85 @@ class AuthenticationService
             ->orderByDesc('is_primary')->orderBy('id')->first();
     }
 
+    /**
+     * Check a submitted code.
+     *
+     * Two ways in: the environment's fixed development code, or one of the
+     * person's own recovery codes. A real deployment configures neither, and
+     * this returns false for everything until a genuine method is wired in —
+     * which is the correct behaviour for a system that is not finished.
+     */
     public function verifyCode(User $user, string $code): bool
     {
+        $submitted = trim($code);
         $expected = $this->prototypeCode();
 
-        if ($expected === null) {
-            return false;
+        if ($expected !== null && hash_equals($expected, $submitted)) {
+            $this->stampMethod($user);
+
+            return true;
         }
 
-        if (! hash_equals($expected, trim($code))) {
-            return false;
-        }
+        return $this->consumeRecoveryCode($user, $submitted);
+    }
 
+    private function stampMethod(User $user): void
+    {
         $method = $this->primaryMethod($user);
 
         if ($method) {
             $method->last_verified_at = now();
+            $method->failed_attempts = 0;
             $method->save();
         }
+    }
+
+    /* ── Recovery codes ──────────────────────────────────────────────────── */
+
+    /**
+     * Issue a fresh set, replacing any that are left.
+     *
+     * Returned in plain text exactly once, here. Only hashes are stored, so a
+     * lost set cannot be recovered — it can only be replaced.
+     */
+    public function issueRecoveryCodes(User $user, int $count = 10): array
+    {
+        $user->recoveryCodes()->whereNull('used_at')->delete();
+
+        $codes = [];
+
+        for ($index = 0; $index < $count; $index++) {
+            // Grouped for reading aloud over the phone, which is how these
+            // actually get used when somebody is locked out mid-shift.
+            $plain = strtolower(Str::random(4).'-'.Str::random(4).'-'.Str::random(4));
+            $codes[] = $plain;
+
+            RecoveryCode::create([
+                'user_id' => $user->id,
+                'code_hash' => hash('sha256', $plain),
+                'issued_at' => now(),
+            ]);
+        }
+
+        return $codes;
+    }
+
+    /** Spend one recovery code. Each works once and once only. */
+    public function consumeRecoveryCode(User $user, string $plain): bool
+    {
+        $code = $user->recoveryCodes()
+            ->whereNull('used_at')
+            ->where('code_hash', hash('sha256', strtolower(trim($plain))))
+            ->first();
+
+        if (! $code) {
+            return false;
+        }
+
+        $code->used_at = now();
+        $code->save();
+
+        $this->stampMethod($user);
 
         return true;
     }

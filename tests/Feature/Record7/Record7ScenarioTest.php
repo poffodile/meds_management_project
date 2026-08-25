@@ -154,20 +154,29 @@ class Record7ScenarioTest extends Record7TestCase
     {
         $this->post('/record7/login/organisation', ['organisation' => self::ORGANISATION]);
 
-        $response = $this->from('/record7/login')->post('/record7/login/credentials', [
+        $this->post('/record7/login/credentials', [
             'username' => 'ethan.cole',
             'password' => self::PASSWORDS['ethan.cole'],
-        ]);
+        ])->assertRedirect('/record7/login');
 
         $this->assertFalse(Auth::guard('record7')->check());
-        $response->assertSessionHas('error', 'We could not sign you in with those details.');
 
-        // Nothing about Oakwood House, which is the house on his suspended row.
-        $this->assertStringNotContainsString('Oakwood', $response->getContent());
-        $this->assertStringNotContainsString('Oakwood', $this->get('/record7/login')->getContent());
+        $screen = $this->get('/record7/login')->assertOk();
 
-        // Refused with the correct password, so it is the account state and not
-        // the credentials that stopped him — and it is audited as high risk.
+        // His credentials are correct, so telling him they are wrong would be a
+        // lie that sends him round a password reset which cannot help.
+        $screen->assertSee('&quot;step&quot;:&quot;unavailable&quot;', false);
+        $screen->assertDontSee('We could not sign you in with those details.', false);
+
+        $content = $screen->getContent();
+
+        // And it reveals nothing about him.
+        foreach (['Oakwood', 'Rosewood', 'Meadow', 'Support Worker', 'suspended', 'Ethan'] as $secret) {
+            $this->assertStringNotContainsString($secret, $content,
+                'The unavailable screen must not reveal "'.$secret.'"');
+        }
+
+        // The precise reason is kept privately, in the audit, at high risk.
         $event = AccessAuditEvent::where('event_type', 'sign_in')
             ->where('event_result', 'denied')
             ->where('user_id', $this->user('ethan.cole')->id)
@@ -175,6 +184,25 @@ class Record7ScenarioTest extends Record7TestCase
 
         $this->assertSame('high', $event->risk_level);
         $this->assertSame('suspended', $event->metadata['refusal']);
+        $this->assertTrue($event->metadata['credentials_were_correct']);
+    }
+
+    /**
+     * The unavailable screen must NOT be reachable with a wrong password.
+     *
+     * Otherwise anyone could type a username with junk and learn from the
+     * different answer that the account exists.
+     */
+    public function test_a_wrong_password_on_a_suspended_account_gives_the_ordinary_refusal(): void
+    {
+        $this->post('/record7/login/organisation', ['organisation' => self::ORGANISATION]);
+
+        $this->from('/record7/login')->post('/record7/login/credentials', [
+            'username' => 'ethan.cole',
+            'password' => 'not-his-password',
+        ])->assertSessionHas('error', 'We could not sign you in with those details.');
+
+        $this->get('/record7/login')->assertDontSee('&quot;step&quot;:&quot;unavailable&quot;', false);
     }
 
     /** "Willow House is inactive and must not be selectable." */

@@ -8,6 +8,7 @@ use App\Services\Record7\AuditRecorder;
 use App\Services\Record7\AuthenticationService;
 use App\Services\Record7\OrganisationDirectory;
 use App\Services\Record7\SessionManager;
+use App\Services\Record7\VerificationPolicy;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
@@ -36,7 +37,8 @@ class SignInController extends R7Controller
         private readonly OrganisationDirectory $directory,
         private readonly AuthenticationService $auth,
         private readonly SessionManager $sessions,
-        private readonly AuditRecorder $audit
+        private readonly AuditRecorder $audit,
+        private readonly VerificationPolicy $verification
     ) {
     }
 
@@ -54,11 +56,16 @@ class SignInController extends R7Controller
             $this->forgetPendingOrganisation($request);
         }
 
+        // Shown once, then cleared: the credentials were right but the account
+        // cannot be used. Nothing identifying travels with it.
+        $unavailable = (bool) $request->session()->pull('record7.unavailable', false);
+
         $organisation = $this->pendingOrganisation($request);
 
         return Inertia::render('Auth/SignIn', [
-            'step' => $organisation ? 'credentials' : 'organisation',
-            'organisationName' => $organisation?->display_name,
+            'step' => $unavailable ? 'unavailable' : ($organisation ? 'credentials' : 'organisation'),
+            'organisationName' => $unavailable ? null : $organisation?->display_name,
+            'supportUrl' => config('record7.support_url'),
             'urls' => [
                 'organisation' => route('record7.login.organisation'),
                 'credentials' => route('record7.login.credentials'),
@@ -72,11 +79,29 @@ class SignInController extends R7Controller
 
     public function chooseOrganisation(Request $request)
     {
-        $data = $request->validate(['organisation' => ['required', 'string', 'max:255']]);
+        $data = $request->validate(
+            ['organisation' => ['required', 'string', 'max:255']],
+            [
+                'organisation.required' => 'Enter your organisation name to continue.',
+                'organisation.max' => 'That is too long to be an organisation name.',
+            ]
+        );
+
+        // Step one is rate limited on its own, so wrong organisation names do
+        // not eat the sign-in allowance the person needs a moment later.
+        $organisationThrottle = 'record7-organisation:'.$request->ip();
+
+        if (RateLimiter::tooManyAttempts($organisationThrottle, 12)) {
+            return back()->withInput()->with(
+                'error',
+                'That is several organisation names in a row. Please wait a minute and try again.'
+            );
+        }
 
         $organisation = $this->directory->match($data['organisation']);
 
         if (! $organisation) {
+            RateLimiter::hit($organisationThrottle, 60);
             $this->audit->record(
                 'organisation_not_recognised', AuditRecorder::FAILURE, null, null, null,
                 'An unrecognised organisation name was entered.', 'low',
@@ -85,8 +110,28 @@ class SignInController extends R7Controller
                 ['typed_length' => mb_strlen($data['organisation'])], $request
             );
 
-            return back()->withInput()->with('error', $this->auth->failureMessage());
+            /*
+             * AN HONEST MESSAGE HERE, A DELIBERATELY VAGUE ONE LATER.
+             *
+             * At this point nobody has offered a credential, only an
+             * organisation name, which is a business name rather than a secret.
+             * Telling someone their sign-in details are wrong before they have
+             * given any is confusing, and sends them off to check a password
+             * that was never the problem.
+             *
+             * The vagueness starts at the next step, where saying WHICH of the
+             * username and password was wrong would let somebody discover who
+             * works for an organisation. That is the enumeration that matters.
+             */
+            return back()->withInput()->with(
+                'error',
+                'We do not recognise that organisation name. Check the spelling with your '
+                .'manager. Capital letters and extra spaces do not matter, but the name itself '
+                .'must match.'
+            );
         }
+
+        RateLimiter::clear($organisationThrottle);
 
         $request->session()->put([
             SessionManager::PENDING_ORG => $organisation->id,
@@ -100,10 +145,16 @@ class SignInController extends R7Controller
 
     public function credentials(Request $request)
     {
-        $data = $request->validate([
-            'username' => ['required', 'string', 'max:255'],
-            'password' => ['required', 'string', 'max:1024'],
-        ]);
+        $data = $request->validate(
+            [
+                'username' => ['required', 'string', 'max:255'],
+                'password' => ['required', 'string', 'max:1024'],
+            ],
+            [
+                'username.required' => 'Enter your username.',
+                'password.required' => 'Enter your password.',
+            ]
+        );
 
         $organisation = $this->pendingOrganisation($request);
 
@@ -116,8 +167,14 @@ class SignInController extends R7Controller
             $organisation->id.'|'.Str::lower(trim($data['username'])).'|'.$request->ip());
 
         if (RateLimiter::tooManyAttempts($throttle, AuthenticationService::MAX_ATTEMPTS)) {
-            return back()->withInput($request->except('password'))
-                ->with('error', $this->auth->failureMessage());
+            // Telling somebody who is rate limited that their details are wrong
+            // is simply untrue, and they will keep trying. Tell them to wait.
+            return back()->withInput($request->except('password'))->with(
+                'error',
+                'Too many sign-in attempts for that username. Please wait '
+                .AuthenticationService::LOCK_MINUTES
+                .' minutes and try again, or reset your password.'
+            );
         }
 
         $user = $this->auth->findUser($organisation, $data['username']);
@@ -138,32 +195,55 @@ class SignInController extends R7Controller
         // a lock is a delay rather than a permanent state needing an admin.
         $this->auth->releaseExpiredLock($user);
 
-        // 0.8 — every restricted state is refused here, before anything about
-        // the person's houses is looked up, let alone shown.
-        if ($refusal = $user->accessRefusalReason()) {
-            RateLimiter::hit($throttle, AuthenticationService::LOCK_MINUTES * 60);
-            $this->audit->record(
-                'sign_in', AuditRecorder::DENIED, $user, $organisation->id, null,
-                $this->refusalReason($refusal),
-                in_array($refusal, ['suspended', 'security_locked'], true) ? 'high' : 'medium',
-                ['account_status' => $user->account_status, 'refusal' => $refusal], $request
-            );
-
-            return back()->withInput($request->except('password'))
-                ->with('error', $this->auth->failureMessage());
-        }
-
+        // THE PASSWORD IS CHECKED FIRST, AND THAT ORDER MATTERS.
+        //
+        // A wrong password gets the same answer whatever state the account is
+        // in, so nobody can type a username with junk and learn whether that
+        // account exists, is suspended or is locked. Only once the password is
+        // proven correct is anything said about the account — and at that point
+        // the person already holds valid credentials, so telling them their
+        // access is unavailable reveals nothing they could not already reach.
         if (! $this->auth->passwordMatches($user, $data['password'])) {
             RateLimiter::hit($throttle, AuthenticationService::LOCK_MINUTES * 60);
             $this->auth->registerFailure($user);
             $this->audit->record(
                 'sign_in', AuditRecorder::FAILURE, $user, $organisation->id, null,
                 'Incorrect password.', 'low',
-                ['failed_attempts' => $user->failed_attempts], $request
+                ['failed_attempts' => $user->failed_attempts, 'account_status' => $user->account_status],
+                $request
             );
 
             return back()->withInput($request->except('password'))
                 ->with('error', $this->auth->failureMessage());
+        }
+
+        // 0.8 — the credentials are right, but the account cannot be used.
+        //
+        // Telling this person their password was wrong would be a lie, and it
+        // sends them round a password-reset loop that cannot fix anything. They
+        // are told plainly that access is unavailable and who can help.
+        //
+        // What they are NOT told: which house they were assigned to, what role
+        // they held, what they could do, or that the word is "suspended". The
+        // precise reason goes to the access audit, where a manager can read it.
+        if ($refusal = $user->accessRefusalReason()) {
+            RateLimiter::hit($throttle, AuthenticationService::LOCK_MINUTES * 60);
+            $this->audit->record(
+                'sign_in', AuditRecorder::DENIED, $user, $organisation->id, null,
+                $this->refusalReason($refusal),
+                in_array($refusal, ['suspended', 'security_locked'], true) ? 'high' : 'medium',
+                [
+                    'account_status' => $user->account_status,
+                    'refusal' => $refusal,
+                    'credentials_were_correct' => true,
+                ],
+                $request
+            );
+
+            $this->forgetPendingOrganisation($request);
+            $request->session()->put('record7.unavailable', true);
+
+            return redirect()->route('record7.login');
         }
 
         RateLimiter::clear($throttle);
@@ -181,9 +261,31 @@ class SignInController extends R7Controller
             null, 'none', [], $request
         );
 
-        if (! $this->auth->requiresVerification($user)) {
+        // WHETHER to verify is a policy decision, not "does this account have
+        // a method configured". Asking on every sign-in trains people to type
+        // the code without reading it; asking at the moments that matter keeps
+        // it meaningful. See VerificationPolicy.
+        $sharedDevice = $request->boolean('shared_device');
+        $reason = $this->verification->reasonToVerify($user, $request, $sharedDevice);
+
+        if ($reason === null) {
+            $this->verification->record(
+                $user,
+                $this->auth->verificationStepEnabled() ? 'trusted_device' : 'step_disabled',
+                'skipped',
+                null,
+                $request
+            );
+
             return $this->completeSignIn($request, $user, $organisation, false);
         }
+
+        $this->verification->record($user, $reason, 'required', null, $request);
+
+        $request->session()->put([
+            'record7.verify_reason' => $reason,
+            'record7.shared_device' => $sharedDevice,
+        ]);
 
         return redirect()->route('record7.verify');
     }
@@ -197,13 +299,21 @@ class SignInController extends R7Controller
         $user = User::find($request->session()->get(SessionManager::PENDING_USER));
         $method = $user ? $this->auth->primaryMethod($user) : null;
 
+        $reason = (string) $request->session()->get('record7.verify_reason', 'new_device');
+
         return Inertia::render('Auth/Verify', [
             'prompt' => $method?->prompt() ?? 'Verify your identity',
             'methodLabel' => $method?->label,
+            // Why this is being asked for. People comply with a control they
+            // understand and work around one that seems arbitrary.
+            'reason' => $this->verification->explain($reason),
+            'canTrustDevice' => $reason !== 'shared_device'
+                && ! $request->session()->get('record7.shared_device', false),
+            'recoveryCodesLeft' => $user ? $this->verification->unusedRecoveryCodeCount($user) : 0,
             'verifyUrl' => route('record7.verify.check'),
             'cancelUrl' => route('record7.login', ['change_organisation' => 1]),
-            // Shown on screen only when a prototype code is configured, so a
-            // real deployment never advertises one.
+            // Shown on screen ONLY when the fictional code is actually enabled,
+            // so a real deployment never advertises one.
             'prototypeCode' => $this->auth->prototypeCode(),
             'error' => session('error'),
         ]);
@@ -211,7 +321,10 @@ class SignInController extends R7Controller
 
     public function verify(Request $request)
     {
-        $data = $request->validate(['code' => ['required', 'string', 'max:32']]);
+        $data = $request->validate(
+            ['code' => ['required', 'string', 'max:32']],
+            ['code.required' => 'Enter the six-digit code, or one of your recovery codes.']
+        );
 
         $user = User::find($request->session()->get(SessionManager::PENDING_USER));
         $organisation = Organisation::find($request->session()->get(SessionManager::PENDING_ORG));
@@ -229,7 +342,11 @@ class SignInController extends R7Controller
             );
             $request->session()->forget([SessionManager::PENDING_USER, SessionManager::PENDING_AT]);
 
-            return redirect()->route('record7.login')->with('error', $this->auth->failureMessage());
+            return redirect()->route('record7.login')->with(
+                'error',
+                'Too many verification attempts. Please sign in again, and use a recovery code '
+                .'if you cannot reach your usual method.'
+            );
         }
 
         if (! $this->auth->verifyCode($user, $data['code'])) {
@@ -238,11 +355,29 @@ class SignInController extends R7Controller
                 'verification', AuditRecorder::FAILURE, $user, $organisation->id, null,
                 'Incorrect verification code.', 'medium', [], $request
             );
+            $this->verification->record($user, (string) $request->session()->get('record7.verify_reason', 'new_device'), 'failed', 'code', $request);
 
-            return back()->with('error', 'That code was not correct.');
+            return back()->with(
+                'error',
+                'That code was not correct. Check your authenticator, or enter one of your '
+                .'recovery codes instead.'
+            );
         }
 
         RateLimiter::clear($throttle);
+
+        $reason = (string) $request->session()->get('record7.verify_reason', 'new_device');
+        $shared = (bool) $request->session()->get('record7.shared_device', false)
+            || $request->boolean('shared_device');
+
+        $this->verification->record($user, $reason, 'passed', 'code', $request);
+
+        // A shared trolley tablet is recognised but NEVER trusted, so the next
+        // person to pick it up is asked for their own code rather than
+        // inheriting this one.
+        $this->verification->rememberDevice($user, $request, $shared);
+
+        $request->session()->forget(['record7.verify_reason', 'record7.shared_device']);
 
         return $this->completeSignIn($request, $user, $organisation, true);
     }
@@ -279,9 +414,10 @@ class SignInController extends R7Controller
                 ->with('error', 'That activation link is no longer valid. Ask your manager to send a new one.');
         }
 
-        $request->validate([
-            'password' => ['required', 'confirmed', Password::min(12)->letters()->numbers()],
-        ]);
+        $request->validate(
+            ['password' => ['required', 'confirmed', Password::min(12)->letters()->numbers()]],
+            $this->passwordMessages()
+        );
 
         $user = $this->auth->activate($invitation, $request->input('password'));
 
@@ -312,10 +448,16 @@ class SignInController extends R7Controller
 
     public function sendResetLink(Request $request)
     {
-        $data = $request->validate([
-            'organisation' => ['required', 'string', 'max:255'],
-            'username' => ['required', 'string', 'max:255'],
-        ]);
+        $data = $request->validate(
+            [
+                'organisation' => ['required', 'string', 'max:255'],
+                'username' => ['required', 'string', 'max:255'],
+            ],
+            [
+                'organisation.required' => 'Enter your organisation name.',
+                'username.required' => 'Enter your username.',
+            ]
+        );
 
         $organisation = $this->directory->match($data['organisation']);
         $user = $organisation ? $this->auth->findUser($organisation, $data['username']) : null;
@@ -372,9 +514,10 @@ class SignInController extends R7Controller
                 ->with('error', 'That reset link has expired. Please request a new one.');
         }
 
-        $request->validate([
-            'password' => ['required', 'confirmed', Password::min(12)->letters()->numbers()],
-        ]);
+        $request->validate(
+            ['password' => ['required', 'confirmed', Password::min(12)->letters()->numbers()]],
+            $this->passwordMessages()
+        );
 
         $user = $this->auth->completeReset($reset, $request->input('password'));
 
@@ -437,6 +580,18 @@ class SignInController extends R7Controller
             SessionManager::PENDING_AT,
             SessionManager::PENDING_USER,
         ]);
+    }
+
+    /** Password rules, written for a person rather than for a validator. */
+    private function passwordMessages(): array
+    {
+        return [
+            'password.required' => 'Choose a password.',
+            'password.confirmed' => 'The two passwords do not match. Enter the same one twice.',
+            'password.min' => 'Use at least twelve characters.',
+            'password.letters' => 'Include at least one letter.',
+            'password.numbers' => 'Include at least one number.',
+        ];
     }
 
     /** Plain wording for the audit trail. Never shown to the person. */

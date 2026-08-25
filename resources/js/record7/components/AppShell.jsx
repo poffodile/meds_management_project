@@ -2,6 +2,8 @@ import React from 'react';
 import { router, usePage } from '@inertiajs/react';
 import Mark from './Mark.jsx';
 import ThemeToggle from './ThemeToggle.jsx';
+import AppNav from './AppNav.jsx';
+import Button from './Button.jsx';
 import useProduct from '../useProduct.js';
 
 /**
@@ -11,9 +13,10 @@ import useProduct from '../useProduct.js';
  * medicines product the most dangerous ambiguity is "which house am I
  * recording against", so Record7 never lets that scroll away.
  *
- * Switch house appears only when there is more than one to switch to.
+ * Navigation appears as a sidebar on desktop and as a bar at the bottom on a
+ * phone. Switch house appears only when there is more than one to switch to.
  */
-export default function AppShell({ urls = {}, children }) {
+export default function AppShell({ urls = {}, nav = [], children }) {
     const product = useProduct();
     const { context } = usePage().props;
 
@@ -28,9 +31,9 @@ export default function AppShell({ urls = {}, children }) {
                     <div className="r7-top__actions">
                         <ThemeToggle />
                         {urls.lock ? (
-                            <button type="button" className="r7-btn r7-btn--quiet" onClick={() => post(urls.lock)}>
+                            <Button variant="quiet" size="small" onClick={() => post(urls.lock)}>
                                 Lock
-                            </button>
+                            </Button>
                         ) : null}
                         <button type="button" className="r7-btn r7-btn--bare" onClick={() => post(urls.signOut)}>
                             Sign out
@@ -57,18 +60,24 @@ export default function AppShell({ urls = {}, children }) {
                     </div>
 
                     {context?.houseCount > 1 && urls.houses ? (
-                        <button
-                            type="button"
-                            className="r7-btn r7-btn--quiet"
-                            onClick={() => router.get(urls.houses)}
-                        >
+                        <Button variant="quiet" size="small" onClick={() => router.get(urls.houses)}>
                             Switch house
-                        </button>
+                        </Button>
                     ) : null}
                 </div>
             </header>
 
-            <main className="r7-main">{children}</main>
+            <div className="r7-body">
+                {nav.length ? (
+                    <aside className="r7-sidebar">
+                        <AppNav items={nav} variant="sidebar" />
+                    </aside>
+                ) : null}
+
+                <main className="r7-main">{children}</main>
+            </div>
+
+            {nav.length ? <AppNav items={nav} variant="tabbar" /> : null}
         </div>
     );
 }

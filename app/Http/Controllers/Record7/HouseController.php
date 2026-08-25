@@ -74,6 +74,7 @@ class HouseController extends R7Controller
                 'town' => $house->town,
                 'accessType' => $this->policy->usableAccess($user, $house->id)?->access_type,
             ], $houses),
+            'error' => session('error'),
             'chooseUrl' => route('record7.houses.choose'),
             'signOutUrl' => route('record7.signout'),
         ]);
@@ -98,7 +99,14 @@ class HouseController extends R7Controller
                 $this->sessions->current($request)
             );
 
-            abort(403, 'You do not have access to that house.');
+            // Back to the list with an inline message, rather than a bare 403
+            // page. Being dropped onto an unstyled error screen mid sign-in
+            // looks like the product broke, when in fact it worked.
+            return back()->with(
+                'error',
+                'You do not have access to that house. Choose one of the houses listed below, '
+                .'or ask your manager to add you.'
+            );
         }
 
         return $this->enter($request, $house, false);

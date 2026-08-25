@@ -28,7 +28,7 @@ export default function Activate({ valid, name, organisationName, activateUrl, s
         return (
             <AuthShell title="This link is no longer valid">
                 <div className="r7-stack">
-                    <Notice tone="problem">
+                    <Notice tone="error">
                         Activation links can only be used once, and they expire after three days.
                     </Notice>
                     <p className="r7-muted r7-measure">
@@ -49,7 +49,7 @@ export default function Activate({ valid, name, organisationName, activateUrl, s
             intro={<>Welcome{name ? <>, <strong>{name}</strong></> : ''}. Choose a password to finish setting up your {organisationName} account.</>}
         >
             <form className="r7-form" onSubmit={submit} noValidate>
-                <Notice tone="problem">{error}</Notice>
+                <Notice tone="error">{error}</Notice>
 
                 <PasswordField
                     label="Choose a password"

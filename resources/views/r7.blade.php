@@ -32,15 +32,39 @@
     {{-- Paint the warm cream ground before React mounts so there is no flash,
          and set the body font so nothing falls back to a serif. The app font is
          scoped to .r7-root; this is the safety net for body. --}}
+    {{--
+        NO THEME FLASH.
+
+        The chosen theme is read and applied BEFORE the stylesheet paints and
+        before React mounts, so a person who chose dark never sees a flash of
+        cream first. Record7 defaults to warm cream, so light needs no work —
+        only a stored dark choice writes anything.
+
+        Inline and synchronous on purpose: anything deferred is, by definition,
+        after the first paint. Storage can throw in a private window, so the
+        whole thing is wrapped and the cream default simply stands.
+    --}}
+    <script>
+        (function () {
+            try {
+                if (window.localStorage.getItem('record7.theme') === 'dark') {
+                    document.documentElement.setAttribute('data-r7-theme', 'dark');
+                }
+            } catch (error) {
+                /* Storage unavailable. Warm cream stands. */
+            }
+        })();
+    </script>
+
     <style>
         html, body {
             margin: 0;
             background: #FAF4E9;
             font-family: "Outfit", "Segoe UI", system-ui, Arial, sans-serif;
         }
-        @media (prefers-color-scheme: dark) {
-            html, body { background: #0E1922; }
-        }
+        /* Paint the midnight ground immediately for a stored dark choice, so
+           the page never flashes cream before the stylesheet arrives. */
+        html[data-r7-theme="dark"], html[data-r7-theme="dark"] body { background: #0E1922; }
     </style>
 
     @viteReactRefresh

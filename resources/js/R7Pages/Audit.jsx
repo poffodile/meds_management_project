@@ -2,6 +2,7 @@ import React from 'react';
 import { router } from '@inertiajs/react';
 import AppShell from '@record7/components/AppShell.jsx';
 import Notice from '@record7/components/Notice.jsx';
+import StatusLabel from '@record7/components/StatusLabel.jsx';
 
 const RESULT_WORDS = {
     success: 'Success',
@@ -12,10 +13,10 @@ const RESULT_WORDS = {
 };
 
 const RESULT_TONE = {
-    success: 'yes',
-    failure: 'warn',
-    denied: 'no',
-    warning: 'warn',
+    success: 'success',
+    failure: 'warning',
+    denied: 'error',
+    warning: 'warning',
     information: 'info',
 };
 
@@ -45,7 +46,7 @@ export default function Audit({ events, houses, filters, total, shown, integrity
 
     return (
         <AppShell urls={urls}>
-            <div className="r7-page-head">
+            <div className="r7-page-heading">
                 <span className="r7-label">Access audit</span>
                 <h1 className="r7-display">Who reached what</h1>
                 <p className="r7-lede r7-measure">
@@ -56,12 +57,12 @@ export default function Audit({ events, houses, filters, total, shown, integrity
 
             <div className="r7-stack">
                 {integrity.brokenLinks > 0 ? (
-                    <Notice tone="problem" tag="Integrity">
+                    <Notice tone="error" title="Integrity">
                         {integrity.brokenLinks} record{integrity.brokenLinks === 1 ? '' : 's'} do not
                         follow the expected sequence. Report this to your system administrator.
                     </Notice>
                 ) : (
-                    <Notice tone="ok" tag="Integrity">
+                    <Notice tone="success" title="Integrity">
                         The record is complete and in sequence. Access events are append only and
                         the database refuses any attempt to change or remove one.
                     </Notice>
@@ -129,9 +130,9 @@ export default function Audit({ events, houses, filters, total, shown, integrity
                                     {event.reason ? <span>{event.reason}</span> : null}
                                 </span>
 
-                                <span className={`r7-state r7-state--${RESULT_TONE[event.result] ?? 'info'}`}>
+                                <StatusLabel tone={RESULT_TONE[event.result] ?? 'info'}>
                                     {RESULT_WORDS[event.result] ?? event.result}
-                                </span>
+                                </StatusLabel>
                             </li>
                         ))}
                     </ul>

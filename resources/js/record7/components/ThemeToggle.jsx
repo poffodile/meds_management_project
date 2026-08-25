@@ -18,7 +18,7 @@ export default function ThemeToggle() {
             aria-pressed={isDark}
             title={isDark ? 'Switch to the light theme' : 'Switch to the dark theme'}
         >
-            <span className="r7-theme__dot" aria-hidden="true" />
+            <span className="r7-theme__swatch" aria-hidden="true" />
             {isDark ? 'Light' : 'Dark'}
         </button>
     );

@@ -2,6 +2,8 @@ import React from 'react';
 import { router, usePage } from '@inertiajs/react';
 import AppShell from '@record7/components/AppShell.jsx';
 import Notice from '@record7/components/Notice.jsx';
+import StatusLabel from '@record7/components/StatusLabel.jsx';
+import PageHeading from '@record7/components/PageHeading.jsx';
 import useProduct from '@record7/useProduct.js';
 
 const COMPETENCY_WORDS = {
@@ -14,12 +16,12 @@ const COMPETENCY_WORDS = {
 };
 
 const COMPETENCY_TONE = {
-    current: 'yes',
-    not_required: 'yes',
-    review_due: 'warn',
-    expired: 'no',
-    suspended: 'no',
-    not_assessed: 'no',
+    current: 'success',
+    not_required: 'success',
+    review_due: 'warning',
+    expired: 'error',
+    suspended: 'error',
+    not_assessed: 'error',
 };
 
 const ACCESS_WORDS = {
@@ -52,7 +54,7 @@ export default function Today({
 
     return (
         <AppShell urls={urls}>
-            <div className="r7-page-head">
+            <div className="r7-page-heading">
                 <span className="r7-label">Today</span>
                 <h1 className="r7-display">Good to go{name ? <>, {name}</> : ''}</h1>
                 <p className="r7-lede r7-measure">
@@ -64,14 +66,14 @@ export default function Today({
 
             <div className="r7-stack">
                 {readOnly ? (
-                    <Notice tone="info" tag="Review only">
+                    <Notice tone="info" title="Review only">
                         Your access to this house is review only. You can look at records but
                         cannot record, change or approve anything.
                     </Notice>
                 ) : null}
 
                 {temporary && accessEndsAt ? (
-                    <Notice tone="attention" tag="Temporary">
+                    <Notice tone="warning" title="Temporary">
                         Your access to this house is temporary and ends on {accessEndsAt}.
                     </Notice>
                 ) : null}
@@ -105,20 +107,20 @@ export default function Today({
                         </header>
                         <div className="r7-panel__body">
                             {competencies.length ? (
-                                <ul className="r7-perms">
+                                <ul className="r7-list">
                                     {competencies.map((competency) => (
-                                        <li className="r7-perm" key={competency.name}>
-                                            <span className="r7-perm__body">
-                                                <span className="r7-perm__name">{competency.name}</span>
+                                        <li className="r7-list__row" key={competency.name}>
+                                            <span className="r7-list__body">
+                                                <span className="r7-strong">{competency.name}</span>
                                                 {competency.reviewDue ? (
-                                                    <span className="r7-perm__why">
+                                                    <span className="r7-list__why">
                                                         Review due {competency.reviewDue}
                                                     </span>
                                                 ) : null}
                                             </span>
-                                            <span className={`r7-state r7-state--${COMPETENCY_TONE[competency.status] ?? 'info'}`}>
+                                            <StatusLabel tone={COMPETENCY_TONE[competency.status] ?? 'info'}>
                                                 {COMPETENCY_WORDS[competency.status] ?? competency.status}
-                                            </span>
+                                            </StatusLabel>
                                         </li>
                                     ))}
                                 </ul>
@@ -145,20 +147,20 @@ export default function Today({
                             Hiding a control is a courtesy, never the check.
                         </p>
 
-                        <ul className="r7-perms">
+                        <ul className="r7-list">
                             {decisions.map((decision) => (
-                                <li className="r7-perm" key={decision.code}>
-                                    <span className="r7-perm__body">
-                                        <span className="r7-perm__name">{decision.name}</span>
+                                <li className="r7-list__row" key={decision.code}>
+                                    <span className="r7-list__body">
+                                        <span className="r7-strong">{decision.name}</span>
                                         {decision.allowed ? (
                                             <span className="r7-code">{decision.code}</span>
                                         ) : (
-                                            <span className="r7-perm__why">{decision.reason}</span>
+                                            <span className="r7-list__why">{decision.reason}</span>
                                         )}
                                     </span>
-                                    <span className={`r7-state r7-state--${decision.allowed ? 'yes' : 'no'}`}>
+                                    <StatusLabel tone={decision.allowed ? 'success' : 'error'}>
                                         {decision.allowed ? 'Allowed' : 'Refused'}
-                                    </span>
+                                    </StatusLabel>
                                 </li>
                             ))}
                         </ul>

@@ -1,3 +1,4 @@
+import InlineError from './InlineError.jsx';
 import React, { useId } from 'react';
 
 /**
@@ -36,7 +37,7 @@ export default function Field({
                 aria-describedby={describedBy}
                 {...rest}
             />
-            {error ? <span className="r7-field__error" id={errorId}>{error}</span> : null}
+            {error ? <InlineError id={errorId}>{error}</InlineError> : null}
         </div>
     );
 }

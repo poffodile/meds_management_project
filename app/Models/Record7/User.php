@@ -82,6 +82,21 @@ class User extends Authenticatable implements AuthenticatableContract
         return $this->hasMany(LoginSession::class, 'user_id');
     }
 
+    public function recoveryCodes()
+    {
+        return $this->hasMany(RecoveryCode::class, 'user_id');
+    }
+
+    public function trustedDevices()
+    {
+        return $this->hasMany(TrustedDevice::class, 'user_id');
+    }
+
+    public function verificationEvents()
+    {
+        return $this->hasMany(VerificationEvent::class, 'user_id');
+    }
+
     /* ── State ───────────────────────────────────────────────────────────── */
 
     /** The account's own role, ignoring service scope. */

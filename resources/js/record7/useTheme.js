@@ -15,22 +15,20 @@ const KEY = 'record7.theme';
  * Storage can throw — a private window, blocked site data — so every read and
  * write is guarded and the light default simply stands.
  */
+function stored() {
+    try {
+        const value = window.localStorage.getItem(KEY);
+
+        return value === 'dark' || value === 'light' ? value : 'light';
+    } catch {
+        return 'light';
+    }
+}
+
 export default function useTheme() {
-    const [theme, setTheme] = useState('light');
-
-    useEffect(() => {
-        let stored = null;
-
-        try {
-            stored = window.localStorage.getItem(KEY);
-        } catch {
-            stored = null;
-        }
-
-        if (stored === 'dark' || stored === 'light') {
-            setTheme(stored);
-        }
-    }, []);
+    // Read on the first render rather than in an effect: an effect runs after
+    // paint, and after paint is exactly when a flash of the wrong theme shows.
+    const [theme, setTheme] = useState(stored);
 
     useEffect(() => {
         const root = document.querySelector('.r7-root');
@@ -39,8 +37,10 @@ export default function useTheme() {
 
         if (theme === 'dark') {
             root.setAttribute('data-theme', 'dark');
+            document.documentElement.setAttribute('data-r7-theme', 'dark');
         } else {
             root.removeAttribute('data-theme');
+            document.documentElement.removeAttribute('data-r7-theme');
         }
     }, [theme]);
 

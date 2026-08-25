@@ -34,10 +34,10 @@ export default function ForgotPassword({ submitUrl, signInUrl, status, localLink
             }
         >
             <form className="r7-form" onSubmit={submit} noValidate>
-                <Notice tone="ok">{status}</Notice>
+                <Notice tone="success">{status}</Notice>
 
                 {localLink ? (
-                    <Notice tone="attention" tag="Test environment">
+                    <Notice tone="warning" title="Test environment">
                         No email is sent locally. Open the reset link directly:
                         <br />
                         <a href={localLink}>{localLink}</a>

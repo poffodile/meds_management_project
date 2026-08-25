@@ -27,7 +27,7 @@ export default function ResetPassword({ valid, resetUrl, requestUrl, signInUrl, 
         return (
             <AuthShell title="This reset link has expired">
                 <div className="r7-stack">
-                    <Notice tone="problem">
+                    <Notice tone="error">
                         Reset links last thirty minutes and can only be used once.
                     </Notice>
                     <Button block onClick={() => router.get(requestUrl)}>
@@ -44,7 +44,7 @@ export default function ResetPassword({ valid, resetUrl, requestUrl, signInUrl, 
     return (
         <AuthShell title="Choose a new password">
             <form className="r7-form" onSubmit={submit} noValidate>
-                <Notice tone="problem">{error}</Notice>
+                <Notice tone="error">{error}</Notice>
 
                 <PasswordField
                     label="New password"

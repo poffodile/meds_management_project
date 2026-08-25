@@ -5,6 +5,7 @@ import Field from '@record7/components/Field.jsx';
 import PasswordField from '@record7/components/PasswordField.jsx';
 import Button from '@record7/components/Button.jsx';
 import Notice from '@record7/components/Notice.jsx';
+import AccountUnavailable from '@record7/components/AccountUnavailable.jsx';
 
 /**
  * Sign in, steps one and two.
@@ -18,7 +19,15 @@ import Notice from '@record7/components/Notice.jsx';
  * An unrecognised name gives exactly the same answer as a wrong password, so
  * this screen cannot be used to discover who is a customer.
  */
-export default function SignIn({ step, organisationName, urls, status, error }) {
+export default function SignIn({ step, organisationName, urls, supportUrl, status, error }) {
+    if (step === 'unavailable') {
+        return (
+            <AuthShell title="You can't sign in right now">
+                <AccountUnavailable signInUrl={urls.change} supportUrl={supportUrl} />
+            </AuthShell>
+        );
+    }
+
     return step === 'credentials'
         ? <Credentials organisationName={organisationName} urls={urls} status={status} error={error} />
         : <OrganisationStep urls={urls} status={status} error={error} />;
@@ -39,8 +48,8 @@ function OrganisationStep({ urls, status, error }) {
             intro="Enter the name exactly as your manager gave it to you. Capital letters and extra spaces do not matter."
         >
             <form className="r7-form" onSubmit={submit} noValidate>
-                <Notice tone="problem">{error}</Notice>
-                <Notice tone="ok">{status}</Notice>
+                <Notice tone="error">{error}</Notice>
+                <Notice tone="success">{status}</Notice>
 
                 <Field
                     label="Organisation"
@@ -87,8 +96,8 @@ function Credentials({ organisationName, urls, status, error }) {
             }
         >
             <form className="r7-form" onSubmit={submit} noValidate>
-                <Notice tone="problem">{error}</Notice>
-                <Notice tone="ok">{status}</Notice>
+                <Notice tone="error">{error}</Notice>
+                <Notice tone="success">{status}</Notice>
 
                 <Field
                     label="Username"

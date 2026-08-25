@@ -104,6 +104,7 @@ class Record7Section0Seeder extends Seeder
         // Outside the transaction: the audit table is append-only and its
         // triggers make it a poor citizen inside a rollback.
         $this->seedInvitationsAndResets();
+        $this->seedConvenienceAccounts();
 
         $this->report();
     }
@@ -433,6 +434,154 @@ class Record7Section0Seeder extends Seeder
         ]);
     }
 
+    /**
+     * Two short accounts for walking the interface by hand.
+     *
+     * The supplied fictional passwords are long, which is right for a test
+     * suite and miserable for a person clicking through a UI review twenty
+     * times over. These two exist purely so that is bearable.
+     *
+     * They are NOT part of the supplied package. They sit alongside it, use the
+     * same houses, and are as fictional as everything else here. The password
+     * is deliberately trivial because this database is local, disposable and
+     * contains nobody real — the same guards that protect the rest of this
+     * seeder protect these.
+     */
+    private function seedConvenienceAccounts(): void
+    {
+        $password = (string) env('RECORD7_TEST_ACCOUNT_PASSWORD', 'precious');
+
+        $organisation = Organisation::first();
+        $oakwood = Service::where('name', 'Oakwood House')->first();
+        $rosewood = Service::where('name', 'Rosewood House')->first();
+
+        if (! $organisation || ! $oakwood || ! $rosewood) {
+            return;
+        }
+
+        // A manager: oversees both houses, reaches the access audit, and does
+        // not administer medication. That separation is the fixture's design.
+        $this->convenienceAccount(
+            $organisation, [$oakwood, $rosewood], $password,
+            'testmanager', 'Test Manager', 'R4', 'manager', false
+        );
+
+        // A support worker: works in both houses and CAN administer, because a
+        // staff account that cannot do the job is not much use for reviewing
+        // the job. Mirrors how Olivia Carter is set up in the package.
+        $this->convenienceAccount(
+            $organisation, [$oakwood, $rosewood], $password,
+            'teststaff', 'Test Staff', 'R7', 'standard', true
+        );
+    }
+
+    /** @param  array<int, Service>  $houses */
+    private function convenienceAccount(
+        Organisation $organisation,
+        array $houses,
+        string $password,
+        string $username,
+        string $fullName,
+        string $roleCode,
+        string $accessType,
+        bool $canAdminister
+    ): void {
+        $role = Role::where('code', $roleCode)->first();
+
+        if (! $role) {
+            return;
+        }
+
+        $user = User::where('username', $username)->first() ?? new User;
+
+        $user->reference = 'usr_'.$username;
+        $user->organisation_id = $organisation->id;
+        $user->full_name = $fullName;
+        $user->preferred_name = explode(' ', $fullName)[1] ?? $fullName;
+        $user->username = $username;
+        $user->work_email = $username.'@record7.test';
+        $user->employee_reference = 'EMP-'.strtoupper($username);
+        $user->password_hash = Hash::make($password);
+        $user->account_status = 'active';
+        $user->employment_type = 'permanent';
+        $user->access_starts_at = now()->subYear();
+        $user->access_ends_at = null;
+        $user->password_set_at = now();
+        $user->failed_attempts = 0;
+        $user->locked_until = null;
+        $user->save();
+
+        UserRole::firstOrCreate(['user_id' => $user->id, 'role_id' => $role->id]);
+
+        foreach ($houses as $house) {
+            $access = UserServiceAccess::firstOrNew([
+                'user_id' => $user->id,
+                'service_id' => $house->id,
+            ]);
+            $access->access_type = $accessType;
+            $access->status = 'active';
+            $access->starts_at = null;
+            $access->ends_at = null;
+            $access->save();
+        }
+
+        MfaMethod::firstOrCreate(
+            ['user_id' => $user->id, 'method_type' => 'authenticator_app'],
+            [
+                'label' => $fullName.' authenticator',
+                'is_primary' => true,
+                'status' => 'active',
+                'registered_at' => now(),
+            ]
+        );
+
+        if (! $canAdminister) {
+            return;
+        }
+
+        // The Support Worker role matrix does not include administering, so a
+        // real support worker holds an explicit allow per house once their
+        // competency is confirmed. Same shape as Olivia Carter.
+        $permission = Permission::where('code', 'administer_medication')->first();
+
+        if ($permission) {
+            foreach ($houses as $house) {
+                UserPermission::firstOrCreate(
+                    [
+                        'user_id' => $user->id,
+                        'permission_id' => $permission->id,
+                        'service_id' => $house->id,
+                    ],
+                    [
+                        'effect' => 'allow',
+                        'status' => 'active',
+                        'reason' => 'Competency confirmed for this house.',
+                    ]
+                );
+            }
+        }
+
+        // And the competency that gates it, or the allow above is refused.
+        foreach (['general_medication', 'prn_medication'] as $code) {
+            $type = CompetencyType::where('code', $code)->first();
+
+            if (! $type) {
+                continue;
+            }
+
+            UserCompetency::firstOrCreate(
+                ['user_id' => $user->id, 'competency_type_id' => $type->id, 'service_id' => null],
+                [
+                    'status' => 'current',
+                    'assessed_at' => now()->subMonths(2),
+                    'review_due_at' => now()->addMonths(10),
+                    'evidence_reference' => 'TEST-EVIDENCE-LOCAL',
+                    'notes' => 'Fictional competency for local interface review.',
+                ]
+            );
+        }
+    }
+
     private function report(): void
     {
         $organisation = Organisation::first();
@@ -459,5 +608,10 @@ class Record7Section0Seeder extends Seeder
         $this->command?->line('  Services  '.Service::orderBy('name')
             ->get()->map(fn ($s) => $s->name.' ['.$s->status.']')->implode('   '));
         $this->command?->line('  Audit events  '.AccessAuditEvent::count());
+        $this->command?->newLine();
+        $this->command?->line('  Short accounts for walking the interface by hand:');
+        $this->command?->line('    testmanager   Service Manager, both houses');
+        $this->command?->line('    teststaff     Support Worker, both houses, can administer');
+        $this->command?->line('    password      '.env('RECORD7_TEST_ACCOUNT_PASSWORD', 'precious'));
     }
 }

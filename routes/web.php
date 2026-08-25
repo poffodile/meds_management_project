@@ -3265,3 +3265,19 @@ Route::prefix('record7')->name('record7.')->group(function () {
             ->middleware(R7Authorize::class.':view_access_audit')->name('audit');
     });
 });
+
+/*
+| Record7 component showcase — development only.
+|
+| Registered outside the production environment entirely, so in production the
+| URL does not exist rather than merely refusing. The controller aborts 404 as
+| well, in case a cached route table ever outlives an environment change.
+|
+| It lives under /record7/dev/ so the development-only surface is obvious from
+| the URL and can never be confused with a real screen. GET /record7 remains
+| the authenticated landing page and is registered in the block above.
+*/
+if (! app()->environment('production')) {
+    Route::get('record7/dev/components', [\App\Http\Controllers\Record7\ShowcaseController::class, 'index'])
+        ->name('record7.showcase');
+}

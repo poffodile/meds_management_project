@@ -1,15 +1,10 @@
 import React from 'react';
 import { router } from '@inertiajs/react';
 import AuthShell from '@record7/components/AuthShell.jsx';
+import HouseRow from '@record7/components/HouseRow.jsx';
 import Notice from '@record7/components/Notice.jsx';
-
-const ACCESS_WORDS = {
-    standard: 'Full access',
-    manager: 'Manager access',
-    oversight: 'Oversight access',
-    read_only: 'Review only',
-    temporary: 'Temporary access',
-};
+import StateBlock from '@record7/components/StateBlock.jsx';
+import TextLink from '@record7/components/TextLink.jsx';
 
 /**
  * Choosing, or switching, the house you are working in.
@@ -24,6 +19,8 @@ export default function Houses({
 }) {
     const switching = Boolean(currentHouseId);
 
+    const choose = (houseId) => router.post(chooseUrl, { house_id: houseId });
+
     return (
         <AuthShell
             step={switching ? null : 4}
@@ -35,42 +32,29 @@ export default function Houses({
                     ? 'Everything you record from here on is filed against the house you choose.'
                     : <>Signed in as <strong>{name}</strong> at <strong>{organisationName}</strong>. Everything you record is filed against the house you choose.</>
             }
-            footer={
-                <button type="button" className="r7-btn r7-btn--bare" onClick={() => router.post(signOutUrl)}>
-                    Sign out instead
-                </button>
-            }
+            footer={<TextLink href={signOutUrl} method="post">Sign out instead</TextLink>}
         >
             <div className="r7-stack">
-                <Notice tone="problem">{error}</Notice>
+                <Notice tone="error">{error}</Notice>
 
-                <ul className="r7-houses">
-                    {houses.map((house) => {
-                        const current = house.id === currentHouseId;
-
-                        return (
+                {houses.length ? (
+                    <ul className="r7-houses">
+                        {houses.map((house) => (
                             <li key={house.id}>
-                                <button
-                                    type="button"
-                                    className={`r7-house${current ? ' r7-house--current' : ''}`}
-                                    onClick={() => router.post(chooseUrl, { house_id: house.id })}
-                                >
-                                    <span className="r7-house__body">
-                                        <span className="r7-house__name">{house.name}</span>
-                                        <span className="r7-house__meta">
-                                            {[house.type, house.town, ACCESS_WORDS[house.accessType]]
-                                                .filter(Boolean)
-                                                .join(', ')}
-                                        </span>
-                                    </span>
-                                    <span className="r7-house__go">
-                                        {current ? 'Currently open' : 'Open'}
-                                    </span>
-                                </button>
+                                <HouseRow
+                                    house={house}
+                                    current={house.id === currentHouseId}
+                                    onChoose={choose}
+                                />
                             </li>
-                        );
-                    })}
-                </ul>
+                        ))}
+                    </ul>
+                ) : (
+                    <StateBlock state="restricted" title="No house is available to you">
+                        Your account does not currently have access to an active house. Please
+                        contact your administrator.
+                    </StateBlock>
+                )}
             </div>
         </AuthShell>
     );

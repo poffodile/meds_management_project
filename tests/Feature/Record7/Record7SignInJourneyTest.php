@@ -41,16 +41,37 @@ class Record7SignInJourneyTest extends Record7TestCase
             ->assertSee('Omega Care Group', false);
     }
 
-    public function test_an_unrecognised_organisation_reveals_nothing(): void
+    public function test_an_unrecognised_organisation_says_so_plainly(): void
     {
+        // An organisation name is a business name, not a credential. Telling
+        // somebody their "sign-in details" are wrong before they have given any
+        // sends them to check a password that was never the problem.
         $response = $this->from('/record7/login')
             ->post('/record7/login/organisation', ['organisation' => 'Some Other Care Group'])
             ->assertRedirect('/record7/login');
 
-        $response->assertSessionHas('error', 'We could not sign you in with those details.');
+        $response->assertSessionHas('error');
+
+        $message = session('error');
+
+        $this->assertStringContainsString('organisation name', $message);
+        $this->assertStringNotContainsString('sign you in', $message);
 
         // Still on step one: no credential fields are offered.
         $this->get('/record7/login')->assertSee('&quot;step&quot;:&quot;organisation&quot;', false);
+    }
+
+    public function test_the_organisation_step_still_names_no_organisation(): void
+    {
+        // Saying a name is unrecognised must not become a way of listing the
+        // ones that are.
+        $this->from('/record7/login')
+            ->post('/record7/login/organisation', ['organisation' => 'Some Other Care Group']);
+
+        $message = (string) session('error');
+
+        $this->assertStringNotContainsString('Omega', $message);
+        $this->assertStringNotContainsString('Oakwood', $message);
     }
 
     public function test_the_sign_in_screen_never_lists_organisations(): void
@@ -165,7 +186,9 @@ class Record7SignInJourneyTest extends Record7TestCase
         ]);
 
         $this->post('/record7/verify', ['code' => '000000'])
-            ->assertSessionHas('error', 'That code was not correct.');
+            ->assertSessionHas('error');
+
+        $this->assertStringContainsString('not correct', (string) session('error'));
 
         $this->assertFalse(Auth::guard('record7')->check());
 

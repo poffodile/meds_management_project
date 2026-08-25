@@ -45,7 +45,7 @@ export default function Lock({ name, fullName, house, organisationName, unlockUr
 
                     <div className="r7-card__body">
                         <form className="r7-form" onSubmit={submit} noValidate>
-                            <Notice tone="problem">{error}</Notice>
+                            <Notice tone="error">{error}</Notice>
 
                             <div className="r7-where">
                                 <span className="r7-where__cell">

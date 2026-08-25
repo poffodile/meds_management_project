@@ -82,8 +82,12 @@
 
   /* ══ BORDER ═════════════════════════════════════════════════════════════ */
 
-  --r7-border-subtle:  #E8DCC7;  /* the standard warm hairline              */
-  --r7-border-strong:  #D5C4A6;  /* input edges, emphasis                   */
+  --r7-border-subtle:  #E8DCC7;  /* decorative hairline between things      */
+  /* The visible boundary of a CONTROL. An input sits on a surface close to
+     the page colour, so this border is what says "you can type here" — WCAG
+     2.2 asks for 3 to 1 against both neighbours, and #D5C4A6 managed only
+     1.56. This value clears it on the page and on a card. */
+  --r7-border-strong:  #9C875C;
   --r7-border-width:   1px;
   --r7-border-emphasis-width: 3px;  /* the left rule on a notice            */
 
@@ -200,6 +204,7 @@
   --r7-width-card-wide: 620px;
   --r7-width-app:      1140px;
   --r7-width-sidebar:   248px;
+  --r7-width-swatch:    140px;
 }
 
 /* ══ DARK ═══════════════════════════════════════════════════════════════════
@@ -245,7 +250,7 @@
   --r7-text-accent:     #9BC6D0;
 
   --r7-border-subtle:  #253440;
-  --r7-border-strong:  #354855;
+  --r7-border-strong:  #61798A;
 
   --r7-state-success:         #7FB394;
   --r7-state-success-surface: #16241C;

@@ -56,10 +56,10 @@ class Record7ThemeTest extends TestCase
         // --r7-midnight is the ink and the dark ground. Nothing filled may use
         // it as a background, because on the dark theme it becomes the page.
         $this->assertStringNotContainsString(
-            'background: var(--r7-midnight)',
+            'background: var(--r7-colour-primary)',
             $this->stylesheet(),
             'A filled control is using the ink token as its background. '
-            .'Use --r7-solid with --r7-on-solid instead.'
+            .'Use --r7-surface-solid with --r7-text-on-solid instead.'
         );
     }
 
@@ -69,11 +69,11 @@ class Record7ThemeTest extends TestCase
             'light' => '.r7-root {',
             'dark' => '.r7-root[data-theme="dark"] {',
         ] as $theme => $block) {
-            $solid = $this->token($block, '--r7-solid');
-            $onSolid = $this->token($block, '--r7-on-solid');
+            $solid = $this->token($block, '--r7-surface-solid');
+            $onSolid = $this->token($block, '--r7-text-on-solid');
 
-            $this->assertNotNull($solid, "--r7-solid must be defined for the {$theme} theme");
-            $this->assertNotNull($onSolid, "--r7-on-solid must be defined for the {$theme} theme");
+            $this->assertNotNull($solid, "--r7-surface-solid must be defined for the {$theme} theme");
+            $this->assertNotNull($onSolid, "--r7-text-on-solid must be defined for the {$theme} theme");
 
             $this->assertNotSame(
                 $solid,
@@ -91,8 +91,8 @@ class Record7ThemeTest extends TestCase
             'dark' => '.r7-root[data-theme="dark"] {',
         ] as $theme => $block) {
             $this->assertNotSame(
-                $this->token($block, '--r7-solid'),
-                $this->token($block, '--r7-page'),
+                $this->token($block, '--r7-surface-solid'),
+                $this->token($block, '--r7-surface-page'),
                 "On the {$theme} theme a filled control is the same colour as the page behind it."
             );
         }
@@ -101,7 +101,7 @@ class Record7ThemeTest extends TestCase
     public function test_the_primary_button_uses_the_solid_tokens(): void
     {
         $this->assertMatchesRegularExpression(
-            '/\.r7-btn--primary\s*\{[^}]*background:\s*var\(--r7-solid\)[^}]*color:\s*var\(--r7-on-solid\)/',
+            '/\.r7-btn--primary\s*\{\s*background:\s*var\(--r7-surface-solid\);\s*color:\s*var\(--r7-text-on-solid\)/',
             $this->stylesheet()
         );
     }
@@ -120,7 +120,7 @@ class Record7ThemeTest extends TestCase
 
     public function test_the_default_ground_is_the_documented_warm_cream(): void
     {
-        $this->assertSame('#FAF4E9', $this->token('.r7-root {', '--r7-page'));
+        $this->assertSame('#FAF4E9', $this->token('.r7-root {', '--r7-surface-page'));
     }
 
     public function test_the_dark_theme_is_reachable_and_still_scoped(): void
@@ -159,7 +159,9 @@ class Record7ThemeTest extends TestCase
 
         // Storage throws in private windows and where site data is blocked.
         $this->assertStringContainsString('catch', $hook);
-        $this->assertStringContainsString("useState('light')", $hook);
+        // Read on the first render, defaulting to light, and guarded.
+        $this->assertStringContainsString('useState(stored)', $hook);
+        $this->assertStringContainsString("return 'light';", $hook);
     }
 
     /* ── Seeing the password ─────────────────────────────────────────────── */
