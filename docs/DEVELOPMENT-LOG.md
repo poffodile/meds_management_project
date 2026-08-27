@@ -944,3 +944,477 @@ JavaScript 22. Production build clean.
 
 **Not done, deliberately.** The Frontend 4 role-cache issue (R7-ISSUE-001) is
 recorded but not fixed. Nothing is committed.
+
+## 2026-08-25 — Record7 login, supplied design reference applied
+
+Michael supplied `record7-login.css` as placement guidance, with a warning that
+it might contain a few errors. It did, and they were worth finding.
+
+**What the reference got right, and is now in.** A second accent. Until now one
+teal was doing two jobs — brand mark and interactive control — and it could not
+do both, because a teal bright enough to read on the deep navy panel is
+unreadable on cream. There are now two: teal for the brand and for state, blue
+for interaction (links, focus, the active step, a focused field, a hovered row).
+Also in: a tinted rather than solid logo tile, taller white input boxes, a soft
+blue focus halo instead of a hard double ring, a lifted primary button with a
+teal arrow, a teal tint on the seventh right, and two thick cropped rings on the
+deep panel.
+
+**What it got wrong.** Four of its colours fail WCAG AA, so four were substituted
+for the nearest passing equivalent:
+
+| Where | Supplied | Measured | Now | Now measures |
+|---|---|---|---|---|
+| Links, active step | `#3A7CA5` | 4.05 | `#367399` | 4.59 |
+| Muted body text | `#6B7683` | 4.11 | `#656F7B` | 4.54 |
+| Small text on navy | `#455663` | 2.27 | `#748EA2` | 4.79 |
+| Input border | `#E2DAC8` | 1.24 | `#8E897E` | 3.09 |
+
+The reference also specifies Plus Jakarta Sans. Kept Sora and Outfit, which are
+the documented Record7 faces and were already agreed.
+
+**Three faults the change surfaced, all now fixed and all now tested.**
+
+1. The dark theme fills the primary button with teal, and the arrow was painted
+   from the teal accent — so on dark the arrow was invisible. This is the same
+   fault as the vanishing Sign in button, one element further in, so it got the
+   same treatment: its own `--r7-icon-on-solid` token and a test that fails if
+   an icon on a filled control is ever the colour of that control.
+2. One token, `--r7-brand-panel-rule`, was carrying both hairlines and the
+   smallest text on the navy panel. Those want opposite values — text has to
+   clear 4.5:1, a hairline that bright stops being a hairline. Split into
+   `--r7-brand-panel-rule` and `--r7-brand-panel-dim`.
+3. On the switch-house screen, the house you are already in and the house under
+   your cursor were the same teal — identical at the one moment the difference
+   matters. Hover is now blue, current stays teal.
+
+**Phone.** The deep half becomes a band across the top that sizes to its
+content. A first attempt fixed it at 210px and left a third of the navy carrying
+nothing, which reads as a mistake rather than as space. The rights list is
+dropped at that width — six numbered lines between someone and their password.
+
+Journey walked end to end on the machine: organisation → username and password →
+house selection → Today, as `testmanager`. Record7 177, Frontend 4 64, JS 22, all
+passing. Nothing committed.
+
+### Later the same day — the sign-in box, positioned from Frontend 4
+
+Michael clarified that the reference screenshot was Frontend 4's own sign-in
+page, and asked for one thing from it: the position and size of the box. Not its
+colours, not its type, not its content.
+
+So the form is a card again. It had been deliberately flattened into the cream on
+the argument that a box inside a panel is one frame too many; the reference makes
+the better case, which is that the form is the one thing on the page you act on,
+and lifting it off the ground says so before you have read a word.
+
+Four numbers were copied out of `frontend4/f4.css`, and only these four:
+
+| | Frontend 4 | Record7 token |
+|---|---|---|
+| Card column | `minmax(360px, 480px)` | `--r7-width-card-min` / `--r7-width-card` |
+| Page inset | `clamp(24px, 6vw, 88px)` | `--r7-auth-inset` |
+| Card padding | `clamp(24px, 4vw, 40px)` | `--r7-card-pad` |
+| Vertical | `align-items: center` | `justify-content: center` on the form half |
+
+The card sits against the far side of the warm half, because in Frontend 4 it is
+the last column of the grid and the only thing between it and the window edge is
+the page inset.
+
+Frontend 4 was read and not touched — `git status` on `frontend4/` and
+`resources/js/F4Pages/` is clean, and its 64 tests still pass.
+
+**One thing this exposed.** The wrapper had been capping the card's width, which
+meant a card asking to be wide — the house list — silently never was. Harmless
+while the card had no padding; the moment it gained some, the house rows started
+wrapping onto two lines. The card caps itself now and the wrapper only positions
+it.
+
+Record7 177, Frontend 4 64, JS 22, all passing. Nothing committed.
+
+### Still the same day — the house list
+
+Michael: the page did not look balanced, and the house rows looked too wide and
+not neat.
+
+Both were true, and they were the same fault seen twice.
+
+**Balance.** The house step was the only screen asking to be wide — 620px against
+480px for the two before it. So the journey changed shape at the last step, which
+reads as three pages rather than one thing being asked three ways. It is 480 now,
+like the others.
+
+**The rows.** Each row was a three-part flex — description on the left, then a
+column on the far right holding the access badge above an "Open →" link, with
+`justify-content: space-between` pushing the two apart. At 620px that left a hole
+down the middle of every row. Three things fixed it:
+
+- The access badge moved onto the name line. What kind of access you hold is part
+  of what is true about the house, not something to be stated opposite it.
+- "Open" went. The whole row is a button, so the word was telling you something
+  the row already said. A chevron does it in a fifth of the width.
+- The building icon went. Every house had the same glyph, so it carried no
+  information at all, and it was costing about seventy pixels — which is exactly
+  what the name and the badge needed in order to share a line. Removing it is
+  what made the two-line row fit.
+
+Rows are now two lines: name and badge, then type, town and — for the house you
+are already in — "Currently open". On a phone the badge stops being pushed right
+and the chevron is hidden, because there is no hover on a touch screen for it to
+answer and it was landing on a line of its own.
+
+Record7 177, Frontend 4 64, JS 22, all passing. Nothing committed.
+
+### Stop point — 25 August 2026
+
+Michael had to go. Two things he wants changed when he is back, neither attempted:
+
+1. **The back arrow looks bad** — *"too bad, it needs to be rounded and nice."*
+   It is currently a text link with a rotated arrow and no shape of its own. It
+   probably wants to be a circular control matching the theme toggle opposite it.
+2. **The arrangement inside a house row** — name, Manager access, Supported
+   Living and the rest. *"I don't like it."* Three arrangements were tried today
+   and all three were rejected, so the next attempt needs to be a genuinely
+   different idea rather than a fourth shuffle.
+
+Full write-up, including what has already been tried and rejected, is in
+`docs/care-one-os/RECORD7/RESUME-HERE.md`.
+
+Everything else from today is finished and green: Record7 177, Frontend 4 64,
+JS 22. Nothing committed, nothing pushed.
+
+## 2026-08-26 — the two queued Record7 items
+
+**The back arrow.** Now the theme control's twin: same diameter, hairline, pill
+radius and hover. The two of them are the only things on that row and sit at its
+two ends, so anything other than a matched pair looked like an accident. Icon
+only, because the control opposite it is too — the word is still announced, just
+not drawn.
+
+**The house row.** Rebuilt on a different principle rather than shuffled a fourth
+time. Three genuinely different options went to Michael and he picked this one:
+the badge appears only when the access carries a catch. Full, manager and
+oversight access all mean "you can do your job", which is what anybody opening
+this screen already assumes, so they say nothing and the row is two clean lines.
+Review-only and temporary get a warning badge — which is then the only badge on
+the screen, and is actually noticed. A badge on every row is wallpaper.
+
+The risk in that design is the reverse mistake: an access type that cannot write
+quietly showing no badge, and somebody walking into a house expecting to record a
+dose. So the test does not assert a hard-coded list — it asks
+`UserServiceAccess::isReadOnly()` which access types cannot write and insists the
+screen flags every one of them. Both new tests were checked to actually fail when
+the rule is broken, rather than assumed to.
+
+Verified both ways in the browser by temporarily setting a house to review-only
+in `record7_local` and restoring it.
+
+Record7 179, Frontend 4 64, JS 22, all passing. Nothing committed.
+
+## 2026-08-27 — Section 1.1, the support worker Today dashboard
+
+Built for Noah at Oakwood House. Nothing committed.
+
+**The honest headline: there was no clinical data model at all.** Section 0 built
+who may do what; nothing existed for what they actually do. Ten new tables carry
+this screen — clients, allergies, medicines, prescriptions, scheduled doses,
+administrations, PRN follow-ups, handovers and handover notes, and rounds.
+
+The plan and the outcome are separate records, because a dose that was never
+given still has to exist or nothing can tell a missed dose from one that was
+never due. Administrations are append-only, enforced by database triggers *and*
+by the model, with corrections as new rows pointing at the original.
+
+**Six bands in the agreed order**, the same at every width. Nothing sits beside
+anything else, because a two-column layout on a wide screen silently changes
+which band gets read first. One test reads the component and fails if the order
+changes; another fails if the band ever gets `grid-template-columns`.
+
+The judgement calls worth recording:
+
+- **Needs attention is one list, not four counters.** Nobody wants "two late,
+  one follow-up"; they want to know what to do first, and that is a judgement
+  across all of them at once.
+- **A refusal that was later given drops off it.** Leaving a closed refusal on
+  the list is how people learn to ignore the list.
+- **People due means late, or in the round now open** — not the whole day. The
+  first build showed every remaining dose, so Margaret's half-nine-at-night
+  tablet sat in "People due" at ten in the morning and buried Terence's late
+  Parkinson's dose. The rest of the day is now one counted line per round.
+- **Severe allergies are on the card you read before you knock**, and severity is
+  a word, never a colour alone.
+- **Recently completed exists** because the commonest double-dose near-miss at a
+  shift change is repeating a round the last person finished but had not
+  mentioned yet.
+
+**The round action is real.** It creates or *joins* a round — two people opening
+the morning round within a minute of each other is ordinary, so a unique key
+makes the second join the first — and writes to the Section 0 audit trail. The
+round *screen* is Section 1.2 and is not built, so the button returns to Today
+where the card then reads "Resume round". That is the honest limit of 1.1.
+
+**Two bugs in the shared shell, neither in the new code, both breaking this
+page:** the whole page scrolled sideways on a tablet because the top bar's two
+halves were not allowed to shrink, so the longest role name in the organisation
+decided the page width; and at 360px the context labels overlapped. Fixed and
+checked at 360, 390, 768 and 1024.
+
+Full write-up, including every assumption I had to make and what is deliberately
+not built: `docs/care-one-os/RECORD7/SECTION-1-1-TODAY.md`.
+
+Record7 198, Frontend 4 64, JS 22, all passing.
+
+### Same day — two corrections before approval
+
+**Numbering restored.** I had drifted: the medication round is **Section 2**, not
+1.2. The agreed run is 1.1 Support Worker Today, 1.2 Manager Today, Section 2
+Medication Round. Corrected in the controller and the Section 1.1 document, which
+now carries the numbering table at the top so it cannot drift again.
+
+**Noah's job separated from his competency.** He arrived from the supplied
+fixture holding the role "Medication Administrator", which is not a job anybody
+is employed as — it describes what he is signed off to do. He is now a **Support
+Worker**, and he can give medicines through the same shape Olivia Carter already
+used: an explicit per-house allow, which the competency gate still has to pass.
+
+That is the whole reason Section 0 keeps three things apart:
+
+| his role | what he is employed as | Support Worker |
+| his permission | what he is authorised to do | per-house allow |
+| his competency | what he is signed off for | medication administration, current |
+
+Four tests cover it, including the one that matters: expire his medication
+competency and he stops being able to administer **while remaining a Support
+Worker**. Collapsing the three into a job title makes that impossible — an
+expired competency could not remove the ability without appearing to demote him.
+
+**Two seeder bugs this exposed.** Re-running the Section 0 seeder renumbers the
+services, which orphaned everything Section 1 had written against the old ids —
+so the clear-out found nothing and the next insert collided on a reference that
+is meant to be unique. Section 1's cleanup now finds its own rows by reference
+prefix as well as by house, and collects handovers by both routes.
+
+**And a regression I had introduced fixed.** My earlier fix for the context strip
+gave every cell `flex-basis: 0`, which made all three the same width at *every*
+viewport — so "Omega Care Group" truncated on a wide monitor with three hundred
+spare pixels beside it. Basis `auto` means they size to content when there is
+room and give way together when there is not.
+
+Record7 202, Frontend 4 64, JS 22, all passing. Nothing committed.
+
+## 2026-08-27 — the composition pass
+
+**Navigation is a rail, not a sidebar.** Sixty-eight pixels of icons that widen
+to 232 on hover *and* on `:focus-within`, so it opens for a pointer and for a
+tab key alike. It widens by changing width, which means the workspace is pushed
+across rather than covered — nothing anybody was reading disappears behind the
+thing they navigate with. On a phone the same list is a drawer from the left,
+with a scrim, Escape to close and focus returned to the button that opened it.
+No bottom bar: on this product that sits under the thing somebody is reading at
+a trolley.
+
+The labels are always in the DOM. Collapsing hides them with width and opacity,
+never `display: none`, so every button keeps its accessible name — a rail whose
+labels exist only while hovered is unusable to anyone not using a mouse.
+
+**Two destinations, because two pages exist.** Nothing is padded out with links
+that go nowhere. Adding the Medication Round later is one more entry in an array.
+
+**Six materials, not six white rectangles.** The first build put everything in
+the same card, which is why it read as a template — sameness is not calm, it is
+an absence of decisions. Now:
+
+| Handover | a deep briefing panel — the voice of the last shift, not the app talking |
+| Attention | the only lifted surface on the page, because it is the only part you act on now |
+| Overview | a broad sunken band with the progress line |
+| People due | rows on the ground; a card each would make five people look like five emergencies |
+| Tasks | rows with an interaction-blue rail and the question in the accent |
+| Completed | no surface at all, small type — a log, not a list |
+
+**The briefing needed its own token per theme.** On cream, deep navy is the
+strongest contrast available. On the dark theme the page is *already* navy, so
+the first attempt fell apart: the gradient's bottom matched the page exactly and
+its top matched the attention cards, and the whole hierarchy collapsed into one
+tone. `--r7-briefing` now goes *deeper* than the page on dark and takes an edge.
+Four contrast pairings were added against it.
+
+**The anchor carries shift, date, house and the one thing to do.** The round
+button moved out of Shift Overview and into the masthead: two primary actions on
+one screen means neither is primary. Overview keeps the progress, which is what
+"where has the day got to" actually asks.
+
+**Reading order untouched.** Six bands, same order, same DOM at every width. A
+wide screen lays a band's *insides* out better — a person's medicines go two
+across — but no band is ever beside another.
+
+Verified 390, 820 and 1440 in both themes: no horizontal scroll at any of them.
+Fixed on the way: the header row overflowed at 390 once the menu button was
+added, and when it wrapped the mark was flung to the right — it now stays beside
+the burger and the actions take the second line.
+
+Record7 202, Frontend 4 64, JS 22, all passing. Nothing committed.
+
+### Same day — the Today content-reduction pass
+
+The shell was approved, so none of it moved. What changed is what it carries.
+
+**Today names no medicines any more.** Not in People due, not in Needs
+attention, not in tasks, not in the activity log. Knowing it is co-careldopa
+does not help answer "what do I need to do right now" — it pushed the thing
+that does answer it off the bottom of a phone. Names, strengths, routes, doses
+and instructions belong on the round screen, where somebody is holding the box.
+
+Nothing was deleted from the database. The detail is still recorded, still
+queried, still authorised; it is simply not this screen's job to show it.
+
+**A test locks it in**, and it reads the actual rendered response rather than
+the props anybody thought to check — every medicine name in the fixture is
+searched for. Verified to fail by putting a name back.
+
+**One deliberate exemption, and it is documented in the test:** what a colleague
+wrote in a handover note. "Lorazepam given at 3:10 and it did settle her" is one
+human telling another what happened overnight. Stripping the drug out of
+somebody's sentence would not reduce clutter, it would break the handover — and
+it is not the product rendering a field from the medicines record, which is what
+the rule is about.
+
+**Band by band.** Handover is three notes, worst first, with the rest counted
+rather than hidden, and an "I have read this" that is recorded per person and
+audited — a handover nobody confirms reading is a handover that was not handed
+over. Needs attention is now who, the problem in plain words, how urgent, and
+**what to do next** written in the interaction colour, because a problem with no
+next action is a worry rather than a task; recent medication changes fold into
+it as actions instead of sitting apart as a list of drugs. Shift overview is
+three numbers, a line, and the next round — not the day's schedule. People due
+is a person and a count. Tasks say why something was given, not what. Recently
+completed is collapsed behind a one-line summary.
+
+**One thing I did not do as asked, and why.** Tasks were to be "assigned
+follow-ups only". I kept every outstanding follow-up in the house visible and
+marked which are yours. Hiding the night shift's unanswered controlled-drug
+follow-up from the person now on duty is precisely the gap the fixture's own
+urgent handover note describes. Say if you want it narrowed and I will.
+
+Also dropped, and worth a look: each person's support note ("Parkinson's, his
+timings matter more than the round does") and their date of birth. Both were
+useful; neither is in the agreed field list, and identity checking belongs where
+administration happens.
+
+Record7 209, Frontend 4 64, JS 22, all passing. Nothing committed.
+
+## 2026-08-28 — Section 1.2, Manager Today (functionality)
+
+Section 1.1's visual design is frozen and rejected; its functionality, schema,
+fixture, scoping, permissions, competency gating, audit behaviour and tests are
+all preserved untouched. Nothing was polished.
+
+**Reused rather than rebuilt.** Almost everything. Late doses, refusals,
+omissions and PRN follow-ups are DERIVED from Section 1.1's own rows — a manager
+looking at a late dose is looking at the same record the support worker is.
+Staff readiness comes straight from Section 0's roles, per-user permissions and
+competencies. Handover acknowledgement is Section 1.1's `record7_handover_reads`.
+None of it was duplicated under a manager-shaped name, because two tables
+meaning the same thing is how a system starts disagreeing with itself.
+
+**Four things genuinely did not exist**, so four new tables: stock levels and
+stock events (nothing recorded what was in a cupboard); a review queue
+(corrections, incidents, escalations and reopen requests had nowhere to wait);
+issue states; and closed/reopened columns on rounds.
+
+**The idea worth keeping is `record7_issue_states`.** An issue is derived every
+time it is asked for. What people have DONE about it — who owns it, when it was
+escalated, whether it is resolved — is stored separately and keyed by a
+deterministic name like `omitted_dose:412`. So a manager can take ownership of a
+late dose without a single byte being written to the dose, and resolving
+something hides it from the active list while the state row, the audit event and
+the untouched clinical record all remain.
+
+**Approving a correction never rewrites anything.** It writes a NEW
+administration pointing back at the original with `corrects_administration_id`,
+recorded against the manager who authorised it. Both rows survive in order for
+ever. The database trigger and the model both refuse the alternative; the
+manager path simply never asks.
+
+**A new permission rather than a borrowed one.** `view_manager_dashboard`, given
+to R2, R3, R4 and R5. Gating on `manage_staff` would have worked today and been
+wrong the first time somebody may manage staff but not oversee medicines.
+Daniel's `correction_approval`, `incident_review` and `stock_management` are
+explicit per-house grants, not a widening of the Service Manager role — quietly
+changing what every Service Manager in the organisation may do is a far larger
+decision than making one screen work.
+
+**Rosewood House got its own people.** Section 1.1 only ever filled Oakwood, so
+switching house showed a populated screen and then an empty one, which proves
+nothing. Rosewood now has three clients, its own shift, an unexplained
+time-critical insulin omission, a controlled-drug balance two capsules short,
+and Ruth Coleman — a Support Worker with the permission and an expired
+competency, who therefore may not administer while remaining exactly as employed
+as she was yesterday.
+
+**Two bugs found and fixed.** `hasPermission` was reading the final access
+decision, which already folds competency in — so the two facts were not actually
+separate and Ruth showed as having no permission when what she had lost was her
+competency. And `item()` merged its formatted timestamp with `+`, which keeps
+the left-hand value for an existing key, so the screen printed
+`2026-08-27T07:00:00.000000Z` at a manager. Both now covered by tests that were
+checked to fail when the bug is put back.
+
+The page itself is a deliberately plain scaffold — headings, tables and plain
+buttons, no new tokens or components — because the real design is being done
+separately and anything decorative here would only have to be thrown away.
+
+Record7 234, Frontend 4 64, JS 22, production build clean. Nothing committed.
+
+### Same day — hardening the issue lifecycle before 1.2 is approved
+
+**The safety hole was real and is closed.** `record7_issue_states` had a single
+`resolved_at`, and the dashboard filtered anything carrying one out of the active
+list. So a manager could clear a time-critical omission or a controlled-drug
+discrepancy off their own screen by pressing a button, while the dose was still
+unrecorded and the balance still short. A workflow flag was hiding a live
+clinical condition.
+
+Six concepts are now completely separate: **acknowledged, owned, escalated,
+action recorded, closed** — all describing the RESPONSE and all stored — and
+**underlying condition resolved**, which is derived from the clinical record
+every time and deliberately not stored anywhere.
+
+`IssueRegistry::conditionActive()` is the single check that decides visibility.
+Nothing is filtered by workflow state any more. A closed issue whose dose is
+still unrecorded stays on the list reading *"Action recorded — underlying issue
+remains unresolved"*. The only thing that removes an omitted dose is recording
+the dose; the only thing that removes a refusal is a later accepted offer; the
+only thing that clears low stock is stock.
+
+`resolved_at` was **dropped**, not left in place. Two fields that both look like
+they answer "is it sorted" is the ambiguity that caused this.
+
+**Closure now costs something.** A reason, an actor, a timestamp and an audit
+event, always. For a safety-critical issue, evidence or a linked corrective
+record as well — and the audit entry records whether the condition was still
+active at the moment of closing, so the trail shows a manager who closed
+something that was still happening.
+
+**A test caught a real gap while I was writing it.** Evidence was required by
+issue TYPE, but a stock event's key is `stock_event:12` whatever it is about —
+so "controlled_drug_discrepancy" was never the type and a CD balance could be
+closed with no evidence at all. The rule now loads the event and asks what it is.
+
+**Identity was a string, and is now owned.** `omitted_dose:412` had nothing
+tying 412 to the house the row was stored under, so a crafted post could attach
+state in one house to a record in another. `issue_type` and `source_id` are
+explicit columns, the unique key is
+`(organisation_id, service_id, issue_type, source_id)`, and every action resolves
+the source through a service-scoped lookup **before** the id is trusted.
+
+**A manager approves a request; they do not write one.** Correction requests
+carry `requested_outcome`. Substituting a different outcome at the moment of
+approving is refused — decline it and ask for a new request. The correction
+names both the requester and the approver on the record itself.
+
+**Two earlier tests were replaced rather than patched.** One asserted that
+resolving removes an issue from the list, which is precisely the behaviour this
+pass exists to prevent; it now asserts the opposite. The other posted to an
+endpoint that no longer exists.
+
+Record7 255, Frontend 4 64, JS 22, production build clean. Nothing committed.

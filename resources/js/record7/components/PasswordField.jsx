@@ -1,3 +1,4 @@
+import Icon from './Icon.jsx';
 import InlineError from './InlineError.jsx';
 import React, { useId, useState } from 'react';
 
@@ -14,6 +15,10 @@ import React, { useId, useState } from 'react';
  */
 export default function PasswordField({
     label,
+    // Matches Field, so a password sitting under a username lines its text up
+    // with it. Without one the two boxes are the same width but their contents
+    // start in different places, which reads as a mistake.
+    icon = 'lock',
     hint = null,
     error = null,
     value,
@@ -30,13 +35,18 @@ export default function PasswordField({
     return (
         <div className="r7-field">
             <label className="r7-label" htmlFor={id}>{label}</label>
-            {hint ? <span className="r7-field__hint" id={hintId}>{hint}</span> : null}
 
             <span className="r7-secret">
+                {icon ? (
+                    <span className="r7-field__icon">
+                        <Icon name={icon} className="r7-icon r7-icon--small" />
+                    </span>
+                ) : null}
+
                 <input
                     id={id}
                     type={shown ? 'text' : 'password'}
-                    className="r7-input"
+                    className={`r7-input${icon ? ' r7-input--iconed' : ''}`}
                     value={value}
                     onChange={(event) => onChange(event.target.value)}
                     aria-invalid={error ? 'true' : undefined}
@@ -53,6 +63,13 @@ export default function PasswordField({
                     {shown ? 'Hide' : 'Show'}
                 </button>
             </span>
+
+            {hint ? (
+                <span className="r7-field__note" id={hintId}>
+                    <Icon name="info" className="r7-icon r7-icon--small" />
+                    <span>{hint}</span>
+                </span>
+            ) : null}
 
             {error ? <InlineError id={errorId}>{error}</InlineError> : null}
         </div>

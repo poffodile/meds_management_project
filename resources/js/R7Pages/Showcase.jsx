@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Mark from '@record7/components/Mark.jsx';
+import CareOneOsBadge from '@record7/components/CareOneOsBadge.jsx';
 import ThemeToggle from '@record7/components/ThemeToggle.jsx';
 import PageHeading from '@record7/components/PageHeading.jsx';
 import SectionHeading from '@record7/components/SectionHeading.jsx';
@@ -70,14 +71,16 @@ export default function Showcase({ environment }) {
     const [code, setCode] = useState('2468');
 
     return (
-        <div className="r7-auth">
-            <header className="r7-auth__head">
-                <Mark productName={product.name} strapline="Component showcase" />
-                <ThemeToggle />
+        <div className="r7-shell">
+            <header className="r7-top">
+                <div className="r7-top__row">
+                    <Mark productName={product.name} strapline="Component showcase" />
+                    <ThemeToggle />
+                </div>
             </header>
 
-            <main className="r7-auth__body">
-                <div style={{ width: '100%', maxWidth: 'var(--r7-width-app)' }}>
+            <main className="r7-main">
+                <div>
                     <PageHeading
                         eyebrow={`Development only — ${environment}`}
                         title="Record7 design system"
@@ -113,6 +116,17 @@ export default function Showcase({ environment }) {
                                 <Mark productName={product.name} />
                                 <Mark productName={product.name} strapline={product.strapline} />
                                 <div className="r7-mark--large"><Mark productName={product.name} /></div>
+                            </div>
+                            <div
+                                className="r7-showcase__demo"
+                                style={{ background: 'var(--r7-brand-panel)' }}
+                            >
+                                <CareOneOsBadge tone="onDark" />
+                            </div>
+                            <div className="r7-showcase__demo">
+                                <span className="r7-careone--on-light">
+                                    <CareOneOsBadge tone="onLight" />
+                                </span>
                             </div>
                         </Group>
 
@@ -338,12 +352,10 @@ export default function Showcase({ environment }) {
 
                     </div>
                 </div>
+                <p className="r7-xs r7-faint" style={{ marginTop: 'var(--r7-space-8)' }}>
+                    Development only. This page is not registered in production.
+                </p>
             </main>
-
-            <footer className="r7-auth__foot">
-                <span>{product.seventhRight}</span>
-                <span>Development only. This page is not registered in production.</span>
-            </footer>
         </div>
     );
 }

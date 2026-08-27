@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { router, useForm } from '@inertiajs/react';
 import AuthShell from '@record7/components/AuthShell.jsx';
 import Field from '@record7/components/Field.jsx';
 import PasswordField from '@record7/components/PasswordField.jsx';
 import Button from '@record7/components/Button.jsx';
 import Notice from '@record7/components/Notice.jsx';
+import TextLink from '@record7/components/TextLink.jsx';
+import Icon from '@record7/components/Icon.jsx';
 import AccountUnavailable from '@record7/components/AccountUnavailable.jsx';
 
 /**
@@ -35,6 +37,7 @@ export default function SignIn({ step, organisationName, urls, supportUrl, statu
 
 function OrganisationStep({ urls, status, error }) {
     const { data, setData, post, processing, errors } = useForm({ organisation: '' });
+    const [showHelp, setShowHelp] = useState(false);
 
     const submit = (event) => {
         event.preventDefault();
@@ -53,6 +56,9 @@ function OrganisationStep({ urls, status, error }) {
 
                 <Field
                     label="Organisation"
+                    icon="house"
+                    placeholder="e.g. Willowbrook House"
+                    hint="It is usually on your invitation email or in your staff handbook."
                     value={data.organisation}
                     onChange={(value) => setData('organisation', value)}
                     error={errors.organisation}
@@ -63,9 +69,29 @@ function OrganisationStep({ urls, status, error }) {
                     required
                 />
 
-                <Button type="submit" block busy={processing} busyLabel="Checking">
-                    Continue
-                </Button>
+                <div className="r7-stack-s">
+                    <Button type="submit" block arrow busy={processing} busyLabel="Checking">
+                        Continue
+                    </Button>
+                    {/* People move faster through a journey whose length they
+                        can see, and slower through one that keeps surprising
+                        them with another step. */}
+                    <span className="r7-next">Next: your username and password</span>
+                </div>
+
+                <div className="r7-help-row">
+                    <span>Do not know your organisation name?</span>
+                    <TextLink onClick={() => setShowHelp((open) => !open)} aria-expanded={showHelp}>
+                        Ask your manager
+                    </TextLink>
+                </div>
+
+                {showHelp ? (
+                    <Notice tone="info" title="Finding your organisation name">
+                        Your manager or organisation administrator has the exact name. It is the
+                        name of the company you work for, not the name of the house you work in.
+                    </Notice>
+                ) : null}
             </form>
         </AuthShell>
     );
@@ -83,24 +109,38 @@ function Credentials({ organisationName, urls, status, error }) {
         <AuthShell
             step={2}
             title="Sign in"
-            intro={<>You are signing in to <strong>{organisationName}</strong>.</>}
             footer={
                 <div className="r7-between">
-                    <button type="button" className="r7-btn r7-btn--bare" onClick={() => router.get(urls.forgot)}>
-                        I have forgotten my password
-                    </button>
-                    <button type="button" className="r7-btn r7-btn--bare" onClick={() => router.get(urls.change)}>
-                        Change organisation
-                    </button>
+                    <span>Cannot get in?</span>
+                    <TextLink href={urls.forgot}>I have forgotten my password</TextLink>
                 </div>
             }
         >
             <form className="r7-form" onSubmit={submit} noValidate>
+                {/* The organisation is settled, so it is shown as a fact with a
+                    way to change it rather than as a sentence to read. On a
+                    shared device the wrong organisation is a real mistake. */}
+                <div className="r7-settled">
+                    <span className="r7-settled__tick">
+                        <Icon name="tick" className="r7-icon r7-icon--small" />
+                    </span>
+                    <span className="r7-settled__body">
+                        <span className="r7-settled__label">Organisation</span>
+                        <span className="r7-settled__value">{organisationName}</span>
+                    </span>
+                    <span className="r7-settled__change">
+                        <TextLink href={urls.change} quiet>Change</TextLink>
+                    </span>
+                </div>
+
                 <Notice tone="error">{error}</Notice>
                 <Notice tone="success">{status}</Notice>
 
                 <Field
                     label="Username"
+                    icon="person"
+                    placeholder="e.g. j.smith"
+                    hint="The username your manager set up, which is usually not your email address."
                     value={data.username}
                     onChange={(value) => setData('username', value)}
                     error={errors.username}
@@ -123,9 +163,12 @@ function Credentials({ organisationName, urls, status, error }) {
                     required
                 />
 
-                <Button type="submit" block busy={processing} busyLabel="Signing in">
-                    Sign in
-                </Button>
+                <div className="r7-stack-s">
+                    <Button type="submit" block arrow busy={processing} busyLabel="Signing in">
+                        Sign in
+                    </Button>
+                    <span className="r7-next">Next: choose the house you are working in</span>
+                </div>
             </form>
         </AuthShell>
     );

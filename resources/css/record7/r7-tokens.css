@@ -47,47 +47,94 @@
      The brand hues. Surfaces and text derive from these but are named
      separately, so a screen asks for "the page" rather than for a hex.      */
 
-  --r7-colour-primary:        #142330;  /* midnight — the ink and the mark  */
-  --r7-colour-primary-strong: #0B141D;
-  --r7-colour-primary-soft:   #1E3240;
+  --r7-colour-primary:        #0F1C27;  /* midnight — the ink and the mark  */
+  --r7-colour-primary-strong: #08131B;
+  --r7-colour-primary-soft:   #1A2B3A;
 
-  --r7-colour-accent:         #2C6070;  /* mineral — links, focus, emphasis */
-  --r7-colour-accent-strong:  #1F4A57;
-  --r7-colour-accent-soft:    #E9F0F1;
-  --r7-colour-accent-border:  #C2D6DA;
+  --r7-colour-accent:         #6EC5B8;  /* mineral — links, focus, emphasis */
+  --r7-colour-accent-strong:  #4FA89A;
+  --r7-colour-accent-soft:    #E8F3F1;
+  --r7-colour-accent-border:  #BFDED8;
+
+  /* TWO ACCENTS, WITH DIFFERENT JOBS.
+     Teal is the brand — the mark, the seventh right, the arrow on a dark
+     button. It is bright, and bright teal on cream is unreadable, so it never
+     carries text there.
+     Blue is interaction — links, focus, the active step, a focused field. It
+     is the one that has to survive on a pale ground, so it is the darker of
+     the two. Using one colour for both jobs is why the earlier palette had to
+     compromise on each. */
+  --r7-colour-interactive:        #367399;
+  --r7-colour-interactive-strong: #2B5E7E;
+  --r7-colour-interactive-soft:   rgba(54, 115, 153, .10);
 
   /* ══ SURFACE ════════════════════════════════════════════════════════════ */
 
-  --r7-surface-page:     #FAF4E9;  /* warm cream — the page itself          */
-  --r7-surface-raised:   #FFFCF5;  /* cards, panels, inputs                 */
-  --r7-surface-sunken:   #F2EADB;  /* wells, table heads, quiet rows        */
-  --r7-surface-accent:   #E9F0F1;  /* tinted, for accent regions            */
+  --r7-surface-page:     #F7F1E4;  /* warm cream — the page itself          */
+  --r7-surface-raised:   #FFFFFF;  /* cards, panels, inputs                 */
+  --r7-surface-sunken:   #EFE8D8;  /* wells, table heads, quiet rows        */
+  --r7-surface-accent:   #E8F3F1;  /* tinted, for accent regions            */
   --r7-surface-overlay:  rgba(20, 35, 48, .42);  /* behind a modal          */
+  /* The faint rings on the warm half. Warm, not grey, or they read as dirt. */
+  --r7-page-glow:  rgba(54, 115, 153, .07);
 
   /* The one strong filled surface: primary buttons, the brand tile, the
      selected filter. Kept SEPARATE from --r7-colour-primary on purpose —
      primary is also the ink, and on the dark theme the ink becomes the page.
      A filled control that borrowed it would be invisible. */
-  --r7-surface-solid:        #142330;
-  --r7-surface-solid-hover:  #1F4A57;
-  --r7-surface-solid-active: #0B141D;
+  --r7-surface-solid:        #0F1C27;
+  --r7-surface-solid-hover:  #1A2B3A;
+  --r7-surface-solid-active: #08131B;
+
+  /* ══ BRAND PANEL ════════════════════════════════════════════════════════
+     The deep side of the sign-in screen. It needs its own tokens rather than
+     borrowing --r7-surface-solid, because that token flips to the light accent
+     on the dark theme — which is right for a button and wrong for a panel that
+     should stay the calm, deep side of the composition in both themes.       */
+
+  --r7-brand-panel:       #0F1C27;
+  --r7-brand-panel-deep:  #08131B;
+  --r7-brand-panel-ink:   #F7F1E4;
+  --r7-brand-panel-muted: #8FA0AC;
+  --r7-brand-panel-rule:  #24384A;  /* hairlines on the deep panel         */
+  --r7-brand-panel-dim:   #748EA2;  /* the smallest text on it, still 4.5:1 */
+  --r7-brand-panel-accent:#6EC5B8;
+  /* A row on the panel that is being singled out. */
+  --r7-brand-panel-raise: #162734;
+
+  /* THE SHIFT BRIEFING.
+     It has to read as a different material from everything below it. On cream
+     that is easy — deep navy against warm paper. On the dark theme the page is
+     already navy, so the briefing goes DEEPER than the page and takes an edge,
+     rather than fading into it. */
+  --r7-briefing-top:    #13233F;
+  --r7-briefing-bottom: #0F1C27;
+  --r7-briefing:        linear-gradient(180deg, var(--r7-briefing-top) 0%, var(--r7-briefing-bottom) 100%);
+  --r7-briefing-edge:   transparent;
+
+  /* Soft shapes behind the composition. Translucent so they sit on whatever
+     ground they are given and never need a second value per theme. Defined
+     here rather than inline because r7.css takes every colour from a token. */
+  --r7-brand-glow:  rgba(110, 197, 184, .10);
+  --r7-brand-glow-2:rgba(54, 115, 153, .12);
 
   /* ══ TEXT ═══════════════════════════════════════════════════════════════ */
 
-  --r7-text-primary:    #142330;  /* body and headings                      */
-  --r7-text-secondary:  #56656F;  /* supporting copy                        */
-  --r7-text-muted:      #8B98A0;  /* labels, timestamps, placeholders       */
-  --r7-text-on-solid:   #FDF9F1;  /* on --r7-surface-solid                  */
-  --r7-text-accent:     #1F4A57;  /* links on cream                         */
+  --r7-text-primary:    #0F1C27;  /* body and headings                      */
+  --r7-text-secondary:  #455663;  /* supporting copy                        */
+  --r7-text-muted:      #656F7B;  /* labels, timestamps, placeholders       */
+  --r7-text-on-solid:   #F7F1E4;  /* on --r7-surface-solid                  */
+  --r7-icon-on-solid:   #6EC5B8;  /* the arrow — never the button fill      */
+  --r7-text-accent:     #367399;  /* links on cream                         */
 
   /* ══ BORDER ═════════════════════════════════════════════════════════════ */
 
-  --r7-border-subtle:  #E8DCC7;  /* decorative hairline between things      */
+  --r7-border-subtle:  #E2DAC8;  /* decorative hairline between things      */
   /* The visible boundary of a CONTROL. An input sits on a surface close to
      the page colour, so this border is what says "you can type here" — WCAG
      2.2 asks for 3 to 1 against both neighbours, and #D5C4A6 managed only
      1.56. This value clears it on the page and on a card. */
-  --r7-border-strong:  #9C875C;
+  --r7-border-strong:  #8E897E;
   --r7-border-width:   1px;
   --r7-border-emphasis-width: 3px;  /* the left rule on a notice            */
 
@@ -178,12 +225,15 @@
      Focus is never removed, only shaped. Two rings so it reads on any
      surface: the page colour first, then the accent.                       */
 
-  --r7-focus-colour: var(--r7-colour-accent);
-  --r7-focus-ring: 0 0 0 2px var(--r7-surface-page), 0 0 0 4px var(--r7-focus-colour);
+  --r7-focus-colour: var(--r7-colour-interactive);
+  --r7-focus-ring: 0 0 0 4px var(--r7-colour-interactive-soft);
   --r7-focus-offset: 2px;
 
+  /* Behind the phone drawer. Navy rather than black, so the page it dims
+     stays warm instead of turning grey. */
+  --r7-scrim:       rgba(15, 28, 39, .45);
   --r7-hover-tint:  var(--r7-surface-sunken);
-  --r7-hover-border: var(--r7-colour-accent);
+  --r7-hover-border: var(--r7-colour-interactive);
 
   /* ══ CONTROLS ═══════════════════════════════════════════════════════════
      Gloved hands, phones, a moving corridor. 48px is the floor.            */
@@ -200,8 +250,20 @@
   /* ══ LAYOUT ═════════════════════════════════════════════════════════════ */
 
   --r7-measure:      62ch;   /* readable line length                        */
-  --r7-width-card:      440px;
+  /* FROM FRONTEND 4, GEOMETRY ONLY.
+     Its sign-in page is a two-column grid whose card column is
+     minmax(360px, 480px), vertically centred, with clamp(24px, 6vw, 88px) of
+     page padding and clamp(24px, 4vw, 40px) inside the card. Those four numbers
+     are copied exactly; nothing else from that page is. */
+  --r7-width-card:      480px;
+  --r7-width-card-min:  360px;
+  --r7-auth-inset:      clamp(24px, 6vw, 88px);
+  --r7-card-pad:        clamp(24px, 4vw, 40px);
   --r7-width-card-wide: 620px;
+  --r7-width-work:      1040px; /* the workspace owns the width it is given */
+  --r7-rail-collapsed:  68px;   /* icons only                             */
+  --r7-rail-open:       232px;  /* icons and their words                  */
+  --r7-drawer-width:    288px;  /* the phone drawer                       */
   --r7-width-app:      1140px;
   --r7-width-sidebar:   248px;
   --r7-width-swatch:    140px;
@@ -222,34 +284,65 @@
 
 .r7-root[data-theme="dark"] {
 
-  --r7-colour-primary:        #0E1922;
-  --r7-colour-primary-strong: #060D13;
-  --r7-colour-primary-soft:   #17262F;
+  --r7-colour-primary:        #0A141C;
+  --r7-colour-primary-strong: #050C12;
+  --r7-colour-primary-soft:   #152532;
 
-  --r7-colour-accent:         #7FB2BE;
-  --r7-colour-accent-strong:  #9BC6D0;
-  --r7-colour-accent-soft:    #16262C;
-  --r7-colour-accent-border:  #2E4A53;
+  --r7-colour-accent:         #6EC5B8;
+  --r7-colour-accent-strong:  #8FD6CB;
+  --r7-colour-accent-soft:    #12242A;
+  --r7-colour-accent-border:  #2C4750;
 
-  --r7-surface-page:     #0E1922;
-  --r7-surface-raised:   #16232C;
-  --r7-surface-sunken:   #1C2A34;
-  --r7-surface-accent:   #16262C;
+  /* Deeper here: the light scrim is navy over cream, and navy over midnight
+     would barely register as a dim at all. */
+  --r7-scrim:                     rgba(0, 0, 0, .62);
+
+  --r7-colour-interactive:        #7FB2D6;
+  --r7-colour-interactive-strong: #9CC6E3;
+  --r7-colour-interactive-soft:   rgba(127, 178, 214, .12);
+
+  --r7-surface-page:     #0A141C;
+  --r7-surface-raised:   #12212C;
+  --r7-surface-sunken:   #182A36;
+  --r7-surface-accent:   #12242A;
   --r7-surface-overlay:  rgba(0, 0, 0, .58);
+  --r7-page-glow:  rgba(110, 197, 184, .06);
 
   /* Lifts to the accent, with deep midnight text on it. Either way a filled
      control reads as a control. */
-  --r7-surface-solid:        #7FB2BE;
-  --r7-surface-solid-hover:  #9BC6D0;
-  --r7-surface-solid-active: #6FA3AF;
+  --r7-surface-solid:        #6EC5B8;
+  --r7-surface-solid-hover:  #8FD6CB;
+  --r7-surface-solid-active: #5AB0A3;
 
-  --r7-text-primary:    #F0E9DC;
-  --r7-text-secondary:  #A9B4BC;
-  --r7-text-muted:      #7A868F;
-  --r7-text-on-solid:   #0E1922;
-  --r7-text-accent:     #9BC6D0;
+  /* Lifted off the dark page rather than inverted, so the panel still reads
+     as the deep side of the composition. */
+  --r7-brand-panel:       #12212C;
+  --r7-brand-panel-deep:  #0A141C;
+  --r7-brand-panel-ink:   #EFE8D8;
+  --r7-brand-panel-muted: #9FADB6;
+  --r7-brand-panel-rule:  #24384A;
+  --r7-brand-panel-dim:   #748EA2;
+  --r7-brand-panel-accent:#6EC5B8;
+  --r7-brand-panel-raise: #182A36;
 
-  --r7-border-subtle:  #253440;
+  /* Deeper than the page, and edged, because on this theme it cannot rely on
+     being darker than its surroundings — it already is. */
+  --r7-briefing-top:    #050C12;
+  --r7-briefing-bottom: #050C12;
+  --r7-briefing:        var(--r7-briefing-top);
+  --r7-briefing-edge:   #22323E;
+
+  --r7-brand-glow:  rgba(110, 197, 184, .09);
+  --r7-brand-glow-2:rgba(127, 178, 214, .08);
+
+  --r7-text-primary:    #EFE8D8;
+  --r7-text-secondary:  #A9B7BF;
+  --r7-text-muted:      #8394A0;
+  --r7-text-on-solid:   #0A141C;
+  --r7-icon-on-solid:   #0A141C;
+  --r7-text-accent:     #8FD6CB;
+
+  --r7-border-subtle:  #22323E;
   --r7-border-strong:  #61798A;
 
   --r7-state-success:         #7FB394;

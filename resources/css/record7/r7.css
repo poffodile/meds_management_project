@@ -182,13 +182,25 @@
   height: var(--r7-control-height-small);
   flex: none;
   border-radius: var(--r7-radius-md);
-  background: var(--r7-surface-solid);
-  color: var(--r7-text-on-solid);
+  /* Tinted and outlined rather than solid: on the dark panel a solid cream
+     tile shouts, and the seven is the thing to notice, not the box. */
+  background: var(--r7-colour-accent-soft);
+  border: var(--r7-border-width) solid var(--r7-colour-accent-border);
+  color: var(--r7-colour-accent-strong);
   font-family: var(--r7-font-display);
   font-size: var(--r7-size-md);
   font-weight: var(--r7-weight-bold);
-  box-shadow: var(--r7-shadow-sm);
 }
+
+/* On the deep panel the tile takes the teal directly. */
+.r7-root .r7-brand .r7-mark__glyph {
+  background: var(--r7-brand-panel-raise);
+  border-color: var(--r7-brand-panel-rule);
+  color: var(--r7-brand-panel-accent);
+}
+
+.r7-root .r7-brand .r7-mark__word { color: var(--r7-brand-panel-ink); }
+.r7-root .r7-brand .r7-mark__word em { color: var(--r7-brand-panel-accent); }
 
 .r7-root .r7-mark--large .r7-mark__glyph {
   width: var(--r7-control-height);
@@ -257,8 +269,20 @@
 .r7-root .r7-btn:active:not(:disabled) { transform: translateY(var(--r7-border-width)); }
 .r7-root .r7-btn:disabled { opacity: .5; cursor: not-allowed; }
 
-.r7-root .r7-btn--primary { background: var(--r7-surface-solid); color: var(--r7-text-on-solid); }
+.r7-root .r7-btn--primary {
+  background: var(--r7-surface-solid);
+  color: var(--r7-text-on-solid);
+  font-weight: var(--r7-weight-semi);
+  box-shadow: var(--r7-shadow-md);
+}
+
 .r7-root .r7-btn--primary:hover:not(:disabled) { background: var(--r7-surface-solid-hover); color: var(--r7-text-on-solid); }
+
+/* On the warm theme the arrow takes the brand teal, so the one bright thing on
+   the screen is the direction you are going. On the dark theme the button is
+   itself teal, so the arrow takes the button's ink instead — its own token,
+   because reusing the accent here made the arrow vanish. */
+.r7-root .r7-btn--primary .r7-icon { color: var(--r7-icon-on-solid); }
 
 .r7-root .r7-btn--secondary {
   background: var(--r7-surface-accent);
@@ -315,17 +339,20 @@
      only thing that says it is one. */
   background: var(--r7-surface-raised);
   color: var(--r7-text-primary);
+  font-size: var(--r7-size-base);
+  font-weight: var(--r7-weight-medium);
   border: var(--r7-border-width) solid var(--r7-border-strong);
   border-radius: var(--r7-radius-md);
-  transition: border-color var(--r7-motion), background var(--r7-motion);
+  transition: border-color var(--r7-motion), box-shadow var(--r7-motion);
 }
 
 .r7-root .r7-input::placeholder { color: var(--r7-text-muted); }
 .r7-root .r7-input:hover:not(:disabled) { border-color: var(--r7-text-muted); }
 
+/* A soft blue halo rather than a hard double ring: it says "here" without
+   drawing a second box around the box. */
 .r7-root .r7-input:focus-visible {
-  border-color: var(--r7-colour-accent);
-  background: var(--r7-surface-raised);
+  border-color: var(--r7-colour-interactive);
   box-shadow: var(--r7-focus-ring);
 }
 
@@ -360,7 +387,7 @@
 }
 
 /* Password field with its reveal control inside it. */
-.r7-root .r7-secret { position: relative; display: flex; }
+.r7-root .r7-secret { position: relative; display: flex; align-items: center; }
 .r7-root .r7-secret .r7-input { padding-right: var(--r7-space-9); }
 
 .r7-root .r7-reveal {
@@ -405,8 +432,7 @@
 }
 
 .r7-root .r7-code-input:focus-visible {
-  border-color: var(--r7-colour-accent);
-  background: var(--r7-surface-raised);
+  border-color: var(--r7-colour-interactive);
   box-shadow: var(--r7-focus-ring);
 }
 
@@ -633,25 +659,68 @@
 
 /* ─────────────────────────────────────────────────────────────────────────
    13. Authentication layout
+
+   A composition of two halves rather than a card floating in the middle of an
+   empty page. The deep half carries the product and what it stands for; the
+   warm half carries the work. A centred card is the default every product
+   reaches for, and it reads as unconsidered precisely because of that.
+
+   On a phone the deep half becomes a compact band across the top, because a
+   full-height brand panel above the form would push the fields below the fold
+   — and the fields are the reason anyone is here.
    ───────────────────────────────────────────────────────────────────────── */
 
 .r7-root .r7-auth {
   min-height: 100vh;
   min-height: 100dvh;
-  display: grid;
-  grid-template-rows: auto 1fr auto;
-  gap: var(--r7-space-5);
-  padding: var(--r7-space-4);
+  display: flex;
+  flex-direction: column;
+  background: var(--r7-surface-page);
 }
 
-.r7-root .r7-auth__head,
-.r7-root .r7-auth__foot {
-  width: 100%;
-  max-width: var(--r7-width-card-wide);
-  margin-inline: auto;
+/* ── The deep half ─────────────────────────────────────────────────────── */
+
+/* The deep half is not flat. A slow diagonal gradient and two very soft
+   circles give it depth without decoration — nothing here is a shape you are
+   meant to notice, only a ground that does not look like a swatch.
+
+   Drawn with gradients rather than images: no asset to load, no second file
+   for the dark theme, and it scales to any panel size. */
+.r7-root .r7-brand {
+  position: relative;
+  overflow: hidden;
+  color: var(--r7-brand-panel-ink);
+  padding: var(--r7-space-5) var(--r7-space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--r7-space-4);
+  background:
+    radial-gradient(circle at 12% 6%, var(--r7-brand-glow) 0%, transparent 42%),
+    radial-gradient(circle at 88% 96%, var(--r7-brand-glow-2) 0%, transparent 38%),
+    linear-gradient(158deg, var(--r7-brand-panel-deep) 0%, var(--r7-brand-panel) 58%);
 }
 
-.r7-root .r7-auth__head {
+/* One faint ring, low and left, so the panel has a horizon. */
+.r7-root .r7-brand::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  /* Two rings, drawn thick and cropped by the panel edge.
+     A hairline circle reads as a stray border; a band this heavy reads as a
+     deliberate mark, and because both sit far off-centre most of each one is
+     outside the panel — you see an arc, not a target. Gradients rather than
+     elements, so there is nothing extra in the DOM to position or hide. */
+  background:
+    radial-gradient(circle at 4% 82%,
+      transparent 0 24%, var(--r7-brand-glow) 24% 29%, transparent 29%),
+    radial-gradient(circle at 96% 10%,
+      transparent 0 17%, var(--r7-brand-glow-2) 17% 20.5%, transparent 20.5%);
+}
+
+.r7-root .r7-brand > * { position: relative; }
+
+.r7-root .r7-brand__top {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -659,42 +728,162 @@
   flex-wrap: wrap;
 }
 
-.r7-root .r7-auth__foot {
-  border-top: var(--r7-border-width) solid var(--r7-border-subtle);
-  padding-top: var(--r7-space-3);
+.r7-root .r7-brand .r7-mark__word { color: var(--r7-brand-panel-ink); }
+.r7-root .r7-brand .r7-mark__word em { color: var(--r7-brand-panel-accent); }
+.r7-root .r7-brand .r7-label { color: var(--r7-brand-panel-muted); }
+
+.r7-root .r7-brand__glyph {
+  background: var(--r7-brand-panel-ink);
+  color: var(--r7-brand-panel);
+}
+
+/* The statement and the rights belong together. Left as separate children of
+   a space-between column they were pushed to opposite ends of the panel, which
+   is what produced the voids. */
+.r7-root .r7-brand__middle {
   display: flex;
   flex-direction: column;
-  gap: var(--r7-space-1);
+  gap: var(--r7-space-6);
+}
+
+.r7-root .r7-rights .r7-label { margin-bottom: var(--r7-space-3); }
+
+/* The statement. Only on wider screens: on a phone it is words between a
+   person and the field they came to fill in. */
+.r7-root .r7-brand__lede { display: none; }
+
+/* The seven rights. Numbered because they genuinely are an enumerated set,
+   not because numbers look tidy — and the seventh is the product's name. */
+.r7-root .r7-rights { display: none; }
+
+.r7-root .r7-brand__foot { display: none; }
+
+/* ── The warm half ─────────────────────────────────────────────────────── */
+
+/* The warm half carries two faint rings, warm rather than grey — a grey ring
+   on cream reads as a smudge. */
+.r7-root .r7-auth__form {
+  position: relative;
+  overflow: hidden;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: var(--r7-space-6) var(--r7-space-4) var(--r7-space-5);
+}
+
+.r7-root .r7-auth__form::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 96% 4%, transparent 0 24%, var(--r7-page-glow) 24% 25.4%, transparent 25.4%),
+    radial-gradient(circle at 4% 98%, transparent 0 16%, var(--r7-page-glow) 16% 17.2%, transparent 17.2%);
+}
+
+.r7-root .r7-auth__form > * { position: relative; }
+
+.r7-root .r7-auth__foot {
+  width: 100%;
+  max-width: var(--r7-width-card);
+  margin-inline: auto;
+  margin-top: var(--r7-space-6);
+  padding-top: var(--r7-space-4);
+  border-top: var(--r7-border-width) solid var(--r7-border-subtle);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--r7-space-3);
   font-size: var(--r7-size-xs);
   color: var(--r7-text-muted);
 }
 
-.r7-root .r7-auth__body { display: grid; place-items: start center; width: 100%; }
+/* On a light ground the endorsement label follows the page's muted ink. */
+.r7-root .r7-auth__foot .r7-careone__label { color: var(--r7-text-muted); }
 
+.r7-root .r7-auth__body { width: 100%; }
+
+/* A raised white card, against a reference Michael supplied.
+   It had been flattened into the warm ground on the argument that a box inside
+   a panel is one frame too many. The reference makes the better case: the form
+   is the one thing on the page you act on, and lifting it off the cream says so
+   before you have read a word. The shadow is soft and the hairline is faint —
+   it should read as raised, not as outlined. */
 .r7-root .r7-card {
   width: 100%;
+  min-width: min(100%, var(--r7-width-card-min));
   max-width: var(--r7-width-card);
+  margin-inline: auto 0;
+  padding: var(--r7-card-pad);
   background: var(--r7-surface-raised);
   border: var(--r7-border-width) solid var(--r7-border-subtle);
   border-radius: var(--r7-radius-lg);
-  box-shadow: var(--r7-shadow-md);
-  overflow: hidden;
+  box-shadow: var(--r7-shadow-lg);
+  overflow: visible;
 }
 
 .r7-root .r7-card--wide { max-width: var(--r7-width-card-wide); }
 
 .r7-root .r7-card__head {
-  padding: var(--r7-space-5) var(--r7-space-4) var(--r7-space-4);
+  padding: 0 0 var(--r7-space-5);
   display: flex;
   flex-direction: column;
   gap: var(--r7-space-2);
 }
 
-.r7-root .r7-card__body { padding: 0 var(--r7-space-4) var(--r7-space-5); }
+/* Step on the left, the theme sign on the right. The row is always present so
+   the sign does not disappear on the screens that have no step number. */
+.r7-root .r7-card__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--r7-space-3);
+  min-height: var(--r7-control-height-small);
+}
+
+.r7-root .r7-card__steps { display: flex; align-items: center; gap: var(--r7-space-3); }
+
+/* Going back.
+   Every screen after the first is somewhere you can arrive by mistake, and the
+   browser's own back button is not a thing people reach for mid-round on a
+   phone. It sits opposite the theme sign, on the row that is always present. */
+/* Deliberately the theme control's twin: same diameter, same hairline, same
+   pill radius, same hover. They are the only two things on that row and they
+   sit at its two ends, so anything other than a matched pair looks like an
+   accident. It was a text link with a rotated arrow and no shape of its own,
+   which is what made it look unfinished.
+
+   The word "Back" is still announced — see the component — it is just not drawn,
+   because the control opposite it is not labelled either. */
+.r7-root .r7-link.r7-back {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: var(--r7-control-height-small);
+  height: var(--r7-control-height-small);
+  padding: 0;
+  background: none;
+  border: var(--r7-border-width) solid var(--r7-border-subtle);
+  border-radius: var(--r7-radius-pill);
+  color: var(--r7-text-secondary);
+  cursor: pointer;
+  transition: border-color var(--r7-motion), background var(--r7-motion), color var(--r7-motion);
+}
+
+.r7-root .r7-link.r7-back:hover {
+  border-color: var(--r7-hover-border);
+  background: var(--r7-surface-raised);
+  color: var(--r7-colour-interactive);
+}
+
+.r7-root .r7-link.r7-back .r7-icon { transform: rotate(180deg); }
+
+.r7-root .r7-card__body { padding: 0; }
 
 .r7-root .r7-card__foot {
-  padding: var(--r7-space-4);
-  background: var(--r7-surface-sunken);
+  margin-top: var(--r7-space-5);
+  padding-top: var(--r7-space-4);
   border-top: var(--r7-border-width) solid var(--r7-border-subtle);
   font-size: var(--r7-size-sm);
   color: var(--r7-text-secondary);
@@ -707,10 +896,10 @@
   height: var(--r7-space-1);
   width: var(--r7-space-6);
   border-radius: var(--r7-radius-pill);
-  background: var(--r7-border-strong);
+  background: var(--r7-surface-sunken);
 }
 
-.r7-root .r7-steps__bar--on { background: var(--r7-colour-accent); }
+.r7-root .r7-steps__bar--on { background: var(--r7-colour-interactive); }
 
 /* ─────────────────────────────────────────────────────────────────────────
    14. House selection
@@ -734,16 +923,28 @@
   transition: border-color var(--r7-motion), background var(--r7-motion), box-shadow var(--r7-motion);
 }
 
+/* Hover is blue and current is teal, and they must not be swapped.
+   Both were the same teal, so on the switch screen the house you are already
+   in and the house under your cursor looked identical — the one moment the
+   difference actually matters. Blue is what your pointer is doing; teal is
+   what is true. */
 .r7-root .r7-house:hover:not(:disabled) {
-  border-color: var(--r7-colour-accent);
-  background: var(--r7-surface-accent);
+  border-color: var(--r7-colour-interactive);
+  background: var(--r7-colour-interactive-soft);
   box-shadow: var(--r7-shadow-sm);
 }
 
-.r7-root .r7-house--current { border-color: var(--r7-colour-accent); background: var(--r7-surface-accent); }
+.r7-root .r7-house--current,
+.r7-root .r7-house--current:hover:not(:disabled) {
+  border-color: var(--r7-colour-accent);
+  background: var(--r7-surface-accent);
+}
 
 .r7-root .r7-house__body { display: flex; flex-direction: column; gap: var(--r7-space-1); min-width: 0; }
 
+/* The badge sits under the name rather than beside it. Beside it, it fitted on
+   a desktop and not on a phone, so the row changed shape between the two; under
+   it, the row is the same everywhere and the name gets the full width. */
 .r7-root .r7-house__name {
   font-family: var(--r7-font-display);
   font-size: var(--r7-size-md);
@@ -751,15 +952,38 @@
   line-height: var(--r7-leading-tight);
 }
 
+/* This only ever appears on a house whose access carries a catch, so it is the
+   one badge on the screen and can afford to look like a warning. It hugs its
+   own text rather than stretching to the row. */
+.r7-root .r7-house__body > .r7-status {
+  align-self: flex-start;
+  gap: var(--r7-space-1);
+  margin-top: var(--r7-space-1);
+  padding: var(--r7-space-1) var(--r7-space-2);
+  font-size: var(--r7-size-2xs);
+  line-height: var(--r7-leading-snug);
+}
+
+/* Which house you are already in, said in the description rather than as a
+   second control. */
+.r7-root .r7-house__current {
+  font-family: var(--r7-font-body);
+  font-weight: var(--r7-weight-medium);
+  color: var(--r7-colour-accent-strong);
+}
+
 .r7-root .r7-house__meta {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--r7-space-1) var(--r7-space-4);
+  align-items: center;
+  gap: var(--r7-space-1) var(--r7-space-3);
   font-size: var(--r7-size-sm);
   color: var(--r7-text-secondary);
 }
 
-.r7-root .r7-house__go { flex: none; color: var(--r7-text-accent); font-weight: var(--r7-weight-semi); font-size: var(--r7-size-sm); }
+.r7-root .r7-house__go { flex: none; color: var(--r7-text-muted); transition: color var(--r7-motion), transform var(--r7-motion); }
+.r7-root .r7-house:hover .r7-house__go { color: var(--r7-colour-interactive); transform: translateX(var(--r7-space-1)); }
+.r7-root .r7-house--current .r7-house__go { color: var(--r7-colour-accent-strong); }
 
 /* ─────────────────────────────────────────────────────────────────────────
    15. Application shell, sidebar and mobile navigation
@@ -776,24 +1000,54 @@
   gap: var(--r7-space-3);
 }
 
-.r7-root .r7-top__row { display: flex; align-items: center; justify-content: space-between; gap: var(--r7-space-3); }
+/* Wraps rather than overflows. Adding the menu button pushed "Sign out" off
+   the right edge of a 390px phone; a row that cannot fit should become two
+   rows, not a page that scrolls sideways. */
+.r7-root .r7-top__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--r7-space-2) var(--r7-space-3);
+}
+
+/* The mark stays beside the menu button when the row wraps; the actions take
+   the auto margin and drop to their own line, right aligned. Without this the
+   mark was pushed to the far right of the first line and the header read as
+   two unrelated fragments. */
+.r7-root .r7-top__row > .r7-mark { margin-right: auto; }
+.r7-root .r7-top__actions { margin-left: auto; }
 .r7-root .r7-top__actions { display: flex; align-items: center; gap: var(--r7-space-2); }
 
 /* Where you are. Never allowed off the screen: the most dangerous ambiguity
    on a medicines product is which house you are recording against. */
+/* WHERE AM I — and it must never push the page sideways.
+   A flex child sizes to its content unless it is told it may shrink, so a long
+   role name ("Medication Administrator") made this strip wider than the tablet
+   it was on and the whole page scrolled horizontally. The values already
+   ellipsis; min-width: 0 is what lets them. */
 .r7-root .r7-where {
   display: flex;
   align-items: stretch;
+  flex: 0 1 auto;
+  min-width: 0;
   border: var(--r7-border-width) solid var(--r7-colour-accent-border);
   background: var(--r7-surface-accent);
   border-radius: var(--r7-radius-md);
   overflow: hidden;
 }
 
+/* Content-sized when there is room, equal shares when there is not.
+   flex-basis: auto is what makes the difference — with a basis of 0 all three
+   cells were the same width at every viewport, so "Omega Care Group" truncated
+   on a wide monitor with three hundred spare pixels beside it. Growing and
+   shrinking from their own content means they only give way when they must,
+   and then together. */
 .r7-root .r7-where__cell {
   display: flex;
   flex-direction: column;
   gap: var(--r7-space-1);
+  flex: 1 1 auto;
   padding: var(--r7-space-2) var(--r7-space-3);
   min-width: 0;
 }
@@ -806,6 +1060,9 @@
   letter-spacing: var(--r7-tracking-label);
   text-transform: uppercase;
   color: var(--r7-text-accent);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .r7-root .r7-where__value {
@@ -821,7 +1078,6 @@
 
 /* The sidebar is desktop only. On a phone it would eat the screen a round
    needs, so navigation moves to a bar under the thumb. */
-.r7-root .r7-sidebar { display: none; }
 
 .r7-root .r7-main {
   flex: 1 1 auto;
@@ -861,39 +1117,8 @@
   font-weight: var(--r7-weight-semi);
 }
 
-.r7-root .r7-tabbar {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 20;
-  display: flex;
-  background: var(--r7-surface-raised);
-  border-top: var(--r7-border-width) solid var(--r7-border-subtle);
-  padding-bottom: env(safe-area-inset-bottom, 0px);
-  box-shadow: var(--r7-shadow-lg);
-}
 
-.r7-root .r7-tabbar__item {
-  flex: 1 1 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--r7-space-1);
-  min-height: var(--r7-control-height);
-  padding: var(--r7-space-2);
-  background: none;
-  border: 0;
-  border-top: var(--r7-border-emphasis-width) solid transparent;
-  color: var(--r7-text-secondary);
-  font-size: var(--r7-size-2xs);
-  font-weight: var(--r7-weight-medium);
-  cursor: pointer;
-  text-decoration: none;
-}
 
-.r7-root .r7-tabbar__item--on { color: var(--r7-text-accent); border-top-color: var(--r7-colour-accent); }
 
 /* ─────────────────────────────────────────────────────────────────────────
    16. Panels and layout helpers
@@ -998,30 +1223,33 @@
    17. Theme toggle
    ───────────────────────────────────────────────────────────────────────── */
 
+/* A sign, not a labelled control. It is a preference rather than a step in the
+   journey, so it takes as little room as a thing can take and still be a
+   comfortable target. */
 .r7-root .r7-theme {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--r7-space-2);
-  min-height: var(--r7-control-height-small);
-  padding: var(--r7-space-2) var(--r7-space-3);
-  background: var(--r7-surface-raised);
-  border: var(--r7-border-width) solid var(--r7-border-strong);
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: var(--r7-control-height-small);
+  height: var(--r7-control-height-small);
+  padding: 0;
+  background: none;
+  border: var(--r7-border-width) solid var(--r7-border-subtle);
   border-radius: var(--r7-radius-pill);
   color: var(--r7-text-secondary);
-  font-size: var(--r7-size-sm);
-  font-weight: var(--r7-weight-medium);
   cursor: pointer;
-  transition: border-color var(--r7-motion), color var(--r7-motion), background var(--r7-motion);
+  transition: border-color var(--r7-motion), background var(--r7-motion);
 }
 
-.r7-root .r7-theme:hover { border-color: var(--r7-hover-border); color: var(--r7-text-primary); }
+.r7-root .r7-theme:hover { border-color: var(--r7-hover-border); background: var(--r7-surface-raised); }
 
 .r7-root .r7-theme__swatch {
-  width: var(--r7-size-xs);
-  height: var(--r7-size-xs);
-  flex: none;
+  width: var(--r7-size-sm);
+  height: var(--r7-size-sm);
   border-radius: var(--r7-radius-pill);
-  border: var(--r7-border-width) solid var(--r7-border-strong);
+  border: var(--r7-border-width) solid var(--r7-text-muted);
+  /* Half cream, half midnight: the convention for this, and it reads at any
+     size without a word beside it. */
   background: linear-gradient(90deg, var(--r7-surface-solid) 0 50%, var(--r7-surface-page) 50% 100%);
 }
 
@@ -1073,13 +1301,38 @@
    ───────────────────────────────────────────────────────────────────────── */
 
 @media (min-width: 600px) {
-  .r7-root .r7-auth { padding: var(--r7-space-6) var(--r7-space-5); gap: var(--r7-space-6); }
-  .r7-root .r7-card__head { padding: var(--r7-space-6) var(--r7-space-6) var(--r7-space-4); }
-  .r7-root .r7-card__body { padding: 0 var(--r7-space-6) var(--r7-space-6); }
-  .r7-root .r7-card__foot { padding: var(--r7-space-4) var(--r7-space-6); }
-  .r7-root .r7-auth__foot { flex-direction: row; justify-content: space-between; gap: var(--r7-space-4); }
+  /* The auth container carries NO padding of its own. The deep panel must run
+     to the edges of the window; padding here left a cream margin around it,
+     which turned a full-bleed composition back into a floating box. The two
+     halves own their own padding instead.
 
-  .r7-root .r7-top { flex-direction: row; align-items: center; justify-content: space-between; padding: var(--r7-space-3) var(--r7-space-5); }
+     The card padding rules that used to live here went with the card's box —
+     there is no longer a frame inside the warm half to pad. */
+  /* The endorsement and the notice sit on one line from tablet up, but they
+     need a real gap and a shared baseline — without them the wordmark and the
+     sentence collide, which is what happened at 820. */
+  .r7-root .r7-auth__foot {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--r7-space-5);
+  }
+
+  .r7-root .r7-auth__foot > span { flex: 0 1 auto; text-align: right; }
+
+  /* The brand and the context share a line here. Both halves have to be
+     allowed to shrink or the longest role name in the organisation decides how
+     wide the page is — which is how a tablet ended up scrolling sideways. It
+     wraps rather than overflows if it still does not fit. */
+  .r7-root .r7-top {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    padding: var(--r7-space-3) var(--r7-space-5);
+  }
+
+  .r7-root .r7-top__row { min-width: 0; }
   .r7-root .r7-main { padding: var(--r7-space-6) var(--r7-space-5) var(--r7-space-9); }
   .r7-root .r7-panel__head, .r7-root .r7-panel__body { padding: var(--r7-space-5); }
 
@@ -1099,19 +1352,8 @@
 @media (min-width: 960px) {
   .r7-root .r7-display { font-size: var(--r7-size-3xl); }
 
-  .r7-root .r7-sidebar {
-    display: flex;
-    flex-direction: column;
-    gap: var(--r7-space-5);
-    flex: 0 0 var(--r7-width-sidebar);
-    width: var(--r7-width-sidebar);
-    padding: var(--r7-space-5) var(--r7-space-4);
-    background: var(--r7-surface-raised);
-    border-right: var(--r7-border-width) solid var(--r7-border-subtle);
-  }
-
-  .r7-root .r7-tabbar { display: none; }
-  .r7-root .r7-main { padding: var(--r7-space-6) var(--r7-space-6) var(--r7-space-8); }
+  
+    .r7-root .r7-main { padding: var(--r7-space-6) var(--r7-space-6) var(--r7-space-8); }
   .r7-root .r7-grid--three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
@@ -1142,4 +1384,1323 @@
   flex: none;
   accent-color: var(--r7-colour-accent);
   cursor: pointer;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   22. The seven rights, on the brand panel
+
+   Numbered because they genuinely are an enumerated set that people are
+   taught in that order, not because numbers decorate well. The seventh is
+   the product's own contribution and is marked as such.
+   ───────────────────────────────────────────────────────────────────────── */
+
+.r7-root .r7-rights__list { display: flex; flex-direction: column; gap: var(--r7-space-2); }
+
+.r7-root .r7-right {
+  display: flex;
+  align-items: baseline;
+  gap: var(--r7-space-3);
+  font-size: var(--r7-size-sm);
+  color: var(--r7-brand-panel-muted);
+}
+
+.r7-root .r7-right__number {
+  flex: none;
+  width: var(--r7-size-lg);
+  font-family: var(--r7-font-display);
+  font-size: var(--r7-size-xs);
+  font-weight: var(--r7-weight-semi);
+  font-variant-numeric: tabular-nums;
+  color: var(--r7-brand-panel-dim);
+}
+
+/* The seventh is the product's own contribution, so it is lifted out of the
+   list rather than merely bolded — a row of its own, with a tick, because it
+   is the one the other six are not finished without. */
+.r7-root .r7-right--seventh {
+  color: var(--r7-brand-panel-ink);
+  background: var(--r7-brand-glow);
+  border: var(--r7-border-width) solid var(--r7-colour-accent-border);
+  border-radius: var(--r7-radius-sm);
+  padding: var(--r7-space-2) var(--r7-space-3);
+  margin-top: var(--r7-space-2);
+  margin-left: calc(var(--r7-space-3) * -1);
+  justify-content: flex-start;
+}
+
+.r7-root .r7-right--seventh .r7-right__number { color: var(--r7-brand-panel-accent); }
+.r7-root .r7-right--seventh .r7-right__tick { margin-left: auto; color: var(--r7-brand-panel-accent); display: flex; }
+
+.r7-root .r7-right__name { font-weight: var(--r7-weight-medium); }
+
+.r7-root .r7-right--seventh .r7-right__name {
+  font-family: var(--r7-font-display);
+  font-weight: var(--r7-weight-semi);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   23. Two halves, from tablet upwards
+   ───────────────────────────────────────────────────────────────────────── */
+
+@media (min-width: 600px) {
+  .r7-root .r7-brand { padding: var(--r7-space-6) var(--r7-space-6); }
+  .r7-root .r7-auth__form { padding: var(--r7-space-8) var(--r7-space-6) var(--r7-space-6); }
+  .r7-root .r7-brand__lede {
+    display: block;
+    font-size: var(--r7-size-md);
+    font-weight: var(--r7-weight-light);
+    line-height: var(--r7-leading-snug);
+    color: var(--r7-brand-panel-muted);
+    max-width: 44ch;
+  }
+}
+
+@media (min-width: 960px) {
+  .r7-root .r7-auth { flex-direction: row; }
+
+  .r7-root .r7-brand {
+    flex: 0 0 44%;
+    max-width: 640px;
+    padding: var(--r7-space-8) var(--r7-space-7);
+    justify-content: space-between;
+    gap: var(--r7-space-7);
+  }
+
+  .r7-root .r7-brand__lede { font-size: var(--r7-size-lg); color: var(--r7-brand-panel-ink); }
+  .r7-root .r7-rights { display: block; }
+
+  /* The notice on the left, the endorsement on the right. Two things that
+     belong to the panel rather than to each other, so they take an edge each
+     instead of stacking in a corner. */
+  .r7-root .r7-brand__foot {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--r7-space-4);
+    font-size: var(--r7-size-xs);
+    color: var(--r7-brand-panel-dim);
+    border-top: var(--r7-border-width) solid var(--r7-brand-panel-rule);
+    padding-top: var(--r7-space-4);
+  }
+
+  /* Vertically centred, with Frontend 4's page inset around it. */
+  .r7-root .r7-auth__form {
+    justify-content: center;
+    padding: var(--r7-auth-inset);
+  }
+
+  /* Centred in the warm half now that it is a card.
+     It used to be held tight against the divide, because a borderless block
+     floating in the middle of a wide half looked marooned. A card does not have
+     that problem — it has its own edges, so it reads as placed rather than
+     stranded, and it needs air on both sides to look lifted rather than shoved
+     against the navy. */
+  .r7-root .r7-auth__body {
+    /* The wide width, not the ordinary one. The wrapper used to cap the card,
+       which meant a card asking to be wide — the house list — silently was not,
+       and once the card gained padding its rows started wrapping. The card caps
+       itself now; this only positions it.
+
+       Held to the far side, which is where Frontend 4 puts it: its card is the
+       last column of the grid, so the only thing between it and the edge of the
+       window is the page inset. */
+    max-width: var(--r7-width-card-wide);
+    margin-inline: auto 0;
+  }
+
+  /* The footing belongs to the deep half on a wide screen. */
+  .r7-root .r7-auth__foot { display: none; }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   24. The Care One OS endorsement
+
+   Quiet on purpose. Record7 is the name on the door of this screen; Care One
+   OS is the house it belongs to, and an endorsement that shouts stops being
+   an endorsement and starts competing.
+   ───────────────────────────────────────────────────────────────────────── */
+
+.r7-root .r7-careone {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--r7-space-3);
+  min-width: 0;
+}
+
+.r7-root .r7-careone__label {
+  font-size: var(--r7-size-2xs);
+  font-weight: var(--r7-weight-semi);
+  letter-spacing: var(--r7-tracking-label);
+  text-transform: uppercase;
+  color: var(--r7-brand-panel-muted);
+  white-space: nowrap;
+}
+
+.r7-root .r7-careone__mark {
+  display: block;
+  height: var(--r7-size-xl);
+  width: auto;
+  max-width: 100%;
+}
+
+/* On a light ground the label follows the page's own muted ink. */
+.r7-root .r7-careone--on-light .r7-careone__label { color: var(--r7-text-muted); }
+
+/* Muted, NOT the rule colour. A rule colour is chosen to be nearly invisible
+   against its ground, which is right for a hairline and useless for a
+   sentence — it measured 1.39 to 1. */
+.r7-root .r7-brand__note {
+  font-size: var(--r7-size-xs);
+  color: var(--r7-brand-panel-muted);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   25. Field detail — an icon in the field, help underneath
+   ───────────────────────────────────────────────────────────────────────── */
+
+.r7-root .r7-field__wrap { position: relative; display: flex; align-items: center; }
+
+.r7-root .r7-field__icon {
+  position: absolute;
+  left: var(--r7-space-4);
+  display: flex;
+  pointer-events: none;
+  color: var(--r7-text-muted);
+}
+
+.r7-root .r7-input--iconed { padding-left: var(--r7-space-8); }
+
+/* Help sits BELOW the field, where it is read after the label rather than
+   before it, and carries a small mark so it does not look like an error. */
+.r7-root .r7-field__note {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--r7-space-2);
+  font-size: var(--r7-size-sm);
+  color: var(--r7-text-secondary);
+}
+
+.r7-root .r7-field__note .r7-icon { margin-top: var(--r7-space-1); color: var(--r7-text-muted); }
+
+/* What happens after this button. People move faster through a journey whose
+   length they can see. */
+.r7-root .r7-next {
+  display: block;
+  text-align: center;
+  font-size: var(--r7-size-xs);
+  color: var(--r7-text-muted);
+}
+
+/* A quiet way out at the foot of the form. */
+.r7-root .r7-help-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--r7-space-4);
+  flex-wrap: wrap;
+  margin-top: var(--r7-space-5);
+  padding-top: var(--r7-space-4);
+  border-top: var(--r7-border-width) solid var(--r7-border-subtle);
+  font-size: var(--r7-size-sm);
+  color: var(--r7-text-secondary);
+}
+
+/* The lock beside the access notice. */
+.r7-root .r7-brand__note { display: flex; align-items: center; gap: var(--r7-space-2); }
+.r7-root .r7-brand__note .r7-icon { color: var(--r7-brand-panel-dim); }
+
+/* The one word the whole statement turns on. */
+.r7-root .r7-brand__accent { font-style: normal; color: var(--r7-brand-panel-accent); }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   26. A step already settled
+
+   Once the organisation is confirmed it stops being a sentence and becomes a
+   fact with a way to change it. A person glancing at step two should be able
+   to see WHICH organisation they are about to sign in to without reading a
+   paragraph, because signing in to the wrong one is a real mistake on a
+   product where several organisations share a device.
+   ───────────────────────────────────────────────────────────────────────── */
+
+.r7-root .r7-settled {
+  display: flex;
+  align-items: center;
+  gap: var(--r7-space-3);
+  padding: var(--r7-space-3) var(--r7-space-4);
+  background: var(--r7-surface-accent);
+  border: var(--r7-border-width) solid var(--r7-colour-accent-border);
+  border-radius: var(--r7-radius-md);
+}
+
+.r7-root .r7-settled__tick {
+  display: flex;
+  flex: none;
+  color: var(--r7-state-success);
+}
+
+.r7-root .r7-settled__body { display: flex; flex-direction: column; gap: var(--r7-space-1); min-width: 0; }
+
+.r7-root .r7-settled__label {
+  font-size: var(--r7-size-2xs);
+  font-weight: var(--r7-weight-semi);
+  letter-spacing: var(--r7-tracking-label);
+  text-transform: uppercase;
+  color: var(--r7-text-accent);
+}
+
+.r7-root .r7-settled__value {
+  font-family: var(--r7-font-display);
+  font-size: var(--r7-size-base);
+  font-weight: var(--r7-weight-semi);
+  line-height: var(--r7-leading-tight);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.r7-root .r7-settled__change { margin-left: auto; flex: none; }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   27. House rows, with a mark and their access stated
+   ───────────────────────────────────────────────────────────────────────── */
+
+
+
+.r7-root .r7-house__body { flex: 1 1 auto; }
+
+
+.r7-root .r7-house__go {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--r7-space-1);
+}
+
+@media (max-width: 599px) {
+  /* The chevron goes — there is no hover on a touch screen for it to answer,
+     and it was landing on a line of its own. */
+  /* Frontend 4's inset is generous, which is right on a desktop and wasteful
+     on a 360px phone — the card was giving up 96px of a 360px screen before a
+     word of content. The card keeps the page inset and trims its own. */
+  .r7-root .r7-card { padding: var(--r7-space-5) var(--r7-space-4); }
+  .r7-root .r7-house__go { display: none; }
+
+  /* THE PHONE HEADER IS A BAND, NOT A PANEL.
+     The deep half cannot be half of a phone screen — the fields would start
+     below the fold, and the fields are why the page was opened. It becomes a
+     fixed band deep enough to carry the mark and one line, and the rights list
+     is dropped rather than shrunk: six numbered lines at phone size is a wall
+     of text between someone and their password. */
+  /* Sized by what is in it, not to a number. A fixed band left a third of the
+     navy carrying nothing, which reads as a mistake rather than as space. The
+     lede stays — it is one line and it is the argument the product makes. The
+     rights list goes: six numbered lines at this width is a wall of text
+     between someone and their password. */
+  .r7-root .r7-brand { gap: var(--r7-space-3); }
+  .r7-root .r7-rights { display: none; }
+  .r7-root .r7-brand__foot { display: none; }
+  .r7-root .r7-brand::before { background: radial-gradient(circle at 88% 18%,
+      transparent 0 30%, var(--r7-brand-glow) 30% 36%, transparent 36%); }
+
+  /* On a phone the status moves under the name so the row does not become a
+     column of three cramped things. */
+  .r7-root .r7-house { flex-wrap: wrap; }
+
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────────
+   29. Navigation — a rail that opens, and a drawer that slides
+
+   THE RAIL TAKES WHAT IT NEEDS AND NO MORE.
+   Collapsed it is a column of icons. It widens on hover and on :focus-within,
+   so it opens for a pointer and for a tab key alike, and it does it by
+   changing width — which means the workspace is PUSHED across rather than
+   covered. Nothing anybody was reading disappears behind the thing they are
+   navigating with.
+
+   The labels are always in the DOM. Collapsing hides them with width and
+   opacity, never display:none, so every button keeps its accessible name.
+   ───────────────────────────────────────────────────────────────────────── */
+
+.r7-root .r7-rail {
+  display: none;
+  flex: 0 0 var(--r7-rail-collapsed);
+  width: var(--r7-rail-collapsed);
+  padding: var(--r7-space-4) var(--r7-space-2);
+  background: var(--r7-surface-raised);
+  border-right: var(--r7-border-width) solid var(--r7-border-subtle);
+  transition: flex-basis var(--r7-motion), width var(--r7-motion);
+  overflow: hidden;
+}
+
+.r7-root .r7-rail:hover,
+.r7-root .r7-rail:focus-within {
+  flex-basis: var(--r7-rail-open);
+  width: var(--r7-rail-open);
+}
+
+.r7-root .r7-nav { display: flex; flex-direction: column; gap: var(--r7-space-1); }
+
+.r7-root .r7-nav__item {
+  display: flex;
+  align-items: center;
+  gap: var(--r7-space-3);
+  width: 100%;
+  min-height: var(--r7-control-height);
+  padding: var(--r7-space-2);
+  border-radius: var(--r7-radius-md);
+  border: var(--r7-border-width) solid transparent;
+  background: none;
+  color: var(--r7-text-secondary);
+  font-size: var(--r7-size-sm);
+  font-weight: var(--r7-weight-medium);
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background var(--r7-motion), color var(--r7-motion);
+}
+
+.r7-root .r7-nav__icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: var(--r7-control-height-small);
+  height: var(--r7-control-height-small);
+}
+
+.r7-root .r7-nav__item:hover { background: var(--r7-hover-tint); color: var(--r7-text-primary); }
+
+.r7-root .r7-nav__item--on {
+  background: var(--r7-surface-accent);
+  border-color: var(--r7-colour-accent-border);
+  color: var(--r7-text-accent);
+  font-weight: var(--r7-weight-semi);
+}
+
+/* Hidden by width, not by display, so the accessible name survives. */
+.r7-root .r7-rail .r7-nav__label {
+  max-width: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-width var(--r7-motion), opacity var(--r7-motion);
+}
+
+.r7-root .r7-rail:hover .r7-nav__label,
+.r7-root .r7-rail:focus-within .r7-nav__label {
+  max-width: var(--r7-rail-open);
+  opacity: 1;
+}
+
+/* ── The phone drawer ──────────────────────────────────────────────────── */
+
+.r7-root .r7-burger {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: var(--r7-control-height-small);
+  height: var(--r7-control-height-small);
+  padding: 0;
+  background: none;
+  border: var(--r7-border-width) solid var(--r7-border-subtle);
+  border-radius: var(--r7-radius-pill);
+  color: var(--r7-text-secondary);
+  cursor: pointer;
+  transition: border-color var(--r7-motion), color var(--r7-motion);
+}
+
+.r7-root .r7-burger:hover { border-color: var(--r7-hover-border); color: var(--r7-colour-interactive); }
+
+.r7-root .r7-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  background: var(--r7-scrim);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--r7-motion);
+}
+
+.r7-root .r7-drawer {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 31;
+  display: flex;
+  flex-direction: column;
+  gap: var(--r7-space-5);
+  width: min(var(--r7-drawer-width), 82vw);
+  padding: var(--r7-space-4);
+  background: var(--r7-surface-raised);
+  border-right: var(--r7-border-width) solid var(--r7-border-subtle);
+  box-shadow: var(--r7-shadow-lg);
+  /* Off-canvas rather than hidden, so it slides rather than appears. */
+  transform: translateX(-100%);
+  transition: transform var(--r7-motion);
+}
+
+/* The open state sits on the elements themselves rather than on an ancestor.
+   A component that depends on a class three levels up breaks the moment
+   somebody rearranges the tree, and it is harder to reason about than a
+   modifier on the thing being modified. */
+.r7-root .r7-scrim--on { opacity: 1; pointer-events: auto; }
+.r7-root .r7-drawer--open { transform: translateX(0); }
+
+.r7-root .r7-drawer__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--r7-space-3);
+  padding-bottom: var(--r7-space-4);
+  border-bottom: var(--r7-border-width) solid var(--r7-border-subtle);
+}
+
+.r7-root .r7-drawer__close {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: var(--r7-control-height-small);
+  height: var(--r7-control-height-small);
+  padding: 0;
+  background: none;
+  border: var(--r7-border-width) solid var(--r7-border-subtle);
+  border-radius: var(--r7-radius-pill);
+  color: var(--r7-text-secondary);
+  cursor: pointer;
+}
+
+/* Nothing slides for anyone who has asked for less movement. */
+@media (prefers-reduced-motion: reduce) {
+  .r7-root .r7-rail,
+  .r7-root .r7-drawer,
+  .r7-root .r7-scrim,
+  .r7-root .r7-rail .r7-nav__label { transition: none; }
+}
+
+/* From tablet up the rail replaces the drawer entirely. 768 rather than a
+   larger number because a portrait tablet has room for sixty-eight pixels of
+   rail and is better served by it than by a button that hides the menu. */
+@media (min-width: 768px) {
+  .r7-root .r7-rail { display: block; }
+  .r7-root .r7-burger,
+  .r7-root .r7-drawer,
+  .r7-root .r7-scrim { display: none; }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   30. Today — the shift board (Section 1.1)
+
+   SIX BANDS, AND EACH ONE IS MADE OF SOMETHING DIFFERENT.
+
+   The first version put every section inside the same white rectangle, which
+   is why it read as a template. Sameness is not calm — it is an absence of
+   decisions. Here the material carries the meaning:
+
+     Handover      a warm briefing panel on the deep ground. It is the voice of
+                   the last shift, so it does not look like the app talking.
+     Attention     raised white cards with a severity rail. The only lifted
+                   surface on the page, because it is the only part you act on
+                   immediately.
+     Overview      a broad sunken band with the progress line. Not a card and
+                   not a statistic — a measure of the day.
+     People due    rows on the cream ground, divided by hairlines. Refined and
+                   readable; a card each would make five people look like five
+                   emergencies.
+     Tasks         rows with an interactive rail and a question in the accent.
+                   They read as things to do rather than things to know.
+     Completed     the quietest thing on the page. No surface at all, small
+                   type, a log rather than a list.
+
+   The reading order never changes and nothing is ever placed beside anything
+   else at band level. Inside a band, a wide screen may use two columns — the
+   DOM order stays the same, so a phone reads exactly what a desktop reads.
+   ───────────────────────────────────────────────────────────────────────── */
+
+/* ── The workspace ─────────────────────────────────────────────────────── */
+
+.r7-root .r7-work {
+  display: flex;
+  flex-direction: column;
+  gap: var(--r7-space-7);
+  width: 100%;
+  max-width: var(--r7-width-work);
+  margin-inline: auto;
+}
+
+/* ── The anchor: shift, date, house, and the one thing to do ───────────── */
+
+.r7-root .r7-anchor {
+  display: grid;
+  gap: var(--r7-space-4) var(--r7-space-7);
+  grid-template-areas: "meta" "title" "action";
+  padding-bottom: var(--r7-space-5);
+  border-bottom: var(--r7-border-emphasis-width) solid var(--r7-text-primary);
+}
+
+.r7-root .r7-anchor__meta {
+  grid-area: meta;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--r7-space-2) var(--r7-space-4);
+  font-size: var(--r7-size-2xs);
+  font-weight: var(--r7-weight-semi);
+  letter-spacing: var(--r7-tracking-label);
+  text-transform: uppercase;
+  color: var(--r7-text-muted);
+}
+
+.r7-root .r7-anchor__shift {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--r7-space-2);
+  color: var(--r7-text-primary);
+}
+
+.r7-root .r7-anchor__shift .r7-icon { color: var(--r7-colour-accent-strong); }
+
+.r7-root .r7-anchor__house { color: var(--r7-colour-interactive); }
+
+.r7-root .r7-anchor__title { grid-area: title; display: flex; flex-direction: column; gap: var(--r7-space-2); }
+
+.r7-root .r7-anchor__greeting {
+  font-family: var(--r7-font-display);
+  font-size: var(--r7-size-2xl);
+  font-weight: var(--r7-weight-bold);
+  line-height: var(--r7-leading-tight);
+  letter-spacing: var(--r7-tracking-tight);
+  color: var(--r7-text-primary);
+  text-wrap: balance;
+}
+
+.r7-root .r7-anchor__lede {
+  font-size: var(--r7-size-base);
+  color: var(--r7-text-secondary);
+  max-width: var(--r7-measure);
+}
+
+.r7-root .r7-anchor__action { grid-area: action; display: flex; flex-direction: column; gap: var(--r7-space-2); }
+
+.r7-root .r7-anchor__hint { font-size: var(--r7-size-sm); color: var(--r7-text-muted); }
+
+/* ── Band frame ────────────────────────────────────────────────────────── */
+
+.r7-root .r7-board { display: flex; flex-direction: column; gap: var(--r7-space-4); }
+
+.r7-root .r7-board__head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--r7-space-3);
+}
+
+.r7-root .r7-board__title {
+  font-family: var(--r7-font-display);
+  font-size: var(--r7-size-lg);
+  font-weight: var(--r7-weight-semi);
+  line-height: var(--r7-leading-tight);
+  letter-spacing: var(--r7-tracking-tight);
+  color: var(--r7-text-primary);
+}
+
+.r7-root .r7-board__count {
+  display: inline-grid;
+  place-items: center;
+  min-width: var(--r7-space-6);
+  padding-inline: var(--r7-space-2);
+  border-radius: var(--r7-radius-pill);
+  background: var(--r7-surface-solid);
+  color: var(--r7-text-on-solid);
+  font-size: var(--r7-size-2xs);
+  font-weight: var(--r7-weight-semi);
+  font-variant-numeric: tabular-nums;
+  line-height: var(--r7-leading-body);
+}
+
+.r7-root .r7-board__note {
+  margin-left: auto;
+  font-size: var(--r7-size-sm);
+  color: var(--r7-text-muted);
+}
+
+.r7-root .r7-board--quiet .r7-board__title { font-size: var(--r7-size-base); color: var(--r7-text-muted); }
+
+.r7-root .r7-board__body { display: flex; flex-direction: column; gap: var(--r7-space-3); }
+
+.r7-root .r7-attentions,
+.r7-root .r7-dues,
+.r7-root .r7-tasks,
+.r7-root .r7-dones,
+.r7-root .r7-notes { display: flex; flex-direction: column; }
+
+.r7-root .r7-attentions,
+.r7-root .r7-tasks,
+.r7-root .r7-notes { gap: var(--r7-space-3); }
+
+/* ── 1. Handover — a briefing, not a card ──────────────────────────────── */
+
+.r7-root .r7-handover {
+  display: flex;
+  flex-direction: column;
+  gap: var(--r7-space-4);
+  padding: var(--r7-space-5);
+  border-radius: var(--r7-radius-lg);
+  background: var(--r7-briefing);
+  border: var(--r7-border-width) solid var(--r7-briefing-edge);
+  color: var(--r7-brand-panel-ink);
+}
+
+.r7-root .r7-handover__from {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--r7-space-2) var(--r7-space-4);
+  font-size: var(--r7-size-sm);
+  color: var(--r7-brand-panel-dim);
+}
+
+.r7-root .r7-handover__from strong { color: var(--r7-brand-panel-ink); font-weight: var(--r7-weight-semi); }
+
+/* The one line the last shift most wanted you to read. */
+.r7-root .r7-handover__summary {
+  font-family: var(--r7-font-display);
+  font-size: var(--r7-size-md);
+  font-weight: var(--r7-weight-light);
+  line-height: var(--r7-leading-snug);
+  color: var(--r7-brand-panel-ink);
+  max-width: var(--r7-measure);
+}
+
+.r7-root .r7-note {
+  display: flex;
+  flex-direction: column;
+  gap: var(--r7-space-2);
+  padding: var(--r7-space-4);
+  padding-left: var(--r7-space-5);
+  background: var(--r7-brand-panel-raise);
+  border-radius: var(--r7-radius-md);
+  position: relative;
+  overflow: hidden;
+}
+
+.r7-root .r7-note::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--r7-space-1);
+  background: var(--r7-brand-panel-rule);
+}
+
+.r7-root .r7-note--urgent::before { background: var(--r7-state-error); }
+.r7-root .r7-note--important::before { background: var(--r7-state-warning); }
+
+.r7-root .r7-note__head { display: flex; align-items: center; flex-wrap: wrap; gap: var(--r7-space-3); }
+.r7-root .r7-note__who { font-weight: var(--r7-weight-semi); color: var(--r7-brand-panel-ink); }
+.r7-root .r7-note__text { color: var(--r7-brand-panel-muted); max-width: var(--r7-measure); }
+
+/* On the deep panel the pills need their own footing. */
+.r7-root .r7-handover .r7-status--error {
+  color: var(--r7-state-error);
+  background: transparent;
+  border-color: var(--r7-state-error);
+}
+
+.r7-root .r7-handover .r7-status--warning {
+  color: var(--r7-state-warning);
+  background: transparent;
+  border-color: var(--r7-state-warning);
+}
+
+.r7-root .r7-handover .r7-status--neutral {
+  color: var(--r7-brand-panel-muted);
+  background: transparent;
+  border-color: var(--r7-brand-panel-rule);
+}
+
+.r7-root .r7-handover .r7-link { color: var(--r7-brand-panel-accent); }
+
+/* ── 2. Needs attention — the only lifted surface on the page ──────────── */
+
+.r7-root .r7-attention {
+  display: grid;
+  gap: var(--r7-space-1) var(--r7-space-4);
+  grid-template-areas:
+    "label   when"
+    "head    head"
+    "who     who"
+    "what    what"
+    "detail  detail";
+  grid-template-columns: 1fr auto;
+  position: relative;
+  overflow: hidden;
+  padding: var(--r7-space-4);
+  padding-left: var(--r7-space-5);
+  background: var(--r7-surface-raised);
+  border: var(--r7-border-width) solid var(--r7-border-subtle);
+  border-radius: var(--r7-radius-md);
+  box-shadow: var(--r7-shadow-md);
+}
+
+.r7-root .r7-attention::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--r7-space-1);
+  background: var(--r7-border-strong);
+}
+
+.r7-root .r7-attention--critical::before { background: var(--r7-state-error); }
+.r7-root .r7-attention--warning::before { background: var(--r7-state-warning); }
+.r7-root .r7-attention--notice::before { background: var(--r7-colour-interactive); }
+
+.r7-root .r7-attention__label {
+  grid-area: label;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--r7-space-1);
+  font-size: var(--r7-size-2xs);
+  font-weight: var(--r7-weight-semi);
+  letter-spacing: var(--r7-tracking-label);
+  text-transform: uppercase;
+  color: var(--r7-text-muted);
+}
+
+.r7-root .r7-attention--critical .r7-attention__label { color: var(--r7-state-error); }
+
+.r7-root .r7-attention__headline {
+  grid-area: head;
+  font-family: var(--r7-font-display);
+  font-size: var(--r7-size-base);
+  font-weight: var(--r7-weight-semi);
+  color: var(--r7-text-primary);
+}
+
+.r7-root .r7-attention__who {
+  grid-area: who;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--r7-space-3);
+  font-size: var(--r7-size-sm);
+  color: var(--r7-text-muted);
+}
+
+.r7-root .r7-attention__who strong { color: var(--r7-text-secondary); font-weight: var(--r7-weight-semi); }
+
+.r7-root .r7-attention__what {
+  grid-area: what;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--r7-space-3);
+  font-size: var(--r7-size-sm);
+  color: var(--r7-text-secondary);
+}
+
+.r7-root .r7-attention__dose { color: var(--r7-text-muted); }
+
+.r7-root .r7-attention__when {
+  grid-area: when;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font-size: var(--r7-size-sm);
+  color: var(--r7-text-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.r7-root .r7-attention__waiting { font-size: var(--r7-size-2xs); }
+
+.r7-root .r7-attention__detail {
+  grid-area: detail;
+  margin-top: var(--r7-space-2);
+  padding-top: var(--r7-space-2);
+  border-top: var(--r7-border-width) solid var(--r7-border-subtle);
+  font-size: var(--r7-size-sm);
+  color: var(--r7-text-muted);
+  max-width: var(--r7-measure);
+}
+
+
+
+
+/* ── 3. Shift overview — a measure of the day, not a statistic ─────────── */
+
+.r7-root .r7-round {
+  display: flex;
+  flex-direction: column;
+  gap: var(--r7-space-4);
+  padding: var(--r7-space-5);
+  background: var(--r7-surface-sunken);
+  border-radius: var(--r7-radius-lg);
+}
+
+.r7-root .r7-round__figures {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--r7-space-4) var(--r7-space-7);
+}
+
+.r7-root .r7-figure { display: flex; flex-direction: column; gap: var(--r7-space-1); }
+
+.r7-root .r7-figure__value {
+  font-family: var(--r7-font-display);
+  font-size: var(--r7-size-xl);
+  font-weight: var(--r7-weight-semi);
+  line-height: var(--r7-leading-tight);
+  font-variant-numeric: tabular-nums;
+  color: var(--r7-text-primary);
+}
+
+.r7-root .r7-figure__label {
+  font-size: var(--r7-size-2xs);
+  letter-spacing: var(--r7-tracking-label);
+  text-transform: uppercase;
+  color: var(--r7-text-muted);
+}
+
+.r7-root .r7-progress {
+  height: var(--r7-space-2);
+  border-radius: var(--r7-radius-pill);
+  background: var(--r7-surface-raised);
+  overflow: hidden;
+}
+
+.r7-root .r7-progress__fill {
+  display: block;
+  height: 100%;
+  border-radius: var(--r7-radius-pill);
+  background: var(--r7-colour-accent-strong);
+  transition: width var(--r7-motion);
+}
+
+.r7-root .r7-round__action {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--r7-space-4);
+}
+
+.r7-root .r7-round__what { display: flex; flex-direction: column; gap: var(--r7-space-1); }
+
+.r7-root .r7-round__slot {
+  font-family: var(--r7-font-display);
+  font-size: var(--r7-size-base);
+  font-weight: var(--r7-weight-semi);
+  color: var(--r7-text-primary);
+}
+
+.r7-root .r7-round__detail { font-size: var(--r7-size-sm); color: var(--r7-text-muted); }
+
+.r7-root .r7-round__critical {
+  font-size: var(--r7-size-sm);
+  font-weight: var(--r7-weight-medium);
+  color: var(--r7-state-warning);
+}
+
+.r7-root .r7-round__state { font-size: var(--r7-size-sm); color: var(--r7-text-secondary); }
+
+/* ── 4. People due — refined rows on the ground ────────────────────────── */
+
+.r7-root .r7-dues { gap: 0; }
+
+.r7-root .r7-due {
+  display: flex;
+  flex-direction: column;
+  gap: var(--r7-space-3);
+  position: relative;
+  padding: var(--r7-space-4) 0;
+  border-top: var(--r7-border-width) solid var(--r7-border-subtle);
+}
+
+.r7-root .r7-due:last-child { border-bottom: var(--r7-border-width) solid var(--r7-border-subtle); }
+
+/* Late is the one state that earns a surface of its own. */
+.r7-root .r7-due--late {
+  padding: var(--r7-space-4);
+  padding-left: var(--r7-space-5);
+  margin-block: var(--r7-space-2);
+  background: var(--r7-surface-raised);
+  border: var(--r7-border-width) solid var(--r7-state-error-border);
+  border-radius: var(--r7-radius-md);
+  overflow: hidden;
+}
+
+.r7-root .r7-due--late::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--r7-space-1);
+  background: var(--r7-state-error);
+}
+
+.r7-root .r7-due__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--r7-space-4);
+}
+
+.r7-root .r7-due__who { display: flex; flex-direction: column; gap: var(--r7-space-1); min-width: 0; }
+
+.r7-root .r7-due__name {
+  font-family: var(--r7-font-display);
+  font-size: var(--r7-size-md);
+  font-weight: var(--r7-weight-semi);
+  color: var(--r7-text-primary);
+}
+
+.r7-root .r7-due__identity {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--r7-space-1) var(--r7-space-3);
+  font-size: var(--r7-size-sm);
+  color: var(--r7-text-muted);
+}
+
+.r7-root .r7-due__when {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--r7-space-1);
+  flex: none;
+}
+
+.r7-root .r7-due__time {
+  font-family: var(--r7-font-display);
+  font-size: var(--r7-size-md);
+  font-weight: var(--r7-weight-semi);
+  font-variant-numeric: tabular-nums;
+  color: var(--r7-text-primary);
+}
+
+.r7-root .r7-due__slot {
+  font-size: var(--r7-size-2xs);
+  letter-spacing: var(--r7-tracking-label);
+  text-transform: uppercase;
+  color: var(--r7-text-muted);
+}
+
+.r7-root .r7-allergy {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--r7-space-2);
+  padding: var(--r7-space-3);
+  background: var(--r7-state-error-surface);
+  border-radius: var(--r7-radius-sm);
+  font-size: var(--r7-size-sm);
+  color: var(--r7-state-error);
+}
+
+.r7-root .r7-allergy > span { display: flex; flex-direction: column; gap: var(--r7-space-1); }
+.r7-root .r7-allergy strong { font-weight: var(--r7-weight-semi); }
+.r7-root .r7-allergy .r7-icon { flex: none; }
+
+
+/* ── 5. Tasks — things to do ───────────────────────────────────────────── */
+
+.r7-root .r7-task {
+  display: grid;
+  gap: var(--r7-space-2) var(--r7-space-4);
+  grid-template-areas:
+    "head  when"
+    "what  when"
+    "ask   when";
+  grid-template-columns: 1fr auto;
+  padding: var(--r7-space-4);
+  padding-left: var(--r7-space-5);
+  position: relative;
+  overflow: hidden;
+  background: var(--r7-surface-raised);
+  border: var(--r7-border-width) solid var(--r7-border-subtle);
+  border-radius: var(--r7-radius-md);
+}
+
+/* The rail is the interaction colour: this is a thing to do, not a thing to
+   know, and it is the only band that says so with the accent. */
+.r7-root .r7-task::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--r7-space-1);
+  background: var(--r7-colour-interactive);
+}
+
+.r7-root .r7-task--overdue::before { background: var(--r7-state-warning); }
+
+.r7-root .r7-task__head {
+  grid-area: head;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--r7-space-2) var(--r7-space-3);
+}
+
+.r7-root .r7-task__who {
+  font-family: var(--r7-font-display);
+  font-size: var(--r7-size-base);
+  font-weight: var(--r7-weight-semi);
+  color: var(--r7-text-primary);
+}
+
+.r7-root .r7-task__room { font-size: var(--r7-size-sm); color: var(--r7-text-muted); }
+
+.r7-root .r7-task__what {
+  grid-area: what;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--r7-space-3);
+  font-size: var(--r7-size-sm);
+  color: var(--r7-text-secondary);
+}
+
+.r7-root .r7-task__why { color: var(--r7-text-muted); }
+
+.r7-root .r7-task__ask {
+  grid-area: ask;
+  font-family: var(--r7-font-display);
+  font-weight: var(--r7-weight-semi);
+  color: var(--r7-colour-interactive);
+}
+
+.r7-root .r7-task__when {
+  grid-area: when;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--r7-space-1);
+  font-size: var(--r7-size-sm);
+  color: var(--r7-text-muted);
+  text-align: right;
+}
+
+.r7-root .r7-task--overdue .r7-task__due { color: var(--r7-state-warning); font-weight: var(--r7-weight-medium); }
+
+/* ── 6. Recently completed — the quietest thing here ───────────────────── */
+
+.r7-root .r7-done {
+  display: grid;
+  gap: var(--r7-space-1) var(--r7-space-4);
+  grid-template-columns: auto 1fr auto;
+  align-items: baseline;
+  padding: var(--r7-space-2) 0;
+  border-bottom: var(--r7-border-width) solid var(--r7-border-subtle);
+  font-size: var(--r7-size-sm);
+}
+
+.r7-root .r7-done:last-child { border-bottom: 0; }
+
+.r7-root .r7-done__time {
+  font-variant-numeric: tabular-nums;
+  color: var(--r7-text-muted);
+}
+
+.r7-root .r7-done__body { display: flex; flex-direction: column; gap: var(--r7-space-1); min-width: 0; }
+.r7-root .r7-done__who { font-weight: var(--r7-weight-semi); color: var(--r7-text-secondary); }
+
+.r7-root .r7-done__what { display: flex; flex-wrap: wrap; gap: var(--r7-space-2); color: var(--r7-text-muted); }
+.r7-root .r7-done__prn { color: var(--r7-text-muted); }
+.r7-root .r7-done__note { color: var(--r7-text-muted); max-width: var(--r7-measure); }
+
+.r7-root .r7-done__side { display: flex; align-items: center; gap: var(--r7-space-3); }
+.r7-root .r7-done__by { font-size: var(--r7-size-2xs); color: var(--r7-text-muted); }
+
+/* An entry that is only "given" needs no badge at all — the row already says
+   it happened. Only the exceptions are worth marking in a log. */
+.r7-root .r7-done .r7-status--success { display: none; }
+
+/* ── Narrow ────────────────────────────────────────────────────────────── */
+
+@media (max-width: 599px) {
+  .r7-root .r7-attention {
+    grid-template-areas: "label" "when" "head" "who" "what" "detail";
+    grid-template-columns: 1fr;
+  }
+
+  .r7-root .r7-attention__when { align-items: flex-start; }
+
+  .r7-root .r7-task {
+    grid-template-areas: "head" "what" "ask" "when";
+    grid-template-columns: 1fr;
+  }
+
+  .r7-root .r7-task__when { align-items: flex-start; text-align: left; }
+
+  .r7-root .r7-done {
+    grid-template-columns: auto 1fr;
+    grid-template-areas: "time body" "side side";
+  }
+
+  .r7-root .r7-done__time { grid-area: time; }
+  .r7-root .r7-done__body { grid-area: body; }
+  .r7-root .r7-done__side { grid-area: side; }
+
+  .r7-root .r7-round__action { align-items: stretch; }
+  .r7-root .r7-round__action .r7-btn,
+  .r7-root .r7-anchor__action .r7-btn { width: 100%; }
+
+    .r7-root .r7-handover { padding: var(--r7-space-4); }
+}
+
+/* ── Wide ──────────────────────────────────────────────────────────────── */
+
+@media (min-width: 768px) {
+  /* The anchor becomes a masthead: what and where on the left, what to do on
+     the right. Same DOM, same reading order — the action simply stops being
+     below the fold on the one screen where there is room for it not to be. */
+  .r7-root .r7-anchor {
+    grid-template-areas:
+      "meta  action"
+      "title action";
+    grid-template-columns: 1fr auto;
+    align-items: start;
+  }
+
+  .r7-root .r7-anchor__action { align-items: flex-end; text-align: right; }
+
+  .r7-root .r7-board__head { gap: var(--r7-space-4); }
+}
+
+/* ── Reduced Today: what each band shows now ───────────────────────────── */
+
+/* Handover foot: how much was left out, and the confirmation. */
+.r7-root .r7-handover__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--r7-space-3);
+  padding-top: var(--r7-space-4);
+  border-top: var(--r7-border-width) solid var(--r7-brand-panel-rule);
+}
+
+.r7-root .r7-handover__more { font-size: var(--r7-size-sm); color: var(--r7-brand-panel-dim); }
+
+.r7-root .r7-handover__read {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--r7-space-2);
+  font-size: var(--r7-size-sm);
+  color: var(--r7-brand-panel-accent);
+}
+
+/* On the deep panel a secondary button needs its own footing. */
+.r7-root .r7-handover .r7-btn--secondary {
+  background: none;
+  border-color: var(--r7-brand-panel-accent);
+  color: var(--r7-brand-panel-accent);
+}
+
+/* Attention: who, what is wrong, what to do, how long it has waited. */
+.r7-root .r7-attention {
+  grid-template-areas:
+    "label    when"
+    "who      when"
+    "problem  problem"
+    "next     next";
+}
+
+.r7-root .r7-attention__who {
+  grid-area: who;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--r7-space-3);
+  font-family: var(--r7-font-display);
+  font-size: var(--r7-size-md);
+  font-weight: var(--r7-weight-semi);
+  color: var(--r7-text-primary);
+}
+
+.r7-root .r7-attention__room {
+  font-family: var(--r7-font-body);
+  font-size: var(--r7-size-sm);
+  font-weight: var(--r7-weight-normal);
+  color: var(--r7-text-muted);
+}
+
+.r7-root .r7-attention__problem {
+  grid-area: problem;
+  font-size: var(--r7-size-base);
+  color: var(--r7-text-secondary);
+  max-width: var(--r7-measure);
+}
+
+/* The next action is the point of the row, so it is the one thing in it that
+   is written in the interaction colour. */
+.r7-root .r7-attention__next {
+  grid-area: next;
+  margin-top: var(--r7-space-1);
+  font-weight: var(--r7-weight-semi);
+  color: var(--r7-colour-interactive);
+}
+
+/* People due: a count, not a list. */
+.r7-root .r7-due__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--r7-space-1) var(--r7-space-3);
+  font-size: var(--r7-size-sm);
+  color: var(--r7-text-muted);
+}
+
+.r7-root .r7-due__critical { color: var(--r7-state-warning); font-weight: var(--r7-weight-medium); }
+.r7-root .r7-due__changed { color: var(--r7-colour-interactive); font-weight: var(--r7-weight-medium); }
+
+/* Tasks: the question, and why it was given. */
+.r7-root .r7-task { grid-template-areas: "head when" "ask when"; }
+
+.r7-root .r7-task__ask {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--r7-space-3);
+}
+
+.r7-root .r7-task__why {
+  font-family: var(--r7-font-body);
+  font-size: var(--r7-size-sm);
+  font-weight: var(--r7-weight-normal);
+  color: var(--r7-text-muted);
+}
+
+/* Recently completed: a summary you open, not a list you scroll past. */
+.r7-root .r7-disclose {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--r7-space-3);
+  width: 100%;
+  padding: var(--r7-space-3) 0;
+  background: none;
+  border: 0;
+  border-bottom: var(--r7-border-width) solid var(--r7-border-subtle);
+  color: var(--r7-text-muted);
+  font-size: var(--r7-size-sm);
+  text-align: left;
+  cursor: pointer;
+}
+
+.r7-root .r7-disclose:hover { color: var(--r7-text-primary); }
+.r7-root .r7-disclose__more { color: var(--r7-colour-interactive); font-weight: var(--r7-weight-medium); }
+
+.r7-root .r7-done { grid-template-columns: auto 1fr auto; }
+.r7-root .r7-done__who { font-weight: var(--r7-weight-semi); color: var(--r7-text-secondary); }
+
+/* Round: what comes after this one. */
+.r7-root .r7-round__next {
+  display: flex;
+  flex-direction: column;
+  gap: var(--r7-space-1);
+  align-items: flex-end;
+  font-size: var(--r7-size-sm);
+  color: var(--r7-text-secondary);
+}
+
+@media (max-width: 599px) {
+  .r7-root .r7-attention {
+    grid-template-areas: "label" "when" "who" "problem" "next";
+    grid-template-columns: 1fr;
+  }
+
+  .r7-root .r7-task { grid-template-areas: "head" "ask" "when"; grid-template-columns: 1fr; }
+  .r7-root .r7-round__next { align-items: flex-start; }
 }

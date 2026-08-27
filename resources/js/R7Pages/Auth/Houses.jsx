@@ -1,5 +1,5 @@
 import React from 'react';
-import { router } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import AuthShell from '@record7/components/AuthShell.jsx';
 import HouseRow from '@record7/components/HouseRow.jsx';
 import Notice from '@record7/components/Notice.jsx';
@@ -15,17 +15,20 @@ import TextLink from '@record7/components/TextLink.jsx';
  * offered.
  */
 export default function Houses({
-    organisationName, name, houses, currentHouseId, chooseUrl, signOutUrl, error,
+    organisationName, name, houses, currentHouseId, chooseUrl, signOutUrl, backUrl, error,
 }) {
+    // Switching is something you can change your mind about, so it offers a way
+    // back. Choosing a house for the first time has nothing behind it but
+    // signing out, which the footer already offers.
     const switching = Boolean(currentHouseId);
+    const { journeySteps } = usePage().props;
 
     const choose = (houseId) => router.post(chooseUrl, { house_id: houseId });
 
     return (
         <AuthShell
-            step={switching ? null : 4}
-            stepCount={4}
-            wide
+            step={switching ? null : (journeySteps ?? 3)}
+            back={switching && backUrl ? { href: backUrl, label: 'Back' } : null}
             title={switching ? 'Switch house' : 'Which house are you working in?'}
             intro={
                 switching
