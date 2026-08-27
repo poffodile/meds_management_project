@@ -403,8 +403,9 @@ class Record7Section12Seeder extends Seeder
                     'instructions' => 'Before food. Do not give if she has already eaten — tell the nurse.']],
             ['sylvia-senna', 'sylvia', 'senna', 'Two tablets', 'Oral', 'Once a day at night', ['Night'], []],
 
+            // Bridget takes her own tablets from the pot with somebody watching.
             ['bridget-paracetamol', 'bridget', 'paracetamol', 'Two tablets', 'Oral', 'Four times a day',
-                ['Morning', 'Lunchtime', 'Teatime', 'Night'], []],
+                ['Morning', 'Lunchtime', 'Teatime', 'Night'], ['support_type' => 'prompted']],
             ['bridget-oxycodone', 'bridget', 'oxycodone', 'One capsule', 'Oral', 'When required',
                 ['prn'], [
                     'prn_max_per_day' => 4,
@@ -427,6 +428,7 @@ class Record7Section12Seeder extends Seeder
                     'frequency_text' => $frequency,
                     'kind' => $slots === ['prn'] ? 'prn' : 'scheduled',
                     'is_time_critical' => $options['is_time_critical'] ?? false,
+                    'support_type' => $options['support_type'] ?? 'staff_administered',
                     'instructions' => $options['instructions'] ?? null,
                     'prn_max_per_day' => $options['prn_max_per_day'] ?? null,
                     'prn_min_gap_minutes' => $options['prn_min_gap_minutes'] ?? null,

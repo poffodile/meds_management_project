@@ -77,6 +77,9 @@ class HouseController extends R7Controller
             'error' => session('error'),
             'chooseUrl' => route('record7.houses.choose'),
             'signOutUrl' => route('record7.signout'),
+            // Only meaningful when a house is already open — otherwise there is
+            // nothing behind this screen to go back to.
+            'backUrl' => $current ? route('record7.today') : null,
         ]);
     }
 

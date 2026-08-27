@@ -1,51 +1,52 @@
 import React from 'react';
 import { router } from '@inertiajs/react';
+import Icon from './Icon.jsx';
 
 /**
- * Record7's navigation, in both of its shapes.
+ * Record7's navigation.
  *
- * On desktop it is a sidebar. On a phone it is a bar pinned to the bottom,
- * under the thumb, because a round is worked one-handed while holding
- * something else. Same items, same order, same words — only the arrangement
- * changes, and it changes in CSS rather than by rendering two different trees.
+ * ONE TREE, TWO SHAPES.
+ * On desktop it is a slim rail that widens on hover or keyboard focus and
+ * pushes the workspace across rather than covering it — so nothing you were
+ * reading is ever hidden by the thing you are navigating with. On a phone the
+ * same list opens as a drawer from the side.
  *
- * Items a person has no permission for are not rendered at all. That is a
- * courtesy: the server refuses them regardless.
+ * IT IS BUILT TO GROW.
+ * Two destinations exist today because two pages exist. Nothing here is padded
+ * out with links that go nowhere: an item a person cannot reach is not
+ * rendered, and the rail is sized by what is in it. Adding the Medication Round
+ * later is one more entry in the array.
+ *
+ * The label is always in the DOM, never swapped in and out. Collapsing hides it
+ * with width and opacity, so a screen reader always has the words and the
+ * button always has an accessible name — a rail whose labels only exist while
+ * hovered is unusable to anyone not using a mouse.
  */
-export default function AppNav({ items = [], variant = 'sidebar' }) {
+export default function AppNav({ items = [], onNavigate = null }) {
     const visible = items.filter((item) => item.available !== false);
 
-    if (variant === 'tabbar') {
-        return (
-            <nav className="r7-tabbar" aria-label="Sections">
-                {visible.map((item) => (
-                    <button
-                        key={item.key}
-                        type="button"
-                        className={`r7-tabbar__item${item.current ? ' r7-tabbar__item--on' : ''}`}
-                        onClick={() => router.get(item.href)}
-                        aria-current={item.current ? 'page' : undefined}
-                    >
-                        {item.label}
-                    </button>
-                ))}
-            </nav>
-        );
-    }
+    const go = (item) => {
+        if (onNavigate) onNavigate();
+        router.get(item.href);
+    };
 
     return (
-        <nav className="r7-nav" aria-label="Sections">
+        <ul className="r7-nav" role="list">
             {visible.map((item) => (
-                <button
-                    key={item.key}
-                    type="button"
-                    className={`r7-nav__item${item.current ? ' r7-nav__item--on' : ''}`}
-                    onClick={() => router.get(item.href)}
-                    aria-current={item.current ? 'page' : undefined}
-                >
-                    {item.label}
-                </button>
+                <li key={item.key ?? item.label}>
+                    <button
+                        type="button"
+                        className={`r7-nav__item${item.current ? ' r7-nav__item--on' : ''}`}
+                        onClick={() => go(item)}
+                        aria-current={item.current ? 'page' : undefined}
+                    >
+                        <span className="r7-nav__icon" aria-hidden="true">
+                            <Icon name={item.icon ?? 'house'} className="r7-icon" />
+                        </span>
+                        <span className="r7-nav__label">{item.label}</span>
+                    </button>
+                </li>
             ))}
-        </nav>
+        </ul>
     );
 }

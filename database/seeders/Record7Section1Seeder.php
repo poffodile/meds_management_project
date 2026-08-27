@@ -308,6 +308,9 @@ class Record7Section1Seeder extends Seeder
                     'prn_max_per_day' => 8,
                     'prn_min_gap_minutes' => 240,
                     'prn_indication' => 'For breathlessness or wheeze',
+                    // She manages this one herself. Recording it as staff
+                    // administration would be a false record.
+                    'support_type' => 'self_administered',
                     'instructions' => 'Aisha administers this herself. Record it; do not hand it to her.',
                 ]],
             ['aisha-levetiracetam', 'aisha', 'levetiracetam', 'One tablet', 'Oral', 'Twice a day',
@@ -327,7 +330,8 @@ class Record7Section1Seeder extends Seeder
                     'prn_indication' => 'For back pain',
                 ]],
 
-            ['joyce-macrogol', 'joyce', 'macrogol', 'One sachet in water', 'Oral', 'Once a day', ['Morning'], []],
+            ['joyce-macrogol', 'joyce', 'macrogol', 'One sachet in water', 'Oral', 'Once a day',
+                ['Morning'], ['support_type' => 'assisted']],
             ['joyce-lorazepam', 'joyce', 'lorazepam', 'One tablet', 'Oral', 'When required',
                 ['prn'], [
                     'prn_max_per_day' => 2,
@@ -355,6 +359,7 @@ class Record7Section1Seeder extends Seeder
                     'frequency_text' => $frequency,
                     'kind' => $slots === ['prn'] ? 'prn' : 'scheduled',
                     'is_time_critical' => $options['is_time_critical'] ?? false,
+                    'support_type' => $options['support_type'] ?? 'staff_administered',
                     'instructions' => $options['instructions'] ?? null,
                     'prn_max_per_day' => $options['prn_max_per_day'] ?? null,
                     'prn_min_gap_minutes' => $options['prn_min_gap_minutes'] ?? null,
