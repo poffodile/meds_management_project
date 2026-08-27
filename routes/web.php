@@ -3206,6 +3206,7 @@ use App\Http\Controllers\Record7\HouseController as R7House;
 use App\Http\Controllers\Record7\SessionController as R7Session;
 use App\Http\Controllers\Record7\SignInController as R7SignIn;
 use App\Http\Controllers\Record7\ManagerController as R7Manager;
+use App\Http\Controllers\Record7\RoundController as R7Round;
 use App\Http\Controllers\Record7\TodayController as R7Today;
 use App\Http\Middleware\Record7\Authenticate as R7Authenticate;
 use App\Http\Middleware\Record7\Authorize as R7Authorize;
@@ -3261,10 +3262,17 @@ Route::prefix('record7')->name('record7.')->group(function () {
         Route::get('/', [R7Today::class, 'index'])
             ->middleware(R7Authorize::class.':view_dashboard')->name('today');
 
-        /* 1.1 — starting or joining the round from Today. */
-        Route::post('/round/start', [R7Today::class, 'startRound'])
+        /* 2.0 — safe entry to the round, and the round workspace.
+           No administration happens here; that begins at Section 2.2. The
+           authorise middleware is the first gate, and RoundAuthority re-checks
+           everything again on each request rather than trusting it. */
+        Route::post('/round/start', [R7Round::class, 'enter'])
             ->middleware([R7Authorize::class.':administer_medication', 'throttle:30,1'])
             ->name('round.start');
+
+        Route::get('/round', [R7Round::class, 'show'])
+            ->middleware(R7Authorize::class.':administer_medication')
+            ->name('round');
 
         /* 1.1 — confirming you have read the handover. Anybody in the house
            may do this: being told what happened overnight is not privileged. */

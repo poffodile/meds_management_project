@@ -99,6 +99,7 @@ class Record7Section0Seeder extends Seeder
             $this->seedCompetencies($pdo);
             $this->seedMfa($pdo);
             $this->seedSessions($pdo);
+            $this->separateRoleFromCompetency();
         });
 
         // Outside the transaction: the audit table is append-only and its
@@ -287,6 +288,60 @@ class Record7Section0Seeder extends Seeder
         }
     }
 
+    /**
+     * A job is not a competency, and the supplied package conflates them.
+     *
+     * Noah Williams arrives from the fixture holding the role "Medication
+     * Administrator". That is not a job anybody is employed as — it describes
+     * what he is signed off to do. His actual employment role is Support
+     * Worker, and Section 0 exists precisely so that what he may do comes from
+     * three separate things:
+     *
+     *   his ROLE          what he is employed as        Support Worker
+     *   his PERMISSION    what he is authorised to do   an explicit per-house allow
+     *   his COMPETENCY    what he is signed off for     medication administration, current
+     *
+     * Renaming the job to describe the competency collapses all three into one,
+     * and then an expired competency cannot take the ability away without also
+     * appearing to demote the person.
+     *
+     * So he moves to Support Worker and keeps the ability through the same
+     * shape Olivia Carter already uses: an explicit allow for the house he
+     * works in, which the competency gate still has to pass. Let his
+     * medication competency lapse and he stops being able to administer,
+     * while remaining a Support Worker — which is the real-world behaviour.
+     */
+    private function separateRoleFromCompetency(): void
+    {
+        $noah = User::where('username', 'noah.williams')->first();
+        $supportWorker = Role::where('code', 'R7')->first();
+        $administer = Permission::where('code', 'administer_medication')->first();
+
+        if (! $noah || ! $supportWorker || ! $administer) {
+            return;
+        }
+
+        UserRole::where('user_id', $noah->id)->delete();
+        UserRole::create(['user_id' => $noah->id, 'role_id' => $supportWorker->id]);
+
+        // One allow per house he actually holds, never a blanket grant: being
+        // competent in one house is not being competent everywhere.
+        foreach (UserServiceAccess::where('user_id', $noah->id)->get() as $access) {
+            UserPermission::firstOrCreate(
+                [
+                    'user_id' => $noah->id,
+                    'permission_id' => $administer->id,
+                    'service_id' => $access->service_id,
+                ],
+                [
+                    'effect' => 'allow',
+                    'status' => 'active',
+                    'reason' => 'Medication administration competency confirmed for this house.',
+                ]
+            );
+        }
+    }
+
     private function seedUserRoles(PDO $pdo): void
     {
         foreach ($this->rows($pdo, 'SELECT * FROM user_roles') as $row) {
@@ -459,16 +514,29 @@ class Record7Section0Seeder extends Seeder
             return;
         }
 
-        // A manager: oversees both houses, reaches the access audit, and does
-        // not administer medication. That separation is the fixture's design.
+        // A manager: oversees both houses, reaches the access audit, AND can
+        // administer medication.
+        //
+        // A service manager is staff. In a real home they are very often
+        // medication trained and work rounds themselves, particularly when a
+        // shift is short. A system that refuses them would not stop the round
+        // happening — it would push them to borrow somebody else's login, which
+        // is the worst possible outcome for a medication record.
+        //
+        // Note HOW this is done: not by editing the supplied role matrix, which
+        // stays exactly as the package defines it, but by an explicit per-house
+        // allow gated by competency. That is the correct clinical model as well
+        // as the tidier one — whether a person may give a medicine depends on
+        // whether they have been assessed, not on their job title. A manager
+        // without the competency still cannot, and neither can a support
+        // worker.
         $this->convenienceAccount(
             $organisation, [$oakwood, $rosewood], $password,
-            'testmanager', 'Test Manager', 'R4', 'manager', false
+            'testmanager', 'Test Manager', 'R4', 'manager', true
         );
 
-        // A support worker: works in both houses and CAN administer, because a
-        // staff account that cannot do the job is not much use for reviewing
-        // the job. Mirrors how Olivia Carter is set up in the package.
+        // A support worker: works in both houses and can administer, set up the
+        // same way Olivia Carter is in the supplied package.
         $this->convenienceAccount(
             $organisation, [$oakwood, $rosewood], $password,
             'teststaff', 'Test Staff', 'R7', 'standard', true
