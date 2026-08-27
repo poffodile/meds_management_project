@@ -7,6 +7,7 @@ use App\Models\Record7\Organisation;
 use App\Models\Record7\Service;
 use App\Models\Record7\User;
 use App\Services\Record7\AccessPolicy;
+use App\Services\Record7\AuthenticationService;
 use App\Services\Record7\SessionManager;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -34,6 +35,13 @@ abstract class R7Controller extends Controller
             'strapline' => config('record7.product_strapline'),
             'seventhRight' => config('record7.seventh_right'),
         ]);
+
+        // How many steps the sign-in journey actually has. With verification
+        // switched off it is organisation, credentials, house — three. With it
+        // on there are four. The screens must not disagree with each other:
+        // "step 1 of 3" followed by "step 4 of 4" is the kind of small
+        // incoherence that makes a product feel unfinished.
+        Inertia::share('journeySteps', app(AuthenticationService::class)->verificationStepEnabled() ? 4 : 3);
 
         // The global shared props read the legacy web guard and run the legacy
         // home switcher, which queries a column Record7's schema does not have.
