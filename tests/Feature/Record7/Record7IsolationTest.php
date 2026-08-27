@@ -135,7 +135,7 @@ class Record7IsolationTest extends TestCase
 
         $this->assertStringContainsString('--r7-colour-primary', $tokens);
         $this->assertStringContainsString('--r7-colour-accent', $tokens);
-        $this->assertMatchesRegularExpression('/--r7-surface-page:\s*#FAF4E9/i', $tokens,
+        $this->assertMatchesRegularExpression('/--r7-surface-page:\s*#F7F1E4/i', $tokens,
             'The page ground must be the documented warm cream');
     }
 

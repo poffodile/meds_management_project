@@ -4,6 +4,7 @@ namespace Tests\Feature\Record7;
 
 use App\Models\Record7\AccessAuditEvent;
 use App\Models\Record7\Service;
+use App\Models\Record7\UserServiceAccess;
 use Illuminate\Support\Facades\Auth;
 
 /**
@@ -141,5 +142,59 @@ class Record7HouseAccessTest extends Record7TestCase
 
         $this->get('/record7/houses')->assertRedirect('/record7/login');
         $this->assertFalse(Auth::guard('record7')->check());
+    }
+
+    /* ── The access badge on the house list ──────────────────────────────── */
+
+    /**
+     * The house list badges only the access that carries a catch, so that a
+     * badge means something when you see one. The risk in that design is the
+     * reverse mistake: an access type that CANNOT write quietly showing no
+     * badge, and somebody walking into a house expecting to record a dose.
+     *
+     * So this does not assert a hard-coded list. It asks the policy which access
+     * types are read-only and insists the screen flags every one of them.
+     */
+    public function test_every_access_type_that_cannot_write_is_flagged_on_the_house_list(): void
+    {
+        $component = file_get_contents(resource_path('js/record7/components/HouseRow.jsx'));
+
+        preg_match('/const RESTRICTED = \[(.*?)\];/s', $component, $m);
+        $this->assertNotEmpty($m, 'HouseRow must declare which access types it flags.');
+
+        preg_match_all("/'([a-z_]+)'/", $m[1], $flagged);
+        $flagged = $flagged[1];
+
+        // Every access type the product offers, taken from the words the screen
+        // knows how to print rather than from a second hard-coded list.
+        preg_match('/const ACCESS_WORDS = \{(.*?)\};/s', $component, $words);
+        preg_match_all('/^\s*([a-z_]+):/m', $words[1], $all);
+
+        $this->assertNotEmpty($all[1], 'ACCESS_WORDS must list the access types.');
+
+        foreach ($all[1] as $accessType) {
+            $access = new UserServiceAccess(['access_type' => $accessType]);
+
+            if ($access->isReadOnly()) {
+                $this->assertContains(
+                    $accessType,
+                    $flagged,
+                    "'{$accessType}' cannot write, so the house list must say so before "
+                    .'somebody opens that house expecting to record.'
+                );
+            }
+        }
+    }
+
+    public function test_the_badge_is_conditional_and_not_on_every_row(): void
+    {
+        $component = file_get_contents(resource_path('js/record7/components/HouseRow.jsx'));
+
+        // Gated on the flag, not rendered unconditionally. A badge on every row
+        // is wallpaper, and the one that matters stops being noticed.
+        $this->assertMatchesRegularExpression(
+            '/\{restricted \?\s*\(\s*<StatusLabel/',
+            $component
+        );
     }
 }

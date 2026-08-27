@@ -3205,6 +3205,7 @@ use App\Http\Controllers\Record7\AuditController as R7Audit;
 use App\Http\Controllers\Record7\HouseController as R7House;
 use App\Http\Controllers\Record7\SessionController as R7Session;
 use App\Http\Controllers\Record7\SignInController as R7SignIn;
+use App\Http\Controllers\Record7\ManagerController as R7Manager;
 use App\Http\Controllers\Record7\TodayController as R7Today;
 use App\Http\Middleware\Record7\Authenticate as R7Authenticate;
 use App\Http\Middleware\Record7\Authorize as R7Authorize;
@@ -3259,6 +3260,36 @@ Route::prefix('record7')->name('record7.')->group(function () {
     Route::middleware(R7Authenticate::class)->group(function () {
         Route::get('/', [R7Today::class, 'index'])
             ->middleware(R7Authorize::class.':view_dashboard')->name('today');
+
+        /* 1.1 — starting or joining the round from Today. */
+        Route::post('/round/start', [R7Today::class, 'startRound'])
+            ->middleware([R7Authorize::class.':administer_medication', 'throttle:30,1'])
+            ->name('round.start');
+
+        /* 1.1 — confirming you have read the handover. Anybody in the house
+           may do this: being told what happened overnight is not privileged. */
+        Route::post('/handover/read', [R7Today::class, 'readHandover'])
+            ->middleware([R7Authorize::class.':view_dashboard', 'throttle:30,1'])
+            ->name('handover.read');
+
+        /* 1.2 — Manager Today. Gated on its own permission rather than on a
+           role, and every action re-checks in the house the session is in. */
+        Route::get('/manager', [R7Manager::class, 'index'])
+            ->middleware(R7Authorize::class.':view_manager_dashboard')->name('manager');
+
+        Route::middleware([R7Authorize::class.':view_manager_dashboard', 'throttle:60,1'])
+            ->group(function () {
+                Route::post('/manager/own', [R7Manager::class, 'own'])->name('manager.own');
+                Route::post('/manager/escalate', [R7Manager::class, 'escalate'])->name('manager.escalate');
+                Route::post('/manager/acknowledge', [R7Manager::class, 'acknowledge'])
+                    ->name('manager.acknowledge');
+                Route::post('/manager/action', [R7Manager::class, 'recordAction'])
+                    ->name('manager.action');
+                Route::post('/manager/close', [R7Manager::class, 'close'])->name('manager.close');
+                Route::post('/manager/decide', [R7Manager::class, 'decide'])->name('manager.decide');
+                Route::post('/manager/round/close', [R7Manager::class, 'closeRound'])
+                    ->name('manager.round.close');
+            });
 
         /* 0.10 — the manager access-audit screen. */
         Route::get('/access-audit', [R7Audit::class, 'index'])

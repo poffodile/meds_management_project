@@ -170,8 +170,27 @@ class Record7DesignSystemTest extends TestCase
                 ['info text on its own surface', $t['--r7-state-info'], $t['--r7-state-info-surface'], 4.5],
                 ['safety warning text', $t['--r7-state-danger'], $t['--r7-state-danger-surface'], 4.5],
                 ['selected control label', $t['--r7-text-accent'], $t['--r7-surface-accent'], 4.5],
+                // The sign-in brand panel. A note here once used the rule
+                // colour and measured 1.39 to 1 — invisible in practice.
+                ['brand panel heading', $t['--r7-brand-panel-ink'], $t['--r7-brand-panel'], 4.5],
+                ['brand panel supporting text', $t['--r7-brand-panel-muted'], $t['--r7-brand-panel'], 4.5],
+                ['brand panel accent', $t['--r7-brand-panel-accent'], $t['--r7-brand-panel'], 4.5],
+                // The smallest text on the deep panel — the right numbers, the
+                // access notice. It is the pairing most likely to be let go.
+                ['brand panel dim text', $t['--r7-brand-panel-dim'], $t['--r7-brand-panel'], 4.5],
+                // The shift briefing is its own ground — deep navy on the warm
+                // theme, deeper than the page on the dark one — so every word
+                // written on it needs checking against IT, not against the
+                // panel token it used to borrow.
+                ['briefing heading', $t['--r7-brand-panel-ink'], $t['--r7-briefing-top'], 4.5],
+                ['briefing body', $t['--r7-brand-panel-muted'], $t['--r7-briefing-top'], 4.5],
+                ['briefing dim text', $t['--r7-brand-panel-dim'], $t['--r7-briefing-top'], 4.5],
+                ['briefing accent', $t['--r7-brand-panel-accent'], $t['--r7-briefing-top'], 4.5],
+                // The interaction colour, wherever it carries meaning.
+                ['interactive text', $t['--r7-colour-interactive'], $t['--r7-surface-page'], 4.5],
+                ['active step marker', $t['--r7-colour-interactive'], $t['--r7-surface-page'], 3.0],
                 // Non-text: 3 to 1 is the bar for a control boundary.
-                ['focus ring', $t['--r7-colour-accent'], $t['--r7-surface-page'], 3.0],
+                ["focus ring", $t["--r7-colour-interactive"], $t['--r7-surface-page'], 3.0],
                 ['input border', $t['--r7-border-strong'], $t['--r7-surface-page'], 3.0],
                 ['solid surface against the page', $t['--r7-surface-solid'], $t['--r7-surface-page'], 3.0],
             ];

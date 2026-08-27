@@ -4,11 +4,17 @@ import useTheme from '../useTheme.js';
 /**
  * Switches between the warm cream and midnight grounds.
  *
- * Labelled in words rather than an icon alone, so what it does is readable
- * without decoding a symbol, and announced properly to assistive technology.
+ * A sign rather than a labelled control. The half-filled circle is the
+ * convention for this and needs no word beside it, which keeps it out of the
+ * way of the sign-in journey — it is a preference, not a step.
+ *
+ * The word is still there for anyone who cannot see the shape: the button
+ * carries an accessible name and hidden text, and aria-pressed says which way
+ * it is currently set.
  */
 export default function ThemeToggle() {
     const { isDark, toggle } = useTheme();
+    const action = isDark ? 'Switch to the light theme' : 'Switch to the dark theme';
 
     return (
         <button
@@ -16,10 +22,11 @@ export default function ThemeToggle() {
             className="r7-theme"
             onClick={toggle}
             aria-pressed={isDark}
-            title={isDark ? 'Switch to the light theme' : 'Switch to the dark theme'}
+            aria-label={action}
+            title={action}
         >
             <span className="r7-theme__swatch" aria-hidden="true" />
-            {isDark ? 'Light' : 'Dark'}
+            <span className="r7-sr-only">{action}</span>
         </button>
     );
 }
