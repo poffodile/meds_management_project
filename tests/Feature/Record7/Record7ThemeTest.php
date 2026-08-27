@@ -84,6 +84,26 @@ class Record7ThemeTest extends TestCase
         }
     }
 
+    public function test_an_icon_on_a_filled_control_is_not_the_control_colour(): void
+    {
+        // The dark theme fills the primary button with the brand teal. An arrow
+        // painted from the accent token was then teal on teal and disappeared —
+        // the same fault as the vanishing button, one element further in.
+        foreach ([
+            'light' => '.r7-root {',
+            'dark' => '.r7-root[data-theme="dark"] {',
+        ] as $theme => $block) {
+            $icon = $this->token($block, '--r7-icon-on-solid');
+
+            $this->assertNotNull($icon, "--r7-icon-on-solid must be defined for the {$theme} theme");
+            $this->assertNotSame(
+                $icon,
+                $this->token($block, '--r7-surface-solid'),
+                "On the {$theme} theme the arrow on a filled control is the colour of the control."
+            );
+        }
+    }
+
     public function test_the_solid_surface_is_not_the_page_colour_in_either_theme(): void
     {
         foreach ([
@@ -120,7 +140,10 @@ class Record7ThemeTest extends TestCase
 
     public function test_the_default_ground_is_the_documented_warm_cream(): void
     {
-        $this->assertSame('#FAF4E9', $this->token('.r7-root {', '--r7-surface-page'));
+        // Refined once, against a supplied design reference: a fractionally
+        // deeper, less yellow cream. Still cream, still the default, still not
+        // taken from the operating system — which is what this test is for.
+        $this->assertSame('#F7F1E4', $this->token('.r7-root {', '--r7-surface-page'));
     }
 
     public function test_the_dark_theme_is_reachable_and_still_scoped(): void
@@ -140,15 +163,32 @@ class Record7ThemeTest extends TestCase
         $this->assertFileExists(resource_path('js/record7/components/ThemeToggle.jsx'));
         $this->assertFileExists(resource_path('js/record7/useTheme.js'));
 
+        // The two shells carry it, so every screen inside them has it.
         foreach ([
             'js/record7/components/AuthShell.jsx',
             'js/record7/components/AppShell.jsx',
-            'js/R7Pages/Lock.jsx',
-        ] as $file) {
+        ] as $shell) {
             $this->assertStringContainsString(
                 '<ThemeToggle />',
-                file_get_contents(resource_path($file)),
-                $file.' must offer the theme toggle'
+                file_get_contents(resource_path($shell)),
+                $shell.' must offer the theme toggle'
+            );
+        }
+
+        // And every page sits in one of them rather than hand-rolling a frame,
+        // which is what guarantees the toggle is always reachable.
+        foreach ([
+            'js/R7Pages/Lock.jsx' => 'AuthShell',
+            'js/R7Pages/Auth/SignIn.jsx' => 'AuthShell',
+            'js/R7Pages/Auth/Verify.jsx' => 'AuthShell',
+            'js/R7Pages/Auth/Houses.jsx' => 'AuthShell',
+            'js/R7Pages/Today.jsx' => 'AppShell',
+            'js/R7Pages/Audit.jsx' => 'AppShell',
+        ] as $page => $shell) {
+            $this->assertStringContainsString(
+                "components/{$shell}.jsx",
+                file_get_contents(resource_path($page)),
+                $page.' must sit inside '.$shell
             );
         }
     }

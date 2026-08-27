@@ -1,4 +1,5 @@
 import React from 'react';
+import Icon from './Icon.jsx';
 
 /**
  * Record7's button.
@@ -23,6 +24,7 @@ export default function Button({
     block = false,
     busy = false,
     busyLabel = 'Working',
+    arrow = false,
     children,
     ...rest
 }) {
@@ -42,6 +44,7 @@ export default function Button({
             className={classes}
         >
             {busy ? busyLabel : children}
+            {arrow && ! busy ? <Icon name="arrow" className="r7-icon r7-icon--small" /> : null}
         </button>
     );
 }
