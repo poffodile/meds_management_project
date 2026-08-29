@@ -41,6 +41,18 @@ class Prescription extends Record7Model
         return $this->kind === 'prn';
     }
 
+    public function requiresSelfAdministrationCheck(): bool
+    {
+        return $this->support_type === 'self_administered'
+            && $this->self_administration_monitoring === 'check_and_record';
+    }
+
+    public function isFullySelfManaged(): bool
+    {
+        return $this->support_type === 'self_administered'
+            && $this->self_administration_monitoring === 'none';
+    }
+
     /**
      * Changed recently enough that whoever is starting a shift may not know.
      *

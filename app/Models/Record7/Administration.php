@@ -22,10 +22,18 @@ class Administration extends Record7Model
     ];
 
     /** Outcomes that mean the person did not get their medicine. */
-    public const NOT_TAKEN = ['refused', 'withheld', 'not_available', 'missed'];
+    public const NOT_TAKEN = ['refused', 'withheld', 'not_available', 'missed', 'person_unavailable'];
 
     /** Facts that a correction replaces rather than edits. */
-    private const FROZEN = ['outcome', 'client_id', 'prescription_id', 'recorded_by_user_id', 'administered_at'];
+    private const FROZEN = [
+        'outcome',
+        'client_id',
+        'prescription_id',
+        'recorded_by_user_id',
+        'administered_at',
+        'corrects_administration_id',
+        'reoffer_of_administration_id',
+    ];
 
     protected static function booted(): void
     {
@@ -75,6 +83,7 @@ class Administration extends Record7Model
             'withheld' => 'Withheld',
             'not_available' => 'Not available',
             'missed' => 'Missed',
+            'person_unavailable' => 'Person unavailable',
         ][$this->outcome] ?? $this->outcome;
     }
 }

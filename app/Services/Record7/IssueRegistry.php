@@ -48,6 +48,7 @@ class IssueRegistry
         'staff_readiness',
         'review',
         'handover_unread',
+        'welfare_check',
     ];
 
     /** Split a key without trusting either half yet. */
@@ -91,6 +92,10 @@ class IssueRegistry
                 ->where('user_id', $parsed['sourceId'])->first(),
             // A handover key names a handover in this house.
             'handover_unread' => \App\Models\Record7\Handover::where('service_id', $serviceId)
+                ->find($parsed['sourceId']),
+            'welfare_check' => Administration::where('service_id', $serviceId)
+                ->where('outcome', 'person_unavailable')
+                ->where('reason_code', 'not_found_in_service')
                 ->find($parsed['sourceId']),
             default => null,
         };
@@ -149,6 +154,11 @@ class IssueRegistry
 
             // Somebody on shift still has not confirmed it.
             'handover_unread' => true,
+            'welfare_check' => Administration::where('service_id', $serviceId)
+                ->where('id', $id)
+                ->where('outcome', 'person_unavailable')
+                ->where('reason_code', 'not_found_in_service')
+                ->exists(),
 
             default => true,
         };
@@ -189,7 +199,11 @@ class IssueRegistry
             return false;
         }
 
-        return ! Administration::where('prescription_id', $refusal->prescription_id)
+        return ! Administration::where('scheduled_dose_id', $refusal->scheduled_dose_id)
+            ->where('service_id', $serviceId)
+            ->where('client_id', $refusal->client_id)
+            ->where('prescription_id', $refusal->prescription_id)
+            ->where('reoffer_of_administration_id', $refusal->id)
             ->where('administered_at', '>', $refusal->administered_at)
             ->whereIn('outcome', ['given', 'self_administered'])
             ->exists();

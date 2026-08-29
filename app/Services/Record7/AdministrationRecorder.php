@@ -4,12 +4,15 @@ namespace App\Services\Record7;
 
 use App\Models\Record7\Administration;
 use App\Models\Record7\Client;
+use App\Models\Record7\IssueState;
 use App\Models\Record7\Round;
 use App\Models\Record7\ScheduledDose;
+use App\Models\Record7\Service;
 use App\Models\Record7\User;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use RuntimeException;
 
 /**
  * Section 2.2 — recording that a planned medicine was actually given.
@@ -67,6 +70,44 @@ class AdministrationRecorder
     public const CONFIRMATION = [
         'staff_administered' => 'You are recording that you gave this medicine.',
         'assisted' => 'You are recording that you helped them to take this medicine.',
+    ];
+
+    public const REFUSAL_REASONS = [
+        'client_declined',
+        'disliked_form_or_taste',
+        'felt_unwell',
+        'no_reason_given',
+    ];
+
+    public const PERSON_UNAVAILABLE_REASONS = [
+        'in_hospital',
+        'away_on_leave',
+        'at_appointment',
+        'not_found_in_service',
+    ];
+
+    public const MEDICINE_UNAVAILABLE_REASONS = [
+        'stock_unavailable',
+        'awaiting_delivery',
+        'damaged_or_expired',
+        'wrong_item_supplied',
+    ];
+
+    public const MISSED_REASONS = [
+        'round_not_completed',
+        'overlooked',
+        'staffing_shortfall',
+        'discovered_later',
+    ];
+
+    public const MISSED_ACTIONS = [
+        'manager_notified',
+        'medication_lead_notified',
+        'pharmacist_contacted',
+        'prescriber_contacted',
+        'nhs_111_contacted',
+        'emergency_services_contacted',
+        'no_escalation_required_under_policy',
     ];
 
     public function __construct(private readonly AuditRecorder $audit)
@@ -134,6 +175,15 @@ class AdministrationRecorder
                 'This is an as-required medicine. Recording it needs the as-required '
                 .'workflow, which is not built yet.',
                 '2.4'
+            );
+        }
+
+        if ($prescription->support_type === 'self_administered'
+            && $prescription->self_administration_monitoring === 'none') {
+            return $this->no(
+                'self_managed',
+                'This medicine is fully self-managed. It does not need individual staff dose recording.',
+                null
             );
         }
 
@@ -254,6 +304,112 @@ class AdministrationRecorder
     }
 
     /**
+     * Record an explicit Section 2.3 outcome for a planned dose.
+     *
+     * This shares the same resolved round/client/dose context as Section 2.2.
+     * The method still validates every clinical boundary again because the
+     * posted outcome is only an assertion from a browser, not authority.
+     *
+     * @return array{administration:Administration, created:bool}
+     */
+    public function recordNonAdministration(
+        User $user,
+        Round $round,
+        Client $client,
+        ScheduledDose $dose,
+        string $outcome,
+        array $input,
+        Request $request
+    ): array {
+        $prescription = $dose->prescription;
+        $medicine = $prescription?->medicine;
+
+        if (! in_array($outcome, ['refused', 'person_unavailable', 'not_available', 'missed'], true)) {
+            throw new RuntimeException('That outcome is not available in Section 2.3.');
+        }
+
+        if (! $prescription) {
+            throw new RuntimeException('This dose has no prescription attached to it.');
+        }
+
+        if ($prescription->kind === 'prn') {
+            throw new RuntimeException('As-required medicines are Section 2.4.');
+        }
+
+        if ($outcome === 'withheld') {
+            throw new RuntimeException('Withheld recording is not part of Section 2.3.');
+        }
+
+        if ($medicine?->is_controlled && ! (bool) ($input['controlled_drug_no_quantity_removed'] ?? false)) {
+            throw new RuntimeException(
+                'For a controlled drug, confirm no quantity was removed from secure storage. '
+                .'If any quantity was removed, use the controlled-drug pathway.'
+            );
+        }
+
+        $reason = $this->requireReason($outcome, $input['reason_code'] ?? null);
+        $notes = $this->cleanMeaningful($input['notes'] ?? null, $outcome === 'missed');
+        $actionTaken = $this->cleanMeaningful($input['action_taken'] ?? null, $outcome === 'missed');
+        $immediateAction = $input['immediate_action_code'] ?? null;
+
+        if ($outcome === 'missed' && ! in_array($immediateAction, self::MISSED_ACTIONS, true)) {
+            throw new RuntimeException('Choose the immediate action taken for the missed dose.');
+        }
+
+        $target = $this->reofferTarget($round, $client, $dose, $outcome, $input['reoffer_of_administration_id'] ?? null);
+
+        try {
+            $administration = Administration::create([
+                'reference' => 'R7N-'.strtoupper(Str::random(12)),
+                'scheduled_dose_id' => $dose->id,
+                'prescription_id' => $dose->prescription_id,
+                'client_id' => $client->id,
+                'service_id' => $round->service_id,
+                'recorded_by_user_id' => $user->id,
+                'outcome' => $outcome,
+                'reason_code' => $reason,
+                'notes' => $notes,
+                'action_taken' => $actionTaken,
+                'immediate_action_code' => $outcome === 'missed' ? $immediateAction : null,
+                'controlled_drug_no_quantity_removed' => $medicine?->is_controlled ? true : null,
+                'administered_at' => now(),
+                'reoffer_of_administration_id' => $target?->id,
+            ]);
+        } catch (UniqueConstraintViolationException $clash) {
+            $existing = Administration::where('scheduled_dose_id', $dose->id)
+                ->whereNull('corrects_administration_id')
+                ->where('reoffer_of_administration_id', $target?->id)
+                ->first();
+
+            if (! $existing) {
+                throw $clash;
+            }
+
+            return ['administration' => $existing, 'created' => false];
+        }
+
+        if ($outcome === 'person_unavailable' && $reason === 'not_found_in_service') {
+            $this->createWelfareAttention($round, $administration);
+        }
+
+        $this->audit->record(
+            eventType: 'medication_non_administration_recorded',
+            result: AuditRecorder::SUCCESS,
+            user: $user,
+            serviceId: $round->service_id,
+            reason: null,
+            riskLevel: $outcome === 'missed' ? 'high' : 'medium',
+            metadata: $this->trail($round, $client, $dose, $administration) + [
+                'reason_code' => $reason,
+                'reoffer_of_administration_id' => $target?->id,
+            ],
+            request: $request
+        );
+
+        return ['administration' => $administration, 'created' => true];
+    }
+
+    /**
      * The structured trail, and nothing beyond it.
      *
      * Identifiers, both times and the outcome — enough to reconstruct exactly
@@ -290,6 +446,90 @@ class AdministrationRecorder
         $notes = trim((string) $notes);
 
         return $notes === '' ? null : Str::limit($notes, 495, '');
+    }
+
+    private function requireReason(string $outcome, ?string $reason): string
+    {
+        $allowed = match ($outcome) {
+            'refused' => self::REFUSAL_REASONS,
+            'person_unavailable' => self::PERSON_UNAVAILABLE_REASONS,
+            'not_available' => self::MEDICINE_UNAVAILABLE_REASONS,
+            'missed' => self::MISSED_REASONS,
+            default => [],
+        };
+
+        if (! in_array($reason, $allowed, true)) {
+            throw new RuntimeException('Choose the structured reason for this outcome.');
+        }
+
+        return $reason;
+    }
+
+    private function cleanMeaningful(?string $value, bool $required): ?string
+    {
+        $clean = trim(preg_replace('/\s+/', ' ', (string) $value));
+
+        if ($clean === '') {
+            if ($required) {
+                throw new RuntimeException('Write a meaningful explanation.');
+            }
+
+            return null;
+        }
+
+        $normalised = strtolower(str_replace(['.', '/', '\\', '_'], '', $clean));
+
+        if (in_array($normalised, ['na', 'none', 'nil', 'no', 'notapplicable', '-'], true)
+            || preg_match('/^-+$/', $clean)) {
+            throw new RuntimeException('Write a meaningful explanation, not filler.');
+        }
+
+        return Str::limit($clean, 495, '');
+    }
+
+    private function reofferTarget(
+        Round $round,
+        Client $client,
+        ScheduledDose $dose,
+        string $outcome,
+        mixed $targetId
+    ): ?Administration {
+        if ($targetId === null || $targetId === '') {
+            return null;
+        }
+
+        if (! in_array($outcome, ['given', 'self_administered'], true)) {
+            throw new RuntimeException('Only an accepted same-dose re-offer can link to a refusal.');
+        }
+
+        $target = Administration::where('service_id', $round->service_id)
+            ->where('client_id', $client->id)
+            ->where('scheduled_dose_id', $dose->id)
+            ->where('prescription_id', $dose->prescription_id)
+            ->where('outcome', 'refused')
+            ->whereNull('reoffer_of_administration_id')
+            ->find((int) $targetId);
+
+        if (! $target) {
+            throw new RuntimeException('A re-offer must refer to the original refusal for this same dose.');
+        }
+
+        return $target;
+    }
+
+    private function createWelfareAttention(Round $round, Administration $administration): void
+    {
+        $service = Service::findOrFail($round->service_id);
+
+        IssueState::firstOrCreate([
+            'organisation_id' => $service->organisation_id,
+            'service_id' => $round->service_id,
+            'issue_type' => 'welfare_check',
+            'source_id' => $administration->id,
+        ], [
+            'issue_key' => 'welfare_check:'.$administration->id,
+            'acknowledged_at' => null,
+        ]);
     }
 
     private function no(string $code, string $reason, ?string $nextSection = null): array
