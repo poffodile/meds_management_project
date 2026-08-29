@@ -161,14 +161,53 @@ class Record7TodayTest extends Record7TestCase
             ->where('outcome', 'refused')
             ->firstOrFail();
 
+        // SECTION 2.3 CORRECTION.
+        //
+        // This test used to pass for the wrong reason. The fixture's refusal is
+        // for a medicine given FOUR TIMES A DAY, so the teatime dose — a
+        // different planned obligation entirely — was closing the morning's
+        // refusal before this test even began. Dennis was dropping off the
+        // chase list because somebody gave him a later tablet, not because
+        // anybody went back to the one he turned down.
+        //
+        // The refusal is therefore live at the start now, and only an accepted
+        // re-offer of THAT dose closes it.
+        // The board only chases the last twelve hours, and the fixture's refusal
+        // is anchored to this morning — so late in the day it falls out of the
+        // window and this test would be measuring the clock rather than the
+        // rule. A refusal is written INSIDE the window instead: administrations
+        // are permanent and the database rightly refuses to have one back-dated.
+        // Its own planned dose, because one dose may carry exactly one original
+        // outcome and the fixture's is already answered.
+        $freshDose = \App\Models\Record7\ScheduledDose::create([
+            'prescription_id' => $refusal->prescription_id,
+            'client_id' => $refusal->client_id,
+            'service_id' => $oakwood,
+            'due_at' => now()->subHours(2),
+            'slot' => 'Teatime',
+            'grace_minutes' => 30,
+        ]);
+
+        $refusal = Administration::create([
+            'reference' => 'TEST-REFUSAL-'.uniqid(),
+            'scheduled_dose_id' => $freshDose->id,
+            'prescription_id' => $refusal->prescription_id,
+            'client_id' => $refusal->client_id,
+            'service_id' => $oakwood,
+            'recorded_by_user_id' => $this->user('noah.williams')->id,
+            'outcome' => 'refused',
+            'reason_code' => 'client_declined',
+            'administered_at' => now()->subHours(2),
+        ]);
+
         $before = collect($this->board()->needsAttention($oakwood))
             ->where('kind', 'refused')->count();
 
-        $this->assertGreaterThan(0, $before);
+        $this->assertGreaterThan(0, $before, 'The refusal has not been answered yet.');
 
-        // Somebody went back twenty minutes later and he took it.
+        // An unrelated later dose of the same medicine is not an answer to it.
         Administration::create([
-            'reference' => 'TEST-REOFFER-'.$refusal->id,
+            'reference' => 'TEST-UNRELATED-'.$refusal->id,
             'scheduled_dose_id' => null,
             'prescription_id' => $refusal->prescription_id,
             'client_id' => $refusal->client_id,
@@ -178,12 +217,28 @@ class Record7TodayTest extends Record7TestCase
             'administered_at' => $refusal->administered_at->copy()->addMinutes(20),
         ]);
 
-        $after = collect($this->board()->needsAttention($oakwood))
-            ->where('kind', 'refused')->count();
+        $this->assertSame(
+            $before,
+            collect($this->board()->needsAttention($oakwood))->where('kind', 'refused')->count(),
+            'Another dose of the same medicine does not answer for this refusal.'
+        );
+
+        // Somebody went back and offered THIS dose again, and he took it.
+        Administration::create([
+            'reference' => 'TEST-REOFFER-'.$refusal->id,
+            'scheduled_dose_id' => $refusal->scheduled_dose_id,
+            'prescription_id' => $refusal->prescription_id,
+            'client_id' => $refusal->client_id,
+            'service_id' => $oakwood,
+            'recorded_by_user_id' => $this->user('noah.williams')->id,
+            'outcome' => 'given',
+            'reoffer_of_administration_id' => $refusal->id,
+            'administered_at' => $refusal->administered_at->copy()->addMinutes(35),
+        ]);
 
         $this->assertSame(
             $before - 1,
-            $after,
+            collect($this->board()->needsAttention($oakwood))->where('kind', 'refused')->count(),
             'A refusal that was re-offered and accepted is closed. Leaving it on the '
             .'list trains people to ignore the list.'
         );

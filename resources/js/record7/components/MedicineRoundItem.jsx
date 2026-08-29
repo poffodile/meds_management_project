@@ -41,13 +41,17 @@ const OUTCOME = {
     missed: { tone: 'error' },
 };
 
-export default function MedicineRoundItem({ medicine, onRecord = null }) {
+export default function MedicineRoundItem({
+    medicine, onRecord = null, onOutcome = null, onReoffer = null,
+}) {
     const {
         name, strength, form, controlled, dose, route, dueAt, directions,
         timeSensitive, support, supportWord, supportMeaning,
         changed, recorded, recordedOutcome, recordedCode, recordedWord,
         missing = [], late, latePhrase, canBeGiven, blockedReason,
         recordedAt, recordedBy, recordedLatePhrase,
+        recordedReason, recordedNotes, recordedAction, recordedEscalation,
+        reofferOf, reofferedFrom, selfManaged,
     } = medicine;
 
     return (
@@ -121,9 +125,21 @@ export default function MedicineRoundItem({ medicine, onRecord = null }) {
                 who has just signed for something must be able to look at it
                 again and see the time and the name, or the only way to check is
                 to record it a second time. */}
+            {/* What came BEFORE this answer. A second attempt that shows no
+                sign of the first reads as though the refusal never happened. */}
+            {recorded && reofferedFrom ? (
+                <p className="r7-med-item__earlier">
+                    Offered again after {reofferedFrom.word.toLowerCase()}
+                    {reofferedFrom.reason ? ` — ${reofferedFrom.reason.toLowerCase()}` : ''}
+                    {reofferedFrom.at ? ` at ${reofferedFrom.at}` : ''}
+                    {reofferedFrom.by ? ` by ${reofferedFrom.by}` : ''}
+                </p>
+            ) : null}
+
             {recorded ? (
                 <p className="r7-med-item__record">
                     {recordedWord ?? recordedOutcome}
+                    {recordedReason ? ` — ${recordedReason.toLowerCase()}` : ''}
                     {recordedAt ? ` at ${recordedAt}` : ''}
                     {recordedBy ? ` by ${recordedBy}` : ''}
                     {/* Said here because the late marker above disappears the
@@ -137,20 +153,69 @@ export default function MedicineRoundItem({ medicine, onRecord = null }) {
                 </p>
             ) : null}
 
+            {/* Everything the worker wrote at the time. Recorded and never
+                shown is the same as not recorded, for whoever picks this up on
+                the next shift. */}
+            {recorded && recordedNotes ? (
+                <p className="r7-med-item__said">&ldquo;{recordedNotes}&rdquo;</p>
+            ) : null}
+
+            {recorded && recordedAction ? (
+                <p className="r7-med-item__said">
+                    What was done: {recordedAction}
+                    {recordedEscalation ? ` — ${recordedEscalation.toLowerCase()}` : ''}
+                </p>
+            ) : null}
+
+            {/* A refusal is not necessarily the end of it. Offering again is a
+                deliberate, separate step — never a second "give" button
+                pretending the first answer did not happen. */}
+            {recorded && reofferOf && onReoffer ? (
+                <div className="r7-med-item__action">
+                    <Button variant="secondary" size="small" onClick={onReoffer}>
+                        Offer again
+                    </Button>
+                    <p className="r7-med-item__held">
+                        The refusal above stays on the record whatever happens next.
+                    </p>
+                </div>
+            ) : null}
+
             {/* THE ACTION IS A SEPARATE, DELIBERATE STEP.
                 It opens a confirmation screen; it does not record anything. The
                 whole row is not a control, so a tap while scrolling cannot sign
                 for a dose, and the button sits at the end of the item where a
                 thumb reaches it on purpose rather than in passing. */}
-            {!recorded && onRecord ? (
+            {/* Nothing to do, and saying so is the point. An unanswered item
+                with no explanation reads as work somebody forgot. */}
+            {!recorded && selfManaged ? (
+                <p className="r7-med-item__held">
+                    They manage this one themselves. No staff record is needed for each dose,
+                    and the round is not waiting on it.
+                </p>
+            ) : null}
+
+            {!recorded && !selfManaged && (onRecord || onOutcome) ? (
                 <div className="r7-med-item__action">
-                    {canBeGiven ? (
+                    {canBeGiven && onRecord ? (
                         <Button variant="secondary" size="small" onClick={onRecord}>
                             Record as given
                         </Button>
-                    ) : (
+                    ) : null}
+
+                    {/* Always available while the dose is unanswered, even when
+                        it cannot be given. A medicine that could not be given is
+                        exactly the one that still needs an answer — Callum's
+                        dose has waited since Section 2.0 for this. */}
+                    {onOutcome ? (
+                        <Button variant="quiet" size="small" onClick={onOutcome}>
+                            {canBeGiven ? 'Not given' : 'Record why it was not given'}
+                        </Button>
+                    ) : null}
+
+                    {!canBeGiven ? (
                         <p className="r7-med-item__held">{blockedReason}</p>
-                    )}
+                    ) : null}
                 </div>
             ) : null}
         </li>

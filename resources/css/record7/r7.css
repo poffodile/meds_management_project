@@ -3243,3 +3243,183 @@
   .r7-root .r7-give__buttons { flex-direction: row; align-items: center; }
   .r7-root .r7-give__buttons .r7-btn { flex: 0 1 auto; }
 }
+
+
+/* ─────────────────────────────────────────────────────────────────────────
+   33. Section 2.3 — why a medicine was not given
+
+   THE FOUR CHOICES ARE NOT A DROPDOWN.
+   They are four large, separated targets, each carrying the sentence that
+   distinguishes it. A select element hides three of the four behind a tap and
+   invites the wrong one to be chosen by muscle memory — which is precisely the
+   error this screen exists to prevent.
+
+   Each choice carries its own edge colour AND its own words, so severity never
+   depends on colour alone. Nothing is preselected; there is no default.
+
+   Mobile first, tokens only, scoped under .r7-root.
+   ───────────────────────────────────────────────────────────────────────── */
+
+.r7-root .r7-outcome {
+  display: flex;
+  flex-direction: column;
+  gap: var(--r7-space-4);
+  padding-top: var(--r7-space-4);
+  border-top: var(--r7-border-width) solid var(--r7-border-subtle);
+}
+
+.r7-root .r7-outcome__lead {
+  font-size: var(--r7-size-sm);
+  color: var(--r7-text-secondary);
+  max-width: var(--r7-measure);
+}
+
+.r7-root .r7-outcome__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--r7-space-3);
+  list-style: none;
+}
+
+.r7-root .r7-outcome__choice {
+  display: flex;
+  flex-direction: column;
+  gap: var(--r7-space-1);
+  width: 100%;
+  min-height: var(--r7-control-height);
+  padding: var(--r7-space-4);
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+  background: var(--r7-surface-raised);
+  border: var(--r7-border-width) solid var(--r7-border-subtle);
+  border-left: var(--r7-border-emphasis-width) solid var(--r7-border-strong);
+  border-radius: var(--r7-radius-md);
+  transition: background var(--r7-motion-fast), border-color var(--r7-motion-fast);
+}
+
+.r7-root .r7-outcome__choice:hover { border-color: var(--r7-colour-interactive); }
+
+/* Chosen is stated by the pressed state for a screen reader, by the fill for
+   everybody else, and by the panel that appears beneath it. */
+.r7-root .r7-outcome__choice--chosen {
+  background: var(--r7-brand-panel-dim);
+  border-color: var(--r7-colour-interactive);
+}
+
+.r7-root .r7-outcome__choice--warning { border-left-color: var(--r7-state-warning); }
+.r7-root .r7-outcome__choice--error { border-left-color: var(--r7-state-error); }
+.r7-root .r7-outcome__choice--info { border-left-color: var(--r7-state-info); }
+
+.r7-root .r7-outcome__word {
+  font-family: var(--r7-font-display);
+  font-size: var(--r7-size-base);
+  font-weight: var(--r7-weight-semi);
+  color: var(--r7-text-primary);
+}
+
+.r7-root .r7-outcome__meaning {
+  font-size: var(--r7-size-sm);
+  color: var(--r7-text-secondary);
+  max-width: var(--r7-measure);
+}
+
+/* What the chosen outcome then asks for. */
+.r7-root .r7-outcome__detail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--r7-space-4);
+  padding-top: var(--r7-space-4);
+  border-top: var(--r7-border-width) solid var(--r7-border-subtle);
+}
+
+.r7-root .r7-outcome__reasons {
+  display: flex;
+  flex-direction: column;
+  gap: var(--r7-space-2);
+  border: 0;
+  padding: 0;
+}
+
+.r7-root .r7-outcome__reason {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--r7-space-3);
+  min-height: var(--r7-control-height-small);
+  padding: var(--r7-space-2) 0;
+  cursor: pointer;
+  color: var(--r7-text-primary);
+}
+
+/* The controlled-drug question is a gate, not a footnote. It carries the
+   warning surface so it cannot be skimmed past on the way to the button. */
+.r7-root .r7-outcome__cd {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--r7-space-3);
+  padding: var(--r7-space-4);
+  background: var(--r7-state-warning-surface);
+  border: var(--r7-border-width) solid var(--r7-state-warning-border);
+  border-radius: var(--r7-radius-md);
+  font-size: var(--r7-size-sm);
+  color: var(--r7-text-primary);
+  max-width: var(--r7-measure);
+  cursor: pointer;
+}
+
+/* The entry point on a medicine row, beside Record as given. */
+.r7-root .r7-med-item__action { display: flex; flex-wrap: wrap; gap: var(--r7-space-3); }
+
+@media (min-width: 768px) {
+  /* Desktop gets more room per choice. It does not get them side by side —
+     four clinical outcomes in a row read as a toolbar, and a toolbar is
+     something people click without reading. */
+  .r7-root .r7-outcome__choice { padding: var(--r7-space-5); }
+  .r7-root .r7-outcome__list { max-width: var(--r7-width-work); }
+}
+
+/* ── Section 2.3 — the first answer, shown before the second is given ────── */
+
+/* A re-offer screen that hid the refusal would read as though it never
+   happened, and the whole point of an append-only record is that it did. */
+.r7-root .r7-reoffer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--r7-space-2);
+  padding: var(--r7-space-4);
+  background: var(--r7-surface-sunken);
+  border-left: var(--r7-border-emphasis-width) solid var(--r7-state-warning);
+  border-radius: var(--r7-radius-sm);
+  max-width: var(--r7-measure);
+}
+
+.r7-root .r7-reoffer__title {
+  font-family: var(--r7-font-display);
+  font-weight: var(--r7-weight-semi);
+  color: var(--r7-text-primary);
+}
+
+.r7-root .r7-reoffer__first { color: var(--r7-text-primary); }
+
+.r7-root .r7-reoffer__said,
+.r7-root .r7-med-item__said {
+  font-size: var(--r7-size-sm);
+  color: var(--r7-text-secondary);
+  max-width: var(--r7-measure);
+}
+
+.r7-root .r7-reoffer__note {
+  font-size: var(--r7-size-sm);
+  color: var(--r7-text-muted);
+}
+
+/* What this answer follows, on the medicine row itself. */
+.r7-root .r7-med-item__earlier {
+  font-size: var(--r7-size-sm);
+  color: var(--r7-text-muted);
+}
+
+/* How far past due a re-offered dose is. Stated because a dose stops being
+   "late" once answered, and somebody offering it again hours later has to know
+   that before they decide. */
+.r7-root .r7-reoffer__late { color: var(--r7-state-error); font-size: var(--r7-size-sm); }

@@ -32,6 +32,7 @@ import Icon from '@record7/components/Icon.jsx';
  */
 export default function RoundPerson({
     house, round, progress, person, safety, medicines, neighbours, authority, stage, urls,
+    welfareConcern = null,
 }) {
     const flash = usePage().props.flash ?? {};
     const recorded = flash['r7.recorded'] ?? null;
@@ -43,17 +44,30 @@ export default function RoundPerson({
 
     const goToPerson = (clientId) => router.get(urls.person.replace('__ID__', clientId));
 
-    const left = medicines.filter((medicine) => !medicine.recorded).length;
+    // A fully self-managed medicine is not work waiting to be done, so it is
+    // not counted as such — it stays on the page as context.
+    const left = medicines.filter((m) => !m.recorded && !m.selfManaged).length;
 
     const outstanding = () => {
-        if (!medicines.length) return 'Nothing planned';
-        if (!left) return `All ${medicines.length} recorded`;
+        const needing = medicines.filter((m) => !m.selfManaged).length;
 
-        return `${left} of ${medicines.length} still to record`;
+        if (!medicines.length) return 'Nothing planned';
+        if (!needing) return 'All self-managed';
+        if (!left) return `All ${needing} recorded`;
+
+        return `${left} of ${needing} still to record`;
     };
 
     const goToConfirm = (doseId) => router.get(
         urls.confirm.replace('__ID__', person.id).replace('__DOSE__', doseId)
+    );
+
+    const goToOutcome = (doseId) => router.get(
+        urls.outcome.replace('__ID__', person.id).replace('__DOSE__', doseId)
+    );
+
+    const goToReoffer = (doseId) => router.get(
+        urls.reoffer.replace('__ID__', person.id).replace('__DOSE__', doseId)
     );
 
     return (
@@ -105,6 +119,24 @@ export default function RoundPerson({
                 ) : null}
 
                 {failed ? <Notice tone="error" title="Not recorded">{failed}</Notice> : null}
+
+                {/* An unanswered "could not be found" concern. Nothing else on
+                    this page closes it — not acknowledging it, and not giving
+                    them a medicine later. Somebody has to say what they found. */}
+                {welfareConcern ? (
+                    <Notice tone="warning" title="Nobody could find them earlier">
+                        This is still open. When you know where they are, record it — no other
+                        action on this page will close it.
+                        {' '}
+                        <button
+                            type="button"
+                            className="r7-linkish"
+                            onClick={() => router.get(welfareConcern.url)}
+                        >
+                            Record that they were found
+                        </button>
+                    </Notice>
+                ) : null}
 
                 {/* ── 2. Who this is ─────────────────────────────────────── */}
                 <section className="r7-person-id">
@@ -171,6 +203,12 @@ export default function RoundPerson({
                                     onRecord={authority.blocked
                                         ? null
                                         : () => goToConfirm(medicine.doseId)}
+                                    onOutcome={authority.blocked
+                                        ? null
+                                        : () => goToOutcome(medicine.doseId)}
+                                    onReoffer={authority.blocked
+                                        ? null
+                                        : () => goToReoffer(medicine.doseId)}
                                 />
                             ))}
                         </ul>

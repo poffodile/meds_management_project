@@ -183,9 +183,15 @@ class Record7IssueLifecycleTest extends Record7TestCase
             'Closing the paperwork does not mean he took it.'
         );
 
-        // Now somebody actually re-offers and he accepts.
+        // SECTION 2.3 CORRECTION. This used to be closed by any later `given`
+        // for the same PRESCRIPTION — so tonight's dose closed this morning's
+        // refusal, and an unrelated obligation silently answered for one nobody
+        // had gone back to. It now takes an accepted re-offer of THIS dose.
+        //
+        // A free-floating administration no longer resolves it, however
+        // plausible it looks.
         Administration::create([
-            'reference' => 'TEST-REOFFER-'.$refusal->id,
+            'reference' => 'TEST-UNRELATED-'.$refusal->id,
             'scheduled_dose_id' => null,
             'prescription_id' => $refusal->prescription_id,
             'client_id' => $refusal->client_id,
@@ -195,7 +201,28 @@ class Record7IssueLifecycleTest extends Record7TestCase
             'administered_at' => $refusal->administered_at->copy()->addMinutes(30),
         ]);
 
-        $this->assertFalse(app(IssueRegistry::class)->conditionActive($key, $rosewood));
+        $this->assertTrue(
+            app(IssueRegistry::class)->conditionActive($key, $rosewood),
+            'A later dose of the same medicine is not an answer to THIS refusal.'
+        );
+
+        // The real thing: an accepted re-offer, linked to the refusal itself.
+        Administration::create([
+            'reference' => 'TEST-REOFFER-'.$refusal->id,
+            'scheduled_dose_id' => $refusal->scheduled_dose_id,
+            'prescription_id' => $refusal->prescription_id,
+            'client_id' => $refusal->client_id,
+            'service_id' => $rosewood,
+            'recorded_by_user_id' => $this->user('olivia.carter')->id,
+            'outcome' => 'given',
+            'reoffer_of_administration_id' => $refusal->id,
+            'administered_at' => $refusal->administered_at->copy()->addMinutes(45),
+        ]);
+
+        $this->assertFalse(
+            app(IssueRegistry::class)->conditionActive($key, $rosewood),
+            'He was offered it again and took it. That closes it.'
+        );
     }
 
     public function test_a_prn_follow_up_stays_until_the_answer_is_recorded(): void

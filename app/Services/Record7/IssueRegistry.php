@@ -3,6 +3,7 @@
 namespace App\Services\Record7;
 
 use App\Models\Record7\Administration;
+use App\Models\Record7\Client;
 use App\Models\Record7\PrnFollowUp;
 use App\Models\Record7\ReviewItem;
 use App\Models\Record7\ScheduledDose;
@@ -10,6 +11,7 @@ use App\Models\Record7\StockEvent;
 use App\Models\Record7\StockLevel;
 use App\Models\Record7\User;
 use App\Models\Record7\UserServiceAccess;
+use App\Models\Record7\WelfareCheck;
 use Illuminate\Support\Carbon;
 use RuntimeException;
 
@@ -154,11 +156,15 @@ class IssueRegistry
 
             // Somebody on shift still has not confirmed it.
             'handover_unread' => true,
-            'welfare_check' => Administration::where('service_id', $serviceId)
-                ->where('id', $id)
-                ->where('outcome', 'person_unavailable')
-                ->where('reason_code', 'not_found_in_service')
-                ->exists(),
+            // NOT "the report exists" — that is true forever, because an
+            // administration is permanent. A welfare item nobody can ever
+            // resolve sits on a manager's board for good and teaches everybody
+            // to scroll past it, which is the opposite of what it is for.
+            //
+            // The real condition is that nobody has accounted for the person
+            // since. It clears on a FACT: somebody records anything else for
+            // them, or their status becomes a known whereabouts. Not on a tick.
+            'welfare_check' => $this->personStillUnaccountedFor($serviceId, $id),
 
             default => true,
         };
@@ -191,6 +197,52 @@ class IssueRegistry
         return \App\Models\Record7\IssueState::needsEvidence($parsed['type']);
     }
 
+    /**
+     * Has anybody accounted for this person since they could not be found?
+     *
+     * Two things count, and both are facts rather than workflow:
+     *
+     *   somebody recorded ANYTHING for them afterwards — you cannot record a
+     *   medicine for somebody you have not found; or
+     *
+     *   their status now says where they are: on leave, in hospital, moved out.
+     *
+     * Until one of those is true the person is still missing as far as this
+     * service knows, and no amount of acknowledging changes that.
+     */
+    private function personStillUnaccountedFor(int $serviceId, ?int $id): bool
+    {
+        $report = Administration::where('service_id', $serviceId)
+            ->where('outcome', 'person_unavailable')
+            ->where('reason_code', 'not_found_in_service')
+            ->find($id);
+
+        if (! $report) {
+            return false;
+        }
+
+        // 1. SOMEBODY WENT AND LOOKED, AND SAID WHAT THEY FOUND.
+        //    A structured record naming this concern, this person, this house
+        //    and this organisation. Not an acknowledgement, not a note, not a
+        //    closed review item, and not an unrelated medicine recorded later
+        //    — none of those establish where anybody is.
+        $evidence = WelfareCheck::where('administration_id', $report->id)
+            ->where('client_id', $report->client_id)
+            ->where('service_id', $report->service_id)
+            ->exists();
+
+        if ($evidence) {
+            return false;
+        }
+
+        // 2. OR THEIR WHEREABOUTS ARE NOW ON THE RECORD.
+        //    "active" means we believe they are here, which is the very thing
+        //    in doubt. Any other status names where they actually are.
+        $client = Client::find($report->client_id);
+
+        return ! ($client && $client->status !== 'active');
+    }
+
     private function refusalStillOpen(int $serviceId, ?int $id): bool
     {
         $refusal = Administration::where('service_id', $serviceId)->find($id);
@@ -204,9 +256,14 @@ class IssueRegistry
             ->where('client_id', $refusal->client_id)
             ->where('prescription_id', $refusal->prescription_id)
             ->where('reoffer_of_administration_id', $refusal->id)
-            ->where('administered_at', '>', $refusal->administered_at)
             ->whereIn('outcome', ['given', 'self_administered'])
             ->exists();
+
+        // NOTE the absence of a timestamp comparison. The chain link already
+        // establishes the order — a re-offer can only name a refusal that
+        // exists, so it is later by construction. Comparing administered_at as
+        // well made the rule depend on two writes landing in different seconds,
+        // which is not something a clinical rule should turn on.
     }
 
     /**

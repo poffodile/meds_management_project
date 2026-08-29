@@ -211,13 +211,20 @@ class RoundController extends R7Controller
             'medicines' => $view['medicines'],
             'neighbours' => $this->personView->neighbours($queue, $person->id),
 
+            // An unanswered "could not be found" concern for this person. Its
+            // presence is what puts the action on the screen; nothing else can.
+            'welfareConcern' => $this->recorder->openWelfareConcernFor($serviceId, $person->id)
+                ? ['url' => route('record7.round.welfare', ['client' => $person->id])]
+                : null,
+
             'authority' => [
                 'allowed' => $check['allowed'],
                 'blocked' => $check['blocked'] ?? false,
                 'reason' => $check['reason'] ?? null,
             ],
 
-            'stage' => 'Section 2.2 — a scheduled medicine can be recorded as given.',
+            'stage' => 'Sections 2.2 and 2.3 — a scheduled medicine can be recorded as '
+                .'given, or answered with why it was not.',
 
             'urls' => [
                 'round' => route('record7.round'),
@@ -225,6 +232,12 @@ class RoundController extends R7Controller
                 // Placeholders the page fills from the medicines it was given,
                 // never from a number the browser invented.
                 'confirm' => route('record7.round.confirm', [
+                    'client' => '__ID__', 'dose' => '__DOSE__',
+                ]),
+                'outcome' => route('record7.round.outcome', [
+                    'client' => '__ID__', 'dose' => '__DOSE__',
+                ]),
+                'reoffer' => route('record7.round.reoffer', [
                     'client' => '__ID__', 'dose' => '__DOSE__',
                 ]),
                 'today' => route('record7.today'),
@@ -322,6 +335,445 @@ class RoundController extends R7Controller
                 'at' => $result['administration']->administered_at->format('H:i'),
                 'by' => $result['administration']->recordedBy?->displayName(),
             ]);
+    }
+
+    /**
+     * Section 2.3 — recording that a planned medicine was NOT given.
+     *
+     * A SEPARATE SCREEN FROM "GIVEN", AND FROM THE ROUND.
+     * Four different things can have happened, and they are not interchangeable:
+     * the person said no; the person was not there; the medicine was not there;
+     * the round never reached them. Collapsing those into one "not given"
+     * button is how a medicines record stops being able to answer the question
+     * an inspection actually asks.
+     *
+     * NOTHING IS PRESELECTED. Callum's client status says he is in hospital,
+     * and the screen still will not choose "person unavailable" for the worker.
+     * A status is a fact about where somebody is; an outcome is a statement
+     * about what a worker did, and only a person can make that statement.
+     */
+    public function outcome(Request $request, int $client, int $dose)
+    {
+        $this->useR7Layout($request);
+
+        [$user, $serviceId, $round, $check, $person] = $this->roundContext($request, $client);
+
+        $scheduled = $this->recorder->resolve($round, $person, $dose);
+
+        abort_if($scheduled === null, 404, 'That medicine is not in this round.');
+
+        return Inertia::render('RoundOutcome', $this->outcomeProps(
+            $serviceId, $round, $person, $scheduled, $check
+        ));
+    }
+
+    /**
+     * Section 2.3 — recording that somebody was found.
+     *
+     * The ONLY thing that answers a "could not be found" concern. Not
+     * acknowledging it, not owning it, not writing a note, not closing a
+     * review item, and not recording an unrelated medicine for them later —
+     * none of those establish where a person is.
+     *
+     * It does not classify anything as safeguarding. Saying you found somebody
+     * says exactly that; whether it becomes a safeguarding matter is a
+     * judgement for a manager and the provider's policy.
+     */
+    public function welfare(Request $request, int $client)
+    {
+        $this->useR7Layout($request);
+
+        [$user, $serviceId, $round, $check, $person] = $this->roundContext($request, $client);
+
+        $concern = $this->recorder->openWelfareConcernFor($serviceId, $person->id);
+
+        abort_if($concern === null, 404, 'There is no open welfare concern for this person.');
+
+        $view = $this->personView->forPerson($round, $person);
+        $house = Service::find($serviceId);
+
+        return Inertia::render('RoundWelfare', [
+            'house' => ['id' => $house?->id, 'name' => $house?->name],
+            'person' => $view['person'],
+            'safety' => $view['safety'],
+
+            'concern' => [
+                'id' => $concern->id,
+                'at' => $concern->administered_at->format('H:i'),
+                'by' => $concern->recordedBy?->displayName(),
+                'note' => $concern->notes,
+            ],
+
+            'resolutions' => collect(\App\Models\Record7\WelfareCheck::RESOLUTION_WORDS)
+                ->map(fn ($word, $code) => ['code' => $code, 'word' => $word])
+                ->values()->all(),
+
+            'authority' => [
+                'allowed' => $check['allowed'],
+                'blocked' => $check['blocked'] ?? false,
+                'reason' => $check['reason'] ?? null,
+            ],
+
+            'stage' => 'Section 2.3 — recording that somebody was found.',
+
+            'urls' => [
+                'record' => route('record7.round.welfare.record', ['client' => $person->id]),
+                'person' => route('record7.round.person', ['client' => $person->id]),
+                'round' => route('record7.round'),
+                'today' => route('record7.today'),
+                'houses' => route('record7.houses'),
+                'lock' => route('record7.lock.now'),
+                'signOut' => route('record7.signout'),
+            ],
+        ]);
+    }
+
+    public function recordWelfare(Request $request, int $client)
+    {
+        $validated = $request->validate([
+            'resolution_type' => ['required', 'string', 'max:60'],
+            'note' => ['nullable', 'string', 'max:500'],
+        ]);
+
+        [$user, $serviceId, $round, $check, $person] = $this->roundContext($request, $client);
+
+        if (! $check['allowed']) {
+            return back()->with('r7.error', $check['reason']);
+        }
+
+        $concern = $this->recorder->openWelfareConcernFor($serviceId, $person->id);
+
+        abort_if($concern === null, 404, 'There is no open welfare concern for this person.');
+
+        try {
+            $this->recorder->recordWelfareCheck(
+                $user, $serviceId, $concern,
+                $validated['resolution_type'], $validated['note'] ?? null, $request
+            );
+        } catch (\RuntimeException $refused) {
+            return back()->with('r7.error', $refused->getMessage());
+        }
+
+        return redirect()
+            ->route('record7.round.person', ['client' => $person->id])
+            ->with('r7.recorded', [
+                'doseId' => null,
+                'created' => true,
+                'outcome' => 'Welfare check recorded',
+                'at' => now()->format('H:i'),
+                'by' => $user->displayName(),
+            ]);
+    }
+
+    /**
+     * Section 2.3 — offering a refused dose again.
+     *
+     * THIS IS NOT A CORRECTION AND NOT A NEW DOSE.
+     * It is a second attempt at the SAME planned obligation. She said no at
+     * eight; it is now nine and somebody is asking again. Both answers are
+     * true, both stay on the record, and the screen says so before anything is
+     * recorded — a second attempt that hid the first would read as though the
+     * refusal never happened.
+     *
+     * Every safeguard the first attempt was held to still applies: support
+     * type, controlled drugs, as-required medicines, competency, permission,
+     * the house and the organisation. A re-offer is a way back to the same
+     * dose, not a way around anything.
+     */
+    public function reoffer(Request $request, int $client, int $dose)
+    {
+        $this->useR7Layout($request);
+
+        [$user, $serviceId, $round, $check, $person] = $this->roundContext($request, $client);
+
+        $scheduled = $this->recorder->resolve($round, $person, $dose);
+
+        abort_if($scheduled === null, 404, 'That medicine is not in this round.');
+
+        $refusal = $this->recorder->openRefusalFor($scheduled);
+
+        // Not "no permission" — there is genuinely nothing here to offer again.
+        abort_if($refusal === null, 404, 'There is no refusal on this dose to offer again.');
+
+        $props = $this->outcomeProps($serviceId, $round, $person, $scheduled, $check);
+
+        // A second offer ends one of two ways. The other outcomes describe what
+        // happened to the original obligation rather than how an offer went.
+        $props['outcomes'] = [
+            [
+                'code' => 'given',
+                'word' => 'They took it this time',
+                'meaning' => 'You offered it again and they accepted it.',
+                'tone' => 'success',
+                'reasons' => [],
+            ],
+            [
+                'code' => 'refused',
+                'word' => 'They refused it again',
+                'meaning' => 'You offered it again and they still said no.',
+                'tone' => 'warning',
+                'reasons' => AdministrationRecorder::REFUSAL_REASONS,
+            ],
+        ];
+
+        $props['reoffer'] = [
+            'of' => $refusal->id,
+            'word' => $refusal->outcomeWord(),
+            'at' => $refusal->administered_at->format('H:i'),
+            'by' => $refusal->recordedBy?->displayName(),
+            'reason' => $refusal->reason_code
+                ? (AdministrationRecorder::REASON_WORDS[$refusal->reason_code] ?? $refusal->reason_code)
+                : null,
+            'notes' => $refusal->notes,
+
+            // HOW LATE IT IS NOW, not how late the refusal was.
+            // A dose stops being "late" the moment it is answered — right for
+            // the chase lists, wrong here: somebody offering a medicine again
+            // twelve hours after it was due needs to know that before they
+            // decide, and the due time alone makes them do the arithmetic.
+            'stillLate' => $scheduled->due_at->lessThan(now())
+                ? $scheduled->due_at->diffForHumans(now(), ['syntax' => \Carbon\CarbonInterface::DIFF_ABSOLUTE, 'parts' => 2])
+                : null,
+        ];
+
+        $props['stage'] = 'Section 2.3 — offering the same planned dose again.';
+        $props['urls']['record'] = route('record7.round.reoffer.record', [
+            'client' => $person->id, 'dose' => $scheduled->id,
+        ]);
+
+        return Inertia::render('RoundOutcome', $props);
+    }
+
+    /**
+     * Record how the second offer went.
+     *
+     * The refusal being answered is resolved on the server from the dose, never
+     * taken from the request — so a posted id cannot attach this attempt to
+     * somebody else's refusal.
+     */
+    public function recordReoffer(Request $request, int $client, int $dose)
+    {
+        $validated = $request->validate([
+            'outcome' => ['required', 'string', 'in:given,refused'],
+            'reason_code' => ['nullable', 'string', 'max:60'],
+            'notes' => ['nullable', 'string', 'max:500'],
+        ]);
+
+        [$user, $serviceId, $round, $check, $person] = $this->roundContext($request, $client);
+
+        if (! $check['allowed']) {
+            return back()->with('r7.error', $check['reason']);
+        }
+
+        $scheduled = $this->recorder->resolve($round, $person, $dose);
+
+        abort_if($scheduled === null, 404, 'That medicine is not in this round.');
+
+        $refusal = $this->recorder->openRefusalFor($scheduled);
+
+        abort_if($refusal === null, 404, 'There is no refusal on this dose to offer again.');
+
+        // Every safeguard, asked again as a re-offer.
+        $eligibility = $this->recorder->eligibility($scheduled, $person, asReoffer: true);
+
+        if (! $eligibility['allowed']) {
+            return back()->with('r7.error', $eligibility['reason']);
+        }
+
+        try {
+            $result = $validated['outcome'] === 'given'
+                ? $this->recorder->recordGiven(
+                    $user, $round, $person, $scheduled, $validated['notes'] ?? null, $request, $refusal
+                )
+                : $this->recorder->recordNonAdministration(
+                    $user, $round, $person, $scheduled, 'refused',
+                    $validated + ['reoffer_of_administration_id' => $refusal->id],
+                    $request
+                );
+        } catch (\RuntimeException $refused) {
+            return back()->with('r7.error', $refused->getMessage());
+        }
+
+        return redirect()
+            ->route('record7.round.person', ['client' => $person->id])
+            ->with('r7.recorded', [
+                'doseId' => $scheduled->id,
+                'created' => $result['created'],
+                'outcome' => $result['administration']->outcomeWord(),
+                'at' => $result['administration']->administered_at->format('H:i'),
+                'by' => $result['administration']->recordedBy?->displayName(),
+            ]);
+    }
+
+    /**
+     * Why this medicine cannot be answered on the ordinary Section 2.3 screen.
+     *
+     * A screen must never offer an action the server would refuse. An
+     * as-required medicine, a fully self-managed one and a suspended
+     * prescription all belong somewhere else — and a worker who fills in a
+     * reason and a note before being told that has been made to waste the one
+     * thing a medicines round has least of.
+     *
+     * Note what is NOT here: a controlled drug, an absent person and a
+     * self-administered medicine are all answerable. Those are precisely the
+     * cases this section exists for.
+     */
+    private function outcomeBlockedReason($scheduled): ?string
+    {
+        $prescription = $scheduled->prescription;
+
+        if (! $prescription) {
+            return 'This dose has no prescription attached to it.';
+        }
+
+        if ($prescription->kind === 'prn') {
+            return 'This is an as-required medicine. Recording it needs the as-required '
+                .'workflow, which is not built yet.';
+        }
+
+        if ($prescription->isFullySelfManaged()) {
+            return 'This medicine is fully self-managed. It does not need an individual '
+                .'staff record, so there is nothing to answer here.';
+        }
+
+        if ($prescription->status !== 'active') {
+            return 'This prescription is '.$prescription->status.'. Ask before recording '
+                .'anything against it.';
+        }
+
+        return null;
+    }
+
+    /**
+     * Write the non-administration outcome.
+     *
+     * Authority is re-checked here, not inherited from the screen: a competency
+     * can expire between choosing a reason and pressing the button. The dose,
+     * the person, the house and the organisation are all resolved from the
+     * session rather than from the numbers in the URL.
+     */
+    public function recordOutcome(Request $request, int $client, int $dose)
+    {
+        $validated = $request->validate([
+            'outcome' => ['required', 'string', 'in:refused,person_unavailable,not_available,missed'],
+            'reason_code' => ['required', 'string', 'max:60'],
+            'notes' => ['nullable', 'string', 'max:500'],
+            'action_taken' => ['nullable', 'string', 'max:500'],
+            'immediate_action_code' => ['nullable', 'string', 'max:80'],
+            'controlled_drug_no_quantity_removed' => ['nullable', 'boolean'],
+        ]);
+
+        [$user, $serviceId, $round, $check, $person] = $this->roundContext($request, $client);
+
+        if (! $check['allowed']) {
+            return back()->with('r7.error', $check['reason']);
+        }
+
+        $scheduled = $this->recorder->resolve($round, $person, $dose);
+
+        abort_if($scheduled === null, 404, 'That medicine is not in this round.');
+
+        try {
+            $result = $this->recorder->recordNonAdministration(
+                $user, $round, $person, $scheduled, $validated['outcome'], $validated, $request
+            );
+        } catch (\RuntimeException $refusal) {
+            // Said in the page, not thrown at the worker as a server error.
+            return back()->with('r7.error', $refusal->getMessage());
+        }
+
+        return redirect()
+            ->route('record7.round.person', ['client' => $person->id])
+            ->with('r7.recorded', [
+                'doseId' => $scheduled->id,
+                'created' => $result['created'],
+                'outcome' => $result['administration']->outcomeWord(),
+                'at' => $result['administration']->administered_at->format('H:i'),
+                'by' => $result['administration']->recordedBy?->displayName(),
+            ]);
+    }
+
+    /** Everything the outcome screen needs, in the order it is read. */
+    private function outcomeProps(
+        int $serviceId, Round $round, Client $person, $scheduled, array $check
+    ): array {
+        $view = $this->personView->forPerson($round, $person);
+        $medicine = collect($view['medicines'])->firstWhere('doseId', $scheduled->id);
+        $house = Service::find($serviceId);
+
+        return [
+            'house' => ['id' => $house?->id, 'name' => $house?->name],
+            'round' => [
+                'slot' => $round->slot,
+                'date' => $round->round_date->format('l j F'),
+            ],
+
+            'person' => $view['person'],
+            'safety' => $view['safety'],
+            'medicine' => $medicine,
+
+            // Said before anything is filled in, not after it is submitted.
+            'blockedReason' => $this->outcomeBlockedReason($scheduled),
+
+            // The four things that can have happened, each with the reasons
+            // that belong to it. Sent from the server so the screen can never
+            // offer a combination the recorder would refuse.
+            'outcomes' => [
+                [
+                    'code' => 'refused',
+                    'word' => 'They refused it',
+                    'meaning' => 'You offered it properly and they said no.',
+                    'tone' => 'warning',
+                    'reasons' => AdministrationRecorder::REFUSAL_REASONS,
+                ],
+                [
+                    'code' => 'person_unavailable',
+                    'word' => 'They were not here',
+                    'meaning' => 'You could not offer it because they were not available to this service.',
+                    'tone' => 'info',
+                    'reasons' => AdministrationRecorder::PERSON_UNAVAILABLE_REASONS,
+                ],
+                [
+                    'code' => 'not_available',
+                    'word' => 'The medicine was not available',
+                    'meaning' => 'The medicine itself could not be given. Nothing about the person.',
+                    'tone' => 'error',
+                    'reasons' => AdministrationRecorder::MEDICINE_UNAVAILABLE_REASONS,
+                ],
+                [
+                    'code' => 'missed',
+                    'word' => 'It was missed',
+                    'meaning' => 'Nobody gave it and nobody recorded why at the time. '
+                        .'This is a medication error and needs more from you.',
+                    'tone' => 'error',
+                    'reasons' => AdministrationRecorder::MISSED_REASONS,
+                ],
+            ],
+
+            'reasonWords' => AdministrationRecorder::REASON_WORDS,
+            'missedActions' => AdministrationRecorder::MISSED_ACTIONS,
+            'missedActionWords' => AdministrationRecorder::MISSED_ACTION_WORDS,
+
+            'authority' => [
+                'allowed' => $check['allowed'],
+                'blocked' => $check['blocked'] ?? false,
+                'reason' => $check['reason'] ?? null,
+            ],
+
+            'stage' => 'Section 2.3 — recording why a medicine was not given.',
+
+            'urls' => [
+                'record' => route('record7.round.outcome.record', [
+                    'client' => $person->id, 'dose' => $scheduled->id,
+                ]),
+                'person' => route('record7.round.person', ['client' => $person->id]),
+                'round' => route('record7.round'),
+                'today' => route('record7.today'),
+                'houses' => route('record7.houses'),
+                'lock' => route('record7.lock.now'),
+                'signOut' => route('record7.signout'),
+            ],
+        ];
     }
 
     /**

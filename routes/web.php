@@ -3302,6 +3302,53 @@ Route::prefix('record7')->name('record7.')->group(function () {
             ->middleware([R7Authorize::class.':administer_medication', 'throttle:60,1'])
             ->name('round.record');
 
+        /* 2.3 — recording why a medicine was NOT given.
+
+           Its own pair of routes rather than an extra field on the "given"
+           path. Refusal, absence, a missing medicine and a missed dose are
+           four different clinical facts, and a screen that reached them by
+           toggling something on the administration form would invite the
+           wrong one to be chosen by accident. */
+        Route::get('/round/person/{client}/medicine/{dose}/outcome', [R7Round::class, 'outcome'])
+            ->whereNumber('client')->whereNumber('dose')
+            ->middleware(R7Authorize::class.':administer_medication')
+            ->name('round.outcome');
+
+        Route::post('/round/person/{client}/medicine/{dose}/outcome', [R7Round::class, 'recordOutcome'])
+            ->whereNumber('client')->whereNumber('dose')
+            ->middleware([R7Authorize::class.':administer_medication', 'throttle:60,1'])
+            ->name('round.outcome.record');
+
+        /* 2.3 — offering a refused dose again.
+
+           The same planned obligation, asked a second time. Which refusal is
+           being answered is resolved on the server from the dose itself, so no
+           id in this request can attach an attempt to somebody else's refusal. */
+        Route::get('/round/person/{client}/medicine/{dose}/again', [R7Round::class, 'reoffer'])
+            ->whereNumber('client')->whereNumber('dose')
+            ->middleware(R7Authorize::class.':administer_medication')
+            ->name('round.reoffer');
+
+        Route::post('/round/person/{client}/medicine/{dose}/again', [R7Round::class, 'recordReoffer'])
+            ->whereNumber('client')->whereNumber('dose')
+            ->middleware([R7Authorize::class.':administer_medication', 'throttle:60,1'])
+            ->name('round.reoffer.record');
+
+        /* 2.3 — recording that somebody who could not be found has been found.
+
+           The only thing that answers that concern. Which concern is being
+           answered is resolved on the server from the person and the house, so
+           no id in the request can attach evidence to somebody else's. */
+        Route::get('/round/person/{client}/welfare', [R7Round::class, 'welfare'])
+            ->whereNumber('client')
+            ->middleware(R7Authorize::class.':administer_medication')
+            ->name('round.welfare');
+
+        Route::post('/round/person/{client}/welfare', [R7Round::class, 'recordWelfare'])
+            ->whereNumber('client')
+            ->middleware([R7Authorize::class.':administer_medication', 'throttle:60,1'])
+            ->name('round.welfare.record');
+
         /* 1.1 — confirming you have read the handover. Anybody in the house
            may do this: being told what happened overnight is not privileged. */
         Route::post('/handover/read', [R7Today::class, 'readHandover'])

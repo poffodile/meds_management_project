@@ -344,6 +344,12 @@ class Record7Section1Seeder extends Seeder
                     // She manages this one herself. Recording it as staff
                     // administration would be a false record.
                     'support_type' => 'self_administered',
+                    // Stated explicitly. The migration backfills existing rows,
+                    // but a reseed writes new ones — so without this the
+                    // arrangement silently disappears every time the fixture is
+                    // rebuilt, and "no monitoring agreed" would read as "none
+                    // required".
+                    'self_administration_monitoring' => 'check_and_record',
                     'instructions' => 'Aisha administers this herself. Record it; do not hand it to her.',
                 ]],
             // A SCHEDULED self-administered medicine, not only a PRN one.
@@ -354,6 +360,7 @@ class Record7Section1Seeder extends Seeder
             ['aisha-colecalciferol', 'aisha', 'colecalciferol', 'One tablet', 'Oral', 'Once a day',
                 ['Morning'], [
                     'support_type' => 'self_administered',
+                    'self_administration_monitoring' => 'check_and_record',
                     'instructions' => 'Aisha keeps this in her own room and takes it herself. '
                         .'Check she has taken it and record it; do not hand it to her.',
                 ]],
@@ -366,6 +373,7 @@ class Record7Section1Seeder extends Seeder
             ['aisha-ferrous', 'aisha', 'ferrous', 'One tablet', 'Oral', 'Once a day',
                 ['Morning'], [
                     'support_type' => 'self_administered',
+                    'self_administration_monitoring' => 'check_and_record',
                     'instructions' => 'Aisha keeps this with her vitamin D and takes both herself.',
                 ]],
 
@@ -450,6 +458,16 @@ class Record7Section1Seeder extends Seeder
                     'kind' => $slots === ['prn'] ? 'prn' : 'scheduled',
                     'is_time_critical' => $options['is_time_critical'] ?? false,
                     'support_type' => $options['support_type'] ?? 'staff_administered',
+
+                    // Every self-administered prescription must SAY what the
+                    // arrangement is. Left null it reads as "no monitoring
+                    // required", which is a different clinical decision from
+                    // "nobody has recorded one" — and the fixture would quietly
+                    // undo the migration's backfill on every reseed.
+                    'self_administration_monitoring' =>
+                        ($options['support_type'] ?? 'staff_administered') === 'self_administered'
+                            ? ($options['self_administration_monitoring'] ?? 'check_and_record')
+                            : null,
                     'instructions' => $options['instructions'] ?? null,
                     'prn_max_per_day' => $options['prn_max_per_day'] ?? null,
                     'prn_min_gap_minutes' => $options['prn_min_gap_minutes'] ?? null,

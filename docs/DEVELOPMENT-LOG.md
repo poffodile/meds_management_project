@@ -1843,3 +1843,97 @@ Section 2.0 round table still prints raw `in_progress` / `part_recorded` and
 
 Record7 360 (Section 2.2: 44), Frontend 4 67, JS 22, production build clean.
 Nothing committed.
+
+---
+
+## 29 August 2026 — Record7 Section 2.3, why a medicine was not given
+
+Part of this section arrived already committed (`8468bdc9`) — the migration, the
+model changes and most of the recorder. It was good work, and it had never been
+run: the migration was committed but not applied to either database. Applying it
+is where the interesting problems started.
+
+**The Section 1.2 defect was real, and worse than it looked.** The old rule
+closed a refusal as soon as ANY later dose of the same prescription was given.
+Dennis's co-careldopa is four times a day — so his teatime tablet was closing his
+morning refusal before anybody went back to him. Two existing tests encoded that
+behaviour and had to be rewritten to assert the corrected rule instead. A test
+that passes by describing a bug is worse than no test.
+
+**And the fix had only gone in half way.** `IssueRegistry` had the new same-dose
+chain rule; `ShiftBoard` still carried the old prescription-level query, so the
+support worker's board and the manager's board would have disagreed about whether
+the same refusal was live. ShiftBoard now asks IssueRegistry rather than
+repeating the query — which is what stops them drifting apart a second time.
+
+**The service had no way in.** `recordNonAdministration` existed and was
+unreachable: no route, no controller action, no UI. Section 2.3 now has its own
+pair of routes rather than a flag on the "given" path, because refusal, absence,
+a missing medicine and a missed dose are four different clinical facts and a
+toggle on the administration form would invite the wrong one by accident.
+
+**Four choices, nothing preselected.** Callum's status says he is in hospital and
+the screen still will not choose for the worker. A status is a fact about where
+somebody is; an outcome is a statement about what a worker did.
+
+**A fixture defect the tests caught.** The seeder writes self-administered
+prescriptions without the monitoring arrangement, so every reseed silently undid
+the migration's backfill — and a null there reads as "no monitoring required",
+which is a different clinical decision from "nobody has recorded one". The
+seeder now derives it.
+
+**Codes are not words.** "no_reason_given" is a database value; a worker at half
+past seven in a corridor should read "They gave no reason". Every code has a
+plain-English sibling now.
+
+**Three mutations, all caught.** Removing the controlled-drug storage gate fails
+1. Accepting any reason for any outcome fails 1. Reverting `refusalStillOpen` to
+the prescription rule fails 3, across three separate test classes.
+
+**Not built, on purpose:** withheld (no authority model exists), PRN (2.4),
+witnessing (2.5), stock (2.7), corrections (2.7). Sources and reasoning are in
+`docs/care-one-os/RECORD7/SECTION-2-3-NON-ADMINISTRATION.md`, deliberately not in
+migration comments.
+
+Record7 393 (Section 2.3: 33), Frontend 4 67, JS 22, production build clean.
+Browser verification NOT done — the Chrome extension disconnected.
+
+### Same day — Section 2.3 in a browser
+
+The extension dropped when the CLI re-authenticated; once it was back, the walk
+found three things.
+
+**1. The footer still said "Section 2.2".** The person page now carries 2.3's
+outcomes as well, so the line under the medicines contradicted the buttons
+directly above it.
+
+**2. A screen offered an action the server would refuse.** Dennis's colecalciferol
+is PROMPTED. Section 2.2 rightly declines to record it as given — and Section
+2.3's screen opened the whole outcome form for it, meaning the recorder would
+only have thrown after a reason and a note had been filled in. It now says so
+before anything is filled in, and the same guard covers as-required medicines,
+fully self-managed ones and suspended prescriptions. Two tests added, both sides.
+
+**3. Re-offer has no way in from the UI.** The database, the recorder and the
+IssueRegistry chain rule all support it and are covered by test — but nothing on
+a person's page offers "offer it again" once a refusal is recorded. That is an
+honest gap in Section 2.3's UI, not a defect in the model, and it is reported
+rather than hidden.
+
+**What the browser confirmed working.** Four distinct outcomes with nothing
+preselected. Callum answered at last — "Person unavailable at 21:45 by Noah",
+the case carried open since Section 2.0, and his obligation line correctly
+disappeared once answered. Reasons in plain English, scoped to the chosen
+outcome. Refusal renders amber, never green. The controlled-drug gate keeps the
+button disabled until somebody states no quantity left the cupboard. Missed
+demands reason, explanation, action and escalation — a reason alone leaves the
+button disabled. No overflow at 390px, choices 129–180px tall. Dark theme
+correct throughout.
+
+**One automation note, not a product fault:** synthetic mouse events did not
+register on the choice buttons or radios, while real `.click()` worked every
+time and the same buttons worked normally for Terence. The product is fine; the
+driver was the problem.
+
+Record7 395 (Section 2.3: 35), Frontend 4 67, JS 22, production build clean.
+Nothing committed.

@@ -78,7 +78,18 @@ class RoundQueue
         $people = $doses->groupBy('client_id')->map(function ($forClient) use ($now) {
             $client = $forClient->first()->client;
 
-            $outstanding = $forClient->filter(fn ($dose) => $dose->administration === null);
+            // A FULLY SELF-MANAGED MEDICINE IS NOT OUTSTANDING WORK.
+            // Where the agreed arrangement is that the person handles it
+            // entirely themselves, there is no staff record to make — so
+            // counting it as unanswered would leave every round permanently
+            // incomplete and teach people that "3 remaining" means nothing.
+            //
+            // It stays visible on the person's own page as context; it simply
+            // stops being something the round is waiting for.
+            $outstanding = $forClient->filter(
+                fn ($dose) => $dose->administration === null
+                    && ! (bool) $dose->prescription?->isFullySelfManaged()
+            );
             $late = $outstanding->filter(fn ($dose) => $dose->isLate($now));
             $timeCritical = $outstanding->filter(fn ($dose) => $dose->prescription->is_time_critical);
 

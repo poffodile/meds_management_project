@@ -36,6 +36,20 @@ class ScheduledDose extends Record7Model
         return $this->hasOne(Administration::class, 'scheduled_dose_id');
     }
 
+    /**
+     * The answer that stands NOW.
+     *
+     * A dose can carry a chain — refused, offered again, refused again, taken.
+     * Every row stays, and the one that describes where the dose has got to is
+     * the last one written. `administration()` returns whichever the database
+     * hands back first, which is fine for asking "has this been answered?" and
+     * wrong for showing what happened.
+     */
+    public function latestAdministration(): HasOne
+    {
+        return $this->hasOne(Administration::class, 'scheduled_dose_id')->latestOfMany();
+    }
+
     public function isRecorded(): bool
     {
         return $this->administration !== null;

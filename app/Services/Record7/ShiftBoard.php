@@ -41,6 +41,16 @@ use Illuminate\Support\Carbon;
  */
 class ShiftBoard
 {
+    /**
+     * Whether a clinical condition is still live is ONE question with ONE
+     * answer, and IssueRegistry owns it. Asking rather than repeating the
+     * query is what stops this board and the manager's board drifting apart —
+     * which is exactly what happened before Section 2.3.
+     */
+    public function __construct(private readonly IssueRegistry $issues)
+    {
+    }
+
     /** Beyond this a "recently completed" entry is not recent, it is history. */
     private const RECENT_HOURS = 12;
 
@@ -543,12 +553,22 @@ class ShiftBoard
             ->orderByDesc('administered_at')
             ->get();
 
-        return $flagged->filter(function ($administration) {
-            return ! Administration::where('prescription_id', $administration->prescription_id)
-                ->where('administered_at', '>', $administration->administered_at)
-                ->whereIn('outcome', ['given', 'self_administered'])
-                ->exists();
-        });
+        // SECTION 2.3. This used to close a refusal as soon as ANY later dose
+        // of the same prescription was given — so tonight's tablet answered for
+        // this morning's refusal, and a person nobody went back to quietly
+        // dropped off the list.
+        //
+        // A refusal is now answered only by an accepted re-offer of the SAME
+        // planned dose, linked to the refusal itself. That is the same rule
+        // IssueRegistry applies; asking it here rather than repeating the query
+        // is what stops the two drifting apart again.
+        return $flagged->filter(
+            fn ($administration) => $this->issues->conditionActive(
+                ($administration->outcome === 'refused' ? 'refusal:' : 'incomplete_record:')
+                    .$administration->id,
+                $serviceId
+            )
+        );
     }
 
     /**

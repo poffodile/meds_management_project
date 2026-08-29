@@ -9,6 +9,7 @@ use App\Models\Record7\Round;
 use App\Models\Record7\ScheduledDose;
 use App\Models\Record7\Service;
 use App\Models\Record7\User;
+use App\Models\Record7\WelfareCheck;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -100,6 +101,56 @@ class AdministrationRecorder
         'discovered_later',
     ];
 
+    /**
+     * The words staff read, for every stored code.
+     *
+     * A code is what the record keeps; it is not what a worker should be asked
+     * to choose from at half past seven in a corridor. "no_reason_given" on a
+     * screen is a database column leaking into somebody's working day.
+     */
+    public const REASON_WORDS = [
+        'client_declined' => 'They said no',
+        'disliked_form_or_taste' => 'They did not like the taste or the form',
+        'felt_unwell' => 'They felt unwell',
+        'no_reason_given' => 'They gave no reason',
+
+        'in_hospital' => 'In hospital',
+        'away_on_leave' => 'Away on leave',
+        'at_appointment' => 'Out at an appointment',
+        'not_found_in_service' => 'Could not be found here',
+
+        'stock_unavailable' => 'None in stock',
+        'awaiting_delivery' => 'Waiting on a delivery',
+        'damaged_or_expired' => 'Damaged or out of date',
+        'wrong_item_supplied' => 'The wrong item was supplied',
+
+        'round_not_completed' => 'The round was not finished',
+        'overlooked' => 'It was overlooked',
+        'staffing_shortfall' => 'There were not enough staff',
+        'discovered_later' => 'Found afterwards, during a check',
+    ];
+
+    /** What was actually done about a missed dose, in the same plain words. */
+    public const MISSED_ACTION_WORDS = [
+        'manager_notified' => 'Told the manager',
+        'medication_lead_notified' => 'Told the medication lead',
+        'pharmacist_contacted' => 'Spoke to the pharmacist',
+        'prescriber_contacted' => 'Spoke to the prescriber or GP',
+        'nhs_111_contacted' => 'Called NHS 111',
+        'emergency_services_contacted' => 'Called the emergency services',
+        'no_escalation_required_under_policy' => 'No escalation needed under our policy',
+    ];
+
+    /**
+     * How a second offer can end.
+     *
+     * They took it, or they said no again. A re-offer is an OFFER — the other
+     * outcomes describe what happened to the original obligation rather than
+     * how an offer went, and filing them here would put the wrong shape of
+     * fact on the chain.
+     */
+    public const REOFFER_OUTCOMES = ['given', 'self_administered', 'refused'];
+
     public const MISSED_ACTIONS = [
         'manager_notified',
         'medication_lead_notified',
@@ -144,12 +195,16 @@ class AdministrationRecorder
      *
      * @return array{allowed:bool, code:?string, reason:?string, nextSection:?string}
      */
-    public function eligibility(ScheduledDose $dose, Client $client): array
+    public function eligibility(ScheduledDose $dose, Client $client, bool $asReoffer = false): array
     {
         $prescription = $dose->prescription;
         $medicine = $prescription?->medicine;
 
-        if ($dose->administration !== null) {
+        // A re-offer exists BECAUSE an answer already exists. Every other check
+        // below still applies to it — support type, controlled drugs, PRN, the
+        // person being here — so a second offer can never sidestep a safeguard
+        // the first one was held to.
+        if (! $asReoffer && $dose->administration !== null) {
             return $this->no(
                 'already_recorded',
                 'This dose already has a recorded outcome. It cannot be recorded twice.'
@@ -235,7 +290,8 @@ class AdministrationRecorder
         Client $client,
         ScheduledDose $dose,
         ?string $notes,
-        Request $request
+        Request $request,
+        ?Administration $reofferOf = null
     ): array {
         try {
             $administration = Administration::create([
@@ -262,6 +318,11 @@ class AdministrationRecorder
                 // a medicine was given is a clinical fact. The dose's own
                 // due_at is left exactly as it was.
                 'administered_at' => now(),
+
+                // Set only when this is a second offer of the same dose. The
+                // refusal it follows is never touched — it stays exactly as it
+                // was recorded, and the two rows together tell the real story.
+                'reoffer_of_administration_id' => $reofferOf?->id,
             ]);
         } catch (UniqueConstraintViolationException $clash) {
             // Somebody — or another request from this same worker — got there
@@ -269,6 +330,9 @@ class AdministrationRecorder
             // rather than an error. Hand back THEIR record.
             $existing = Administration::where('scheduled_dose_id', $dose->id)
                 ->whereNull('corrects_administration_id')
+                ->where(fn ($q) => $reofferOf
+                    ? $q->where('reoffer_of_administration_id', $reofferOf->id)
+                    : $q->whereNull('reoffer_of_administration_id'))
                 ->first();
 
             if (! $existing) {
@@ -498,16 +562,26 @@ class AdministrationRecorder
             return null;
         }
 
-        if (! in_array($outcome, ['given', 'self_administered'], true)) {
-            throw new RuntimeException('Only an accepted same-dose re-offer can link to a refusal.');
+        // A second offer can end two ways: they take it, or they say no again.
+        // Both are answers to the SAME planned dose and both belong on the
+        // chain. Anything else — the medicine running out, the person leaving,
+        // the round being missed — is a fact about the original obligation, not
+        // an answer to an offer, so it cannot be filed as one.
+        if (! in_array($outcome, self::REOFFER_OUTCOMES, true)) {
+            throw new RuntimeException(
+                'A re-offer records whether they took it or refused it again. Nothing else.'
+            );
         }
 
+        // Every filter is in the query, so a refusal belonging to another
+        // person, house, prescription or dose is not found rather than merely
+        // rejected. The database trigger asserts the same thing again for
+        // anything that bypasses this class entirely.
         $target = Administration::where('service_id', $round->service_id)
             ->where('client_id', $client->id)
             ->where('scheduled_dose_id', $dose->id)
             ->where('prescription_id', $dose->prescription_id)
             ->where('outcome', 'refused')
-            ->whereNull('reoffer_of_administration_id')
             ->find((int) $targetId);
 
         if (! $target) {
@@ -515,6 +589,124 @@ class AdministrationRecorder
         }
 
         return $target;
+    }
+
+    /**
+     * Record that somebody went and looked.
+     *
+     * The ONLY thing that answers a "could not be found" concern. Everything
+     * about it is resolved from the authenticated session and the concern
+     * itself — the actor, the house, the organisation, the person — so a
+     * posted id cannot attach evidence to somebody else's concern, and the
+     * database asserts the same thing again underneath.
+     *
+     * Deliberately NOT a safeguarding classification. Recording that you found
+     * somebody says exactly that and nothing more; whether it becomes a
+     * safeguarding matter is a judgement for a manager and the provider's own
+     * policy, not something a medicines round decides on their behalf.
+     *
+     * @return array{check:WelfareCheck, created:bool}
+     */
+    public function recordWelfareCheck(
+        User $user,
+        int $serviceId,
+        Administration $report,
+        string $resolutionType,
+        ?string $note,
+        Request $request
+    ): array {
+        if (! array_key_exists($resolutionType, WelfareCheck::RESOLUTION_WORDS)) {
+            throw new RuntimeException('Say what you actually found.');
+        }
+
+        if ($report->outcome !== 'person_unavailable'
+            || $report->reason_code !== 'not_found_in_service'
+            || (int) $report->service_id !== $serviceId) {
+            throw new RuntimeException('That is not a could-not-be-found record for this house.');
+        }
+
+        $service = Service::findOrFail($serviceId);
+
+        try {
+            $check = WelfareCheck::create([
+                'reference' => 'R7W-'.strtoupper(Str::random(12)),
+                'organisation_id' => $service->organisation_id,
+                'service_id' => $serviceId,
+                'client_id' => $report->client_id,
+                'administration_id' => $report->id,
+                'resolution_type' => $resolutionType,
+                'note' => $this->cleanNotes($note),
+                'recorded_by_user_id' => $user->id,
+                'occurred_at' => now(),
+            ]);
+        } catch (UniqueConstraintViolationException $clash) {
+            // Somebody else already answered it. That is a safe outcome, not an
+            // error — hand back what they recorded.
+            $existing = WelfareCheck::where('administration_id', $report->id)->first();
+
+            if (! $existing) {
+                throw $clash;
+            }
+
+            return ['check' => $existing, 'created' => false];
+        }
+
+        $this->audit->record(
+            eventType: 'welfare_check_recorded',
+            result: AuditRecorder::SUCCESS,
+            user: $user,
+            serviceId: $serviceId,
+            reason: null,
+            riskLevel: 'medium',
+            metadata: [
+                'welfare_check_id' => $check->id,
+                'administration_id' => $report->id,
+                'client_id' => $report->client_id,
+                'resolution_type' => $resolutionType,
+                'occurred_at' => $check->occurred_at->toIso8601String(),
+            ],
+            request: $request
+        );
+
+        return ['check' => $check, 'created' => true];
+    }
+
+    /**
+     * The unanswered "could not be found" concern for this person, if there is
+     * one — so a screen can offer to answer it and nothing else can.
+     */
+    public function openWelfareConcernFor(int $serviceId, int $clientId): ?Administration
+    {
+        return Administration::where('service_id', $serviceId)
+            ->where('client_id', $clientId)
+            ->where('outcome', 'person_unavailable')
+            ->where('reason_code', 'not_found_in_service')
+            ->whereNotExists(fn ($q) => $q->selectRaw('1')
+                ->from('record7_welfare_checks')
+                ->whereColumn('record7_welfare_checks.administration_id', 'record7_administrations.id'))
+            ->orderByDesc('id')
+            ->first();
+    }
+
+    /**
+     * The refusal on this dose that is still waiting for a second offer, if
+     * there is one.
+     *
+     * A refusal that has already been offered again is closed to further
+     * attempts — the next attempt chains from THAT answer instead, so two
+     * workers cannot both re-offer the same refusal and produce two competing
+     * second attempts.
+     */
+    public function openRefusalFor(ScheduledDose $dose): ?Administration
+    {
+        $refusals = Administration::where('scheduled_dose_id', $dose->id)
+            ->where('outcome', 'refused')
+            ->orderBy('id')
+            ->get();
+
+        return $refusals->first(fn ($refusal) => ! Administration::where(
+            'reoffer_of_administration_id', $refusal->id
+        )->exists());
     }
 
     private function createWelfareAttention(Round $round, Administration $administration): void

@@ -215,7 +215,7 @@ class RoundPersonView
      */
     private function medicines(Round $round, Client $client, Carbon $now): array
     {
-        return ScheduledDose::with(['prescription.medicine', 'administration.recordedBy'])
+        return ScheduledDose::with(['prescription.medicine', 'latestAdministration.recordedBy'])
             ->where('client_id', $client->id)
             ->where('service_id', $round->service_id)
             ->whereDate('due_at', $round->round_date->toDateString())
@@ -227,6 +227,10 @@ class RoundPersonView
                 $medicine = $prescription?->medicine;
                 $support = $prescription?->support_type ?? 'staff_administered';
                 $eligibility = $this->recorder->eligibility($dose, $client);
+                $openRefusal = $this->recorder->openRefusalFor($dose);
+
+                // The answer that stands, not whichever row came back first.
+                $answer = $dose->latestAdministration;
 
                 return [
                     'doseId' => $dose->id,
@@ -276,22 +280,22 @@ class RoundPersonView
 
                     // Read-only. Section 2.1 shows whether something has been
                     // recorded; it provides no way to record it.
-                    'recorded' => $dose->administration !== null,
-                    'recordedOutcome' => $dose->administration?->outcomeWord(),
+                    'recorded' => $answer !== null,
+                    'recordedOutcome' => $answer?->outcomeWord(),
 
                     // The CODE as well as the word. "Refused" and "Given" are
                     // both recorded outcomes, and a screen that knows only that
                     // something was recorded has to paint them the same — which
                     // is how a stock failure ends up looking like a completed
                     // administration.
-                    'recordedCode' => $dose->administration?->outcome,
+                    'recordedCode' => $answer?->outcome,
 
                     // Kept visible after the event. A worker who has just
                     // signed for something has to be able to look at it and see
                     // the time and the name, or the only way to check is to
                     // record it again.
-                    'recordedAt' => $dose->administration?->administered_at->format('H:i'),
-                    'recordedBy' => $dose->administration?->recordedBy?->displayName(),
+                    'recordedAt' => $answer?->administered_at->format('H:i'),
+                    'recordedBy' => $answer?->recordedBy?->displayName(),
 
                     // ONE WORD FOR ONE OUTCOME, RESOLVED HERE.
                     // The pill and the line beneath it were being worded
@@ -299,9 +303,7 @@ class RoundPersonView
                     // different words — "Taken themselves" above
                     // "Self-administered at 08:10". Deciding it once, on the
                     // server, is the only way they cannot drift apart.
-                    'recordedWord' => $dose->administration
-                        ? $this->recordedWord($dose->administration, $support)
-                        : null,
+                    'recordedWord' => $answer ? $this->recordedWord($answer, $support) : null,
 
                     // LATENESS DOES NOT STOP BEING TRUE WHEN IT IS RECORDED.
                     // A dose is "late" only while it is unanswered, so the
@@ -309,11 +311,35 @@ class RoundPersonView
                     // medicine given eight hours late then read exactly like
                     // one given on time. The delay is measured against the
                     // moment it was actually given and kept.
-                    'recordedLatePhrase' => $dose->administration
-                        && $dose->minutesLate($dose->administration->administered_at) > 0
-                            ? $this->duration(
-                                $dose->minutesLate($dose->administration->administered_at)
-                            )
+                    // WHY, not just WHAT. A refusal that does not say why is a
+                    // gap in the record, and the worker who wrote it a minute
+                    // ago is the only person who can still fill it in.
+                    'recordedReason' => $answer?->reason_code
+                        ? (AdministrationRecorder::REASON_WORDS[$answer->reason_code]
+                            ?? $answer->reason_code)
+                        : null,
+                    'recordedNotes' => $answer?->notes,
+
+                    // What was actually done about a missed dose, and who was
+                    // told. Recorded at the time; useless if never shown.
+                    'recordedAction' => $answer?->action_taken,
+                    'recordedEscalation' => $answer?->immediate_action_code
+                        ? (AdministrationRecorder::MISSED_ACTION_WORDS[
+                                $answer->immediate_action_code
+                            ] ?? $answer->immediate_action_code)
+                        : null,
+
+                    // A refusal on this dose that nobody has offered again yet.
+                    // Present means the screen may offer a second attempt; the
+                    // recorder and the database both check it again.
+                    'reofferOf' => $openRefusal?->id,
+                    'reofferedFrom' => $answer?->reoffer_of_administration_id
+                        ? $this->earlierAnswer($answer)
+                        : null,
+
+                    'recordedLatePhrase' => $answer
+                        && $dose->minutesLate($answer->administered_at) > 0
+                            ? $this->duration($dose->minutesLate($answer->administered_at))
                             : null,
 
                     // Whether Section 2.2 can honestly record this as given,
@@ -321,6 +347,11 @@ class RoundPersonView
                     // Asked of the same class that will refuse the write, so
                     // the screen can never offer an action the server declines.
                     'canBeGiven' => $eligibility['allowed'],
+
+                    // Fully self-managed: the person handles this one entirely
+                    // themselves by agreement, so there is nothing for staff to
+                    // record and nothing for the round to wait on.
+                    'selfManaged' => (bool) $prescription?->isFullySelfManaged(),
                     'blockedReason' => $eligibility['reason'],
                     'blockedCode' => $eligibility['code'],
                     'nextSection' => $eligibility['nextSection'],
@@ -366,6 +397,31 @@ class RoundPersonView
         }
 
         return $administration->outcomeWord();
+    }
+
+    /**
+     * The answer this one follows, said plainly.
+     *
+     * A second attempt that shows no sign of the first reads as though the
+     * refusal never happened — which is exactly what an append-only record
+     * exists to prevent.
+     */
+    private function earlierAnswer(Administration $administration): ?array
+    {
+        $earlier = Administration::find($administration->reoffer_of_administration_id);
+
+        if (! $earlier) {
+            return null;
+        }
+
+        return [
+            'word' => $earlier->outcomeWord(),
+            'at' => $earlier->administered_at->format('H:i'),
+            'by' => $earlier->recordedBy?->displayName(),
+            'reason' => $earlier->reason_code
+                ? (AdministrationRecorder::REASON_WORDS[$earlier->reason_code] ?? $earlier->reason_code)
+                : null,
+        ];
     }
 
     /** Under an hour stays in minutes; past that, hours and minutes. */

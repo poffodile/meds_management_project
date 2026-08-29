@@ -1055,7 +1055,11 @@ class Record7AdministrationTest extends Record7TestCase
 
         $this->assertStringNotContainsString('{medicines.length} to check', $page);
         $this->assertStringContainsString('still to record', $page);
-        $this->assertStringContainsString('!medicine.recorded', $page);
+
+        // Section 2.3 refined this: a fully self-managed medicine is not work
+        // waiting to be done either, so it is excluded from the same count.
+        $this->assertStringContainsString('!m.recorded', $page);
+        $this->assertStringContainsString('!m.selfManaged', $page);
     }
 
     /**
