@@ -1,4 +1,5 @@
 import React from 'react';
+import { router } from '@inertiajs/react';
 import AppShell from '@record7/components/AppShell.jsx';
 
 /**
@@ -61,9 +62,12 @@ export default function Round({
                     <Row label="House" value={house.name} />
                     <Row label="Round" value={round.slot} />
                     <Row label="Date" value={round.date} />
+                    {/* Worked out from the doses themselves, server-side, and
+                        already a sentence by the time it gets here. The view
+                        does not decide what a window is. */}
                     <Row
-                        label="Scheduled window"
-                        value={round.window.from ? `${round.window.from} to ${round.window.to}` : null}
+                        label={round.window.single ? 'Scheduled time' : 'Scheduled window'}
+                        value={round.window.label}
                     />
                     <Row label="Status" value={round.status} />
                     <Row label="Opened by" value={round.openedBy} />
@@ -72,7 +76,10 @@ export default function Round({
                         label="Progress"
                         value={`${progress.recorded} of ${progress.people} people recorded, `
                             + `${progress.remaining} remaining, ${progress.late} late, `
-                            + `${progress.timeSensitive} time-sensitive`}
+                            + `${progress.timeSensitive} time-sensitive`
+                            + (progress.awayNeedingOutcome
+                                ? `, ${progress.awayNeedingOutcome} away and still needing an outcome`
+                                : '')}
                     />
                 </section>
 
@@ -109,7 +116,18 @@ export default function Round({
                         <tbody>
                             {queue.map((person) => (
                                 <tr key={person.clientId}>
-                                    <td>{person.name} ({person.fullName})</td>
+                                    <td>
+                                        {/* Opening a person is a GET. Section 2.0
+                                            and 2.1 both submit nothing. */}
+                                        <button
+                                            type="button"
+                                            onClick={() => router.get(
+                                                urls.person.replace('__ID__', person.clientId)
+                                            )}
+                                        >
+                                            {person.name} ({person.fullName})
+                                        </button>
+                                    </td>
                                     <td>{person.room ?? '—'}</td>
                                     <td>{person.dueAt}</td>
                                     <td>{person.itemCount}</td>
@@ -118,7 +136,10 @@ export default function Round({
                                     <td>{person.progress}</td>
                                     <td>{person.hasSafetyWarning ? 'yes' : 'no'}</td>
                                     <td>{person.support.word}</td>
-                                    <td>{person.clientStatusWord}</td>
+                                    <td>
+                                        {person.clientStatusWord}
+                                        {person.needsOutcome ? ' — outcome still required' : ''}
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>

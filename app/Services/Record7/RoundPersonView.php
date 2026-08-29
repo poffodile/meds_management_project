@@ -1,0 +1,417 @@
+<?php
+
+namespace App\Services\Record7;
+
+use App\Models\Record7\Administration;
+use App\Models\Record7\Client;
+use App\Models\Record7\Round;
+use App\Models\Record7\ScheduledDose;
+use Illuminate\Support\Carbon;
+
+/**
+ * One person, opened from a round, ready to be checked before anything is given.
+ *
+ * WHAT THIS SCREEN IS FOR
+ * The last look before a medicine is handed over: is this the right person, is
+ * there anything that must stop me, and what exactly am I about to give them.
+ * It is not a care profile and not a medication history — only what belongs to
+ * this person, in this house, in this round, on this date.
+ *
+ * NOTHING CAN BE RECORDED FROM HERE.
+ * Section 2.1 reads. There is no method on this class that writes anything, no
+ * outcome, no correction, no stock movement. Recording begins at 2.2, and a
+ * control that looked as though it recorded something would be worse than no
+ * control at all.
+ *
+ * AN ID FROM A BROWSER IS NOT PROOF OF ANYTHING.
+ * A client id arrives as a number in a URL. It is never used to load anybody
+ * until it has been resolved through the organisation, the house AND the round
+ * — three filters, all applied before the record is fetched. A person from
+ * another company, another house or another round is not "not shown", they are
+ * not found.
+ *
+ * NOTHING IS INVENTED.
+ * Where Record7 holds no photograph and no separate sensitivity record, this
+ * says so in words rather than producing a placeholder that looks like data. A
+ * fabricated blank is more dangerous than an honest gap, because a reader
+ * cannot tell the difference between "no allergies" and "nobody has asked".
+ */
+class RoundPersonView
+{
+    public function __construct(private readonly AdministrationRecorder $recorder)
+    {
+    }
+
+    /** The words staff use for each agreed support arrangement. */
+    public const SUPPORT_WORDS = [
+        'staff_administered' => 'Staff administered',
+        'assisted' => 'Assisted',
+        'prompted' => 'Prompted',
+        'self_administered' => 'Self-administered',
+    ];
+
+    /** What each arrangement actually means for the person holding the pot. */
+    public const SUPPORT_MEANING = [
+        'staff_administered' => 'You give this and record it.',
+        'assisted' => 'They take it themselves with your physical help.',
+        'prompted' => 'They take it themselves. You remind and watch, you do not hand it over.',
+        'self_administered' => 'Authorised to manage this themselves. Record it; do not hand it to them.',
+    ];
+
+    /**
+     * Resolve a person through the round, or refuse.
+     *
+     * Three filters, in this order: the house owns the client, the round owns
+     * the house, and the client has a dose planned in THIS round. The last one
+     * is what stops somebody who genuinely lives here being opened as though
+     * they were part of a round they are not in.
+     */
+    public function resolve(Round $round, int $clientId): ?Client
+    {
+        $client = Client::where('id', $clientId)
+            ->where('service_id', $round->service_id)
+            ->where('organisation_id', $round->organisation_id)
+            ->first();
+
+        if (! $client) {
+            return null;
+        }
+
+        $inThisRound = ScheduledDose::where('client_id', $client->id)
+            ->where('service_id', $round->service_id)
+            ->whereDate('due_at', $round->round_date->toDateString())
+            ->where('slot', $round->slot)
+            ->exists();
+
+        return $inThisRound ? $client : null;
+    }
+
+    /**
+     * Everything the screen shows, in the order it should be read.
+     *
+     * Identity first, then anything that could stop the round, then the
+     * medicines. That order is the safety check itself: knowing what to give
+     * before knowing who you are giving it to is how the wrong person gets the
+     * right medicine.
+     */
+    public function forPerson(Round $round, Client $client, ?Carbon $now = null): array
+    {
+        $now ??= now();
+
+        return [
+            'person' => $this->identity($client),
+            'safety' => $this->safety($client),
+            'medicines' => $this->medicines($round, $client, $now),
+        ];
+    }
+
+    /* ── Identity ───────────────────────────────────────────────────────── */
+
+    private function identity(Client $client): array
+    {
+        return [
+            'id' => $client->id,
+            'fullName' => $client->full_name,
+            // Only when it tells the reader something. "Terence Boyle, known
+            // as Terry" is worth a line; "Callum Fraser, known as Callum" is
+            // the same name twice, and four of the six people in the fixture
+            // were getting that line. A preferred name that is simply the
+            // first name is not a preferred name.
+            'preferredName' => $this->preferredName($client),
+            'room' => $client->room_name,
+
+            // The second identity check every medicines policy asks for.
+            'bornOn' => $client->date_of_birth?->format('j F Y'),
+            'reference' => $client->reference,
+
+            // RECORD7 HOLDS NO PHOTOGRAPHS. Not a nullable column that happens
+            // to be empty — the concept does not exist in the schema at all.
+            // Saying so is the honest answer; rendering a grey silhouette would
+            // suggest a photo had been looked for and not found.
+            'photo' => null,
+            'photoState' => 'not_held',
+
+            'status' => $client->status,
+            'statusWord' => $client->statusWord(),
+            'available' => $client->isAvailable(),
+
+            // A real field, written by staff about how this person prefers to
+            // be supported. Not a clinical warning, and not presented as one.
+            'supportNote' => $client->support_note,
+        ];
+    }
+
+    /** Null unless the person is actually called something else. */
+    private function preferredName(Client $client): ?string
+    {
+        $preferred = trim((string) $client->preferred_name);
+
+        if ($preferred === '') {
+            return null;
+        }
+
+        $firstName = explode(' ', trim((string) $client->full_name))[0] ?? '';
+
+        return strcasecmp($preferred, $firstName) === 0
+            || strcasecmp($preferred, (string) $client->full_name) === 0
+                ? null
+                : $preferred;
+    }
+
+    /* ── Critical safety ────────────────────────────────────────────────── */
+
+    /**
+     * Allergies, worst first, and an honest account of what is not recorded.
+     *
+     * RECORD7 HAS NO SEPARATE "SENSITIVITY" RECORD. It has allergies with a
+     * severity, and mild or moderate ones are the nearest thing the data holds
+     * to a sensitivity. They are shown for what they are rather than relabelled
+     * — inventing a clinical distinction the source does not make would be
+     * worse than the gap it papers over.
+     */
+    private function safety(Client $client): array
+    {
+        $allergies = $client->allergies()->get()
+            ->sortByDesc(fn ($allergy) => match ($allergy->severity) {
+                'life_threatening' => 3,
+                'severe' => 2,
+                'moderate' => 1,
+                default => 0,
+            })
+            ->values()
+            ->map(fn ($allergy) => [
+                'id' => $allergy->id,
+                'substance' => $allergy->substance,
+                'reaction' => $allergy->reaction,
+                'severity' => $allergy->severity,
+                'severityWord' => $allergy->severityWord(),
+                'critical' => $allergy->isCritical(),
+                'source' => $allergy->source,
+                'recordedOn' => $allergy->recorded_at?->format('j F Y'),
+            ])->all();
+
+        return [
+            'allergies' => $allergies,
+            'criticalCount' => count(array_filter($allergies, fn ($a) => $a['critical'])),
+
+            // "None recorded" and "nobody has ever asked" are different facts,
+            // and a reader has to be able to tell them apart before giving a
+            // medicine. Record7 cannot currently distinguish them, and says so.
+            'allergiesState' => $allergies === [] ? 'none_recorded' : 'recorded',
+
+            // Stated rather than implied by an empty section.
+            'sensitivitiesState' => 'not_separately_held',
+        ];
+    }
+
+    /* ── Medicines due in this round ────────────────────────────────────── */
+
+    /**
+     * Only what is planned for this person, in this round, on this date.
+     *
+     * Filtered by service, date and slot as well as by person — so a dose from
+     * this morning cannot appear in tonight's round, and nothing from the
+     * person's history appears merely because it belongs to them.
+     */
+    private function medicines(Round $round, Client $client, Carbon $now): array
+    {
+        return ScheduledDose::with(['prescription.medicine', 'administration.recordedBy'])
+            ->where('client_id', $client->id)
+            ->where('service_id', $round->service_id)
+            ->whereDate('due_at', $round->round_date->toDateString())
+            ->where('slot', $round->slot)
+            ->orderBy('due_at')
+            ->get()
+            ->map(function ($dose) use ($client, $now) {
+                $prescription = $dose->prescription;
+                $medicine = $prescription?->medicine;
+                $support = $prescription?->support_type ?? 'staff_administered';
+                $eligibility = $this->recorder->eligibility($dose, $client);
+
+                return [
+                    'doseId' => $dose->id,
+
+                    // Medicine identity, from the medicine record.
+                    'name' => $medicine?->name,
+                    'strength' => $medicine?->strength,
+                    'form' => $medicine?->form,
+                    'controlled' => (bool) $medicine?->is_controlled,
+                    // Held for later interoperability, empty until a catalogue
+                    // is synchronised. Shown as absent rather than as blank.
+                    'dmdCode' => $medicine?->dmd_code,
+
+                    // What is actually to be given, from the prescription.
+                    'dose' => $prescription?->dose,
+                    'route' => $prescription?->route,
+                    'frequency' => $prescription?->frequency_text,
+                    'directions' => $prescription?->instructions,
+
+                    'dueAt' => $dose->due_at->format('H:i'),
+                    'timeSensitive' => (bool) $prescription?->is_time_critical,
+                    'graceMinutes' => $dose->grace_minutes,
+                    'late' => $dose->isLate($now),
+                    'minutesLate' => $dose->minutesLate($now),
+                    // "355 min late" makes a support worker do arithmetic to
+                    // find out it is nearly six hours. Today already writes
+                    // elapsed time as hours and minutes; the round says it the
+                    // same way rather than inventing a second dialect.
+                    'latePhrase' => $this->lateness($dose->minutesLate($now)),
+
+                    // PER MEDICINE, never rolled up. A person can be handed one
+                    // tablet and watched taking another, and a single label
+                    // across both would be wrong about one of them.
+                    'support' => $support,
+                    'supportWord' => self::SUPPORT_WORDS[$support] ?? $support,
+                    'supportMeaning' => self::SUPPORT_MEANING[$support] ?? null,
+                    'selfAdministered' => $support === 'self_administered',
+
+                    // A change nobody was told about is the classic cause of a
+                    // wrong dose after a few days off.
+                    'changed' => $prescription?->changedRecently()
+                        ? [
+                            'on' => $prescription->changed_at->format('j F'),
+                            'note' => $prescription->change_note,
+                        ]
+                        : null,
+
+                    // Read-only. Section 2.1 shows whether something has been
+                    // recorded; it provides no way to record it.
+                    'recorded' => $dose->administration !== null,
+                    'recordedOutcome' => $dose->administration?->outcomeWord(),
+
+                    // The CODE as well as the word. "Refused" and "Given" are
+                    // both recorded outcomes, and a screen that knows only that
+                    // something was recorded has to paint them the same — which
+                    // is how a stock failure ends up looking like a completed
+                    // administration.
+                    'recordedCode' => $dose->administration?->outcome,
+
+                    // Kept visible after the event. A worker who has just
+                    // signed for something has to be able to look at it and see
+                    // the time and the name, or the only way to check is to
+                    // record it again.
+                    'recordedAt' => $dose->administration?->administered_at->format('H:i'),
+                    'recordedBy' => $dose->administration?->recordedBy?->displayName(),
+
+                    // ONE WORD FOR ONE OUTCOME, RESOLVED HERE.
+                    // The pill and the line beneath it were being worded
+                    // separately, so the same fact appeared twice in two
+                    // different words — "Taken themselves" above
+                    // "Self-administered at 08:10". Deciding it once, on the
+                    // server, is the only way they cannot drift apart.
+                    'recordedWord' => $dose->administration
+                        ? $this->recordedWord($dose->administration, $support)
+                        : null,
+
+                    // LATENESS DOES NOT STOP BEING TRUE WHEN IT IS RECORDED.
+                    // A dose is "late" only while it is unanswered, so the
+                    // moment it was signed for the late marker vanished — and a
+                    // medicine given eight hours late then read exactly like
+                    // one given on time. The delay is measured against the
+                    // moment it was actually given and kept.
+                    'recordedLatePhrase' => $dose->administration
+                        && $dose->minutesLate($dose->administration->administered_at) > 0
+                            ? $this->duration(
+                                $dose->minutesLate($dose->administration->administered_at)
+                            )
+                            : null,
+
+                    // Whether Section 2.2 can honestly record this as given,
+                    // and if not, the reason in the worker's own language.
+                    // Asked of the same class that will refuse the write, so
+                    // the screen can never offer an action the server declines.
+                    'canBeGiven' => $eligibility['allowed'],
+                    'blockedReason' => $eligibility['reason'],
+                    'blockedCode' => $eligibility['code'],
+                    'nextSection' => $eligibility['nextSection'],
+
+                    // Truthful about what the record does not say, rather than
+                    // rendering an empty line that looks like "no directions".
+                    'missing' => array_values(array_filter([
+                        $medicine?->strength ? null : 'strength',
+                        $medicine?->form ? null : 'form',
+                        $prescription?->route ? null : 'route',
+                        $prescription?->dose ? null : 'dose',
+                    ])),
+                ];
+            })->values()->all();
+    }
+
+    /**
+     * What to CALL an outcome on this screen.
+     *
+     * The stored code is the record; this is the sentence a worker reads, and
+     * two of them need saying more carefully than the shared vocabulary does.
+     *
+     * "Not available" sits beside a person whose own availability is a
+     * first-class fact here, so it says which one was missing.
+     *
+     * "Given" beside an assisted arrangement reads as the worker having handed
+     * it over on their own. They did not — they steadied a hand. The stored
+     * outcome is still `given`, because staff were physically part of the
+     * administration, but the words on the screen say what actually happened.
+     */
+    public function recordedWord(Administration $administration, string $support): string
+    {
+        if ($administration->outcome === 'not_available') {
+            return 'Medicine not available';
+        }
+
+        if ($administration->outcome === 'self_administered') {
+            return 'Taken themselves';
+        }
+
+        if ($administration->outcome === 'given' && $support === 'assisted') {
+            return 'Given with help';
+        }
+
+        return $administration->outcomeWord();
+    }
+
+    /** Under an hour stays in minutes; past that, hours and minutes. */
+    private function lateness(int $minutes): string
+    {
+        return $this->duration($minutes).' late';
+    }
+
+    /**
+     * The same span of time without the word "late" on the end.
+     *
+     * The recorded line already says "after it was due", and "7h 12m late after
+     * it was due" is the kind of sentence nobody writes on purpose.
+     */
+    private function duration(int $minutes): string
+    {
+        if ($minutes < 60) {
+            return $minutes.' min';
+        }
+
+        $rest = $minutes % 60;
+
+        return intdiv($minutes, 60).'h'.($rest ? ' '.$rest.'m' : '');
+    }
+
+    /**
+     * Where this person sits in the round, so next and previous can only ever
+     * move within it.
+     *
+     * Derived from the authorised queue rather than from an id in a request, so
+     * neither control can walk out of the round, the house or the organisation.
+     */
+    public function neighbours(array $queue, int $clientId): array
+    {
+        $ids = array_column($queue, 'clientId');
+        $at = array_search($clientId, $ids, true);
+
+        if ($at === false) {
+            return ['previous' => null, 'next' => null, 'position' => null, 'total' => count($ids)];
+        }
+
+        return [
+            'previous' => $queue[$at - 1] ?? null,
+            'next' => $queue[$at + 1] ?? null,
+            'position' => $at + 1,
+            'total' => count($ids),
+        ];
+    }
+}

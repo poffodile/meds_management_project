@@ -2704,3 +2704,542 @@
   .r7-root .r7-task { grid-template-areas: "head" "ask" "when"; grid-template-columns: 1fr; }
   .r7-root .r7-round__next { align-items: flex-start; }
 }
+
+
+/* ─────────────────────────────────────────────────────────────────────────
+   31. Section 2.1 — the person safety view
+
+   THE PAGE IS READ TOP TO BOTTOM AND THAT IS THE SAFETY CHECK: where you are,
+   who this is, what could stop you, what is due. Nothing is behind a tab and
+   nothing important is to the side, because on a phone "to the side" means
+   "below the fold" and on a desktop it means "not read".
+
+   Mobile first throughout. The desktop rules only widen the measure and let
+   the medicine head breathe — they never move a section into a column beside
+   another one, because that would change which of them is read first.
+   ───────────────────────────────────────────────────────────────────────── */
+
+/* ── 1. Where you are ──────────────────────────────────────────────────── */
+
+.r7-root .r7-person-top {
+  display: flex;
+  flex-direction: column;
+  gap: var(--r7-space-3);
+  padding-bottom: var(--r7-space-4);
+  border-bottom: var(--r7-border-width) solid var(--r7-border-subtle);
+}
+
+.r7-root .r7-link.r7-back-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--r7-space-2);
+  align-self: flex-start;
+  font-weight: var(--r7-weight-medium);
+}
+
+.r7-root .r7-link.r7-back-inline .r7-icon { transform: rotate(180deg); }
+
+.r7-root .r7-person-top__where {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--r7-space-2) var(--r7-space-4);
+  font-size: var(--r7-size-2xs);
+  font-weight: var(--r7-weight-semi);
+  letter-spacing: var(--r7-tracking-label);
+  text-transform: uppercase;
+  color: var(--r7-text-muted);
+}
+
+.r7-root .r7-person-top__position { color: var(--r7-colour-interactive); }
+
+/* ── 2. Who this is ────────────────────────────────────────────────────── */
+
+.r7-root .r7-person-id {
+  display: flex;
+  flex-direction: column;
+  gap: var(--r7-space-3);
+  padding: var(--r7-space-5);
+  background: var(--r7-surface-raised);
+  border: var(--r7-border-width) solid var(--r7-border-subtle);
+  border-radius: var(--r7-radius-lg);
+}
+
+.r7-root .r7-person-id__note {
+  font-size: var(--r7-size-sm);
+  color: var(--r7-text-muted);
+  max-width: var(--r7-measure);
+}
+
+.r7-root .r7-identity__avatar--photo { object-fit: cover; }
+
+/* ── 3. What could stop you ────────────────────────────────────────────── */
+
+.r7-root .r7-person-safety { display: flex; flex-direction: column; gap: var(--r7-space-3); }
+
+/* The one block on the page that is allowed to shout. */
+.r7-root .r7-allergies {
+  display: flex;
+  flex-direction: column;
+  gap: var(--r7-space-3);
+  padding: var(--r7-space-4);
+  padding-left: var(--r7-space-5);
+  position: relative;
+  overflow: hidden;
+  background: var(--r7-state-error-surface);
+  border: var(--r7-border-width) solid var(--r7-state-error-border);
+  border-radius: var(--r7-radius-md);
+}
+
+.r7-root .r7-allergies::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--r7-space-1);
+  background: var(--r7-state-error);
+}
+
+/* Nothing recorded is not the same as nothing, so it is quiet rather than
+   reassuring — it must not look like an all-clear. */
+.r7-root .r7-allergies--empty {
+  background: var(--r7-surface-sunken);
+  border-color: var(--r7-border-subtle);
+}
+
+.r7-root .r7-allergies--empty::before { background: var(--r7-border-strong); }
+
+.r7-root .r7-allergies__title {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--r7-space-2);
+  font-family: var(--r7-font-display);
+  font-size: var(--r7-size-base);
+  font-weight: var(--r7-weight-semi);
+  color: var(--r7-state-error);
+}
+
+.r7-root .r7-allergies--empty .r7-allergies__title { color: var(--r7-text-secondary); }
+
+.r7-root .r7-allergies__list { display: flex; flex-direction: column; gap: var(--r7-space-3); }
+
+.r7-root .r7-allergy-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--r7-space-2) var(--r7-space-3);
+}
+
+.r7-root .r7-allergy-row__substance {
+  font-family: var(--r7-font-display);
+  font-size: var(--r7-size-md);
+  font-weight: var(--r7-weight-semi);
+  color: var(--r7-text-primary);
+}
+
+.r7-root .r7-allergy-row__reaction { flex-basis: 100%; color: var(--r7-text-secondary); }
+.r7-root .r7-allergy-row__source { flex-basis: 100%; font-size: var(--r7-size-sm); color: var(--r7-text-muted); }
+
+.r7-root .r7-allergies__none { color: var(--r7-text-secondary); max-width: var(--r7-measure); }
+.r7-root .r7-allergies__note { font-size: var(--r7-size-sm); color: var(--r7-text-muted); max-width: var(--r7-measure); }
+
+/* Where they actually are. */
+.r7-root .r7-away {
+  display: flex;
+  flex-direction: column;
+  gap: var(--r7-space-2);
+  padding: var(--r7-space-4);
+  background: var(--r7-state-warning-surface);
+  border: var(--r7-border-width) solid var(--r7-state-warning-border);
+  border-radius: var(--r7-radius-md);
+}
+
+.r7-root .r7-away__state {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--r7-space-2);
+  font-family: var(--r7-font-display);
+  font-size: var(--r7-size-base);
+  font-weight: var(--r7-weight-semi);
+  color: var(--r7-state-warning);
+}
+
+.r7-root .r7-away__note { color: var(--r7-text-secondary); max-width: var(--r7-measure); }
+
+/* The obligation is not a footnote to the absence — it is the half of the
+   message that gets lost. It carries the panel's own colour and weight so it
+   cannot be skimmed as more explanation of why nobody is there. */
+.r7-root .r7-away__obligation {
+  max-width: var(--r7-measure);
+  padding-top: var(--r7-space-2);
+  border-top: var(--r7-border-width) solid var(--r7-state-warning-border);
+  font-weight: var(--r7-weight-semi);
+  color: var(--r7-text-primary);
+}
+
+.r7-root .r7-person-safety__note {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--r7-space-2);
+  font-size: var(--r7-size-sm);
+  color: var(--r7-text-muted);
+  max-width: var(--r7-measure);
+}
+
+.r7-root .r7-person-safety__note .r7-icon { flex: none; }
+
+/* ── 4. What is due ────────────────────────────────────────────────────── */
+
+.r7-root .r7-person-meds { display: flex; flex-direction: column; gap: var(--r7-space-4); }
+
+.r7-root .r7-person-meds__head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--r7-space-3);
+  padding-bottom: var(--r7-space-3);
+  border-bottom: var(--r7-border-width) solid var(--r7-border-subtle);
+}
+
+.r7-root .r7-person-meds__head .r7-board__note { margin-left: auto; }
+
+.r7-root .r7-med-items { display: flex; flex-direction: column; gap: var(--r7-space-3); }
+
+/* Stacked on a phone, and still stacked on a desktop — a medicine is read as a
+   block, not scanned across a row of columns. The desktop simply gets more
+   room for the head. */
+.r7-root .r7-med-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--r7-space-3);
+  padding: var(--r7-space-4);
+  background: var(--r7-surface-raised);
+  border: var(--r7-border-width) solid var(--r7-border-subtle);
+  border-radius: var(--r7-radius-md);
+  position: relative;
+  overflow: hidden;
+}
+
+.r7-root .r7-med-item--critical {
+  padding-left: var(--r7-space-5);
+  border-color: var(--r7-state-warning-border);
+}
+
+.r7-root .r7-med-item--critical::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--r7-space-1);
+  background: var(--r7-state-warning);
+}
+
+.r7-root .r7-med-item__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--r7-space-4);
+}
+
+.r7-root .r7-med-item__name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--r7-space-2) var(--r7-space-3);
+  font-family: var(--r7-font-display);
+  font-size: var(--r7-size-md);
+  font-weight: var(--r7-weight-semi);
+  color: var(--r7-text-primary);
+}
+
+.r7-root .r7-med-item__strength {
+  font-family: var(--r7-font-body);
+  font-size: var(--r7-size-base);
+  font-weight: var(--r7-weight-medium);
+  color: var(--r7-text-secondary);
+}
+
+.r7-root .r7-med-item__form {
+  font-family: var(--r7-font-body);
+  font-size: var(--r7-size-sm);
+  font-weight: var(--r7-weight-normal);
+  color: var(--r7-text-muted);
+}
+
+.r7-root .r7-med-item__due {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  flex: none;
+}
+
+.r7-root .r7-med-item__time {
+  font-family: var(--r7-font-display);
+  font-size: var(--r7-size-md);
+  font-weight: var(--r7-weight-semi);
+  font-variant-numeric: tabular-nums;
+  color: var(--r7-text-primary);
+}
+
+.r7-root .r7-med-item__late {
+  font-size: var(--r7-size-2xs);
+  font-weight: var(--r7-weight-medium);
+  color: var(--r7-state-error);
+}
+
+/* Dose and route are the two things somebody is about to act on, so they are
+   the largest plain text in the item. */
+.r7-root .r7-med-item__what {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--r7-space-2) var(--r7-space-5);
+  font-size: var(--r7-size-base);
+  color: var(--r7-text-primary);
+}
+
+.r7-root .r7-med-item__route { color: var(--r7-text-secondary); }
+
+.r7-root .r7-med-item__flags { display: flex; flex-wrap: wrap; gap: var(--r7-space-2); }
+
+.r7-root .r7-med-item__directions,
+.r7-root .r7-med-item__changed,
+.r7-root .r7-med-item__missing {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--r7-space-2);
+  font-size: var(--r7-size-sm);
+  max-width: var(--r7-measure);
+}
+
+.r7-root .r7-med-item__directions { color: var(--r7-text-secondary); }
+.r7-root .r7-med-item__directions .r7-icon { flex: none; color: var(--r7-colour-interactive); }
+.r7-root .r7-med-item__changed { color: var(--r7-state-warning); font-weight: var(--r7-weight-medium); }
+.r7-root .r7-med-item__missing { color: var(--r7-state-error); }
+
+/* ── Support type, per medicine ────────────────────────────────────────── */
+
+.r7-root .r7-support {
+  display: flex;
+  flex-direction: column;
+  gap: var(--r7-space-1);
+  padding: var(--r7-space-3);
+  border-left: var(--r7-border-emphasis-width) solid var(--r7-border-strong);
+  background: var(--r7-surface-sunken);
+  border-radius: var(--r7-radius-sm);
+}
+
+.r7-root .r7-support__word {
+  font-weight: var(--r7-weight-semi);
+  color: var(--r7-text-primary);
+}
+
+.r7-root .r7-support__meaning { font-size: var(--r7-size-sm); color: var(--r7-text-secondary); }
+
+/* Each arrangement gets its own edge, so the difference is visible before the
+   words are read. Never colour alone — the word is always there too. */
+.r7-root .r7-support--self_administered { border-left-color: var(--r7-colour-interactive); }
+.r7-root .r7-support--prompted { border-left-color: var(--r7-colour-accent-strong); }
+.r7-root .r7-support--assisted { border-left-color: var(--r7-state-warning); }
+
+.r7-root .r7-support--compact { flex-direction: row; padding: 0; background: none; border-left: 0; }
+
+/* The ordinary arrangement is a label, not an announcement. It stays readable
+   and stays in the reading order — it simply stops out-weighing the medicine
+   name, and stops competing with the arrangements that actually need noticing. */
+.r7-root .r7-support--compact .r7-support__word {
+  font-size: var(--r7-size-sm);
+  font-weight: var(--r7-weight-normal);
+  color: var(--r7-text-secondary);
+}
+
+.r7-root .r7-person-meds__stage {
+  font-size: var(--r7-size-sm);
+  color: var(--r7-text-muted);
+  padding-top: var(--r7-space-3);
+  border-top: var(--r7-border-width) solid var(--r7-border-subtle);
+}
+
+/* ── Moving on ─────────────────────────────────────────────────────────── */
+
+.r7-root .r7-person-move {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--r7-space-3);
+  padding-top: var(--r7-space-4);
+  border-top: var(--r7-border-width) solid var(--r7-border-subtle);
+}
+
+@media (max-width: 599px) {
+  .r7-root .r7-person-id { padding: var(--r7-space-4); }
+  .r7-root .r7-med-item__head { flex-direction: column; gap: var(--r7-space-2); }
+  .r7-root .r7-med-item__due { align-items: flex-start; flex-direction: row; gap: var(--r7-space-3); }
+  .r7-root .r7-person-move { flex-direction: column; align-items: stretch; }
+  .r7-root .r7-person-move .r7-btn { width: 100%; }
+}
+
+@media (min-width: 768px) {
+  /* Desktop gets a wider measure and a roomier item head — it does not get a
+     table, and it does not get the sections side by side. */
+  .r7-root .r7-person-id { padding: var(--r7-space-6); }
+  .r7-root .r7-med-item { padding: var(--r7-space-5); }
+  .r7-root .r7-med-item--critical { padding-left: var(--r7-space-6); }
+
+  /* Directions and support can share a line once there is room for both to
+     keep a readable measure. */
+  .r7-root .r7-med-item__what { gap: var(--r7-space-2) var(--r7-space-7); }
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────────
+   32. Section 2.2 — recording that a medicine was given
+
+   The shape of this screen is an argument about safety, not decoration.
+
+   The medicine block is the heaviest thing on the page because it is what is
+   being signed for. The action sits BELOW it, separated by a rule, so a thumb
+   travelling down a phone reaches the words before the button rather than the
+   button before the words. Nothing here is a swipe, nothing is hidden behind a
+   long press, and the row on the previous screen is not itself a control.
+
+   Mobile first, tokens only, everything scoped under .r7-root.
+   ───────────────────────────────────────────────────────────────────────── */
+
+.r7-root .r7-give {
+  display: flex;
+  flex-direction: column;
+  gap: var(--r7-space-4);
+}
+
+.r7-root .r7-give__medicine {
+  display: flex;
+  flex-direction: column;
+  gap: var(--r7-space-3);
+  padding: var(--r7-space-4);
+  background: var(--r7-surface-raised);
+  border: var(--r7-border-width) solid var(--r7-border-subtle);
+  border-radius: var(--r7-radius-md);
+}
+
+.r7-root .r7-give__name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--r7-space-2);
+  font-family: var(--r7-font-display);
+  font-size: var(--r7-size-lg);
+  font-weight: var(--r7-weight-semi);
+  color: var(--r7-text-primary);
+  letter-spacing: var(--r7-tracking-tight);
+}
+
+.r7-root .r7-give__strength { font-size: var(--r7-size-base); color: var(--r7-text-secondary); }
+.r7-root .r7-give__form { font-size: var(--r7-size-sm); color: var(--r7-text-muted); }
+
+.r7-root .r7-give__facts {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--r7-space-3);
+  margin: 0;
+}
+
+.r7-root .r7-give__late {
+  display: block;
+  font-size: var(--r7-size-sm);
+  color: var(--r7-state-error);
+}
+
+/* The action, kept apart from the facts on purpose. */
+.r7-root .r7-give__action {
+  display: flex;
+  flex-direction: column;
+  gap: var(--r7-space-3);
+  padding-top: var(--r7-space-4);
+  border-top: var(--r7-border-width) solid var(--r7-border-subtle);
+}
+
+/* Written in the first person: what YOU are recording, not a category name. */
+.r7-root .r7-give__sentence {
+  font-family: var(--r7-font-display);
+  font-size: var(--r7-size-base);
+  font-weight: var(--r7-weight-semi);
+  color: var(--r7-text-primary);
+  max-width: var(--r7-measure);
+}
+
+.r7-root .r7-give__latenote,
+.r7-root .r7-give__noteshint,
+.r7-root .r7-give__only {
+  font-size: var(--r7-size-sm);
+  color: var(--r7-text-muted);
+  max-width: var(--r7-measure);
+}
+
+.r7-root .r7-give__notes { display: flex; flex-direction: column; gap: var(--r7-space-2); }
+
+.r7-root .r7-textarea {
+  min-height: var(--r7-textarea-height);
+  padding: var(--r7-space-3);
+  resize: vertical;
+  font-family: inherit;
+  line-height: var(--r7-leading-body);
+}
+
+.r7-root .r7-give__buttons {
+  display: flex;
+  flex-direction: column;
+  gap: var(--r7-space-3);
+}
+
+/* ── Back on the person's own list ─────────────────────────────────────── */
+
+/* The action on a medicine row, at the END of the item. A control anywhere
+   above the facts invites a press before they have been read. */
+.r7-root .r7-med-item__action {
+  padding-top: var(--r7-space-3);
+  border-top: var(--r7-border-width) solid var(--r7-border-subtle);
+}
+
+/* Why this one cannot be recorded here — a sentence, not a disabled button. A
+   greyed control tells a worker nothing about what to do instead. */
+.r7-root .r7-med-item__held {
+  font-size: var(--r7-size-sm);
+  color: var(--r7-text-secondary);
+  max-width: var(--r7-measure);
+}
+
+/* What was recorded, kept visible and quiet. */
+.r7-root .r7-med-item__record {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--r7-space-2);
+  font-size: var(--r7-size-sm);
+  color: var(--r7-text-secondary);
+}
+
+/* How late it actually was. Quiet, because the dose is answered and nobody
+   needs chasing — but present, because "Given" alone cannot distinguish a
+   medicine given on time from one given eight hours afterwards. */
+.r7-root .r7-med-item__recordlate { color: var(--r7-state-error); }
+
+.r7-root .r7-linkish {
+  align-self: flex-start;
+  padding: 0;
+  background: none;
+  border: 0;
+  font: inherit;
+  font-size: var(--r7-size-sm);
+  color: var(--r7-colour-interactive);
+  text-decoration: underline;
+  text-underline-offset: var(--r7-focus-offset);
+  cursor: pointer;
+}
+
+.r7-root .r7-linkish:hover { color: var(--r7-colour-interactive-strong); }
+
+@media (min-width: 768px) {
+  /* Desktop gets the facts side by side and the buttons on one line. It does
+     not get a denser medicine block: the thing being signed for stays large. */
+  .r7-root .r7-give__medicine { padding: var(--r7-space-5); }
+  .r7-root .r7-give__facts { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .r7-root .r7-give__buttons { flex-direction: row; align-items: center; }
+  .r7-root .r7-give__buttons .r7-btn { flex: 0 1 auto; }
+}

@@ -147,6 +147,26 @@ class Record7Section1Seeder extends Seeder
         }
 
         PrnFollowUp::whereIn('client_id', $clientIds)->delete();
+
+        // A review item can name an administration. Deleting the administration
+        // and leaving the review item pointing at a vanished id makes the
+        // manager queue break the next time somebody opens it — which is how
+        // reseeding 1.1 twice broke 1.2's correction request.
+        $administrationIds = $connection->table('record7_administrations')
+            ->whereIn('client_id', $clientIds)->pluck('id');
+
+        if ($administrationIds->isNotEmpty()) {
+            $connection->table('record7_review_items')
+                ->where('subject_type', 'administration')
+                ->whereIn('subject_id', $administrationIds)
+                ->delete();
+
+            $connection->table('record7_issue_states')
+                ->whereNotNull('linked_administration_id')
+                ->whereIn('linked_administration_id', $administrationIds)
+                ->update(['linked_administration_id' => null]);
+        }
+
         // Through the query builder, not the model: the model refuses to delete
         // an administration, and it is right to.
         $connection->table('record7_administrations')->whereIn('client_id', $clientIds)->delete();
@@ -198,6 +218,14 @@ class Record7Section1Seeder extends Seeder
             'lorazepam' => ['Lorazepam', '1mg', 'tablet', true],
             'macrogol' => ['Macrogol', '13.8g', 'sachet', false],
             'colecalciferol' => ['Colecalciferol', '800unit', 'tablet', false],
+
+            // A controlled drug on a REGULAR schedule, not as-required. Every
+            // other controlled medicine here is PRN, and as-required is refused
+            // before the witness rule is ever reached — so without this the
+            // rule that a controlled drug needs a witness is never visible on
+            // a round screen.
+            'morphine_mr' => ['Morphine sulfate MR', '10mg', 'tablet', true],
+            'ferrous' => ['Ferrous fumarate', '210mg', 'tablet', false],
         ];
 
         $medicines = [];
@@ -237,7 +265,12 @@ class Record7Section1Seeder extends Seeder
             ],
             'callum' => [
                 'OAK-C-006', 'Callum Fraser', 'Callum', '1988-05-17', 'Flat 6', 'in_hospital',
-                'Admitted to the Royal on Tuesday. Medicines on hold until he is back.',
+                // NOT "medicines on hold". That phrase reads at the end of a
+                // long shift as "nothing to do here", and each planned dose
+                // still has to be answered for. Says the same clinical fact —
+                // this service is not giving them — without the implication.
+                'Admitted to the Royal on Tuesday. We are not giving his medicines while he is '
+                    .'there.',
             ],
         ];
 
@@ -313,12 +346,65 @@ class Record7Section1Seeder extends Seeder
                     'support_type' => 'self_administered',
                     'instructions' => 'Aisha administers this herself. Record it; do not hand it to her.',
                 ]],
+            // A SCHEDULED self-administered medicine, not only a PRN one.
+            // Without this the fixture never puts an authorised
+            // self-administration into a round, and the one arrangement where a
+            // worker must NOT hand the medicine over is the one arrangement
+            // nobody ever sees on the round screen.
+            ['aisha-colecalciferol', 'aisha', 'colecalciferol', 'One tablet', 'Oral', 'Once a day',
+                ['Morning'], [
+                    'support_type' => 'self_administered',
+                    'instructions' => 'Aisha keeps this in her own room and takes it herself. '
+                        .'Check she has taken it and record it; do not hand it to her.',
+                ]],
+
+            // A SECOND self-administered medicine, left open. The first one is
+            // recorded so the round shows what an authorised self-administration
+            // looks like once answered; this one stays unanswered so it also
+            // shows WHY staff cannot sign for it themselves. One without the
+            // other only tells half the story.
+            ['aisha-ferrous', 'aisha', 'ferrous', 'One tablet', 'Oral', 'Once a day',
+                ['Morning'], [
+                    'support_type' => 'self_administered',
+                    'instructions' => 'Aisha keeps this with her vitamin D and takes both herself.',
+                ]],
+
             ['aisha-levetiracetam', 'aisha', 'levetiracetam', 'One tablet', 'Oral', 'Twice a day',
                 ['Morning', 'Night'], [
                     'is_time_critical' => true,
                     'grace' => 45,
                     'changed_at' => $today->copy()->subDays(2)->setTime(14, 20),
                     'change_note' => 'Dose increased from 250mg to 500mg by the epilepsy nurse on Monday.',
+                ]],
+
+            // ── Arrangements that were otherwise invisible on a round ──────
+            //
+            // The fixture had one assisted medicine (already answered), one
+            // self-administered one (already answered) and no prompted one at
+            // all, so three of the four support arrangements could not be seen
+            // on the screen that has to tell them apart. These are ordinary,
+            // unremarkable medicines chosen so each arrangement is present and
+            // still open when somebody opens the morning round.
+
+            ['margaret-macrogol', 'margaret', 'macrogol', 'One sachet in water', 'Oral',
+                'Once a day', ['Morning'], [
+                    'support_type' => 'assisted',
+                    'instructions' => 'She can hold the cup herself; steady it and stay with her.',
+                ]],
+
+            // A controlled drug given on a schedule. It cannot be recorded
+            // until witnessed administration exists, and it is meant to sit
+            // there saying so.
+            ['margaret-morphine', 'margaret', 'morphine_mr', 'One tablet', 'Oral', 'Twice a day',
+                ['Morning', 'Night'], [
+                    'instructions' => 'Controlled drug. Two signatures and the register, every time.',
+                ]],
+
+            ['dennis-colecalciferol', 'dennis', 'colecalciferol', 'One tablet', 'Oral',
+                'Once a day', ['Morning'], [
+                    'support_type' => 'prompted',
+                    'instructions' => 'Dennis takes this himself. Remind him and stay while he does; '
+                        .'do not hand it to him.',
                 ]],
 
             ['dennis-metformin', 'dennis', 'metformin', 'One tablet', 'Oral', 'Twice a day with food',
@@ -342,10 +428,14 @@ class Record7Section1Seeder extends Seeder
             ['joyce-paracetamol', 'joyce', 'paracetamol', 'Two tablets', 'Oral', 'Four times a day',
                 ['Morning', 'Lunchtime', 'Teatime', 'Night'], []],
 
-            // Callum is in hospital. His prescription is suspended, and the
-            // dashboard must not put him in the round.
+            // Callum is in hospital. His prescription is STILL ACTIVE — the
+            // prescriber has not stopped it, the house simply is not giving it
+            // while he is on a ward. So the dose is planned, it stays planned,
+            // and somebody has to record why it was not given. Suspending the
+            // prescription instead would have made the obligation vanish, which
+            // is how a missing dose becomes a dose nobody ever had to explain.
             ['callum-sertraline', 'callum', 'sertraline', 'One tablet', 'Oral', 'Once a day',
-                ['Morning'], ['status' => 'suspended']],
+                ['Morning'], []],
         ];
 
         foreach ($rows as [$key, $clientKey, $medicineKey, $dose, $route, $frequency, $slots, $options]) {
@@ -417,6 +507,16 @@ class Record7Section1Seeder extends Seeder
                     continue;
                 }
 
+                // NOTHING IS RECORDED FOR SOMEBODY WHO IS NOT THERE.
+                // Callum is on a ward. Auto-filling an outcome for him would be
+                // inventing a clinical record, and marking it omitted would be
+                // deciding something a person has to decide. The dose stays
+                // planned and unanswered until somebody records the real
+                // outcome and reason — which is Section 2.3's job.
+                if (! $prescription['model']->client->isAvailable()) {
+                    continue;
+                }
+
                 $this->record($dose, $key, $slot['name'], $olivia, $house);
             }
         }
@@ -465,6 +565,16 @@ class Record7Section1Seeder extends Seeder
             return;
         }
 
+        // The three arrangements above are left OPEN on purpose. An assisted
+        // medicine that has already been answered demonstrates nothing about
+        // assisting somebody, and a prompted or controlled one that is already
+        // recorded never shows why it could not be.
+        if (in_array($key, [
+            'margaret-macrogol', 'margaret-morphine', 'dennis-colecalciferol', 'aisha-ferrous',
+        ], true)) {
+            return;
+        }
+
         Administration::create([
             'reference' => 'OAK-A-'.substr(md5($key.$slot.now()->timestamp), 0, 10),
             'scheduled_dose_id' => $dose->id,
@@ -472,7 +582,14 @@ class Record7Section1Seeder extends Seeder
             'client_id' => $dose->client_id,
             'service_id' => $house->id,
             'recorded_by_user_id' => $olivia->id,
-            'outcome' => $outcome[0] ?? 'given',
+            // "Given" means a worker handed it over. Recording that against a
+            // medicine the person is authorised to take themselves would be a
+            // false record of who did what — and Record7 has a separate outcome
+            // for exactly this.
+            'outcome' => $outcome[0]
+                ?? ($dose->prescription?->support_type === 'self_administered'
+                    ? 'self_administered'
+                    : 'given'),
             'reason_code' => $outcome[1] ?? null,
             'notes' => $outcome[2] ?? null,
             'administered_at' => $dose->due_at->copy()->addMinutes(random_int(2, 25)),

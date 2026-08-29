@@ -120,19 +120,27 @@ class ShiftBoard
             $prescription = $dose->prescription;
             $critical = $prescription->is_time_critical;
 
+            $away = ! $dose->client->isAvailable();
+
             $items[] = [
-                'kind' => $critical ? 'late_time_critical' : 'late',
-                'severity' => $critical ? 0 : 1,
+                'kind' => $away ? 'away' : ($critical ? 'late_time_critical' : 'late'),
+                'severity' => $away ? 2 : ($critical ? 0 : 1),
                 'minutes' => $dose->minutesLate($now),
                 'client' => $dose->client->displayName(),
                 'room' => $dose->client->room_name,
                 'dueAt' => $dose->due_at->format('H:i'),
-                'problem' => $critical
-                    ? 'A time-critical medicine is late'
-                    : 'A medicine is late',
-                'next' => $critical
-                    ? 'Go to '.$dose->client->displayName().' before anyone else'
-                    : 'Give it in this round',
+                // Not "unexplained" when the explanation is that they are on a
+                // ward. The dose still needs an outcome; it does not need
+                // somebody sent to their room to look for them.
+                'problem' => $away
+                    ? 'A planned medicine is unrecorded while '.$dose->client->displayName()
+                        .' is '.strtolower($dose->client->statusWord())
+                    : ($critical ? 'A time-critical medicine is late' : 'A medicine is late'),
+                'next' => $away
+                    ? 'Record why it was not given'
+                    : ($critical
+                        ? 'Go to '.$dose->client->displayName().' before anyone else'
+                        : 'Give it in this round'),
             ];
         }
 
@@ -309,6 +317,11 @@ class ShiftBoard
                 'name' => $client->displayName(),
                 'fullName' => $client->full_name,
                 'room' => $client->room_name,
+                // Somebody can be due a dose and not be in the building. Saying
+                // "1 medicine due" without saying "in hospital" would send a
+                // support worker to an empty flat.
+                'available' => $client->isAvailable(),
+                'whereabouts' => $client->isAvailable() ? null : $client->statusWord(),
                 'nextDueAt' => $next->due_at->format('H:i'),
                 'slot' => $next->slot,
                 'isLate' => $next->isLate($now),

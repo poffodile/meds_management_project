@@ -1418,3 +1418,428 @@ pass exists to prevent; it now asserts the opposite. The other posted to an
 endpoint that no longer exists.
 
 Record7 255, Frontend 4 64, JS 22, production build clean. Nothing committed.
+
+## 2026-08-29 — Section 2.0, round foundation and safe entry
+
+Sections 0, 1.1 and 1.2 untouched apart from one deliberate change noted below.
+Plain scaffold only; no new visual language.
+
+**Reused, not rebuilt.** `record7_rounds` already existed from 1.1 and 1.2 with
+the house, date, slot, opener, start time and the completed/closed/reopened
+timestamps. All of it kept.
+
+**Three things genuinely missing.**
+
+1. **Organisation on the round itself.** It was reachable through the house, and
+   reachable-through-a-join is not ownership. Identity is now
+   `UNIQUE (organisation_id, service_id, round_date, slot)`.
+2. **Participation as its own record.** `started_by_user_id` said who opened it
+   and nothing said who else worked on it. `record7_round_participants` gives
+   every person their own row, with `role_at_join` and `access_type_at_join`
+   snapshotted — so a competency lapsing later cannot make it look as though
+   somebody was never entitled.
+3. **How a person is supported.** Nothing recorded whether a medicine is given
+   by staff, assisted, prompted or taken by the person themselves. Aisha manages
+   her own inhaler; recording that as staff administration is a false record.
+   It sits on the prescription because it varies by medicine for one person, and
+   the queue says "mixed" rather than picking one and being wrong about the other.
+
+**Concurrency is settled by the database.** A check-then-insert loses the race:
+both requests read "no round", both insert, the house gets two. The insert is
+attempted and the unique constraint is allowed to refuse it; whoever loses reads
+the winner's round and joins. A test inserts a duplicate straight through the
+query builder, past every application guard, and asserts the database says no.
+
+**Joining is not becoming the opener, and resuming is not joining again.**
+`started_by_user_id` never changes. Somebody returning to their own round gets
+`round_resumed`, not a second participation row — "joined" four times over a
+morning tells a manager nothing.
+
+**Authority is re-checked on every request, never inherited from login.** Seven
+things in order: account, organisation, house, access status, permission,
+competency, round status. A shift is hours long, and in that time any of them
+can change.
+
+**Losing authority destroys nothing.** The round stays open, the participation
+history stays, and the person gets a blocked state saying another authorised
+worker or a manager must continue. Tested by expiring a competency mid-round.
+
+**Ordering is derived, never written down.** Five bands — late and
+time-sensitive, late, due now and time-sensitive, due now, later — each computed
+from the dose and the prescription. No name appears anywhere in the sort, and
+the test derives the expected banding independently rather than asserting a
+fixed list.
+
+**Nothing is administered.** No control, no route, no method writes to
+`record7_administrations`. A test asserts the scaffold contains no `router.post`
+and no `<form>` at all.
+
+**One deliberate change to Section 1.1.** Start Round used to return to Today;
+per the agreed journey it now lands in the round workspace. The 1.1 test was
+updated, not deleted — joining is still what it proves.
+
+**Two of my own test errors, corrected rather than worked around.** I banned the
+word "administer" in the scaffold, which fails on the legitimate support type
+"Staff administered" — the honest check is that the page cannot submit anything.
+And I expected a `round_entry_refused` audit event where Section 0's authorise
+middleware had already recorded `permission_denied`; the gate that turned him
+away is the one that should record it, and two rows for one refusal would be
+worse than one.
+
+Record7 279, Frontend 4 64, JS 22, production build clean. Nothing committed.
+
+### Same day — the two Section 2.0 corrections
+
+**1. Callum keeps his planned dose.**
+
+The root cause was not a queue filter — he had *no doses at all*. His
+prescription was seeded `suspended`, and the seeder skips non-active
+prescriptions, so no obligation was ever planned. Suspending the prescription
+was the wrong model: the prescriber has not stopped his sertraline, the house
+simply is not giving it while he is on a ward.
+
+His prescription is active again, the dose is planned, and the seeder records
+**nothing** for anybody who is not available — auto-filling an outcome would be
+inventing a clinical record, and marking it omitted would be deciding something
+a person has to decide. It stays planned and unanswered for Section 2.3.
+
+The queue keeps him, flagged `available: false`, with `clientStatusWord` and a
+new `needsOutcome`. He sorts into a sixth band *below everybody present*,
+because his dose still has to be answered for but nobody is walking to a room he
+is not in. Round progress counts `awayNeedingOutcome` separately, so "2
+remaining" is not read as two people standing in their doorways.
+
+**Two ripples handled rather than ignored.** Section 1.1's People Due gained
+`available` / `whereabouts` — showing "1 medicine due" without saying "in
+hospital" would send a support worker to an empty flat. And both attention lists
+now say *"A planned medicine is unrecorded while Callum is in hospital — record
+why it was not given"* rather than calling it an unexplained omission, which
+would waste a manager's morning on a question that already has an answer.
+
+The same principle covers authorised self-administration: staff not physically
+handing something over does not remove the obligation.
+
+**2. The round window is computed, not assumed.**
+
+Every round in the fixture has exactly one distinct due time, so "08:00 to
+08:00" was the same number printed twice. The window now comes from
+`COUNT(DISTINCT time)` on the real doses: one time renders as "Scheduled time:
+08:00", a genuine spread renders its real first and last. Neither case is
+special-cased for today's data, and the decision is made server-side — the view
+no longer decides what a window is.
+
+**Three tests reversed, five added.** Two asserted that an absent person is kept
+out of the round, which is precisely what this correction forbids; they now
+assert the opposite. The ordering test's own band function had to learn the
+away band, or it disagreed with the service it was checking.
+
+**One fragility closed on the way.** Reseeding 1.1 deleted administrations that
+1.2's correction request pointed at, leaving a review item aimed at a vanished
+id — it broke the manager queue twice while I worked. Section 1.1's clear-out
+now removes review items naming those administrations and nulls any linked
+issue state.
+
+Record7 283 (Section 2.0: 28), Frontend 4 64, JS 22, production build clean.
+Nothing committed.
+
+---
+
+## 27 August 2026 — Record7 Section 2.1, the person and medicine safety view
+
+The screen a support worker reads in the second before a medicine leaves their
+hand. It shows one person, from one round, and it records nothing.
+
+**Nothing was added to the schema.** I checked before assuming. `information_schema`
+confirms Record7 holds no photograph column anywhere and has no "sensitivity"
+concept at all — only `record7_client_allergies` with a severity. Everything else
+the screen needs was already there from Sections 1.1 and 2.0: dose, route,
+`support_type`, `frequency_text`, `is_time_critical`, instructions, the change
+note, the medicine's name, strength, form and controlled flag, and the client's
+support note, status, date of birth and room. So Section 2.1 adds no migration.
+
+Where the data does not exist the screen says so in words instead of drawing a
+convincing blank. "None recorded" is not "none", and a grey silhouette where a
+photograph would go implies somebody looked for one.
+
+**Three filters before any record is loaded.** A client id is a number in a URL.
+`RoundPersonView::resolve()` requires the organisation to match, the house to
+match, and the person to actually have a dose in *this* round on *this* date in
+*this* slot. The third filter is the one that matters most: somebody who
+genuinely lives in the house but is not in the round would otherwise open with a
+list of medicines that are not part of the round being done. All three failures
+return 404 — not a redirect to somebody else, which would be the worst possible
+answer.
+
+**Support type is resolved per medicine, never per person.** Somebody can be
+handed one tablet and watched taking another. A single label across both is
+wrong about one of them, and which one it is wrong about is the dangerous
+question. Each item also spells out what the word means, because "prompted" and
+"assisted" are exactly the words an agency worker on their first shift will
+guess at.
+
+**Callum stays.** In hospital, his medicines still show, still say they need an
+outcome, and the screen says plainly not to go looking for him. The obligation
+did not leave with the person.
+
+**No way to record anything.** No form, no POST route on the path, no handler on
+any component. A test asserts the service file contains no write call at all,
+and another asserts the page contains no `router.post` and no `<form>`. A button
+here that looked like it recorded something would be worse than no button.
+
+**Three of my own mistakes, found by breaking the product on purpose.** I removed
+the round-membership filter, then the slot filter, then flattened support type to
+a single value, and confirmed each mutation was caught (1, 1 and 3 tests
+respectively). A test nobody has watched fail is not evidence.
+
+One test of mine was simply wrong: it expected 404 after switching house, but with
+no round open in the new house the controller correctly sends you back to Today.
+It now asserts the thing that actually matters — the previous house's person never
+renders — and checks the right status for whichever branch applies.
+
+**Browser verification is outstanding.** The preview session had idle-locked, and
+I will not type a password into a login field. Rendering the real pages to static
+HTML did not work either: the bundle re-requests the route on hydration and
+follows the lock redirect. This needs the owner to unlock the session.
+
+Record7 308 (Section 2.1: 25), Frontend 4 67, JS 22, production build clean
+(`r7-e802114b.css` 72.56 kB, `r7-4f3b280b.js` 76.31 kB). Nothing committed.
+
+### Same day — Section 2.1 looked at in a browser
+
+Six people, both themes, phone and desktop. Five things were wrong, and four of
+them were only findable by looking.
+
+**1. Every recorded outcome was painted green.** The screen knew that
+*something* had been recorded, not *what*. So Joyce's macrogol — none in the
+cupboard, pharmacy has not delivered — sat in the success colour, one line under
+"Given", and read as a completed administration. The view now carries the
+outcome code as well as the word: given and self-administered are success,
+refused and withheld are warning, not available and missed are error.
+
+**2. "Not available" did not say what was not available.** Everywhere else on
+this screen availability is about the person — "In hospital", "At home". Next to
+a medicine, the bare word is genuinely ambiguous. It now reads "Medicine not
+available".
+
+**3. A self-administered medicine was recorded as "Given".** That is a false
+record of who did what: "given" means a worker handed it over. The fixture now
+records the self-administered outcome for self-administered prescriptions, and
+the pill reads "Taken themselves" so it cannot be confused with the arrangement
+label sitting directly under it.
+
+**4. The ordinary case was shouting.** "Staff administered / You give this and
+record it." was a filled block on every medicine — heavier than the medicine
+name, and repeated so consistently that the one saying "Prompted" would have
+been skimmed with the rest. The explanatory panel is now for the arrangements
+somebody can actually get wrong; staff-administered is a quiet label.
+
+**5. Four of six people were "known as" their own first name.** "Callum Fraser,
+known as Callum" is the same name twice. A preferred name now earns its line
+only when it differs from the first name — so Terence keeps "Known as Terry" and
+the other four lose a line of noise.
+
+**One fixture gap closed.** The only self-administered medicine in the fixture
+was an as-required inhaler, which by design never enters a scheduled round — so
+the one arrangement where a worker must NOT hand the medicine over could not be
+seen on the round screen at all. Aisha now has a scheduled self-administered
+medicine as well.
+
+**Lateness is readable.** "355 min late" made a support worker do arithmetic to
+discover it was nearly six hours. It now says "5h 55m late", the same way Today
+already writes elapsed time.
+
+Six new tests, and the tone rule was checked by breaking it: painting
+"not available" as success again fails two of them.
+
+**Verified by eye:** staff-administered, multiple medicines, mixed support types
+per medicine, self-administered, Callum in hospital, time-critical and late,
+allergy display against the "none recorded" state, 1440px, ~390px (no
+horizontal overflow at a 390px root), light and dark, and back-to-round.
+
+**Not verified by eye:** the "prompted" arrangement exists only at Rosewood,
+which Noah cannot reach; it shares the code path with assisted and
+self-administered and is covered by test.
+
+**One thing for the owner, not changed:** Callum's support note says "Medicines
+on hold until he is back" directly under a panel saying his medicines "still
+need an outcome recorded". Both are true — on hold means not given, and the
+omission still has to be recorded — but a tired reader could take the first as
+"nothing to do here". That is fixture wording about clinical meaning, so it is
+flagged rather than rewritten.
+
+Record7 314 (Section 2.1: 31), Frontend 4 67, JS 22, production build clean.
+Nothing committed.
+
+### Same day — Callum's wording, the last thing outstanding on 2.1
+
+Two facts about an absent person pull in opposite directions: this service is
+not giving the medicine, and the planned dose still has to be answered for.
+Said together, or left to a free-text note saying medicines are "on hold", the
+first swallows the second — and at the end of a long shift "on hold" reads as
+"nothing to do here". A planned dose with no outcome is precisely the gap an
+inspection finds months later with nobody able to say what happened.
+
+So the two facts now sit apart, and the obligation gets its own weight:
+
+> **In hospital**
+> This service is not giving their medicines while they are away, so do not go
+> looking for them.
+> ───
+> **The doses below are still planned and have not been cancelled. Each one must
+> still have an outcome recorded saying why it was not given.**
+
+The fixture note lost "on hold" as well. It says the same clinical fact —
+"We are not giving his medicines while he is there" — without the implication,
+and it claims nothing about what the hospital is doing.
+
+Nothing else moved: no change to his status, his availability, the planned dose,
+or the Section 2.3 boundary. A new test holds both halves — the note may not
+contain "on hold", "no action", "nothing to do", "cancelled" or "suspended", an
+absent person must still have an unanswered dose, and the panel must carry both
+sentences. It was watched failing against the old wording before the fixture was
+reseeded.
+
+**One thing worth remembering.** Reseeding Section 1 on its own broke three
+Section 1.2 tests — the documented fragility where 1.2's correction request
+points at an administration that 1.1's clear-out removed. Reseeding
+Record7Section12Seeder afterwards restores it. Not a regression from this
+change; a fixture ordering rule.
+
+Record7 315 (Section 2.1: 32), Frontend 4 67, JS 22, production build clean.
+Nothing committed.
+
+---
+
+## 27 August 2026 — Record7 Section 2.2, signing for a medicine
+
+The first part of Record7 that writes a clinical record. Everything about it is
+shaped by one fact: an administration cannot be deleted afterwards. A wrong
+record is not a bug to be tidied up later; it is a permanent statement that
+somebody was given something.
+
+**One schema change, and it is the important one.** `record7_administrations`
+had no constraint stopping the same planned dose being answered twice. A
+generated column now carries the claim a row makes — "dose 5, correcting
+nothing" — with a unique index on it. Two originals for the same dose cannot
+both exist. PRN rows keep a NULL claim, so as-required administrations are
+untouched. A Section 2.7 correction claims "dose 5, correcting 12" and is still
+possible; two corrections of the same original are not, which is deliberate —
+a second correction should chain from the first rather than race it.
+
+Check-then-insert was not an option. Two phones, a double tap, a retry after a
+timeout, two tabs: every one of those puts two inserts in flight with nothing
+between them.
+
+**Both times are kept, always.** The planned dose is never edited, moved or
+deleted to mark it done. A medicine given six hours late keeps its due time and
+gains an administration time from the server's clock — never the browser's. A
+product that overwrote the due time would make "was it late?" unanswerable a
+month later, which is the question an inspection actually asks.
+
+**Who signed it is never taken from the request.** The worker comes from the
+authenticated session after authority is re-checked. Posting a staff id does
+nothing. Joining a colleague's round does not make your records look like
+theirs — proved by a test that opens the round as Olivia and records as Noah.
+
+**What it refuses, and why each refusal exists.** A controlled drug needs a
+witness (2.5). An as-required medicine needs its own reasoning (2.4). Somebody
+in hospital cannot be recorded as handed a tablet (2.3 owns that outcome).
+A self-administered medicine is theirs to take. And **prompted is refused too**
+— there the worker reminds and watches but does not hand it over, so "given by
+Noah" would be a false statement about who administered a medicine, in a record
+that can never be deleted. Assisted IS allowed: the worker is physically part of
+the administration, which is what a paper MAR has always been signed for. That
+line is a judgement, and it is the one thing in this section most worth
+overruling if the owner disagrees.
+
+**Opening and recording are two separate requests.** The medicine row is not a
+control. It carries a button at the END of the item that opens a confirmation
+screen, and only that screen can write. A tap that both reveals and commits is
+how a thumb resting on a phone during a scroll signs for a dose nobody gave.
+
+**Stock was not touched.** Nothing in Record7 currently couples administration
+to stock — `record7_stock_events` holds counts and discrepancies only — so there
+was no dependency to work around. A test asserts both the events and the levels
+are unchanged by recording a medicine.
+
+**The audit uses the existing pattern rather than a second one.** The
+administration row is the authoritative clinical record; the hash-chained
+`record7_access_audit_events` gains a `medication_administered` event carrying
+identifiers, both times and the outcome — and deliberately no clinical free
+text, which would spread the same sensitive sentence across two tables with two
+different retention rules.
+
+**Six mutations, and one of them found my own weak tests.** Dropping the unique
+index fails three tests. Trusting a posted staff id fails one. Removing the four
+boundary rules fails five. But removing the authority re-check failed nothing —
+because two of my tests were passing on the middleware and on "already
+recorded", not on the rules they named. Both were rewritten to build a fresh
+unanswered dose, and a closed-round test was added; removing both round guards
+now fails it. A test that passes for the wrong reason is worse than no test.
+
+**Honest limitation.** The `$check['allowed']` guard inside the record action is
+defence in depth that no test can currently reach: by the time it runs, the
+middleware has checked permission and competency and the round was resolved as
+open in this house. It stays because those guarantees are the sort that quietly
+change.
+
+Record7 352 (Section 2.2: 37), Frontend 4 67, JS 22, production build clean.
+Nothing committed. Browser verification still outstanding — the preview session
+idle-locked again.
+
+### Same day — Section 2.2 in a browser: seven findings, all wording or hierarchy
+
+The logic was right. What the screen SAID about it was wrong in seven places,
+and none of them would have been found by a test I had thought to write.
+
+**1. A dose given eight hours late read exactly like one given on time.** A dose
+stops being "late" the moment it is answered — correct for the chase lists, and
+it silently removed the only marker separating a punctual administration from a
+badly delayed one. Lateness is now measured against the moment it was actually
+given and kept: "Given at 16:43 by Noah — 8h 13m after it was due".
+
+**2. "2 to check" beside two medicines that were both already answered.** Not a
+neutral inaccuracy: it sends somebody looking for work that is done, and on a
+round that is how a dose gets given twice. It now says "1 of 4 still to record"
+or "All 2 recorded".
+
+**3. An assisted medicine recorded as plain "Given ... by Noah".** He steadied a
+cup; he did not hand it over. The stored outcome is still `given` — staff were
+physically part of the administration, which is what a paper MAR has always been
+signed for — but the words now say "Given with help". The domain model was not
+touched, as instructed.
+
+**4. The same outcome worded two ways, two lines apart.** The pill said "Taken
+themselves" and the line beneath said "Self-administered at 08:10". The word is
+now decided once, on the server, so the two cannot drift.
+
+**5. "You are recording this medicine" on a screen refusing to record it.**
+Arriving on an already-answered or controlled medicine under that heading reads
+as a system that has changed its mind. It now says "This medicine", and an
+already-recorded dose is told what was recorded rather than only that it cannot
+be recorded again.
+
+**6 and 7, introduced by my own fixes and caught on the next pass.** "7h 12m
+late after it was due" — a sentence nobody writes on purpose; the duration no
+longer carries the word. And the success banner said "Recorded: Given" over an
+item reading "Given with help"; it now uses the same word.
+
+**Fixture, not domain.** Four of the fifteen journeys could not be walked at
+all: the only assisted medicine was already answered, the only self-administered
+one likewise, there was no prompted medicine anywhere in Oakwood, and every
+controlled drug in the fixture was as-required — so the witness rule, which is
+refused after the as-required rule, could never be reached on a round screen.
+Oakwood gained four ordinary medicines to make those four paths visible. No
+behaviour changed.
+
+**Still not walkable: PRN.** An as-required medicine has no scheduled dose by
+design, so putting one in a round would mean fabricating a state the product
+cannot produce. The guard is belt-and-braces and proved by test only.
+
+**Also noticed, not fixed — outside Section 2.2.** A Record7 404 renders the
+legacy Care One OS error page rather than staying inside Record7. And the
+Section 2.0 round table still prints raw `in_progress` / `part_recorded` and
+"yes, 477 min" where the rest of the product now writes hours and minutes.
+
+Record7 360 (Section 2.2: 44), Frontend 4 67, JS 22, production build clean.
+Nothing committed.

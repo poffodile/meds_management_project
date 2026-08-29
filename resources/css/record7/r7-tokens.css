@@ -242,6 +242,10 @@
   --r7-control-height-small: 40px;
   --r7-control-padding-x:    var(--r7-space-5);
 
+  /* Three lines of a note before it scrolls. Enough to write something
+     useful on a phone without pushing the button off the screen.        */
+  --r7-textarea-height:      112px;
+
   /* ══ MOTION ═════════════════════════════════════════════════════════════ */
 
   --r7-motion-fast: 120ms cubic-bezier(.32, .06, .18, 1);

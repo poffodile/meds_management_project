@@ -86,21 +86,33 @@ class ManagerBoard
 
         foreach ($this->omittedDoses($serviceId, $now) as $dose) {
             $critical = $dose->prescription->is_time_critical;
+            // Somebody on a ward is not an unexplained omission. The dose still
+            // needs an outcome recorded against it, but calling it unexplained
+            // when the explanation is known would waste a manager's morning.
+            $away = ! $dose->client->isAvailable();
 
             $items[] = $this->item($serviceId, [
                 'key' => 'omitted_dose:'.$dose->id,
-                'kind' => $critical ? 'time_critical_omission' : 'omission',
-                'severity' => $critical ? 'high' : 'medium',
-                'rank' => $critical ? 0 : 2,
+                'kind' => $away ? 'absent_no_outcome' : ($critical ? 'time_critical_omission' : 'omission'),
+                'severity' => $away ? 'medium' : ($critical ? 'high' : 'medium'),
+                'rank' => $away ? 4 : ($critical ? 0 : 2),
                 'subject' => $dose->client->displayName(),
                 'subjectKind' => 'client',
-                'issue' => $critical
-                    ? 'A time-critical medicine has no record and no explanation'
-                    : 'A dose has no record and no explanation',
-                'why' => $critical
-                    ? 'An unexplained time-critical omission is reportable and needs establishing today'
-                    : 'An unexplained gap in the record cannot be closed by the person who left it',
-                'next' => 'Establish what happened and record the outcome or an incident',
+                'issue' => $away
+                    ? 'A planned dose is unrecorded while the person is '
+                        .strtolower($dose->client->statusWord())
+                    : ($critical
+                        ? 'A time-critical medicine has no record and no explanation'
+                        : 'A dose has no record and no explanation'),
+                'why' => $away
+                    ? 'The obligation does not disappear because somebody is away, and only a '
+                        .'manager can confirm how an absent period should be recorded'
+                    : ($critical
+                        ? 'An unexplained time-critical omission is reportable and needs establishing today'
+                        : 'An unexplained gap in the record cannot be closed by the person who left it'),
+                'next' => $away
+                    ? 'Have the outcome and reason recorded for the period away'
+                    : 'Establish what happened and record the outcome or an incident',
                 'at' => $dose->due_at,
                 'minutes' => $dose->minutesLate($now),
             ]);

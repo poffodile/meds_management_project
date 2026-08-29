@@ -480,7 +480,14 @@ class Record7RoundEntryTest extends Record7TestCase
 
         // Derive the expected banding from the records, exactly as the service
         // does, and confirm the order is non-decreasing.
+        // Derived here independently, exactly as the service derives it —
+        // including that somebody who is not in the building sorts last however
+        // late their dose is, because nobody is walking to an empty flat.
         $band = function (array $person): int {
+            if (! $person['available']) {
+                return 6;
+            }
+
             return match (true) {
                 $person['late'] && $person['timeSensitive'] => 1,
                 $person['late'] => 2,
@@ -585,16 +592,177 @@ class Record7RoundEntryTest extends Record7TestCase
         );
     }
 
-    public function test_a_person_in_hospital_is_not_put_in_the_round(): void
+    /**
+     * REVERSES an earlier assertion, deliberately.
+     *
+     * This used to prove that somebody in hospital was kept out of the round.
+     * That was wrong: his prescription is still active, a dose is still planned
+     * for this house on this date in this round, and removing him made the
+     * obligation silently cease to exist. Nobody would ever have been asked why
+     * it was not given.
+     *
+     * He stays, flagged, with nothing recorded on his behalf.
+     */
+    public function test_a_person_in_hospital_keeps_their_planned_dose_in_the_round(): void
     {
         $oakwood = $this->oakwood();
         $callum = Client::where('service_id', $oakwood->id)->where('status', 'in_hospital')->firstOrFail();
 
+        $planned = ScheduledDose::where('client_id', $callum->id)
+            ->whereDate('due_at', now()->toDateString())
+            ->get();
+
+        $this->assertNotEmpty($planned, 'An absent person still has doses planned for today.');
+
+        $round = $this->entry()->enter(
+            $this->user('noah.williams'),
+            $oakwood->id,
+            $planned->first()->slot,
+            request()
+        )['round'];
+
+        $person = collect(app(RoundQueue::class)->forRound($round))
+            ->firstWhere('clientId', $callum->id);
+
+        $this->assertNotNull($person, 'Being away is not a reason to vanish from the round.');
+
+        // Shown as absent, in words.
+        $this->assertFalse($person['available']);
+        $this->assertSame('in_hospital', $person['clientStatus']);
+        $this->assertNotEmpty($person['clientStatusWord']);
+
+        // NOTHING has been decided on his behalf.
+        $this->assertSame('not_started', $person['progress']);
+        $this->assertTrue($person['needsOutcome']);
+        $this->assertSame(
+            0,
+            Administration::where('client_id', $callum->id)->count(),
+            'No outcome may be invented for somebody who is not there.'
+        );
+    }
+
+    public function test_an_absent_person_sorts_below_everybody_who_is_present(): void
+    {
+        $oakwood = $this->oakwood();
+        $callum = Client::where('service_id', $oakwood->id)->where('status', 'in_hospital')->firstOrFail();
+
+        $slot = ScheduledDose::where('client_id', $callum->id)
+            ->whereDate('due_at', now()->toDateString())->firstOrFail()->slot;
+
+        $round = $this->entry()->enter($this->user('noah.williams'), $oakwood->id, $slot, request())['round'];
+
+        $queue = app(RoundQueue::class)->forRound($round);
+        $positions = array_column($queue, 'clientId');
+        $callumAt = array_search($callum->id, $positions, true);
+
+        $this->assertNotFalse($callumAt);
+
+        // Everybody actually in the building comes first — nobody is sent to a
+        // room the person is not in.
+        foreach (array_slice($queue, 0, $callumAt) as $earlier) {
+            $this->assertTrue(
+                $earlier['available'],
+                'An absent person must not sort above somebody who is present.'
+            );
+        }
+    }
+
+    public function test_a_self_administered_medicine_does_not_disappear(): void
+    {
+        $oakwood = $this->oakwood();
+
+        $selfAdministered = \App\Models\Record7\Prescription::where('support_type', 'self_administered')
+            ->whereIn('client_id', Client::where('service_id', $oakwood->id)->select('id'))
+            ->first();
+
+        if (! $selfAdministered) {
+            $this->markTestSkipped('The fixture holds no self-administered medicine.');
+        }
+
+        $dose = ScheduledDose::where('prescription_id', $selfAdministered->id)
+            ->whereDate('due_at', now()->toDateString())
+            ->first();
+
+        if (! $dose) {
+            // This one is as-required, so it has no scheduled dose by design.
+            // The support type must still be a real distinct value rather than
+            // a reason the medicine is absent from the system altogether.
+            $this->assertSame('self_administered', $selfAdministered->support_type);
+
+            return;
+        }
+
+        $round = $this->entry()->enter($this->user('noah.williams'), $oakwood->id, $dose->slot, request())['round'];
+
+        $person = collect(app(RoundQueue::class)->forRound($round))
+            ->firstWhere('clientId', $selfAdministered->client_id);
+
+        $this->assertNotNull($person, 'Staff not handing it over does not remove the obligation.');
+        $this->assertNotSame('recorded', $person['progress']);
+    }
+
+    /* -- The scheduled window ------------------------------------------- */
+
+    /**
+     * "08:00 to 08:00" is not a window, it is the same number twice.
+     *
+     * Computed from the distinct due times rather than special-cased for the
+     * shape of today's fixture.
+     */
+    public function test_a_single_time_round_is_reported_as_one_time(): void
+    {
+        $oakwood = $this->oakwood();
         $round = $this->entry()->enter($this->user('noah.williams'), $oakwood->id, 'Morning', request())['round'];
 
-        $ids = array_column(app(RoundQueue::class)->forRound($round), 'clientId');
+        $times = ScheduledDose::where('service_id', $oakwood->id)
+            ->whereDate('due_at', now()->toDateString())
+            ->where('slot', 'Morning')
+            ->pluck('due_at')
+            ->map(fn ($d) => \Illuminate\Support\Carbon::parse($d)->format('H:i'))
+            ->unique();
 
-        $this->assertNotContains($callum->id, $ids);
+        $window = app(RoundQueue::class)->window($round);
+
+        if ($times->count() === 1) {
+            $this->assertTrue($window['single']);
+            $this->assertSame($times->first(), $window['label']);
+            $this->assertStringNotContainsString(' to ', $window['label']);
+        } else {
+            $this->assertFalse($window['single']);
+            $this->assertStringContainsString(' to ', $window['label']);
+        }
+    }
+
+    public function test_a_spread_round_reports_its_real_first_and_last(): void
+    {
+        $oakwood = $this->oakwood();
+
+        // Move one Morning dose later, so this round genuinely spans a period.
+        $dose = ScheduledDose::where('service_id', $oakwood->id)
+            ->whereDate('due_at', now()->toDateString())
+            ->where('slot', 'Morning')
+            ->firstOrFail();
+
+        $dose->update(['due_at' => $dose->due_at->copy()->addMinutes(45)]);
+
+        $round = $this->entry()->enter($this->user('noah.williams'), $oakwood->id, 'Morning', request())['round'];
+
+        $window = app(RoundQueue::class)->window($round);
+
+        $this->assertFalse($window['single'], 'Two distinct times is a window.');
+        $this->assertNotSame($window['from'], $window['to']);
+        $this->assertSame($window['from'].' to '.$window['to'], $window['label']);
+
+        $times = ScheduledDose::where('service_id', $oakwood->id)
+            ->whereDate('due_at', now()->toDateString())
+            ->where('slot', 'Morning')
+            ->pluck('due_at')
+            ->map(fn ($d) => \Illuminate\Support\Carbon::parse($d)->format('H:i'))
+            ->sort()
+            ->values();
+
+        $this->assertSame($times->first(), $window['from']);
+        $this->assertSame($times->last(), $window['to']);
     }
 
     /* ── Identity ───────────────────────────────────────────────────────── */

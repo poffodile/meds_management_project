@@ -3274,6 +3274,34 @@ Route::prefix('record7')->name('record7.')->group(function () {
             ->middleware(R7Authorize::class.':administer_medication')
             ->name('round');
 
+        /* 2.1 — one person, checked before anything is given. Read only: this
+           route has no POST and records nothing. */
+        Route::get('/round/person/{client}', [R7Round::class, 'person'])
+            ->whereNumber('client')
+            ->middleware(R7Authorize::class.':administer_medication')
+            ->name('round.person');
+
+        /* 2.2 — recording that a scheduled medicine was given.
+
+           TWO ROUTES, NOT ONE. Reading the confirmation and committing it are
+           deliberately separate requests: a single control that both reveals
+           and records is how a thumb resting on a phone signs for a dose that
+           was never given.
+
+           Both ids are numbers from a browser and neither is trusted. The
+           house comes from the session, the round from the house, the person
+           from the round and the dose from the person, so a manipulated id
+           finds nothing rather than reaching somebody else's medicine. */
+        Route::get('/round/person/{client}/medicine/{dose}', [R7Round::class, 'confirm'])
+            ->whereNumber('client')->whereNumber('dose')
+            ->middleware(R7Authorize::class.':administer_medication')
+            ->name('round.confirm');
+
+        Route::post('/round/person/{client}/medicine/{dose}/given', [R7Round::class, 'record'])
+            ->whereNumber('client')->whereNumber('dose')
+            ->middleware([R7Authorize::class.':administer_medication', 'throttle:60,1'])
+            ->name('round.record');
+
         /* 1.1 — confirming you have read the handover. Anybody in the house
            may do this: being told what happened overnight is not privileged. */
         Route::post('/handover/read', [R7Today::class, 'readHandover'])

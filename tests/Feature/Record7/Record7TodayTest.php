@@ -212,7 +212,18 @@ class Record7TodayTest extends Record7TestCase
 
     /* ── Somebody who is not there ──────────────────────────────────────── */
 
-    public function test_a_client_in_hospital_is_not_put_in_the_round(): void
+    /**
+     * REVERSED, deliberately, as part of Section 2.0.
+     *
+     * This used to assert that somebody in hospital had no doses planned and
+     * never appeared. That was the wrong model: the prescriber has not stopped
+     * his medicine, so the dose is still planned, and removing it made the
+     * obligation silently cease to exist — nobody would ever be asked why it
+     * was not given.
+     *
+     * He now appears, marked as away, with nothing recorded on his behalf.
+     */
+    public function test_a_client_in_hospital_still_has_their_planned_dose(): void
     {
         $oakwood = $this->oakwood()->id;
 
@@ -220,15 +231,27 @@ class Record7TodayTest extends Record7TestCase
             ->where('status', 'in_hospital')
             ->firstOrFail();
 
-        // Their prescription is suspended, so no dose should have been planned.
-        $this->assertSame(
+        $this->assertGreaterThan(
             0,
             ScheduledDose::where('client_id', $callum->id)->count(),
-            'Somebody on a hospital ward must not appear in the house round.'
+            'An absent person keeps the doses that were planned for them.'
         );
 
-        $names = array_column($this->board()->peopleDue($oakwood), 'fullName');
-        $this->assertNotContains($callum->full_name, $names);
+        // And nothing has been decided for him.
+        $this->assertSame(
+            0,
+            \App\Models\Record7\Administration::where('client_id', $callum->id)->count()
+        );
+
+        // Where he appears at all, it says where he is — otherwise a support
+        // worker is sent to an empty flat.
+        $people = collect($this->board()->peopleDue($oakwood, Carbon::today()->setTime(9, 30)));
+        $entry = $people->firstWhere('fullName', $callum->full_name);
+
+        if ($entry) {
+            $this->assertFalse($entry['available']);
+            $this->assertNotEmpty($entry['whereabouts']);
+        }
     }
 
     public function test_a_severe_allergy_is_shown_before_the_door_is_knocked_on(): void
@@ -503,8 +526,11 @@ class Record7TodayTest extends Record7TestCase
         $this->signIn('noah.williams');
         $this->post('/record7/houses', ['house_id' => $this->oakwood()->id]);
 
-        $this->post('/record7/round/start')->assertRedirect('/record7');
-        $this->post('/record7/round/start')->assertRedirect('/record7');
+        // Section 2.0 moved the destination: starting a round now lands in the
+        // round workspace rather than back on Today. Joining is still the point
+        // of this test, and it still holds.
+        $this->post('/record7/round/start')->assertRedirect('/record7/round');
+        $this->post('/record7/round/start')->assertRedirect('/record7/round');
 
         $rounds = Round::where('service_id', $this->oakwood()->id)
             ->whereDate('round_date', now()->toDateString())

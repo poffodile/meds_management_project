@@ -49,6 +49,15 @@ abstract class R7Controller extends Controller
         // HandleInertiaRequests untouched for the other front ends.
         $user = $this->user();
 
+        // Record7's own flash keys. The shared middleware exposes only
+        // 'success' and 'error', which belong to the legacy front ends; these
+        // are namespaced so the two can never be confused, and overriding here
+        // leaves HandleInertiaRequests untouched for everybody else.
+        Inertia::share('flash', [
+            'r7.recorded' => fn () => session('r7.recorded'),
+            'r7.error' => fn () => session('r7.error'),
+        ]);
+
         Inertia::share('homes', null);
         Inertia::share('witnessPending', 0);
         Inertia::share('auth', [

@@ -24,14 +24,21 @@ use Illuminate\Support\Carbon;
  *   3. due now, time-sensitive     the insulin that must not drift
  *   4. due now                     the rest of this round
  *   5. later in this round         everything still ahead of its time
+ *   6. away from the house         still owed an outcome, but not in their flat
  *
  * Within a band, earliest due first. No name appears anywhere in the sort.
  *
- * WHAT IS NOT SILENTLY MARKED DONE.
- * Somebody who takes their own medicines, or is out, or is in hospital, is not
- * quietly counted as administered. They appear with their real status and their
- * real support type, and recording what actually happened is a later section's
- * job. Marking them complete here would be a false clinical record.
+ * NOBODY DROPS OUT OF THE QUEUE FOR BEING ABSENT.
+ * A person in hospital, away for the day, or managing their own medicines still
+ * has a planned dose belonging to this house, this date and this round. That
+ * obligation does not evaporate because they are not in their flat — somebody
+ * still has to record what happened to it and why.
+ *
+ * So they stay in the queue, flagged with where they actually are and how they
+ * are supported, and NOTHING is marked administered, completed or omitted on
+ * their behalf. Recording the real outcome is Section 2.3's job. Filtering them
+ * out would be worse than either: the dose would silently cease to exist and
+ * nobody would ever be asked about it.
  */
 class RoundQueue
 {
@@ -107,16 +114,25 @@ class RoundQueue
                 // Presence of a warning, not the warning itself.
                 'hasSafetyWarning' => $client->allergies->contains(fn ($a) => $a->isCritical()),
 
-                // Whether this person is here to be seen at all.
+                // Where they actually are. Not a reason to remove them from the
+                // round — a reason the round needs to know about them.
                 'clientStatus' => $client->status,
                 'clientStatusWord' => $client->statusWord(),
                 'available' => $client->isAvailable(),
+                // The planned obligation is still outstanding and still needs an
+                // explicit outcome. Section 2.3 will collect it.
+                'needsOutcome' => ! $client->isAvailable() && $outstanding->isNotEmpty(),
 
                 // How they are supported, which decides who does what.
                 'support' => $this->supportFor($forClient),
 
                 // Sorting only. Never rendered.
-                '_band' => match (true) {
+                //
+                // Somebody who is not in the building sorts below everybody who
+                // is. Their dose still has to be answered for, but nobody is
+                // walking to a room they are not in, and putting them among the
+                // people who are waiting would send staff to an empty flat.
+                '_band' => ! $client->isAvailable() ? 6 : match (true) {
                     $isLate && $isTimeCritical => 1,
                     $isLate => 2,
                     $dueNow && $isTimeCritical => 3,
@@ -165,6 +181,42 @@ class RoundQueue
         ];
     }
 
+    /**
+     * The scheduled window this round actually covers.
+     *
+     * Read from the doses rather than assumed. A round whose doses all fall at
+     * one minute is a single time and is said once — "08:00 to 08:00" is not a
+     * window, it is the same number twice. A round genuinely spread across a
+     * period reports its real first and last.
+     *
+     * Both cases come from COUNT(DISTINCT time); neither is special-cased for
+     * the shape of today's fixture.
+     */
+    public function window(Round $round): array
+    {
+        $times = ScheduledDose::where('service_id', $round->service_id)
+            ->whereDate('due_at', $round->round_date->toDateString())
+            ->where('slot', $round->slot)
+            ->pluck('due_at')
+            ->map(fn ($due) => Carbon::parse($due)->format('H:i'))
+            ->unique()
+            ->sort()
+            ->values();
+
+        if ($times->isEmpty()) {
+            return ['from' => null, 'to' => null, 'single' => false, 'label' => null];
+        }
+
+        $single = $times->count() === 1;
+
+        return [
+            'from' => $times->first(),
+            'to' => $times->last(),
+            'single' => $single,
+            'label' => $single ? $times->first() : $times->first().' to '.$times->last(),
+        ];
+    }
+
     /** Round-level figures, counted from the same records. */
     public function progress(Round $round, ?Carbon $now = null): array
     {
@@ -176,6 +228,9 @@ class RoundQueue
             'remaining' => count(array_filter($people, fn ($p) => $p['progress'] !== 'recorded')),
             'late' => count(array_filter($people, fn ($p) => $p['late'])),
             'timeSensitive' => count(array_filter($people, fn ($p) => $p['timeSensitive'])),
+            // Counted separately so "3 remaining" is not read as three people
+            // standing in their doorways.
+            'awayNeedingOutcome' => count(array_filter($people, fn ($p) => $p['needsOutcome'])),
         ];
     }
 }
