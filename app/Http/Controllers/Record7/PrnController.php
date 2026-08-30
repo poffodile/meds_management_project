@@ -118,6 +118,14 @@ class PrnController extends R7Controller
 
             'stage' => 'Section 2.4 — giving an as-required medicine.',
 
+            // One attempt, minted by the server for this worker, this person
+            // and this medicine. The form hands it back so a double-click or a
+            // retry is recognised as the same attempt rather than a second
+            // dose. Only issued when they may actually record.
+            'attemptToken' => $check['allowed']
+                ? $this->prn->beginAttempt($user, $serviceId, $person, $prescribed)->token
+                : null,
+
             'urls' => [
                 'record' => route('record7.prn.record', [
                     'client' => $person->id, 'prescription' => $prescribed->id,
@@ -141,12 +149,9 @@ class PrnController extends R7Controller
      */
     public function record(Request $request, int $client, int $prescription)
     {
-        $validated = $request->validate([
-            'dose_amount' => ['required', 'numeric', 'min:0.001', 'max:9999'],
-            'observed_reason' => ['required', 'string', 'max:60'],
-            'notes' => ['nullable', 'string', 'max:500'],
-        ]);
-
+        // SCOPE FIRST, then the payload. Somebody probing another person's URL
+        // gets the same "not found" whatever they send, rather than a
+        // validation error that confirms the address was worth trying.
         [$user, $serviceId, $check, $person] = $this->personContext($request, $client);
 
         if (! $check['allowed']) {
@@ -157,13 +162,24 @@ class PrnController extends R7Controller
 
         abort_if($prescribed === null, 404, 'That as-required medicine is not prescribed for them.');
 
+        $validated = $request->validate([
+            'dose_amount' => ['required', 'numeric', 'min:0.001', 'max:9999'],
+            'observed_reason' => ['required', 'string', 'max:60'],
+            'notes' => ['nullable', 'string', 'max:500'],
+
+            // Required, but proving it is the service's job, not this one's —
+            // ownership has to be checked inside the lock that spends it.
+            'attempt_token' => ['required', 'string', 'max:64'],
+        ]);
+
         try {
             $result = $this->prn->record(
                 $user, $serviceId, $person, $prescribed,
                 (float) $validated['dose_amount'],
                 $validated['observed_reason'],
                 $validated['notes'] ?? null,
-                $request
+                $request,
+                $validated['attempt_token']
             );
         } catch (RuntimeException $refused) {
             return back()->with('r7.error', $refused->getMessage());
@@ -172,7 +188,9 @@ class PrnController extends R7Controller
         return redirect()
             ->route('record7.prn', ['client' => $person->id])
             ->with('r7.recorded', [
-                'created' => true,
+                // False when this was a replay. The dose is recorded either
+                // way; saying "recorded" twice would suggest two doses.
+                'created' => $result['created'],
                 'outcome' => $result['administration']->outcomeWord(),
                 'at' => $result['administration']->administered_at->format('H:i'),
                 'by' => $user->displayName(),

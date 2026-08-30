@@ -5,9 +5,11 @@ namespace App\Services\Record7;
 use App\Models\Record7\Administration;
 use App\Models\Record7\Client;
 use App\Models\Record7\Prescription;
+use App\Models\Record7\PrnAttempt;
 use App\Models\Record7\PrnFollowUp;
 use App\Models\Record7\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use RuntimeException;
@@ -329,9 +331,54 @@ class PrnAdministration
     }
 
     /**
+     * Mint an attempt for the give screen.
+     *
+     * The identity of an attempt is issued here, by the server, and never
+     * accepted from a browser as a new value. A worker may only hand back one
+     * they were given, for the person and medicine it was given for.
+     */
+    public function beginAttempt(
+        User $user,
+        int $serviceId,
+        Client $client,
+        Prescription $prescription
+    ): PrnAttempt {
+        return PrnAttempt::create([
+            'token' => (string) Str::uuid().'-'.Str::random(24),
+            'organisation_id' => $client->organisation_id ?? $user->organisation_id,
+            'service_id' => $serviceId,
+            'client_id' => $client->id,
+            'prescription_id' => $prescription->id,
+            'issued_to_user_id' => $user->id,
+            'issued_at' => now(),
+        ]);
+    }
+
+    /**
      * Record that it was given, and set the ask-back.
      *
-     * @return array{administration:Administration, followUp:?PrnFollowUp}
+     * WHY THIS IS ONE TRANSACTION AROUND A LOCK.
+     * Every limit used to be checked and then written, with nothing holding the
+     * two together. Two workers pressing at the same moment both read the same
+     * usage window, both concluded the interval had passed, and both wrote —
+     * two doses out of an allowance for one. A check has to happen where the
+     * write happens.
+     *
+     * So the prescription row is locked first. It is the authoritative row for
+     * this person and this medicine — a PRN prescription belongs to exactly one
+     * client — which makes it the right thing to serialise on without inventing
+     * a table to hold a lock. Everything after the lock sees committed state,
+     * so the second worker reads the first worker's dose rather than the
+     * history that existed before it.
+     *
+     * REPLAY IS NOT A SECOND DOSE.
+     * The attempt is spent inside the same lock. A double-click, a retry or a
+     * resubmitted form arrives carrying a token that is already spent, and gets
+     * back the administration it already created — not an error, because
+     * nothing went wrong, and not a second record, because nothing happened
+     * twice.
+     *
+     * @return array{administration:Administration, followUp:?PrnFollowUp, created:bool}
      */
     public function record(
         User $user,
@@ -341,12 +388,113 @@ class PrnAdministration
         float $amount,
         string $observedReason,
         ?string $notes,
-        Request $request
+        Request $request,
+        ?string $attemptToken = null
     ): array {
         if (! array_key_exists($observedReason, self::OBSERVED_REASONS)) {
             throw new RuntimeException('Say what you saw or what they told you.');
         }
 
+        if ($attemptToken === null || trim($attemptToken) === '') {
+            throw new RuntimeException(
+                'Start again from the medicine so this can be recorded safely.'
+            );
+        }
+
+        return DB::connection('record7')->transaction(function () use (
+            $user, $serviceId, $client, $prescription, $amount,
+            $observedReason, $notes, $request, $attemptToken
+        ) {
+            // THE LOCK. Held until this transaction commits, so no other
+            // request can evaluate an interval or a daily maximum against
+            // history that is about to change.
+            $locked = Prescription::where('id', $prescription->id)
+                ->lockForUpdate()
+                ->first();
+
+            if ($locked === null) {
+                throw new RuntimeException('That prescription is no longer available.');
+            }
+
+            $attempt = $this->claimAttempt($attemptToken, $user, $serviceId, $client, $locked);
+
+            // Already recorded. Hand back what it became.
+            if ($attempt->isSpent()) {
+                $existing = $attempt->administration()->first();
+
+                if ($existing !== null) {
+                    return [
+                        'administration' => $existing,
+                        'followUp' => PrnFollowUp::where('administration_id', $existing->id)->first(),
+                        'created' => false,
+                    ];
+                }
+            }
+
+            return $this->write(
+                $user, $serviceId, $client, $locked, $amount,
+                $observedReason, $notes, $request, $attempt
+            );
+        });
+    }
+
+    /**
+     * Find the attempt this request is spending, and prove it is theirs.
+     *
+     * A token is not a password but it is a claim, so every part of the claim
+     * is checked rather than trusted: that it exists, that it was issued to
+     * this worker, and that it was issued for this person, this medicine and
+     * this house. An unknown token is refused outright rather than quietly
+     * treated as a fresh attempt.
+     */
+    private function claimAttempt(
+        string $token,
+        User $user,
+        int $serviceId,
+        Client $client,
+        Prescription $prescription
+    ): PrnAttempt {
+        $attempt = PrnAttempt::where('token', $token)->lockForUpdate()->first();
+
+        if ($attempt === null) {
+            throw new RuntimeException(
+                'Start again from the medicine so this can be recorded safely.'
+            );
+        }
+
+        $belongs = $attempt->issued_to_user_id === $user->id
+            && $attempt->service_id === $serviceId
+            && $attempt->client_id === $client->id
+            && $attempt->prescription_id === $prescription->id;
+
+        if (! $belongs) {
+            throw new RuntimeException(
+                'That record does not belong to this person and medicine.'
+            );
+        }
+
+        return $attempt;
+    }
+
+    /**
+     * The write itself, inside the lock and the transaction.
+     *
+     * @return array{administration:Administration, followUp:?PrnFollowUp, created:bool}
+     */
+    private function write(
+        User $user,
+        int $serviceId,
+        Client $client,
+        Prescription $prescription,
+        float $amount,
+        string $observedReason,
+        ?string $notes,
+        Request $request,
+        PrnAttempt $attempt
+    ): array {
+        // RE-EVALUATED HERE, under the lock. The screen having offered the
+        // button is not evidence, and neither is a check made before waiting
+        // for the lock.
         $eligibility = $this->eligibility($prescription, $client);
 
         if (! $eligibility['allowed']) {
@@ -395,6 +543,14 @@ class PrnAdministration
         // no interval is stated none is invented — the gap is surfaced instead.
         $followUp = null;
 
+        // SPEND IT, inside the same lock that authorised it. The unique index
+        // on administration_id is the last line: even if everything above were
+        // bypassed, one attempt can never point at two records.
+        $attempt->forceFill([
+            'consumed_at' => now(),
+            'administration_id' => $administration->id,
+        ])->save();
+
         if ($prescription->prn_review_after_minutes !== null) {
             $followUp = PrnFollowUp::create([
                 'administration_id' => $administration->id,
@@ -429,7 +585,11 @@ class PrnAdministration
             request: $request
         );
 
-        return ['administration' => $administration, 'followUp' => $followUp];
+        return [
+            'administration' => $administration,
+            'followUp' => $followUp,
+            'created' => true,
+        ];
     }
 
     /**

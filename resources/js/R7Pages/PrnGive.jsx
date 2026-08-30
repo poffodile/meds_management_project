@@ -25,7 +25,8 @@ import Icon from '@record7/components/Icon.jsx';
  * telling a worker something untrue about somebody's prescription.
  */
 export default function PrnGive({
-    house, person, safety, medicine, observedReasons, authority, stage, urls,
+    house, person, safety, medicine, observedReasons, authority, attemptToken,
+    stage, urls,
 }) {
     const nav = [
         { key: 'today', label: 'Today', href: urls.today, icon: 'house' },
@@ -38,9 +39,15 @@ export default function PrnGive({
         dose_amount: fixedDose ? String(medicine.doseMin) : '',
         observed_reason: '',
         notes: '',
+
+        // Issued by the server for this attempt. Sent back untouched so a
+        // double-click or a retry is recognised as the same attempt rather
+        // than a second dose. The button being disabled is a courtesy; this
+        // is what actually prevents it.
+        attempt_token: attemptToken ?? '',
     });
 
-    const blocked = authority.blocked || !medicine.canGive;
+    const blocked = authority.blocked || !medicine.canGive || !attemptToken;
     const ready = Boolean(data.dose_amount) && Boolean(data.observed_reason);
 
     const submit = () => {

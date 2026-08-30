@@ -9,6 +9,7 @@ use App\Models\Record7\IssueState;
 use App\Models\Record7\Medicine;
 use App\Models\Record7\Organisation;
 use App\Models\Record7\Prescription;
+use App\Models\Record7\PrnAttempt;
 use App\Models\Record7\PrnFollowUp;
 use App\Models\Record7\ScheduledDose;
 use App\Models\Record7\Service;
@@ -16,6 +17,7 @@ use App\Models\Record7\StockEvent;
 use App\Models\Record7\UserCompetency;
 use App\Services\Record7\IssueRegistry;
 use App\Services\Record7\PrnAdministration;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -88,6 +90,39 @@ class Record7PrnTest extends Record7TestCase
     }
 
     /**
+     * The token the give screen would have handed this worker.
+     *
+     * Fetched from the real screen rather than minted directly, so these tests
+     * exercise the wiring a browser uses instead of a shortcut around it.
+     */
+    private function attemptToken(Prescription $p): ?string
+    {
+        $screen = $this->get($this->url($p));
+
+        // A blocked or missing screen issues nothing, and that is the point:
+        // no token means no way to record.
+        if ($screen->status() !== 200) {
+            return null;
+        }
+
+        return $screen->viewData('page')['props']['attemptToken'] ?? null;
+    }
+
+    /**
+     * Give it, the way the screen does: open, then submit what it issued.
+     *
+     * Each call opens the screen afresh, so two calls carry two attempts —
+     * which is what a worker giving a genuinely second dose actually does.
+     * Replay is tested by deliberately sending one token twice.
+     */
+    private function postGive(Prescription $p, array $payload)
+    {
+        return $this->post($this->url($p), $payload + [
+            'attempt_token' => $this->attemptToken($p) ?? 'no-token-was-issued',
+        ]);
+    }
+
+    /**
      * A PRN with no history, carrying the same rule as a fixture one.
      *
      * NOT a clear-out. Administrations are permanent and the database refuses
@@ -147,7 +182,7 @@ class Record7PrnTest extends Record7TestCase
 
         $dosesBefore = ScheduledDose::where('prescription_id', $paracetamol->id)->count();
 
-        $this->post($this->url($paracetamol), [
+        $this->postGive($paracetamol, [
             'dose_amount' => 2,
             'observed_reason' => 'reported_pain',
         ])->assertRedirect('/record7/person/'.$paracetamol->client_id.'/prn');
@@ -171,7 +206,7 @@ class Record7PrnTest extends Record7TestCase
         $this->signInWithoutRound();
         $paracetamol = $this->freshPrn($this->paracetamol());
 
-        $this->post($this->url($paracetamol), [
+        $this->postGive($paracetamol, [
             'dose_amount' => 2,
             'observed_reason' => 'reported_pain',
             'notes' => 'Lower back, said it was a seven.',
@@ -195,12 +230,12 @@ class Record7PrnTest extends Record7TestCase
         $paracetamol = $this->freshPrn($this->paracetamol());
 
         // The prescription says exactly two tablets.
-        $this->post($this->url($paracetamol), [
+        $this->postGive($paracetamol, [
             'dose_amount' => 4,
             'observed_reason' => 'reported_pain',
         ])->assertSessionHas('r7.error');
 
-        $this->post($this->url($paracetamol), [
+        $this->postGive($paracetamol, [
             'dose_amount' => 1,
             'observed_reason' => 'reported_pain',
         ])->assertSessionHas('r7.error');
@@ -215,14 +250,14 @@ class Record7PrnTest extends Record7TestCase
         $this->signInWithoutRound();
         $paracetamol = $this->freshPrn($this->paracetamol());
 
-        $this->post($this->url($paracetamol), [
+        $this->postGive($paracetamol, [
             'dose_amount' => 2, 'observed_reason' => 'reported_pain',
         ]);
 
         $this->assertSame(1, Administration::where('prescription_id', $paracetamol->id)->count());
 
         // Straight away again — four hours have not passed.
-        $this->post($this->url($paracetamol), [
+        $this->postGive($paracetamol, [
             'dose_amount' => 2, 'observed_reason' => 'reported_pain',
         ])->assertSessionHas('r7.error');
 
@@ -258,7 +293,7 @@ class Record7PrnTest extends Record7TestCase
             'administered_at' => now()->subHours(5),
         ]);
 
-        $this->post($this->url($paracetamol), [
+        $this->postGive($paracetamol, [
             'dose_amount' => 2, 'observed_reason' => 'reported_pain',
         ])->assertRedirect('/record7/person/'.$paracetamol->client_id.'/prn');
 
@@ -298,7 +333,7 @@ class Record7PrnTest extends Record7TestCase
         $this->assertFalse($eligibility['allowed']);
         $this->assertSame('max_administrations_reached', $eligibility['code']);
 
-        $this->post($this->url($paracetamol), [
+        $this->postGive($paracetamol, [
             'dose_amount' => 2, 'observed_reason' => 'reported_pain',
         ])->assertSessionHas('r7.error');
 
@@ -369,7 +404,7 @@ class Record7PrnTest extends Record7TestCase
 
         // Three in a row, because nothing says otherwise.
         foreach (range(1, 3) as $ignored) {
-            $this->post('/record7/person/'.$client->id.'/prn/'.$bare->id, [
+            $this->postGive($bare, [
                 'dose_amount' => 1, 'observed_reason' => 'reported_pain',
             ]);
         }
@@ -520,7 +555,7 @@ class Record7PrnTest extends Record7TestCase
         $this->assertNull($this->prn()->lastGiven($paracetamol));
 
         // And it does not lock them out five minutes later.
-        $this->post($this->url($paracetamol), [
+        $this->postGive($paracetamol, [
             'dose_amount' => 2, 'observed_reason' => 'reported_pain',
         ])->assertRedirect('/record7/person/'.$paracetamol->client_id.'/prn');
 
@@ -569,7 +604,7 @@ class Record7PrnTest extends Record7TestCase
         $this->signInWithoutRound();
         $paracetamol = $this->freshPrn($this->paracetamol());
 
-        $this->post($this->url($paracetamol), [
+        $this->postGive($paracetamol, [
             'dose_amount' => 2,
             'observed_reason' => 'observed_distress',
             'notes' => 'Rubbing his back and would not settle.',
@@ -586,7 +621,7 @@ class Record7PrnTest extends Record7TestCase
 
         // An invented reason is refused.
         $paracetamol = $this->freshPrn($this->paracetamol());
-        $this->post($this->url($paracetamol), [
+        $this->postGive($paracetamol, [
             'dose_amount' => 2, 'observed_reason' => 'because_i_felt_like_it',
         ])->assertSessionHas('r7.error');
 
@@ -601,7 +636,7 @@ class Record7PrnTest extends Record7TestCase
         // Change the stated interval and the follow-up must follow it.
         $paracetamol->forceFill(['prn_review_after_minutes' => 25])->save();
 
-        $this->post($this->url($paracetamol), [
+        $this->postGive($paracetamol, [
             'dose_amount' => 2, 'observed_reason' => 'reported_pain',
         ]);
 
@@ -624,7 +659,7 @@ class Record7PrnTest extends Record7TestCase
 
         $paracetamol->forceFill(['prn_review_after_minutes' => null])->save();
 
-        $this->post($this->url($paracetamol), [
+        $this->postGive($paracetamol, [
             'dose_amount' => 2, 'observed_reason' => 'reported_pain',
         ]);
 
@@ -646,7 +681,7 @@ class Record7PrnTest extends Record7TestCase
         $this->signInWithoutRound();
         $paracetamol = $this->freshPrn($this->paracetamol());
 
-        $this->post($this->url($paracetamol), [
+        $this->postGive($paracetamol, [
             'dose_amount' => 2, 'observed_reason' => 'reported_pain',
         ]);
 
@@ -678,7 +713,7 @@ class Record7PrnTest extends Record7TestCase
             $this->signInWithoutRound();
             $paracetamol = $this->freshPrn($this->paracetamol());
 
-            $this->post($this->url($paracetamol), [
+            $this->postGive($paracetamol, [
                 'dose_amount' => 2, 'observed_reason' => 'reported_pain',
             ]);
 
@@ -700,7 +735,7 @@ class Record7PrnTest extends Record7TestCase
         $this->signInWithoutRound();
         $paracetamol = $this->freshPrn($this->paracetamol());
 
-        $this->post($this->url($paracetamol), [
+        $this->postGive($paracetamol, [
             'dose_amount' => 2, 'observed_reason' => 'reported_pain',
         ]);
 
@@ -736,7 +771,7 @@ class Record7PrnTest extends Record7TestCase
         $this->signInWithoutRound();
         $paracetamol = $this->freshPrn($this->paracetamol());
 
-        $this->post($this->url($paracetamol), [
+        $this->postGive($paracetamol, [
             'dose_amount' => 2, 'observed_reason' => 'reported_pain',
         ]);
 
@@ -785,7 +820,7 @@ class Record7PrnTest extends Record7TestCase
         $this->assertSame('self_administered', $salbutamol->support_type);
         $this->assertSame('check_and_record', $salbutamol->self_administration_monitoring);
 
-        $this->post($this->url($salbutamol), [
+        $this->postGive($salbutamol, [
             'dose_amount' => 2, 'observed_reason' => 'reported_breathless',
         ])->assertRedirect('/record7/person/'.$salbutamol->client_id.'/prn');
 
@@ -817,7 +852,7 @@ class Record7PrnTest extends Record7TestCase
         $this->assertSame('2.5', $eligibility['nextSection']);
 
         // And so does the server, when the button is bypassed entirely.
-        $this->post($this->url($lorazepam), [
+        $this->postGive($lorazepam, [
             'dose_amount' => 1, 'observed_reason' => 'observed_distress',
         ])->assertSessionHas('r7.error');
 
@@ -852,7 +887,7 @@ class Record7PrnTest extends Record7TestCase
         $events = StockEvent::count();
         $levels = DB::connection('record7')->table('record7_stock_levels')->get()->toArray();
 
-        $this->post($this->url($paracetamol), [
+        $this->postGive($paracetamol, [
             'dose_amount' => 2, 'observed_reason' => 'reported_pain',
         ]);
 
@@ -955,7 +990,7 @@ class Record7PrnTest extends Record7TestCase
             ->where('competency_type_id', $gate->id)
             ->update(['status' => 'expired']);
 
-        $this->post($this->url($paracetamol), [
+        $this->postGive($paracetamol, [
             'dose_amount' => 2, 'observed_reason' => 'reported_pain',
         ])->assertForbidden();
 
@@ -1006,5 +1041,678 @@ class Record7PrnTest extends Record7TestCase
             'dose_unit' => $p->dose_unit,
             'administered_at' => $at,
         ]);
+    }
+
+    /* ── 2.4 correction. One clinical attempt, one record. ──────────────── */
+
+    /**
+     * The double-click. Same token, twice.
+     *
+     * This is the case the section was reopened for: nothing about the request
+     * is suspicious, it simply arrives twice, and only the token can tell that
+     * apart from a second dose the prescription would have allowed.
+     */
+    public function test_replaying_the_same_attempt_records_one_administration(): void
+    {
+        $this->signInWithoutRound();
+        $paracetamol = $this->freshPrn($this->paracetamol());
+
+        $token = $this->attemptToken($paracetamol);
+        $this->assertNotNull($token, 'The screen must issue an attempt.');
+
+        $payload = [
+            'dose_amount' => 2,
+            'observed_reason' => 'reported_pain',
+            'attempt_token' => $token,
+        ];
+
+        $this->post($this->url($paracetamol), $payload)
+            ->assertRedirect('/record7/person/'.$paracetamol->client_id.'/prn');
+
+        // The very same attempt, sent again.
+        $this->post($this->url($paracetamol), $payload)
+            ->assertRedirect('/record7/person/'.$paracetamol->client_id.'/prn');
+
+        $this->assertSame(
+            1,
+            Administration::where('prescription_id', $paracetamol->id)->count(),
+            'One attempt is one administration, however many times it arrives.'
+        );
+
+        // And exactly one ask-back, not two.
+        $this->assertSame(
+            1,
+            PrnFollowUp::whereIn(
+                'administration_id',
+                Administration::where('prescription_id', $paracetamol->id)->pluck('id')
+            )->count()
+        );
+    }
+
+    /** A replay is not an error. Nothing went wrong; it just already happened. */
+    public function test_a_replay_reports_that_nothing_new_was_recorded(): void
+    {
+        $this->signInWithoutRound();
+        $paracetamol = $this->freshPrn($this->paracetamol());
+
+        $payload = [
+            'dose_amount' => 2,
+            'observed_reason' => 'reported_pain',
+            'attempt_token' => $this->attemptToken($paracetamol),
+        ];
+
+        $this->post($this->url($paracetamol), $payload)
+            ->assertSessionHas('r7.recorded.created', true);
+
+        $this->post($this->url($paracetamol), $payload)
+            ->assertSessionHas('r7.recorded.created', false)
+            ->assertSessionMissing('r7.error');
+    }
+
+    /** Two workers, one token, at the same moment. */
+    public function test_two_concurrent_submissions_of_one_attempt_record_once(): void
+    {
+        $this->signInWithoutRound();
+        $paracetamol = $this->freshPrn($this->paracetamol());
+
+        $token = $this->attemptToken($paracetamol);
+        $attempt = PrnAttempt::where('token', $token)->firstOrFail();
+        $person = Client::findOrFail($paracetamol->client_id);
+        $user = $this->user('noah.williams');
+
+        // Both reach the service with the same attempt. The second must find it
+        // spent and hand back what the first created.
+        $first = $this->prn()->record(
+            $user, $person->service_id, $person, $paracetamol,
+            2.0, 'reported_pain', null, request(), $token
+        );
+
+        $second = $this->prn()->record(
+            $user, $person->service_id, $person, $paracetamol,
+            2.0, 'reported_pain', null, request(), $token
+        );
+
+        $this->assertTrue($first['created']);
+        $this->assertFalse($second['created'], 'The second must not create.');
+        $this->assertSame($first['administration']->id, $second['administration']->id);
+
+        $this->assertSame(1, Administration::where('prescription_id', $paracetamol->id)->count());
+        $this->assertTrue($attempt->fresh()->isSpent());
+    }
+
+    /** A token nobody issued buys nothing. */
+    public function test_an_unknown_attempt_token_is_refused(): void
+    {
+        $this->signInWithoutRound();
+        $paracetamol = $this->freshPrn($this->paracetamol());
+
+        $this->post($this->url($paracetamol), [
+            'dose_amount' => 2,
+            'observed_reason' => 'reported_pain',
+            'attempt_token' => 'i-made-this-up-entirely',
+        ])->assertSessionHas('r7.error');
+
+        $this->assertSame(0, Administration::where('prescription_id', $paracetamol->id)->count());
+    }
+
+    /** Nor does omitting it. */
+    public function test_a_missing_attempt_token_is_refused(): void
+    {
+        $this->signInWithoutRound();
+        $paracetamol = $this->freshPrn($this->paracetamol());
+
+        $this->post($this->url($paracetamol), [
+            'dose_amount' => 2,
+            'observed_reason' => 'reported_pain',
+        ])->assertSessionHasErrors('attempt_token');
+
+        $this->assertSame(0, Administration::where('prescription_id', $paracetamol->id)->count());
+    }
+
+    /**
+     * A token issued for one medicine cannot be spent on another.
+     *
+     * The attack this closes: open a screen you are allowed to open, then aim
+     * the attempt it gave you at something you are not.
+     */
+    public function test_an_attempt_token_cannot_be_spent_on_another_prescription(): void
+    {
+        $this->signInWithoutRound();
+
+        $paracetamol = $this->freshPrn($this->paracetamol());
+        $salbutamol = $this->freshPrn($this->salbutamol());
+
+        $token = $this->attemptToken($salbutamol);
+
+        $this->post($this->url($paracetamol), [
+            'dose_amount' => 2,
+            'observed_reason' => 'reported_pain',
+            'attempt_token' => $token,
+        ])->assertSessionHas('r7.error');
+
+        $this->assertSame(0, Administration::where('prescription_id', $paracetamol->id)->count());
+        $this->assertFalse(PrnAttempt::where('token', $token)->firstOrFail()->isSpent());
+    }
+
+    /**
+     * Nor at another person's medicine.
+     *
+     * Not simulated by editing the attempt — the database refuses to re-point
+     * one, which is itself part of the guard. This is the real attack: a token
+     * legitimately issued on one screen, submitted against another.
+     */
+    public function test_an_attempt_token_cannot_be_spent_on_another_persons_medicine(): void
+    {
+        $this->signInWithoutRound();
+
+        $mine = $this->freshPrn($this->paracetamol());
+        $theirs = $this->freshPrn($this->salbutamol());
+
+        // Two different people, confirmed rather than assumed.
+        $this->assertNotSame($mine->client_id, $theirs->client_id);
+
+        $token = $this->attemptToken($theirs);
+
+        $this->post($this->url($mine), [
+            'dose_amount' => 2,
+            'observed_reason' => 'reported_pain',
+            'attempt_token' => $token,
+        ])->assertSessionHas('r7.error');
+
+        $this->assertSame(0, Administration::where('prescription_id', $mine->id)->count());
+        $this->assertSame(0, Administration::where('prescription_id', $theirs->id)->count());
+        $this->assertFalse(PrnAttempt::where('token', $token)->firstOrFail()->isSpent());
+    }
+
+    /**
+     * A colleague's attempt is not yours to spend.
+     *
+     * Both workers may give this medicine to this person, so nothing else in
+     * the request distinguishes them. Only who the attempt was issued to does.
+     */
+    public function test_an_attempt_token_issued_to_another_worker_is_refused(): void
+    {
+        $this->signInWithoutRound('noah.williams');
+        $paracetamol = $this->freshPrn($this->paracetamol());
+
+        $theirToken = $this->attemptToken($paracetamol);
+        $this->assertNotNull($theirToken);
+
+        // A different worker, equally entitled to be here, picks it up.
+        $this->signInWithoutRound('olivia.carter');
+
+        $this->post($this->url($paracetamol), [
+            'dose_amount' => 2,
+            'observed_reason' => 'reported_pain',
+            'attempt_token' => $theirToken,
+        ])->assertSessionHas('r7.error');
+
+        $this->assertSame(0, Administration::where('prescription_id', $paracetamol->id)->count());
+        $this->assertFalse(PrnAttempt::where('token', $theirToken)->firstOrFail()->isSpent());
+    }
+
+    /**
+     * The point of all this: a genuinely second dose still works.
+     *
+     * Idempotency must not become a limit. Where the prescription permits
+     * another dose, a new attempt records it.
+     */
+    public function test_a_genuinely_new_attempt_still_records_a_second_dose(): void
+    {
+        $this->signInWithoutRound();
+
+        // No interval and no maximum: nothing but the attempt distinguishes
+        // these two, which is exactly the case a timestamp guess would break.
+        $paracetamol = $this->freshPrn($this->paracetamol());
+        $paracetamol->forceFill([
+            'prn_min_gap_minutes' => null,
+            'prn_max_administrations' => null,
+            'prn_max_total_amount' => null,
+        ])->save();
+
+        foreach (range(1, 2) as $ignored) {
+            $this->postGive($paracetamol, [
+                'dose_amount' => 2,
+                'observed_reason' => 'reported_pain',
+            ]);
+        }
+
+        $this->assertSame(
+            2,
+            Administration::where('prescription_id', $paracetamol->id)->count(),
+            'A second attempt is a second dose when the prescription allows it.'
+        );
+    }
+
+    /**
+     * Two distinct attempts cannot both pass a limit from stale history.
+     *
+     * Each opens its own screen while the allowance still shows room, so both
+     * were offered the button. Only one may spend it.
+     */
+    public function test_two_distinct_attempts_cannot_both_pass_the_last_permitted_dose(): void
+    {
+        $this->signInWithoutRound();
+
+        $paracetamol = $this->freshPrn($this->paracetamol());
+        $paracetamol->forceFill([
+            'prn_min_gap_minutes' => null,
+            'prn_max_administrations' => 1,
+            'prn_max_total_amount' => null,
+        ])->save();
+
+        // BOTH tokens minted BEFORE either is spent — the stale-read window.
+        $first = $this->attemptToken($paracetamol);
+        $second = $this->attemptToken($paracetamol);
+
+        $this->assertNotSame($first, $second);
+
+        $this->post($this->url($paracetamol), [
+            'dose_amount' => 2, 'observed_reason' => 'reported_pain',
+            'attempt_token' => $first,
+        ]);
+
+        $this->post($this->url($paracetamol), [
+            'dose_amount' => 2, 'observed_reason' => 'reported_pain',
+            'attempt_token' => $second,
+        ])->assertSessionHas('r7.error');
+
+        $this->assertSame(
+            1,
+            Administration::where('prescription_id', $paracetamol->id)->count(),
+            'The maximum is one, and it was evaluated where the write happens.'
+        );
+    }
+
+    /** The guards run inside the lock, not before it. */
+    public function test_the_interval_is_re_evaluated_after_the_screen_was_opened(): void
+    {
+        $this->signInWithoutRound();
+
+        $paracetamol = $this->freshPrn($this->paracetamol());
+        $paracetamol->forceFill(['prn_min_gap_minutes' => 240])->save();
+
+        // The screen opens while nothing has been given.
+        $token = $this->attemptToken($paracetamol);
+        $this->assertNotNull($token);
+
+        // Somebody else gives a dose in the meantime.
+        $this->givenHoursAgo($paracetamol, 2.0, 0);
+
+        $this->post($this->url($paracetamol), [
+            'dose_amount' => 2, 'observed_reason' => 'reported_pain',
+            'attempt_token' => $token,
+        ])->assertSessionHas('r7.error');
+
+        $this->assertSame(
+            1,
+            Administration::where('prescription_id', $paracetamol->id)->count(),
+            'The button having been offered is not evidence it is still allowed.'
+        );
+    }
+
+    /** A spent attempt is history. The database refuses to move it. */
+    public function test_a_spent_attempt_cannot_be_re_pointed(): void
+    {
+        $this->signInWithoutRound();
+        $paracetamol = $this->freshPrn($this->paracetamol());
+
+        $this->postGive($paracetamol, [
+            'dose_amount' => 2, 'observed_reason' => 'reported_pain',
+        ]);
+
+        $attempt = PrnAttempt::whereNotNull('administration_id')
+            ->where('prescription_id', $paracetamol->id)->firstOrFail();
+
+        $this->expectException(\Illuminate\Database\QueryException::class);
+
+        DB::connection('record7')->table('record7_prn_attempts')
+            ->where('id', $attempt->id)->update(['consumed_at' => null, 'administration_id' => null]);
+    }
+
+    /** Still blocked, and the token cannot be used to sneak past it. */
+    public function test_a_controlled_prn_is_refused_even_with_a_valid_attempt(): void
+    {
+        $this->signInWithoutRound();
+        $lorazepam = $this->lorazepam();
+
+        $before = Administration::where('prescription_id', $lorazepam->id)->count();
+
+        $this->postGive($lorazepam, [
+            'dose_amount' => 1, 'observed_reason' => 'reported_pain',
+        ])->assertSessionHas('r7.error');
+
+        $this->assertSame(
+            $before,
+            Administration::where('prescription_id', $lorazepam->id)->count(),
+            'Controlled as-required stays with Section 2.5.'
+        );
+    }
+
+    /**
+     * The prescription row really is locked while the decision is made.
+     *
+     * WHY THIS TEST IS SHAPED LIKE THIS.
+     * A single-threaded test suite cannot observe a lock doing its job — there
+     * is no second connection to be held up. Removing lockForUpdate() breaks no
+     * behavioural test, which would leave the most important guard in this
+     * change completely unguarded.
+     *
+     * So this asserts the statement itself. It is a structural test rather than
+     * a behavioural one, and it is here precisely because the behaviour cannot
+     * be reached from one thread.
+     */
+    public function test_the_prescription_row_is_locked_while_the_decision_is_made(): void
+    {
+        $this->signInWithoutRound();
+        $paracetamol = $this->freshPrn($this->paracetamol());
+        $token = $this->attemptToken($paracetamol);
+
+        $connection = DB::connection('record7');
+        $connection->flushQueryLog();
+        $connection->enableQueryLog();
+
+        $this->post($this->url($paracetamol), [
+            'dose_amount' => 2, 'observed_reason' => 'reported_pain',
+            'attempt_token' => $token,
+        ]);
+
+        $statements = collect($connection->getQueryLog())
+            ->pluck('query')
+            ->map(fn ($q) => strtolower($q));
+
+        $connection->disableQueryLog();
+
+        $this->assertTrue(
+            $statements->contains(fn ($q) => str_contains($q, 'record7_prescriptions')
+                && str_contains($q, 'for update')),
+            'The prescription must be selected FOR UPDATE before anything is decided.'
+        );
+
+        $this->assertTrue(
+            $statements->contains(fn ($q) => str_contains($q, 'record7_prn_attempts')
+                && str_contains($q, 'for update')),
+            'The attempt must be claimed under a lock, not merely read.'
+        );
+
+        // And it was a real administration, not a refusal that skipped the lock.
+        $this->assertSame(1, Administration::where('prescription_id', $paracetamol->id)->count());
+    }
+
+    /** Nothing here touches stock. */
+    public function test_the_attempt_flow_changes_no_stock(): void
+    {
+        $this->signInWithoutRound();
+        $paracetamol = $this->freshPrn($this->paracetamol());
+
+        $levels = DB::connection('record7')->table('record7_stock_levels')
+            ->orderBy('id')->pluck('quantity', 'id')->toArray();
+        $events = StockEvent::count();
+
+        $this->postGive($paracetamol, [
+            'dose_amount' => 2, 'observed_reason' => 'reported_pain',
+        ]);
+
+        $this->assertSame($levels, DB::connection('record7')->table('record7_stock_levels')
+            ->orderBy('id')->pluck('quantity', 'id')->toArray());
+        $this->assertSame($events, StockEvent::count());
+    }
+
+    /* ── 2.4 correction, part two. The database, not just the model. ────── */
+
+    /**
+     * A spent attempt, made the ordinary way, for the raw-SQL attacks below.
+     *
+     * @return array{0:PrnAttempt,1:Prescription}
+     */
+    private function spentAttempt(): array
+    {
+        $this->signInWithoutRound();
+        $paracetamol = $this->freshPrn($this->paracetamol());
+
+        $this->postGive($paracetamol, [
+            'dose_amount' => 2, 'observed_reason' => 'reported_pain',
+        ]);
+
+        $attempt = PrnAttempt::whereNotNull('administration_id')
+            ->where('prescription_id', $paracetamol->id)->firstOrFail();
+
+        return [$attempt, $paracetamol];
+    }
+
+    /** An attempt nobody has spent yet. */
+    private function unspentAttempt(): PrnAttempt
+    {
+        $this->signInWithoutRound();
+        $paracetamol = $this->freshPrn($this->paracetamol());
+        $token = $this->attemptToken($paracetamol);
+
+        return PrnAttempt::where('token', $token)->firstOrFail();
+    }
+
+    /**
+     * Raw SQL, deliberately bypassing Eloquent.
+     *
+     * The model guards are real, but a statement issued from a console or a
+     * future controller never passes through them. These assert the database
+     * refuses on its own.
+     */
+    private function assertRawSqlRefused(string $sql, array $bindings = []): void
+    {
+        try {
+            DB::connection('record7')->statement($sql, $bindings);
+            $this->fail('The database allowed: '.$sql);
+        } catch (QueryException $refused) {
+            $this->assertNotEmpty($refused->getMessage());
+        }
+    }
+
+    public function test_raw_sql_cannot_delete_an_unspent_attempt(): void
+    {
+        $attempt = $this->unspentAttempt();
+
+        $this->assertRawSqlRefused(
+            'DELETE FROM record7_prn_attempts WHERE id = ?', [$attempt->id]
+        );
+
+        $this->assertNotNull($attempt->fresh(), 'The attempt must survive.');
+    }
+
+    public function test_raw_sql_cannot_delete_a_spent_attempt(): void
+    {
+        [$attempt] = $this->spentAttempt();
+
+        $this->assertRawSqlRefused(
+            'DELETE FROM record7_prn_attempts WHERE id = ?', [$attempt->id]
+        );
+
+        $this->assertNotNull(
+            $attempt->fresh(),
+            'Deleting a spent attempt would erase how the dose came to be recorded.'
+        );
+    }
+
+    public function test_raw_sql_cannot_change_when_an_attempt_was_issued(): void
+    {
+        $attempt = $this->unspentAttempt();
+
+        $this->assertRawSqlRefused(
+            'UPDATE record7_prn_attempts SET issued_at = ? WHERE id = ?',
+            ['2020-01-01 00:00:00', $attempt->id]
+        );
+
+        $this->assertEquals($attempt->issued_at, $attempt->fresh()->issued_at);
+    }
+
+    /** Every field that says who and what this attempt was for. */
+    public function test_raw_sql_cannot_change_the_ownership_of_an_attempt(): void
+    {
+        $attempt = $this->unspentAttempt();
+        $elsewhere = $this->house('Rosewood House');
+        $someoneElse = Client::where('id', '!=', $attempt->client_id)->firstOrFail();
+        $otherPrescription = Prescription::where('id', '!=', $attempt->prescription_id)->firstOrFail();
+        $otherUser = $this->user('olivia.carter');
+
+        foreach ([
+            ['token', 'rewritten-token'],
+            ['organisation_id', $elsewhere->organisation_id],
+            ['service_id', $elsewhere->id],
+            ['client_id', $someoneElse->id],
+            ['prescription_id', $otherPrescription->id],
+            ['issued_to_user_id', $otherUser->id],
+        ] as [$column, $value]) {
+            $this->assertRawSqlRefused(
+                "UPDATE record7_prn_attempts SET {$column} = ? WHERE id = ?",
+                [$value, $attempt->id]
+            );
+        }
+
+        $fresh = $attempt->fresh();
+        $this->assertSame($attempt->token, $fresh->token);
+        $this->assertSame($attempt->client_id, $fresh->client_id);
+        $this->assertSame($attempt->prescription_id, $fresh->prescription_id);
+        $this->assertSame($attempt->service_id, $fresh->service_id);
+        $this->assertSame($attempt->issued_to_user_id, $fresh->issued_to_user_id);
+    }
+
+    /** Consumed is a pair. Half of it is not a state. */
+    public function test_raw_sql_cannot_consume_only_half_of_the_pair(): void
+    {
+        $attempt = $this->unspentAttempt();
+        [$other] = $this->spentAttempt();
+
+        $this->assertRawSqlRefused(
+            'UPDATE record7_prn_attempts SET consumed_at = NOW() WHERE id = ?',
+            [$attempt->id]
+        );
+
+        $this->assertRawSqlRefused(
+            'UPDATE record7_prn_attempts SET administration_id = ? WHERE id = ?',
+            [$other->administration_id, $attempt->id]
+        );
+
+        $this->assertFalse($attempt->fresh()->isSpent());
+    }
+
+    /**
+     * The administration must be the one this attempt was actually for.
+     *
+     * Checked at the database, because the route through the
+     * application is the one these attacks deliberately never take.
+     */
+    public function test_raw_sql_cannot_consume_using_an_unrelated_administration(): void
+    {
+        $attempt = $this->unspentAttempt();
+
+        // A real administration, for somebody else entirely.
+        $elsewhere = Administration::where('client_id', '!=', $attempt->client_id)
+            ->whereNotIn('id', PrnAttempt::whereNotNull('administration_id')->pluck('administration_id'))
+            ->firstOrFail();
+
+        $this->assertRawSqlRefused(
+            'UPDATE record7_prn_attempts SET consumed_at = NOW(), administration_id = ? WHERE id = ?',
+            [$elsewhere->id, $attempt->id]
+        );
+
+        $this->assertRawSqlRefused(
+            'UPDATE record7_prn_attempts SET consumed_at = NOW(), administration_id = ? WHERE id = ?',
+            [999999, $attempt->id]
+        );
+
+        $this->assertFalse($attempt->fresh()->isSpent());
+    }
+
+    /** Spent is final, including where it points. */
+    public function test_raw_sql_cannot_repoint_or_clear_a_spent_attempt(): void
+    {
+        [$attempt] = $this->spentAttempt();
+        $originalAdministration = $attempt->administration_id;
+
+        $free = Administration::whereNotIn(
+            'id', PrnAttempt::whereNotNull('administration_id')->pluck('administration_id')
+        )->firstOrFail();
+
+        $this->assertRawSqlRefused(
+            'UPDATE record7_prn_attempts SET administration_id = ? WHERE id = ?',
+            [$free->id, $attempt->id]
+        );
+
+        $this->assertRawSqlRefused(
+            'UPDATE record7_prn_attempts SET consumed_at = NULL, administration_id = NULL WHERE id = ?',
+            [$attempt->id]
+        );
+
+        $this->assertRawSqlRefused(
+            'UPDATE record7_prn_attempts SET consumed_at = ? WHERE id = ?',
+            ['2020-01-01 00:00:00', $attempt->id]
+        );
+
+        $this->assertSame($originalAdministration, $attempt->fresh()->administration_id);
+    }
+
+    /** An attempt is born unspent; it cannot be inserted already consumed. */
+    public function test_raw_sql_cannot_insert_an_already_consumed_attempt(): void
+    {
+        [$spent, $prescription] = $this->spentAttempt();
+
+        $this->assertRawSqlRefused(
+            'INSERT INTO record7_prn_attempts
+                (token, organisation_id, service_id, client_id, prescription_id,
+                 issued_to_user_id, issued_at, consumed_at, administration_id)
+             VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW(), ?)',
+            [
+                'forged-preconsumed-'.uniqid(),
+                $spent->organisation_id, $spent->service_id, $spent->client_id,
+                $prescription->id, $spent->issued_to_user_id,
+                $spent->administration_id,
+            ]
+        );
+    }
+
+    /**
+     * And the transition that IS allowed still works — exactly once.
+     *
+     * Everything above is a refusal, so this is the test that proves the
+     * refusals have not simply closed the door on the real path.
+     */
+    public function test_the_valid_transition_still_succeeds_exactly_once(): void
+    {
+        $this->signInWithoutRound();
+        $paracetamol = $this->freshPrn($this->paracetamol());
+
+        $token = $this->attemptToken($paracetamol);
+        $attempt = PrnAttempt::where('token', $token)->firstOrFail();
+
+        $this->assertFalse($attempt->isSpent(), 'Issued unspent.');
+
+        $this->post($this->url($paracetamol), [
+            'dose_amount' => 2,
+            'observed_reason' => 'reported_pain',
+            'attempt_token' => $token,
+        ])->assertRedirect('/record7/person/'.$paracetamol->client_id.'/prn');
+
+        $spent = $attempt->fresh();
+
+        $this->assertTrue($spent->isSpent(), 'Consumed.');
+        $this->assertNotNull($spent->administration_id, 'Both halves set together.');
+
+        $administration = Administration::findOrFail($spent->administration_id);
+        $this->assertSame($paracetamol->id, $administration->prescription_id);
+        $this->assertSame($paracetamol->client_id, $administration->client_id);
+        $this->assertSame($spent->issued_to_user_id, $administration->recorded_by_user_id);
+
+        // And only once: the same token again adds nothing.
+        $this->post($this->url($paracetamol), [
+            'dose_amount' => 2,
+            'observed_reason' => 'reported_pain',
+            'attempt_token' => $token,
+        ]);
+
+        $this->assertSame(1, Administration::where('prescription_id', $paracetamol->id)->count());
+        $this->assertSame(
+            $administration->id,
+            $attempt->fresh()->administration_id,
+            'The linkage never moved.'
+        );
     }
 }
