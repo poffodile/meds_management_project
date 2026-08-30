@@ -3423,3 +3423,45 @@
    "late" once answered, and somebody offering it again hours later has to know
    that before they decide. */
 .r7-root .r7-reoffer__late { color: var(--r7-state-error); font-size: var(--r7-size-sm); }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   34. Section 2.4 — as-required medicines
+
+   The window block is the point of this screen. A worker told only "you
+   cannot give this" has nothing to act on and nothing to question; the
+   arithmetic — when the last dose was, how many, how much — is what lets
+   them decide whether to wait, ring the GP, or try something that is not a
+   medicine at all.
+
+   Where the prescription states no limit, that absence is said out loud in
+   the muted line rather than left as blank space, because blank space reads
+   as "no limit exists" and it may only mean "nobody wrote one down".
+   ───────────────────────────────────────────────────────────────────────── */
+
+.r7-root .r7-prn-window {
+  display: flex;
+  flex-direction: column;
+  gap: var(--r7-space-2);
+  padding: var(--r7-space-4);
+  background: var(--r7-surface-sunken);
+  border-left: var(--r7-border-emphasis-width) solid var(--r7-colour-interactive);
+  border-radius: var(--r7-radius-sm);
+  max-width: var(--r7-measure);
+}
+
+.r7-root .r7-prn-window__title {
+  font-family: var(--r7-font-display);
+  font-weight: var(--r7-weight-semi);
+  color: var(--r7-text-primary);
+}
+
+.r7-root .r7-prn-window__line {
+  font-size: var(--r7-size-sm);
+  color: var(--r7-text-primary);
+}
+
+/* What the prescription does NOT say. Muted, but present. */
+.r7-root .r7-prn-window__silent {
+  font-size: var(--r7-size-sm);
+  color: var(--r7-text-muted);
+}

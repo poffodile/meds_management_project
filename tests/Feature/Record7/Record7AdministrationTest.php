@@ -30,6 +30,9 @@ use Illuminate\Support\Facades\DB;
  */
 class Record7AdministrationTest extends Record7TestCase
 {
+    /** These describe the medication day, so they run at a fixed hour in it. */
+    protected bool $anchorClockToFixtureDay = true;
+
     private function oakwood(): Service
     {
         return $this->house('Oakwood House');

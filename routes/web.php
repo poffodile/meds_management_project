@@ -3206,6 +3206,7 @@ use App\Http\Controllers\Record7\HouseController as R7House;
 use App\Http\Controllers\Record7\SessionController as R7Session;
 use App\Http\Controllers\Record7\SignInController as R7SignIn;
 use App\Http\Controllers\Record7\ManagerController as R7Manager;
+use App\Http\Controllers\Record7\PrnController as R7Prn;
 use App\Http\Controllers\Record7\RoundController as R7Round;
 use App\Http\Controllers\Record7\TodayController as R7Today;
 use App\Http\Middleware\Record7\Authenticate as R7Authenticate;
@@ -3348,6 +3349,41 @@ Route::prefix('record7')->name('record7.')->group(function () {
             ->whereNumber('client')
             ->middleware([R7Authorize::class.':administer_medication', 'throttle:60,1'])
             ->name('round.welfare.record');
+
+        /* 2.4 — as-required medicines.
+
+           PERSON-SCOPED, NOT ROUND-SCOPED. Somebody in pain at three in the
+           morning is not a medication round, and requiring one would leave a
+           worker choosing between refusing a needed medicine and opening a fake
+           round. Every authority check the round makes still runs here; only
+           the requirement for an open round is dropped, because that is a
+           scheduling fact rather than a safety one. */
+        Route::get('/person/{client}/prn', [R7Prn::class, 'index'])
+            ->whereNumber('client')
+            ->middleware(R7Authorize::class.':administer_medication')
+            ->name('prn');
+
+        Route::get('/person/{client}/prn/{prescription}', [R7Prn::class, 'give'])
+            ->whereNumber('client')->whereNumber('prescription')
+            ->middleware(R7Authorize::class.':administer_medication')
+            ->name('prn.give');
+
+        Route::post('/person/{client}/prn/{prescription}', [R7Prn::class, 'record'])
+            ->whereNumber('client')->whereNumber('prescription')
+            ->middleware([R7Authorize::class.':administer_medication', 'throttle:60,1'])
+            ->name('prn.record');
+
+        /* The ask-back. Giving somebody paracetamol and never asking whether it
+           worked is how a person stays in pain all afternoon. */
+        Route::get('/prn/follow-up/{followUp}', [R7Prn::class, 'review'])
+            ->whereNumber('followUp')
+            ->middleware(R7Authorize::class.':administer_medication')
+            ->name('prn.review');
+
+        Route::post('/prn/follow-up/{followUp}', [R7Prn::class, 'recordReview'])
+            ->whereNumber('followUp')
+            ->middleware([R7Authorize::class.':administer_medication', 'throttle:60,1'])
+            ->name('prn.review.record');
 
         /* 1.1 — confirming you have read the handover. Anybody in the house
            may do this: being told what happened overnight is not privileged. */

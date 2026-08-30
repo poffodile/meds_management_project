@@ -3,9 +3,11 @@
 namespace Tests\Feature\Record7;
 
 use App\Models\Record7\Organisation;
+use App\Models\Record7\ScheduledDose;
 use App\Models\Record7\Service;
 use App\Models\Record7\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Carbon;
 use Tests\TestCase;
 
 /**
@@ -43,6 +45,25 @@ abstract class Record7TestCase extends TestCase
 
     protected const CODE = '246810';
 
+    /**
+     * Mid-afternoon: the morning round is behind us and the evening one is not.
+     *
+     * Chosen so that a test which reaches backwards a few hours to make a dose
+     * late stays inside the same day, and one that looks at "this morning"
+     * finds something that has already happened.
+     */
+    private const FIXTURE_HOUR = 14;
+
+    /**
+     * Opt in where the tests are about the medication DAY.
+     *
+     * Off by default, deliberately. Section 0 has its own time semantics — an
+     * activation link seeded on Thursday expires on Sunday morning, and pinning
+     * the clock to Sunday afternoon would expire it. Those tests want the real
+     * clock; the medication-day suites want the fixture's.
+     */
+    protected bool $anchorClockToFixtureDay = false;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -53,6 +74,56 @@ abstract class Record7TestCase extends TestCase
                 .'RECORD7_ALLOW_FIXTURE_SEED=true php artisan db:seed --class=Record7Section0Seeder'
             );
         }
+
+        if ($this->anchorClockToFixtureDay) {
+            $this->anchorTheClockToTheFixture();
+        }
+    }
+
+    protected function tearDown(): void
+    {
+        // Never leave a frozen clock behind for whatever runs next.
+        Carbon::setTestNow();
+
+        parent::tearDown();
+    }
+
+    /**
+     * Run the suite at a fixed point in the fixture's own day.
+     *
+     * WHY THIS EXISTS.
+     * The fixture is anchored to whenever it was seeded, and a great many of
+     * these tests describe behaviour that only exists at certain times: a dose
+     * is late, this morning's round is behind us, a medicine given three hours
+     * ago is still within today. Run at ten past midnight, all of that is
+     * false — the morning is in the future, and a test reaching back five hours
+     * to make something late lands on yesterday and falls straight out of the
+     * round's own date filter.
+     *
+     * That is not the product misbehaving. It is a suite whose invariants
+     * depend on the hour, being run at an hour nobody had in mind.
+     *
+     * So the clock is pinned to the FIXTURE'S date, read from the data rather
+     * than written down here — no literal date appears in this file, and
+     * reseeding on any day still works. Production is untouched: this is a
+     * test-time freeze and nothing else.
+     *
+     * A test that needs a different moment overrides it with its own
+     * Carbon::setTestNow(), and tearDown clears whichever was in force.
+     */
+    private function anchorTheClockToTheFixture(): void
+    {
+        $anchor = ScheduledDose::orderByDesc('due_at')->value('due_at');
+
+        // Section 0 fixtures carry no doses at all; those tests do not care
+        // what time it is, so the real clock is left alone.
+        if ($anchor === null) {
+            return;
+        }
+
+        Carbon::setTestNow(
+            Carbon::parse($anchor)->startOfDay()->addHours(self::FIXTURE_HOUR)
+        );
     }
 
     protected function user(string $username): User

@@ -79,6 +79,7 @@ class Record7Section12Seeder extends Seeder
         $connection->unprepared('DROP TRIGGER IF EXISTS record7_administrations_no_delete');
 
         try {
+            $this->withFixtureClock(function () use ($connection, $rosewood, $oakwood, $daniel, $olivia, $sarah) {
             $connection->transaction(function () use ($rosewood, $oakwood, $daniel, $olivia, $sarah) {
                 $this->clear($rosewood, $oakwood);
 
@@ -100,6 +101,7 @@ class Record7Section12Seeder extends Seeder
                     'Rosewood House seeded: '.count($clients).' clients, '
                     .count($prescriptions).' prescriptions. Manager fixtures for Daniel Evans in place.'
                 );
+            });
             });
         } finally {
             $this->restoreDeleteGuard();
@@ -451,6 +453,39 @@ class Record7Section12Seeder extends Seeder
      * explanation, which is the most serious thing on either dashboard. And
      * Harold refused his amlodipine and nobody went back.
      */
+
+    /**
+     * Run the fixture at a stated moment, if one is given.
+     *
+     * This fixture only records what has already happened: a slot still ahead
+     * of the clock is left unanswered, on purpose, because that is what a real
+     * shift looks like part-way through. Built at ten past midnight nothing has
+     * happened yet, so there is no refusal to re-offer and no gap to close —
+     * and several Section 1.2 tests need exactly those.
+     *
+     * RECORD7_FIXTURE_CLOCK pins the fixture to a stated moment so a test
+     * database is the same whenever it is built. Opt-in; unset, the preview
+     * keeps its live "now".
+     */
+    private function withFixtureClock(callable $work): void
+    {
+        $clock = env('RECORD7_FIXTURE_CLOCK');
+
+        if (! $clock) {
+            $work();
+
+            return;
+        }
+
+        Carbon::setTestNow(Carbon::parse($clock));
+
+        try {
+            $work();
+        } finally {
+            Carbon::setTestNow();
+        }
+    }
+
     private function day(Service $house, array $prescriptions, User $olivia): void
     {
         $now = now();

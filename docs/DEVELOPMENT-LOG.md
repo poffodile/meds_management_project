@@ -1937,3 +1937,60 @@ driver was the problem.
 
 Record7 395 (Section 2.3: 35), Frontend 4 67, JS 22, production build clean.
 Nothing committed.
+
+---
+
+## 30 August 2026 — Record7 Section 2.4, as-required medicines
+
+**The old limit column was lying, and the fixture proved it.** `prn_max_per_day`
+said `4` against Dennis's two-tablet paracetamol — four administrations — and
+`8` against Aisha's two-puff inhaler, which with a four-hour gap is unreachable
+as administrations and only makes sense as puffs. One number carrying two rules
+reads as enforced and is not. The column is untouched for history, and a test
+asserts its name appears nowhere in the PRN service.
+
+Structured limits replace it, one rule each: dose min/max/unit, a period, a
+maximum number of doses, a maximum total amount, a review interval. All nullable,
+and where a prescription is silent nothing is enforced and nothing invented.
+
+**Rolling, not midnight.** Four doses at ten and four after midnight is eight in
+six hours, all inside a calendar-day allowance. A test freezes the clock and
+shows rolling counting four where calendar counts two.
+
+**Only a real dose spends the allowance.** A refusal, an absence, a missing
+medicine, a missed dose — records, not doses. Somebody who said no at two and
+asks at three has had nothing, and four tests say so separately.
+
+**PRN left the round, deliberately.** Somebody in pain at three in the morning is
+not a medication round, and requiring one would mean refusing them or faking a
+round. Every authority check still runs through the same RoundAuthority; only the
+open-round requirement is dropped.
+
+**Effectiveness and concern are two questions.** A medicine can work perfectly
+and still leave a rash. `concerning_response` is its own column, needs what was
+seen and what was done, and never decides anything is safeguarding.
+
+**Two defects from earlier sections surfaced and were fixed.** The Section 2.3
+re-offer foreign keys made the fixture impossible to reseed — deleting a refusal
+something pointed at failed outright. Blanking the links first is refused by the
+no-rewrite trigger, correctly, so the clear-out now deletes newest-first: a link
+can only point at an earlier row, so descending ids remove every child before its
+parent without rewriting anything. Welfare checks needed the same trigger swap
+the administrations already had.
+
+**Three of my own test mistakes, found by running them.** A helper that deleted
+administrations (the append-only trigger refused it, rightly — it now creates
+fresh prescriptions instead); a midnight test anchored to the real clock, which
+at 23:40 measured the hour rather than the rule; and an expectation that the
+count guard would fire when the interval guard legitimately fires first.
+
+**Five mutations, all caught:** dropping the controlled block (1), letting a
+refusal consume the allowance (5), removing the interval (1), inventing a default
+limit (1), and using the legacy column as the rule (1).
+
+**Browser found two wording defects:** "For For back pain" from a template that
+assumed its input needed a preposition, and "2 puff" where the unit needed
+pluralising. Both fixed server-side so every surface agrees.
+
+Record7 448 (Section 2.4: 35), Frontend 4 67, JS 22, production build clean.
+Nothing committed.

@@ -107,6 +107,22 @@ class RoundPersonView
 
     /* ── Identity ───────────────────────────────────────────────────────── */
 
+    /**
+     * Who this is. Public because Section 2.4 needs the same identity block
+     * without a round — a PRN happens at three in the morning, not on a
+     * timetable, and the person must be checked exactly as carefully.
+     */
+    public function identityFor(Client $client): array
+    {
+        return $this->identity($client);
+    }
+
+    /** Allergies and what is not recorded, likewise reusable without a round. */
+    public function safetyFor(Client $client): array
+    {
+        return $this->safety($client);
+    }
+
     private function identity(Client $client): array
     {
         return [

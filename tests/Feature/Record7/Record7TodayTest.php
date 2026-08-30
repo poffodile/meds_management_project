@@ -22,6 +22,9 @@ use Illuminate\Support\Carbon;
  */
 class Record7TodayTest extends Record7TestCase
 {
+    /** These describe the medication day, so they run at a fixed hour in it. */
+    protected bool $anchorClockToFixtureDay = true;
+
     private function board(): ShiftBoard
     {
         return app(ShiftBoard::class);

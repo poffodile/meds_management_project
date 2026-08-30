@@ -70,12 +70,54 @@ class Record7Section1Seeder extends Seeder
         $connection = DB::connection('record7');
         $connection->unprepared('DROP TRIGGER IF EXISTS record7_administrations_no_delete');
 
+        // Section 2.4: welfare checks are append-only too, and one may be
+        // answering an administration this clear-out is about to remove.
+        $connection->unprepared('DROP TRIGGER IF EXISTS record7_welfare_checks_no_delete');
+
         try {
-            $connection->transaction(function () use ($house, $organisationId, $olivia) {
-                $this->seed($house, $organisationId, $olivia);
+            $this->withFixtureClock(function () use ($connection, $house, $organisationId, $olivia) {
+                $connection->transaction(function () use ($house, $organisationId, $olivia) {
+                    $this->seed($house, $organisationId, $olivia);
+                });
             });
         } finally {
             $this->restoreDeleteGuard();
+        }
+    }
+
+
+    /**
+     * Run the fixture at a stated moment, if one is given.
+     *
+     * WHY THIS EXISTS.
+     * This fixture is anchored to "now" on purpose — reseeding regenerates
+     * today, so the preview always looks like a real shift in progress. That is
+     * right for a preview and wrong for a test suite, because what the fixture
+     * contains depends on the hour it was built. Seeded at ten past midnight no
+     * slot has passed yet, so there are no administrations at all: no refusal
+     * to re-offer, no omission to chase, no gap for a manager to close. The day
+     * has not started.
+     *
+     * RECORD7_FIXTURE_CLOCK pins the fixture to a stated moment so a test
+     * database is the same whenever it is built. It is opt-in and changes
+     * nothing when unset — the preview keeps its live "now".
+     */
+    private function withFixtureClock(callable $work): void
+    {
+        $clock = env('RECORD7_FIXTURE_CLOCK');
+
+        if (! $clock) {
+            $work();
+
+            return;
+        }
+
+        Carbon::setTestNow(Carbon::parse($clock));
+
+        try {
+            $work();
+        } finally {
+            Carbon::setTestNow();
         }
     }
 
@@ -167,9 +209,31 @@ class Record7Section1Seeder extends Seeder
                 ->update(['linked_administration_id' => null]);
         }
 
-        // Through the query builder, not the model: the model refuses to delete
-        // an administration, and it is right to.
-        $connection->table('record7_administrations')->whereIn('client_id', $clientIds)->delete();
+        // Welfare checks answer an administration, so they go before it does.
+        $connection->table('record7_welfare_checks')->whereIn('client_id', $clientIds)->delete();
+
+        // NEWEST FIRST, because of the chain links.
+        //
+        // Section 2.3 gave administrations two self-referencing foreign keys —
+        // corrections and re-offers — so deleting a refusal that something else
+        // points at fails outright, and a fixture containing any re-offer
+        // became impossible to reseed.
+        //
+        // Blanking the links first is not an option and should not be: the
+        // no-rewrite trigger refuses it, correctly, because those links are part
+        // of the permanent record. But a link can only ever point at a row that
+        // already existed, so a higher id always references a lower one. Going
+        // down the ids therefore removes every child before its parent, without
+        // rewriting a single row.
+        //
+        // FICTIONAL data only — the guard at the top of this seeder refuses to
+        // run at all without an explicit environment flag.
+        $connection->table('record7_administrations')
+            ->whereIn('client_id', $clientIds)
+            ->orderByDesc('id')
+            ->pluck('id')
+            ->each(fn ($id) => $connection->table('record7_administrations')
+                ->where('id', $id)->delete());
         ScheduledDose::whereIn('client_id', $clientIds)->delete();
         Prescription::whereIn('client_id', $clientIds)->delete();
         ClientAllergy::whereIn('client_id', $clientIds)->delete();
@@ -198,6 +262,16 @@ class Record7Section1Seeder extends Seeder
             BEGIN
                 SIGNAL SQLSTATE '45000'
                 SET MESSAGE_TEXT = 'record7 administrations are a permanent record and cannot be deleted';
+            END
+        SQL);
+
+        DB::connection('record7')->unprepared(<<<'SQL'
+            CREATE TRIGGER record7_welfare_checks_no_delete
+            BEFORE DELETE ON record7_welfare_checks
+            FOR EACH ROW
+            BEGIN
+                SIGNAL SQLSTATE '45000'
+                SET MESSAGE_TEXT = 'a record7 welfare check cannot be deleted';
             END
         SQL);
     }
@@ -336,9 +410,20 @@ class Record7Section1Seeder extends Seeder
                 ]],
             ['terence-lansoprazole', 'terence', 'lansoprazole', 'One capsule', 'Oral', 'Once a day before food', ['Morning'], []],
 
+            // SALBUTAMOL — the limit is PUFFS, not doses.
+            //
+            // The old prn_max_per_day of 8 could not have meant eight
+            // administrations: with four hours between doses that is
+            // unreachable in a day. Two puffs a time, eight puffs in twenty-four
+            // hours, is the only reading the rest of this prescription supports.
+            // It is now written as an amount limit and says so.
             ['aisha-salbutamol', 'aisha', 'salbutamol', 'Two puffs', 'Inhaled', 'When required',
                 ['prn'], [
                     'prn_max_per_day' => 8,
+                    'dose_min' => 2, 'dose_max' => 2, 'dose_unit' => 'puff',
+                    'prn_limit_period' => 'rolling_24h',
+                    'prn_max_total_amount' => 8,
+                    'prn_review_after_minutes' => 60,
                     'prn_min_gap_minutes' => 240,
                     'prn_indication' => 'For breathlessness or wheeze',
                     // She manages this one herself. Recording it as staff
@@ -417,9 +502,20 @@ class Record7Section1Seeder extends Seeder
 
             ['dennis-metformin', 'dennis', 'metformin', 'One tablet', 'Oral', 'Twice a day with food',
                 ['Morning', 'Teatime'], []],
+            // PARACETAMOL — the limit is DOSES, and the two limits agree.
+            //
+            // Two tablets a time, four times, is eight tablets: the count and
+            // the amount describe the same ceiling from different directions.
+            // Both are stated so neither has to be inferred from the other, and
+            // so the fixture exercises both guards.
             ['dennis-paracetamol', 'dennis', 'paracetamol', 'Two tablets', 'Oral', 'When required',
                 ['prn'], [
                     'prn_max_per_day' => 4,
+                    'dose_min' => 2, 'dose_max' => 2, 'dose_unit' => 'tablet',
+                    'prn_limit_period' => 'rolling_24h',
+                    'prn_max_administrations' => 4,
+                    'prn_max_total_amount' => 8,
+                    'prn_review_after_minutes' => 60,
                     'prn_min_gap_minutes' => 240,
                     'prn_indication' => 'For back pain',
                 ]],
@@ -428,6 +524,10 @@ class Record7Section1Seeder extends Seeder
                 ['Morning'], ['support_type' => 'assisted']],
             ['joyce-lorazepam', 'joyce', 'lorazepam', 'One tablet', 'Oral', 'When required',
                 ['prn'], [
+                    // Deliberately NO structured limits: this is a controlled
+                    // drug and Section 2.4 cannot administer it at all. Adding
+                    // safety numbers it will never reach would suggest a
+                    // readiness Record7 does not have until Section 2.5.
                     'prn_max_per_day' => 2,
                     'prn_min_gap_minutes' => 360,
                     'prn_indication' => 'For severe agitation, when reassurance has not worked',
@@ -469,9 +569,22 @@ class Record7Section1Seeder extends Seeder
                             ? ($options['self_administration_monitoring'] ?? 'check_and_record')
                             : null,
                     'instructions' => $options['instructions'] ?? null,
+                    // Kept as it was, for history and for the front ends that
+                    // still read it. Nothing in Section 2.4 decides anything
+                    // from it — see the structured limits below.
                     'prn_max_per_day' => $options['prn_max_per_day'] ?? null,
                     'prn_min_gap_minutes' => $options['prn_min_gap_minutes'] ?? null,
                     'prn_indication' => $options['prn_indication'] ?? null,
+
+                    // Structured, one rule each, and null wherever the
+                    // prescription genuinely does not say.
+                    'dose_min' => $options['dose_min'] ?? null,
+                    'dose_max' => $options['dose_max'] ?? null,
+                    'dose_unit' => $options['dose_unit'] ?? null,
+                    'prn_limit_period' => $options['prn_limit_period'] ?? null,
+                    'prn_max_administrations' => $options['prn_max_administrations'] ?? null,
+                    'prn_max_total_amount' => $options['prn_max_total_amount'] ?? null,
+                    'prn_review_after_minutes' => $options['prn_review_after_minutes'] ?? null,
                     'starts_on' => $today->copy()->subMonths(6),
                     'status' => $options['status'] ?? 'active',
                     'changed_at' => $options['changed_at'] ?? null,
@@ -634,7 +747,8 @@ class Record7Section1Seeder extends Seeder
             'recorded_by_user_id' => $olivia->id,
             'witnessed_by_user_id' => null,
             'outcome' => 'given',
-            'reason_code' => 'prn_agitation',
+            'reason_code' => 'observed_distress',
+            'dose_amount' => 1, 'dose_unit' => 'tablet',
             'notes' => 'Awake and very distressed since about two. Sat with her first, '
                 .'no settling. Stock counted, 14 remaining.',
             'administered_at' => $givenAt,
@@ -644,7 +758,13 @@ class Record7Section1Seeder extends Seeder
             'administration_id' => $administration->id,
             'client_id' => $lorazepam->client_id,
             'service_id' => $house->id,
-            'due_at' => $givenAt->copy()->addHours(1),
+            // From the prescription where it states one. Lorazepam is
+            // controlled and carries no structured interval, so the fixture
+            // keeps the historical hour for this one legacy row rather than
+            // inventing an instruction.
+            'due_at' => $givenAt->copy()->addMinutes(
+                (int) ($lorazepam->prn_review_after_minutes ?? 60)
+            ),
             'outcome' => 'pending',
         ]);
 
@@ -662,7 +782,8 @@ class Record7Section1Seeder extends Seeder
                 'service_id' => $house->id,
                 'recorded_by_user_id' => $olivia->id,
                 'outcome' => 'given',
-                'reason_code' => 'prn_pain',
+                'reason_code' => 'reported_pain',
+                'dose_amount' => 2, 'dose_unit' => 'tablet',
                 'notes' => 'Lower back again. Rated it seven out of ten.',
                 'administered_at' => $painGivenAt,
             ]);
@@ -671,7 +792,9 @@ class Record7Section1Seeder extends Seeder
                 'administration_id' => $painAdministration->id,
                 'client_id' => $paracetamol->client_id,
                 'service_id' => $house->id,
-                'due_at' => $painGivenAt->copy()->addHour(),
+                'due_at' => $painGivenAt->copy()->addMinutes(
+                    (int) ($paracetamol->prn_review_after_minutes ?? 60)
+                ),
                 'outcome' => 'pending',
             ]);
         }

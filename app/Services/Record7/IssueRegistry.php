@@ -51,6 +51,7 @@ class IssueRegistry
         'review',
         'handover_unread',
         'welfare_check',
+        'prn_concerning_response',
     ];
 
     /** Split a key without trusting either half yet. */
@@ -98,6 +99,11 @@ class IssueRegistry
             'welfare_check' => Administration::where('service_id', $serviceId)
                 ->where('outcome', 'person_unavailable')
                 ->where('reason_code', 'not_found_in_service')
+                ->find($parsed['sourceId']),
+
+            // A response somebody was worried about, on a PRN in this house.
+            'prn_concerning_response' => PrnFollowUp::where('service_id', $serviceId)
+                ->where('concerning_response', true)
                 ->find($parsed['sourceId']),
             default => null,
         };
@@ -165,6 +171,14 @@ class IssueRegistry
             // since. It clears on a FACT: somebody records anything else for
             // them, or their status becomes a known whereabouts. Not on a tick.
             'welfare_check' => $this->personStillUnaccountedFor($serviceId, $id),
+
+            // Live while the concern stands on the record. Recorded by a person
+            // and, like every other condition here, not something a manager can
+            // clear by ticking — it clears when the clinical record says so.
+            'prn_concerning_response' => PrnFollowUp::where('service_id', $serviceId)
+                ->where('id', $id)
+                ->where('concerning_response', true)
+                ->exists(),
 
             default => true,
         };

@@ -56,6 +56,10 @@ class IssueState extends Record7Model
         'stock_out',
         'incomplete_record',
         'prn_follow_up',
+
+        // Somebody was worried enough about a response to write it down.
+        // Closing that needs evidence, not a tick.
+        'prn_concerning_response',
     ];
 
     public function owner(): BelongsTo

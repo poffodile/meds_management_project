@@ -25,6 +25,9 @@ use App\Services\Record7\RoundQueue;
  */
 class Record7PersonSafetyViewTest extends Record7TestCase
 {
+    /** These describe the medication day, so they run at a fixed hour in it. */
+    protected bool $anchorClockToFixtureDay = true;
+
     private function oakwood(): Service
     {
         return $this->house('Oakwood House');
