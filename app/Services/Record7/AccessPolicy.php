@@ -42,6 +42,7 @@ class AccessPolicy
         'stock_management',
         'reconciliation',
         'correction_approval',
+        'reopen_medication_round',
         'manage_staff',
         'manage_organisation',
     ];

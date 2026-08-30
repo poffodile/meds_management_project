@@ -3585,3 +3585,24 @@
 .r7-root .r7-cd-history__figures,
 .r7-root .r7-cd-history__who { color: var(--r7-text-secondary); font-size: var(--r7-size-sm); }
 .r7-root .r7-cd-history__balance { font-variant-numeric: tabular-nums; }
+
+/* ── Section 2.6 — round lifecycle ──────────────────────────────────────
+   The count and what stays unresolved sit next to the close control, so a
+   manager reads what they are signing off before they sign it. */
+
+.r7-root .r7-round-count,
+.r7-root .r7-round-unresolved {
+    display: block;
+    font-size: var(--r7-size-sm);
+    color: var(--r7-text-secondary);
+}
+
+.r7-root .r7-round-unresolved { color: var(--r7-state-error); }
+
+.r7-root .r7-round-history {
+    list-style: none;
+    margin: var(--r7-space-1) 0;
+    padding: 0;
+    font-size: var(--r7-size-sm);
+    color: var(--r7-text-secondary);
+}

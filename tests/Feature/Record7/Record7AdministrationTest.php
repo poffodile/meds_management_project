@@ -751,7 +751,12 @@ class Record7AdministrationTest extends Record7TestCase
         // He is standing on the confirmation screen when it closes.
         $this->get($this->url($dose))->assertOk();
 
-        $round->forceFill(['closed_at' => now()])->save();
+        // Section 2.6: a round is closed by appending a lifecycle event, not by
+        // writing the projection column. Writing closed_at alone is now proved
+        // NOT to close anything — see Record7RoundLifecycleTest — so this
+        // closes it the way the application actually does.
+        app(\App\Services\Record7\RoundLifecycle::class)
+            ->close($this->user('daniel.evans'), $round, request());
 
         $before = Administration::count();
 

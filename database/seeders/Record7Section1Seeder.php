@@ -14,6 +14,7 @@ use App\Models\Record7\UserCompetency;
 use App\Models\Record7\UserPermission;
 use App\Models\Record7\Prescription;
 use App\Models\Record7\PrnFollowUp;
+use App\Models\Record7\Role;
 use App\Models\Record7\ScheduledDose;
 use App\Models\Record7\Service;
 use App\Models\Record7\User;
@@ -154,6 +155,7 @@ class Record7Section1Seeder extends Seeder
         $prescriptions = $this->prescriptions($clients, $medicines);
         $this->day($house, $prescriptions, $olivia);
         $this->secondSignatory($house);
+        $this->reopenAuthority();
         $this->overnightPrn($house, $prescriptions, $olivia);
         $this->handover($house, $olivia, $clients);
 
@@ -822,6 +824,51 @@ class Record7Section1Seeder extends Seeder
      * This is the thing that most often falls down the gap between shifts, so
      * the fixture makes sure there is one waiting.
      */
+    /**
+     * Who may reopen a signed-off round.
+     *
+     * WHY THE FIXTURE DOES THIS AS WELL AS THE MIGRATION.
+     * Section 0 rebuilds the roles and permissions from the packaged fixture,
+     * which wipes a grant a migration made earlier. Section 2.5 learned the
+     * same lesson with the controlled-drug witness: an authority that only
+     * exists until the next reseed is an authority nobody can test.
+     *
+     * Three roles, and only three (owner ruling). Organisation Administrator is
+     * deliberately absent — it administers accounts and structure, and managing
+     * staff is not a reason to reopen a clinical period.
+     */
+    private function reopenAuthority(): void
+    {
+        $permission = Permission::firstOrCreate(
+            ['code' => 'reopen_medication_round'],
+            [
+                'name' => 'Reopen a medication round',
+                'description' => 'Make a signed-off round writable again, once a request has been approved.',
+                'is_sensitive' => true,
+            ]
+        );
+
+        $roles = Role::whereIn('name', [
+            'Service Manager',
+            'Medication Lead',
+            'Organisation Owner',
+        ])->get();
+
+        foreach ($roles as $role) {
+            $already = DB::connection('record7')->table('record7_role_permissions')
+                ->where('role_id', $role->id)
+                ->where('permission_id', $permission->id)
+                ->exists();
+
+            if (! $already) {
+                DB::connection('record7')->table('record7_role_permissions')->insert([
+                    'role_id' => $role->id,
+                    'permission_id' => $permission->id,
+                ]);
+            }
+        }
+    }
+
     /**
      * A second person who can actually witness a controlled drug here.
      *

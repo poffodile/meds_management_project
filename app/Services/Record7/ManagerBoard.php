@@ -362,8 +362,12 @@ class ManagerBoard
             $late = $inSlot->filter(fn ($dose) => $dose->isLate($now));
             $criticalLate = $late->filter(fn ($dose) => $dose->prescription->is_time_critical);
 
+            // Section 2.6: closed comes from the lifecycle chain, never from
+            // the projection column. A reopened round is open again, and
+            // `closed_at` now records the most recent closure rather than the
+            // current state, so reading it here would call it closed forever.
             $state = match (true) {
-                $round?->closed_at !== null => 'closed',
+                $round !== null && $round->isClosed() => 'closed',
                 $recorded->count() === $inSlot->count() => 'completed',
                 $round !== null => 'in_progress',
                 default => 'not_started',
@@ -388,7 +392,21 @@ class ManagerBoard
                     ? User::find($round->started_by_user_id)?->displayName()
                     : null,
                 'startedAt' => $round?->started_at?->format('H:i'),
+                // The most recent closure, which is what the column now means.
                 'closedAt' => $round?->closed_at?->format('H:i'),
+                'reopenedAt' => $round?->reopened_at?->format('H:i'),
+
+                // Section 2.6. A manager about to sign a round off needs to
+                // see what they are signing off, not discover it afterwards.
+                'accountability' => $round
+                    ? app(RoundLifecycle::class)->accountability($round)
+                    : null,
+                'unresolved' => $round
+                    ? app(RoundLifecycle::class)->unresolvedCategories($round)
+                    : [],
+                'lifecycle' => $round
+                    ? app(RoundLifecycle::class)->history($round)
+                    : [],
                 'roundId' => $round?->id,
                 // The only judgement this method makes, and it is the one a
                 // manager actually wants: do I need to do something.

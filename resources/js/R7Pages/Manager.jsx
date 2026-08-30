@@ -156,10 +156,48 @@ export default function Manager({
                                     <td>{round.startedAt ?? '—'}</td>
                                     <td>{round.interventionNeeded ? 'yes' : 'no'}</td>
                                     <td>
+                                        {/* Section 2.6. What is actually being
+                                            signed off, said before signing it
+                                            rather than discovered afterwards. */}
+                                        {round.accountability ? (
+                                            <span className="r7-round-count">
+                                                {round.accountability.accounted} of{' '}
+                                                {round.accountability.planned} doses accounted for
+                                            </span>
+                                        ) : null}
+
+                                        {round.unresolved?.length ? (
+                                            <span className="r7-round-unresolved">
+                                                Still unresolved: {round.unresolved.join(', ')}
+                                            </span>
+                                        ) : null}
+
+                                        {round.lifecycle?.length ? (
+                                            <ul className="r7-round-history">
+                                                {round.lifecycle.map((entry) => (
+                                                    <li key={entry.id}>
+                                                        {entry.word} {entry.at}
+                                                        {entry.by ? ` by ${entry.by}` : ''}
+                                                        {entry.reason ? ` — ${entry.reason}` : ''}
+                                                        {entry.imported ? ' (imported)' : ''}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        ) : null}
+
                                         {round.roundId && round.state !== 'closed' ? (
                                             <button
                                                 type="button"
-                                                onClick={() => post(urls.closeRound, { round_id: round.roundId })}
+                                                onClick={() => {
+                                                    const warn = round.unresolved?.length
+                                                        ? `Closing does not resolve: ${round.unresolved.join(', ')}. `
+                                                          + 'Those stay open. Continue?'
+                                                        : 'Close this round?';
+
+                                                    if (window.confirm(warn)) {
+                                                        post(urls.closeRound, { round_id: round.roundId });
+                                                    }
+                                                }}
                                             >
                                                 Close round
                                             </button>

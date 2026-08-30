@@ -10,6 +10,7 @@ use App\Models\Record7\Service;
 use App\Models\Record7\User;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Carbon;
 
 /**
@@ -142,7 +143,20 @@ class RoundEntry
 
         return Round::where('service_id', $serviceId)
             ->whereDate('round_date', $now->toDateString())
-            ->whereNull('closed_at')
+            // Section 2.6: state comes from the lifecycle chain, not from a
+            // projection column. A round is open unless its NEWEST event is a
+            // closure — so a reopened round is open again, which `closed_at`
+            // alone could never say now that it is no longer cleared.
+            ->whereNotExists(function ($q) {
+                $q->select(DB::raw(1))
+                    ->from('record7_round_lifecycle_events as latest')
+                    ->whereColumn('latest.round_id', 'record7_rounds.id')
+                    ->where('latest.event', 'closed')
+                    ->whereRaw('latest.sequence_no = (
+                        SELECT MAX(inner_e.sequence_no) FROM record7_round_lifecycle_events inner_e
+                        WHERE inner_e.round_id = record7_rounds.id
+                    )');
+            })
             ->orderByDesc('started_at')
             ->first();
     }
@@ -160,7 +174,20 @@ class RoundEntry
         return Round::whereIn('id', RoundParticipant::where('user_id', $user->id)->select('round_id'))
             ->where('service_id', '!=', $serviceId)
             ->whereDate('round_date', $now->toDateString())
-            ->whereNull('closed_at')
+            // Section 2.6: state comes from the lifecycle chain, not from a
+            // projection column. A round is open unless its NEWEST event is a
+            // closure — so a reopened round is open again, which `closed_at`
+            // alone could never say now that it is no longer cleared.
+            ->whereNotExists(function ($q) {
+                $q->select(DB::raw(1))
+                    ->from('record7_round_lifecycle_events as latest')
+                    ->whereColumn('latest.round_id', 'record7_rounds.id')
+                    ->where('latest.event', 'closed')
+                    ->whereRaw('latest.sequence_no = (
+                        SELECT MAX(inner_e.sequence_no) FROM record7_round_lifecycle_events inner_e
+                        WHERE inner_e.round_id = record7_rounds.id
+                    )');
+            })
             ->get();
     }
 

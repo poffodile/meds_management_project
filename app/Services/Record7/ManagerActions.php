@@ -10,6 +10,7 @@ use App\Models\Record7\Service;
 use App\Models\Record7\StockEvent;
 use App\Models\Record7\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use RuntimeException;
 
@@ -273,6 +274,12 @@ class ManagerActions
         $this->require($manager, $serviceId, match ($item->kind) {
             'correction_request' => 'correction_approval',
             'incident', 'handover_escalation' => 'incident_review',
+
+            // Section 2.6. Reopening makes a signed-off period writable again,
+            // which is not the same act as looking at a dashboard — and
+            // view_manager_dashboard, which this used to fall through to, is
+            // held by anybody who can see the manager screen at all.
+            'round_reopen_request' => 'reopen_medication_round',
             default => 'view_manager_dashboard',
         });
 
@@ -280,15 +287,30 @@ class ManagerActions
             throw new RuntimeException('That has already been decided.');
         }
 
-        if ($decision === 'approved') {
-            $this->carryOut($manager, $serviceId, $item, $correctedOutcome, $note);
-        }
-
+        // ONE TRANSACTION. The decision and what it causes stand or fall
+        // together: if carrying it out fails, the item must not be left
+        // claiming it was approved.
+        DB::connection('record7')->transaction(function () use (
+            $manager, $serviceId, $item, $decision, $note, $correctedOutcome
+        ) {
+        // THE DECISION IS RECORDED FIRST, then carried out.
+        //
+        // It used to be the other way round, which broke the moment a
+        // consequence needed to see the decision: Section 2.6 reopens a round
+        // only against an APPROVED request, and checking that while the row
+        // still said "open" refused every legitimate reopen. Deciding, then
+        // acting on the decision, is also the more honest order — the approval
+        // is what authorises the act, so it exists before the act does.
         $item->status = $decision;
         $item->decided_by_user_id = $manager->id;
         $item->decided_at = now();
         $item->decision_note = $note;
         $item->save();
+
+        if ($decision === 'approved') {
+            $this->carryOut($manager, $serviceId, $item->fresh(), $correctedOutcome, $note);
+        }
+        });
 
         $this->record($manager, $serviceId, 'review_'.$decision, $item->reference, $request, [
             'review_item_id' => $item->id,
@@ -315,11 +337,21 @@ class ManagerActions
         if ($item->kind === 'round_reopen_request' && $item->subject_id) {
             $round = Round::where('service_id', $serviceId)->find($item->subject_id);
 
-            $round?->forceFill([
-                'closed_at' => null,
-                'reopened_at' => now(),
-                'reopened_by_user_id' => $manager->id,
-            ])->save();
+            if ($round === null) {
+                return;
+            }
+
+            // APPROVING AUTHORISES THE TRANSITION; IT IS NOT THE TRANSITION.
+            // The old code here set closed_at = null, which destroyed the very
+            // closure it was undoing and kept only the most recent reopen. The
+            // lifecycle service appends instead, so every cycle survives.
+            app(RoundLifecycle::class)->reopen(
+                $manager,
+                $round,
+                $item,
+                $note ?: 'Reopened on approval of '.$item->reference.'.',
+                request()
+            );
         }
     }
 
@@ -413,16 +445,12 @@ class ManagerActions
 
         $round = Round::where('service_id', $serviceId)->findOrFail($roundId);
 
-        $round->forceFill([
-            'closed_at' => now(),
-            'closed_by_user_id' => $manager->id,
-        ])->save();
+        // Section 2.6 owns the transition. Writing closed_at here as well would
+        // give a round two ways to become closed, and only one of them would
+        // leave history behind.
+        app(RoundLifecycle::class)->close($manager, $round, $request);
 
-        $this->record($manager, $serviceId, 'round_closed', $round->slot.' round', $request, [
-            'round_id' => $round->id,
-        ]);
-
-        return $round;
+        return $round->fresh();
     }
 
     /* ── Shared ─────────────────────────────────────────────────────────── */
