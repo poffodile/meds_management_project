@@ -199,8 +199,20 @@ class PrnAdministration
      *
      * @return array{allowed:bool, code:?string, reason:?string, nextSection:?string}
      */
-    public function eligibility(Prescription $prescription, Client $client, ?Carbon $now = null): array
-    {
+    /**
+     * @param bool $controlledPathway Section 2.5 is handling the register, the
+     *   witness and the balance itself. It skips ONLY the stop below, and every
+     *   later guard still runs in order — which is the whole reason this is a
+     *   flag rather than the caller tolerating a returned code, because that
+     *   would have skipped prescription status, support type, availability,
+     *   interval and maximum along with it.
+     */
+    public function eligibility(
+        Prescription $prescription,
+        Client $client,
+        ?Carbon $now = null,
+        bool $controlledPathway = false
+    ): array {
         $now ??= now();
         $medicine = $prescription->medicine;
 
@@ -210,7 +222,7 @@ class PrnAdministration
 
         // Section 2.5 owns the register, the witness and the balance. Nothing
         // here may write a controlled administration without them.
-        if ($medicine?->is_controlled) {
+        if ($medicine?->is_controlled && ! $controlledPathway) {
             return $this->no(
                 'witness_required',
                 'This is a controlled drug. It needs a witness and a register entry, which '
@@ -436,6 +448,78 @@ class PrnAdministration
                 $observedReason, $notes, $request, $attempt
             );
         });
+    }
+
+    /**
+     * Section 2.5 reuses the attempt machinery rather than working around it.
+     *
+     * A controlled as-required medicine is still an as-required medicine: the
+     * same double-click, the same retry, the same need to tell a replay from a
+     * second dose. This claims the attempt exactly as the ordinary path does,
+     * inside whatever transaction and lock the caller is already holding.
+     *
+     * @return array{attempt:PrnAttempt, already:?Administration}
+     */
+    public function claimForControlled(
+        ?string $token,
+        User $user,
+        int $serviceId,
+        Client $client,
+        Prescription $prescription
+    ): array {
+        if ($token === null || trim($token) === '') {
+            throw new RuntimeException(
+                'Start again from the medicine so this can be recorded safely.'
+            );
+        }
+
+        $attempt = $this->claimAttempt($token, $user, $serviceId, $client, $prescription);
+
+        return [
+            'attempt' => $attempt,
+            'already' => $attempt->isSpent() ? $attempt->administration()->first() : null,
+        ];
+    }
+
+    /**
+     * Every Section 2.4 guard, run for a controlled medicine.
+     *
+     * The ONLY thing 2.5 is allowed to skip is 2.4's own refusal that a
+     * controlled drug cannot be given yet — which 2.5 exists to replace. Every
+     * other guard still bites, and each has a test proving it still refuses a
+     * controlled as-required dose independently.
+     */
+    public function assertGivable(
+        Prescription $prescription,
+        Client $client,
+        float $amount,
+        ?string $observedReason,
+        bool $controlled = false
+    ): void {
+        if (! array_key_exists((string) $observedReason, self::OBSERVED_REASONS)) {
+            throw new RuntimeException('Say what you saw or what they told you.');
+        }
+
+        $eligibility = $this->eligibility($prescription, $client, null, $controlled);
+
+        if (! $eligibility['allowed']) {
+            throw new RuntimeException($eligibility['reason']);
+        }
+
+        $doseCheck = $this->checkDose($prescription, $amount);
+
+        if (! $doseCheck['allowed']) {
+            throw new RuntimeException($doseCheck['reason']);
+        }
+    }
+
+    /** Spend an attempt against the administration it produced. */
+    public function spend(PrnAttempt $attempt, Administration $administration): void
+    {
+        $attempt->forceFill([
+            'consumed_at' => now(),
+            'administration_id' => $administration->id,
+        ])->save();
     }
 
     /**

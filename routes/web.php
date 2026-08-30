@@ -3206,6 +3206,7 @@ use App\Http\Controllers\Record7\HouseController as R7House;
 use App\Http\Controllers\Record7\SessionController as R7Session;
 use App\Http\Controllers\Record7\SignInController as R7SignIn;
 use App\Http\Controllers\Record7\ManagerController as R7Manager;
+use App\Http\Controllers\Record7\ControlledDrugController as R7Cd;
 use App\Http\Controllers\Record7\PrnController as R7Prn;
 use App\Http\Controllers\Record7\RoundController as R7Round;
 use App\Http\Controllers\Record7\TodayController as R7Today;
@@ -3372,6 +3373,51 @@ Route::prefix('record7')->name('record7.')->group(function () {
             ->whereNumber('client')->whereNumber('prescription')
             ->middleware([R7Authorize::class.':administer_medication', 'throttle:60,1'])
             ->name('prn.record');
+
+        /* 2.5 — controlled drugs.
+
+           Person-scoped for the same reason as as-required: a controlled drug
+           may be needed at three in the morning, and requiring an open round
+           would mean refusing somebody or faking one. Every authority check the
+           round performs still runs. */
+        Route::get('/person/{client}/controlled', [R7Cd::class, 'index'])
+            ->whereNumber('client')
+            ->middleware(R7Authorize::class.':administer_medication')
+            ->name('cd');
+
+        Route::get('/person/{client}/controlled/{prescription}', [R7Cd::class, 'give'])
+            ->whereNumber('client')->whereNumber('prescription')
+            ->middleware(R7Authorize::class.':administer_medication')
+            ->name('cd.give');
+
+        Route::post('/person/{client}/controlled/{prescription}', [R7Cd::class, 'record'])
+            ->whereNumber('client')->whereNumber('prescription')
+            ->middleware([R7Authorize::class.':administer_medication', 'throttle:60,1'])
+            ->name('cd.record');
+
+        /* Taken out of storage and not given. The clinical outcome and the
+           physical movement are both recorded, and they are not the same fact. */
+        Route::post('/person/{client}/controlled/{prescription}/not-given', [R7Cd::class, 'notGiven'])
+            ->whereNumber('client')->whereNumber('prescription')
+            ->middleware([R7Authorize::class.':administer_medication', 'throttle:60,1'])
+            ->name('cd.not-given');
+
+        /* Stock arriving, and counting what is actually there. */
+        Route::post('/person/{client}/controlled/{prescription}/receipt', [R7Cd::class, 'receipt'])
+            ->whereNumber('client')->whereNumber('prescription')
+            ->middleware([R7Authorize::class.':manage_controlled_drugs', 'throttle:60,1'])
+            ->name('cd.receipt');
+
+        /* Putting right an earlier entry, by adding one. Never by editing. */
+        Route::post('/person/{client}/controlled/{prescription}/correct', [R7Cd::class, 'correct'])
+            ->whereNumber('client')->whereNumber('prescription')
+            ->middleware([R7Authorize::class.':manage_controlled_drugs', 'throttle:60,1'])
+            ->name('cd.correct');
+
+        Route::post('/person/{client}/controlled/{prescription}/count', [R7Cd::class, 'count'])
+            ->whereNumber('client')->whereNumber('prescription')
+            ->middleware([R7Authorize::class.':administer_medication', 'throttle:60,1'])
+            ->name('cd.count');
 
         /* The ask-back. Giving somebody paracetamol and never asking whether it
            worked is how a person stays in pain all afternoon. */

@@ -69,6 +69,14 @@ class Record7Section12Seeder extends Seeder
         $this->refuseUnlessSafe();
 
         $rosewood = Service::where('name', self::HOUSE)->firstOrFail();
+        // Section 2.5. Section 0 rebuilds the houses from the fixture without a
+        // care setting, and an unset setting correctly means "witness
+        // required". These are supported-living houses in the fiction, so the
+        // fixture says so explicitly rather than leaving the rule to guess.
+        if ($rosewood->care_setting === null) {
+            $rosewood->forceFill(['care_setting' => 'supported_living'])->save();
+        }
+
         $oakwood = Service::where('name', 'Oakwood House')->firstOrFail();
 
         $daniel = User::where('username', 'daniel.evans')->firstOrFail();
@@ -77,6 +85,14 @@ class Record7Section12Seeder extends Seeder
 
         $connection = DB::connection('record7');
         $connection->unprepared('DROP TRIGGER IF EXISTS record7_administrations_no_delete');
+
+        // Section 2.5. A fixture rebuild, not ordinary use — lifted here and
+        // restored immediately afterwards, like the administration guard.
+        $connection->unprepared('DROP TRIGGER IF EXISTS record7_cd_register_no_delete');
+
+        // Section 2.4 attempts are one-way in the application; a full fixture
+        // rebuild is not ordinary use, so the guard is lifted and restored.
+        $connection->unprepared('DROP TRIGGER IF EXISTS record7_prn_attempts_no_delete');
 
         try {
             $this->withFixtureClock(function () use ($connection, $rosewood, $oakwood, $daniel, $olivia, $sarah) {
@@ -150,8 +166,26 @@ class Record7Section12Seeder extends Seeder
             ->pluck('id');
 
         if ($clientIds->isNotEmpty()) {
+            // Attempts are a claim on a record, not a clinical record. Release
+            // them before clearing what they point at.
+            // Balances are derived; register entries are history, cleared only
+            // because this is a full rebuild of the fixture.
+            $connection->table('record7_prn_attempts')->whereIn('client_id', $clientIds)->delete();
+
             PrnFollowUp::whereIn('client_id', $clientIds)->delete();
             $connection->table('record7_administrations')->whereIn('client_id', $clientIds)->delete();
+
+            // AFTER the administrations, which point at register entries.
+            $connection->table('record7_cd_balances')->whereIn('client_id', $clientIds)->delete();
+            // NEWEST FIRST. A correction points at the entry it corrects, and a
+            // chain link can only ever refer to an earlier row, so removing them
+            // in reverse order is the only order that works.
+            $connection->table('record7_cd_register')
+                ->whereIn('client_id', $clientIds)
+                ->orderByDesc('id')
+                ->pluck('id')
+                ->each(fn ($id) => $connection->table('record7_cd_register')
+                    ->where('id', $id)->delete());
             ScheduledDose::whereIn('client_id', $clientIds)->delete();
             Prescription::whereIn('client_id', $clientIds)->delete();
             ClientAllergy::whereIn('client_id', $clientIds)->delete();
@@ -175,11 +209,38 @@ class Record7Section12Seeder extends Seeder
             StockLevel::where('service_id', $serviceId)->delete();
             ReviewItem::where('service_id', $serviceId)->delete();
             IssueState::where('service_id', $serviceId)->delete();
+
+            // AND by reference, because service_id is not enough on a reseed.
+            // Section 0 rebuilds the houses with new ids, so rows from the
+            // previous run are orphaned rather than matched — but `reference`
+            // is globally unique, so they collide and the seeder dies. This
+            // seeder owns the ROSE- namespace, so it clears its own.
+            ReviewItem::where('reference', 'like', self::PREFIX.'%')->delete();
         }
     }
 
     private function restoreDeleteGuard(): void
     {
+        DB::connection('record7')->unprepared(<<<'SQL'
+            CREATE TRIGGER record7_prn_attempts_no_delete
+            BEFORE DELETE ON record7_prn_attempts
+            FOR EACH ROW
+            BEGIN
+                SIGNAL SQLSTATE '45000'
+                SET MESSAGE_TEXT = 'an as-required attempt cannot be deleted';
+            END
+        SQL);
+
+        DB::connection('record7')->unprepared(<<<'SQL'
+            CREATE TRIGGER record7_cd_register_no_delete
+            BEFORE DELETE ON record7_cd_register
+            FOR EACH ROW
+            BEGIN
+                SIGNAL SQLSTATE '45000'
+                SET MESSAGE_TEXT = 'a controlled drug register entry cannot be deleted';
+            END
+        SQL);
+
         DB::connection('record7')->unprepared(<<<'SQL'
             CREATE TRIGGER record7_administrations_no_delete
             BEFORE DELETE ON record7_administrations
@@ -329,6 +390,9 @@ class Record7Section12Seeder extends Seeder
 
     private function medicines(): array
     {
+        // Fictional schedule, written down rather than inferred.
+        $schedules = ['oxycodone' => '2'];
+
         $rows = [
             'amlodipine' => ['Amlodipine', '5mg', 'tablet', false],
             'insulin' => ['Insulin glargine', '100units/ml', 'injection', false],
@@ -341,6 +405,11 @@ class Record7Section12Seeder extends Seeder
         $medicines = [];
 
         foreach ($rows as $key => [$name, $strength, $form, $controlled]) {
+            if ($controlled && isset($schedules[$key])) {
+                Medicine::where('name', $name)->where('strength', $strength)
+                    ->update(['cd_schedule' => $schedules[$key]]);
+            }
+
             $medicines[$key] = Medicine::firstOrCreate(
                 ['name' => $name, 'strength' => $strength],
                 ['form' => $form, 'is_controlled' => $controlled]
@@ -414,6 +483,14 @@ class Record7Section12Seeder extends Seeder
                     'prn_min_gap_minutes' => 240,
                     'prn_indication' => 'For breakthrough pain',
                     'instructions' => 'Controlled drug. Two signatures and a stock count every time.',
+
+                    // Section 2.5 can give this now, so it carries the
+                    // structured facts a register and a dose check need.
+                    // Fictional design data, per section 0 of the spec.
+                    'dose_min' => 1, 'dose_max' => 1, 'dose_unit' => 'capsule',
+                    'prn_limit_period' => 'rolling_24h',
+                    'prn_max_administrations' => 4,
+                    'prn_review_after_minutes' => 60,
                 ]],
         ];
 
@@ -435,6 +512,18 @@ class Record7Section12Seeder extends Seeder
                     'prn_max_per_day' => $options['prn_max_per_day'] ?? null,
                     'prn_min_gap_minutes' => $options['prn_min_gap_minutes'] ?? null,
                     'prn_indication' => $options['prn_indication'] ?? null,
+
+                    // Sections 2.4 and 2.5 read these. Without them a register
+                    // cannot count a quantity and a dose check has no range,
+                    // and the row above silently dropped whatever was stated.
+                    'dose_min' => $options['dose_min'] ?? null,
+                    'dose_max' => $options['dose_max'] ?? null,
+                    'dose_unit' => $options['dose_unit'] ?? null,
+                    'prn_limit_period' => $options['prn_limit_period'] ?? null,
+                    'prn_max_administrations' => $options['prn_max_administrations'] ?? null,
+                    'prn_max_total_amount' => $options['prn_max_total_amount'] ?? null,
+                    'prn_review_after_minutes' => $options['prn_review_after_minutes'] ?? null,
+
                     'starts_on' => $today->copy()->subMonths(4),
                     'status' => 'active',
                 ]),
@@ -542,6 +631,47 @@ class Record7Section12Seeder extends Seeder
         $oxycodone = $prescriptions['bridget-oxycodone']['model'];
         $givenAt = Carbon::today()->setTime(4, 40);
 
+        // Section 2.5. Stock in first, then the dose as a real movement.
+        // Rosewood is supported living, so this is legitimately unwitnessed
+        // and the register records why rather than leaving it blank.
+        $register = app(\App\Services\Record7\ControlledDrugRegister::class);
+        $snapshot = $register->snapshot($oxycodone->medicine, $oxycodone->dose_unit);
+        $person = Client::find($oxycodone->client_id);
+        $rule = $register->witnessRule($house);
+
+        $balance = $register->lockBalance($person, $house, $snapshot);
+
+        // Topped up rather than blindly added: the register is append-only, so
+        // a reseed books in only the shortfall instead of pretending the
+        // earlier stock never arrived.
+        $shortfall = 23 - (float) $balance->current_balance;
+
+        if ($shortfall > 0) {
+            $register->record(
+                balance: $balance, snapshot: $snapshot, action: 'receipt',
+                quantities: ['received' => $shortfall],
+                user: $olivia, witness: null,
+                witnessRequired: $rule['required'],
+                unwitnessedBasis: $rule['required'] ? null : 'setting_does_not_require',
+                client: $person, house: $house, prescription: $oxycodone,
+                notes: 'Booked in from the pharmacy.',
+                at: $givenAt->copy()->subDays(3),
+            );
+        }
+
+        $balance->refresh();
+
+        $movement = $register->record(
+            balance: $balance, snapshot: $snapshot, action: 'administration',
+            quantities: ['removed' => 1, 'given' => 1, 'returned' => 0, 'wasted' => 0],
+            user: $olivia, witness: null,
+            witnessRequired: $rule['required'],
+            unwitnessedBasis: $rule['required'] ? null : 'setting_does_not_require',
+            client: $person, house: $house, prescription: $oxycodone,
+            notes: 'Given overnight.',
+            at: $givenAt,
+        );
+
         $administration = Administration::create([
             'reference' => self::PREFIX.'A-PRN-'.substr(md5('bridget-oxycodone'.$now->timestamp), 0, 8),
             'scheduled_dose_id' => null,
@@ -553,6 +683,8 @@ class Record7Section12Seeder extends Seeder
             'reason_code' => 'prn_pain',
             'notes' => 'Woke in pain. Stock counted, 22 remaining.',
             'administered_at' => $givenAt,
+            'dose_amount' => 1, 'dose_unit' => 'capsule',
+            'cd_register_id' => $movement->id,
         ]);
 
         PrnFollowUp::create([

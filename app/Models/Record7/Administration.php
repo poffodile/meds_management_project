@@ -33,6 +33,15 @@ class Administration extends Record7Model
         'administered_at',
         'corrects_administration_id',
         'reoffer_of_administration_id',
+
+        // Section 2.5. These were protected by neither this list nor the
+        // trigger, which nothing exploited only because nothing ever wrote a
+        // witness. Section 2.5 writes one, so they are closed first.
+        'witnessed_by_user_id',
+        'dose_amount',
+        'dose_unit',
+        'controlled_drug_no_quantity_removed',
+        'cd_register_id',
     ];
 
     protected static function booted(): void

@@ -3465,3 +3465,123 @@
   font-size: var(--r7-size-sm);
   color: var(--r7-text-muted);
 }
+
+/* ── Section 2.5 — controlled drugs ─────────────────────────────────────
+   The balance is the thing a worker has come here to see, so it is the
+   heaviest text on the card. A disagreement between the count and the
+   register is the most serious thing this screen can say, and it is the
+   only place here that earns a warning colour. */
+
+.r7-root .r7-cd-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--r7-space-3);
+}
+
+.r7-root .r7-cd-card {
+    border: var(--r7-border-width) solid var(--r7-border-subtle);
+    border-radius: var(--r7-radius-md);
+    background: var(--r7-surface-raised);
+    padding: var(--r7-space-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--r7-space-2);
+}
+
+.r7-root .r7-cd-card__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--r7-space-2);
+}
+
+.r7-root .r7-cd-card__name { margin: 0; font-size: var(--r7-size-lg); }
+.r7-root .r7-cd-card__strength { font-weight: 400; color: var(--r7-text-secondary); }
+
+.r7-root .r7-cd-card__schedule {
+    font-size: var(--r7-size-sm);
+    color: var(--r7-text-secondary);
+    border: var(--r7-border-width) solid var(--r7-border-subtle);
+    border-radius: var(--r7-radius-pill);
+    padding: 0 var(--r7-space-2);
+    white-space: nowrap;
+}
+
+.r7-root .r7-cd-card__schedule--unknown { font-style: italic; }
+
+.r7-root .r7-cd-card__directions,
+.r7-root .r7-cd-card__for { margin: 0; color: var(--r7-text-secondary); }
+
+.r7-root .r7-cd-card__balance { margin: 0; font-size: var(--r7-size-lg); }
+.r7-root .r7-cd-card__balance--unknown {
+    color: var(--r7-text-secondary);
+    font-size: var(--r7-size-md);
+    font-style: italic;
+}
+
+.r7-root .r7-cd-card__actions { display: flex; gap: var(--r7-space-2); }
+
+.r7-root .r7-cd-detail {
+    border: var(--r7-border-width) solid var(--r7-border-subtle);
+    border-radius: var(--r7-radius-md);
+    padding: var(--r7-space-4);
+    background: var(--r7-surface-raised);
+    display: flex;
+    flex-direction: column;
+    gap: var(--r7-space-1);
+}
+
+.r7-root .r7-cd-detail__name { margin: 0; font-size: var(--r7-size-xl); }
+.r7-root .r7-cd-detail__form { font-weight: 400; color: var(--r7-text-secondary); }
+.r7-root .r7-cd-detail__directions { margin: 0; color: var(--r7-text-secondary); }
+.r7-root .r7-cd-detail__balance { margin: 0; font-size: var(--r7-size-lg); }
+.r7-root .r7-cd-detail__after { color: var(--r7-text-secondary); }
+
+.r7-root .r7-cd-tabs {
+    display: flex;
+    gap: var(--r7-space-2);
+    flex-wrap: wrap;
+    margin: var(--r7-space-3) 0;
+}
+
+.r7-root .r7-cd-tab {
+    border: var(--r7-border-width) solid var(--r7-border-subtle);
+    background: transparent;
+    border-radius: var(--r7-radius-md);
+    padding: var(--r7-space-2) var(--r7-space-3);
+    font: inherit;
+    color: var(--r7-text-primary);
+    cursor: pointer;
+}
+
+.r7-root .r7-cd-tab--on {
+    border-color: var(--r7-colour-accent);
+    background: var(--r7-colour-accent-soft);
+}
+
+.r7-root .r7-cd-history__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--r7-space-2);
+}
+
+.r7-root .r7-cd-history__row {
+    display: grid;
+    gap: var(--r7-space-1);
+    padding: var(--r7-space-3);
+    border: var(--r7-border-width) solid var(--r7-border-subtle);
+    border-radius: var(--r7-radius-md);
+}
+
+.r7-root .r7-cd-history__row--flag { border-color: var(--r7-state-error); }
+.r7-root .r7-cd-history__what { font-weight: 600; }
+.r7-root .r7-cd-history__figures,
+.r7-root .r7-cd-history__who { color: var(--r7-text-secondary); font-size: var(--r7-size-sm); }
+.r7-root .r7-cd-history__balance { font-variant-numeric: tabular-nums; }

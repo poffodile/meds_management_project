@@ -8,6 +8,10 @@ use App\Models\Record7\ClientAllergy;
 use App\Models\Record7\Handover;
 use App\Models\Record7\HandoverNote;
 use App\Models\Record7\Medicine;
+use App\Models\Record7\CompetencyType;
+use App\Models\Record7\Permission;
+use App\Models\Record7\UserCompetency;
+use App\Models\Record7\UserPermission;
 use App\Models\Record7\Prescription;
 use App\Models\Record7\PrnFollowUp;
 use App\Models\Record7\ScheduledDose;
@@ -56,6 +60,14 @@ class Record7Section1Seeder extends Seeder
         $this->refuseUnlessSafe();
 
         $house = Service::where('name', self::HOUSE)->firstOrFail();
+        // Section 2.5. Section 0 rebuilds the houses from the fixture without a
+        // care setting, and an unset setting correctly means "witness
+        // required". These are supported-living houses in the fiction, so the
+        // fixture says so explicitly rather than leaving the rule to guess.
+        if ($house->care_setting === null) {
+            $house->forceFill(['care_setting' => 'supported_living'])->save();
+        }
+
         $organisationId = $house->organisation_id;
 
         // Who wrote the history. Noah is the person reviewing the dashboard, so
@@ -73,6 +85,16 @@ class Record7Section1Seeder extends Seeder
         // Section 2.4: welfare checks are append-only too, and one may be
         // answering an administration this clear-out is about to remove.
         $connection->unprepared('DROP TRIGGER IF EXISTS record7_welfare_checks_no_delete');
+
+        // Section 2.5: the register is permanent in the application, and this
+        // is a full fixture rebuild rather than ordinary use. The guard is
+        // lifted for the rebuild and put straight back, the same way the
+        // administration and welfare guards already are.
+        $connection->unprepared('DROP TRIGGER IF EXISTS record7_cd_register_no_delete');
+
+        // Section 2.4 attempts are one-way in the application; a full fixture
+        // rebuild is not ordinary use, so the guard is lifted and restored.
+        $connection->unprepared('DROP TRIGGER IF EXISTS record7_prn_attempts_no_delete');
 
         try {
             $this->withFixtureClock(function () use ($connection, $house, $organisationId, $olivia) {
@@ -131,6 +153,7 @@ class Record7Section1Seeder extends Seeder
 
         $prescriptions = $this->prescriptions($clients, $medicines);
         $this->day($house, $prescriptions, $olivia);
+        $this->secondSignatory($house);
         $this->overnightPrn($house, $prescriptions, $olivia);
         $this->handover($house, $olivia, $clients);
 
@@ -188,6 +211,13 @@ class Record7Section1Seeder extends Seeder
             return;
         }
 
+        // Section 2.4 left attempts pointing at these administrations. They
+        // are a claim on a record, not a clinical record themselves, so the
+        // fixture releases them before clearing what they point at.
+        // Balances are derived and rebuildable; register entries are history,
+        // and this is a fixture rebuild rather than ordinary use.
+        $connection->table('record7_prn_attempts')->whereIn('client_id', $clientIds)->delete();
+
         PrnFollowUp::whereIn('client_id', $clientIds)->delete();
 
         // A review item can name an administration. Deleting the administration
@@ -234,6 +264,20 @@ class Record7Section1Seeder extends Seeder
             ->pluck('id')
             ->each(fn ($id) => $connection->table('record7_administrations')
                 ->where('id', $id)->delete());
+
+        // AFTER the administrations, which point at register entries. Balances
+        // are derived and rebuildable; register entries are history, cleared
+        // here only because this is a full rebuild of the fixture.
+        $connection->table('record7_cd_balances')->whereIn('client_id', $clientIds)->delete();
+        // NEWEST FIRST. A correction points at the entry it corrects, and a
+        // chain link can only ever refer to an earlier row, so removing them
+        // in reverse order is the only order that works.
+        $connection->table('record7_cd_register')
+            ->whereIn('client_id', $clientIds)
+            ->orderByDesc('id')
+            ->pluck('id')
+            ->each(fn ($id) => $connection->table('record7_cd_register')
+                ->where('id', $id)->delete());
         ScheduledDose::whereIn('client_id', $clientIds)->delete();
         Prescription::whereIn('client_id', $clientIds)->delete();
         ClientAllergy::whereIn('client_id', $clientIds)->delete();
@@ -256,12 +300,32 @@ class Record7Section1Seeder extends Seeder
     private function restoreDeleteGuard(): void
     {
         DB::connection('record7')->unprepared(<<<'SQL'
+            CREATE TRIGGER record7_prn_attempts_no_delete
+            BEFORE DELETE ON record7_prn_attempts
+            FOR EACH ROW
+            BEGIN
+                SIGNAL SQLSTATE '45000'
+                SET MESSAGE_TEXT = 'an as-required attempt cannot be deleted';
+            END
+        SQL);
+
+        DB::connection('record7')->unprepared(<<<'SQL'
             CREATE TRIGGER record7_administrations_no_delete
             BEFORE DELETE ON record7_administrations
             FOR EACH ROW
             BEGIN
                 SIGNAL SQLSTATE '45000'
                 SET MESSAGE_TEXT = 'record7 administrations are a permanent record and cannot be deleted';
+            END
+        SQL);
+
+        DB::connection('record7')->unprepared(<<<'SQL'
+            CREATE TRIGGER record7_cd_register_no_delete
+            BEFORE DELETE ON record7_cd_register
+            FOR EACH ROW
+            BEGIN
+                SIGNAL SQLSTATE '45000'
+                SET MESSAGE_TEXT = 'a controlled drug register entry cannot be deleted';
             END
         SQL);
 
@@ -304,11 +368,24 @@ class Record7Section1Seeder extends Seeder
 
         $medicines = [];
 
+        // Fictional schedules, per section 0 of the Section 2.5 specification.
+        // Nothing infers a schedule from a name; these are written down because
+        // somebody has to, and in the fixture that somebody is this seeder.
+        $schedules = ['lorazepam' => '4', 'morphine_mr' => '2'];
+
         foreach ($rows as $key => [$name, $strength, $form, $controlled]) {
             $medicines[$key] = Medicine::firstOrCreate(
                 ['name' => $name, 'strength' => $strength],
-                ['form' => $form, 'is_controlled' => $controlled]
+                [
+                    'form' => $form,
+                    'is_controlled' => $controlled,
+                    'cd_schedule' => $schedules[$key] ?? null,
+                ]
             );
+
+            if ($controlled && $medicines[$key]->cd_schedule === null) {
+                $medicines[$key]->forceFill(['cd_schedule' => $schedules[$key] ?? null])->save();
+            }
         }
 
         return $medicines;
@@ -491,6 +568,11 @@ class Record7Section1Seeder extends Seeder
             ['margaret-morphine', 'margaret', 'morphine_mr', 'One tablet', 'Oral', 'Twice a day',
                 ['Morning', 'Night'], [
                     'instructions' => 'Controlled drug. Two signatures and the register, every time.',
+                    // A register counts quantities, and a quantity needs a unit.
+                    // Section 2.4 left controlled prescriptions without one
+                    // because it could not give them; Section 2.5 can, so the
+                    // fixture states it. Fictional design data.
+                    'dose_min' => 1, 'dose_max' => 1, 'dose_unit' => 'tablet',
                 ]],
 
             ['dennis-colecalciferol', 'dennis', 'colecalciferol', 'One tablet', 'Oral',
@@ -530,6 +612,13 @@ class Record7Section1Seeder extends Seeder
                     // readiness Record7 does not have until Section 2.5.
                     'prn_max_per_day' => 2,
                     'prn_min_gap_minutes' => 360,
+
+                    // Section 2.5 can now give this, so it needs the structured
+                    // facts a register and a dose check require. Fictional.
+                    'dose_min' => 1, 'dose_max' => 1, 'dose_unit' => 'tablet',
+                    'prn_limit_period' => 'rolling_24h',
+                    'prn_max_administrations' => 2,
+                    'prn_review_after_minutes' => 60,
                     'prn_indication' => 'For severe agitation, when reassurance has not worked',
                     'instructions' => 'Controlled drug. Two signatures and a stock count every time.',
                 ]],
@@ -733,10 +822,128 @@ class Record7Section1Seeder extends Seeder
      * This is the thing that most often falls down the gap between shifts, so
      * the fixture makes sure there is one waiting.
      */
+    /**
+     * A second person who can actually witness a controlled drug here.
+     *
+     * WHY THE FIXTURE NEEDS THIS.
+     * A witnessed controlled-drug administration needs two distinct people, and
+     * the only worker in this house who could witness was Noah — who is also
+     * the one giving it. Nobody may witness themselves, so the whole
+     * care-home journey was unreachable from a clean seed and could only be
+     * demonstrated by editing the database by hand. A workflow that needs
+     * hidden setup to work is a workflow nobody can check.
+     *
+     * Sarah Ahmed already exists as the medication lead, which is exactly who a
+     * second signature would realistically come from, so this gives her the
+     * authority and the competency rather than inventing another person.
+     *
+     * Fictional design data, like everything else in this seeder.
+     */
+    private function secondSignatory(Service $house): void
+    {
+        $sarah = User::where('username', 'sarah.ahmed')->first();
+
+        if ($sarah === null) {
+            return;
+        }
+
+        $permission = Permission::where('code', 'witness_medication')->first();
+
+        if ($permission !== null) {
+            UserPermission::updateOrCreate(
+                [
+                    'user_id' => $sarah->id,
+                    'permission_id' => $permission->id,
+                    'service_id' => $house->id,
+                ],
+                [
+                    'effect' => 'allow',
+                    'status' => 'active',
+                    'reason' => 'Medication lead. Second signature for controlled drugs.',
+                    'starts_at' => now()->subMonths(6),
+                ]
+            );
+        }
+
+        // Authority without competency is not authority: the access policy
+        // asks for both, and a witness who is not assessed is not a witness.
+        $competency = CompetencyType::where('code', 'medication_witness')->first();
+
+        if ($competency !== null) {
+            UserCompetency::updateOrCreate(
+                [
+                    'user_id' => $sarah->id,
+                    'competency_type_id' => $competency->id,
+                    'service_id' => $house->id,
+                ],
+                [
+                    'status' => 'current',
+                    'assessed_at' => now()->subMonths(4),
+                    'review_due_at' => now()->addMonths(8),
+                    'evidence_reference' => 'Assessed with the medication lead pack.',
+                ]
+            );
+        }
+    }
+
     private function overnightPrn(Service $house, array $prescriptions, User $olivia): void
     {
         $lorazepam = $prescriptions['joyce-lorazepam']['model'];
         $givenAt = Carbon::today()->setTime(3, 10);
+
+        // Section 2.5. Stock came in before it could be given, and the dose
+        // that follows is a real register movement rather than an
+        // administration with nothing behind it. Oakwood is supported living,
+        // so this movement legitimately has no witness and says why.
+        $register = app(\App\Services\Record7\ControlledDrugRegister::class);
+        $medicine = $lorazepam->medicine;
+        $snapshot = $register->snapshot($medicine, $lorazepam->dose_unit);
+        $client = Client::find($lorazepam->client_id);
+        $rule = $register->witnessRule($house);
+
+        $balance = $register->lockBalance($client, $house, $snapshot);
+
+        // TOPPED UP, NOT BLINDLY ADDED. The register is append-only by
+        // design, so a reseed cannot erase what is already there. Booking in
+        // only the shortfall keeps the fixture stable across reseeds without
+        // pretending history did not happen.
+        $shortfall = 15 - (float) $balance->current_balance;
+
+        if ($shortfall > 0) {
+            $register->record(
+                balance: $balance,
+                snapshot: $snapshot,
+                action: 'receipt',
+                quantities: ['received' => $shortfall],
+                user: $olivia,
+                witness: null,
+                witnessRequired: $rule['required'],
+                unwitnessedBasis: $rule['required'] ? null : 'setting_does_not_require',
+                client: $client,
+                house: $house,
+                prescription: $lorazepam,
+                notes: 'Booked in from the pharmacy.',
+                at: $givenAt->copy()->subDays(2),
+            );
+        }
+
+        $balance->refresh();
+
+        $movement = $register->record(
+            balance: $balance,
+            snapshot: $snapshot,
+            action: 'administration',
+            quantities: ['removed' => 1, 'given' => 1, 'returned' => 0, 'wasted' => 0],
+            user: $olivia,
+            witness: null,
+            witnessRequired: $rule['required'],
+            unwitnessedBasis: $rule['required'] ? null : 'setting_does_not_require',
+            client: $client,
+            house: $house,
+            prescription: $lorazepam,
+            notes: 'Given overnight.',
+            at: $givenAt,
+        );
 
         $administration = Administration::create([
             'reference' => 'OAK-A-PRN-'.substr(md5('joyce-lorazepam'.now()->timestamp), 0, 8),
@@ -752,6 +959,7 @@ class Record7Section1Seeder extends Seeder
             'notes' => 'Awake and very distressed since about two. Sat with her first, '
                 .'no settling. Stock counted, 14 remaining.',
             'administered_at' => $givenAt,
+            'cd_register_id' => $movement->id,
         ]);
 
         PrnFollowUp::create([
