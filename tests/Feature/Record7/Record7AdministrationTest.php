@@ -864,6 +864,18 @@ class Record7AdministrationTest extends Record7TestCase
 
     /* ── 27. Stock stays out of it ──────────────────────────────────────── */
 
+    /**
+     * SECTION 2.7 NARROWED THIS; IT DID NOT REMOVE IT.
+     *
+     * The original guarantee — no administration anywhere touches stock — was
+     * correct for Sections 2.2 to 2.6 and is what kept that boundary honest.
+     * Section 2.7 makes it wrong for TRACKED preparations only: a medicine
+     * somebody is counting, whose prescription carries a structured dose.
+     *
+     * Everywhere else the old rule stands exactly as it did, and it is worth
+     * more now than before: an untracked medicine must not acquire a silent
+     * debit just because a ledger exists somewhere in the product.
+     */
     public function test_recording_an_administration_does_not_touch_stock(): void
     {
         $round = $this->enterRound();
@@ -1091,9 +1103,16 @@ class Record7AdministrationTest extends Record7TestCase
 
         // And the page words itself from those facts rather than always
         // claiming an action it may be refusing.
+        //
+        // SECTION 2.7 renamed the flag this reads from `blocked` to
+        // `cannotRecord`, because the screen now has two different questions —
+        // whether the form appears at all, and whether the button is live —
+        // and one name for both hid the shortfall fields behind the very
+        // condition they exist to satisfy. The RULE is unchanged and so is
+        // what this test defends: the heading is chosen from the facts.
         $confirm = file_get_contents(resource_path('js/R7Pages/RoundConfirm.jsx'));
 
-        $this->assertStringContainsString("blocked ? 'This medicine'", $confirm);
+        $this->assertStringContainsString("cannotRecord ? 'This medicine'", $confirm);
         $this->assertStringContainsString('already been recorded', $confirm);
     }
 

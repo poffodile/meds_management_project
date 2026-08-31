@@ -42,6 +42,12 @@ class Administration extends Record7Model
         'dose_unit',
         'controlled_drug_no_quantity_removed',
         'cd_register_id',
+
+        // Section 2.7. What a dose did to the cupboard is as permanent as the
+        // outcome it belongs to. Both are frozen in the database trigger too,
+        // and both belong here so the model refuses before MySQL has to.
+        'stock_movement_id',
+        'stock_no_quantity_removed',
     ];
 
     protected static function booted(): void

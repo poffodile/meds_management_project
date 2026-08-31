@@ -8,6 +8,7 @@ use App\Models\Record7\ReviewItem;
 use App\Models\Record7\Round;
 use App\Models\Record7\Service;
 use App\Models\Record7\StockEvent;
+use App\Models\Record7\StockMovement;
 use App\Models\Record7\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -47,7 +48,8 @@ class ManagerActions
     public function __construct(
         private readonly AccessPolicy $policy,
         private readonly AuditRecorder $audit,
-        private readonly IssueRegistry $registry
+        private readonly IssueRegistry $registry,
+        private readonly StockLedger $stock
     ) {
     }
 
@@ -221,16 +223,34 @@ class ManagerActions
         $state->acknowledged_by_user_id ??= $manager->id;
         $state->save();
 
-        // Closing a stock event is the one case where the workflow act and the
-        // condition genuinely coincide: the event IS the record of the problem.
+        /* SECTION 2.7. THE ONE PLACE THIS STILL HAPPENS, AND WHY.
+         *
+         * This used to close ANY stock event by writing resolved_at, which made
+         * a quantity discrepancy stop existing because a manager typed a
+         * sentence. Fixture row 90 is what that looked like: a Senna count
+         * short by two, closed with "Found recorded on the wrong chart. Balance
+         * corrected at the next count." No balance was corrected and no
+         * corrective record exists. Two tablets are unaccounted for and the
+         * system said nothing.
+         *
+         * Quantity discrepancies are now derived from the ledger and end only
+         * when a correction names them. `delivery_overdue` is different in kind:
+         * it asserts no quantity at all. The condition it describes is "the
+         * pharmacy has not delivered" and the fact that ends it is "it arrived",
+         * so here the workflow act and the condition genuinely do coincide.
+         * Nothing about closing it can make a missing quantity cease to exist,
+         * because it never claimed one.
+         */
         if ($parsed['type'] === 'stock_event') {
-            StockEvent::where('service_id', $serviceId)
-                ->find($parsed['sourceId'])
-                ?->forceFill([
+            $event = StockEvent::where('service_id', $serviceId)->find($parsed['sourceId']);
+
+            if ($event && $event->kind === 'delivery_overdue') {
+                $event->forceFill([
                     'resolved_at' => now(),
                     'resolved_by_user_id' => $manager->id,
                     'resolution_note' => $reason,
                 ])->save();
+            }
         }
 
         $this->record($manager, $serviceId, 'issue_closed', $issueKey, $request, [
@@ -329,6 +349,20 @@ class ManagerActions
         ?string $note
     ): void {
         if ($item->kind === 'correction_request') {
+            // SECTION 2.7. APPROVAL IS NOT EXECUTION, for a stock correction.
+            //
+            // An administration correction is carried out here because the
+            // manager approving it holds the only authority it needs. A stock
+            // reconciliation does not: carrying it out requires the
+            // `reconciliation` permission, the balance lock, request-time
+            // authority and the exact approved delta, and the approver holds
+            // none of those and takes neither lock. So this approves and stops,
+            // and somebody with `reconciliation` executes it from the stock
+            // screen against the approval this just granted.
+            if ($item->subject_type === 'stock_movement') {
+                return;
+            }
+
             $this->correct($manager, $serviceId, $item, $correctedOutcome, $note);
 
             return;
@@ -406,7 +440,13 @@ class ManagerActions
             throw new RuntimeException('That record belongs to another organisation.');
         }
 
-        Administration::create([
+        // SECTION 2.7. The stock consequence travels with the clinical one, in
+        // this transaction, or neither happens. Worked out before the record is
+        // written so a refusal cannot leave a corrected outcome standing with
+        // no matching movement.
+        $stock = $this->stockConsequence($manager, $item, $original, $correctedOutcome);
+
+        $correction = Administration::create([
             'reference' => 'COR-'.Str::upper(Str::random(10)),
             'scheduled_dose_id' => $original->scheduled_dose_id,
             'prescription_id' => $original->prescription_id,
@@ -426,7 +466,118 @@ class ManagerActions
             )),
             'administered_at' => $original->administered_at,
             'corrects_administration_id' => $original->id,
+
+            // Only where the correction ESTABLISHED a debit that never existed.
+            // A compensating correction points at the movement it corrects
+            // instead, and is not carried on the administration.
+            'stock_movement_id' => $stock['establishes']?->id,
+            'dose_amount' => $stock['dose_amount'],
+            'dose_unit' => $stock['dose_unit'],
         ]);
+
+        if ($stock['verification_due']) {
+            // The clinical correction stands and no debit is invented. What is
+            // now known is that the balance is wrong by an amount nobody can
+            // state, and the only thing that answers that is somebody counting.
+            $this->stock->auditVerificationDue($correction, $manager, request());
+        }
+    }
+
+    /**
+     * What a corrected outcome does to the cupboard.
+     *
+     * THE ATTRIBUTABLE QUANTITY, NOT "THE ORIGINAL DEBIT". An administration
+     * movement debits `given + wasted`, and correcting the outcome does not
+     * un-waste anything: the wasted portion was destroyed as a separate
+     * physical act that no clinical correction has touched. So only
+     * `quantity_given` comes back, and any return or waste on the original
+     * episode stands until separately corrected with its own evidence.
+     *
+     * @return array{establishes:?\App\Models\Record7\StockMovement,
+     *               verification_due:bool, dose_amount:?float, dose_unit:?string}
+     */
+    private function stockConsequence(
+        User $manager, ReviewItem $item, Administration $original, string $correctedOutcome
+    ): array {
+        $none = [
+            'establishes' => null, 'verification_due' => false,
+            'dose_amount' => null, 'dose_unit' => null,
+        ];
+
+        $consuming = in_array($correctedOutcome, ['given', 'self_administered'], true);
+        $originalMovement = $original->stock_movement_id
+            ? StockMovement::find($original->stock_movement_id)
+            : null;
+
+        // Nothing moved and nothing is being claimed to have moved.
+        if ($originalMovement === null && ! $consuming) {
+            return $none;
+        }
+
+        // A debit that never existed is being established. The historical
+        // amount must be stated in the approved evidence — reading today's
+        // prescription would give last month's dose this month's figure.
+        if ($originalMovement === null) {
+            $medicineId = $original->prescription?->medicine_id;
+
+            // Nothing is being counted for this person and this medicine, so
+            // there is no balance to move and nothing to go and verify.
+            if ($medicineId === null
+                || $this->stock->trackedFor($original->client_id, $medicineId) === null) {
+                return $none;
+            }
+
+            if ($item->requested_dose_amount === null || $item->requested_dose_unit === null) {
+                return ['establishes' => null, 'verification_due' => true,
+                    'dose_amount' => null, 'dose_unit' => null];
+            }
+
+            $movement = $this->stock->establishDebit(
+                $manager, $original, (float) $item->requested_dose_amount,
+                (string) $item->requested_dose_unit, $item->id
+            );
+
+            return [
+                'establishes' => $movement,
+                'verification_due' => $movement === null,
+                'dose_amount' => $movement ? (float) $item->requested_dose_amount : null,
+                'dose_unit' => $movement ? (string) $item->requested_dose_unit : null,
+            ];
+        }
+
+        $attributable = (float) $originalMovement->quantity_given;
+
+        // given -> given, at a different actual amount. Only the difference
+        // moves; the unit must match exactly and is never converted.
+        if ($consuming) {
+            if ($item->requested_dose_amount === null || $item->requested_dose_unit === null) {
+                throw new RuntimeException(
+                    'A correction to a dose that was given has to say how much was actually given.'
+                );
+            }
+
+            if ((string) $item->requested_dose_unit !== (string) $originalMovement->unit) {
+                throw new RuntimeException(
+                    'That correction is in a different unit from the movement it corrects. '
+                    .'Record7 does not convert between units.'
+                );
+            }
+
+            $delta = $attributable - (float) $item->requested_dose_amount;
+
+            $this->stock->compensate($manager, $originalMovement, $delta, $item->id);
+
+            return [
+                'establishes' => null, 'verification_due' => false,
+                'dose_amount' => (float) $item->requested_dose_amount,
+                'dose_unit' => (string) $item->requested_dose_unit,
+            ];
+        }
+
+        // given -> a non-consuming outcome. The dose comes back; the waste does not.
+        $this->stock->compensate($manager, $originalMovement, $attributable, $item->id);
+
+        return $none;
     }
 
     /* ── Rounds ─────────────────────────────────────────────────────────── */

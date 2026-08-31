@@ -7,8 +7,9 @@ use App\Models\Record7\Client;
 use App\Models\Record7\PrnFollowUp;
 use App\Models\Record7\ReviewItem;
 use App\Models\Record7\ScheduledDose;
+use App\Models\Record7\StockBalance;
 use App\Models\Record7\StockEvent;
-use App\Models\Record7\StockLevel;
+use App\Models\Record7\StockMovement;
 use App\Models\Record7\User;
 use App\Models\Record7\UserServiceAccess;
 use App\Models\Record7\WelfareCheck;
@@ -47,6 +48,9 @@ class IssueRegistry
         'stock_event',
         'stock_out',
         'stock_low',
+        'stock_discrepancy',
+        'stock_verification_due',
+        'controlled_drug_discrepancy',
         'staff_readiness',
         'review',
         'handover_unread',
@@ -88,7 +92,15 @@ class IssueRegistry
                 ->find($parsed['sourceId']),
             'prn_follow_up' => PrnFollowUp::where('service_id', $serviceId)->find($parsed['sourceId']),
             'stock_event' => StockEvent::where('service_id', $serviceId)->find($parsed['sourceId']),
-            'stock_out', 'stock_low' => StockLevel::where('service_id', $serviceId)
+            'stock_out', 'stock_low' => StockBalance::where('service_id', $serviceId)
+                ->find($parsed['sourceId']),
+            'stock_discrepancy' => StockMovement::where('service_id', $serviceId)
+                ->find($parsed['sourceId']),
+            'stock_verification_due' => Administration::where('service_id', $serviceId)
+                ->whereNotNull('corrects_administration_id')
+                ->find($parsed['sourceId']),
+            'controlled_drug_discrepancy' => \App\Models\Record7\CdRegister::where('service_id', $serviceId)
+                ->where('is_discrepancy', true)
                 ->find($parsed['sourceId']),
             'review' => ReviewItem::where('service_id', $serviceId)->find($parsed['sourceId']),
             'staff_readiness' => UserServiceAccess::where('service_id', $serviceId)
@@ -146,12 +158,39 @@ class IssueRegistry
             // A not-taken outcome with nothing said about why.
             'incomplete_record' => $this->recordStillIncomplete($serviceId, $id),
 
-            // The stock event has not been resolved.
+            // SECTION 2.7. `stock_event` now covers ONE kind: a delivery that
+            // has not arrived. It asserts no quantity, so "somebody said it
+            // arrived" genuinely is the fact that ends it. Counts and quantity
+            // discrepancies moved to the ledger, where a note cannot end them.
             'stock_event' => StockEvent::where('service_id', $serviceId)
-                ->where('id', $id)->whereNull('resolved_at')->exists(),
+                ->where('id', $id)->where('kind', 'delivery_overdue')
+                ->whereNull('resolved_at')->exists(),
 
-            'stock_out' => (bool) StockLevel::where('service_id', $serviceId)->find($id)?->isOut(),
-            'stock_low' => (bool) StockLevel::where('service_id', $serviceId)->find($id)?->isLow(),
+            // Derived from the ledger balance, which is itself derived from the
+            // ledger. Nothing here can be set by a person.
+            'stock_out' => (bool) StockBalance::with('threshold')
+                ->where('service_id', $serviceId)->find($id)?->isOut(),
+
+            // Unavailable rather than false where no reorder level is recorded.
+            // `isLow()` returns false in that case and the board does not offer
+            // the issue at all, so a blank never renders as healthy.
+            'stock_low' => (bool) StockBalance::with('threshold')
+                ->where('service_id', $serviceId)->find($id)?->isLow(),
+
+            // ONE ENTRY, ONE ANSWER. This movement proved an inconsistency and
+            // stays live until a correction names THIS movement. Correcting an
+            // earlier discrepancy on the same balance does not touch it.
+            'stock_discrepancy' => $this->stockDiscrepancyOpen($serviceId, $id),
+
+            // A correction established that a dose was given without saying how
+            // much. Only somebody counting answers it — see the method.
+            'stock_verification_due' => $this->stockVerificationDue($serviceId, $id),
+
+            // SECTION 2.5 REMAINS THE SOLE AUTHORITY. Derived exactly as it
+            // derives it: a register entry marked as a disagreement, with no
+            // correction naming it, IS the condition. Ordinary reconciliation
+            // cannot reach it and nothing here can close it.
+            'controlled_drug_discrepancy' => $this->controlledDiscrepancyOpen($serviceId, $id),
 
             // The person still cannot administer here.
             'staff_readiness' => $this->staffStillBlocked($serviceId, $id),
@@ -182,6 +221,114 @@ class IssueRegistry
 
             default => true,
         };
+    }
+
+    /**
+     * Is THIS disagreement still unanswered?
+     *
+     * Each movement that proved an inconsistency carries its own identity and
+     * its own requirement. A later shortfall is not swallowed because an earlier
+     * count is still open, and correcting the earlier one can never hide the
+     * later one — they are separate rows. Only a correction naming THIS
+     * movement ends it, and the unique index on `corrects_movement_id` means
+     * that correction can only ever exist once.
+     */
+    private function stockDiscrepancyOpen(int $serviceId, ?int $id): bool
+    {
+        if ($id === null) {
+            return false;
+        }
+
+        return StockMovement::where('service_id', $serviceId)
+            ->where('id', $id)
+            ->where('is_discrepancy', true)
+            ->whereNotExists(function ($query) {
+                $query->select(\Illuminate\Support\Facades\DB::raw(1))
+                    ->from('record7_stock_movements as fix')
+                    ->whereColumn('fix.corrects_movement_id', 'record7_stock_movements.id');
+            })
+            ->exists();
+    }
+
+    /** A Section 2.5 register disagreement nobody has corrected. */
+    private function controlledDiscrepancyOpen(int $serviceId, ?int $id): bool
+    {
+        if ($id === null) {
+            return false;
+        }
+
+        return \App\Models\Record7\CdRegister::where('service_id', $serviceId)
+            ->where('id', $id)
+            ->where('is_discrepancy', true)
+            ->whereNotExists(function ($query) {
+                $query->select(\Illuminate\Support\Facades\DB::raw(1))
+                    ->from('record7_cd_register as fix')
+                    ->whereColumn('fix.corrects_register_id', 'record7_cd_register.id');
+            })
+            ->exists();
+    }
+
+    /**
+     * Does somebody still have to go and count?
+     *
+     * Raised where a correction established that a dose WAS given but nobody
+     * could say how much, so no debit was invented. The balance is now known to
+     * be wrong by an unknown amount, and the only thing that answers that is a
+     * physical count.
+     *
+     * IT CLEARS ON A FACT, and a narrow one. The count must be later than the
+     * correction, and belong to the same organisation, service, person and
+     * preparation. An older count proves nothing about a position that has
+     * since changed; somebody else's count, or a count of another preparation,
+     * proves nothing about this one. A note, a review decision and an
+     * IssueState closure each prove nothing at all.
+     */
+    private function stockVerificationDue(int $serviceId, ?int $id): bool
+    {
+        $correction = Administration::with('prescription')
+            ->where('service_id', $serviceId)
+            ->whereNotNull('corrects_administration_id')
+            ->whereIn('outcome', ['given', 'self_administered'])
+            ->whereNull('stock_movement_id')
+            ->find($id);
+
+        if ($correction === null) {
+            return false;
+        }
+
+        $medicineId = $correction->prescription?->medicine_id;
+
+        if ($medicineId === null) {
+            return false;
+        }
+
+        // Nothing is being counted for this person and this medicine, so there
+        // is no balance to be wrong and nothing to verify.
+        $balance = StockBalance::where('client_id', $correction->client_id)
+            ->where('medicine_id', $medicineId)
+            ->first();
+
+        if ($balance === null) {
+            return false;
+        }
+
+        // FROM THE MOMENT OF THE CORRECTION ONWARDS, not strictly after it.
+        //
+        // A correction that establishes an unknown quantity writes no movement,
+        // so the balance does not change at that instant — which means a count
+        // taken in the same second establishes the position just as well as one
+        // taken a minute later. Requiring strictly later would also make this
+        // unclearable whenever the two share a timestamp, which is not a rare
+        // edge: it is what happens under a frozen clock, and it is what happens
+        // when somebody corrects and counts in one go.
+        $counted = StockMovement::where('service_id', $balance->service_id)
+            ->where('owner_ref', $balance->owner_ref)
+            ->where('preparation_key', $balance->preparation_key)
+            ->where('action', 'stock_check')
+            ->where('occurred_at', '>=', $correction->created_at)
+            ->exists();
+
+        return ! $counted;
     }
 
     /**

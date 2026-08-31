@@ -97,6 +97,10 @@ class Record7Section1Seeder extends Seeder
         // rebuild is not ordinary use, so the guard is lifted and restored.
         $connection->unprepared('DROP TRIGGER IF EXISTS record7_prn_attempts_no_delete');
 
+        // Section 2.6: lifecycle events point at the rounds this rebuild
+        // removes, and they are append-only in the application.
+        $connection->unprepared('DROP TRIGGER IF EXISTS record7_round_lifecycle_no_delete');
+
         try {
             $this->withFixtureClock(function () use ($connection, $house, $organisationId, $olivia) {
                 $connection->transaction(function () use ($house, $organisationId, $olivia) {
@@ -156,6 +160,7 @@ class Record7Section1Seeder extends Seeder
         $this->day($house, $prescriptions, $olivia);
         $this->secondSignatory($house);
         $this->reopenAuthority();
+        $this->stockAuthority();
         $this->overnightPrn($house, $prescriptions, $olivia);
         $this->handover($house, $olivia, $clients);
 
@@ -283,6 +288,31 @@ class Record7Section1Seeder extends Seeder
         ScheduledDose::whereIn('client_id', $clientIds)->delete();
         Prescription::whereIn('client_id', $clientIds)->delete();
         ClientAllergy::whereIn('client_id', $clientIds)->delete();
+        /* SECTION 2.6, AND A DEFECT THIS FIXES.
+           Round lifecycle events carry a foreign key to the round and an
+           append-only delete guard, and neither seeder cleared them — so from
+           the moment Section 2.6 landed, reseeding died on
+           "Cannot delete or update a parent row" the first time a round had
+           been closed. The events are fixture history for fixture rounds, so
+           they are cleared here with the guard lifted, exactly as the
+           administration and register guards already are.
+
+           The projection on the round is nulled first: it points AT an event,
+           so the event cannot go while the round still names it. */
+        $roundIds = $connection->table('record7_rounds')
+            ->where('service_id', $serviceId)->pluck('id');
+
+        if ($roundIds->isNotEmpty()) {
+            $connection->table('record7_rounds')->whereIn('id', $roundIds)
+                ->update(['last_lifecycle_event_id' => null]);
+
+            // The guard is lifted in run(), OUTSIDE the transaction: creating
+            // or dropping a trigger implicitly commits in MySQL, and doing it
+            // here would end the transaction out from under the seeder.
+            $connection->table('record7_round_lifecycle_events')
+                ->whereIn('round_id', $roundIds)->delete();
+        }
+
         $connection->table('record7_rounds')->where('service_id', $serviceId)->delete();
 
         // By both routes, for the same reason: a handover written against the
@@ -308,6 +338,16 @@ class Record7Section1Seeder extends Seeder
             BEGIN
                 SIGNAL SQLSTATE '45000'
                 SET MESSAGE_TEXT = 'an as-required attempt cannot be deleted';
+            END
+        SQL);
+
+        DB::connection('record7')->unprepared(<<<'SQL'
+            CREATE TRIGGER record7_round_lifecycle_no_delete
+            BEFORE DELETE ON record7_round_lifecycle_events
+            FOR EACH ROW
+            BEGIN
+                SIGNAL SQLSTATE '45000'
+                SET MESSAGE_TEXT = 'a round lifecycle event cannot be deleted';
             END
         SQL);
 
@@ -562,6 +602,12 @@ class Record7Section1Seeder extends Seeder
                 'Once a day', ['Morning'], [
                     'support_type' => 'assisted',
                     'instructions' => 'She can hold the cup herself; steady it and stay with her.',
+
+                    // Section 2.7. FICTIONAL DESIGN DATA, so a dose can move a
+                    // balance. It is NOT derived from the dose text above and
+                    // nothing at runtime reads that text — a legacy audit
+                    // finding is what happens when something does.
+                    'dose_min' => 1, 'dose_max' => 1, 'dose_unit' => 'sachet',
                 ]],
 
             // A controlled drug given on a schedule. It cannot be recorded
@@ -577,8 +623,12 @@ class Record7Section1Seeder extends Seeder
                     'dose_min' => 1, 'dose_max' => 1, 'dose_unit' => 'tablet',
                 ]],
 
+            // Section 2.7 fictional design data: tracked, quantified, and
+            // deliberately left with NO reorder level, so "no rule recorded"
+            // is exercised rather than assumed.
             ['dennis-colecalciferol', 'dennis', 'colecalciferol', 'One tablet', 'Oral',
                 'Once a day', ['Morning'], [
+                    'dose_min' => 1, 'dose_max' => 1, 'dose_unit' => 'tablet',
                     'support_type' => 'prompted',
                     'instructions' => 'Dennis takes this himself. Remind him and stay while he does; '
                         .'do not hand it to him.',
@@ -605,7 +655,13 @@ class Record7Section1Seeder extends Seeder
                 ]],
 
             ['joyce-macrogol', 'joyce', 'macrogol', 'One sachet in water', 'Oral', 'Once a day',
-                ['Morning'], ['support_type' => 'assisted']],
+                ['Morning'], [
+                    'support_type' => 'assisted',
+                    // Section 2.7 fictional design data. Two people in one
+                    // house are prescribed macrogol, and each has their own
+                    // balance — which the old service-level table could not say.
+                    'dose_min' => 1, 'dose_max' => 1, 'dose_unit' => 'sachet',
+                ]],
             ['joyce-lorazepam', 'joyce', 'lorazepam', 'One tablet', 'Oral', 'When required',
                 ['prn'], [
                     // Deliberately NO structured limits: this is a controlled
@@ -928,6 +984,64 @@ class Record7Section1Seeder extends Seeder
                     'assessed_at' => now()->subMonths(4),
                     'review_due_at' => now()->addMonths(8),
                     'evidence_reference' => 'Assessed with the medication lead pack.',
+                ]
+            );
+        }
+    }
+
+    /**
+     * Two people who can actually work with stock, and one who cannot reconcile.
+     *
+     * WHY THE FIXTURE NEEDS THIS.
+     * `stock_management` is gated by the `stock_management` competency, and
+     * nobody held one. Sarah had the permission through the Medication Lead
+     * role and was refused on competency; Daniel had explicit per-house grants
+     * written by the Section 1.2 seeder and was refused on both. Every user in
+     * the fixture was denied every stock write, so no positive stock workflow
+     * was reachable from a clean seed — the same gap that had to be fixed for
+     * the controlled-drug witness and the round reopen.
+     *
+     * It belongs here rather than in a migration because Section 0's reseed
+     * deletes record7_user_competencies outright, and a grant written once by a
+     * migration would vanish the next time anybody reseeded.
+     *
+     * The resulting split is the point, not a side effect:
+     *
+     *   Sarah    stock_management + reconciliation, no correction_approval
+     *   Daniel   stock_management + correction_approval, NO reconciliation
+     *
+     * So Daniel is a stock manager who may count and book deliveries in but may
+     * not erase a discrepancy, and the person who approves a reconciliation is
+     * not the person who carries it out.
+     */
+    private function stockAuthority(): void
+    {
+        $competency = CompetencyType::where('code', 'stock_management')->first();
+
+        if ($competency === null) {
+            return;
+        }
+
+        foreach (['sarah.ahmed', 'daniel.evans'] as $username) {
+            $user = User::where('username', $username)->first();
+
+            if ($user === null) {
+                continue;
+            }
+
+            UserCompetency::updateOrCreate(
+                [
+                    'user_id' => $user->id,
+                    'competency_type_id' => $competency->id,
+                    // Organisation-wide: Daniel manages two houses and counting
+                    // stock in one does not make him unassessed in the other.
+                    'service_id' => null,
+                ],
+                [
+                    'status' => 'current',
+                    'assessed_at' => now()->subMonths(3),
+                    'review_due_at' => now()->addMonths(9),
+                    'evidence_reference' => 'Assessed with the medicines management pack.',
                 ]
             );
         }

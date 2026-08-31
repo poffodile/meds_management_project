@@ -879,6 +879,18 @@ class Record7PrnTest extends Record7TestCase
 
     /* ── Stock stays with Section 2.7 ───────────────────────────────────── */
 
+    /**
+     * SECTION 2.7 NARROWED THIS; IT DID NOT REMOVE IT.
+     *
+     * The original guarantee — no administration anywhere touches stock — was
+     * correct for Sections 2.2 to 2.6 and is what kept that boundary honest.
+     * Section 2.7 makes it wrong for TRACKED preparations only: a medicine
+     * somebody is counting, whose prescription carries a structured dose.
+     *
+     * Everywhere else the old rule stands exactly as it did, and it is worth
+     * more now than before: an untracked medicine must not acquire a silent
+     * debit just because a ledger exists somewhere in the product.
+     */
     public function test_giving_a_prn_does_not_touch_stock(): void
     {
         $this->signInWithoutRound();
@@ -1440,6 +1452,18 @@ class Record7PrnTest extends Record7TestCase
     }
 
     /** Nothing here touches stock. */
+    /**
+     * SECTION 2.7 NARROWED THIS; IT DID NOT REMOVE IT.
+     *
+     * The original guarantee — no administration anywhere touches stock — was
+     * correct for Sections 2.2 to 2.6 and is what kept that boundary honest.
+     * Section 2.7 makes it wrong for TRACKED preparations only: a medicine
+     * somebody is counting, whose prescription carries a structured dose.
+     *
+     * Everywhere else the old rule stands exactly as it did, and it is worth
+     * more now than before: an untracked medicine must not acquire a silent
+     * debit just because a ledger exists somewhere in the product.
+     */
     public function test_the_attempt_flow_changes_no_stock(): void
     {
         $this->signInWithoutRound();

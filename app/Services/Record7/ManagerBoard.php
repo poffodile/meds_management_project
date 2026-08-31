@@ -3,6 +3,7 @@
 namespace App\Services\Record7;
 
 use App\Models\Record7\Administration;
+use App\Models\Record7\CdRegister;
 use App\Models\Record7\Client;
 use App\Models\Record7\CompetencyType;
 use App\Models\Record7\Handover;
@@ -13,11 +14,12 @@ use App\Models\Record7\ReviewItem;
 use App\Models\Record7\Round;
 use App\Models\Record7\ScheduledDose;
 use App\Models\Record7\Service;
+use App\Models\Record7\StockBalance;
 use App\Models\Record7\StockEvent;
-use App\Models\Record7\StockLevel;
 use App\Models\Record7\User;
 use App\Models\Record7\UserServiceAccess;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Everything a manager has to act on, in ONE house.
@@ -60,7 +62,8 @@ class ManagerBoard
 
     public function __construct(
         private readonly AccessPolicy $policy,
-        private readonly IssueRegistry $registry
+        private readonly IssueRegistry $registry,
+        private readonly StockLedger $ledger
     ) {
     }
 
@@ -623,7 +626,70 @@ class ManagerBoard
 
     /* ── 5. The review queue ────────────────────────────────────────────── */
 
-    public function openReviewItems(int $serviceId): array
+    /**
+     * WHAT A MANAGER MAY ACTUALLY DO WITH THIS REQUEST, decided here.
+     *
+     * The queue screen used to hard-code its buttons: "Approve as missed" for
+     * anything shaped like a correction, and Decline for everything, always.
+     * That produced two wrong things at once. Sarah, who has no
+     * `correction_approval`, was offered Decline and would have met a 403 —
+     * an action nobody may offer somebody who cannot perform it. And Section
+     * 2.7's stock reconciliation was offered "Approve as missed", which is
+     * meaningless: it asks for a QUANTITY, not an outcome.
+     *
+     * So the actions come from the request itself — its kind, its subject, its
+     * status — and from this person's request-time authority in THIS house.
+     * The backend still refuses independently; a screen that offers only what
+     * is possible is a courtesy, not the control.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function actionsFor(ReviewItem $item, ?User $user, int $serviceId): array
+    {
+        if (! $item->isOpen() || $user === null) {
+            return [];
+        }
+
+        $permission = match ($item->kind) {
+            'correction_request' => 'correction_approval',
+            'incident', 'handover_escalation' => 'incident_review',
+            'round_reopen_request' => 'reopen_medication_round',
+            default => 'view_manager_dashboard',
+        };
+
+        if (! $this->policy->allows($user, $permission, $serviceId)) {
+            return [];
+        }
+
+        // A stock reconciliation approves a FIGURE somebody has already named.
+        // Sending a corrected outcome with it would be answering a question
+        // nobody asked, and `carryOut` deliberately does not execute it.
+        $stock = $item->kind === 'correction_request' && $item->subject_type === 'stock_movement';
+
+        $approve = [
+            'key' => 'approve',
+            'decision' => 'approved',
+            'correctedOutcome' => null,
+            'label' => 'Approve',
+        ];
+
+        if ($item->kind === 'correction_request') {
+            $approve['label'] = $stock
+                ? 'Approve this adjustment'
+                : 'Approve as '.($item->requested_outcome ?? 'requested');
+
+            // The outcome is the requester's, never the approver's. It is sent
+            // back only so the server can refuse a substitution.
+            $approve['correctedOutcome'] = $stock ? null : $item->requested_outcome;
+        }
+
+        return [
+            $approve,
+            ['key' => 'decline', 'decision' => 'declined', 'correctedOutcome' => null, 'label' => 'Decline'],
+        ];
+    }
+
+    public function openReviewItems(int $serviceId, ?User $user = null): array
     {
         $rank = ['high' => 0, 'medium' => 1, 'low' => 2];
 
@@ -645,6 +711,9 @@ class ManagerBoard
                 'waitingMinutes' => (int) max(0, $item->raised_at->diffInMinutes(now(), false)),
                 'subjectType' => $item->subject_type,
                 'subjectId' => $item->subject_id,
+                'requestedOutcome' => $item->requested_outcome,
+                'requestedDelta' => $item->requested_quantity_delta,
+                'actions' => $this->actionsFor($item, $user, $serviceId),
             ])->values()->all();
     }
 
@@ -678,69 +747,217 @@ class ManagerBoard
      * shows the four things that stop a round or start an investigation, and
      * anything already resolved is absent.
      */
+    /**
+     * ORDINARY AND CONTROLLED DISAGREEMENTS READ DIFFERENTLY, AND NOT BY COLOUR.
+     *
+     * They have opposite consequences: an ordinary discrepancy does not stop a
+     * dose, and a controlled one stops all further movement until reconciled.
+     * That distinction has to survive a greyscale screen, a colour-blind reader
+     * and a phone in daylight, so it is carried by four independent signals —
+     * the wording, the status marker, the consequence sentence and the action
+     * offered. Colour may reinforce it. It never carries it alone.
+     *
+     * These two sentences are asserted verbatim by the suite, so a later
+     * redesign cannot quietly soften either.
+     */
+    public const ORDINARY_DISCREPANCY_CONSEQUENCE =
+        'Medicine may still be administered if physical availability is verified. '
+        .'Reconciliation required.';
+
+    public const CONTROLLED_DISCREPANCY_CONSEQUENCE =
+        'Further CD movement is blocked until reconciled.';
+
     public function stockConcerns(int $serviceId): array
     {
         $concerns = [];
 
+        /* ── Deliveries that have not arrived ───────────────────────────── */
+
+        // ALL THAT IS LEFT OF THE OLD TABLE. A delivery asserts no quantity,
+        // so "somebody said it arrived" genuinely is the fact that ends it.
+        // Counts and quantity discrepancies moved to the ledger, where a note
+        // cannot end them, and controlled ones were never this table's to hold.
         foreach (StockEvent::with('medicine')
             ->where('service_id', $serviceId)
+            ->where('kind', 'delivery_overdue')
             ->whereNull('resolved_at')
             ->orderByDesc('occurred_at')
             ->get() as $event) {
-            $controlled = (bool) $event->medicine?->is_controlled;
-
             $concerns[] = [
                 'key' => 'stock_event:'.$event->id,
-                'kind' => $event->kind === 'discrepancy'
-                    ? ($controlled ? 'controlled_drug_discrepancy' : 'stock_discrepancy')
-                    : 'delivery_overdue',
-                'severity' => $controlled ? 'high' : 'medium',
+                'kind' => 'delivery_overdue',
+                'severity' => 'medium',
                 'medicine' => $event->medicine?->name,
-                'controlled' => $controlled,
-                'difference' => $event->difference(),
-                'issue' => match (true) {
-                    $event->kind === 'delivery_overdue' => 'An ordered medicine has not been delivered',
-                    $controlled => 'A controlled-drug balance does not match the record',
-                    default => 'A stock count does not match the record',
-                },
-                'why' => $controlled
-                    ? 'A controlled-drug discrepancy is reportable and must be investigated by a manager'
-                    : 'Only a manager can authorise a correction or chase a supplier',
-                'next' => $controlled
-                    ? 'Recount with a witness and report if it does not reconcile'
-                    : 'Chase the supplier and record the outcome',
+                'person' => null,
+                'controlled' => false,
+                'difference' => null,
+                'unresolvedCount' => 1,
+                'entries' => [],
+                'issue' => 'An ordered medicine has not been delivered',
+                'why' => 'Only a manager can chase a supplier or arrange an emergency supply',
+                'next' => 'Chase the supplier and record the outcome',
                 'note' => $event->note,
                 'at' => $event->occurred_at,
             ];
         }
 
-        foreach (StockLevel::with('medicine')->where('service_id', $serviceId)->get() as $level) {
-            if (! $level->isOut() && ! $level->isLow()) {
-                continue;
+        /* ── Controlled drugs, read from Section 2.5's register ─────────── */
+
+        // READ ONLY, AND FROM THE ONE AUTHORITY. This board used to derive a
+        // controlled-drug discrepancy from the ordinary stock table, which held
+        // a second, disagreeing copy of the same story. There is one register
+        // and it is not this one's to change.
+        foreach ($this->controlledDiscrepancies($serviceId) as $entry) {
+            $concerns[] = $entry;
+        }
+
+        /* ── Ordinary stock, derived from the ledger ────────────────────── */
+
+        $balances = StockBalance::with(['medicine', 'client', 'threshold'])
+            ->where('service_id', $serviceId)
+            ->get();
+
+        foreach ($balances as $balance) {
+            $person = $balance->client?->preferred_name;
+            $medicine = $balance->medicine?->name;
+
+            /* AGGREGATION IS PRESENTATION, AND NOTHING ELSE.
+             *
+             * Every disagreement keeps its own immutable movement, its own
+             * issue key and its own correction requirement. One card per
+             * balance stops a single unaccounted-for supply producing a board
+             * item per dose, which is how people learn to scroll past things —
+             * but nothing is collapsed away. The card carries the OLDEST
+             * unresolved entry's key so the existing own/escalate/close
+             * machinery works unchanged, and every entry is listed with its
+             * own key beneath it.
+             *
+             * Deliberately NOT a persistent balance-level key: one of those
+             * would let a new discrepancy inherit the acknowledgement and
+             * closure of an old, resolved one and arrive looking handled.
+             */
+            $unresolved = $this->ledger->unresolvedDiscrepancies($balance);
+
+            if ($unresolved->isNotEmpty()) {
+                $oldest = $unresolved->first();
+
+                $concerns[] = [
+                    'key' => 'stock_discrepancy:'.$oldest->id,
+                    'kind' => 'stock_discrepancy',
+                    'severity' => 'high',
+                    'medicine' => $medicine,
+                    'person' => $person,
+                    'controlled' => false,
+                    'difference' => $oldest->difference(),
+                    'unresolvedCount' => $unresolved->count(),
+                    'entries' => $unresolved->map(fn ($m) => [
+                        'key' => 'stock_discrepancy:'.$m->id,
+                        'movementId' => $m->id,
+                        'cause' => $m->discrepancyCause(),
+                        'expected' => $m->expected_quantity !== null
+                            ? $this->ledger->tidy($m->expected_quantity) : null,
+                        'counted' => $m->counted_quantity !== null
+                            ? $this->ledger->tidy($m->counted_quantity) : null,
+                        'difference' => $m->difference(),
+                        'balanceAfter' => $this->ledger->tidy($m->balance_after),
+                        'unit' => $m->unit,
+                        'at' => $m->occurred_at,
+                        'by' => $m->recordedBy?->displayName(),
+                    ])->all(),
+                    'issue' => $unresolved->count() > 1
+                        ? $unresolved->count().' unresolved discrepancies on this balance'
+                        : ($oldest->discrepancyCause() === 'count'
+                            ? 'A stock count does not match the record'
+                            : 'More was given than the record can account for'),
+                    'why' => 'Only a reconciliation with approved evidence can settle what is '
+                        .'actually there',
+                    'next' => self::ORDINARY_DISCREPANCY_CONSEQUENCE,
+                    'note' => null,
+                    'at' => $oldest->occurred_at,
+                ];
             }
 
-            $out = $level->isOut();
-
-            $concerns[] = [
-                'key' => ($out ? 'stock_out:' : 'stock_low:').$level->id,
-                'kind' => $out ? 'stock_out' : 'stock_low',
-                'severity' => $out ? 'high' : 'medium',
-                'medicine' => $level->medicine?->name,
-                'controlled' => (bool) $level->medicine?->is_controlled,
-                'difference' => null,
-                'issue' => $out
-                    ? 'None of this medicine is in the house'
-                    : 'Stock is below the level this house keeps',
-                'why' => $out
-                    ? 'A dose cannot be given and somebody has to obtain a supply today'
-                    : 'Ordering and emergency supply are a management decision',
-                'next' => $out ? 'Arrange an emergency supply and tell the prescriber' : 'Order more',
-                'note' => null,
-                'at' => $level->last_counted_at,
-            ];
+            if ($balance->isOut()) {
+                $concerns[] = [
+                    'key' => 'stock_out:'.$balance->id,
+                    'kind' => 'stock_out',
+                    'severity' => 'high',
+                    'medicine' => $medicine,
+                    'person' => $person,
+                    'controlled' => false,
+                    'difference' => null,
+                    'unresolvedCount' => 1,
+                    'entries' => [],
+                    'issue' => 'None of this medicine is left for this person',
+                    'why' => 'A dose cannot be given and somebody has to obtain a supply today',
+                    'next' => 'Arrange an emergency supply and tell the prescriber',
+                    'note' => null,
+                    'at' => $balance->last_counted_at,
+                ];
+            } elseif ($balance->isLow()) {
+                // Only where a reorder level has actually been recorded. Where
+                // none has, `isLow()` is false and no concern is raised — which
+                // is honest silence, not reassurance. The stock screen says so
+                // in words rather than showing a comforting blank.
+                $concerns[] = [
+                    'key' => 'stock_low:'.$balance->id,
+                    'kind' => 'stock_low',
+                    'severity' => 'medium',
+                    'medicine' => $medicine,
+                    'person' => $person,
+                    'controlled' => false,
+                    'difference' => null,
+                    'unresolvedCount' => 1,
+                    'entries' => [],
+                    'issue' => 'Stock is below the reorder level recorded for this person',
+                    'why' => 'Ordering and emergency supply are a management decision',
+                    'next' => 'Order more',
+                    'note' => null,
+                    'at' => $balance->last_counted_at,
+                ];
+            }
         }
 
         return $concerns;
+    }
+
+    /**
+     * Controlled-drug disagreements, read from the Section 2.5 register.
+     *
+     * Derived exactly as 2.5 derives them: an entry marked as a disagreement
+     * with no correction naming it IS the condition. Nothing here writes.
+     */
+    private function controlledDiscrepancies(int $serviceId): array
+    {
+        $open = CdRegister::with(['medicine', 'client'])
+            ->where('service_id', $serviceId)
+            ->where('is_discrepancy', true)
+            ->whereNotExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('record7_cd_register as fix')
+                    ->whereColumn('fix.corrects_register_id', 'record7_cd_register.id');
+            })
+            ->orderBy('occurred_at')
+            ->get();
+
+        return $open->map(fn ($entry) => [
+            'key' => 'controlled_drug_discrepancy:'.$entry->id,
+            'kind' => 'controlled_drug_discrepancy',
+            'severity' => 'high',
+            'medicine' => $entry->medicine?->name,
+            'person' => $entry->client?->preferred_name,
+            'controlled' => true,
+            'difference' => $entry->counted_quantity !== null && $entry->expected_quantity !== null
+                ? (float) $entry->counted_quantity - (float) $entry->expected_quantity
+                : null,
+            'unresolvedCount' => 1,
+            'entries' => [],
+            'issue' => 'A controlled-drug balance does not match the register',
+            'why' => 'A controlled-drug discrepancy is reportable and must be investigated',
+            'next' => self::CONTROLLED_DISCREPANCY_CONSEQUENCE,
+            'note' => $entry->notes,
+            'at' => $entry->occurred_at,
+        ])->all();
     }
 
     /* ── 7. Handover oversight ──────────────────────────────────────────── */

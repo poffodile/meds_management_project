@@ -18,6 +18,13 @@
         </include>
     </coverage>
     <php>
+        <!-- The suite outgrew PHP's 128M default.
+             Direct phpunit finished at exactly 128.00 MB — right on the line —
+             and `php artisan test`, which wraps the run in its own process and
+             reporter, tipped over it when Section 2.7 took the Record7 suite
+             from 590 tests to 690. Nothing leaks; there is simply more of it.
+             512M gives both runners room, so the two agree again. -->
+        <ini name="memory_limit" value="512M"/>
         <env name="APP_ENV" value="testing"/>
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="CACHE_DRIVER" value="array"/>

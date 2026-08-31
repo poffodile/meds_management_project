@@ -12,6 +12,7 @@ use App\Models\Record7\User;
 use App\Models\Record7\WelfareCheck;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use RuntimeException;
 
@@ -161,8 +162,135 @@ class AdministrationRecorder
         'no_escalation_required_under_policy',
     ];
 
-    public function __construct(private readonly AuditRecorder $audit)
+    public function __construct(
+        private readonly AuditRecorder $audit,
+        private readonly StockLedger $stock,
+    ) {
+    }
+
+    /* ── Section 2.7: what this dose does to the cupboard ─────────────────── */
+
+    /**
+     * What Record7 knows about the stock behind one scheduled dose.
+     *
+     * Three honest states, and the screens name all three rather than letting
+     * silence look like success:
+     *
+     *   untracked      nobody has counted this medicine for this person, so a
+     *                  dose changes nothing and says nothing;
+     *   unquantified   it is counted, but the prescription carries no fixed
+     *                  structured dose, so a debit would be a guess;
+     *   tracked        a quantity is known and the balance moves.
+     *
+     * The quantity comes from the structured columns or not at all.
+     * `record7_prescriptions.dose` is display text — legacy audit CR-02 is what
+     * happens when arithmetic reads it.
+     *
+     * @return array{state:string, balance:?\App\Models\Record7\StockBalance, snapshot:?array,
+     *               quantity:?float, sufficient:bool, shortfall:float, unit:?string}
+     */
+    public function stockPosition(Client $client, ScheduledDose $dose, ?float $recorded = null): array
     {
+        $none = [
+            'state' => 'untracked', 'balance' => null, 'snapshot' => null,
+            'quantity' => null, 'sufficient' => true, 'shortfall' => 0.0, 'unit' => null,
+        ];
+
+        $prescription = $dose->prescription;
+        $medicine = $prescription?->medicine;
+
+        // Controlled medicines are Section 2.5's, entirely.
+        if (! $prescription || ! $medicine || $medicine->is_controlled) {
+            return $none;
+        }
+
+        // A medicine the person holds and manages themselves is not in stock
+        // Record7 accounts for, so no dose of it moves a balance.
+        if (! $this->stock->consumesAccountedStock($prescription)) {
+            // Union keeps the LEFT side's keys, so the override goes first.
+            return ['state' => 'self_managed'] + $none;
+        }
+
+        if ($prescription->dose_unit === null || trim((string) $prescription->dose_unit) === '') {
+            return $none;
+        }
+
+        $snapshot = $this->stock->snapshot($medicine, $prescription->dose_unit);
+        $balance = $this->stock->balanceFor($client, $snapshot);
+
+        if (! $balance) {
+            return $none;
+        }
+
+        $quantity = $this->stock->doseQuantity($prescription, $recorded);
+
+        if ($quantity === null) {
+            return [
+                'state' => 'unquantified', 'balance' => $balance, 'snapshot' => $snapshot,
+                'quantity' => null, 'sufficient' => true, 'shortfall' => 0.0,
+                'unit' => $snapshot['unit'],
+            ];
+        }
+
+        $cover = $this->stock->canCover($balance, 'administration', $quantity);
+
+        return [
+            'state' => 'tracked',
+            'balance' => $balance,
+            'snapshot' => $snapshot,
+            'quantity' => $quantity,
+            'sufficient' => $cover['sufficient'],
+            'shortfall' => $cover['shortfall'],
+            'unit' => $snapshot['unit'],
+        ];
+    }
+
+    /**
+     * Move the stock a recorded dose actually consumed.
+     *
+     * Called inside the transaction that will write the administration, so the
+     * two stand or fall together. The balance is locked before any arithmetic
+     * and the head moves last, inside the same lock.
+     *
+     * Returns null where there is nothing to move — an untracked medicine, an
+     * unquantified prescription, or a controlled one.
+     */
+    private function debitForDose(
+        User $user, Round $round, Client $client, ScheduledDose $dose, array $shortfallInput
+    ): ?\App\Models\Record7\StockMovement {
+        $position = $this->stockPosition($client, $dose);
+
+        if ($position['state'] !== 'tracked') {
+            return null;
+        }
+
+        $house = Service::findOrFail($round->service_id);
+        $balance = $this->stock->lockExisting($position['balance']);
+        $quantity = (float) $position['quantity'];
+
+        // RE-ASKED UNDER THE LOCK. What was true a moment ago is not evidence.
+        $cover = $this->stock->canCover($balance, 'administration', $quantity);
+        $shortfall = null;
+
+        if (! $cover['sufficient']) {
+            // The record shows less than this dose needs. The dose is not
+            // refused — somebody checked and it was there — but Record7 will
+            // not claim a balance it cannot support, so the verification is
+            // required and the resulting position is kept, negative and all.
+            $shortfall = $this->stock->verifyShortfall($user, $shortfallInput);
+        }
+
+        return $this->stock->record(
+            balance: $balance,
+            snapshot: $position['snapshot'],
+            action: 'administration',
+            quantities: ['removed' => $quantity, 'given' => $quantity],
+            user: $user,
+            client: $client,
+            house: $house,
+            prescription: $dose->prescription,
+            shortfall: $shortfall,
+        );
     }
 
     /**
@@ -293,37 +421,63 @@ class AdministrationRecorder
         Request $request,
         ?Administration $reofferOf = null
     ): array {
+        // SECTION 2.7. The stock movement and the clinical record describe one
+        // physical event and are written together. The movement goes first
+        // because the administration carries the reference: the other direction
+        // would mean writing the ledger row with a null link and UPDATING it,
+        // which is exactly what an append-only ledger must never allow.
+        //
+        // If the administration insert fails, the movement rolls back with it.
+        // There is no state in which a debit exists for a dose nobody recorded.
+        $shortfallInput = $request->only([
+            'shortfall_basis', 'shortfall_statement', 'shortfall_observed_quantity',
+        ]);
+
         try {
-            $administration = Administration::create([
-                'reference' => 'R7A-'.strtoupper(Str::random(12)),
-                'scheduled_dose_id' => $dose->id,
-                'prescription_id' => $dose->prescription_id,
-                'client_id' => $client->id,
-                'service_id' => $round->service_id,
+            $administration = $this->stock->guarded(
+                fn () => DB::connection('record7')->transaction(function () use (
+                    $user, $round, $client, $dose, $notes, $reofferOf, $shortfallInput
+                ) {
+                    $movement = $this->debitForDose($user, $round, $client, $dose, $shortfallInput);
 
-                // THE AUTHENTICATED USER. Never an id from the request — a
-                // worker must not be able to sign a medicine in somebody
-                // else's name, and joining a colleague's round must not make
-                // your actions look like theirs.
-                'recorded_by_user_id' => $user->id,
+                    return Administration::create([
+                        'reference' => 'R7A-'.strtoupper(Str::random(12)),
+                        'scheduled_dose_id' => $dose->id,
+                        'prescription_id' => $dose->prescription_id,
+                        'client_id' => $client->id,
+                        'service_id' => $round->service_id,
 
-                'outcome' => 'given',
+                        // THE AUTHENTICATED USER. Never an id from the request — a
+                        // worker must not be able to sign a medicine in somebody
+                        // else's name, and joining a colleague's round must not make
+                        // your actions look like theirs.
+                        'recorded_by_user_id' => $user->id,
 
-                // No reason code. A medicine given as prescribed does not need
-                // one, and forcing a choice would fill the record with filler.
-                'reason_code' => null,
-                'notes' => $this->cleanNotes($notes),
+                        'outcome' => 'given',
 
-                // The server's clock. A browser can say anything, and the time
-                // a medicine was given is a clinical fact. The dose's own
-                // due_at is left exactly as it was.
-                'administered_at' => now(),
+                        // No reason code. A medicine given as prescribed does not need
+                        // one, and forcing a choice would fill the record with filler.
+                        'reason_code' => null,
+                        'notes' => $this->cleanNotes($notes),
 
-                // Set only when this is a second offer of the same dose. The
-                // refusal it follows is never touched — it stays exactly as it
-                // was recorded, and the two rows together tell the real story.
-                'reoffer_of_administration_id' => $reofferOf?->id,
-            ]);
+                        // The server's clock. A browser can say anything, and the time
+                        // a medicine was given is a clinical fact. The dose's own
+                        // due_at is left exactly as it was.
+                        'administered_at' => now(),
+
+                        // Set only when this is a second offer of the same dose. The
+                        // refusal it follows is never touched — it stays exactly as it
+                        // was recorded, and the two rows together tell the real story.
+                        'reoffer_of_administration_id' => $reofferOf?->id,
+
+                        'stock_movement_id' => $movement?->id,
+                    ]);
+                }),
+                $user,
+                $round->service_id,
+                ['client_id' => $client->id, 'scheduled_dose_id' => $dose->id, 'outcome' => 'given'],
+                $request
+            );
         } catch (UniqueConstraintViolationException $clash) {
             // Somebody — or another request from this same worker — got there
             // first. The obligation is answered, so this is a safe outcome
@@ -422,23 +576,48 @@ class AdministrationRecorder
 
         $target = $this->reofferTarget($round, $client, $dose, $outcome, $input['reoffer_of_administration_id'] ?? null);
 
+        /* ── Section 2.7: did any of it physically leave the cupboard? ──── */
+
+        // Only a preparation that is being counted, and whose dose is known,
+        // has anything to declare. Anywhere else the honest answer is silence,
+        // and demanding one would be demanding a guess.
+        $position = $this->stockPosition($client, $dose);
+        $declaration = $this->stockDeclaration($position, $input);
+
         try {
-            $administration = Administration::create([
-                'reference' => 'R7N-'.strtoupper(Str::random(12)),
-                'scheduled_dose_id' => $dose->id,
-                'prescription_id' => $dose->prescription_id,
-                'client_id' => $client->id,
-                'service_id' => $round->service_id,
-                'recorded_by_user_id' => $user->id,
-                'outcome' => $outcome,
-                'reason_code' => $reason,
-                'notes' => $notes,
-                'action_taken' => $actionTaken,
-                'immediate_action_code' => $outcome === 'missed' ? $immediateAction : null,
-                'controlled_drug_no_quantity_removed' => $medicine?->is_controlled ? true : null,
-                'administered_at' => now(),
-                'reoffer_of_administration_id' => $target?->id,
-            ]);
+            $administration = $this->stock->guarded(
+                fn () => DB::connection('record7')->transaction(function () use (
+                    $user, $round, $client, $dose, $outcome, $reason, $notes, $actionTaken,
+                    $immediateAction, $medicine, $target, $position, $declaration
+                ) {
+                    $movement = $declaration['removed']
+                        ? $this->accountForRemoval($user, $round, $client, $dose, $position, $declaration)
+                        : null;
+
+                    return Administration::create([
+                        'reference' => 'R7N-'.strtoupper(Str::random(12)),
+                        'scheduled_dose_id' => $dose->id,
+                        'prescription_id' => $dose->prescription_id,
+                        'client_id' => $client->id,
+                        'service_id' => $round->service_id,
+                        'recorded_by_user_id' => $user->id,
+                        'outcome' => $outcome,
+                        'reason_code' => $reason,
+                        'notes' => $notes,
+                        'action_taken' => $actionTaken,
+                        'immediate_action_code' => $outcome === 'missed' ? $immediateAction : null,
+                        'controlled_drug_no_quantity_removed' => $medicine?->is_controlled ? true : null,
+                        'administered_at' => now(),
+                        'reoffer_of_administration_id' => $target?->id,
+                        'stock_no_quantity_removed' => $declaration['declared'],
+                        'stock_movement_id' => $movement?->id,
+                    ]);
+                }),
+                $user,
+                $round->service_id,
+                ['client_id' => $client->id, 'scheduled_dose_id' => $dose->id, 'outcome' => $outcome],
+                $request
+            );
         } catch (UniqueConstraintViolationException $clash) {
             $existing = Administration::where('scheduled_dose_id', $dose->id)
                 ->whereNull('corrects_administration_id')
@@ -471,6 +650,106 @@ class AdministrationRecorder
         );
 
         return ['administration' => $administration, 'created' => true];
+    }
+
+    /**
+     * What the recorder said about the cupboard, checked before anything moves.
+     *
+     * PHYSICAL MOVEMENT AND MAR OUTCOME ARE SEPARATE FACTS. A refusal where the
+     * tablet never left the pot moves nothing; the same refusal where it came
+     * out and went in the bin moves something. Only the person who was there
+     * knows which, so they are asked — and the answer is frozen on insert like
+     * every other clinical fact, in the model and in the trigger.
+     *
+     * @return array{declared:?bool, removed:bool, returned:float, wasted:float}
+     */
+    private function stockDeclaration(array $position, array $input): array
+    {
+        if ($position['state'] !== 'tracked') {
+            // Nothing is being counted, or no quantity is knowable. There is
+            // no question to answer, so none is recorded.
+            return ['declared' => null, 'removed' => false, 'returned' => 0.0, 'wasted' => 0.0];
+        }
+
+        $declared = $input['stock_no_quantity_removed'] ?? null;
+
+        if ($declared === null || $declared === '') {
+            throw new RuntimeException(
+                'Say whether any of this medicine was taken out of stock.'
+            );
+        }
+
+        $noneRemoved = filter_var($declared, FILTER_VALIDATE_BOOLEAN);
+
+        if ($noneRemoved) {
+            return ['declared' => true, 'removed' => false, 'returned' => 0.0, 'wasted' => 0.0];
+        }
+
+        $returned = (float) ($input['stock_quantity_returned'] ?? 0);
+        $wasted = (float) ($input['stock_quantity_wasted'] ?? 0);
+
+        if ($returned < 0 || $wasted < 0) {
+            throw new RuntimeException('A quantity cannot be less than nothing.');
+        }
+
+        if ($returned + $wasted <= 0) {
+            throw new RuntimeException(
+                'Say how much went back into stock and how much was disposed of.'
+            );
+        }
+
+        return [
+            'declared' => false,
+            'removed' => true,
+            'returned' => $returned,
+            'wasted' => $wasted,
+        ];
+    }
+
+    /**
+     * One movement for one physical episode: what came out, and where it went.
+     *
+     * Deliberately not a removal followed by a separate return. Two movements
+     * would let a crash between them leave a removal with nothing accounting
+     * for it, which is the state a ledger exists to make impossible.
+     */
+    private function accountForRemoval(
+        User $user, Round $round, Client $client, ScheduledDose $dose,
+        array $position, array $declaration
+    ): \App\Models\Record7\StockMovement {
+        $house = Service::findOrFail($round->service_id);
+        $balance = $this->stock->lockExisting($position['balance']);
+
+        $removed = $declaration['returned'] + $declaration['wasted'];
+
+        // Only what was destroyed leaves the balance. What went back was never
+        // really gone, and recording it as a debit and a credit would say twice
+        // that something happened once.
+        $cover = $this->stock->canCover($balance, 'non_administration', $declaration['wasted']);
+
+        if (! $cover['sufficient']) {
+            $this->stock->refuse(
+                'insufficient_for_waste',
+                'The record shows less of this medicine than that. Count what is physically '
+                .'there and record it before disposing of any.'
+            );
+        }
+
+        return $this->stock->record(
+            balance: $balance,
+            snapshot: $position['snapshot'],
+            action: 'non_administration',
+            quantities: [
+                'removed' => $removed,
+                'given' => 0,
+                'returned' => $declaration['returned'],
+                'wasted' => $declaration['wasted'],
+            ],
+            user: $user,
+            client: $client,
+            house: $house,
+            prescription: $dose->prescription,
+        );
     }
 
     /**

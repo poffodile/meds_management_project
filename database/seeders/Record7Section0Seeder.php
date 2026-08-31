@@ -20,6 +20,7 @@ use App\Services\Record7\OrganisationDirectory;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use PDO;
 use RuntimeException;
@@ -86,21 +87,36 @@ class Record7Section0Seeder extends Seeder
 
         $pdo = $this->openFixture();
 
-        DB::connection('record7')->transaction(function () use ($pdo) {
-            $this->clearExisting();
-            $this->seedOrganisations($pdo);
-            $this->seedServices($pdo);
-            $this->seedRolesAndPermissions($pdo);
-            $this->seedCompetencyTypes($pdo);
-            $this->seedUsers($pdo);
-            $this->seedUserRoles($pdo);
-            $this->seedServiceAccess($pdo);
-            $this->seedUserPermissions($pdo);
-            $this->seedCompetencies($pdo);
-            $this->seedMfa($pdo);
-            $this->seedSessions($pdo);
-            $this->separateRoleFromCompetency();
-        });
+        /* THE APPEND-ONLY GUARDS COME OFF HERE, OUTSIDE THE TRANSACTION.
+         *
+         * Creating or dropping a trigger implicitly commits in MySQL, so doing
+         * it inside would end the transaction out from under the seeder — the
+         * same reason Sections 1 and 1.2 swap theirs either side. They go back
+         * in the finally below, whatever happens in between.
+         *
+         * This is a fixture rebuild in a development database, gated by
+         * guard() above. There is no runtime path to any of it. */
+        $this->liftFixtureGuards();
+
+        try {
+            DB::connection('record7')->transaction(function () use ($pdo) {
+                $this->clearExisting();
+                $this->seedOrganisations($pdo);
+                $this->seedServices($pdo);
+                $this->seedRolesAndPermissions($pdo);
+                $this->seedCompetencyTypes($pdo);
+                $this->seedUsers($pdo);
+                $this->seedUserRoles($pdo);
+                $this->seedServiceAccess($pdo);
+                $this->seedUserPermissions($pdo);
+                $this->seedCompetencies($pdo);
+                $this->seedMfa($pdo);
+                $this->seedSessions($pdo);
+                $this->separateRoleFromCompetency();
+            });
+        } finally {
+            $this->restoreFixtureGuards();
+        }
 
         // Outside the transaction: the audit table is append-only and its
         // triggers make it a poor citizen inside a rollback.
@@ -160,20 +176,205 @@ class Record7Section0Seeder extends Seeder
         return $pdo;
     }
 
+    /**
+     * The append-only guards this rebuild has to work through, and the SQL
+     * that puts each one back exactly as its migration wrote it.
+     *
+     * FIXTURE REBUILD ONLY. guard() has already refused production and refused
+     * to run without RECORD7_ALLOW_FIXTURE_SEED. Nothing in the application
+     * calls these, and the triggers are back in place before this method's
+     * caller returns — including when it throws.
+     */
+    private const FIXTURE_GUARDS = [
+        'record7_round_lifecycle_no_delete' => <<<'SQL'
+            CREATE TRIGGER record7_round_lifecycle_no_delete
+            BEFORE DELETE ON record7_round_lifecycle_events
+            FOR EACH ROW
+            BEGIN
+                SIGNAL SQLSTATE '45000'
+                SET MESSAGE_TEXT = 'a round lifecycle event cannot be deleted';
+            END
+        SQL,
+
+        'record7_stock_movements_no_delete' => <<<'SQL'
+            CREATE TRIGGER record7_stock_movements_no_delete
+            BEFORE DELETE ON record7_stock_movements
+            FOR EACH ROW
+            BEGIN
+                SIGNAL SQLSTATE '45000'
+                SET MESSAGE_TEXT = 'a stock movement cannot be deleted';
+            END
+        SQL,
+
+        'record7_stock_attempts_no_delete' => <<<'SQL'
+            CREATE TRIGGER record7_stock_attempts_no_delete
+            BEFORE DELETE ON record7_stock_attempts
+            FOR EACH ROW
+            BEGIN
+                SIGNAL SQLSTATE '45000'
+                SET MESSAGE_TEXT = 'a stock attempt cannot be deleted';
+            END
+        SQL,
+
+        'record7_cd_register_no_delete' => <<<'SQL'
+            CREATE TRIGGER record7_cd_register_no_delete
+            BEFORE DELETE ON record7_cd_register
+            FOR EACH ROW
+            BEGIN
+                SIGNAL SQLSTATE '45000'
+                SET MESSAGE_TEXT = 'a controlled drug register entry cannot be deleted';
+            END
+        SQL,
+
+        'record7_prn_attempts_no_delete' => <<<'SQL'
+            CREATE TRIGGER record7_prn_attempts_no_delete
+            BEFORE DELETE ON record7_prn_attempts
+            FOR EACH ROW
+            BEGIN
+                SIGNAL SQLSTATE '45000'
+                SET MESSAGE_TEXT = 'an as-required attempt cannot be deleted';
+            END
+        SQL,
+
+        'record7_welfare_checks_no_delete' => <<<'SQL'
+            CREATE TRIGGER record7_welfare_checks_no_delete
+            BEFORE DELETE ON record7_welfare_checks
+            FOR EACH ROW
+            BEGIN
+                SIGNAL SQLSTATE '45000'
+                SET MESSAGE_TEXT = 'a welfare check cannot be deleted';
+            END
+        SQL,
+
+        'record7_administrations_no_delete' => <<<'SQL'
+            CREATE TRIGGER record7_administrations_no_delete
+            BEFORE DELETE ON record7_administrations
+            FOR EACH ROW
+            BEGIN
+                SIGNAL SQLSTATE '45000'
+                SET MESSAGE_TEXT = 'record7 administrations are a permanent record and cannot be deleted';
+            END
+        SQL,
+    ];
+
+    private function liftFixtureGuards(): void
+    {
+        $connection = DB::connection('record7');
+
+        foreach (array_keys(self::FIXTURE_GUARDS) as $trigger) {
+            $connection->unprepared("DROP TRIGGER IF EXISTS {$trigger}");
+        }
+    }
+
+    /**
+     * Put every one back, whatever happened in between.
+     *
+     * IF EXISTS on the drop and a create per guard, so a rebuild that failed
+     * halfway still leaves the database protected. A seeder that can leave an
+     * append-only table writable is worse than one that fails.
+     */
+    private function restoreFixtureGuards(): void
+    {
+        $connection = DB::connection('record7');
+
+        foreach (self::FIXTURE_GUARDS as $trigger => $sql) {
+            $connection->unprepared("DROP TRIGGER IF EXISTS {$trigger}");
+            $connection->unprepared($sql);
+        }
+    }
+
+    /**
+     * Clear the fictional environment, dependants first.
+     *
+     * WHY THIS GREW.
+     * It used to delete the access layer alone — users, roles, services,
+     * organisations — with foreign key checks switched off, and leave every
+     * clinical row that pointed at them behind. Section 0 then rebuilt the
+     * houses with NEW ids, so the previous run's clients, rounds, stock and
+     * register entries were not replaced but stranded. That is where the
+     * fifteen orphaned rows in each of the two retired stock tables came from:
+     * six reseeds, each leaving its predecessor behind.
+     *
+     * Section 2.6 then made it fail outright rather than merely accumulate.
+     * Lifecycle events carry a foreign key to the round and a delete guard, so
+     * the first reseed after a round had been closed died on "Cannot delete or
+     * update a parent row" — and a clean fictional environment is what every
+     * section's verification rests on.
+     *
+     * So the order below is the FK graph, dependants first. Foreign key checks
+     * are still switched off, because a fixture rebuild is not the place to
+     * fight a graph this deep — but the order is correct anyway, so the
+     * deletes would stand on their own if they ever had to.
+     */
     private function clearExisting(): void
     {
         $connection = DB::connection('record7');
         $connection->statement('SET FOREIGN_KEY_CHECKS=0');
 
+        /* Projections first: a round names its last lifecycle event, and a
+           balance names its last movement. Nulling those is what lets the
+           rows they point at go. */
+        $connection->table('record7_rounds')->update(['last_lifecycle_event_id' => null]);
+        $connection->table('record7_stock_balances')->update(['last_movement_id' => null]);
+
         foreach ([
+            // Section 2.7 — stock. Attempts and thresholds point at movements
+            // and balances; corrections point at earlier movements, so the
+            // ledger comes down newest first.
+            'record7_stock_attempts',
+            'record7_stock_thresholds',
+            'record7_stock_movements',
+            'record7_stock_balances',
+
+            // The retired tables. Cleared here for the first time, which is
+            // what stops the orphans accumulating again.
+            'record7_stock_events',
+            'record7_stock_levels',
+
+            // Section 2.6 — round lifecycle, then the rounds themselves.
+            // Participants join a round and name a user, so they go first.
+            'record7_round_lifecycle_events',
+            'record7_round_participants',
+            'record7_rounds',
+
+            // Sections 2.3 to 2.5 — everything that answers an administration.
+            'record7_welfare_checks',
+            'record7_prn_attempts',
+            'record7_prn_follow_ups',
+            'record7_administrations',
+            'record7_cd_balances',
+            'record7_cd_register',
+
+            // Section 1.2 — the manager surface.
+            'record7_issue_states',
+            'record7_review_items',
+
+            // Handover, then the medicines plan, then the people.
+            'record7_handover_reads',
+            'record7_handover_notes',
+            'record7_handovers',
+            'record7_scheduled_doses',
+            'record7_prescriptions',
+            'record7_client_allergies',
+            'record7_clients',
+
+            // And finally the access layer this seeder owns.
             'record7_login_sessions', 'record7_mfa_methods', 'record7_user_competencies',
             'record7_user_permissions', 'record7_user_service_access', 'record7_user_roles',
             'record7_account_invitations', 'record7_password_resets',
+
+            // Section 0's own sign-in machinery. These name a user and were
+            // never cleared, so every reseed left another set behind.
+            'record7_recovery_codes', 'record7_trusted_devices', 'record7_verification_events',
             'record7_users', 'record7_role_permissions', 'record7_permissions',
             'record7_roles', 'record7_competency_types', 'record7_services',
             'record7_organisations',
         ] as $table) {
-            $connection->table($table)->delete();
+            // A table a later section has not created yet is not an error:
+            // Section 0 has to be runnable against a partly migrated database.
+            if (Schema::connection('record7')->hasTable($table)) {
+                $connection->table($table)->delete();
+            }
         }
 
         $connection->statement('SET FOREIGN_KEY_CHECKS=1');

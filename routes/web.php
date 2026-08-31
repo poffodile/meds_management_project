@@ -3206,6 +3206,7 @@ use App\Http\Controllers\Record7\HouseController as R7House;
 use App\Http\Controllers\Record7\SessionController as R7Session;
 use App\Http\Controllers\Record7\SignInController as R7SignIn;
 use App\Http\Controllers\Record7\ManagerController as R7Manager;
+use App\Http\Controllers\Record7\StockController as R7Stock;
 use App\Http\Controllers\Record7\ControlledDrugController as R7Cd;
 use App\Http\Controllers\Record7\PrnController as R7Prn;
 use App\Http\Controllers\Record7\RoundController as R7Round;
@@ -3436,6 +3437,42 @@ Route::prefix('record7')->name('record7.')->group(function () {
         Route::post('/handover/read', [R7Today::class, 'readHandover'])
             ->middleware([R7Authorize::class.':view_dashboard', 'throttle:30,1'])
             ->name('handover.read');
+
+        /* 2.7 — Stock, reconciliation and corrections.
+           Reading is open to anybody who can see the dashboard; every write is
+           gated on its own permission, re-checked in the controller against the
+           house the session is in. Custody and reconciliation are deliberately
+           separate: a stock manager may count, but only `reconciliation` may
+           declare what the true balance is. */
+        Route::get('/stock', [R7Stock::class, 'index'])
+            ->middleware(R7Authorize::class.':view_dashboard')->name('stock');
+
+        Route::get('/stock/{balance}', [R7Stock::class, 'show'])
+            ->whereNumber('balance')
+            ->middleware(R7Authorize::class.':view_dashboard')->name('stock.show');
+
+        Route::middleware([R7Authorize::class.':stock_management', 'throttle:60,1'])
+            ->group(function () {
+                Route::post('/stock/{balance}/opening', [R7Stock::class, 'open'])
+                    ->whereNumber('balance')->name('stock.opening');
+                Route::post('/stock/{balance}/receipt', [R7Stock::class, 'receipt'])
+                    ->whereNumber('balance')->name('stock.receipt');
+                Route::post('/stock/{balance}/count', [R7Stock::class, 'count'])
+                    ->whereNumber('balance')->name('stock.count');
+                Route::post('/stock/{balance}/threshold', [R7Stock::class, 'threshold'])
+                    ->whereNumber('balance')->name('stock.threshold');
+            });
+
+        // Raising is open to either stock authority; the controller decides.
+        Route::post('/stock/movement/{movement}/correction-request', [R7Stock::class, 'requestCorrection'])
+            ->whereNumber('movement')
+            ->middleware(['throttle:60,1'])->name('stock.correction.request');
+
+        // Carrying it out is reconciliation's alone.
+        Route::post('/stock/movement/{movement}/correct', [R7Stock::class, 'correct'])
+            ->whereNumber('movement')
+            ->middleware([R7Authorize::class.':reconciliation', 'throttle:60,1'])
+            ->name('stock.correct');
 
         /* 1.2 — Manager Today. Gated on its own permission rather than on a
            role, and every action re-checks in the house the session is in. */

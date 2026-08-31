@@ -144,16 +144,45 @@ class Record7IssueLifecycleTest extends Record7TestCase
         $this->assertNotContains($key, $this->keys($rosewood));
     }
 
-    public function test_closing_a_controlled_drug_discrepancy_needs_evidence(): void
+    /**
+     * REPLACES test_closing_a_controlled_drug_discrepancy_needs_evidence.
+     *
+     * OLD BEHAVIOUR. Closing a `stock_event` of kind `discrepancy` whose
+     * medicine was controlled, with no evidence and no linked record, was
+     * refused and left `resolved_at` null.
+     *
+     * WHY IT IS OBSOLETE. Section 2.7 forbids a controlled medicine from having
+     * an ordinary stock record at all — the insert trigger refuses one before
+     * any other check — so the row this test selected has ceased to exist. The
+     * rule it protected is not lost: it is now carried by Section 2.5's derived
+     * condition, which is stronger, because a controlled-drug discrepancy
+     * cannot be closed WITH evidence either. Only a correction in the register
+     * ends it.
+     *
+     * NEW INVARIANT, in two parts. An ordinary medicine's discrepancy still
+     * needs evidence before the board item can be closed, and closing it still
+     * does not resolve it; and a controlled medicine cannot reach this table.
+     */
+    public function test_closing_an_ordinary_stock_discrepancy_needs_evidence_and_still_does_not_resolve_it(): void
     {
         $this->enter('daniel.evans', 'Rosewood House');
+        $rosewood = $this->rosewood()->id;
 
-        $event = StockEvent::where('service_id', $this->rosewood()->id)
-            ->where('kind', 'discrepancy')
-            ->whereNull('resolved_at')
+        $balance = \App\Models\Record7\StockBalance::where('service_id', $rosewood)
+            ->whereHas('medicine', fn ($q) => $q->where('name', 'Senna'))
             ->firstOrFail();
 
-        $key = 'stock_event:'.$event->id;
+        $entry = app(\App\Services\Record7\StockLedger::class)
+            ->unresolvedDiscrepancies($balance)->firstOrFail();
+
+        $key = 'stock_discrepancy:'.$entry->id;
+
+        // The fixture has already closed this one once, with evidence, and
+        // deliberately: it is the case where a manager has acted and the
+        // shortage is still there. So the assertion is that a NEW closure
+        // without evidence does not happen, not that none has ever happened.
+        $before = IssueState::where('issue_key', $key)->whereNotNull('closed_at')
+            ->value('closed_at');
 
         // No evidence, no linked record: refused.
         $this->post('/record7/manager/close', [
@@ -161,8 +190,39 @@ class Record7IssueLifecycleTest extends Record7TestCase
             'reason' => 'Dealt with it.',
         ])->assertStatus(500);
 
-        $this->assertNull($event->fresh()->resolved_at);
-        $this->assertSame(0, IssueState::where('issue_key', $key)->whereNotNull('closed_at')->count());
+        $this->assertEquals(
+            $before,
+            IssueState::where('issue_key', $key)->whereNotNull('closed_at')->value('closed_at'),
+            'A closure with no evidence changed nothing.'
+        );
+
+        // With evidence it closes — and the disagreement is still there.
+        $this->post('/record7/manager/close', [
+            'issue_key' => $key,
+            'reason' => 'Recounted and reported.',
+            'evidence_reference' => 'INCIDENT-2026-0912',
+        ])->assertRedirect('/record7/manager');
+
+        $this->assertTrue(
+            app(IssueRegistry::class)->conditionActive($key, $rosewood),
+            'Closing the paperwork does not put the tablets back.'
+        );
+    }
+
+    public function test_a_controlled_medicine_cannot_have_an_ordinary_stock_record(): void
+    {
+        $oxycodone = \App\Models\Record7\Medicine::where('name', 'Oxycodone')->firstOrFail();
+
+        $this->assertSame(
+            0,
+            \App\Models\Record7\StockBalance::where('medicine_id', $oxycodone->id)->count(),
+            'Section 2.5 is the only authority for a controlled balance.'
+        );
+
+        $this->assertSame(
+            0,
+            \App\Models\Record7\StockMovement::where('medicine_id', $oxycodone->id)->count()
+        );
     }
 
     public function test_a_refusal_stays_until_it_is_re_offered_and_accepted(): void
@@ -244,27 +304,113 @@ class Record7IssueLifecycleTest extends Record7TestCase
         $this->assertFalse(app(IssueRegistry::class)->conditionActive($key, $rosewood));
     }
 
-    public function test_low_stock_stays_until_the_cupboard_is_restocked(): void
+    /**
+     * REPLACES test_low_stock_stays_until_the_cupboard_is_restocked.
+     *
+     * OLD BEHAVIOUR. `$level->update(['quantity' => 500])` made `stock_low`
+     * inactive — a balance written directly, in one statement, by a test.
+     *
+     * WHY IT IS UNSAFE. It is the exact act Section 2.7 exists to make
+     * impossible. The balance is derived from an append-only ledger, and a
+     * figure that can be typed over is a figure nobody can rely on. A test that
+     * demonstrates the write also licenses it.
+     *
+     * NEW INVARIANT. The condition clears only when stock genuinely arrives —
+     * a receipt, through the ledger, under the lock — and a direct UPDATE on
+     * the head is refused by the database.
+     */
+    public function test_low_stock_stays_until_stock_is_actually_received(): void
     {
         $rosewood = $this->rosewood()->id;
+        $ledger = app(\App\Services\Record7\StockLedger::class);
 
-        $level = StockLevel::where('service_id', $rosewood)
-            ->get()->first(fn ($l) => $l->isLow() || $l->isOut());
+        $balance = \App\Models\Record7\StockBalance::where('service_id', $rosewood)
+            ->get()->first(fn ($b) => $b->isLow() || $b->isOut());
 
-        $this->assertNotNull($level);
-        $key = ($level->isOut() ? 'stock_out:' : 'stock_low:').$level->id;
-
-        // The fixture already closed this one, with evidence.
-        $item = collect($this->board()->attention($rosewood))->firstWhere('key', $key);
-
-        if ($item) {
-            $this->assertTrue($item['conditionActive']);
-            $this->assertStringContainsString('remains unresolved', $item['status']);
+        if (! $balance) {
+            // Rosewood's balances are healthy in the fixture; Oakwood carries
+            // the low and out cases. Either is a fair subject for this rule.
+            $balance = \App\Models\Record7\StockBalance::all()
+                ->first(fn ($b) => $b->isLow() || $b->isOut());
         }
 
-        $level->update(['quantity' => 500]);
+        $this->assertNotNull($balance);
+        $key = ($balance->isOut() ? 'stock_out:' : 'stock_low:').$balance->id;
+        $service = $balance->service_id;
 
-        $this->assertFalse(app(IssueRegistry::class)->conditionActive($key, $rosewood));
+        $this->assertTrue(app(IssueRegistry::class)->conditionActive($key, $service));
+
+        // The old shortcut, now refused outright.
+        try {
+            \Illuminate\Support\Facades\DB::connection('record7')
+                ->table('record7_stock_balances')
+                ->where('id', $balance->id)->update(['current_balance' => 500]);
+            $this->fail('A balance was written directly.');
+        } catch (\Illuminate\Database\QueryException $refused) {
+            $this->assertNotEmpty($refused->getMessage());
+        }
+
+        $this->assertTrue(
+            app(IssueRegistry::class)->conditionActive($key, $service),
+            'Nothing arrived, so nothing changed.'
+        );
+
+        // What actually clears it: stock, recorded through the ledger.
+        \Illuminate\Support\Facades\DB::connection('record7')->transaction(function () use ($ledger, $balance) {
+            $locked = $ledger->lockExisting($balance);
+
+            $ledger->record(
+                balance: $locked,
+                snapshot: $ledger->snapshot($balance->medicine, $balance->unit),
+                action: 'receipt',
+                quantities: ['received' => 500],
+                user: $this->user('sarah.ahmed'),
+                client: $balance->client,
+                house: \App\Models\Record7\Service::findOrFail($balance->service_id),
+            );
+        });
+
+        $this->assertFalse(app(IssueRegistry::class)->conditionActive($key, $service));
+    }
+
+    /**
+     * The other half of the same rule: where nobody has said what low means,
+     * `stock_low` is UNAVAILABLE rather than false. A blank must never render
+     * as healthy, and nothing invents a level.
+     */
+    public function test_low_stock_is_unavailable_where_no_threshold_is_recorded(): void
+    {
+        $balance = \App\Models\Record7\StockBalance::with('threshold')->get()
+            ->first(fn ($b) => ! $b->hasThreshold() && ! $b->isOut());
+
+        $this->assertNotNull($balance, 'The fixture deliberately leaves one without a level.');
+
+        $ledger = app(\App\Services\Record7\StockLedger::class);
+
+        // Take it down to almost nothing. With no rule recorded, nothing can
+        // call that low.
+        \Illuminate\Support\Facades\DB::connection('record7')->transaction(function () use ($ledger, $balance) {
+            $locked = $ledger->lockExisting($balance);
+
+            $ledger->record(
+                balance: $locked,
+                snapshot: $ledger->snapshot($balance->medicine, $balance->unit),
+                action: 'waste',
+                quantities: ['wasted' => (float) $balance->current_balance - 1],
+                user: $this->user('sarah.ahmed'),
+                client: $balance->client,
+                house: \App\Models\Record7\Service::findOrFail($balance->service_id),
+            );
+        });
+
+        $fresh = $balance->fresh();
+
+        $this->assertSame('1.000', (string) $fresh->current_balance);
+        $this->assertFalse($fresh->hasThreshold());
+        $this->assertFalse($fresh->isLow(), 'No rule exists, so nothing is low.');
+        $this->assertFalse(
+            app(IssueRegistry::class)->conditionActive('stock_low:'.$fresh->id, $fresh->service_id)
+        );
     }
 
     public function test_an_incomplete_record_stays_until_it_is_explained(): void

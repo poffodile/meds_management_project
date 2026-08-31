@@ -296,6 +296,14 @@ class RoundController extends R7Controller
     {
         $validated = $request->validate([
             'notes' => ['nullable', 'string', 'max:500'],
+
+            // Section 2.7. Present only where the record could not cover the
+            // dose. Validated for shape here; whether it is REQUIRED is
+            // decided under the balance lock, because the answer can change
+            // between opening the screen and pressing the button.
+            'shortfall_basis' => ['nullable', 'string', 'max:60'],
+            'shortfall_statement' => ['nullable', 'string', 'max:190'],
+            'shortfall_observed_quantity' => ['nullable', 'numeric', 'min:0'],
         ]);
 
         [$user, $serviceId, $round, $check, $person] = $this->roundContext($request, $client);
@@ -801,6 +809,34 @@ class RoundController extends R7Controller
     }
 
     /** Everything the confirmation screen needs, in the order it is read. */
+    /**
+     * What Record7 can say about the stock behind this dose.
+     *
+     * Three honest states and one warning, all of them said in words rather
+     * than left to a blank space. `sufficient` false is not a refusal: it is
+     * the moment the screen asks somebody to go and look.
+     *
+     * @return array{state:string, sufficient:bool, balance:?string, needed:?string,
+     *               shortfall:?string, unit:?string}
+     */
+    private function stockNotice(Client $person, $scheduled): array
+    {
+        $position = app(AdministrationRecorder::class)->stockPosition($person, $scheduled);
+        $ledger = app(\App\Services\Record7\StockLedger::class);
+
+        return [
+            'state' => $position['state'],
+            'sufficient' => $position['sufficient'],
+            'balance' => $position['balance']
+                ? $ledger->tidy($position['balance']->current_balance) : null,
+            'needed' => $position['quantity'] !== null
+                ? $ledger->tidy($position['quantity']) : null,
+            'shortfall' => $position['shortfall'] > 0
+                ? $ledger->tidy($position['shortfall']) : null,
+            'unit' => $position['unit'],
+        ];
+    }
+
     private function confirmProps(
         int $serviceId, Round $round, Client $person, $scheduled, array $check
     ): array {
@@ -830,6 +866,18 @@ class RoundController extends R7Controller
                 'blocked' => $check['blocked'] ?? false,
                 'reason' => $check['reason'] ?? null,
             ],
+
+            /* SECTION 2.7. WHAT THE CUPBOARD SAYS, BEFORE THE BUTTON.
+             *
+             * A worker about to give a dose needs to know the record cannot
+             * cover it BEFORE they press Given, not afterwards. Where it
+             * cannot, the screen says so and asks what they physically
+             * checked — and the dose is still recordable, because refusing to
+             * record a medicine somebody actually gave would make the record
+             * less truthful than the room. */
+            'stock' => $this->stockNotice($person, $scheduled),
+
+            'shortfallBases' => \App\Models\Record7\StockMovement::SHORTFALL_BASES,
 
             'stage' => 'Section 2.2 — recording that a medicine was given. '
                 .'Refusals and omissions begin at Section 2.3.',

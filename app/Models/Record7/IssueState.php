@@ -57,6 +57,12 @@ class IssueState extends Record7Model
         'incomplete_record',
         'prn_follow_up',
 
+        // Section 2.7. A correction established that a dose was given without
+        // saying how much, so the balance is known to be wrong by an amount
+        // nobody can state. Closing that on a manager's board needs evidence,
+        // and closing it does not clear it — only somebody counting does.
+        'stock_verification_due',
+
         // Somebody was worried enough about a response to write it down.
         // Closing that needs evidence, not a tick.
         'prn_concerning_response',

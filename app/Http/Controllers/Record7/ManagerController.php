@@ -98,7 +98,7 @@ class ManagerController extends R7Controller
             'staff' => $this->board->staffReadiness($serviceId),
             'outcomes' => $this->board->outstandingOutcomes($serviceId),
             'review' => [
-                'open' => $this->board->openReviewItems($serviceId),
+                'open' => $this->board->openReviewItems($serviceId, $user),
                 'decided' => $this->board->decidedReviewItems($serviceId),
             ],
             'stock' => $this->board->stockConcerns($serviceId),

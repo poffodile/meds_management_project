@@ -296,20 +296,235 @@ export default function Manager({
                                     <br />
                                     Raised by {item.raisedBy}, waiting {item.waitingMinutes} min
                                     <br />
+                                    {/* SECTION 2.7. THE BUTTONS COME FROM THE SERVER.
+                                        They used to be hard-coded here: "Approve as missed" for
+                                        anything correction-shaped, and Decline for everyone,
+                                        always. That offered Decline to people who would meet a
+                                        403, and offered "approve as missed" for a stock
+                                        reconciliation, which asks for a quantity and not an
+                                        outcome. What a person may do with a request depends on
+                                        its kind, its subject, its status and their authority in
+                                        THIS house — all of which the server knows and this
+                                        screen does not. */}
+                                    {item.actions.length === 0 ? (
+                                        <em>You cannot decide this in this house. </em>
+                                    ) : item.actions.map((action) => (
+                                        <React.Fragment key={action.key}>
+                                            <button
+                                                type="button"
+                                                onClick={() => post(urls.decide, {
+                                                    review_id: item.id,
+                                                    decision: action.decision,
+                                                    ...(action.correctedOutcome
+                                                        ? { corrected_outcome: action.correctedOutcome }
+                                                        : {}),
+                                                    note: action.decision === 'approved'
+                                                        ? 'Approved from Manager Today.'
+                                                        : 'Declined from Manager Today.',
+                                                })}
+                                            >
+                                                {action.label}
+                                            </button>{' '}
+                                        </React.Fragment>
+                                    ))}
+                                </li>
+                            ))}
+                        </ol>
+                    )}
+                </Section>
+
+                {/* 2 ── Are the rounds running safely and on time? */}
+                <Section title="Round oversight" count={rounds.length}>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Round</th><th>Due</th><th>State</th>
+                                <th>Expected</th><th>Completed</th><th>Remaining</th>
+                                <th>Late</th><th>Time critical late</th>
+                                <th>Opened by</th><th>Started</th><th>Intervention</th><th />
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {rounds.map((round) => (
+                                <tr key={round.slot}>
+                                    <td>{round.slot}</td>
+                                    <td>{round.dueAt}</td>
+                                    <td>{round.state}</td>
+                                    <td>{round.expectedPeople}</td>
+                                    <td>{round.completedPeople}</td>
+                                    <td>{round.remainingPeople}</td>
+                                    <td>{round.lateCount}</td>
+                                    <td>{round.timeCriticalLate}</td>
+                                    <td>{round.openedBy ?? '—'}</td>
+                                    <td>{round.startedAt ?? '—'}</td>
+                                    <td>{round.interventionNeeded ? 'yes' : 'no'}</td>
+                                    <td>
+                                        {/* Section 2.6. What is actually being
+                                            signed off, said before signing it
+                                            rather than discovered afterwards. */}
+                                        {round.accountability ? (
+                                            <span className="r7-round-count">
+                                                {round.accountability.accounted} of{' '}
+                                                {round.accountability.planned} doses accounted for
+                                            </span>
+                                        ) : null}
+
+                                        {round.unresolved?.length ? (
+                                            <span className="r7-round-unresolved">
+                                                Still unresolved: {round.unresolved.join(', ')}
+                                            </span>
+                                        ) : null}
+
+                                        {round.lifecycle?.length ? (
+                                            <ul className="r7-round-history">
+                                                {round.lifecycle.map((entry) => (
+                                                    <li key={entry.id}>
+                                                        {entry.word} {entry.at}
+                                                        {entry.by ? ` by ${entry.by}` : ''}
+                                                        {entry.reason ? ` — ${entry.reason}` : ''}
+                                                        {entry.imported ? ' (imported)' : ''}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        ) : null}
+
+                                        {round.roundId && round.state !== 'closed' ? (
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    const warn = round.unresolved?.length
+                                                        ? `Closing does not resolve: ${round.unresolved.join(', ')}. `
+                                                          + 'Those stay open. Continue?'
+                                                        : 'Close this round?';
+
+                                                    if (window.confirm(warn)) {
+                                                        post(urls.closeRound, { round_id: round.roundId });
+                                                    }
+                                                }}
+                                            >
+                                                Close round
+                                            </button>
+                                        ) : null}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </Section>
+
+                {/* 3 ── Who cannot administer, and why? */}
+                <Section title="Staff readiness" count={staff.length}>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Staff</th><th>Employment role</th><th>Access</th>
+                                <th>Permission</th><th>Competency</th><th>Expires</th>
+                                <th>Restriction</th><th>May administer</th><th>Reason</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {staff.map((member) => (
+                                <tr key={member.userId}>
+                                    <td>{member.fullName}</td>
+                                    <td>{member.role}</td>
+                                    <td>{member.accessType} ({member.accessStatus})</td>
+                                    <td>{member.hasPermission ? 'granted' : 'not granted'}</td>
+                                    <td>
+                                        {member.competencyStatus}
+                                        {member.competencyExpiringSoon ? ' (expiring soon)' : ''}
+                                    </td>
+                                    <td>{member.competencyExpires ?? '—'}</td>
+                                    <td>{member.restriction ?? '—'}</td>
+                                    <td>{member.mayAdminister ? 'yes' : 'no'}</td>
+                                    <td>{member.reason ?? '—'}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </Section>
+
+                {/* 4 ── What remains unresolved? */}
+                <Section title="Outstanding outcomes and follow-ups">
+                    <h3>Omissions ({outcomes.omissions.length})</h3>
+                    <ul>
+                        {outcomes.omissions.map((o) => (
+                            <li key={o.id}>
+                                {o.client} — {o.slot} round, due {o.dueAt}, {o.minutesLate} min late
+                                {o.timeCritical ? ' — TIME CRITICAL' : ''}
+                            </li>
+                        ))}
+                    </ul>
+
+                    <h3>Refusals not followed up ({outcomes.refusals.length})</h3>
+                    <ul>
+                        {outcomes.refusals.map((r) => (
+                            <li key={r.id}>{r.client} — {r.at} — {r.note}</li>
+                        ))}
+                    </ul>
+
+                    <h3>Other not-taken outcomes ({outcomes.notTaken.length})</h3>
+                    <ul>
+                        {outcomes.notTaken.map((n) => (
+                            <li key={n.id}>{n.client} — {n.outcome} at {n.at} — {n.note}</li>
+                        ))}
+                    </ul>
+
+                    <h3>Incomplete records ({outcomes.incompleteRecords.length})</h3>
+                    <ul>
+                        {outcomes.incompleteRecords.map((r) => (
+                            <li key={r.id}>{r.client} — {r.outcome} at {r.at}, no reason recorded</li>
+                        ))}
+                    </ul>
+
+                    <h3>PRN effectiveness checks ({outcomes.prnFollowUps.length})</h3>
+                    <ul>
+                        {outcomes.prnFollowUps.map((p) => (
+                            <li key={p.id}>
+                                {p.client} — given {p.givenAt} by {p.givenBy}, answer due {p.dueAt}
+                                {p.overdue ? ' — overdue' : ''}
+                            </li>
+                        ))}
+                    </ul>
+                </Section>
+
+                {/* 5 ── What needs a decision? */}
+                <Section title="Manager review queue" count={review.open.length}>
+                    {review.open.length === 0 ? <p>Nothing waiting for a decision.</p> : (
+                        <ol>
+                            {review.open.map((item) => (
+                                <li key={item.id} style={{ marginBottom: '1rem' }}>
+                                    <strong>{item.kindWord}: {item.title}</strong> ({item.severity})
+                                    <br />
+                                    {item.detail}
+                                    <br />
+                                    Raised by {item.raisedBy}, waiting {item.waitingMinutes} min
+                                    <br />
                                     {item.kind === 'correction_request' ? (
                                         <>
                                             {can.decideCorrections ? (
                                                 <>
+                                                    {/* SECTION 2.7. A stock reconciliation asks for
+                                                        a QUANTITY, not an outcome — "approve as
+                                                        missed" would be meaningless on it, and
+                                                        sending a corrected outcome would be
+                                                        answering a question nobody asked. What is
+                                                        approved here is the figure the request
+                                                        names; carrying it out is somebody else's,
+                                                        on the stock screen. */}
                                                     <button
                                                         type="button"
                                                         onClick={() => post(urls.decide, {
                                                             review_id: item.id,
                                                             decision: 'approved',
-                                                            corrected_outcome: 'missed',
+                                                            ...(item.subjectType === 'stock_movement'
+                                                                ? {}
+                                                                : { corrected_outcome: 'missed' }),
                                                             note: 'Approved from Manager Today.',
                                                         })}
                                                     >
-                                                        Approve as missed
+                                                        {item.subjectType === 'stock_movement'
+                                                            ? 'Approve this adjustment'
+                                                            : 'Approve as missed'}
                                                     </button>{' '}
                                                 </>
                                             ) : <em>You cannot decide corrections in this house. </em>}

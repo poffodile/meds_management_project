@@ -7,6 +7,7 @@ use App\Models\Record7\Client;
 use App\Models\Record7\Prescription;
 use App\Models\Record7\PrnAttempt;
 use App\Models\Record7\PrnFollowUp;
+use App\Models\Record7\Service;
 use App\Models\Record7\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -77,8 +78,10 @@ class PrnAdministration
     /** Outcomes that mean the medicine actually went in. */
     private const CONSUMES_ALLOWANCE = ['given', 'self_administered'];
 
-    public function __construct(private readonly AuditRecorder $audit)
-    {
+    public function __construct(
+        private readonly AuditRecorder $audit,
+        private readonly StockLedger $stock,
+    ) {
     }
 
     /**
@@ -561,6 +564,68 @@ class PrnAdministration
     }
 
     /**
+     * Move the stock an as-required dose actually consumed.
+     *
+     * Returns null where there is nothing to move: a controlled medicine
+     * (Section 2.5's, entirely), one nobody is counting for this person, one
+     * with no unit recorded, or one the person holds and manages themselves.
+     *
+     * Must be called inside the caller's transaction. The balance lock is taken
+     * AFTER the prescription lock and never before it, so the two locks are
+     * always acquired in the same order and a cycle cannot form.
+     */
+    private function debitStock(
+        User $user,
+        int $serviceId,
+        Client $client,
+        Prescription $prescription,
+        float $amount,
+        Request $request
+    ): ?\App\Models\Record7\StockMovement {
+        $medicine = $prescription->medicine;
+
+        if (! $medicine
+            || $medicine->is_controlled
+            || $prescription->dose_unit === null
+            || trim((string) $prescription->dose_unit) === ''
+            || ! $this->stock->consumesAccountedStock($prescription)
+            || $amount <= 0) {
+            return null;
+        }
+
+        $snapshot = $this->stock->snapshot($medicine, $prescription->dose_unit);
+        $balance = $this->stock->balanceFor($client, $snapshot);
+
+        // Untracked: nobody is counting this medicine for this person, so a
+        // dose changes nothing and claims nothing.
+        if (! $balance) {
+            return null;
+        }
+
+        $locked = $this->stock->lockExisting($balance);
+        $cover = $this->stock->canCover($locked, 'administration', $amount);
+        $shortfall = null;
+
+        if (! $cover['sufficient']) {
+            $shortfall = $this->stock->verifyShortfall($user, $request->only([
+                'shortfall_basis', 'shortfall_statement', 'shortfall_observed_quantity',
+            ]));
+        }
+
+        return $this->stock->record(
+            balance: $locked,
+            snapshot: $snapshot,
+            action: 'administration',
+            quantities: ['removed' => $amount, 'given' => $amount],
+            user: $user,
+            client: $client,
+            house: Service::findOrFail($serviceId),
+            prescription: $prescription,
+            shortfall: $shortfall,
+        );
+    }
+
+    /**
      * The write itself, inside the lock and the transaction.
      *
      * @return array{administration:Administration, followUp:?PrnFollowUp, created:bool}
@@ -597,6 +662,13 @@ class PrnAdministration
             ? 'self_administered'
             : 'given';
 
+        // SECTION 2.7. What was actually taken is what leaves the cupboard —
+        // never the prescribed range, and never anything read out of the dose
+        // text. This runs inside the transaction and the prescription lock the
+        // caller is already holding; the balance lock is taken after the
+        // prescription one, always in that order, so no cycle can form.
+        $movement = $this->debitStock($user, $serviceId, $client, $prescription, $amount, $request);
+
         $administration = Administration::create([
             'reference' => 'R7P-'.strtoupper(Str::random(12)),
 
@@ -604,6 +676,8 @@ class PrnAdministration
             // here is also what keeps the one-answer-per-dose constraint out of
             // the way of a second dose the prescription permits.
             'scheduled_dose_id' => null,
+
+            'stock_movement_id' => $movement?->id,
 
             'prescription_id' => $prescription->id,
             'client_id' => $client->id,

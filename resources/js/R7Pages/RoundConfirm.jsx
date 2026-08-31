@@ -37,7 +37,8 @@ import Icon from '@record7/components/Icon.jsx';
  * the assumption that it will sometimes lose that race.
  */
 export default function RoundConfirm({
-    house, round, person, safety, medicine, confirmation, authority, stage, urls,
+    house, round, person, safety, medicine, confirmation, authority,
+    stock = {}, shortfallBases = {}, stage, urls,
 }) {
     const nav = [
         { key: 'today', label: 'Today', href: urls.today, icon: 'house' },
@@ -45,9 +46,31 @@ export default function RoundConfirm({
     ];
 
     const [showNotes, setShowNotes] = useState(false);
-    const { data, setData, post, processing, errors } = useForm({ notes: '' });
+    const { data, setData, post, processing, errors } = useForm({
+        notes: '',
+        shortfall_basis: '',
+        shortfall_statement: '',
+        shortfall_observed_quantity: '',
+    });
 
-    const blocked = authority.blocked || !medicine?.canBeGiven;
+    /*
+     * SECTION 2.7. THE RECORD SAYS THERE IS NOT ENOUGH.
+     *
+     * This is not a refusal. Somebody is standing at the cupboard and can look,
+     * and if the medicine is there the dose must be recordable — a system that
+     * refused would make the record less truthful than the room. What it will
+     * not do is claim a balance it cannot support, so it asks what was checked
+     * and keeps the resulting shortfall on the ledger for a manager to settle.
+     */
+    const short = stock.state === 'tracked' && stock.sufficient === false;
+    const verified = !short
+        || (data.shortfall_basis !== '' && data.shortfall_statement.trim() !== '');
+
+    // WHETHER THE FORM APPEARS AT ALL, and whether the button is live, are two
+    // different questions. Folding them together hid the verification fields
+    // behind the very condition they exist to satisfy.
+    const cannotRecord = authority.blocked || !medicine?.canBeGiven;
+    const blocked = cannotRecord || !verified;
 
     const submit = () => {
         if (blocked || processing) return;
@@ -132,7 +155,7 @@ export default function RoundConfirm({
                             — under the words "You are recording this medicine"
                             reads as a system that has changed its mind. */}
                         <h2 className="r7-board__title">
-                            {blocked ? 'This medicine' : 'You are recording this medicine'}
+                            {cannotRecord ? 'This medicine' : 'You are recording this medicine'}
                         </h2>
 
                         <div className="r7-give__medicine">
@@ -203,7 +226,7 @@ export default function RoundConfirm({
                         </div>
 
                         {/* ── 4. The sentence, then the control ──────────── */}
-                        {!blocked ? (
+                        {!cannotRecord ? (
                             <div className="r7-give__action">
                                 <p className="r7-give__sentence">{confirmation}</p>
 
@@ -247,6 +270,69 @@ export default function RoundConfirm({
 
                                 {errors.notes ? (
                                     <Notice tone="error">{errors.notes}</Notice>
+                                ) : null}
+
+                                {short ? (
+                                    <div className="r7-give__shortfall">
+                                        <Notice tone="warning" title="The record shows less than this dose needs">
+                                            The stock record holds {stock.balance} {stock.unit} and this
+                                            dose takes {stock.needed}. Go and look before you record it.
+                                            If the medicine is there, record the dose — the shortfall is
+                                            kept for a manager to settle.
+                                        </Notice>
+
+                                        <label className="r7-label" htmlFor="shortfall-basis">
+                                            What did you check?
+                                        </label>
+                                        <select
+                                            id="shortfall-basis"
+                                            className="r7-input"
+                                            value={data.shortfall_basis}
+                                            onChange={(e) => setData('shortfall_basis', e.target.value)}
+                                        >
+                                            <option value="">Choose one</option>
+                                            {Object.entries(shortfallBases).map(([value, label]) => (
+                                                <option key={value} value={value}>{label}</option>
+                                            ))}
+                                        </select>
+
+                                        <label className="r7-label" htmlFor="shortfall-statement">
+                                            Say in your own words what you found
+                                        </label>
+                                        <textarea
+                                            id="shortfall-statement"
+                                            className="r7-input"
+                                            rows={2}
+                                            maxLength={190}
+                                            value={data.shortfall_statement}
+                                            onChange={(e) => setData('shortfall_statement', e.target.value)}
+                                        />
+
+                                        <label className="r7-label" htmlFor="shortfall-observed">
+                                            How many are actually there? (optional)
+                                        </label>
+                                        <input
+                                            id="shortfall-observed"
+                                            type="number"
+                                            step="0.001"
+                                            min="0"
+                                            className="r7-input"
+                                            value={data.shortfall_observed_quantity}
+                                            onChange={(e) => setData('shortfall_observed_quantity', e.target.value)}
+                                        />
+                                        <p className="r7-hint">
+                                            This is what you saw, for whoever reconciles it. It is not a
+                                            formal stock count.
+                                        </p>
+                                    </div>
+                                ) : null}
+
+                                {stock.state === 'unquantified' ? (
+                                    <Notice tone="info" title="This dose will not move the stock figure">
+                                        The prescription does not record a structured dose quantity, so
+                                        Record7 cannot say how much this takes out. The dose is recorded
+                                        either way.
+                                    </Notice>
                                 ) : null}
 
                                 <div className="r7-give__buttons">

@@ -19,7 +19,6 @@ use App\Models\Record7\Role;
 use App\Models\Record7\ScheduledDose;
 use App\Models\Record7\Service;
 use App\Models\Record7\StockEvent;
-use App\Models\Record7\StockLevel;
 use App\Models\Record7\User;
 use App\Models\Record7\UserCompetency;
 use App\Models\Record7\UserPermission;
@@ -93,6 +92,16 @@ class Record7Section12Seeder extends Seeder
         // Section 2.4 attempts are one-way in the application; a full fixture
         // rebuild is not ordinary use, so the guard is lifted and restored.
         $connection->unprepared('DROP TRIGGER IF EXISTS record7_prn_attempts_no_delete');
+
+        // Section 2.6: lifecycle events point at the rounds this rebuild
+        // removes, and they are append-only in the application.
+        $connection->unprepared('DROP TRIGGER IF EXISTS record7_round_lifecycle_no_delete');
+
+        // Section 2.7. The stock ledger is append-only for the same reason the
+        // register is, and lifted here for the same reason: this is a rebuild
+        // of fictional data, not ordinary use.
+        $connection->unprepared('DROP TRIGGER IF EXISTS record7_stock_movements_no_delete');
+        $connection->unprepared('DROP TRIGGER IF EXISTS record7_stock_attempts_no_delete');
 
         try {
             $this->withFixtureClock(function () use ($connection, $rosewood, $oakwood, $daniel, $olivia, $sarah) {
@@ -198,6 +207,31 @@ class Record7Section12Seeder extends Seeder
             HandoverNote::whereIn('handover_id', $handovers)->delete();
             Handover::whereIn('id', $handovers)->delete();
 
+        /* SECTION 2.6, AND A DEFECT THIS FIXES.
+           Round lifecycle events carry a foreign key to the round and an
+           append-only delete guard, and neither seeder cleared them — so from
+           the moment Section 2.6 landed, reseeding died on
+           "Cannot delete or update a parent row" the first time a round had
+           been closed. The events are fixture history for fixture rounds, so
+           they are cleared here with the guard lifted, exactly as the
+           administration and register guards already are.
+
+           The projection on the round is nulled first: it points AT an event,
+           so the event cannot go while the round still names it. */
+        $roundIds = $connection->table('record7_rounds')
+            ->where('service_id', $rosewood->id)->pluck('id');
+
+        if ($roundIds->isNotEmpty()) {
+            $connection->table('record7_rounds')->whereIn('id', $roundIds)
+                ->update(['last_lifecycle_event_id' => null]);
+
+            // The guard is lifted in run(), OUTSIDE the transaction: creating
+            // or dropping a trigger implicitly commits in MySQL, and doing it
+            // here would end the transaction out from under the seeder.
+            $connection->table('record7_round_lifecycle_events')
+                ->whereIn('round_id', $roundIds)->delete();
+        }
+
             $connection->table('record7_rounds')->where('service_id', $rosewood->id)->delete();
             Client::whereIn('id', $clientIds)->delete();
         }
@@ -206,9 +240,33 @@ class Record7Section12Seeder extends Seeder
         // they point.
         foreach ([$rosewood->id, $oakwood->id] as $serviceId) {
             StockEvent::where('service_id', $serviceId)->delete();
-            StockLevel::where('service_id', $serviceId)->delete();
             ReviewItem::where('service_id', $serviceId)->delete();
             IssueState::where('service_id', $serviceId)->delete();
+
+            /* SECTION 2.7. Cleared by REFERENCE as well as by service id, which
+               is the fix for exactly the problem this table's predecessor had:
+               record7_stock_levels and record7_stock_events clear by service_id
+               alone, Section 0 rebuilds the houses with new ids, and fifteen of
+               eighteen rows in each are stranded duplicates from six reseeds.
+               The ledger carries a reference so that cannot happen again.
+
+               Order matters: attempts point at movements, thresholds and heads
+               are derived, and a correction can only ever name an earlier
+               movement — so the chain comes down newest first. */
+            $connection->table('record7_stock_attempts')->where('service_id', $serviceId)->delete();
+            $connection->table('record7_stock_thresholds')
+                ->whereIn('stock_balance_id', function ($q) use ($serviceId) {
+                    $q->select('id')->from('record7_stock_balances')->where('service_id', $serviceId);
+                })->delete();
+            $connection->table('record7_stock_balances')->where('service_id', $serviceId)
+                ->update(['last_movement_id' => null]);
+            $connection->table('record7_stock_movements')
+                ->where('service_id', $serviceId)
+                ->orderByDesc('id')
+                ->pluck('id')
+                ->each(fn ($id) => $connection->table('record7_stock_movements')
+                    ->where('id', $id)->delete());
+            $connection->table('record7_stock_balances')->where('service_id', $serviceId)->delete();
 
             // AND by reference, because service_id is not enough on a reseed.
             // Section 0 rebuilds the houses with new ids, so rows from the
@@ -216,6 +274,7 @@ class Record7Section12Seeder extends Seeder
             // is globally unique, so they collide and the seeder dies. This
             // seeder owns the ROSE- namespace, so it clears its own.
             ReviewItem::where('reference', 'like', self::PREFIX.'%')->delete();
+            ReviewItem::where('reference', 'like', 'R7SC-%')->delete();
         }
     }
 
@@ -238,6 +297,36 @@ class Record7Section12Seeder extends Seeder
             BEGIN
                 SIGNAL SQLSTATE '45000'
                 SET MESSAGE_TEXT = 'a controlled drug register entry cannot be deleted';
+            END
+        SQL);
+
+        DB::connection('record7')->unprepared(<<<'SQL'
+            CREATE TRIGGER record7_round_lifecycle_no_delete
+            BEFORE DELETE ON record7_round_lifecycle_events
+            FOR EACH ROW
+            BEGIN
+                SIGNAL SQLSTATE '45000'
+                SET MESSAGE_TEXT = 'a round lifecycle event cannot be deleted';
+            END
+        SQL);
+
+        DB::connection('record7')->unprepared(<<<'SQL'
+            CREATE TRIGGER record7_stock_movements_no_delete
+            BEFORE DELETE ON record7_stock_movements
+            FOR EACH ROW
+            BEGIN
+                SIGNAL SQLSTATE '45000'
+                SET MESSAGE_TEXT = 'a stock movement cannot be deleted';
+            END
+        SQL);
+
+        DB::connection('record7')->unprepared(<<<'SQL'
+            CREATE TRIGGER record7_stock_attempts_no_delete
+            BEFORE DELETE ON record7_stock_attempts
+            FOR EACH ROW
+            BEGIN
+                SIGNAL SQLSTATE '45000'
+                SET MESSAGE_TEXT = 'a stock attempt cannot be deleted';
             END
         SQL);
 
@@ -472,7 +561,11 @@ class Record7Section12Seeder extends Seeder
             ['sylvia-insulin', 'sylvia', 'insulin', '12 units', 'Subcutaneous', 'Once a day before breakfast',
                 ['Morning'], ['is_time_critical' => true, 'grace' => 30,
                     'instructions' => 'Before food. Do not give if she has already eaten — tell the nurse.']],
-            ['sylvia-senna', 'sylvia', 'senna', 'Two tablets', 'Oral', 'Once a day at night', ['Night'], []],
+            // Section 2.7 fictional design data. Senna carries the fixture's
+            // live stock disagreement, and it needs a structured quantity for a
+            // dose to move a balance at all. Not derived from the dose text.
+            ['sylvia-senna', 'sylvia', 'senna', 'Two tablets', 'Oral', 'Once a day at night', ['Night'],
+                ['dose_min' => 2, 'dose_max' => 2, 'dose_unit' => 'tablet']],
 
             // Bridget takes her own tablets from the pot with somebody watching.
             ['bridget-paracetamol', 'bridget', 'paracetamol', 'Two tablets', 'Oral', 'Four times a day',
@@ -738,53 +831,57 @@ class Record7Section12Seeder extends Seeder
 
     /* ── Manager fixtures ───────────────────────────────────────────────── */
 
+    /**
+     * The ordinary stock ledger, built explicitly.
+     *
+     * NOTHING IS IMPORTED, and the old tables are no longer written for stock
+     * at all. `record7_stock_levels` and `record7_stock_events` between them
+     * held 36 rows, 30 of which were stranded duplicates from six reseeds — the
+     * tables clear by service_id, and Section 0 rebuilds the houses with new
+     * ids. Those rows are fixture debris, and promoting debris into a clinical
+     * ledger would put six copies of one invented discrepancy into the record.
+     *
+     * WRITTEN THROUGH THE SERVICE, NOT INSERTED. Every movement goes through
+     * StockLedger, so the fixture cannot contain a position the application
+     * could not have produced — no hand-placed balance, no sequence the lock
+     * never issued, no figure the trigger would have refused.
+     *
+     * WHAT IT SETS UP, and why each one is here:
+     *
+     *   Margaret / macrogol        opened at zero      -> stock_out, and the
+     *                                                     dose Section 1.1's
+     *                                                     shift could not give
+     *   Joyce / macrogol           five, level six     -> stock_low, and proof
+     *                                                     that two people's
+     *                                                     supplies of one
+     *                                                     medicine are separate
+     *   Dennis / colecalciferol    twenty, NO level    -> "no reorder level
+     *                                                     recorded", which is
+     *                                                     not the same as fine
+     *   Sylvia / senna             thirty, then two    -> TWO unresolved
+     *                              counts that            disagreements on one
+     *                              disagree               balance, so the card
+     *                                                     has to aggregate
+     *                                                     without losing either
+     *   Sylvia / insulin           ten, level five     -> tracked but with no
+     *                                                     structured dose, so
+     *                                                     doses move nothing
+     *                                                     and the screen says so
+     *
+     * The controlled Oxycodone rows are gone entirely. They were the same
+     * fictional incident the Section 2.5 register already holds properly — 23
+     * booked in, one given at 4:40, balance 22 — written a second time in a
+     * table with no history and no owner. Section 2.5 is the only authority for
+     * a controlled balance, so the duplicate is not recreated.
+     */
     private function stock(Service $rosewood, Service $oakwood, array $medicines, User $olivia): void
     {
-        // Rosewood: a controlled-drug balance two capsules short of the book.
-        // The single most serious thing a manager can be shown.
-        $oxycodone = StockLevel::create([
-            'organisation_id' => $rosewood->organisation_id,
-            'service_id' => $rosewood->id,
-            'medicine_id' => $medicines['oxycodone']->id,
-            'quantity' => 20,
-            'low_threshold' => 8,
-            'last_counted_at' => now()->subHours(2),
-        ]);
-
-        StockEvent::create([
-            'service_id' => $rosewood->id,
-            'medicine_id' => $medicines['oxycodone']->id,
-            'kind' => 'discrepancy',
-            'expected_quantity' => 22,
-            'counted_quantity' => 20,
-            'note' => 'Book says 22 after the 4:40 dose. Cupboard holds 20. Counted twice.',
-            'recorded_by_user_id' => $olivia->id,
-            'occurred_at' => now()->subHours(2),
-        ]);
-
-        StockLevel::create([
-            'organisation_id' => $rosewood->organisation_id,
-            'service_id' => $rosewood->id,
-            'medicine_id' => $medicines['insulin']->id,
-            'quantity' => 2,
-            'low_threshold' => 5,
-            'last_counted_at' => now()->subDay(),
-        ]);
-
-        // Oakwood: the macrogol that Section 1.1's shift could not give. The
-        // support worker saw "none in the cupboard"; the manager sees why.
+        // The delivery that has not arrived. THE ONE THING THIS TABLE STILL
+        // HOLDS: it asserts no quantity, so "it arrived" genuinely is the fact
+        // that ends it, and closing it cannot make a missing quantity vanish.
         $macrogol = Medicine::where('name', 'Macrogol')->first();
 
         if ($macrogol) {
-            StockLevel::create([
-                'organisation_id' => $oakwood->organisation_id,
-                'service_id' => $oakwood->id,
-                'medicine_id' => $macrogol->id,
-                'quantity' => 0,
-                'low_threshold' => 6,
-                'last_counted_at' => now()->subHours(4),
-            ]);
-
             StockEvent::create([
                 'service_id' => $oakwood->id,
                 'medicine_id' => $macrogol->id,
@@ -795,22 +892,143 @@ class Record7Section12Seeder extends Seeder
             ]);
         }
 
-        // And a resolved one, so "resolved things disappear" is testable.
-        StockEvent::create([
-            'service_id' => $rosewood->id,
-            'medicine_id' => $medicines['senna']->id,
-            'kind' => 'discrepancy',
-            'expected_quantity' => 30,
-            'counted_quantity' => 28,
-            'note' => 'Two tablets unaccounted for at the Monday count.',
-            'recorded_by_user_id' => $olivia->id,
-            'occurred_at' => now()->subDays(2),
-            'resolved_at' => now()->subDay(),
-            'resolved_by_user_id' => $olivia->id,
-            'resolution_note' => 'Found recorded on the wrong chart. Balance corrected at the next count.',
-        ]);
+        $ledger = app(\App\Services\Record7\StockLedger::class);
+        $sarah = User::where('username', 'sarah.ahmed')->first();
+        $keeper = $sarah ?: $olivia;
 
-        $oxycodone->refresh();
+        // Oakwood, where Section 1.1's shift ran out of macrogol.
+        $this->openBalance($ledger, $oakwood, $keeper, 'Margaret', 'Macrogol', 'sachet', 0, null,
+            'Counted at the start of the week. None in the cupboard.');
+
+        $this->openBalance($ledger, $oakwood, $keeper, 'Joyce', 'Macrogol', 'sachet', 5, 6,
+            'Counted at the start of the week.');
+
+        $this->openBalance($ledger, $oakwood, $keeper, 'Dennis', 'Colecalciferol', 'tablet', 20, null,
+            'Counted at the start of the week.');
+
+        // Rosewood. Senna carries the live disagreement — two counts, neither
+        // reconciled, on one balance.
+        $senna = $this->openBalance($ledger, $rosewood, $keeper, 'Sylvia', 'Senna', 'tablet', 30, null,
+            'Counted when the box was opened.');
+
+        if ($senna) {
+            $this->countAgainst($ledger, $rosewood, $keeper, $senna, 28,
+                'Two tablets unaccounted for at the Monday count.', now()->subDays(2));
+
+            $this->countAgainst($ledger, $rosewood, $keeper, $senna->fresh(), 27,
+                'Counted again on Wednesday with a second person. Still short, and one further.',
+                now()->subDay());
+        }
+
+        // Tracked, with no structured dose on the prescription — so doses move
+        // nothing and the stock screen has to say that rather than imply the
+        // figure is being kept up to date.
+        $this->openBalance($ledger, $rosewood, $keeper, 'Sylvia', 'Insulin glargine', 'unit', 10, 5,
+            'Counted with the district nurse.');
+    }
+
+    /**
+     * Open one person's balance, and record what "low" means where it is known.
+     *
+     * A null threshold is deliberate and is not the same as a threshold of
+     * zero: it means nobody has said what low is for this medicine, and the
+     * screens have to say that rather than show a reassuring blank.
+     */
+    private function openBalance(
+        \App\Services\Record7\StockLedger $ledger,
+        Service $house,
+        User $keeper,
+        string $personName,
+        string $medicineName,
+        string $unit,
+        float $quantity,
+        ?float $threshold,
+        string $note
+    ): ?\App\Models\Record7\StockBalance {
+        $client = Client::where('service_id', $house->id)
+            ->where('preferred_name', $personName)
+            ->first();
+
+        $medicine = Medicine::where('name', $medicineName)->first();
+
+        if (! $client || ! $medicine) {
+            return null;
+        }
+
+        $snapshot = $ledger->snapshot($medicine, $unit);
+        $balance = $ledger->lockBalance($client, $house, $snapshot);
+
+        // Only ever opened once. The ledger is append-only, so a reseed that
+        // found existing history would be adding to it rather than replacing
+        // it — and the clear-out above is what makes this the first movement.
+        if ($balance->last_sequence_no === 0) {
+            $ledger->record(
+                balance: $balance,
+                snapshot: $snapshot,
+                action: 'opening_balance',
+                quantities: ['received' => $quantity],
+                user: $keeper,
+                client: $client,
+                house: $house,
+                notes: $note,
+                at: now()->subDays(3),
+            );
+        }
+
+        if ($threshold !== null) {
+            // FICTIONAL DESIGN DATA. Not inherited policy, not a clinical
+            // reorder level, and never invented at runtime — a balance with no
+            // row here simply has no low-stock rule.
+            \App\Models\Record7\StockThreshold::updateOrCreate(
+                ['stock_balance_id' => $balance->id],
+                [
+                    'low_threshold' => $threshold,
+                    'set_by_user_id' => $keeper->id,
+                    'set_at' => now()->subDays(3),
+                    'note' => 'Fictional design data for the Section 2.7 fixture.',
+                ]
+            );
+        }
+
+        return $balance->fresh();
+    }
+
+    /**
+     * A physical count that disagrees with the ledger.
+     *
+     * IT DOES NOT MOVE THE BALANCE. Both figures are kept and a disagreement
+     * opens; only an approved correction can settle it. That is what makes the
+     * reconciliation workflow mean something, and it is the opposite of what
+     * the retired table did, where a manager's sentence closed a two-tablet
+     * shortage and nothing was ever put right.
+     */
+    private function countAgainst(
+        \App\Services\Record7\StockLedger $ledger,
+        Service $house,
+        User $keeper,
+        \App\Models\Record7\StockBalance $balance,
+        float $counted,
+        string $note,
+        Carbon $at
+    ): void {
+        $client = Client::find($balance->client_id);
+        $medicine = Medicine::find($balance->medicine_id);
+
+        if (! $client || ! $medicine) {
+            return;
+        }
+
+        $ledger->record(
+            balance: $ledger->lockExisting($balance),
+            snapshot: $ledger->snapshot($medicine, $balance->unit),
+            action: 'stock_check',
+            quantities: ['counted' => $counted],
+            user: $keeper,
+            client: $client,
+            house: $house,
+            notes: $note,
+            at: $at,
+        );
     }
 
     private function reviewQueue(
@@ -908,11 +1126,23 @@ class Record7Section12Seeder extends Seeder
         // This is the case the whole lifecycle change exists for: it must stay
         // on the list and say "Action recorded — underlying issue remains
         // unresolved" rather than vanishing because somebody pressed a button.
-        $insulin = StockLevel::where('service_id', $rosewood->id)
-            ->whereHas('medicine', fn ($q) => $q->where('name', 'Insulin glargine'))
+        //
+        // Section 2.7: the balance is now derived from the ledger, so this
+        // closure sits on a figure nobody can edit. Sylvia's senna is short by
+        // three against two unreconciled counts, which is exactly the shape
+        // this case needs — a manager has acted, and the disagreement stands.
+        $insulin = \App\Models\Record7\StockBalance::where('service_id', $rosewood->id)
+            ->whereHas('medicine', fn ($q) => $q->where('name', 'Senna'))
             ->first();
 
         if (! $insulin) {
+            return;
+        }
+
+        $open = app(\App\Services\Record7\StockLedger::class)
+            ->unresolvedDiscrepancies($insulin)->first();
+
+        if (! $open) {
             return;
         }
 
@@ -920,21 +1150,21 @@ class Record7Section12Seeder extends Seeder
             [
                 'organisation_id' => $rosewood->organisation_id,
                 'service_id' => $rosewood->id,
-                'issue_type' => 'stock_low',
-                'source_id' => $insulin->id,
+                'issue_type' => 'stock_discrepancy',
+                'source_id' => $open->id,
             ],
             [
-                'issue_key' => 'stock_low:'.$insulin->id,
+                'issue_key' => 'stock_discrepancy:'.$open->id,
                 'owner_user_id' => $daniel->id,
                 'assigned_at' => now()->subHours(3),
                 'acknowledged_at' => now()->subHours(3),
                 'acknowledged_by_user_id' => $daniel->id,
                 'action_recorded_at' => now()->subHours(2),
                 'action_recorded_by_user_id' => $daniel->id,
-                'action_note' => 'Rang the pharmacy and chased the order.',
+                'action_note' => 'Recounted with a second person. Still short.',
                 'closed_at' => now()->subHour(),
                 'closed_by_user_id' => $daniel->id,
-                'closure_reason' => 'Emergency supply collected. Delivery due tomorrow.',
+                'closure_reason' => 'Reported to the medicines lead. Reconciliation requested.',
                 'evidence_reference' => 'PHARMACY-ORDER-4471',
             ]
         );

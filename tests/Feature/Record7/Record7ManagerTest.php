@@ -293,15 +293,70 @@ class Record7ManagerTest extends Record7TestCase
         ], 'record7');
     }
 
-    public function test_a_resolved_stock_discrepancy_is_not_an_active_concern(): void
+    /**
+     * REPLACES test_a_resolved_stock_discrepancy_is_not_an_active_concern.
+     *
+     * OLD BEHAVIOUR. A `record7_stock_events` row with `resolved_at` set was
+     * absent from `stockConcerns()`.
+     *
+     * WHY IT WAS UNSAFE. The row it selected was the Senna discrepancy —
+     * expected 30, counted 28 — closed with the sentence "Found recorded on the
+     * wrong chart. Balance corrected at the next count." No balance was
+     * corrected, no corrective record existed, and there was no Senna stock row
+     * at all. The test therefore certified that two unaccounted-for tablets stop
+     * being a concern because a manager typed a sentence, which is exactly the
+     * acknowledgement-erases-evidence pattern removed everywhere else in
+     * Sections 2.3, 2.5 and 2.6.
+     *
+     * NEW INVARIANT. A stock discrepancy leaves the board only once a
+     * correction naming that movement exists. Nothing a manager can write ends
+     * it.
+     */
+    public function test_a_stock_discrepancy_stays_active_until_a_correction_names_it(): void
     {
-        $resolved = StockEvent::where('service_id', $this->rosewood()->id)
-            ->whereNotNull('resolved_at')
+        $rosewood = $this->rosewood()->id;
+        $ledger = app(\App\Services\Record7\StockLedger::class);
+
+        $balance = \App\Models\Record7\StockBalance::where('service_id', $rosewood)
+            ->whereHas('medicine', fn ($q) => $q->where('name', 'Senna'))
             ->firstOrFail();
 
-        $keys = array_column($this->board()->stockConcerns($this->rosewood()->id), 'key');
+        $entry = $ledger->unresolvedDiscrepancies($balance)->firstOrFail();
+        $key = 'stock_discrepancy:'.$entry->id;
 
-        $this->assertNotContains('stock_event:'.$resolved->id, $keys);
+        $this->assertContains(
+            $key,
+            array_column($this->board()->stockConcerns($rosewood), 'key'),
+            'An unreconciled shortage is on the board.'
+        );
+
+        // The approved reconciliation — and only that — settles it.
+        $item = \App\Models\Record7\ReviewItem::create([
+            'reference' => 'R7SC-'.strtoupper(\Illuminate\Support\Str::random(10)),
+            'organisation_id' => $entry->organisation_id,
+            'service_id' => $rosewood,
+            'kind' => 'correction_request',
+            'title' => 'Reconcile the senna count',
+            'subject_type' => 'stock_movement',
+            'subject_id' => $entry->id,
+            'correction_shape' => 'stock_delta',
+            'requested_quantity_delta' => -2,
+            'raised_by_user_id' => $this->user('sarah.ahmed')->id,
+            'raised_at' => now(),
+            'severity' => 'high',
+            'status' => 'approved',
+            'decided_by_user_id' => $this->user('daniel.evans')->id,
+            'decided_at' => now(),
+        ]);
+
+        \Illuminate\Support\Facades\DB::connection('record7')->transaction(
+            fn () => $ledger->compensate($this->user('sarah.ahmed'), $entry, -2, $item->id)
+        );
+
+        $this->assertNotContains(
+            $key,
+            array_column($this->board()->stockConcerns($rosewood), 'key')
+        );
     }
 
     /* ── Clinical records survive manager actions ───────────────────────── */
