@@ -1,5 +1,6 @@
 import React from 'react';
 import Icon from './Icon.jsx';
+import TextLink from './TextLink.jsx';
 
 /**
  * One thing that is wrong, and what to do about it.
@@ -32,7 +33,19 @@ function waited(minutes) {
     return rest ? `${hours}h ${rest}m` : `${hours}h`;
 }
 
-export default function AttentionRow({ item }) {
+/**
+ * The way to the thing, where there is one.
+ *
+ * A row that says what to do and offers no way to do it teaches people to work
+ * around the screen. Not every kind has a destination yet, so the control is
+ * rendered only when one was supplied — an absent link says "not from here",
+ * which is honest, where a dead one would not be.
+ *
+ * It is a control of its own and not the whole row: this list is read far more
+ * often than it is acted on, and a row that navigates under a thumb resting on
+ * a phone in a corridor is the wrong habit to teach on a medicines product.
+ */
+export default function AttentionRow({ item, href = null, action = 'Open' }) {
     const kind = KINDS[item.kind] ?? KINDS.late;
     const ago = waited(item.minutes);
 
@@ -53,6 +66,12 @@ export default function AttentionRow({ item }) {
             <span className="r7-attention__problem">{item.problem}</span>
 
             <span className="r7-attention__next">{item.next}</span>
+
+            {href ? (
+                <TextLink className="r7-attention__go" href={href}>
+                    {action}
+                </TextLink>
+            ) : null}
 
             <span className="r7-attention__when">
                 {item.dueAt ? <span>due {item.dueAt}</span> : null}

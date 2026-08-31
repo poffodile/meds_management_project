@@ -39,9 +39,9 @@ export default function PrnList({
             <div className="r7-work">
 
                 <header className="r7-person-top">
-                    <TextLink className="r7-back-inline" href={urls.today}>
+                    <TextLink className="r7-back-inline" href={urls.back ?? urls.today}>
                         <Icon name="arrow" className="r7-icon r7-icon--small" />
-                        <span>Back to Today</span>
+                        <span>Back to {urls.backLabel ?? 'Today'}</span>
                     </TextLink>
 
                     <p className="r7-person-top__where">

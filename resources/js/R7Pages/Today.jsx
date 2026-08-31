@@ -56,8 +56,37 @@ export default function Today({
     // Two destinations, because two pages exist. Nothing is padded out with
     // links that go nowhere — the rail is sized by what is actually in it.
     const nav = [
-        { key: 'today', label: 'Today', href: '/record7', icon: 'house', current: true },
-        { key: 'people', label: 'People', href: '/record7', icon: 'person', available: can.viewPeople },
+        { key: 'today', label: 'Today', href: urls.today ?? '/record7', icon: 'house', current: true },
+
+        /* PEOPLE POINTED AT TODAY — THE SCREEN IT WAS ON.
+           It read as a dead control because it was one. Record7 has no separate
+           people index: the round IS the list of people, and a person's own
+           screen is resolved THROUGH the round. So this goes to the round, and
+           it is offered only while one is open, because that is exactly when
+           there is somewhere to arrive. A control that appears when it leads
+           somewhere is better than one that is always there and never does. */
+        {
+            key: 'people',
+            label: 'People',
+            href: urls.round,
+            icon: 'person',
+            available: can.viewPeople && round?.state === 'in_progress',
+        },
+
+        /* STOCK, FOR THE PEOPLE WHOSE JOB IT IS.
+           Section 2.7 shipped complete and unreachable. Offered on stock
+           authority rather than on the read permission the page itself
+           enforces: a support worker with no stock duty gets a menu about
+           their own work. Every write on that page is gated again by its own
+           route and again in the controller, so being shown the door is never
+           the same as being given the keys. */
+        {
+            key: 'stock',
+            label: 'Stock',
+            href: urls.stock,
+            icon: 'building',
+            available: can.viewStock,
+        },
     ];
 
     const started = round?.state === 'in_progress';
@@ -121,7 +150,19 @@ export default function Today({
                     {attention.length ? (
                         <ul className="r7-attentions">
                             {attention.map((item, index) => (
-                                <AttentionRow item={item} key={`${item.kind}-${item.client}-${index}`} />
+                                <AttentionRow
+                                    item={item}
+                                    key={`${item.kind}-${item.client}-${index}`}
+                                    /* Only a follow-up has a destination today.
+                                       The others name work that is answered on
+                                       a person's own screen inside a round, and
+                                       a link that guessed at one would be worse
+                                       than none. */
+                                    href={item.followUpId
+                                        ? urls.prnFollowUp.replace('__ID__', item.followUpId)
+                                        : null}
+                                    action="Record the answer"
+                                />
                             ))}
                         </ul>
                     ) : (
@@ -151,7 +192,16 @@ export default function Today({
                     {peopleDue.length ? (
                         <ul className="r7-dues">
                             {peopleDue.map((person) => (
-                                <PersonDueCard person={person} key={person.clientId} />
+                                <PersonDueCard
+                                    person={person}
+                                    key={person.clientId}
+                                    /* Their own screen resolves through the
+                                       round, so the way in exists only while
+                                       one is open. */
+                                    href={round?.state === 'in_progress'
+                                        ? urls.person.replace('__ID__', person.clientId)
+                                        : null}
+                                />
                             ))}
                         </ul>
                     ) : (
@@ -167,7 +217,11 @@ export default function Today({
                     {tasks.length ? (
                         <ul className="r7-tasks">
                             {tasks.map((task) => (
-                                <TaskRow task={task} key={task.id} />
+                                <TaskRow
+                                    task={task}
+                                    key={task.id}
+                                    href={urls.prnFollowUp.replace('__ID__', task.id)}
+                                />
                             ))}
                         </ul>
                     ) : (

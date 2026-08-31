@@ -355,8 +355,8 @@ class AdministrationRecorder
         if ($prescription->kind === 'prn') {
             return $this->no(
                 'as_required',
-                'This is an as-required medicine. Recording it needs the as-required '
-                .'workflow, which is not built yet.',
+                'This is an as-required medicine. Record it on the as-required screen, '
+                .'where the reason for giving it and whether it worked are recorded too.',
                 '2.4'
             );
         }
@@ -375,8 +375,8 @@ class AdministrationRecorder
         if ($medicine?->is_controlled) {
             return $this->no(
                 'witness_required',
-                'This is a controlled drug and needs a witness. Witnessed administration '
-                .'is not built yet, so it cannot be recorded here.',
+                'This is a controlled drug. It needs a witness and a register entry, so it '
+                .'is recorded on the controlled drug screen rather than here.',
                 '2.5'
             );
         }

@@ -84,11 +84,35 @@ class TodayController extends R7Controller
                 'record' => $mayRecord->allowed,
                 'recordRefusal' => $mayRecord->allowed ? null : $mayRecord->message,
                 'viewPeople' => in_array('view_people', $granted, true),
+
+                /* STOCK IS OFFERED TO THE PEOPLE WHOSE JOB IT IS.
+                   Reading the stock page is allowed to anybody who may see the
+                   dashboard, and that has not changed — this decides whether
+                   the way in is PUT IN FRONT of somebody, which is a different
+                   question from whether they may look. A support worker with no
+                   stock duty gets a menu about their own work; the two stock
+                   authorities get the door. Every write on that page is gated
+                   again by its own route middleware and again in the
+                   controller, so a visible page is never a granted action. */
+                'viewStock' => in_array('stock_management', $granted, true)
+                    || in_array('reconciliation', $granted, true),
             ],
 
             'urls' => [
                 'startRound' => route('record7.round.start'),
                 'readHandover' => route('record7.handover.read'),
+
+                /* WHERE TODAY CAN SEND SOMEBODY.
+                   Today names work in three places — the round, an as-required
+                   follow-up, the stock a house holds — and until now none of
+                   them was a link. A board that says what is wrong and offers
+                   no way to it teaches people to work around the screen. */
+                'today' => route('record7.today'),
+                'round' => route('record7.round'),
+                'stock' => route('record7.stock'),
+                'person' => route('record7.round.person', ['client' => '__ID__']),
+                'prnFollowUp' => route('record7.prn.review', ['followUp' => '__ID__']),
+
                 'houses' => route('record7.houses'),
                 'lock' => route('record7.lock.now'),
                 'signOut' => route('record7.signout'),

@@ -87,6 +87,37 @@ class RoundPersonView
     }
 
     /**
+     * Where a worker should be put back after doing something for this person
+     * on a screen outside the round.
+     *
+     * WHY THIS EXISTS. The as-required and controlled-drug workflows are
+     * reached FROM a round, but they are not part of one — they have their own
+     * routes and their own screens, and a worker who finished on one of them
+     * was left there. On a shift that means going back to Today and starting
+     * the round again to reach the next person, which is how somebody loses
+     * their place in a list of six people and gives one of them nothing.
+     *
+     * The answer is only ever their round screen or Today, and it is decided
+     * from the record rather than from where the browser says it came from:
+     * a referrer can be forged, absent, or simply stale, and this has to be
+     * right when somebody has had the page open through a shift change.
+     *
+     * Returns null when there is no open round holding this person, which the
+     * caller reads as "send them to Today" — the honest answer, because their
+     * round screen would refuse them anyway.
+     */
+    public function openRoundHolding(int $serviceId, Client $person, ?Carbon $now = null): ?Round
+    {
+        $round = app(RoundEntry::class)->openRoundFor($serviceId, $now);
+
+        if (! $round) {
+            return null;
+        }
+
+        return $this->resolve($round, $person->id) ? $round : null;
+    }
+
+    /**
      * Everything the screen shows, in the order it should be read.
      *
      * Identity first, then anything that could stop the round, then the
@@ -250,6 +281,13 @@ class RoundPersonView
 
                 return [
                     'doseId' => $dose->id,
+
+                    // The prescription this dose belongs to. Carried so the
+                    // round can hand the worker to the screen that CAN record
+                    // it when this one cannot: a controlled drug and an
+                    // as-required medicine are both refused here and answered
+                    // elsewhere, and a hand-off needs the prescription.
+                    'prescriptionId' => $prescription?->id,
 
                     // Medicine identity, from the medicine record.
                     'name' => $medicine?->name,

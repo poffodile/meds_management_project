@@ -69,9 +69,13 @@ export default function PrnReview({
             <div className="r7-work">
 
                 <header className="r7-person-top">
-                    <TextLink className="r7-back-inline" href={urls.person}>
+                    {/* A follow-up is most often opened straight from Today,
+                        not from inside the round, so the way back is wherever
+                        the worker actually belongs — their round screen while
+                        one is open, Today otherwise. */}
+                    <TextLink className="r7-back-inline" href={urls.back ?? urls.person}>
                         <Icon name="arrow" className="r7-icon r7-icon--small" />
-                        <span>Back to {person.fullName}</span>
+                        <span>Back to {urls.backLabel ?? person.fullName}</span>
                     </TextLink>
 
                     <p className="r7-person-top__where">

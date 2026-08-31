@@ -1,5 +1,6 @@
 import React from 'react';
 import StatusLabel from './StatusLabel.jsx';
+import TextLink from './TextLink.jsx';
 
 /**
  * A follow-up that still needs an answer.
@@ -13,7 +14,7 @@ import StatusLabel from './StatusLabel.jsx';
  * marked, but nothing is hidden — a follow-up the night shift left open must
  * not be invisible to the person now on duty.
  */
-export default function TaskRow({ task }) {
+export default function TaskRow({ task, href = null }) {
     return (
         <li className={`r7-task${task.overdue ? ' r7-task--overdue' : ''}`}>
             <span className="r7-task__head">
@@ -33,6 +34,16 @@ export default function TaskRow({ task }) {
                     {task.overdue ? `Answer due ${task.waitingFor}` : `Ask ${task.waitingFor}`}
                 </span>
             </span>
+
+            {/* The screen that answers the question the row asks. Built in
+                Section 2.4 and, until now, reachable only by typing its
+                address — so the board asked "did it work?" and gave nobody a
+                way to say. Named for the act, not the destination. */}
+            {href ? (
+                <TextLink className="r7-task__go" href={href}>
+                    Record the answer
+                </TextLink>
+            ) : null}
         </li>
     );
 }

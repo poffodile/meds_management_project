@@ -35,8 +35,16 @@ export default function CdList({
             <div className="r7-work">
 
                 <header className="r7-person-top">
-                    <TextLink className="r7-back-inline" href={urls.person}>
+                    {/* The way back to the work, first, because that is the one
+                        a worker who has just signed for something needs. The
+                        cross-link to their as-required medicines follows it: a
+                        useful sideways move, but not the way out. */}
+                    <TextLink className="r7-back-inline" href={urls.back ?? urls.today}>
                         <Icon name="arrow" className="r7-icon r7-icon--small" />
+                        <span>Back to {urls.backLabel ?? 'Today'}</span>
+                    </TextLink>
+
+                    <TextLink className="r7-back-inline" href={urls.person}>
                         <span>{person.fullName}&rsquo;s as-required medicines</span>
                     </TextLink>
 

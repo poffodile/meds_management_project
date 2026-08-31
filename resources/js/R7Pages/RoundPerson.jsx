@@ -32,7 +32,7 @@ import Icon from '@record7/components/Icon.jsx';
  */
 export default function RoundPerson({
     house, round, progress, person, safety, medicines, neighbours, authority, stage, urls,
-    welfareConcern = null,
+    welfareConcern = null, asRequired = null,
 }) {
     const flash = usePage().props.flash ?? {};
     const recorded = flash['r7.recorded'] ?? null;
@@ -69,6 +69,44 @@ export default function RoundPerson({
     const goToReoffer = (doseId) => router.get(
         urls.reoffer.replace('__ID__', person.id).replace('__DOSE__', doseId)
     );
+
+    /**
+     * Where a medicine this screen cannot record IS recorded.
+     *
+     * Two of the refusals in the round are not dead ends but directions, and
+     * until now they read as dead ends because nothing carried the worker on.
+     * A controlled drug goes to the register screen, where a witness signs; an
+     * as-required medicine goes to its own list, where the reason for giving it
+     * and whether it worked are recorded too.
+     *
+     * Driven by the refusal CODE, never by the medicine's own flags. The server
+     * decides why a dose cannot be recorded here, and the door has to be the
+     * one that answers the reason actually given — a medicine could be
+     * controlled AND refused for something else entirely, and sending somebody
+     * to fetch a colleague to witness a stopped prescription would waste two
+     * people's time and teach them to distrust the screen.
+     */
+    const handOffFor = (medicine) => {
+        if (medicine.blockedCode === 'witness_required' && medicine.prescriptionId) {
+            return {
+                label: 'Record with a witness',
+                onClick: () => router.get(
+                    urls.controlled
+                        .replace('__ID__', person.id)
+                        .replace('__PRESCRIPTION__', medicine.prescriptionId)
+                ),
+            };
+        }
+
+        if (medicine.blockedCode === 'as_required') {
+            return {
+                label: 'Go to as-required medicines',
+                onClick: () => router.get(urls.asRequired.replace('__ID__', person.id)),
+            };
+        }
+
+        return null;
+    };
 
     return (
         <AppShell urls={urls} nav={nav}>
@@ -209,6 +247,12 @@ export default function RoundPerson({
                                     onReoffer={authority.blocked
                                         ? null
                                         : () => goToReoffer(medicine.doseId)}
+                                    /* Withheld from somebody who may not record
+                                       in this round at all: the door leads to a
+                                       screen that would refuse them anyway, and
+                                       offering it would be the same defect in a
+                                       new place. */
+                                    handOff={authority.blocked ? null : handOffFor(medicine)}
                                 />
                             ))}
                         </ul>
@@ -217,6 +261,24 @@ export default function RoundPerson({
                             They are in the round list, but no medicine is planned for this slot.
                         </StateBlock>
                     )}
+
+                    {/* AS-REQUIRED MEDICINES, WHICH ARE NEVER "DUE".
+                        Nothing schedules them, so they cannot appear in the
+                        list above and should not — but they belong to this
+                        person and are needed at exactly the unplanned moments a
+                        worker is standing here. Shown only when they have any,
+                        because an empty list reads as "there is something here"
+                        until somebody has walked into it. */}
+                    {asRequired && !authority.blocked ? (
+                        <p className="r7-person-meds__prn">
+                            <TextLink href={asRequired.url}>
+                                {asRequired.count === 1
+                                    ? 'One as-required medicine'
+                                    : `${asRequired.count} as-required medicines`}
+                            </TextLink>
+                            <span> — not due, but available if they need one.</span>
+                        </p>
+                    ) : null}
 
                     {/* Stated once, plainly, so nobody hunts for a button that
                         is not there yet. */}

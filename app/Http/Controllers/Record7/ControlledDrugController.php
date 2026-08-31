@@ -72,7 +72,7 @@ class ControlledDrugController extends R7Controller
                 'reason' => $check['reason'] ?? null,
             ],
             'stage' => 'Section 2.5 — controlled drugs.',
-            'urls' => $this->urls($person),
+            'urls' => $this->urls($person, $serviceId),
         ]);
     }
 
@@ -121,7 +121,7 @@ class ControlledDrugController extends R7Controller
                 'reason' => $check['reason'] ?? null,
             ],
             'stage' => 'Section 2.5 — controlled drugs.',
-            'urls' => $this->urls($person) + [
+            'urls' => $this->urls($person, $serviceId) + [
                 'record' => route('record7.cd.record', ['client' => $person->id, 'prescription' => $prescribed->id]),
                 'receipt' => route('record7.cd.receipt', ['client' => $person->id, 'prescription' => $prescribed->id]),
                 'count' => route('record7.cd.count', ['client' => $person->id, 'prescription' => $prescribed->id]),
@@ -375,11 +375,25 @@ class ControlledDrugController extends R7Controller
             ->values()->all();
     }
 
-    private function urls(Client $person): array
+    private function urls(Client $person, ?int $serviceId = null): array
     {
+        /* THE WAY BACK TO WHERE THE WORK IS.
+           This screen is reached from a round but is not part of one, so
+           finishing here used to leave somebody outside the round with no way
+           back into it but Today and a fresh start. Their own round screen
+           when a round is open and holds them; Today when it does not, which
+           is the honest answer rather than a link that would be refused. */
+        $round = $serviceId !== null
+            ? $this->personView->openRoundHolding($serviceId, $person)
+            : null;
+
         return [
             'cd' => route('record7.cd', ['client' => $person->id]),
             'person' => route('record7.prn', ['client' => $person->id]),
+            'back' => $round
+                ? route('record7.round.person', ['client' => $person->id])
+                : route('record7.today'),
+            'backLabel' => $round ? $person->displayName().'’s round' : 'Today',
             'today' => route('record7.today'),
             'round' => route('record7.round'),
             'houses' => route('record7.houses'),

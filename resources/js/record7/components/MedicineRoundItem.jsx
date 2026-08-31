@@ -42,7 +42,7 @@ const OUTCOME = {
 };
 
 export default function MedicineRoundItem({
-    medicine, onRecord = null, onOutcome = null, onReoffer = null,
+    medicine, onRecord = null, onOutcome = null, onReoffer = null, handOff = null,
 }) {
     const {
         name, strength, form, controlled, dose, route, dueAt, directions,
@@ -210,6 +210,20 @@ export default function MedicineRoundItem({
                     {onOutcome ? (
                         <Button variant="quiet" size="small" onClick={onOutcome}>
                             {canBeGiven ? 'Not given' : 'Record why it was not given'}
+                        </Button>
+                    ) : null}
+
+                    {/* THE WAY TO THE SCREEN THAT CAN RECORD IT.
+                        A controlled drug and an as-required medicine are both
+                        refused here for good reasons — one needs a witness and
+                        a register entry, the other a reason and a follow-up —
+                        and both workflows were built. What was missing was the
+                        door, so the round explained the refusal and left the
+                        worker with nowhere to go. The reason still shows: the
+                        link is the answer to it, not a replacement for it. */}
+                    {!canBeGiven && handOff ? (
+                        <Button variant="secondary" size="small" onClick={handOff.onClick}>
+                            {handOff.label}
                         </Button>
                     ) : null}
 

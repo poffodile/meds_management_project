@@ -3606,3 +3606,36 @@
     font-size: var(--r7-size-sm);
     color: var(--r7-text-secondary);
 }
+
+/* ── Staff navigation and hand-off pass ─────────────────────────────────────
+   The way to the thing, on rows that until now only described it.
+
+   Each of these rows is laid out with named grid areas, so a new child with no
+   area of its own would land in whatever implicit cell came next and move
+   between breakpoints. Each is given the full width of its row instead, on a
+   line of its own under the text it acts on — which is also the reading order
+   somebody wants: what is wrong, then what to do, then the way to do it.
+
+   Layout only. No colour and no size of its own: these are ordinary r7-link
+   controls and they should look like every other link on the screen. */
+.r7-root .r7-attention__go,
+.r7-root .r7-task__go,
+.r7-root .r7-due__go {
+    grid-column: 1 / -1;
+    justify-self: start;
+    margin-top: var(--r7-space-2);
+}
+
+/* The hand-off inside a notice is not in a grid; it only needs separating from
+   the sentence explaining why this screen cannot record the medicine. */
+.r7-root .r7-give__handoff {
+    margin: var(--r7-space-3) 0 0;
+}
+
+/* As-required medicines, offered from a person's round screen. Quiet: they are
+   available, not outstanding, and must not read as work waiting to be done. */
+.r7-root .r7-person-meds__prn {
+    margin: var(--r7-space-4) 0 0;
+    font-size: var(--r7-size-sm);
+    color: var(--r7-text-secondary);
+}

@@ -46,6 +46,28 @@ class PrnController extends R7Controller
     }
 
     /** Every as-required medicine this person has, and what is allowed now. */
+    /**
+     * Where to put a worker back after they have finished here.
+     *
+     * This screen is reached from a round but is not part of one, so finishing
+     * used to leave somebody outside the round with no way back into it except
+     * Today and a fresh start — which on a shift means losing your place in a
+     * list of six people. Their round screen when a round is open and holds
+     * them, Today when it does not; decided from the record rather than from a
+     * referrer, which can be forged, absent or simply stale.
+     */
+    private function backTo(int $serviceId, Client $person): array
+    {
+        $round = $this->personView->openRoundHolding($serviceId, $person);
+
+        return [
+            'back' => $round
+                ? route('record7.round.person', ['client' => $person->id])
+                : route('record7.today'),
+            'backLabel' => $round ? $person->displayName().'’s round' : 'Today',
+        ];
+    }
+
     public function index(Request $request, int $client)
     {
         $this->useR7Layout($request);
@@ -72,6 +94,7 @@ class PrnController extends R7Controller
                 'give' => route('record7.prn.give', [
                     'client' => $person->id, 'prescription' => '__PRESCRIPTION__',
                 ]),
+                ...$this->backTo($serviceId, $person),
                 'today' => route('record7.today'),
                 'round' => route('record7.round'),
                 'houses' => route('record7.houses'),
@@ -131,6 +154,7 @@ class PrnController extends R7Controller
                     'client' => $person->id, 'prescription' => $prescribed->id,
                 ]),
                 'list' => route('record7.prn', ['client' => $person->id]),
+                ...$this->backTo($serviceId, $person),
                 'today' => route('record7.today'),
                 'round' => route('record7.round'),
                 'houses' => route('record7.houses'),
@@ -259,6 +283,7 @@ class PrnController extends R7Controller
             'urls' => [
                 'record' => route('record7.prn.review.record', ['followUp' => $outstanding->id]),
                 'person' => route('record7.prn', ['client' => $person->id]),
+                ...$this->backTo($serviceId, $person),
                 'today' => route('record7.today'),
                 'round' => route('record7.round'),
                 'houses' => route('record7.houses'),

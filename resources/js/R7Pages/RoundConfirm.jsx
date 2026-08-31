@@ -72,6 +72,28 @@ export default function RoundConfirm({
     const cannotRecord = authority.blocked || !medicine?.canBeGiven;
     const blocked = cannotRecord || !verified;
 
+    /*
+     * WHERE THIS MEDICINE IS ACTUALLY RECORDED, WHEN IT IS NOT HERE.
+     *
+     * Decided from the refusal code the server gave, exactly as the person
+     * screen decides it, so the two screens can never offer different doors for
+     * the same dose. Withheld from somebody whose authority is blocked: the
+     * destination would refuse them too.
+     */
+    const handOff = (() => {
+        if (authority.blocked || !medicine) return null;
+
+        if (medicine.blockedCode === 'witness_required' && urls.controlled) {
+            return { label: 'Record with a witness', href: urls.controlled };
+        }
+
+        if (medicine.blockedCode === 'as_required' && urls.asRequired) {
+            return { label: 'Go to as-required medicines', href: urls.asRequired };
+        }
+
+        return null;
+    })();
+
     const submit = () => {
         if (blocked || processing) return;
         post(urls.record, { preserveScroll: true });
@@ -113,6 +135,18 @@ export default function RoundConfirm({
                                 + `${medicine.recordedBy ? ` by ${medicine.recordedBy}` : ''}.`
                                 + ' Nothing further is needed here.'
                             : medicine.blockedReason}
+
+                        {/* The same hand-off the person screen offers, repeated
+                            here because this is where somebody arrives having
+                            opened the medicine before reading why it is
+                            refused. Sending them back a screen to find the way
+                            forward is how a worker ends up recording it in the
+                            wrong place instead. */}
+                        {!medicine.recorded && handOff ? (
+                            <p className="r7-give__handoff">
+                                <TextLink href={handOff.href}>{handOff.label}</TextLink>
+                            </p>
+                        ) : null}
                     </Notice>
                 ) : null}
 
@@ -355,8 +389,8 @@ export default function RoundConfirm({
 
                                 <p className="r7-give__only">
                                     This screen can only record that a medicine was given. Refusals,
-                                    omissions and medicines that were not available are recorded in
-                                    a later part of Record7 that is not built yet.
+                                    omissions and medicines that were not available are recorded on the
+                                    person's own screen, under "Something else happened".
                                 </p>
                             </div>
                         ) : null}

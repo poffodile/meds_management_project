@@ -1,6 +1,7 @@
 import React from 'react';
 import StatusLabel from './StatusLabel.jsx';
 import Icon from './Icon.jsx';
+import TextLink from './TextLink.jsx';
 
 /**
  * One person, and only what decides whether you go to them next.
@@ -13,7 +14,7 @@ import Icon from './Icon.jsx';
  * who to walk to, not what to hand over. The names live on the round screen,
  * where somebody is holding the box.
  */
-export default function PersonDueCard({ person }) {
+export default function PersonDueCard({ person, href = null }) {
     return (
         <li className={`r7-due${person.isLate ? ' r7-due--late' : ''}`}>
             <div className="r7-due__head">
@@ -55,6 +56,18 @@ export default function PersonDueCard({ person }) {
                         ))}
                     </span>
                 </p>
+            ) : null}
+
+            {/* The way to this person's own screen, offered only while a round
+                is open, because that screen resolves a person THROUGH the round
+                and there is nowhere to arrive otherwise. Deciding who to walk to
+                and walking to them were two separate screens with no door
+                between them. Named after the person, so a corridor full of
+                identical "Open" links stays tellable apart by ear. */}
+            {href ? (
+                <TextLink className="r7-due__go" href={href}>
+                    Go to {person.name}
+                </TextLink>
             ) : null}
         </li>
     );

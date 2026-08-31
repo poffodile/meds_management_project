@@ -166,6 +166,13 @@ class ShiftBoard
                 'dueAt' => $followUp->due_at->format('H:i'),
                 'problem' => 'Nobody has recorded whether an as-required medicine worked',
                 'next' => 'Ask '.$followUp->client->displayName().' and record the answer',
+
+                // THE ROW SAYS WHAT TO DO; THIS IS WHAT LETS SOMEBODY DO IT.
+                // The follow-up screen was built in Section 2.4 and has been
+                // reachable only by typing its address. The id travels; Today
+                // turns it into a link, because building routes is the
+                // controller's job and not this board's.
+                'followUpId' => $followUp->id,
             ];
         }
 

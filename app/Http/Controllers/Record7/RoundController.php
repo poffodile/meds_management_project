@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Record7;
 
 use App\Models\Record7\Client;
+use App\Models\Record7\Prescription;
 use App\Models\Record7\Round;
 use App\Models\Record7\Service;
 use App\Services\Record7\AdministrationRecorder;
@@ -217,6 +218,28 @@ class RoundController extends R7Controller
                 ? ['url' => route('record7.round.welfare', ['client' => $person->id])]
                 : null,
 
+            /* THE MEDICINES THIS ROUND WILL NEVER LIST.
+               An as-required medicine has no scheduled dose, so it cannot
+               appear among "due in this round" — correctly, because nothing is
+               due. But that also meant a person's as-required medicines were
+               unreachable from the one screen a worker is actually standing on,
+               and somebody in pain at eleven o'clock is a round problem even
+               when the tablet is not a round item.
+
+               The count decides whether the way in appears at all: an empty
+               list is worse than no link, because it reads as "there is
+               something here" until you have walked into it. Active only —
+               a stopped prescription is not something to offer. */
+            'asRequired' => ($count = Prescription::where('client_id', $person->id)
+                ->where('kind', 'prn')
+                ->where('status', 'active')
+                ->count()) > 0
+                    ? [
+                        'count' => $count,
+                        'url' => route('record7.prn', ['client' => $person->id]),
+                    ]
+                    : null,
+
             'authority' => [
                 'allowed' => $check['allowed'],
                 'blocked' => $check['blocked'] ?? false,
@@ -240,6 +263,20 @@ class RoundController extends R7Controller
                 'reoffer' => route('record7.round.reoffer', [
                     'client' => '__ID__', 'dose' => '__DOSE__',
                 ]),
+
+                /* THE TWO WORKFLOWS THIS SCREEN HANDS OFF TO.
+                   Neither can be recorded here — a controlled drug needs a
+                   witness and a register entry, an as-required medicine needs
+                   a reason and a follow-up — and both were already built. What
+                   was missing was the door, so a worker met a refusal with
+                   nowhere to go. The links are placeholders filled from the
+                   medicine the page was given, never from a number the browser
+                   invented, exactly as confirm and outcome already are. */
+                'controlled' => route('record7.cd.give', [
+                    'client' => '__ID__', 'prescription' => '__PRESCRIPTION__',
+                ]),
+                'asRequired' => route('record7.prn', ['client' => '__ID__']),
+
                 'today' => route('record7.today'),
                 'houses' => route('record7.houses'),
                 'lock' => route('record7.lock.now'),
@@ -635,8 +672,8 @@ class RoundController extends R7Controller
         }
 
         if ($prescription->kind === 'prn') {
-            return 'This is an as-required medicine. Recording it needs the as-required '
-                .'workflow, which is not built yet.';
+            return 'This is an as-required medicine. Record it on the as-required screen, '
+                .'where the reason for giving it and whether it worked are recorded too.';
         }
 
         if ($prescription->isFullySelfManaged()) {
@@ -888,6 +925,20 @@ class RoundController extends R7Controller
                 ]),
                 'person' => route('record7.round.person', ['client' => $person->id]),
                 'round' => route('record7.round'),
+
+                /* The same two hand-offs the person screen offers. A worker who
+                   opened a medicine before reading why it is refused must not
+                   have to go back a screen to find the way forward. Resolved
+                   here from the dose actually being confirmed, so there is no
+                   placeholder for the page to fill. */
+                'controlled' => $scheduled->prescription
+                    ? route('record7.cd.give', [
+                        'client' => $person->id,
+                        'prescription' => $scheduled->prescription->id,
+                    ])
+                    : null,
+                'asRequired' => route('record7.prn', ['client' => $person->id]),
+
                 'today' => route('record7.today'),
                 'houses' => route('record7.houses'),
                 'lock' => route('record7.lock.now'),

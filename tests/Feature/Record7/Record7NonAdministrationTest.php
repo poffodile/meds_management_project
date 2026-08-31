@@ -1549,10 +1549,14 @@ class Record7NonAdministrationTest extends Record7TestCase
 
         $this->get($this->url($dose))
             ->assertOk()
+            // The guard is unchanged; only what it SAYS is. It used to tell a
+            // support worker the as-required workflow was "not built yet", three
+            // sections after Section 2.4 built it — so the screen refused the
+            // dose and then told the reader to stop rather than where to go.
             ->assertInertia(fn ($page) => $page->where(
                 'blockedReason',
-                'This is an as-required medicine. Recording it needs the as-required '
-                .'workflow, which is not built yet.'
+                'This is an as-required medicine. Record it on the as-required screen, '
+                .'where the reason for giving it and whether it worked are recorded too.'
             ));
     }
 
