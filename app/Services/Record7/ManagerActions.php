@@ -604,6 +604,80 @@ class ManagerActions
         return $round->fresh();
     }
 
+    /**
+     * Ask for a closed round to be opened again. Raises a request; nothing else.
+     *
+     * SEPARATION OF DUTIES IS THE POINT. Seeing a closed round and asking about
+     * it is `view_manager_dashboard`; opening it is `reopen_medication_round`,
+     * checked at the moment of the decision by decideReview() and again inside
+     * RoundLifecycle::reopen(). This method deliberately holds neither — it
+     * cannot reopen a round even if its caller could.
+     */
+    public function requestRoundReopen(
+        User $manager,
+        int $serviceId,
+        int $roundId,
+        string $reason,
+        Request $request
+    ): ReviewItem {
+        $this->require($manager, $serviceId, 'view_manager_dashboard');
+
+        if (trim($reason) === '') {
+            throw new RuntimeException('Say why this round should be opened again.');
+        }
+
+        // Scoped to the house from the session. An id naming another house's
+        // round is a 404, not a request against it.
+        $round = Round::where('service_id', $serviceId)->findOrFail($roundId);
+
+        if (! $round->isClosed()) {
+            throw new RuntimeException('That round is not closed.');
+        }
+
+        // One open request per round. Two people noticing the same gap should
+        // not produce two decisions, and the second approval would meet "that
+        // round is not closed" after the first had already reopened it.
+        $existing = ReviewItem::where('service_id', $serviceId)
+            ->where('kind', 'round_reopen_request')
+            ->where('subject_type', 'round')
+            ->where('subject_id', $round->id)
+            ->where('status', 'open')
+            ->exists();
+
+        if ($existing) {
+            throw new RuntimeException('Somebody has already asked for that round to be opened again.');
+        }
+
+        $item = ReviewItem::create([
+            'reference' => 'R7RR-'.Str::upper(Str::random(10)),
+            'organisation_id' => $round->organisation_id,
+            'service_id' => $serviceId,
+            'kind' => 'round_reopen_request',
+            'title' => 'Reopen the '.strtolower($round->slot).' round of '
+                .$round->round_date->format('j F'),
+            'detail' => $reason,
+            'subject_type' => 'round',
+            'subject_id' => $round->id,
+            'raised_by_user_id' => $manager->id,
+            'raised_at' => now(),
+            'severity' => 'high',
+            'status' => 'open',
+        ]);
+
+        $this->audit->record(
+            eventType: 'round_reopen_requested',
+            result: AuditRecorder::SUCCESS,
+            user: $manager,
+            serviceId: $serviceId,
+            reason: $reason,
+            riskLevel: 'medium',
+            metadata: ['round_id' => $round->id, 'review_item_id' => $item->id],
+            request: $request
+        );
+
+        return $item;
+    }
+
     /* ── Shared ─────────────────────────────────────────────────────────── */
 
     /**

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { router } from '@inertiajs/react';
 import AppShell from '@record7/components/AppShell.jsx';
 
@@ -43,7 +43,13 @@ export default function Manager({
     const nav = [
         { key: 'today', label: 'Today', href: urls.today, icon: 'house' },
         { key: 'manager', label: 'Manager', href: '/record7/manager', icon: 'person', current: true },
+        { key: 'stock', label: 'Stock', href: urls.stock, icon: 'building', available: can.viewStock },
+        { key: 'audit', label: 'Audit', href: urls.audit, icon: 'clock', available: can.viewAudit },
     ];
+
+    // Which closed round is having a reopening reason typed for it, if any.
+    const [reopenFor, setReopenFor] = useState(null);
+    const [reopenReason, setReopenReason] = useState('');
 
     return (
         <AppShell urls={urls} nav={nav}>
@@ -87,6 +93,21 @@ export default function Manager({
                                     {item.closureReason ? <><br />Closure reason: {item.closureReason}</> : null}
                                     {item.evidenceReference ? <><br />Evidence: {item.evidenceReference}</> : null}
                                     <br />
+                                    {/* The way to the work the row describes.
+                                        Resolved on the server from the record
+                                        itself, so it is always inside this
+                                        house, and absent where there is nowhere
+                                        honest to go. */}
+                                    {item.destination ? (
+                                        <>
+                                            <button
+                                                type="button"
+                                                onClick={() => router.get(item.destination.url)}
+                                            >
+                                                {item.destination.label}
+                                            </button>{' '}
+                                        </>
+                                    ) : null}
                                     <button type="button" onClick={() => post(urls.acknowledge, { issue_key: item.key })}>
                                         Acknowledge
                                     </button>{' '}
@@ -201,6 +222,77 @@ export default function Manager({
                                             >
                                                 Close round
                                             </button>
+                                        ) : null}
+
+                                        {/* SECTION 2.6, THE OTHER HALF.
+                                            Reopening was built, audited and
+                                            tested, and could only ever happen
+                                            against an approved request that
+                                            nothing could raise. This raises
+                                            one. It does NOT reopen the round —
+                                            that still needs somebody holding
+                                            reopen_medication_round to approve
+                                            it in the queue below, which is why
+                                            there is no direct button here even
+                                            for people who hold it. */}
+                                        {round.roundId && round.state === 'closed'
+                                            && !round.reopenRequested ? (
+                                            reopenFor === round.roundId ? (
+                                                <>
+                                                    {/* Asked for in writing, in
+                                                        place. Whoever decides
+                                                        this was not there, and
+                                                        a reason typed into a
+                                                        browser dialogue is one
+                                                        nobody can read back. */}
+                                                    <label>
+                                                        Why should it be opened again?
+                                                        <textarea
+                                                            rows={2}
+                                                            value={reopenReason}
+                                                            maxLength={500}
+                                                            onChange={(e) => setReopenReason(e.target.value)}
+                                                        />
+                                                    </label>
+                                                    <button
+                                                        type="button"
+                                                        disabled={reopenReason.trim().length < 10}
+                                                        onClick={() => {
+                                                            post(urls.requestReopen, {
+                                                                round_id: round.roundId,
+                                                                reason: reopenReason.trim(),
+                                                            });
+                                                            setReopenFor(null);
+                                                            setReopenReason('');
+                                                        }}
+                                                    >
+                                                        Send the request
+                                                    </button>{' '}
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => {
+                                                            setReopenFor(null);
+                                                            setReopenReason('');
+                                                        }}
+                                                    >
+                                                        Cancel
+                                                    </button>
+                                                </>
+                                            ) : (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setReopenFor(round.roundId);
+                                                        setReopenReason('');
+                                                    }}
+                                                >
+                                                    Request reopening
+                                                </button>
+                                            )
+                                        ) : null}
+
+                                        {round.reopenRequested ? (
+                                            <em>Reopening requested — waiting on a decision</em>
                                         ) : null}
                                     </td>
                                 </tr>
@@ -331,231 +423,6 @@ export default function Manager({
                             ))}
                         </ol>
                     )}
-                </Section>
-
-                {/* 2 ── Are the rounds running safely and on time? */}
-                <Section title="Round oversight" count={rounds.length}>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Round</th><th>Due</th><th>State</th>
-                                <th>Expected</th><th>Completed</th><th>Remaining</th>
-                                <th>Late</th><th>Time critical late</th>
-                                <th>Opened by</th><th>Started</th><th>Intervention</th><th />
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {rounds.map((round) => (
-                                <tr key={round.slot}>
-                                    <td>{round.slot}</td>
-                                    <td>{round.dueAt}</td>
-                                    <td>{round.state}</td>
-                                    <td>{round.expectedPeople}</td>
-                                    <td>{round.completedPeople}</td>
-                                    <td>{round.remainingPeople}</td>
-                                    <td>{round.lateCount}</td>
-                                    <td>{round.timeCriticalLate}</td>
-                                    <td>{round.openedBy ?? '—'}</td>
-                                    <td>{round.startedAt ?? '—'}</td>
-                                    <td>{round.interventionNeeded ? 'yes' : 'no'}</td>
-                                    <td>
-                                        {/* Section 2.6. What is actually being
-                                            signed off, said before signing it
-                                            rather than discovered afterwards. */}
-                                        {round.accountability ? (
-                                            <span className="r7-round-count">
-                                                {round.accountability.accounted} of{' '}
-                                                {round.accountability.planned} doses accounted for
-                                            </span>
-                                        ) : null}
-
-                                        {round.unresolved?.length ? (
-                                            <span className="r7-round-unresolved">
-                                                Still unresolved: {round.unresolved.join(', ')}
-                                            </span>
-                                        ) : null}
-
-                                        {round.lifecycle?.length ? (
-                                            <ul className="r7-round-history">
-                                                {round.lifecycle.map((entry) => (
-                                                    <li key={entry.id}>
-                                                        {entry.word} {entry.at}
-                                                        {entry.by ? ` by ${entry.by}` : ''}
-                                                        {entry.reason ? ` — ${entry.reason}` : ''}
-                                                        {entry.imported ? ' (imported)' : ''}
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        ) : null}
-
-                                        {round.roundId && round.state !== 'closed' ? (
-                                            <button
-                                                type="button"
-                                                onClick={() => {
-                                                    const warn = round.unresolved?.length
-                                                        ? `Closing does not resolve: ${round.unresolved.join(', ')}. `
-                                                          + 'Those stay open. Continue?'
-                                                        : 'Close this round?';
-
-                                                    if (window.confirm(warn)) {
-                                                        post(urls.closeRound, { round_id: round.roundId });
-                                                    }
-                                                }}
-                                            >
-                                                Close round
-                                            </button>
-                                        ) : null}
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </Section>
-
-                {/* 3 ── Who cannot administer, and why? */}
-                <Section title="Staff readiness" count={staff.length}>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Staff</th><th>Employment role</th><th>Access</th>
-                                <th>Permission</th><th>Competency</th><th>Expires</th>
-                                <th>Restriction</th><th>May administer</th><th>Reason</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {staff.map((member) => (
-                                <tr key={member.userId}>
-                                    <td>{member.fullName}</td>
-                                    <td>{member.role}</td>
-                                    <td>{member.accessType} ({member.accessStatus})</td>
-                                    <td>{member.hasPermission ? 'granted' : 'not granted'}</td>
-                                    <td>
-                                        {member.competencyStatus}
-                                        {member.competencyExpiringSoon ? ' (expiring soon)' : ''}
-                                    </td>
-                                    <td>{member.competencyExpires ?? '—'}</td>
-                                    <td>{member.restriction ?? '—'}</td>
-                                    <td>{member.mayAdminister ? 'yes' : 'no'}</td>
-                                    <td>{member.reason ?? '—'}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </Section>
-
-                {/* 4 ── What remains unresolved? */}
-                <Section title="Outstanding outcomes and follow-ups">
-                    <h3>Omissions ({outcomes.omissions.length})</h3>
-                    <ul>
-                        {outcomes.omissions.map((o) => (
-                            <li key={o.id}>
-                                {o.client} — {o.slot} round, due {o.dueAt}, {o.minutesLate} min late
-                                {o.timeCritical ? ' — TIME CRITICAL' : ''}
-                            </li>
-                        ))}
-                    </ul>
-
-                    <h3>Refusals not followed up ({outcomes.refusals.length})</h3>
-                    <ul>
-                        {outcomes.refusals.map((r) => (
-                            <li key={r.id}>{r.client} — {r.at} — {r.note}</li>
-                        ))}
-                    </ul>
-
-                    <h3>Other not-taken outcomes ({outcomes.notTaken.length})</h3>
-                    <ul>
-                        {outcomes.notTaken.map((n) => (
-                            <li key={n.id}>{n.client} — {n.outcome} at {n.at} — {n.note}</li>
-                        ))}
-                    </ul>
-
-                    <h3>Incomplete records ({outcomes.incompleteRecords.length})</h3>
-                    <ul>
-                        {outcomes.incompleteRecords.map((r) => (
-                            <li key={r.id}>{r.client} — {r.outcome} at {r.at}, no reason recorded</li>
-                        ))}
-                    </ul>
-
-                    <h3>PRN effectiveness checks ({outcomes.prnFollowUps.length})</h3>
-                    <ul>
-                        {outcomes.prnFollowUps.map((p) => (
-                            <li key={p.id}>
-                                {p.client} — given {p.givenAt} by {p.givenBy}, answer due {p.dueAt}
-                                {p.overdue ? ' — overdue' : ''}
-                            </li>
-                        ))}
-                    </ul>
-                </Section>
-
-                {/* 5 ── What needs a decision? */}
-                <Section title="Manager review queue" count={review.open.length}>
-                    {review.open.length === 0 ? <p>Nothing waiting for a decision.</p> : (
-                        <ol>
-                            {review.open.map((item) => (
-                                <li key={item.id} style={{ marginBottom: '1rem' }}>
-                                    <strong>{item.kindWord}: {item.title}</strong> ({item.severity})
-                                    <br />
-                                    {item.detail}
-                                    <br />
-                                    Raised by {item.raisedBy}, waiting {item.waitingMinutes} min
-                                    <br />
-                                    {item.kind === 'correction_request' ? (
-                                        <>
-                                            {can.decideCorrections ? (
-                                                <>
-                                                    {/* SECTION 2.7. A stock reconciliation asks for
-                                                        a QUANTITY, not an outcome — "approve as
-                                                        missed" would be meaningless on it, and
-                                                        sending a corrected outcome would be
-                                                        answering a question nobody asked. What is
-                                                        approved here is the figure the request
-                                                        names; carrying it out is somebody else's,
-                                                        on the stock screen. */}
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => post(urls.decide, {
-                                                            review_id: item.id,
-                                                            decision: 'approved',
-                                                            ...(item.subjectType === 'stock_movement'
-                                                                ? {}
-                                                                : { corrected_outcome: 'missed' }),
-                                                            note: 'Approved from Manager Today.',
-                                                        })}
-                                                    >
-                                                        {item.subjectType === 'stock_movement'
-                                                            ? 'Approve this adjustment'
-                                                            : 'Approve as missed'}
-                                                    </button>{' '}
-                                                </>
-                                            ) : <em>You cannot decide corrections in this house. </em>}
-                                        </>
-                                    ) : null}
-                                    {item.kind !== 'correction_request' ? (
-                                        <button
-                                            type="button"
-                                            onClick={() => post(urls.decide, {
-                                                review_id: item.id,
-                                                decision: 'approved',
-                                                note: 'Approved from Manager Today.',
-                                            })}
-                                        >
-                                            Approve
-                                        </button>
-                                    ) : null}{' '}
-                                    <button
-                                        type="button"
-                                        onClick={() => post(urls.decide, {
-                                            review_id: item.id,
-                                            decision: 'declined',
-                                            note: 'Declined from Manager Today.',
-                                        })}
-                                    >
-                                        Decline
-                                    </button>
-                                </li>
-                            ))}
-                        </ol>
-                    )}
 
                     <h3>Already decided ({review.decided.length})</h3>
                     <ul>
@@ -567,6 +434,19 @@ export default function Manager({
                         ))}
                     </ul>
                 </Section>
+
+                {/* ── DELETED HERE: A SECOND COPY OF THE FOUR SECTIONS ABOVE.
+                    Round oversight, Staff readiness, Outstanding outcomes and
+                    the review queue were each rendered twice, and the two
+                    copies were not the same. The first is the Section 2.7
+                    version, where what a person may do with a request comes
+                    from the server. The second was the code that version
+                    replaced: it never read item.actions, and it drew Decline
+                    outside every authority check — so somebody holding no
+                    correction authority was still offered the button, which is
+                    the defect Section 2.7 was rejected for. The server refused
+                    them either way, but offering an action nobody may take is
+                    its own fault. One authoritative rendering now. */}
 
                 {/* 6 ── Urgent stock and controlled drugs */}
                 <Section title="Stock and controlled-drug concerns" count={stock.length}>

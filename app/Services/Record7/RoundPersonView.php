@@ -351,6 +351,22 @@ class RoundPersonView
                     'recordedAt' => $answer?->administered_at->format('H:i'),
                     'recordedBy' => $answer?->recordedBy?->displayName(),
 
+                    // The record itself, so somebody who sees that it is wrong
+                    // can ask about THAT row rather than about the dose. A dose
+                    // may carry a refusal and a re-offer; a correction has to
+                    // name which of them it means.
+                    'administrationId' => $answer?->id,
+
+                    // A correction is asked about a record that has not already
+                    // been corrected and is not itself a correction. Worked out
+                    // here so the round does not offer a door the correction
+                    // screen would immediately close.
+                    'correctable' => $answer !== null
+                        && $answer->corrects_administration_id === null
+                        && ! Administration::where('service_id', $dose->service_id)
+                            ->where('corrects_administration_id', $answer->id)
+                            ->exists(),
+
                     // ONE WORD FOR ONE OUTCOME, RESOLVED HERE.
                     // The pill and the line beneath it were being worded
                     // separately, so the same fact appeared twice in two

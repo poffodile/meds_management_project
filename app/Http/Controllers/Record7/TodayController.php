@@ -96,6 +96,21 @@ class TodayController extends R7Controller
                    controller, so a visible page is never a granted action. */
                 'viewStock' => in_array('stock_management', $granted, true)
                     || in_array('reconciliation', $granted, true),
+
+                /* THE TWO SENIOR DESTINATIONS.
+                   Manager Today and the access audit were both built, both
+                   tested, and referenced by nothing: the only mention of
+                   /record7/manager in the whole front end was the manager
+                   page's own nav item marking itself as current. A service
+                   manager holding every senior permission could not navigate
+                   to the screen that is their job.
+
+                   Offered on the permission the destination itself enforces,
+                   so the menu and the door agree. Being shown a way in is not
+                   authority to do anything once inside: every action on both
+                   screens is re-checked server-side against this house. */
+                'viewManager' => in_array('view_manager_dashboard', $granted, true),
+                'viewAudit' => in_array('view_access_audit', $granted, true),
             ],
 
             'urls' => [
@@ -110,6 +125,8 @@ class TodayController extends R7Controller
                 'today' => route('record7.today'),
                 'round' => route('record7.round'),
                 'stock' => route('record7.stock'),
+                'manager' => route('record7.manager'),
+                'audit' => route('record7.audit'),
                 'person' => route('record7.round.person', ['client' => '__ID__']),
                 'prnFollowUp' => route('record7.prn.review', ['followUp' => '__ID__']),
 

@@ -16,8 +16,10 @@ use App\Models\Record7\ScheduledDose;
 use App\Models\Record7\Service;
 use App\Models\Record7\StockBalance;
 use App\Models\Record7\StockEvent;
+use App\Models\Record7\StockMovement;
 use App\Models\Record7\User;
 use App\Models\Record7\UserServiceAccess;
+use App\Models\Record7\WelfareCheck;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -81,8 +83,18 @@ class ManagerBoard
      * what goes wrong in a house is a support worker's to fix and putting those
      * here would bury the handful that are not.
      */
-    public function attention(int $serviceId, ?Carbon $now = null): array
+    /**
+     * @param  User|null  $viewer  Who is looking. Only used to decide which
+     *                             destinations to offer: a row must never send
+     *                             somebody to a screen that will refuse them.
+     *                             Null means offer none, which is why the
+     *                             lifecycle service's call is unaffected.
+     */
+    public function attention(int $serviceId, ?Carbon $now = null, ?User $viewer = null): array
     {
+        $this->viewer = $viewer;
+
+
         $now ??= now();
         $house = Service::find($serviceId);
         $items = [];
@@ -309,13 +321,171 @@ class ManagerBoard
                 ? $state->statusWording($conditionActive)
                 : ($conditionActive ? 'Open' : 'Resolved'),
             'note' => $state?->note,
+
+            // Where the work actually is. Null where there is nowhere honest
+            // to send somebody, which is not the same as forgetting to link.
+            'destination' => $this->destinationFor($serviceId, $item['key']),
         ];
+    }
+
+    /**
+     * The screen that answers the row, resolved from the record itself.
+     *
+     * EVERY ROW TOLD A MANAGER WHAT TO DO AND OFFERED NO WAY TO DO IT. The
+     * board named a person and a next action — "establish what happened",
+     * "have the answer recorded" — and carried no link at all, so the way to
+     * the work was to remember an address.
+     *
+     * THE ID IN THE KEY IS NOT TRUSTED. An issue key is a string that reaches
+     * this class from a request in other code paths, so nothing here builds a
+     * URL out of it. The id is used to LOAD a record scoped to this house, and
+     * every id in the resulting link comes off the loaded row. A key naming
+     * another house's dose resolves to null rather than to a link out of the
+     * house the manager is standing in.
+     *
+     * Null is a real answer. A person's round screen only exists while a round
+     * is open that holds them; a delivery that has not arrived has no balance
+     * to open. Offering a link that lands on a redirect or a 404 would be worse
+     * than the honest absence of one.
+     */
+    private function destinationFor(int $serviceId, string $issueKey): ?array
+    {
+        [$type, $raw] = array_pad(explode(':', $issueKey, 2), 2, null);
+
+        if (! is_numeric($raw)) {
+            return null;
+        }
+
+        $id = (int) $raw;
+
+        return match ($type) {
+            // A dose nobody answered, a refusal nobody followed up, a record
+            // left incomplete, somebody who could not be found. All of them are
+            // answered on that person's own screen inside the round.
+            'omitted_dose' => $this->personDestination(
+                $serviceId,
+                ScheduledDose::where('service_id', $serviceId)->find($id)?->client_id
+            ),
+
+            /* All three name an administration. `stock_verification_due` is a
+               correction that established a dose was given without saying how
+               much — answered by somebody counting, on the person it concerns,
+               not on a balance. */
+            'refusal', 'incomplete_record', 'stock_verification_due' => $this->personDestination(
+                $serviceId,
+                Administration::where('service_id', $serviceId)->find($id)?->client_id
+            ),
+
+            'welfare_check' => $this->personDestination(
+                $serviceId,
+                WelfareCheck::where('service_id', $serviceId)->find($id)?->client_id
+            ),
+
+            /* The follow-up has its own screen and needs no round — but it
+               RECORDS A CLINICAL ANSWER, so it is gated on being able to give
+               medicines, and a manager who cannot would meet a 403 there.
+               Offering a door somebody will be turned away from is the same
+               defect as offering an action they may not take. */
+            'prn_follow_up', 'prn_concerning_response' => $this->viewerMayAdminister($serviceId)
+                && PrnFollowUp::where('service_id', $serviceId)->whereKey($id)->exists()
+                    ? [
+                        'url' => route('record7.prn.review', ['followUp' => $id]),
+                        'label' => 'Open the follow-up',
+                    ]
+                    : null,
+
+            /* Section 2.7 balances. The history and every action live there.
+
+               THESE TWO KEYS DO NOT CARRY THE SAME ID. `stock_out` and
+               `stock_low` are derived from a balance and name one;
+               `stock_discrepancy` names the MOVEMENT that disagreed, because
+               that is the row a reconciliation has to correct. Treating them
+               alike would have sent a manager to whichever balance happened to
+               share a number with a movement — a link into the right house and
+               the wrong medicine, which is worse than no link. */
+            'stock_out', 'stock_low' => $this->balanceDestination(
+                StockBalance::where('service_id', $serviceId)->find($id)
+            ),
+
+            'stock_discrepancy' => $this->balanceDestination(
+                ($movement = StockMovement::where('service_id', $serviceId)->find($id))
+                && $movement->client_id !== null
+                    ? $this->ledger->trackedFor($movement->client_id, $movement->medicine_id)
+                    : null
+            ),
+
+            // A controlled-drug disagreement belongs to the register, on the
+            // person it concerns — never to the ordinary stock screen.
+            'controlled_drug_discrepancy' => $this->viewerMayAdminister($serviceId)
+                && ($client = CdRegister::where('service_id', $serviceId)->find($id)?->client_id)
+                    ? [
+                        'url' => route('record7.cd', ['client' => $client]),
+                        'label' => 'Open the register',
+                    ]
+                    : null,
+
+            // A delivery that has not arrived names no balance to open, so the
+            // house's stock list is the closest honest destination.
+            'stock_event' => [
+                'url' => route('record7.stock'),
+                'label' => 'Open stock',
+            ],
+
+            // Staff readiness, unread handovers and queued review items are
+            // answered on this screen, not on another one.
+            default => null,
+        };
+    }
+
+    /** A balance's own screen, where its history and every action live. */
+    private function balanceDestination(?StockBalance $balance): ?array
+    {
+        return $balance
+            ? [
+                'url' => route('record7.stock.show', ['balance' => $balance->id]),
+                'label' => 'Open this balance',
+            ]
+            : null;
+    }
+
+    /**
+     * Whether the person reading the board could actually use a screen that
+     * records a dose. Null viewer means no, which keeps the default safe.
+     */
+    private function viewerMayAdminister(int $serviceId): bool
+    {
+        return $this->viewer !== null
+            && $this->policy->allows($this->viewer, 'administer_medication', $serviceId);
+    }
+
+    /** A person's round screen, but only while a round is open that holds them. */
+    private function personDestination(int $serviceId, ?int $clientId): ?array
+    {
+        if ($clientId === null) {
+            return null;
+        }
+
+        $client = Client::where('service_id', $serviceId)->find($clientId);
+
+        if (! $client) {
+            return null;
+        }
+
+        return app(RoundPersonView::class)->openRoundHolding($serviceId, $client)
+            ? [
+                'url' => route('record7.round.person', ['client' => $client->id]),
+                'label' => 'Go to '.$client->displayName(),
+            ]
+            : null;
     }
 
     private function typeOf(string $issueKey): string
     {
         return explode(':', $issueKey, 2)[0];
     }
+
+    /** Who is reading the board, for the duration of one attention() call. */
+    private ?User $viewer = null;
 
     private ?\Illuminate\Support\Collection $states = null;
 
@@ -355,7 +525,7 @@ class ManagerBoard
             ->get()
             ->keyBy('slot');
 
-        return $doses->groupBy('slot')->map(function ($inSlot, $slot) use ($rounds, $now) {
+        return $doses->groupBy('slot')->map(function ($inSlot, $slot) use ($rounds, $now, $serviceId) {
             $round = $rounds->get($slot);
 
             $recorded = $inSlot->filter(fn ($dose) => $dose->administration !== null);
@@ -411,6 +581,18 @@ class ManagerBoard
                     ? app(RoundLifecycle::class)->history($round)
                     : [],
                 'roundId' => $round?->id,
+
+                // Whether somebody has already asked for this one to be opened
+                // again. Two people noticing the same gap should produce one
+                // decision, not two, and the second approval would meet a round
+                // the first had already reopened.
+                'reopenRequested' => $round !== null && ReviewItem::where('service_id', $serviceId)
+                    ->where('kind', 'round_reopen_request')
+                    ->where('subject_type', 'round')
+                    ->where('subject_id', $round->id)
+                    ->where('status', 'open')
+                    ->exists(),
+
                 // The only judgement this method makes, and it is the one a
                 // manager actually wants: do I need to do something.
                 'interventionNeeded' => $criticalLate->count() > 0

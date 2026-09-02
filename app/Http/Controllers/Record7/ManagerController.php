@@ -93,7 +93,9 @@ class ManagerController extends R7Controller
             'today' => now()->format('l j F'),
             'name' => $user->displayName(),
 
-            'attention' => $this->board->attention($serviceId),
+            // The reader is passed in so a row never offers a destination they
+            // would be refused at — the same rule the review actions follow.
+            'attention' => $this->board->attention($serviceId, null, $user),
             'rounds' => $this->board->rounds($serviceId),
             'staff' => $this->board->staffReadiness($serviceId),
             'outcomes' => $this->board->outstandingOutcomes($serviceId),
@@ -108,6 +110,18 @@ class ManagerController extends R7Controller
                 'decideCorrections' => $this->policy->allows($user, 'correction_approval', $serviceId),
                 'reviewIncidents' => $this->policy->allows($user, 'incident_review', $serviceId),
                 'manageStock' => $this->policy->allows($user, 'stock_management', $serviceId),
+
+                // Whether the other senior destinations are offered in the
+                // menu. Each is the permission its own route enforces, so the
+                // menu and the door cannot disagree.
+                'viewAudit' => $this->policy->allows($user, 'view_access_audit', $serviceId),
+                'viewStock' => $this->policy->allows($user, 'stock_management', $serviceId)
+                    || $this->policy->allows($user, 'reconciliation', $serviceId),
+
+                // Reopening a closed round is requested here and approved by
+                // somebody holding this. Both halves are checked again on the
+                // server; this only decides what the screen offers.
+                'reopenRounds' => $this->policy->allows($user, 'reopen_medication_round', $serviceId),
             ],
 
             'urls' => [
@@ -118,6 +132,9 @@ class ManagerController extends R7Controller
                 'close' => route('record7.manager.close'),
                 'decide' => route('record7.manager.decide'),
                 'closeRound' => route('record7.manager.round.close'),
+                'requestReopen' => route('record7.manager.round.reopen.request'),
+                'audit' => route('record7.audit'),
+                'stock' => route('record7.stock'),
                 'houses' => route('record7.houses'),
                 'today' => route('record7.today'),
                 'lock' => route('record7.lock.now'),
@@ -259,6 +276,47 @@ class ManagerController extends R7Controller
             $this->manager(),
             $this->house($request),
             $data['round_id'],
+            $request
+        );
+
+        return redirect()->route('record7.manager');
+    }
+
+    /**
+     * Ask for a closed round to be opened again.
+     *
+     * WHY THIS EXISTS. Section 2.6 built reopening properly — append-only,
+     * audited at high risk, and authorised only against an APPROVED
+     * round_reopen_request. Nothing in the application could raise one, so the
+     * whole reopen half of the lifecycle was reachable from a seeded fixture
+     * and nowhere else.
+     *
+     * THIS DOES NOT REOPEN ANYTHING. It writes a request. The round stays
+     * closed until somebody holding `reopen_medication_round` approves it, and
+     * the reopening itself is still done by RoundLifecycle::reopen() through
+     * the existing decision path — there is deliberately no direct button that
+     * skips the request.
+     *
+     * Requesting is gated on seeing the manager board, because that is the only
+     * screen where a closed round is visible; approving is gated on the
+     * reopening permission, which is held by different people. Priya can see a
+     * closed round and ask; she cannot open it.
+     */
+    public function requestRoundReopen(Request $request)
+    {
+        $data = $request->validate([
+            'round_id' => ['required', 'integer'],
+            // A REASON IS THE WHOLE POINT. Reopening makes a signed-off period
+            // writable again; a request that does not say why is one nobody can
+            // fairly decide.
+            'reason' => ['required', 'string', 'min:10', 'max:500'],
+        ]);
+
+        $this->actions->requestRoundReopen(
+            $this->manager(),
+            $this->house($request),
+            $data['round_id'],
+            trim($data['reason']),
             $request
         );
 

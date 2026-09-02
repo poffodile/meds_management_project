@@ -277,6 +277,14 @@ class RoundController extends R7Controller
                 ]),
                 'asRequired' => route('record7.prn', ['client' => '__ID__']),
 
+                /* Asking about a record that is already there. Filled from the
+                   administration the page was given, never from a number the
+                   browser invented, and the controller behind it re-scopes to
+                   this house regardless. */
+                'correction' => route('record7.correction.show', [
+                    'administration' => '__ADMINISTRATION__',
+                ]),
+
                 'today' => route('record7.today'),
                 'houses' => route('record7.houses'),
                 'lock' => route('record7.lock.now'),

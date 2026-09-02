@@ -31,7 +31,15 @@ const RESULT_TONE = {
  * Reading it is itself recorded. Looking at who accessed what is an access
  * event like any other.
  */
-export default function Audit({ events, houses, filters, total, shown, integrity, urls }) {
+export default function Audit({ events, houses, filters, total, shown, integrity, urls, can = {} }) {
+    /* The way back to the other senior screen. This one is reached from
+       Manager Today and had no way back to it. */
+    const nav = [
+        { key: 'today', label: 'Today', href: urls.today, icon: 'house' },
+        { key: 'manager', label: 'Manager', href: urls.manager, icon: 'person', available: can.viewManager },
+        { key: 'audit', label: 'Audit', href: urls.self, icon: 'clock', current: true },
+    ];
+
     const setFilter = (key, value) => {
         const next = { ...filters };
 
@@ -45,7 +53,7 @@ export default function Audit({ events, houses, filters, total, shown, integrity
     };
 
     return (
-        <AppShell urls={urls}>
+        <AppShell urls={urls} nav={nav}>
             <div className="r7-page-heading">
                 <span className="r7-label">Access audit</span>
                 <h1 className="r7-display">Who reached what</h1>

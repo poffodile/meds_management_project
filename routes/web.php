@@ -3206,6 +3206,7 @@ use App\Http\Controllers\Record7\HouseController as R7House;
 use App\Http\Controllers\Record7\SessionController as R7Session;
 use App\Http\Controllers\Record7\SignInController as R7SignIn;
 use App\Http\Controllers\Record7\ManagerController as R7Manager;
+use App\Http\Controllers\Record7\CorrectionController as R7Correction;
 use App\Http\Controllers\Record7\StockController as R7Stock;
 use App\Http\Controllers\Record7\ControlledDrugController as R7Cd;
 use App\Http\Controllers\Record7\PrnController as R7Prn;
@@ -3491,7 +3492,33 @@ Route::prefix('record7')->name('record7.')->group(function () {
                 Route::post('/manager/decide', [R7Manager::class, 'decide'])->name('manager.decide');
                 Route::post('/manager/round/close', [R7Manager::class, 'closeRound'])
                     ->name('manager.round.close');
+
+                /* Section 2.6. ASKING is not REOPENING. This raises a request
+                   against a closed round and nothing else; the reopening
+                   itself happens through /manager/decide, which checks
+                   `reopen_medication_round` and goes through
+                   RoundLifecycle::reopen(). There is deliberately no direct
+                   reopen route: a signed-off period becoming writable again
+                   must always leave a request and a decision behind it. */
+                Route::post('/manager/round/reopen-request', [R7Manager::class, 'requestRoundReopen'])
+                    ->name('manager.round.reopen.request');
             });
+
+        /* Asking for a recorded administration to be corrected.
+           Open to the people who record doses, because they are the ones who
+           discover the error. Raising a request is not approving it: the
+           decision needs `correction_approval`, is taken on the manager board,
+           and is re-checked there. Nothing on these two routes writes,
+           changes or deletes an administration. */
+        Route::get('/administration/{administration}/correction', [R7Correction::class, 'show'])
+            ->whereNumber('administration')
+            ->middleware(R7Authorize::class.':administer_medication')
+            ->name('correction.show');
+
+        Route::post('/administration/{administration}/correction', [R7Correction::class, 'store'])
+            ->whereNumber('administration')
+            ->middleware([R7Authorize::class.':administer_medication', 'throttle:30,1'])
+            ->name('correction.store');
 
         /* 0.10 — the manager access-audit screen. */
         Route::get('/access-audit', [R7Audit::class, 'index'])

@@ -37,6 +37,7 @@ export default function RoundPerson({
     const flash = usePage().props.flash ?? {};
     const recorded = flash['r7.recorded'] ?? null;
     const failed = flash['r7.error'] ?? null;
+    const requested = flash['r7.requested'] ?? null;
     const nav = [
         { key: 'today', label: 'Today', href: urls.today, icon: 'house' },
         { key: 'round', label: 'Round', href: urls.round, icon: 'clock', current: true },
@@ -156,6 +157,19 @@ export default function RoundPerson({
                     </Notice>
                 ) : null}
 
+                {/* A correction ASKED FOR. Deliberately not the banner above:
+                    nothing was signed, and nothing has changed on this page. */}
+                {requested ? (
+                    <Notice
+                        tone="info"
+                        title={`Correction requested at ${requested.at}`}
+                    >
+                        {`${requested.by} has asked for the ${requested.medicine} record to be `
+                            + `corrected (${requested.reference}). A manager has to decide it, and `
+                            + 'the original record is unchanged until they do.'}
+                    </Notice>
+                ) : null}
+
                 {failed ? <Notice tone="error" title="Not recorded">{failed}</Notice> : null}
 
                 {/* An unanswered "could not be found" concern. Nothing else on
@@ -253,6 +267,20 @@ export default function RoundPerson({
                                        offering it would be the same defect in a
                                        new place. */
                                     handOff={authority.blocked ? null : handOffFor(medicine)}
+                                    /* Only where there is a record to ask
+                                       about, and only where it has not already
+                                       been corrected. */
+                                    onRequestCorrection={
+                                        !authority.blocked
+                                        && medicine.correctable
+                                        && medicine.administrationId
+                                            ? () => router.get(
+                                                urls.correction.replace(
+                                                    '__ADMINISTRATION__', medicine.administrationId
+                                                )
+                                            )
+                                            : null
+                                    }
                                 />
                             ))}
                         </ul>

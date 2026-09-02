@@ -87,6 +87,27 @@ export default function Today({
             icon: 'building',
             available: can.viewStock,
         },
+
+        /* THE SENIOR DESTINATIONS, ON THE PERMISSION EACH ONE ENFORCES.
+           Both screens existed and neither was linked from anywhere, so the
+           people who own them reached them by typing an address or not at all.
+           Gated exactly as the routes are gated, so the menu never offers a
+           door that would refuse the person opening it — and never hides one
+           from somebody entitled to it. */
+        {
+            key: 'manager',
+            label: 'Manager',
+            href: urls.manager,
+            icon: 'person',
+            available: can.viewManager,
+        },
+        {
+            key: 'audit',
+            label: 'Audit',
+            href: urls.audit,
+            icon: 'clock',
+            available: can.viewAudit,
+        },
     ];
 
     const started = round?.state === 'in_progress';

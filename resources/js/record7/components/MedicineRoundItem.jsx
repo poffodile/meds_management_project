@@ -43,6 +43,7 @@ const OUTCOME = {
 
 export default function MedicineRoundItem({
     medicine, onRecord = null, onOutcome = null, onReoffer = null, handOff = null,
+    onRequestCorrection = null,
 }) {
     const {
         name, strength, form, controlled, dose, route, dueAt, directions,
@@ -170,6 +171,20 @@ export default function MedicineRoundItem({
             {/* A refusal is not necessarily the end of it. Offering again is a
                 deliberate, separate step — never a second "give" button
                 pretending the first answer did not happen. */}
+            {/* THE RECORD IS WRONG, AND THE PERSON WHO WROTE IT KNOWS.
+                Signing for the wrong outcome is the commonest recording error
+                there is, and until now the only honest thing a worker could do
+                was tell somebody verbally. This asks; it changes nothing. The
+                original stays exactly as it is either way — a correction adds a
+                record beside it and never rewrites it. */}
+            {recorded && onRequestCorrection ? (
+                <div className="r7-med-item__action">
+                    <Button variant="quiet" size="small" onClick={onRequestCorrection}>
+                        This is not what happened
+                    </Button>
+                </div>
+            ) : null}
+
             {recorded && reofferOf && onReoffer ? (
                 <div className="r7-med-item__action">
                     <Button variant="secondary" size="small" onClick={onReoffer}>

@@ -110,6 +110,14 @@ class AuditController extends R7Controller
                 fn (Service $house) => ['id' => $house->id, 'name' => $house->name],
                 $this->policy->availableServices($user)
             ),
+
+            // Whether Manager Today is offered in the menu from here. Read of
+            // the same permission that screen's own route enforces, against
+            // the house the session is in.
+            'can' => [
+                'viewManager' => $currentHouse !== null
+                    && $this->policy->allows($user, 'view_manager_dashboard', $currentHouse),
+            ],
             'filters' => $filters,
             'total' => $query->count(),
             'shown' => $events->count(),
@@ -120,6 +128,7 @@ class AuditController extends R7Controller
             ],
             'urls' => [
                 'self' => route('record7.audit'),
+                'manager' => route('record7.manager'),
                 'today' => route('record7.today'),
                 'houses' => route('record7.houses'),
                 'lock' => route('record7.lock.now'),
