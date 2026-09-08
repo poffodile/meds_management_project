@@ -102,6 +102,10 @@ class CorrectionController extends R7Controller
             return 'As-required medicine corrections need the PRN-specific correction pathway so dose amount, limits, stock and follow-up stay together.';
         }
 
+        if ($administration->prescription?->medicine?->is_controlled) {
+            return 'Controlled-drug corrections need the controlled-drug correction pathway so the clinical record and register stay together.';
+        }
+
         if ($administration->corrects_administration_id !== null) {
             return 'That record is itself a correction. Ask about the original instead.';
         }
