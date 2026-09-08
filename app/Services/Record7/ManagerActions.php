@@ -407,11 +407,13 @@ class ManagerActions
             throw new RuntimeException('That correction request does not name a record to correct.');
         }
 
+        // `withheld` is deliberately absent until Record7 can prove the
+        // instruction/authority/evidence for withholding. Manager correction
+        // approval must not be a back door around that clinical-authority gap.
         $outcomes = [
             'given',
             'self_administered',
             'refused',
-            'withheld',
             'not_available',
             'missed',
             'person_unavailable',
