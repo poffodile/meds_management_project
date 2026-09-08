@@ -98,6 +98,10 @@ class CorrectionController extends R7Controller
     /** Why this record cannot be asked about, if it cannot. */
     private function refusal(Administration $administration, int $serviceId): ?string
     {
+        if ($administration->prescription?->kind === 'prn') {
+            return 'As-required medicine corrections need the PRN-specific correction pathway so dose amount, limits, stock and follow-up stay together.';
+        }
+
         if ($administration->corrects_administration_id !== null) {
             return 'That record is itself a correction. Ask about the original instead.';
         }
