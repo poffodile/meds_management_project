@@ -57,7 +57,8 @@ class Administration extends Record7Model
                 return;
             }
 
-            $original = self::with('prescription')->find($administration->corrects_administration_id);
+            $original = self::with('prescription.medicine')
+                ->find($administration->corrects_administration_id);
 
             // PRN corrections need more than a replacement outcome. A PRN dose
             // also carries an actual amount, spends interval/count/amount
@@ -69,6 +70,17 @@ class Administration extends Record7Model
                 throw new RuntimeException(
                     'As-required medicine corrections need the PRN-specific correction pathway '
                     .'so dose amount, limits, stock and follow-up stay together.'
+                );
+            }
+
+            // Controlled-drug corrections have an independent append-only
+            // register and balance. The ordinary correction workflow only knows
+            // the ordinary stock ledger, so allowing it to change the clinical
+            // outcome would let the MAR and controlled-drug register disagree.
+            if ($original?->prescription?->medicine?->is_controlled) {
+                throw new RuntimeException(
+                    'Controlled-drug corrections need the controlled-drug correction pathway '
+                    .'so the clinical record and register stay together.'
                 );
             }
         });
