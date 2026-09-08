@@ -55,16 +55,15 @@ class CorrectionController extends R7Controller
      * approve", so it is refused here instead, where the person can still fix
      * it.
      *
-     * `withheld` is included because the approval path accepts it as a
-     * correction TARGET — Section 2.7 §8.3 is explicit that correcting to
-     * withheld is a correction and not a withheld recording, which remains
-     * unbuilt.
+     * `withheld` is deliberately absent. Recording that a medicine was
+     * withheld needs a structured instruction/authority/evidence model that
+     * Record7 does not yet hold. A correction must not become a way around that
+     * missing clinical-authority control.
      */
     private const OUTCOMES = [
         'given' => 'It was given',
         'self_administered' => 'They took it themselves',
         'refused' => 'They refused it',
-        'withheld' => 'It was withheld',
         'not_available' => 'It was not available',
         'missed' => 'It was missed',
         'person_unavailable' => 'The person was unavailable',
