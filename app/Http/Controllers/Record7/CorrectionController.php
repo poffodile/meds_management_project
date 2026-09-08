@@ -67,6 +67,7 @@ class CorrectionController extends R7Controller
         'withheld' => 'It was withheld',
         'not_available' => 'It was not available',
         'missed' => 'It was missed',
+        'person_unavailable' => 'The person was unavailable',
     ];
 
     /** The house from the session, the administration from the house. */
