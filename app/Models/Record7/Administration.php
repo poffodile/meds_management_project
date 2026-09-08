@@ -52,6 +52,27 @@ class Administration extends Record7Model
 
     protected static function booted(): void
     {
+        static::creating(function (self $administration) {
+            if ($administration->corrects_administration_id === null) {
+                return;
+            }
+
+            $original = self::with('prescription')->find($administration->corrects_administration_id);
+
+            // PRN corrections need more than a replacement outcome. A PRN dose
+            // also carries an actual amount, spends interval/count/amount
+            // allowance, may move stock, and may create an effectiveness
+            // follow-up. The generic correction workflow does not yet capture
+            // those consequences, so it must not append a clinically partial
+            // PRN correction while pretending the record is complete.
+            if ($original?->prescription?->kind === 'prn') {
+                throw new RuntimeException(
+                    'As-required medicine corrections need the PRN-specific correction pathway '
+                    .'so dose amount, limits, stock and follow-up stay together.'
+                );
+            }
+        });
+
         static::updating(function (self $administration) {
             foreach (self::FROZEN as $field) {
                 if ($administration->isDirty($field)) {
