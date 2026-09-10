@@ -155,4 +155,71 @@ class Record7ManagerRefusalConsistencyTest extends Record7TestCase
         $this->assertFalse($registry->conditionActive($key, $house->id));
         $this->assertNotContains($key, $this->boardKeys($house->id));
     }
+
+    public function test_a_refusal_corrected_away_is_not_left_on_manager_today(): void
+    {
+        $house = $this->rosewood();
+        $prescription = $this->prescription();
+        $client = Client::findOrFail($prescription->client_id);
+        $slot = 'CorrectedManagerRefusal-'.Str::random(10);
+
+        Round::create([
+            'organisation_id' => $house->organisation_id,
+            'service_id' => $house->id,
+            'round_date' => now()->toDateString(),
+            'slot' => $slot,
+            'started_by_user_id' => $this->user('olivia.carter')->id,
+            'started_at' => now()->subMinutes(25),
+        ]);
+
+        $dose = ScheduledDose::create([
+            'prescription_id' => $prescription->id,
+            'client_id' => $client->id,
+            'service_id' => $house->id,
+            'due_at' => now()->subMinutes(20),
+            'slot' => $slot,
+            'grace_minutes' => 60,
+        ]);
+
+        $refusal = Administration::create([
+            'reference' => 'TEST-CORRECTED-REFUSAL-'.Str::random(12),
+            'scheduled_dose_id' => $dose->id,
+            'prescription_id' => $prescription->id,
+            'client_id' => $client->id,
+            'service_id' => $house->id,
+            'recorded_by_user_id' => $this->user('olivia.carter')->id,
+            'outcome' => 'refused',
+            'reason_code' => 'client_declined',
+            'administered_at' => now()->subMinutes(15),
+        ]);
+
+        $key = 'refusal:'.$refusal->id;
+        $registry = app(IssueRegistry::class);
+
+        $this->assertTrue($registry->conditionActive($key, $house->id));
+        $this->assertContains($key, $this->boardKeys($house->id));
+
+        Administration::create([
+            'reference' => 'TEST-CORRECTED-REFUSAL-FIX-'.Str::random(12),
+            'scheduled_dose_id' => $dose->id,
+            'prescription_id' => $prescription->id,
+            'client_id' => $client->id,
+            'service_id' => $house->id,
+            'recorded_by_user_id' => $this->user('daniel.evans')->id,
+            'outcome' => 'given',
+            'reason_code' => 'manager_correction',
+            'administered_at' => now()->subMinutes(5),
+            'corrects_administration_id' => $refusal->id,
+        ]);
+
+        $this->assertFalse(
+            $registry->conditionActive($key, $house->id),
+            'A refusal corrected to given remains historical evidence, not a live refusal condition.'
+        );
+        $this->assertNotContains(
+            $key,
+            $this->boardKeys($house->id),
+            'Manager Today must not retain a refusal that has been append-only corrected away.'
+        );
+    }
 }
