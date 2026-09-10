@@ -953,13 +953,27 @@ class AdministrationRecorder
     /**
      * The unanswered "could not be found" concern for this person, if there is
      * one — so a screen can offer to answer it and nothing else can.
+     *
+     * The historical report is permanent, but the action is live state. It is
+     * no longer actionable once the report has been corrected away, somebody
+     * has recorded a structured welfare check, or the person's current status
+     * already records known whereabouts.
      */
     public function openWelfareConcernFor(int $serviceId, int $clientId): ?Administration
     {
+        $client = Client::where('service_id', $serviceId)->find($clientId);
+
+        if (! $client || $client->status !== 'active') {
+            return null;
+        }
+
         return Administration::where('service_id', $serviceId)
             ->where('client_id', $clientId)
             ->where('outcome', 'person_unavailable')
             ->where('reason_code', 'not_found_in_service')
+            ->whereNotExists(fn ($q) => $q->selectRaw('1')
+                ->from('record7_administrations as fix')
+                ->whereColumn('fix.corrects_administration_id', 'record7_administrations.id'))
             ->whereNotExists(fn ($q) => $q->selectRaw('1')
                 ->from('record7_welfare_checks')
                 ->whereColumn('record7_welfare_checks.administration_id', 'record7_administrations.id'))
