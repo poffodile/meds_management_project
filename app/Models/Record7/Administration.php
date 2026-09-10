@@ -115,16 +115,16 @@ class Administration extends Record7Model
      * scheduled_dose_id, leaving the real round dose looking unanswered.
      *
      * For a scheduled controlled prescription we therefore resolve the one
-     * matching dose from the person's CURRENT open round. Zero matches means
-     * there is no scheduled round context to write against; more than one means
-     * Record7 cannot know which obligation is being answered. Both fail closed
+     * matching dose from the person's CURRENT open round. If the browser did
+     * name a dose, that id has to describe this same person, prescription,
+     * service and current round; an old same-prescription dose is not accepted
+     * merely because its number is real. Zero or multiple matches fail closed
      * rather than guessing. PRN controlled medicines remain unplanned and are
      * untouched by this rule.
      */
     private static function anchorScheduledControlledDrug(self $administration): void
     {
-        if ($administration->scheduled_dose_id !== null
-            || $administration->corrects_administration_id !== null
+        if ($administration->corrects_administration_id !== null
             || $administration->cd_register_id === null
             || $administration->prescription_id === null) {
             return;
@@ -150,6 +150,25 @@ class Administration extends Record7Model
             throw new RuntimeException(
                 'This is a scheduled controlled medicine. Open or reopen its medication round before recording it.'
             );
+        }
+
+        if ($administration->scheduled_dose_id !== null) {
+            $named = ScheduledDose::where('id', $administration->scheduled_dose_id)
+                ->where('service_id', $round->service_id)
+                ->where('client_id', $client->id)
+                ->where('prescription_id', $prescription->id)
+                ->first();
+
+            if ($named === null
+                || $named->due_at->toDateString() !== $round->round_date->toDateString()
+                || $named->slot !== $round->slot) {
+                throw new RuntimeException(
+                    'That scheduled dose is not part of this person’s current open round. '
+                    .'Do not attach a controlled-drug record to an older or different dose.'
+                );
+            }
+
+            return;
         }
 
         $matches = ScheduledDose::where('service_id', $round->service_id)
