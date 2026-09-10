@@ -48,25 +48,24 @@ class CorrectionController extends R7Controller
     }
 
     /**
-     * THE OUTCOMES A CORRECTION MAY ASK FOR.
+     * THE OUTCOMES THE GENERIC CORRECTION FORM CAN SAFELY CREATE.
      *
-     * Taken to match ManagerActions::correct() exactly. A request naming
-     * anything outside this list is refused there with "there is nothing to
-     * approve", so it is refused here instead, where the person can still fix
-     * it.
+     * `given` and `self_administered` are complete replacement outcomes in the
+     * current generic contract. The non-taken outcomes are deliberately absent:
+     * Section 2.3 requires structured reasons, and `missed` additionally needs
+     * structured action/escalation evidence. The generic correction form stores
+     * only an outcome plus free text, so allowing it to create `refused`,
+     * `not_available`, `missed` or `person_unavailable` would append a clinically
+     * partial replacement record. `withheld` remains unavailable for its separate
+     * clinical-authority reason.
      *
-     * `withheld` is deliberately absent. Recording that a medicine was
-     * withheld needs a structured instruction/authority/evidence model that
-     * Record7 does not yet hold. A correction must not become a way around that
-     * missing clinical-authority control.
+     * This does not stop an incorrect non-taken record being corrected AWAY to
+     * a taken outcome. It only prevents this generic pathway from creating a new
+     * non-taken outcome until its structured correction contract exists.
      */
     private const OUTCOMES = [
         'given' => 'It was given',
         'self_administered' => 'They took it themselves',
-        'refused' => 'They refused it',
-        'not_available' => 'It was not available',
-        'missed' => 'It was missed',
-        'person_unavailable' => 'The person was unavailable',
     ];
 
     /** The house from the session, the administration from the house. */
