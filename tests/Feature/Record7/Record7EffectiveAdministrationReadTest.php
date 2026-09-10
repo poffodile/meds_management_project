@@ -8,6 +8,7 @@ use App\Models\Record7\Prescription;
 use App\Models\Record7\ScheduledDose;
 use App\Models\Record7\Service;
 use App\Services\Record7\AdministrationRecorder;
+use App\Services\Record7\ManagerBoard;
 use App\Services\Record7\ShiftBoard;
 use Illuminate\Support\Str;
 
@@ -148,6 +149,32 @@ class Record7EffectiveAdministrationReadTest extends Record7TestCase
         $this->assertNull(
             app(AdministrationRecorder::class)->openRefusalFor($dose->fresh()),
             'A refusal corrected away remains in history but must no longer be actionable as a re-offer.'
+        );
+    }
+
+    public function test_manager_not_taken_list_uses_effective_outcome_and_does_not_count_a_correction_twice(): void
+    {
+        $prescription = $this->ordinaryScheduledPrescription();
+        $dose = $this->dose($prescription, 'ManagerEffective-'.Str::random(10));
+        $notAvailable = $this->administration($dose, 'not_available');
+
+        $before = collect(app(ManagerBoard::class)->outstandingOutcomes($dose->service_id)['notTaken']);
+        $this->assertTrue($before->contains(fn ($row) => $row['id'] === $notAvailable->id));
+
+        $this->administration($dose, 'given', $notAvailable->id);
+
+        $after = collect(app(ManagerBoard::class)->outstandingOutcomes($dose->service_id)['notTaken']);
+
+        $this->assertFalse(
+            $after->contains(fn ($row) => $row['id'] === $notAvailable->id),
+            'A medicine-unavailable event corrected to given must leave the manager not-taken list.'
+        );
+
+        $this->assertFalse(
+            $after->contains(fn ($row) => $row['id'] !== $notAvailable->id
+                && ($row['client'] ?? null) === $notAvailable->client->displayName()
+                && ($row['at'] ?? null) === $notAvailable->administered_at->format('H:i')),
+            'The correction row must not appear as a second not-taken medication event.'
         );
     }
 }
