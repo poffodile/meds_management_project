@@ -53,6 +53,7 @@ class Administration extends Record7Model
     protected static function booted(): void
     {
         static::creating(function (self $administration) {
+            self::anchorScheduledControlledDrug($administration);
             self::assertScheduledRoundWritable($administration);
 
             if ($administration->corrects_administration_id === null) {
@@ -101,6 +102,70 @@ class Administration extends Record7Model
         static::deleting(function () {
             throw new RuntimeException('A Record7 administration cannot be deleted.');
         });
+    }
+
+    /**
+     * Keep a scheduled controlled-drug administration attached to its planned
+     * obligation even though the controlled-drug workspace is person-scoped.
+     *
+     * Section 2.5 deliberately has to work outside a round for PRN medicines,
+     * so its route does not carry a round id. That became unsafe for a scheduled
+     * controlled medicine: the clinical record could be written with no
+     * scheduled_dose_id, leaving the real round dose looking unanswered.
+     *
+     * For a scheduled controlled prescription we therefore resolve the one
+     * matching dose from the person's CURRENT open round. Zero matches means
+     * there is no scheduled round context to write against; more than one means
+     * Record7 cannot know which obligation is being answered. Both fail closed
+     * rather than guessing. PRN controlled medicines remain unplanned and are
+     * untouched by this rule.
+     */
+    private static function anchorScheduledControlledDrug(self $administration): void
+    {
+        if ($administration->scheduled_dose_id !== null
+            || $administration->corrects_administration_id !== null
+            || $administration->cd_register_id === null
+            || $administration->prescription_id === null) {
+            return;
+        }
+
+        $prescription = Prescription::with('medicine')->find($administration->prescription_id);
+
+        if ($prescription?->kind !== 'scheduled' || ! $prescription->medicine?->is_controlled) {
+            return;
+        }
+
+        $client = Client::where('service_id', $administration->service_id)
+            ->find($administration->client_id);
+
+        if ($client === null) {
+            throw new RuntimeException('That controlled-drug record does not belong to this house.');
+        }
+
+        $round = app(\App\Services\Record7\RoundPersonView::class)
+            ->openRoundHolding((int) $administration->service_id, $client);
+
+        if ($round === null) {
+            throw new RuntimeException(
+                'This is a scheduled controlled medicine. Open or reopen its medication round before recording it.'
+            );
+        }
+
+        $matches = ScheduledDose::where('service_id', $round->service_id)
+            ->where('client_id', $client->id)
+            ->where('prescription_id', $prescription->id)
+            ->whereDate('due_at', $round->round_date->toDateString())
+            ->where('slot', $round->slot)
+            ->get();
+
+        if ($matches->count() !== 1) {
+            throw new RuntimeException(
+                'Record7 cannot identify one scheduled dose for this controlled medicine in the open round. '
+                .'Do not guess which dose this administration belongs to.'
+            );
+        }
+
+        $administration->scheduled_dose_id = $matches->first()->id;
     }
 
     /**
