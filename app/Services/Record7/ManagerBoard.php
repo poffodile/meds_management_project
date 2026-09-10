@@ -744,11 +744,12 @@ class ManagerBoard
     /**
      * Everything clinical that is still open in this house.
      *
-     * Resolved things are absent by construction rather than by a flag: a
-     * refusal that was re-offered and accepted is not in this list because a
-     * later "given" exists for the same prescription, and a follow-up that was
-     * answered is not pending. Nothing has to be tidied up afterwards, so
-     * nothing can be forgotten and left showing as a problem.
+     * Resolved things are absent by construction rather than by a flag. A
+     * refusal disappears only when IssueRegistry says this exact refused dose
+     * has an accepted linked re-offer; an unrelated later dose does not answer
+     * for it. A follow-up that was answered is not pending. Nothing has to be
+     * tidied up afterwards, so nothing can be forgotten and left showing as a
+     * problem.
      */
     public function outstandingOutcomes(int $serviceId, ?Carbon $now = null): array
     {
@@ -1209,7 +1210,7 @@ class ManagerBoard
             ->filter(fn ($dose) => $dose->isLate($now));
     }
 
-    /** Refused, with no later "given" for the same prescription. */
+    /** Refused until the shared clinical registry says this exact refusal is resolved. */
     private function unresolvedRefusals(int $serviceId, Carbon $now)
     {
         return Administration::with(['client'])
@@ -1217,10 +1218,11 @@ class ManagerBoard
             ->where('outcome', 'refused')
             ->where('administered_at', '>=', $now->copy()->subHours(self::RECENT_HOURS))
             ->get()
-            ->filter(fn ($administration) => ! Administration::where('prescription_id', $administration->prescription_id)
-                ->where('administered_at', '>', $administration->administered_at)
-                ->whereIn('outcome', ['given', 'self_administered'])
-                ->exists());
+            ->filter(fn ($administration) => $this->registry->conditionActive(
+                'refusal:'.$administration->id,
+                $serviceId,
+                $now
+            ));
     }
 
     /**
