@@ -122,8 +122,10 @@ class Record7EffectiveAdministrationReadTest extends Record7TestCase
 
         // Written later, but it corrects an older clinical event. It must not
         // become the effective state of the whole dose merely because its id is
-        // now the highest row id for this scheduled dose.
-        $this->administration($dose, 'missed', $firstRefusal->id);
+        // now the highest row id for this scheduled dose. Use an allowed taken
+        // correction here: generic corrections to new non-taken outcomes are
+        // deliberately blocked until their structured Section 2.3 data travels.
+        $this->administration($dose, 'self_administered', $firstRefusal->id);
 
         $answer = $dose->fresh()->effectiveAdministration();
 
