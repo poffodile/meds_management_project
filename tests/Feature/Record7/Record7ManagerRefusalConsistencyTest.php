@@ -94,12 +94,32 @@ class Record7ManagerRefusalConsistencyTest extends Record7TestCase
         $this->assertTrue($registry->conditionActive($key, $house->id));
         $this->assertContains($key, $this->boardKeys($house->id));
 
-        // A different administration of the same prescription is not a re-offer
-        // of this dose. It must not make Manager Today disagree with the shared
-        // clinical condition registry.
+        // A later scheduled obligation for the same prescription is still a
+        // different dose. The old Manager Today rule treated this later `given`
+        // as if somebody had gone back to the earlier refusal, which hid a live
+        // issue. It must remain unrelated unless it explicitly names the
+        // refusal as its re-offer.
+        $laterRound = Round::create([
+            'organisation_id' => $house->organisation_id,
+            'service_id' => $house->id,
+            'round_date' => now()->toDateString(),
+            'slot' => 'LaterDose-'.Str::random(10),
+            'started_by_user_id' => $this->user('olivia.carter')->id,
+            'started_at' => now()->subMinutes(15),
+        ]);
+
+        $laterDose = ScheduledDose::create([
+            'prescription_id' => $prescription->id,
+            'client_id' => $client->id,
+            'service_id' => $house->id,
+            'due_at' => now()->subMinutes(12),
+            'slot' => $laterRound->slot,
+            'grace_minutes' => 60,
+        ]);
+
         Administration::create([
             'reference' => 'TEST-UNRELATED-GIVEN-'.Str::random(12),
-            'scheduled_dose_id' => null,
+            'scheduled_dose_id' => $laterDose->id,
             'prescription_id' => $prescription->id,
             'client_id' => $client->id,
             'service_id' => $house->id,
@@ -110,7 +130,7 @@ class Record7ManagerRefusalConsistencyTest extends Record7TestCase
 
         $this->assertTrue(
             $registry->conditionActive($key, $house->id),
-            'An unrelated later given must not resolve the earlier refusal.'
+            'A later unrelated scheduled dose must not resolve the earlier refusal.'
         );
         $this->assertContains(
             $key,
