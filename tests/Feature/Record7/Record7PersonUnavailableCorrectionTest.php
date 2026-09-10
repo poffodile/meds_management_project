@@ -4,7 +4,11 @@ namespace Tests\Feature\Record7;
 
 use App\Models\Record7\Administration;
 use App\Models\Record7\Client;
+use App\Models\Record7\Prescription;
 use App\Models\Record7\ReviewItem;
+use App\Models\Record7\ScheduledDose;
+use App\Services\Record7\AdministrationRecorder;
+use App\Services\Record7\IssueRegistry;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -117,6 +121,68 @@ class Record7PersonUnavailableCorrectionTest extends Record7TestCase
         $this->assertSame('open', $item->fresh()->status, 'The failed approval was not rolled back.');
         $this->assertNull(
             Administration::where('corrects_administration_id', $original->id)->first()
+        );
+    }
+
+    public function test_correcting_a_not_found_report_away_closes_the_welfare_lifecycle_everywhere(): void
+    {
+        $service = $this->house('Rosewood House');
+        $prescription = Prescription::with(['client', 'medicine'])
+            ->where('kind', 'scheduled')
+            ->whereHas('client', fn ($query) => $query->where('service_id', $service->id))
+            ->whereHas('medicine', fn ($query) => $query->where('is_controlled', false))
+            ->firstOrFail();
+
+        $dose = ScheduledDose::create([
+            'prescription_id' => $prescription->id,
+            'client_id' => $prescription->client_id,
+            'service_id' => $service->id,
+            'due_at' => now()->subMinutes(17),
+            'slot' => 'WelfareCorrection-'.Str::random(8),
+            'grace_minutes' => 60,
+        ]);
+
+        $report = Administration::create([
+            'reference' => 'TEST-WELFARE-'.Str::upper(Str::random(10)),
+            'scheduled_dose_id' => $dose->id,
+            'prescription_id' => $prescription->id,
+            'client_id' => $prescription->client_id,
+            'service_id' => $service->id,
+            'recorded_by_user_id' => $this->user('olivia.carter')->id,
+            'outcome' => 'person_unavailable',
+            'reason_code' => 'not_found_in_service',
+            'notes' => 'Could not find the person in the service at the scheduled time.',
+            'administered_at' => now()->subMinutes(12),
+        ]);
+
+        $registry = app(IssueRegistry::class);
+        $recorder = app(AdministrationRecorder::class);
+        $key = 'welfare_check:'.$report->id;
+
+        $this->assertTrue($registry->conditionActive($key, $service->id));
+        $this->assertSame($report->id, $recorder->openWelfareConcernFor($service->id, $report->client_id)?->id);
+
+        Administration::create([
+            'reference' => 'TEST-WELFARE-FIX-'.Str::upper(Str::random(10)),
+            'scheduled_dose_id' => $dose->id,
+            'prescription_id' => $prescription->id,
+            'client_id' => $prescription->client_id,
+            'service_id' => $service->id,
+            'recorded_by_user_id' => $this->user('daniel.evans')->id,
+            'outcome' => 'given',
+            'reason_code' => 'manager_correction',
+            'notes' => 'Approved correction: the person was present and the medicine was given.',
+            'administered_at' => now()->subMinutes(5),
+            'corrects_administration_id' => $report->id,
+        ]);
+
+        $this->assertFalse(
+            $registry->conditionActive($key, $service->id),
+            'A corrected-away not-found report must not remain a live welfare condition.'
+        );
+        $this->assertNull(
+            $recorder->openWelfareConcernFor($service->id, $report->client_id),
+            'The round screen must not continue offering a welfare action for a corrected-away report.'
         );
     }
 }
