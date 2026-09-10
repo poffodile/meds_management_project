@@ -262,7 +262,7 @@ class RoundPersonView
      */
     private function medicines(Round $round, Client $client, Carbon $now): array
     {
-        return ScheduledDose::with(['prescription.medicine', 'latestAdministration.recordedBy'])
+        return ScheduledDose::with(['prescription.medicine'])
             ->where('client_id', $client->id)
             ->where('service_id', $round->service_id)
             ->whereDate('due_at', $round->round_date->toDateString())
@@ -276,8 +276,14 @@ class RoundPersonView
                 $eligibility = $this->recorder->eligibility($dose, $client);
                 $openRefusal = $this->recorder->openRefusalFor($dose);
 
-                // The answer that stands, not whichever row came back first.
-                $answer = $dose->latestAdministration;
+                // A correction changes the meaning of one clinical event; it
+                // is not a newer administration. Resolve the effective meaning
+                // first, then recover the underlying event for who/when and
+                // refusal-chain context.
+                $answer = $dose->effectiveAdministration();
+                $event = $answer?->corrects_administration_id
+                    ? Administration::find($answer->corrects_administration_id)
+                    : $answer;
 
                 return [
                     'doseId' => $dose->id,
@@ -344,27 +350,24 @@ class RoundPersonView
                     // administration.
                     'recordedCode' => $answer?->outcome,
 
-                    // Kept visible after the event. A worker who has just
-                    // signed for something has to be able to look at it and see
-                    // the time and the name, or the only way to check is to
-                    // record it again.
-                    'recordedAt' => $answer?->administered_at->format('H:i'),
-                    'recordedBy' => $answer?->recordedBy?->displayName(),
+                    // The effective outcome may come from a manager-approved
+                    // correction, but that manager did not perform the clinical
+                    // act. Keep the time and actor from the event being corrected.
+                    'recordedAt' => $event?->administered_at->format('H:i'),
+                    'recordedBy' => $event?->recordedBy?->displayName(),
 
-                    // The record itself, so somebody who sees that it is wrong
-                    // can ask about THAT row rather than about the dose. A dose
-                    // may carry a refusal and a re-offer; a correction has to
-                    // name which of them it means.
+                    // The effective record id is retained for audit/navigation.
+                    // Once it is a correction the screen will not offer another
+                    // generic correction against it.
                     'administrationId' => $answer?->id,
 
-                    // A correction is asked about a record that has not already
-                    // been corrected and is not itself a correction. Worked out
-                    // here so the round does not offer a door the correction
-                    // screen would immediately close.
-                    'correctable' => $answer !== null
-                        && $answer->corrects_administration_id === null
+                    // A correction is asked about a real event that has not
+                    // already been corrected. Corrections themselves are never
+                    // offered as new correction targets.
+                    'correctable' => $event !== null
+                        && $answer?->id === $event->id
                         && ! Administration::where('service_id', $dose->service_id)
-                            ->where('corrects_administration_id', $answer->id)
+                            ->where('corrects_administration_id', $event->id)
                             ->exists(),
 
                     // ONE WORD FOR ONE OUTCOME, RESOLVED HERE.
@@ -380,7 +383,8 @@ class RoundPersonView
                     // moment it was signed for the late marker vanished — and a
                     // medicine given eight hours late then read exactly like
                     // one given on time. The delay is measured against the
-                    // moment it was actually given and kept.
+                    // moment the clinical event actually happened, not the later
+                    // time somebody approved a correction.
                     // WHY, not just WHAT. A refusal that does not say why is a
                     // gap in the record, and the worker who wrote it a minute
                     // ago is the only person who can still fill it in.
@@ -403,13 +407,13 @@ class RoundPersonView
                     // Present means the screen may offer a second attempt; the
                     // recorder and the database both check it again.
                     'reofferOf' => $openRefusal?->id,
-                    'reofferedFrom' => $answer?->reoffer_of_administration_id
-                        ? $this->earlierAnswer($answer)
+                    'reofferedFrom' => $event?->reoffer_of_administration_id
+                        ? $this->earlierAnswer($event)
                         : null,
 
-                    'recordedLatePhrase' => $answer
-                        && $dose->minutesLate($answer->administered_at) > 0
-                            ? $this->duration($dose->minutesLate($answer->administered_at))
+                    'recordedLatePhrase' => $event
+                        && $dose->minutesLate($event->administered_at) > 0
+                            ? $this->duration($dose->minutesLate($event->administered_at))
                             : null,
 
                     // Whether Section 2.2 can honestly record this as given,
