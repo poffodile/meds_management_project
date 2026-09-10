@@ -239,9 +239,15 @@ class ShiftBoard
             'total' => $doses->count(),
             'recorded' => $recorded->count(),
             'remaining' => $doses->count() - $recorded->count(),
-            'notTaken' => $recorded->filter(
-                fn ($dose) => in_array($dose->administration->outcome, Administration::NOT_TAKEN, true)
-            )->count(),
+            // Outcome is the one fact here that cannot be read from the simple
+            // existence relation. A correction changes what the latest actual
+            // event says without changing the fact that the dose was answered.
+            'notTaken' => $recorded->filter(function ($dose) {
+                $answer = $dose->effectiveAdministration();
+
+                return $answer !== null
+                    && in_array($answer->outcome, Administration::NOT_TAKEN, true);
+            })->count(),
             'peopleAway' => Client::where('service_id', $serviceId)
                 ->where('status', '!=', 'active')->count(),
         ];
@@ -439,6 +445,12 @@ class ShiftBoard
     /**
      * What has already been done, so nobody does it twice.
      *
+     * One row here is one actual medication event. A correction does not mean
+     * somebody administered another medicine; it changes what an earlier event
+     * should say while the original actor and time remain the clinical act.
+     * Showing a correction as another completed medicine inflates the count and
+     * can make a shift look as though an extra dose happened.
+     *
      * The commonest double-dose near-miss on a shift change is somebody
      * repeating a round the previous person had already finished but not yet
      * mentioned. This is the answer to "has Margaret had her morning ones?"
@@ -447,21 +459,32 @@ class ShiftBoard
     {
         $now ??= now();
 
-        $entries = Administration::with(['client', 'recordedBy'])
+        $events = Administration::with(['client', 'recordedBy'])
             ->where('service_id', $serviceId)
+            ->whereNull('corrects_administration_id')
             ->where('administered_at', '>=', $now->copy()->subHours(self::RECENT_HOURS))
             ->orderByDesc('administered_at')
             ->limit(20)
-            ->get()
-            ->map(fn ($administration) => [
-                'id' => $administration->id,
-                'client' => $administration->client->displayName(),
-                'outcome' => $administration->outcome,
-                'outcomeWord' => $administration->outcomeWord(),
-                'taken' => $administration->wasTaken(),
-                'at' => $administration->administered_at->format('H:i'),
-                'by' => $administration->recordedBy?->displayName(),
-            ])->all();
+            ->get();
+
+        $entries = $events->map(function (Administration $event) use ($serviceId) {
+            $answer = Administration::where('service_id', $serviceId)
+                ->where('corrects_administration_id', $event->id)
+                ->first() ?? $event;
+
+            return [
+                // Keep the clinical event identity. The correction is evidence
+                // about this event, not another administration to repeat or count.
+                'id' => $event->id,
+                'client' => $event->client->displayName(),
+                'outcome' => $answer->outcome,
+                'outcomeWord' => $answer->outcomeWord(),
+                'taken' => $answer->wasTaken(),
+                'at' => $event->administered_at->format('H:i'),
+                'by' => $event->recordedBy?->displayName(),
+                'corrected' => $answer->id !== $event->id,
+            ];
+        })->all();
 
         return [
             // The band is collapsed, so the summary is what most people ever
