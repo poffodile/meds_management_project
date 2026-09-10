@@ -7,6 +7,7 @@ use App\Models\Record7\Client;
 use App\Models\Record7\Prescription;
 use App\Models\Record7\ScheduledDose;
 use App\Models\Record7\Service;
+use App\Services\Record7\AdministrationRecorder;
 use App\Services\Record7\ShiftBoard;
 use Illuminate\Support\Str;
 
@@ -128,5 +129,25 @@ class Record7EffectiveAdministrationReadTest extends Record7TestCase
         $this->assertNotNull($answer);
         $this->assertSame($acceptedReoffer->id, $answer->id);
         $this->assertSame('given', $answer->outcome);
+    }
+
+    public function test_a_refusal_corrected_to_given_is_not_still_offered_for_reoffer(): void
+    {
+        $prescription = $this->ordinaryScheduledPrescription();
+        $dose = $this->dose($prescription, 'CorrectedRefusal-'.Str::random(10));
+        $refusal = $this->administration($dose, 'refused');
+
+        $this->assertSame(
+            $refusal->id,
+            app(AdministrationRecorder::class)->openRefusalFor($dose)?->id,
+            'The uncorrected refusal is the live re-offer target.'
+        );
+
+        $this->administration($dose, 'given', $refusal->id);
+
+        $this->assertNull(
+            app(AdministrationRecorder::class)->openRefusalFor($dose->fresh()),
+            'A refusal corrected away remains in history but must no longer be actionable as a re-offer.'
+        );
     }
 }
