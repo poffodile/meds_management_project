@@ -87,6 +87,19 @@ class Administration extends Record7Model
                     .'so the clinical record and register stay together.'
                 );
             }
+
+            // The generic correction request stores only the replacement outcome
+            // and free-text detail. Section 2.3 requires structured evidence for
+            // every non-taken outcome: a reason for refusal/unavailability, and
+            // for a missed dose the action/escalation as well. Until that data
+            // travels with the correction, appending a new non-taken outcome
+            // here would create a clinically partial permanent record.
+            if (in_array($administration->outcome, self::NOT_TAKEN, true)) {
+                throw new RuntimeException(
+                    'Non-taken outcome corrections need the structured Section 2.3 correction pathway '
+                    .'so the clinical reason and required action evidence stay with the permanent record.'
+                );
+            }
         });
 
         static::updating(function (self $administration) {
