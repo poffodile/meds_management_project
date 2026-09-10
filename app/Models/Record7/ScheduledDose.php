@@ -31,9 +31,18 @@ class ScheduledDose extends Record7Model
         return $this->belongsTo(Client::class, 'client_id');
     }
 
+    /**
+     * The newest append-only answer attached to this planned dose.
+     *
+     * Most callers ask only whether an answer exists, and latest-of-many keeps
+     * that meaning unchanged. A few Today/round readers also inspect the
+     * outcome, though, and a plain hasOne lets the database hand back an
+     * arbitrary row once a refusal, re-offer or correction has been appended.
+     * Those readers must never depend on row-return order for a clinical fact.
+     */
     public function administration(): HasOne
     {
-        return $this->hasOne(Administration::class, 'scheduled_dose_id');
+        return $this->hasOne(Administration::class, 'scheduled_dose_id')->latestOfMany();
     }
 
     /**
@@ -41,9 +50,7 @@ class ScheduledDose extends Record7Model
      *
      * A dose can carry a chain — refused, offered again, refused again, taken.
      * Every row stays, and the one that describes where the dose has got to is
-     * the last one written. `administration()` returns whichever the database
-     * hands back first, which is fine for asking "has this been answered?" and
-     * wrong for showing what happened.
+     * the last one written.
      */
     public function latestAdministration(): HasOne
     {
