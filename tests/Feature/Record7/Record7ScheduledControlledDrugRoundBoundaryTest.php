@@ -169,4 +169,41 @@ class Record7ScheduledControlledDrugRoundBoundaryTest extends Record7TestCase
             request()
         );
     }
+
+    public function test_a_posted_scheduled_cd_dose_id_from_another_round_is_refused(): void
+    {
+        $prescription = $this->copyPrescription();
+        $person = Client::findOrFail($prescription->client_id);
+        $house = $this->oakwood();
+
+        $olderRound = Round::create([
+            'organisation_id' => $house->organisation_id,
+            'service_id' => $house->id,
+            'round_date' => now()->toDateString(),
+            'slot' => 'OlderCd-'.Str::random(12),
+            'started_by_user_id' => $this->user('noah.williams')->id,
+            'started_at' => now()->subHours(2),
+        ]);
+        $staleDose = $this->dose($olderRound, $prescription, 0);
+
+        $currentRound = $this->roundFor($prescription);
+        $this->dose($currentRound, $prescription, 1);
+        $this->seedStock($prescription, $person);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('not part of this person’s current open round');
+
+        app(ControlledDrugAdministration::class)->give(
+            $this->user('noah.williams'),
+            $house,
+            $person,
+            $prescription,
+            $staleDose,
+            (float) ($prescription->dose_min ?? 1),
+            $this->witnessId($house),
+            null,
+            'Stale scheduled-dose id from another round.',
+            request()
+        );
+    }
 }
