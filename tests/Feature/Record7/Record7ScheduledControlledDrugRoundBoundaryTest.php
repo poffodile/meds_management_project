@@ -33,7 +33,7 @@ class Record7ScheduledControlledDrugRoundBoundaryTest extends Record7TestCase
         }
     }
 
-    private function house(): Service
+    private function oakwood(): Service
     {
         return $this->house('Oakwood House');
     }
@@ -42,7 +42,7 @@ class Record7ScheduledControlledDrugRoundBoundaryTest extends Record7TestCase
     {
         return Prescription::with('medicine')
             ->where('kind', 'scheduled')
-            ->whereHas('client', fn ($q) => $q->where('service_id', $this->house()->id))
+            ->whereHas('client', fn ($q) => $q->where('service_id', $this->oakwood()->id))
             ->whereHas('medicine', fn ($q) => $q->where('is_controlled', true))
             ->firstOrFail();
     }
@@ -70,7 +70,7 @@ class Record7ScheduledControlledDrugRoundBoundaryTest extends Record7TestCase
 
     private function roundFor(Prescription $prescription): Round
     {
-        $house = $this->house();
+        $house = $this->oakwood();
 
         return Round::create([
             'organisation_id' => $house->organisation_id,
@@ -104,7 +104,7 @@ class Record7ScheduledControlledDrugRoundBoundaryTest extends Record7TestCase
 
     private function seedStock(Prescription $prescription, Client $person): void
     {
-        $house = $this->house();
+        $house = $this->oakwood();
 
         app(ControlledDrugAdministration::class)->receive(
             $this->user('noah.williams'),
@@ -128,12 +128,12 @@ class Record7ScheduledControlledDrugRoundBoundaryTest extends Record7TestCase
 
         $result = app(ControlledDrugAdministration::class)->give(
             $this->user('noah.williams'),
-            $this->house(),
+            $this->oakwood(),
             $person,
             $prescription,
             null,
             (float) ($prescription->dose_min ?? 1),
-            $this->witnessId($this->house()),
+            $this->witnessId($this->oakwood()),
             null,
             'Scheduled controlled medicine.',
             request()
@@ -158,12 +158,12 @@ class Record7ScheduledControlledDrugRoundBoundaryTest extends Record7TestCase
 
         app(ControlledDrugAdministration::class)->give(
             $this->user('noah.williams'),
-            $this->house(),
+            $this->oakwood(),
             $person,
             $prescription,
             null,
             (float) ($prescription->dose_min ?? 1),
-            $this->witnessId($this->house()),
+            $this->witnessId($this->oakwood()),
             null,
             'Ambiguous scheduled controlled medicine.',
             request()
