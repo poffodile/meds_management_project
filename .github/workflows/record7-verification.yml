@@ -84,6 +84,8 @@ jobs:
   frontend-build:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    permissions:
+      contents: write
 
     steps:
       - name: Check out branch
@@ -101,11 +103,26 @@ jobs:
       - name: Build frontend
         run: npm run build
 
-      - name: Retain regenerated lockfile
-        uses: actions/upload-artifact@v4
-        with:
-          name: record7-regenerated-package-lock
-          path: package-lock.json
+      - name: Commit exact regenerated lockfile
+        shell: bash
+        run: |
+          if git diff --quiet -- package-lock.json; then
+            echo "Committed lockfile is already reproducible."
+            exit 0
+          fi
+
+          changed="$(git diff --name-only)"
+          if [ "$changed" != "package-lock.json" ]; then
+            echo "Refusing to commit because files other than package-lock.json changed:"
+            printf '%s\n' "$changed"
+            exit 1
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package-lock.json
+          git commit -m "build: refresh frontend lockfile"
+          git push origin HEAD:record7-section0-access
 
       - name: Verify committed lockfile is reproducible
         run: git diff --exit-code -- package-lock.json
