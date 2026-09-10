@@ -303,14 +303,24 @@ class IssueRegistry
         }
 
         // Nothing is being counted for this person and this medicine, so there
-        // is no balance to be wrong and nothing to verify.
-        $balance = StockBalance::where('client_id', $correction->client_id)
+        // is no balance to be wrong and nothing to verify. More than one
+        // preparation is different: medicine identity alone cannot prove which
+        // balance the historical dose came from, so one arbitrary count must
+        // never clear the requirement.
+        $balances = StockBalance::where('service_id', $serviceId)
+            ->where('client_id', $correction->client_id)
             ->where('medicine_id', $medicineId)
-            ->first();
+            ->get();
 
-        if ($balance === null) {
+        if ($balances->isEmpty()) {
             return false;
         }
+
+        if ($balances->count() !== 1) {
+            return true;
+        }
+
+        $balance = $balances->first();
 
         // FROM THE MOMENT OF THE CORRECTION ONWARDS, not strictly after it.
         //
@@ -382,6 +392,19 @@ class IssueRegistry
             return false;
         }
 
+        // The historical report remains forever, but a direct append-only
+        // correction changes what that event now means. A report corrected away
+        // must not leave a welfare condition live merely because its original
+        // row is permanent.
+        $effective = Administration::where('service_id', $serviceId)
+            ->where('corrects_administration_id', $report->id)
+            ->first() ?? $report;
+
+        if ($effective->outcome !== 'person_unavailable'
+            || $effective->reason_code !== 'not_found_in_service') {
+            return false;
+        }
+
         // 1. SOMEBODY WENT AND LOOKED, AND SAID WHAT THEY FOUND.
         //    A structured record naming this concern, this person, this house
         //    and this organisation. Not an acknowledgement, not a note, not a
@@ -409,6 +432,17 @@ class IssueRegistry
         $refusal = Administration::where('service_id', $serviceId)->find($id);
 
         if (! $refusal || $refusal->outcome !== 'refused') {
+            return false;
+        }
+
+        // The original refusal is permanent, but its direct append-only
+        // correction determines whether it is still a refusal at all. If it was
+        // corrected away, the refusal lifecycle ends before re-offers are asked.
+        $effectiveRefusal = Administration::where('service_id', $serviceId)
+            ->where('corrects_administration_id', $refusal->id)
+            ->first() ?? $refusal;
+
+        if ($effectiveRefusal->outcome !== 'refused') {
             return false;
         }
 
