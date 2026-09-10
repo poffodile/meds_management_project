@@ -273,7 +273,7 @@ class AdministrationRecorder
         $shortfall = null;
 
         if (! $cover['sufficient']) {
-            // The record shows less than this dose needs. The dose is not
+            // The record shows less of this medicine than that. The dose is not
             // refused — somebody checked and it was there — but Record7 will
             // not claim a balance it cannot support, so the verification is
             // required and the resulting position is kept, negative and all.
@@ -951,41 +951,29 @@ class AdministrationRecorder
     }
 
     /**
-     * The unanswered "could not be found" concern for this person, if there is
-     * one — so a screen can offer to answer it and nothing else can.
-     */
-    public function openWelfareConcernFor(int $serviceId, int $clientId): ?Administration
-    {
-        return Administration::where('service_id', $serviceId)
-            ->where('client_id', $clientId)
-            ->where('outcome', 'person_unavailable')
-            ->where('reason_code', 'not_found_in_service')
-            ->whereNotExists(fn ($q) => $q->selectRaw('1')
-                ->from('record7_welfare_checks')
-                ->whereColumn('record7_welfare_checks.administration_id', 'record7_administrations.id'))
-            ->orderByDesc('id')
-            ->first();
-    }
-
-    /**
-     * The refusal on this dose that is still waiting for a second offer, if
-     * there is one.
+     * The refusal state on this dose that is still waiting for another offer.
      *
-     * A refusal that has already been offered again is closed to further
-     * attempts — the next attempt chains from THAT answer instead, so two
-     * workers cannot both re-offer the same refusal and produce two competing
-     * second attempts.
+     * The raw row is not enough once corrections exist. Start with the latest
+     * real clinical event in the dose chain, then apply that event's correction.
+     * If what now stands is not a refusal there is nothing to re-offer. If it is
+     * a refusal, the effective row is the target — this also handles a recorded
+     * `given` that was later corrected to `refused` without rewriting either row.
+     *
+     * One direct answer per refusal remains enforced by the generated dose claim
+     * and the database trigger; a refusal already re-offered is not actionable
+     * again, and the next refusal in the chain becomes the new target instead.
      */
     public function openRefusalFor(ScheduledDose $dose): ?Administration
     {
-        $refusals = Administration::where('scheduled_dose_id', $dose->id)
-            ->where('outcome', 'refused')
-            ->orderBy('id')
-            ->get();
+        $refusal = $dose->effectiveAdministration();
 
-        return $refusals->first(fn ($refusal) => ! Administration::where(
-            'reoffer_of_administration_id', $refusal->id
-        )->exists());
+        if ($refusal === null || $refusal->outcome !== 'refused') {
+            return null;
+        }
+
+        return Administration::where('reoffer_of_administration_id', $refusal->id)->exists()
+            ? null
+            : $refusal;
     }
 
     private function createWelfareAttention(Round $round, Administration $administration): void
