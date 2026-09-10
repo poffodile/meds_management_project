@@ -53,6 +53,8 @@ class Administration extends Record7Model
     protected static function booted(): void
     {
         static::creating(function (self $administration) {
+            self::assertScheduledRoundWritable($administration);
+
             if ($administration->corrects_administration_id === null) {
                 return;
             }
@@ -99,6 +101,47 @@ class Administration extends Record7Model
         static::deleting(function () {
             throw new RuntimeException('A Record7 administration cannot be deleted.');
         });
+    }
+
+    /**
+     * A scheduled clinical act and a round closure must settle in one order.
+     *
+     * The ordinary and controlled-drug recorders both create their clinical row
+     * inside a transaction. Locking the matching round here makes that row share
+     * the same serialization point as RoundLifecycle::close(): if the medicine
+     * gets the lock first, the manager waits and their close snapshot includes
+     * it; if the manager closes first, this sees the closed lifecycle and the
+     * surrounding medicine/stock transaction rolls back.
+     *
+     * Corrections are deliberately different. They are retrospective append-only
+     * evidence about a record that already existed when the manager signed. A
+     * correction may therefore be appended after closure without reopening the
+     * round or altering the immutable close-time snapshot.
+     */
+    private static function assertScheduledRoundWritable(self $administration): void
+    {
+        if ($administration->scheduled_dose_id === null
+            || $administration->corrects_administration_id !== null) {
+            return;
+        }
+
+        $dose = ScheduledDose::find($administration->scheduled_dose_id);
+
+        if ($dose === null) {
+            return;
+        }
+
+        $round = Round::where('service_id', $dose->service_id)
+            ->whereDate('round_date', $dose->due_at->toDateString())
+            ->where('slot', $dose->slot)
+            ->lockForUpdate()
+            ->first();
+
+        if ($round?->isClosed()) {
+            throw new RuntimeException(
+                'That round has been closed by a manager. Reopen it before recording another scheduled outcome.'
+            );
+        }
     }
 
     public function prescription(): BelongsTo
