@@ -54,12 +54,6 @@ jobs:
           extensions: mbstring, intl, pdo_mysql, pdo_sqlite
           coverage: none
 
-      - name: Set up Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: npm
-
       - name: Install PHP dependencies
         run: composer install --no-interaction --no-progress --prefer-dist
 
@@ -71,12 +65,6 @@ jobs:
       - name: Create disposable test databases
         run: |
           php -r '$pdo = new PDO("mysql:host=127.0.0.1;port=3306", "root", "record7-ci-root"); $pdo->exec("CREATE DATABASE IF NOT EXISTS laravel_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"); $pdo->exec("CREATE DATABASE IF NOT EXISTS record7_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");'
-
-      - name: Install frontend dependencies
-        run: npm ci
-
-      - name: Build frontend
-        run: npm run build
 
       - name: Migrate isolated Record7 database
         run: php artisan migrate:fresh --database=record7 --path=database/migrations/record7 --force
@@ -92,3 +80,15 @@ jobs:
 
       - name: Run Record7 feature tests
         run: php artisan test tests/Feature/Record7
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Build frontend
+        run: npm run build
