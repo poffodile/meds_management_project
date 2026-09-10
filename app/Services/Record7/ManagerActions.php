@@ -407,17 +407,12 @@ class ManagerActions
             throw new RuntimeException('That correction request does not name a record to correct.');
         }
 
-        // `withheld` is deliberately absent until Record7 can prove the
-        // instruction/authority/evidence for withholding. Manager correction
-        // approval must not be a back door around that clinical-authority gap.
-        $outcomes = [
-            'given',
-            'self_administered',
-            'refused',
-            'not_available',
-            'missed',
-            'person_unavailable',
-        ];
+        // The generic correction request carries a replacement outcome plus
+        // free text. Only the two taken outcomes are complete under that
+        // contract. Section 2.3 non-taken outcomes need their structured reason
+        // (and missed-dose action evidence), while withheld still needs its own
+        // clinical-authority contract.
+        $outcomes = ['given', 'self_administered'];
 
         // THE MANAGER APPROVES A REQUEST — THEY DO NOT WRITE ONE.
         // The person who was there says what they believe happened; the manager
@@ -425,6 +420,13 @@ class ManagerActions
         // moment of approving would be a new clinical judgement wearing
         // somebody else's request as a disguise.
         $requested = $item->requested_outcome;
+
+        if (in_array($requested, ['refused', 'not_available', 'missed', 'person_unavailable'], true)) {
+            throw new RuntimeException(
+                'That replacement outcome needs the structured Section 2.3 correction pathway '
+                .'before it can be approved here.'
+            );
+        }
 
         if (! in_array($requested, $outcomes, true)) {
             throw new RuntimeException(
@@ -497,8 +499,8 @@ class ManagerActions
      * What a corrected outcome does to the cupboard.
      *
      * THE ATTRIBUTABLE QUANTITY, NOT "THE ORIGINAL DEBIT". An administration
-     * movement debits `given + wasted`, and correcting the outcome does not
-     * un-waste anything: the wasted portion was destroyed as a separate
+     * movement debits `given + wasted`, and correcting the clinical outcome does
+     * not un-waste anything: the wasted portion was destroyed as a separate
      * physical act that no clinical correction has touched. So only
      * `quantity_given` comes back, and any return or waste on the original
      * episode stands until separately corrected with its own evidence.
