@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 jobs:
-  record7-verification:
+  record7-backend:
     runs-on: ubuntu-latest
     timeout-minutes: 25
 
@@ -81,14 +81,25 @@ jobs:
       - name: Run Record7 feature tests
         run: php artisan test tests/Feature/Record7
 
+  frontend-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v4
+
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: npm
 
-      - name: Install frontend dependencies
-        run: npm ci
+      - name: Resolve frontend dependency graph for diagnostic build
+        run: npm install --no-audit --no-fund
 
       - name: Build frontend
         run: npm run build
+
+      - name: Verify committed lockfile is reproducible
+        run: git diff --exit-code -- package-lock.json
