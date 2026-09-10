@@ -2,6 +2,7 @@
 
 namespace App\Models\Record7;
 
+use App\Exceptions\Record7RoundClosed;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use RuntimeException;
 
@@ -203,7 +204,7 @@ class Administration extends Record7Model
             ->first();
 
         if ($round?->isClosed()) {
-            throw new RuntimeException(
+            throw new Record7RoundClosed(
                 'That round has been closed by a manager. Reopen it before recording another scheduled outcome.'
             );
         }
