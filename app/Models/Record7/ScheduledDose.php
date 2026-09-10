@@ -31,44 +31,43 @@ class ScheduledDose extends Record7Model
         return $this->belongsTo(Client::class, 'client_id');
     }
 
-    /**
-     * The latest actual clinical event attached to this planned dose.
-     *
-     * Corrections are not another attempt at the medicine. They describe what
-     * one earlier event should have said. Excluding them here preserves the
-     * simple question most callers ask — has this planned obligation received
-     * any clinical answer? — without allowing a later correction to an older
-     * refusal to jump ahead of a newer re-offer in the dose chain.
-     */
     public function administration(): HasOne
     {
-        return $this->hasOne(Administration::class, 'scheduled_dose_id')
-            ->whereNull('corrects_administration_id')
-            ->latestOfMany();
-    }
-
-    /** The latest actual event in the refusal/re-offer chain. */
-    public function latestAdministration(): HasOne
-    {
-        return $this->hasOne(Administration::class, 'scheduled_dose_id')
-            ->whereNull('corrects_administration_id')
-            ->latestOfMany();
+        return $this->hasOne(Administration::class, 'scheduled_dose_id');
     }
 
     /**
-     * What the latest clinical event says now.
+     * The answer that stands NOW.
      *
-     * First choose the latest real event — original administration or re-offer.
-     * Then, and only then, apply the one append-only correction that names that
-     * event. This is deliberately different from "latest row wins": a manager
-     * may correct an older refusal after a newer re-offer exists, and that older
-     * correction must not become the current state of the whole scheduled dose.
+     * A dose can carry a chain — refused, offered again, refused again, taken.
+     * Every row stays, and the one that describes where the dose has got to is
+     * the last one written. `administration()` returns whichever the database
+     * hands back first, which is fine for asking "has this been answered?" and
+     * wrong for showing what happened.
+     */
+    public function latestAdministration(): HasOne
+    {
+        return $this->hasOne(Administration::class, 'scheduled_dose_id')->latestOfMany();
+    }
+
+    /**
+     * What the latest real clinical event says after its own correction.
+     *
+     * This is deliberately explicit rather than replacing either existing
+     * relationship while the read-side reconciliation is still in progress.
+     * First choose the latest non-correction event in the dose chain — original
+     * outcome or re-offer. Then apply the one append-only correction that names
+     * that event, if it has one.
+     *
+     * A correction to an older refusal must never jump ahead of a newer
+     * re-offer merely because the correction row was inserted later.
      */
     public function effectiveAdministration(): ?Administration
     {
-        $event = $this->relationLoaded('latestAdministration')
-            ? $this->latestAdministration
-            : $this->latestAdministration()->first();
+        $event = Administration::where('scheduled_dose_id', $this->id)
+            ->whereNull('corrects_administration_id')
+            ->orderByDesc('id')
+            ->first();
 
         if ($event === null) {
             return null;
