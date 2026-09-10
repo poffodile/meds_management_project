@@ -968,24 +968,26 @@ class AdministrationRecorder
     }
 
     /**
-     * The refusal on this dose that is still waiting for a second offer, if
-     * there is one.
+     * The refusal state on this dose that is still waiting for another offer.
      *
-     * A refusal that has already been offered again is closed to further
-     * attempts — the next attempt chains from THAT answer instead, so two
-     * workers cannot both re-offer the same refusal and produce two competing
-     * second attempts.
+     * A raw refusal row is not enough once corrections exist. Start with the
+     * latest real clinical event in the dose chain, then apply that event's
+     * append-only correction. If what now stands is not a refusal, there is
+     * nothing to re-offer. If it is a refusal, only that effective event is the
+     * current target; an older refusal cannot become actionable again merely
+     * because its historical row remains permanent.
      */
     public function openRefusalFor(ScheduledDose $dose): ?Administration
     {
-        $refusals = Administration::where('scheduled_dose_id', $dose->id)
-            ->where('outcome', 'refused')
-            ->orderBy('id')
-            ->get();
+        $refusal = $dose->effectiveAdministration();
 
-        return $refusals->first(fn ($refusal) => ! Administration::where(
-            'reoffer_of_administration_id', $refusal->id
-        )->exists());
+        if ($refusal === null || $refusal->outcome !== 'refused') {
+            return null;
+        }
+
+        return Administration::where('reoffer_of_administration_id', $refusal->id)->exists()
+            ? null
+            : $refusal;
     }
 
     private function createWelfareAttention(Round $round, Administration $administration): void
