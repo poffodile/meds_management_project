@@ -199,15 +199,11 @@ class AdministrationRecorder
         $prescription = $dose->prescription;
         $medicine = $prescription?->medicine;
 
-        // Controlled medicines are Section 2.5's, entirely.
         if (! $prescription || ! $medicine || $medicine->is_controlled) {
             return $none;
         }
 
-        // A medicine the person holds and manages themselves is not in stock
-        // Record7 accounts for, so no dose of it moves a balance.
         if (! $this->stock->consumesAccountedStock($prescription)) {
-            // Union keeps the LEFT side's keys, so the override goes first.
             return ['state' => 'self_managed'] + $none;
         }
 
@@ -245,16 +241,6 @@ class AdministrationRecorder
         ];
     }
 
-    /**
-     * Move the stock a recorded dose actually consumed.
-     *
-     * Called inside the transaction that will write the administration, so the
-     * two stand or fall together. The balance is locked before any arithmetic
-     * and the head moves last, inside the same lock.
-     *
-     * Returns null where there is nothing to move — an untracked medicine, an
-     * unquantified prescription, or a controlled one.
-     */
     private function debitForDose(
         User $user, Round $round, Client $client, ScheduledDose $dose, array $shortfallInput
     ): ?\App\Models\Record7\StockMovement {
@@ -267,16 +253,10 @@ class AdministrationRecorder
         $house = Service::findOrFail($round->service_id);
         $balance = $this->stock->lockExisting($position['balance']);
         $quantity = (float) $position['quantity'];
-
-        // RE-ASKED UNDER THE LOCK. What was true a moment ago is not evidence.
         $cover = $this->stock->canCover($balance, 'administration', $quantity);
         $shortfall = null;
 
         if (! $cover['sufficient']) {
-            // The record shows less than this dose needs. The dose is not
-            // refused — somebody checked and it was there — but Record7 will
-            // not claim a balance it cannot support, so the verification is
-            // required and the resulting position is kept, negative and all.
             $shortfall = $this->stock->verifyShortfall($user, $shortfallInput);
         }
 
@@ -293,14 +273,6 @@ class AdministrationRecorder
         );
     }
 
-    /**
-     * Find the dose, or refuse to admit it exists.
-     *
-     * Every filter is applied in the query rather than checked afterwards, so a
-     * dose belonging to another organisation, another house, another person,
-     * another date or another slot is not found rather than merely rejected —
-     * and the reply cannot be used to discover that it exists at all.
-     */
     public function resolve(Round $round, Client $client, int $doseId): ?ScheduledDose
     {
         return ScheduledDose::with(['prescription.medicine', 'administration'])
@@ -313,25 +285,11 @@ class AdministrationRecorder
             ->first();
     }
 
-    /**
-     * May this dose be recorded as given, and if not, what is the worker told?
-     *
-     * Order matters. "Already recorded" comes first because it is the answer to
-     * a retry rather than a refusal, and a worker who has just pressed the
-     * button twice should be told what happened, not lectured about controlled
-     * drugs.
-     *
-     * @return array{allowed:bool, code:?string, reason:?string, nextSection:?string}
-     */
     public function eligibility(ScheduledDose $dose, Client $client, bool $asReoffer = false): array
     {
         $prescription = $dose->prescription;
         $medicine = $prescription?->medicine;
 
-        // A re-offer exists BECAUSE an answer already exists. Every other check
-        // below still applies to it — support type, controlled drugs, PRN, the
-        // person being here — so a second offer can never sidestep a safeguard
-        // the first one was held to.
         if (! $asReoffer && $dose->administration !== null) {
             return $this->no(
                 'already_recorded',
@@ -350,8 +308,6 @@ class AdministrationRecorder
             );
         }
 
-        // PRN reasoning is a different question entirely — was it needed, has
-        // enough time passed, did it work afterwards. Section 2.4.
         if ($prescription->kind === 'prn') {
             return $this->no(
                 'as_required',
@@ -370,8 +326,6 @@ class AdministrationRecorder
             );
         }
 
-        // A controlled drug needs a second person to witness it. The general
-        // "given" button existing is not a reason to skip that.
         if ($medicine?->is_controlled) {
             return $this->no(
                 'witness_required',
@@ -393,8 +347,6 @@ class AdministrationRecorder
             );
         }
 
-        // Callum is in hospital. His dose stays planned and still needs an
-        // answer — but the answer is not "given".
         if (! $client->isAvailable()) {
             return $this->no(
                 'person_away',
@@ -407,11 +359,6 @@ class AdministrationRecorder
         return ['allowed' => true, 'code' => null, 'reason' => null, 'nextSection' => null];
     }
 
-    /**
-     * Write it, or hand back the record that already exists.
-     *
-     * @return array{administration:Administration, created:bool}
-     */
     public function recordGiven(
         User $user,
         Round $round,
@@ -421,14 +368,6 @@ class AdministrationRecorder
         Request $request,
         ?Administration $reofferOf = null
     ): array {
-        // SECTION 2.7. The stock movement and the clinical record describe one
-        // physical event and are written together. The movement goes first
-        // because the administration carries the reference: the other direction
-        // would mean writing the ledger row with a null link and UPDATING it,
-        // which is exactly what an append-only ledger must never allow.
-        //
-        // If the administration insert fails, the movement rolls back with it.
-        // There is no state in which a debit exists for a dose nobody recorded.
         $shortfallInput = $request->only([
             'shortfall_basis', 'shortfall_statement', 'shortfall_observed_quantity',
         ]);
@@ -446,30 +385,12 @@ class AdministrationRecorder
                         'prescription_id' => $dose->prescription_id,
                         'client_id' => $client->id,
                         'service_id' => $round->service_id,
-
-                        // THE AUTHENTICATED USER. Never an id from the request — a
-                        // worker must not be able to sign a medicine in somebody
-                        // else's name, and joining a colleague's round must not make
-                        // your actions look like theirs.
                         'recorded_by_user_id' => $user->id,
-
                         'outcome' => 'given',
-
-                        // No reason code. A medicine given as prescribed does not need
-                        // one, and forcing a choice would fill the record with filler.
                         'reason_code' => null,
                         'notes' => $this->cleanNotes($notes),
-
-                        // The server's clock. A browser can say anything, and the time
-                        // a medicine was given is a clinical fact. The dose's own
-                        // due_at is left exactly as it was.
                         'administered_at' => now(),
-
-                        // Set only when this is a second offer of the same dose. The
-                        // refusal it follows is never touched — it stays exactly as it
-                        // was recorded, and the two rows together tell the real story.
                         'reoffer_of_administration_id' => $reofferOf?->id,
-
                         'stock_movement_id' => $movement?->id,
                     ]);
                 }),
@@ -479,9 +400,6 @@ class AdministrationRecorder
                 $request
             );
         } catch (UniqueConstraintViolationException $clash) {
-            // Somebody — or another request from this same worker — got there
-            // first. The obligation is answered, so this is a safe outcome
-            // rather than an error. Hand back THEIR record.
             $existing = Administration::where('scheduled_dose_id', $dose->id)
                 ->whereNull('corrects_administration_id')
                 ->where(fn ($q) => $reofferOf
@@ -521,15 +439,6 @@ class AdministrationRecorder
         return ['administration' => $administration, 'created' => true];
     }
 
-    /**
-     * Record an explicit Section 2.3 outcome for a planned dose.
-     *
-     * This shares the same resolved round/client/dose context as Section 2.2.
-     * The method still validates every clinical boundary again because the
-     * posted outcome is only an assertion from a browser, not authority.
-     *
-     * @return array{administration:Administration, created:bool}
-     */
     public function recordNonAdministration(
         User $user,
         Round $round,
@@ -575,12 +484,6 @@ class AdministrationRecorder
         }
 
         $target = $this->reofferTarget($round, $client, $dose, $outcome, $input['reoffer_of_administration_id'] ?? null);
-
-        /* ── Section 2.7: did any of it physically leave the cupboard? ──── */
-
-        // Only a preparation that is being counted, and whose dose is known,
-        // has anything to declare. Anywhere else the honest answer is silence,
-        // and demanding one would be demanding a guess.
         $position = $this->stockPosition($client, $dose);
         $declaration = $this->stockDeclaration($position, $input);
 
@@ -652,31 +555,16 @@ class AdministrationRecorder
         return ['administration' => $administration, 'created' => true];
     }
 
-    /**
-     * What the recorder said about the cupboard, checked before anything moves.
-     *
-     * PHYSICAL MOVEMENT AND MAR OUTCOME ARE SEPARATE FACTS. A refusal where the
-     * tablet never left the pot moves nothing; the same refusal where it came
-     * out and went in the bin moves something. Only the person who was there
-     * knows which, so they are asked — and the answer is frozen on insert like
-     * every other clinical fact, in the model and in the trigger.
-     *
-     * @return array{declared:?bool, removed:bool, returned:float, wasted:float}
-     */
     private function stockDeclaration(array $position, array $input): array
     {
         if ($position['state'] !== 'tracked') {
-            // Nothing is being counted, or no quantity is knowable. There is
-            // no question to answer, so none is recorded.
             return ['declared' => null, 'removed' => false, 'returned' => 0.0, 'wasted' => 0.0];
         }
 
         $declared = $input['stock_no_quantity_removed'] ?? null;
 
         if ($declared === null || $declared === '') {
-            throw new RuntimeException(
-                'Say whether any of this medicine was taken out of stock.'
-            );
+            throw new RuntimeException('Say whether any of this medicine was taken out of stock.');
         }
 
         $noneRemoved = filter_var($declared, FILTER_VALIDATE_BOOLEAN);
@@ -693,9 +581,7 @@ class AdministrationRecorder
         }
 
         if ($returned + $wasted <= 0) {
-            throw new RuntimeException(
-                'Say how much went back into stock and how much was disposed of.'
-            );
+            throw new RuntimeException('Say how much went back into stock and how much was disposed of.');
         }
 
         return [
@@ -706,25 +592,13 @@ class AdministrationRecorder
         ];
     }
 
-    /**
-     * One movement for one physical episode: what came out, and where it went.
-     *
-     * Deliberately not a removal followed by a separate return. Two movements
-     * would let a crash between them leave a removal with nothing accounting
-     * for it, which is the state a ledger exists to make impossible.
-     */
     private function accountForRemoval(
         User $user, Round $round, Client $client, ScheduledDose $dose,
         array $position, array $declaration
     ): \App\Models\Record7\StockMovement {
         $house = Service::findOrFail($round->service_id);
         $balance = $this->stock->lockExisting($position['balance']);
-
         $removed = $declaration['returned'] + $declaration['wasted'];
-
-        // Only what was destroyed leaves the balance. What went back was never
-        // really gone, and recording it as a debit and a credit would say twice
-        // that something happened once.
         $cover = $this->stock->canCover($balance, 'non_administration', $declaration['wasted']);
 
         if (! $cover['sufficient']) {
@@ -752,15 +626,6 @@ class AdministrationRecorder
         );
     }
 
-    /**
-     * The structured trail, and nothing beyond it.
-     *
-     * Identifiers, both times and the outcome — enough to reconstruct exactly
-     * what was recorded and by whom. Deliberately no clinical free text: the
-     * notes belong on the clinical record, and copying them into the access
-     * audit would spread the same sensitive sentence across two tables with two
-     * different retention rules.
-     */
     private function trail(Round $round, Client $client, ScheduledDose $dose, Administration $administration): array
     {
         return [
@@ -771,19 +636,15 @@ class AdministrationRecorder
             'medicine_id' => $dose->prescription?->medicine_id,
             'scheduled_dose_id' => $dose->id,
             'support_type' => $dose->prescription?->support_type,
-
-            // BOTH times. Either one alone makes lateness unanswerable later.
             'due_at' => $dose->due_at->toIso8601String(),
             'administered_at' => $administration->administered_at->toIso8601String(),
             'minutes_late' => $dose->minutesLate($administration->administered_at),
-
             'outcome' => $administration->outcome,
             'administration_id' => $administration->id,
             'administration_reference' => $administration->reference,
         ];
     }
 
-    /** Empty is null, not an empty string pretending to be a note. */
     private function cleanNotes(?string $notes): ?string
     {
         $notes = trim((string) $notes);
@@ -841,21 +702,12 @@ class AdministrationRecorder
             return null;
         }
 
-        // A second offer can end two ways: they take it, or they say no again.
-        // Both are answers to the SAME planned dose and both belong on the
-        // chain. Anything else — the medicine running out, the person leaving,
-        // the round being missed — is a fact about the original obligation, not
-        // an answer to an offer, so it cannot be filed as one.
         if (! in_array($outcome, self::REOFFER_OUTCOMES, true)) {
             throw new RuntimeException(
                 'A re-offer records whether they took it or refused it again. Nothing else.'
             );
         }
 
-        // Every filter is in the query, so a refusal belonging to another
-        // person, house, prescription or dose is not found rather than merely
-        // rejected. The database trigger asserts the same thing again for
-        // anything that bypasses this class entirely.
         $target = Administration::where('service_id', $round->service_id)
             ->where('client_id', $client->id)
             ->where('scheduled_dose_id', $dose->id)
@@ -870,22 +722,6 @@ class AdministrationRecorder
         return $target;
     }
 
-    /**
-     * Record that somebody went and looked.
-     *
-     * The ONLY thing that answers a "could not be found" concern. Everything
-     * about it is resolved from the authenticated session and the concern
-     * itself — the actor, the house, the organisation, the person — so a
-     * posted id cannot attach evidence to somebody else's concern, and the
-     * database asserts the same thing again underneath.
-     *
-     * Deliberately NOT a safeguarding classification. Recording that you found
-     * somebody says exactly that and nothing more; whether it becomes a
-     * safeguarding matter is a judgement for a manager and the provider's own
-     * policy, not something a medicines round decides on their behalf.
-     *
-     * @return array{check:WelfareCheck, created:bool}
-     */
     public function recordWelfareCheck(
         User $user,
         int $serviceId,
@@ -919,8 +755,6 @@ class AdministrationRecorder
                 'occurred_at' => now(),
             ]);
         } catch (UniqueConstraintViolationException $clash) {
-            // Somebody else already answered it. That is a safe outcome, not an
-            // error — hand back what they recorded.
             $existing = WelfareCheck::where('administration_id', $report->id)->first();
 
             if (! $existing) {
@@ -953,30 +787,40 @@ class AdministrationRecorder
     /**
      * The unanswered "could not be found" concern for this person, if there is
      * one — so a screen can offer to answer it and nothing else can.
+     *
+     * The historical report may remain forever, but the action is only live
+     * while its effective meaning is still "could not be found", no structured
+     * welfare check has answered it, and the person's current status has not
+     * otherwise established known whereabouts.
      */
     public function openWelfareConcernFor(int $serviceId, int $clientId): ?Administration
     {
+        $client = Client::where('service_id', $serviceId)->find($clientId);
+
+        if ($client === null || $client->status !== 'active') {
+            return null;
+        }
+
         return Administration::where('service_id', $serviceId)
             ->where('client_id', $clientId)
             ->where('outcome', 'person_unavailable')
             ->where('reason_code', 'not_found_in_service')
+            ->whereNull('corrects_administration_id')
             ->whereNotExists(fn ($q) => $q->selectRaw('1')
                 ->from('record7_welfare_checks')
                 ->whereColumn('record7_welfare_checks.administration_id', 'record7_administrations.id'))
             ->orderByDesc('id')
-            ->first();
+            ->get()
+            ->first(function (Administration $report) use ($serviceId) {
+                $effective = Administration::where('service_id', $serviceId)
+                    ->where('corrects_administration_id', $report->id)
+                    ->first() ?? $report;
+
+                return $effective->outcome === 'person_unavailable'
+                    && $effective->reason_code === 'not_found_in_service';
+            });
     }
 
-    /**
-     * The refusal state on this dose that is still waiting for another offer.
-     *
-     * A raw refusal row is not enough once corrections exist. Start with the
-     * latest real clinical event in the dose chain, then apply that event's
-     * append-only correction. If what now stands is not a refusal, there is
-     * nothing to re-offer. If it is a refusal, only that effective event is the
-     * current target; an older refusal cannot become actionable again merely
-     * because its historical row remains permanent.
-     */
     public function openRefusalFor(ScheduledDose $dose): ?Administration
     {
         $refusal = $dose->effectiveAdministration();
