@@ -590,11 +590,24 @@ class StockLedger
             return null;
         }
 
-        $balance = $this->trackedFor($original->client_id, $medicine->id);
+        $balances = StockBalance::where('service_id', $original->service_id)
+            ->where('client_id', $original->client_id)
+            ->where('medicine_id', $medicine->id)
+            ->get();
 
-        if ($balance === null) {
+        if ($balances->isEmpty()) {
             return null;
         }
+
+        if ($balances->count() !== 1) {
+            $this->refuse(
+                'ambiguous_preparation',
+                'There is more than one preparation balance for this medicine and person, so '
+                .'Record7 cannot prove which one the historical dose came from.'
+            );
+        }
+
+        $balance = $balances->first();
 
         // EXACT MATCH OR NOTHING. Record7 does not convert between units, and
         // guessing what somebody meant is how a millilitre becomes a milligram.
