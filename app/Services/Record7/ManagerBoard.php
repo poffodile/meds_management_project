@@ -776,16 +776,28 @@ class ManagerBoard
 
             'notTaken' => Administration::with('client')
                 ->where('service_id', $serviceId)
-                ->whereIn('outcome', ['withheld', 'not_available', 'missed'])
+                ->whereNull('corrects_administration_id')
                 ->where('administered_at', '>=', $now->copy()->subHours(self::RECENT_HOURS))
                 ->get()
-                ->map(fn ($a) => [
-                    'id' => $a->id,
-                    'client' => $a->client->displayName(),
-                    'outcome' => $a->outcomeWord(),
-                    'at' => $a->administered_at->format('H:i'),
-                    'note' => $a->notes,
-                ])->values()->all(),
+                ->map(function ($event) use ($serviceId) {
+                    $effective = Administration::where('service_id', $serviceId)
+                        ->where('corrects_administration_id', $event->id)
+                        ->first() ?? $event;
+
+                    if (! in_array($effective->outcome, ['withheld', 'not_available', 'missed'], true)) {
+                        return null;
+                    }
+
+                    return [
+                        'id' => $event->id,
+                        'client' => $event->client->displayName(),
+                        'outcome' => $effective->outcomeWord(),
+                        'at' => $event->administered_at->format('H:i'),
+                        'note' => $effective->notes ?? $event->notes,
+                    ];
+                })
+                ->filter()
+                ->values()->all(),
 
             'incompleteRecords' => $this->incompleteRecords($serviceId, $now)->map(fn ($a) => [
                 'id' => $a->id,
